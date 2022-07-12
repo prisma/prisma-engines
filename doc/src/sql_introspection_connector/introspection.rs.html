@@ -177,6 +177,7 @@
 <span id="172">172</span>
 <span id="173">173</span>
 <span id="174">174</span>
+<span id="175">175</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">calculate_datamodel::CalculateDatamodelContext</span> <span class="kw">as</span> <span class="ident">Context</span>,
     <span class="ident">introspection_helpers</span>::{
@@ -254,20 +255,21 @@
         }
 
         <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">table</span>.<span class="ident">indexes</span>() {
-            <span class="ident">model</span>.<span class="ident">add_index</span>(<span class="ident">calculate_index</span>(<span class="ident">index</span>, <span class="ident">ctx</span>));
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">index</span>) <span class="op">=</span> <span class="ident">calculate_index</span>(<span class="ident">index</span>, <span class="ident">ctx</span>) {
+                <span class="ident">model</span>.<span class="ident">add_index</span>(<span class="ident">index</span>);
+            }
         }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="op">=</span> <span class="ident">table</span>.<span class="ident">primary_key</span>() {
-            <span class="kw">let</span> <span class="ident">clustered</span> <span class="op">=</span> <span class="ident">primary_key_is_clustered</span>(<span class="ident">table</span>.<span class="ident">id</span>, <span class="ident">ctx</span>);
+            <span class="kw">let</span> <span class="ident">clustered</span> <span class="op">=</span> <span class="ident">primary_key_is_clustered</span>(<span class="ident">pk</span>.<span class="ident">id</span>, <span class="ident">ctx</span>);
 
             <span class="ident">model</span>.<span class="ident">primary_key</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">PrimaryKeyDefinition</span> {
                 <span class="ident">name</span>: <span class="prelude-val">None</span>,
-                <span class="ident">db_name</span>: <span class="ident">pk</span>.<span class="ident">constraint_name</span>.<span class="ident">clone</span>(),
+                <span class="ident">db_name</span>: <span class="prelude-val">Some</span>(<span class="ident">pk</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>()),
                 <span class="ident">fields</span>: <span class="ident">pk</span>
-                    .<span class="ident">columns</span>
-                    .<span class="ident">iter</span>()
+                    .<span class="ident">columns</span>()
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> {
-                        <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">sort_order</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">sort</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">sort</span> {
+                        <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">sort_order</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">sort</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">sort</span> {
                             <span class="ident">SQLSortOrder::Asc</span> =&gt; <span class="ident">SortOrder::Asc</span>,
                             <span class="ident">SQLSortOrder::Desc</span> =&gt; <span class="ident">SortOrder::Desc</span>,
                         });
@@ -275,11 +277,11 @@
                         <span class="ident">PrimaryKeyField</span> {
                             <span class="ident">name</span>: <span class="ident">c</span>.<span class="ident">name</span>().<span class="ident">to_string</span>(),
                             <span class="ident">sort_order</span>,
-                            <span class="ident">length</span>: <span class="ident">c</span>.<span class="ident">length</span>,
+                            <span class="ident">length</span>: <span class="ident">c</span>.<span class="ident">length</span>(),
                         }
                     })
                     .<span class="ident">collect</span>(),
-                <span class="ident">defined_on_field</span>: <span class="ident">pk</span>.<span class="ident">columns</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span>,
+                <span class="ident">defined_on_field</span>: <span class="ident">pk</span>.<span class="ident">columns</span>().<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span>,
                 <span class="ident">clustered</span>,
             });
         }

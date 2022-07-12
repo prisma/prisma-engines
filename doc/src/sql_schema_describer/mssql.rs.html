@@ -775,66 +775,12 @@
 <span id="770">770</span>
 <span id="771">771</span>
 <span id="772">772</span>
-<span id="773">773</span>
-<span id="774">774</span>
-<span id="775">775</span>
-<span id="776">776</span>
-<span id="777">777</span>
-<span id="778">778</span>
-<span id="779">779</span>
-<span id="780">780</span>
-<span id="781">781</span>
-<span id="782">782</span>
-<span id="783">783</span>
-<span id="784">784</span>
-<span id="785">785</span>
-<span id="786">786</span>
-<span id="787">787</span>
-<span id="788">788</span>
-<span id="789">789</span>
-<span id="790">790</span>
-<span id="791">791</span>
-<span id="792">792</span>
-<span id="793">793</span>
-<span id="794">794</span>
-<span id="795">795</span>
-<span id="796">796</span>
-<span id="797">797</span>
-<span id="798">798</span>
-<span id="799">799</span>
-<span id="800">800</span>
-<span id="801">801</span>
-<span id="802">802</span>
-<span id="803">803</span>
-<span id="804">804</span>
-<span id="805">805</span>
-<span id="806">806</span>
-<span id="807">807</span>
-<span id="808">808</span>
-<span id="809">809</span>
-<span id="810">810</span>
-<span id="811">811</span>
-<span id="812">812</span>
-<span id="813">813</span>
-<span id="814">814</span>
-<span id="815">815</span>
-<span id="816">816</span>
-<span id="817">817</span>
-<span id="818">818</span>
-<span id="819">819</span>
-<span id="820">820</span>
-<span id="821">821</span>
-<span id="822">822</span>
-<span id="823">823</span>
-<span id="824">824</span>
-<span id="825">825</span>
-<span id="826">826</span>
-<span id="827">827</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">getters::Getter</span>, <span class="ident">ids</span>::<span class="kw-2">*</span>, <span class="ident">parsers::Parser</span>, <span class="ident">Column</span>, <span class="ident">ColumnArity</span>, <span class="ident">ColumnType</span>, <span class="ident">ColumnTypeFamily</span>, <span class="ident">DefaultValue</span>,
-    <span class="ident">DescriberError</span>, <span class="ident">DescriberErrorKind</span>, <span class="ident">DescriberResult</span>, <span class="ident">ForeignKeyAction</span>, <span class="ident">Index</span>, <span class="ident">IndexColumn</span>, <span class="ident">IndexType</span>, <span class="ident">PrimaryKey</span>,
-    <span class="ident">PrimaryKeyColumn</span>, <span class="ident">Procedure</span>, <span class="ident">SQLSortOrder</span>, <span class="ident">SqlMetadata</span>, <span class="ident">SqlSchema</span>, <span class="ident">UserDefinedType</span>, <span class="ident">View</span>,
+    <span class="ident">DescriberError</span>, <span class="ident">DescriberErrorKind</span>, <span class="ident">DescriberResult</span>, <span class="ident">ForeignKeyAction</span>, <span class="ident">IndexColumn</span>, <span class="ident">Procedure</span>, <span class="ident">SQLSortOrder</span>,
+    <span class="ident">SqlMetadata</span>, <span class="ident">SqlSchema</span>, <span class="ident">UserDefinedType</span>, <span class="ident">View</span>,
 };
+<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">indexmap::IndexMap</span>;
 <span class="kw">use</span> <span class="ident">indoc::indoc</span>;
 <span class="kw">use</span> <span class="ident">native_types</span>::{<span class="ident">MsSqlType</span>, <span class="ident">MsSqlTypeParameter</span>, <span class="ident">NativeType</span>};
@@ -842,8 +788,7 @@
 <span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
 <span class="kw">use</span> <span class="ident">quaint::prelude::Queryable</span>;
 <span class="kw">use</span> <span class="ident">regex::Regex</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">any::type_name</span>, <span class="ident">borrow::Cow</span>, <span class="ident">convert::TryInto</span>};
-<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">trace</span>};
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">any::type_name</span>, <span class="ident">borrow::Cow</span>, <span class="ident">collections::HashMap</span>, <span class="ident">convert::TryInto</span>};
 
 <span class="doccomment">/// Matches a default value in the schema, that is not a string.</span>
 <span class="doccomment">///</span>
@@ -895,34 +840,30 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MssqlSchemaExt</span> {
-    <span class="kw">pub</span> <span class="ident">clustered_indexes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IndexId</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">constraints</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IndexId</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">nonclustered_primary_keys</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TableId</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">index_bits</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">IndexId</span>, <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">IndexBits</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">const</span> <span class="ident">DEFAULT_REF</span>: <span class="kw-2">&amp;</span><span class="ident">MssqlSchemaExt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">MssqlSchemaExt</span> {
-    <span class="ident">clustered_indexes</span>: <span class="ident">Vec::new</span>(),
-    <span class="ident">constraints</span>: <span class="ident">Vec::new</span>(),
-    <span class="ident">nonclustered_primary_keys</span>: <span class="ident">Vec::new</span>(),
-};
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">MssqlSchemaExt</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">DEFAULT_REF</span>
-    }
+<span class="attribute">#[<span class="ident">enumflags2::bitflags</span>]</span>
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IndexBits</span> {
+    <span class="ident">Clustered</span> <span class="op">=</span> <span class="number">0b1</span>,
+    <span class="ident">Constraint</span> <span class="op">=</span> <span class="number">0b10</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">MssqlSchemaExt</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pk_is_clustered</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table_id</span>: <span class="ident">TableId</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">nonclustered_primary_keys</span>.<span class="ident">binary_search</span>(<span class="kw-2">&amp;</span><span class="ident">table_id</span>).<span class="ident">is_err</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index_is_clustered</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">IndexId</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">index_bits</span>
+            .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>)
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">contains</span>(<span class="ident">IndexBits::Clustered</span>))
+            .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index_is_clustered</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index_id</span>: <span class="ident">IndexId</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">clustered_indexes</span>.<span class="ident">binary_search</span>(<span class="kw-2">&amp;</span><span class="ident">index_id</span>).<span class="ident">is_ok</span>()
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index_is_a_constraint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index_id</span>: <span class="ident">IndexId</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">constraints</span>.<span class="ident">binary_search</span>(<span class="kw-2">&amp;</span><span class="ident">index_id</span>).<span class="ident">is_ok</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index_is_a_constraint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">IndexId</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">index_bits</span>
+            .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>)
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">contains</span>(<span class="ident">IndexBits::Constraint</span>))
+            .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
     }
 }
 
@@ -960,10 +901,6 @@
             .<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">get_foreign_keys</span>(<span class="ident">schema</span>, <span class="kw-2">&amp;</span><span class="ident">table_names</span>, <span class="kw-2">&amp;mut</span> <span class="ident">sql_schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="comment">// Sort the vectors we will use for binary search.</span>
-        <span class="ident">mssql_ext</span>.<span class="ident">clustered_indexes</span>.<span class="ident">sort</span>();
-        <span class="ident">mssql_ext</span>.<span class="ident">nonclustered_primary_keys</span>.<span class="ident">sort</span>();
-
         <span class="ident">sql_schema</span>.<span class="ident">views</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_views</span>(<span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="ident">sql_schema</span>.<span class="ident">procedures</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_procedures</span>(<span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="ident">sql_schema</span>.<span class="ident">user_defined_types</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_user_defined_types</span>(<span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -989,12 +926,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_databases</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="string">&quot;SELECT name FROM sys.schemas&quot;</span>;
         <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">query_raw</span>(<span class="ident">sql</span>, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="kw">let</span> <span class="ident">names</span> <span class="op">=</span> <span class="ident">rows</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">row</span><span class="op">|</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;name&quot;</span>)).<span class="ident">collect</span>();
-
-        <span class="macro">trace!</span>(<span class="string">&quot;Found schema names: {:?}&quot;</span>, <span class="ident">names</span>);
-
-        <span class="prelude-val">Ok</span>(<span class="ident">names</span>)
+        <span class="prelude-val">Ok</span>(<span class="ident">rows</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">row</span><span class="op">|</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;name&quot;</span>)).<span class="ident">collect</span>())
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_procedures</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Procedure</span><span class="op">&gt;</span><span class="op">&gt;</span> {
@@ -1003,7 +935,8 @@
             FROM sys.objects
             WHERE SCHEMA_NAME(schema_id) = @P1
                 AND is_ms_shipped = 0
-                AND type = &#39;P&#39;;
+                AND type = &#39;P&#39;
+            ORDER BY name;
         &quot;#</span>;
 
         <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">query_raw</span>(<span class="ident">sql</span>, <span class="kw-2">&amp;</span>[<span class="ident">schema</span>.<span class="ident">into</span>()]).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -1025,12 +958,12 @@
         <span class="ident">sql_schema</span>: <span class="kw-2">&amp;mut</span> <span class="ident">SqlSchema</span>,
     ) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">TableId</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">select</span> <span class="op">=</span> <span class="string">r#&quot;
-            SELECT t.name AS table_name
-            FROM sys.tables t
-            WHERE SCHEMA_NAME(t.schema_id) = @P1
-            AND t.is_ms_shipped = 0
-            AND t.type = &#39;U&#39;
-            ORDER BY t.name asc;
+            SELECT tbl.name AS table_name
+            FROM sys.tables tbl
+            WHERE SCHEMA_NAME(tbl.schema_id) = @P1
+            AND tbl.is_ms_shipped = 0
+            AND tbl.type = &#39;U&#39;
+            ORDER BY tbl.name;
         &quot;#</span>;
 
         <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">query_raw</span>(<span class="ident">select</span>, <span class="kw-2">&amp;</span>[<span class="ident">schema</span>.<span class="ident">into</span>()]).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -1042,8 +975,6 @@
             <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">sql_schema</span>.<span class="ident">push_table</span>(<span class="ident">name</span>);
             <span class="ident">map</span>.<span class="ident">insert</span>(<span class="ident">cloned_name</span>, <span class="ident">id</span>);
         }
-
-        <span class="macro">trace!</span>(<span class="string">&quot;Found table names: {:?}&quot;</span>, <span class="ident">map</span>);
 
         <span class="prelude-val">Ok</span>(<span class="ident">map</span>)
     }
@@ -1106,15 +1037,13 @@
                     INNER JOIN sys.types typ ON c.user_type_id = typ.user_type_id
             WHERE OBJECT_SCHEMA_NAME(c.object_id) = @P1
             AND t.is_ms_shipped = 0
-            ORDER BY COLUMNPROPERTY(c.object_id, c.name, &#39;ordinal&#39;);
+            ORDER BY table_name, COLUMNPROPERTY(c.object_id, c.name, &#39;ordinal&#39;);
         &quot;#</span>};
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">query_raw</span>(<span class="ident">sql</span>, <span class="kw-2">&amp;</span>[<span class="ident">schema</span>.<span class="ident">into</span>()]).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">for</span> <span class="ident">col</span> <span class="kw">in</span> <span class="ident">rows</span> {
-            <span class="macro">debug!</span>(<span class="string">&quot;Got column: {:?}&quot;</span>, <span class="ident">col</span>);
-
             <span class="kw">let</span> <span class="ident">table_name</span> <span class="op">=</span> <span class="ident">col</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;table_name&quot;</span>);
             <span class="kw">let</span> <span class="ident">table_id</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">table_id</span>) <span class="op">=</span> <span class="ident">table_ids</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">table_name</span>) {
                 <span class="kw-2">*</span><span class="ident">table_id</span>
@@ -1217,8 +1146,6 @@
             ));
         }
 
-        <span class="ident">columns</span>.<span class="ident">sort_by_key</span>(<span class="op">|</span>(<span class="ident">table_id</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">table_id</span>);
-
         <span class="prelude-val">Ok</span>(<span class="ident">columns</span>)
     }
 
@@ -1258,17 +1185,15 @@
                     &#39;CLUSTERED COLUMNSTORE&#39;,
                     &#39;NONCLUSTERED COLUMNSTORE&#39;
                 )
-            ORDER BY index_name, seq_in_index
+            ORDER BY table_name, index_name, seq_in_index
         &quot;#</span>};
 
         <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">query_raw</span>(<span class="ident">sql</span>, <span class="kw-2">&amp;</span>[<span class="ident">schema</span>.<span class="ident">into</span>()]).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">current_index</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IndexId</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
         <span class="kw">for</span> <span class="ident">row</span> <span class="kw">in</span> <span class="ident">rows</span> {
-            <span class="macro">trace!</span>(<span class="string">&quot;Got index row: {:#?}&quot;</span>, <span class="ident">row</span>);
-
             <span class="kw">let</span> <span class="ident">table_name</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;table_name&quot;</span>);
             <span class="kw">let</span> <span class="ident">table_id</span> <span class="op">=</span> <span class="ident">table_ids</span>[<span class="ident">table_name</span>.<span class="ident">as_str</span>()];
-            <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">sql_schema</span>[<span class="ident">table_id</span>];
             <span class="kw">let</span> <span class="ident">index_name</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;index_name&quot;</span>);
 
             <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">get_expect_bool</span>(<span class="string">&quot;is_descending&quot;</span>) {
@@ -1279,79 +1204,46 @@
             <span class="kw">let</span> <span class="ident">clustered</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;clustering&quot;</span>).<span class="ident">starts_with</span>(<span class="string">&quot;CLUSTERED&quot;</span>);
 
             <span class="kw">let</span> <span class="ident">column_name</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get</span>(<span class="string">&quot;column_name&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">to_string</span>()).<span class="ident">unwrap</span>();
+            <span class="kw">let</span> <span class="ident">column_id</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">col</span>) <span class="op">=</span> <span class="ident">sql_schema</span>.<span class="ident">walk</span>(<span class="ident">table_id</span>).<span class="ident">column</span>(<span class="kw-2">&amp;</span><span class="ident">column_name</span>) {
+                <span class="ident">col</span>.<span class="ident">id</span>
+            } <span class="kw">else</span> {
+                <span class="kw">continue</span>;
+            };
             <span class="comment">// Multi-column indices will return more than one row (with different column_name values).</span>
             <span class="comment">// We cannot assume that one row corresponds to one index.</span>
             <span class="kw">let</span> <span class="ident">seq_in_index</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_i64</span>(<span class="string">&quot;seq_in_index&quot;</span>);
-            <span class="kw">let</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">seq_in_index</span> <span class="op">-</span> <span class="number">1</span>;
             <span class="kw">let</span> <span class="ident">is_unique</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_bool</span>(<span class="string">&quot;is_unique&quot;</span>);
             <span class="kw">let</span> <span class="ident">is_unique_constraint</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_bool</span>(<span class="string">&quot;is_unique_constraint&quot;</span>);
-
             <span class="kw">let</span> <span class="ident">is_pk</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_bool</span>(<span class="string">&quot;is_primary_key&quot;</span>);
 
-            <span class="kw">if</span> <span class="ident">is_pk</span> {
-                <span class="macro">debug!</span>(<span class="string">&quot;Column &#39;{}&#39; is part of the primary key&quot;</span>, <span class="ident">column_name</span>);
-
-                <span class="kw">match</span> <span class="kw-2">&amp;mut</span> <span class="ident">table</span>.<span class="ident">primary_key</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">pk</span>) =&gt; {
-                        <span class="kw">if</span> <span class="ident">pk</span>.<span class="ident">columns</span>.<span class="ident">len</span>() <span class="op">&lt;</span> (<span class="ident">pos</span> <span class="op">+</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">usize</span> {
-                            <span class="ident">pk</span>.<span class="ident">columns</span>.<span class="ident">resize</span>((<span class="ident">pos</span> <span class="op">+</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">PrimaryKeyColumn::default</span>());
-                        }
-
-                        <span class="ident">pk</span>.<span class="ident">columns</span>[<span class="ident">pos</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">=</span> <span class="ident">PrimaryKeyColumn::new</span>(<span class="ident">column_name</span>);
-                        <span class="ident">pk</span>.<span class="ident">columns</span>[<span class="ident">pos</span> <span class="kw">as</span> <span class="ident">usize</span>].<span class="ident">set_sort_order</span>(<span class="ident">sort_order</span>);
-
-                        <span class="macro">debug!</span>(
-                            <span class="string">&quot;The primary key has already been created, added column to it: {:?}&quot;</span>,
-                            <span class="ident">pk</span>.<span class="ident">columns</span>
-                        );
-                    }
-                    <span class="prelude-val">None</span> =&gt; {
-                        <span class="macro">debug!</span>(<span class="string">&quot;Instantiating primary key&quot;</span>);
-
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">column</span> <span class="op">=</span> <span class="ident">PrimaryKeyColumn::new</span>(<span class="ident">column_name</span>);
-                        <span class="ident">column</span>.<span class="ident">set_sort_order</span>(<span class="ident">sort_order</span>);
-
-                        <span class="kw">if</span> <span class="op">!</span><span class="ident">clustered</span> {
-                            <span class="ident">mssql_ext</span>.<span class="ident">nonclustered_primary_keys</span>.<span class="ident">push</span>(<span class="ident">table_id</span>);
-                        }
-
-                        <span class="ident">table</span>.<span class="ident">primary_key</span>.<span class="ident">replace</span>(<span class="ident">PrimaryKey</span> {
-                            <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="ident">column</span>],
-                            <span class="ident">constraint_name</span>: <span class="prelude-val">Some</span>(<span class="ident">index_name</span>),
-                        });
-                    }
+            <span class="kw">if</span> <span class="ident">seq_in_index</span> <span class="op">==</span> <span class="number">1</span> {
+                <span class="comment">// new index!</span>
+                <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">is_pk</span> {
+                    <span class="ident">sql_schema</span>.<span class="ident">push_primary_key</span>(<span class="ident">table_id</span>, <span class="ident">index_name</span>)
+                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">is_unique</span> {
+                    <span class="ident">sql_schema</span>.<span class="ident">push_unique_constraint</span>(<span class="ident">table_id</span>, <span class="ident">index_name</span>)
+                } <span class="kw">else</span> {
+                    <span class="ident">sql_schema</span>.<span class="ident">push_index</span>(<span class="ident">table_id</span>, <span class="ident">index_name</span>)
                 };
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">table</span>.<span class="ident">indices</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> <span class="ident">index</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">index_name</span>) {
-                <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">indices</span>.<span class="ident">iter_mut</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">idx</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">index_name</span>).<span class="ident">unwrap</span>();
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">column</span> <span class="op">=</span> <span class="ident">IndexColumn::new</span>(<span class="ident">column_name</span>);
-                <span class="ident">column</span>.<span class="ident">set_sort_order</span>(<span class="ident">sort_order</span>);
 
-                <span class="ident">index</span>.<span class="ident">columns</span>.<span class="ident">push</span>(<span class="ident">column</span>);
-            } <span class="kw">else</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">column</span> <span class="op">=</span> <span class="ident">IndexColumn::new</span>(<span class="ident">column_name</span>);
-                <span class="ident">column</span>.<span class="ident">set_sort_order</span>(<span class="ident">sort_order</span>);
-
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bits</span> <span class="op">=</span> <span class="ident">BitFlags::empty</span>();
                 <span class="kw">if</span> <span class="ident">clustered</span> {
-                    <span class="ident">mssql_ext</span>
-                        .<span class="ident">clustered_indexes</span>
-                        .<span class="ident">push</span>(<span class="ident">IndexId</span>(<span class="ident">table_id</span>, <span class="ident">table</span>.<span class="ident">indices</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>));
+                    <span class="ident">bits</span> <span class="op">|</span><span class="op">=</span> <span class="ident">IndexBits::Clustered</span>;
                 }
-
                 <span class="kw">if</span> <span class="ident">is_unique_constraint</span> {
-                    <span class="ident">mssql_ext</span>
-                        .<span class="ident">constraints</span>
-                        .<span class="ident">push</span>(<span class="ident">IndexId</span>(<span class="ident">table_id</span>, <span class="ident">table</span>.<span class="ident">indices</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>));
+                    <span class="ident">bits</span> <span class="op">|</span><span class="op">=</span> <span class="ident">IndexBits::Constraint</span>;
                 }
+                <span class="ident">mssql_ext</span>.<span class="ident">index_bits</span>.<span class="ident">insert</span>(<span class="ident">id</span>, <span class="ident">bits</span>);
 
-                <span class="ident">table</span>.<span class="ident">indices</span>.<span class="ident">push</span>(<span class="ident">Index</span> {
-                    <span class="ident">name</span>: <span class="ident">index_name</span>,
-                    <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="ident">column</span>],
-                    <span class="ident">tpe</span>: <span class="kw">match</span> <span class="ident">is_unique</span> {
-                        <span class="bool-val">true</span> =&gt; <span class="ident">IndexType::Unique</span>,
-                        <span class="bool-val">false</span> =&gt; <span class="ident">IndexType::Normal</span>,
-                    },
-                });
-            }
+                <span class="ident">current_index</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>);
+            };
+
+            <span class="ident">sql_schema</span>.<span class="ident">push_index_column</span>(<span class="ident">IndexColumn</span> {
+                <span class="ident">index_id</span>: <span class="ident">current_index</span>.<span class="ident">unwrap</span>(),
+                <span class="ident">column_id</span>,
+                <span class="ident">sort_order</span>: <span class="prelude-val">Some</span>(<span class="ident">sort_order</span>),
+                <span class="ident">length</span>: <span class="prelude-val">None</span>,
+            });
         }
 
         <span class="prelude-val">Ok</span>(())
@@ -1494,8 +1386,6 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">current_fk</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">ForeignKeyId</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
         <span class="kw">for</span> <span class="ident">row</span> <span class="kw">in</span> <span class="ident">result_set</span>.<span class="ident">into_iter</span>() {
-            <span class="macro">trace!</span>(<span class="string">&quot;Got description FK row {:#?}&quot;</span>, <span class="ident">row</span>);
-
             <span class="kw">let</span> <span class="ident">table_name</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;table_name&quot;</span>);
             <span class="kw">let</span> <span class="ident">constraint_name</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;constraint_name&quot;</span>);
             <span class="kw">let</span> <span class="ident">column</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;column_name&quot;</span>);

@@ -686,11 +686,13 @@
 <span id="681">681</span>
 <span id="682">682</span>
 <span id="683">683</span>
+<span id="684">684</span>
+<span id="685">685</span>
+<span id="686">686</span>
+<span id="687">687</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">shadow_db</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">sql_renderer::IteratorJoin</span>, <span class="ident">SqlFlavour</span>};
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_imports</span>)]</span> <span class="comment">// wtf, this one is unused on CI, not locally</span>
-<span class="kw">use</span> <span class="ident">datamodel::common::preview_features::PreviewFeature</span>;
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">indoc::indoc</span>;
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{
@@ -1034,6 +1036,12 @@ SET enable_experimental_alter_column_type_general = true;
 
     <span class="kw">fn</span> <span class="ident">drop_migrations_table</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">Box::pin</span>(<span class="self">self</span>.<span class="ident">raw_cmd</span>(<span class="string">&quot;DROP TABLE _prisma_migrations&quot;</span>))
+    }
+
+    <span class="kw">fn</span> <span class="ident">empty_database_schema</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SqlSchema</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">SqlSchema::default</span>();
+        <span class="ident">schema</span>.<span class="ident">set_connector_data</span>(<span class="ident">Box::new</span>(<span class="ident">sql_schema_describer::postgres::PostgresSchemaExt::default</span>()));
+        <span class="ident">schema</span>
     }
 
     <span class="kw">fn</span> <span class="ident">ensure_connection_validity</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {

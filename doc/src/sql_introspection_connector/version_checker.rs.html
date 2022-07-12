@@ -236,7 +236,7 @@
 <span class="kw">use</span> <span class="ident">sql_schema_describer::ForeignKeyWalker</span>;
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
     <span class="ident">walkers</span>::{<span class="ident">ColumnWalker</span>, <span class="ident">TableWalker</span>},
-    <span class="ident">ForeignKeyAction</span>, <span class="ident">PrimaryKey</span>, <span class="ident">SqlSchema</span>,
+    <span class="ident">ForeignKeyAction</span>, <span class="ident">SqlSchema</span>,
 };
 <span class="kw">use</span> <span class="ident">tracing::debug</span>;
 
@@ -256,7 +256,7 @@
     <span class="ident">has_inline_relations</span>: <span class="ident">bool</span>,
 }
 
-<span class="kw">const</span> <span class="ident">SQLITE_TYPES</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="string">&quot;BOOLEAN&quot;</span>, <span class="string">&quot;DATE&quot;</span>, <span class="string">&quot;REAL&quot;</span>, <span class="string">&quot;INTEGER&quot;</span>, <span class="string">&quot;TEXT&quot;</span>];
+<span class="kw">const</span> <span class="ident">SQLITE_TYPES</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="string">&quot;boolean&quot;</span>, <span class="string">&quot;date&quot;</span>, <span class="string">&quot;real&quot;</span>, <span class="string">&quot;integer&quot;</span>, <span class="string">&quot;text&quot;</span>];
 
 <span class="kw">const</span> <span class="ident">POSTGRES_TYPES</span>: <span class="kw-2">&amp;</span>[<span class="ident">PostgresType</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
     <span class="ident">PostgresType::Boolean</span>,
@@ -281,7 +281,7 @@
 ];
 
 <span class="kw">impl</span> <span class="ident">VersionChecker</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">SqlSchema</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">IntrospectionContext</span>) -&gt; <span class="ident">VersionChecker</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">SqlSchema</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">IntrospectionContext</span>) -&gt; <span class="ident">VersionChecker</span> {
         <span class="ident">VersionChecker</span> {
             <span class="ident">sql_family</span>: <span class="ident">ctx</span>.<span class="ident">sql_family</span>(),
             <span class="ident">is_cockroachdb</span>: <span class="ident">ctx</span>.<span class="ident">source</span>.<span class="ident">active_provider</span> <span class="op">==</span> <span class="string">&quot;cockroachdb&quot;</span>,
@@ -298,7 +298,7 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_column_for_type_and_default_value</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">column</span>: <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">check_column_for_type_and_default_value</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">column</span>: <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">sql_family</span> {
             <span class="ident">SqlFamily::Postgres</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_cockroachdb</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">uses_non_prisma_types</span> <span class="op">=</span> <span class="bool-val">true</span>; <span class="comment">// we can be sure it&#39;s not prisma 1</span>
@@ -362,10 +362,10 @@
         }
 
         <span class="kw">if</span> <span class="op">!</span><span class="ident">is_prisma_1_or_11_list_table</span>(<span class="ident">table</span>) <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">is_relay_table</span>(<span class="ident">table</span>) {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">PrimaryKey</span> { <span class="ident">columns</span>, .. }) <span class="op">=</span> <span class="ident">table</span>.<span class="ident">primary_key</span>() {
-                <span class="kw">if</span> <span class="ident">columns</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
-                    <span class="kw">let</span> <span class="ident">col</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">column</span>(<span class="ident">columns</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>().<span class="ident">name</span>()).<span class="ident">unwrap</span>();
-                    <span class="kw">let</span> <span class="ident">tpe</span> <span class="op">=</span> <span class="ident">col</span>.<span class="ident">column_type</span>();
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="op">=</span> <span class="ident">table</span>.<span class="ident">primary_key</span>() {
+                <span class="kw">if</span> <span class="ident">pk</span>.<span class="ident">columns</span>().<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
+                    <span class="kw">let</span> <span class="ident">col</span> <span class="op">=</span> <span class="ident">pk</span>.<span class="ident">columns</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>();
+                    <span class="kw">let</span> <span class="ident">tpe</span> <span class="op">=</span> <span class="ident">col</span>.<span class="ident">as_column</span>().<span class="ident">column_type</span>();
 
                     <span class="kw">if</span> <span class="self">self</span>.<span class="ident">sql_family</span> <span class="op">==</span> <span class="ident">SqlFamily::Postgres</span> {
                         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">native_type</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">tpe</span>.<span class="ident">native_type</span> {

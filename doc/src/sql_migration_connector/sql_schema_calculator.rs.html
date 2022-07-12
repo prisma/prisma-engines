@@ -527,6 +527,56 @@
 <span id="522">522</span>
 <span id="523">523</span>
 <span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">sql_schema_calculator_flavour</span>;
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">use</span> <span class="ident">sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour</span>;
@@ -535,7 +585,11 @@
 <span class="kw">use</span> <span class="ident">datamodel</span>::{
     <span class="ident">datamodel_connector</span>::{<span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ScalarType</span>},
     <span class="ident">dml</span>::{<span class="ident">prisma_value</span>, <span class="ident">PrismaValue</span>},
-    <span class="ident">parser_database</span>::{<span class="ident">ast</span>, <span class="ident">walkers::ScalarFieldWalker</span>, <span class="ident">IndexType</span>, <span class="ident">ScalarFieldType</span>, <span class="ident">SortOrder</span>},
+    <span class="ident">parser_database</span>::{
+        <span class="ident">ast</span>,
+        <span class="ident">walkers</span>::{<span class="ident">ModelWalker</span>, <span class="ident">ScalarFieldWalker</span>},
+        <span class="ident">ScalarFieldType</span>, <span class="ident">SortOrder</span>,
+    },
     <span class="ident">ValidatedSchema</span>,
 };
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span> <span class="kw">as</span> <span class="ident">sql</span>;
@@ -570,56 +624,69 @@
     <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="ident">ctx</span>.<span class="ident">datamodel</span>.<span class="ident">db</span>.<span class="ident">walk_models</span>() {
         <span class="kw">let</span> <span class="ident">table_id</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">describer_schema</span>.<span class="ident">push_table</span>(<span class="ident">model</span>.<span class="ident">database_name</span>().<span class="ident">to_owned</span>());
         <span class="ident">ctx</span>.<span class="ident">model_id_to_table_id</span>.<span class="ident">insert</span>(<span class="ident">model</span>.<span class="ident">model_id</span>(), <span class="ident">table_id</span>);
-        <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">describer_schema</span>[<span class="ident">table_id</span>];
-
-        <span class="ident">table</span>.<span class="ident">primary_key</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_key</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">sql::PrimaryKey</span> {
-            <span class="ident">columns</span>: <span class="ident">pk</span>
-                .<span class="ident">scalar_field_attributes</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">sql::PrimaryKeyColumn</span> {
-                    <span class="ident">name</span>: <span class="ident">field</span>.<span class="ident">as_index_field</span>().<span class="ident">database_name</span>().<span class="ident">to_owned</span>(),
-                    <span class="ident">length</span>: <span class="ident">field</span>.<span class="ident">length</span>(),
-                    <span class="ident">sort_order</span>: <span class="ident">field</span>.<span class="ident">sort_order</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">so</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">so</span> {
-                        <span class="ident">SortOrder::Asc</span> =&gt; <span class="ident">sql::SQLSortOrder::Asc</span>,
-                        <span class="ident">SortOrder::Desc</span> =&gt; <span class="ident">sql::SQLSortOrder::Desc</span>,
-                    }),
-                })
-                .<span class="ident">collect</span>(),
-            <span class="ident">constraint_name</span>: <span class="ident">pk</span>
-                .<span class="ident">constraint_name</span>(<span class="ident">ctx</span>.<span class="ident">flavour</span>.<span class="ident">datamodel_connector</span>())
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">into_owned</span>()),
-        });
-
-        <span class="ident">table</span>.<span class="ident">indices</span> <span class="op">=</span> <span class="ident">model</span>
-            .<span class="ident">indexes</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">index</span>
-                    .<span class="ident">scalar_field_attributes</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> <span class="ident">sql::IndexColumn</span> {
-                        <span class="ident">name</span>: <span class="ident">sf</span>.<span class="ident">as_index_field</span>().<span class="ident">database_name</span>().<span class="ident">to_owned</span>(),
-                        <span class="ident">sort_order</span>: <span class="ident">sf</span>.<span class="ident">sort_order</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">s</span> {
-                            <span class="ident">SortOrder::Asc</span> =&gt; <span class="ident">sql::SQLSortOrder::Asc</span>,
-                            <span class="ident">SortOrder::Desc</span> =&gt; <span class="ident">sql::SQLSortOrder::Desc</span>,
-                        }),
-                        <span class="ident">length</span>: <span class="ident">sf</span>.<span class="ident">length</span>(),
-                    })
-                    .<span class="ident">collect</span>();
-
-                <span class="kw">let</span> <span class="ident">index_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">index</span>.<span class="ident">index_type</span>() {
-                    <span class="ident">IndexType::Unique</span> =&gt; <span class="ident">sql::IndexType::Unique</span>,
-                    <span class="ident">IndexType::Normal</span> =&gt; <span class="ident">sql::IndexType::Normal</span>,
-                    <span class="ident">IndexType::Fulltext</span> =&gt; <span class="ident">sql::IndexType::Fulltext</span>,
-                };
-
-                <span class="ident">sql::Index</span> {
-                    <span class="ident">name</span>: <span class="ident">index</span>.<span class="ident">constraint_name</span>(<span class="ident">ctx</span>.<span class="ident">flavour</span>.<span class="ident">datamodel_connector</span>()).<span class="ident">into_owned</span>(),
-                    <span class="ident">columns</span>,
-                    <span class="ident">tpe</span>: <span class="ident">index_type</span>,
-                }
-            })
-            .<span class="ident">collect</span>();
 
         <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">scalar_fields</span>() {
             <span class="ident">push_column_for_scalar_field</span>(<span class="ident">field</span>, <span class="ident">table_id</span>, <span class="ident">ctx</span>);
+        }
+
+        <span class="ident">push_model_indexes</span>(<span class="ident">model</span>, <span class="ident">table_id</span>, <span class="ident">ctx</span>);
+    }
+}
+
+<span class="kw">fn</span> <span class="ident">push_model_indexes</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">table_id</span>: <span class="ident">sql::TableId</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_key</span>() {
+        <span class="kw">let</span> <span class="ident">constraint_name</span> <span class="op">=</span> <span class="ident">pk</span>
+            .<span class="ident">constraint_name</span>(<span class="ident">ctx</span>.<span class="ident">flavour</span>.<span class="ident">datamodel_connector</span>())
+            .<span class="ident">map</span>(<span class="ident">String::from</span>)
+            .<span class="ident">unwrap_or_else</span>(<span class="ident">String::new</span>);
+        <span class="kw">let</span> <span class="ident">pkid</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">describer_schema</span>.<span class="ident">push_primary_key</span>(<span class="ident">table_id</span>, <span class="ident">constraint_name</span>);
+        <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">pk</span>.<span class="ident">scalar_field_attributes</span>() {
+            <span class="kw">let</span> <span class="ident">column_id</span> <span class="op">=</span> <span class="ident">ctx</span>
+                .<span class="ident">walk</span>(<span class="ident">table_id</span>)
+                .<span class="ident">column</span>(<span class="ident">field</span>.<span class="ident">as_index_field</span>().<span class="ident">database_name</span>())
+                .<span class="ident">unwrap</span>()
+                .<span class="ident">id</span>;
+            <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">describer_schema</span>.<span class="ident">push_index_column</span>(<span class="ident">sql::IndexColumn</span> {
+                <span class="ident">index_id</span>: <span class="ident">pkid</span>,
+                <span class="ident">column_id</span>,
+                <span class="ident">sort_order</span>: <span class="ident">field</span>.<span class="ident">sort_order</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">so</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">so</span> {
+                    <span class="ident">SortOrder::Asc</span> =&gt; <span class="ident">sql::SQLSortOrder::Asc</span>,
+                    <span class="ident">SortOrder::Desc</span> =&gt; <span class="ident">sql::SQLSortOrder::Desc</span>,
+                }),
+                <span class="ident">length</span>: <span class="ident">field</span>.<span class="ident">length</span>(),
+            });
+        }
+    }
+
+    <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">indexes</span>() {
+        <span class="kw">let</span> <span class="ident">constraint_name</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">constraint_name</span>(<span class="ident">ctx</span>.<span class="ident">flavour</span>.<span class="ident">datamodel_connector</span>()).<span class="ident">into_owned</span>();
+        <span class="kw">let</span> <span class="ident">index_id</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">index</span>.<span class="ident">is_unique</span>() {
+            <span class="ident">ctx</span>.<span class="ident">schema</span>
+                .<span class="ident">describer_schema</span>
+                .<span class="ident">push_unique_constraint</span>(<span class="ident">table_id</span>, <span class="ident">constraint_name</span>)
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">index</span>.<span class="ident">is_fulltext</span>() {
+            <span class="ident">ctx</span>.<span class="ident">schema</span>
+                .<span class="ident">describer_schema</span>
+                .<span class="ident">push_fulltext_index</span>(<span class="ident">table_id</span>, <span class="ident">constraint_name</span>)
+        } <span class="kw">else</span> {
+            <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">describer_schema</span>.<span class="ident">push_index</span>(<span class="ident">table_id</span>, <span class="ident">constraint_name</span>)
+        };
+
+        <span class="kw">for</span> <span class="ident">sf</span> <span class="kw">in</span> <span class="ident">index</span>.<span class="ident">scalar_field_attributes</span>() {
+            <span class="kw">let</span> <span class="ident">column_id</span> <span class="op">=</span> <span class="ident">ctx</span>
+                .<span class="ident">walk</span>(<span class="ident">table_id</span>)
+                .<span class="ident">column</span>(<span class="ident">sf</span>.<span class="ident">as_index_field</span>().<span class="ident">database_name</span>())
+                .<span class="ident">unwrap</span>()
+                .<span class="ident">id</span>;
+            <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">describer_schema</span>.<span class="ident">push_index_column</span>(<span class="ident">sql::IndexColumn</span> {
+                <span class="ident">index_id</span>,
+                <span class="ident">column_id</span>,
+                <span class="ident">sort_order</span>: <span class="ident">sf</span>.<span class="ident">sort_order</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">s</span> {
+                    <span class="ident">SortOrder::Asc</span> =&gt; <span class="ident">sql::SQLSortOrder::Asc</span>,
+                    <span class="ident">SortOrder::Desc</span> =&gt; <span class="ident">sql::SQLSortOrder::Desc</span>,
+                }),
+                <span class="ident">length</span>: <span class="ident">sf</span>.<span class="ident">length</span>(),
+            });
         }
     }
 }
@@ -709,10 +776,11 @@
             <span class="macro">format!</span>(<span class="string">&quot;{table_name}_B{fk_suffix}&quot;</span>)
         };
 
-        <span class="kw">let</span> <span class="ident">table_id</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">describer_schema</span>.<span class="ident">push_table</span>(<span class="ident">table_name</span>);
+        <span class="kw">let</span> <span class="ident">table_id</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">describer_schema</span>.<span class="ident">push_table</span>(<span class="ident">table_name</span>.<span class="ident">clone</span>());
         <span class="kw">let</span> <span class="ident">column_a_type</span> <span class="op">=</span> <span class="ident">ctx</span>
             .<span class="ident">walk</span>(<span class="ident">model_a_table_id</span>)
             .<span class="ident">primary_key_columns</span>()
+            .<span class="ident">unwrap</span>()
             .<span class="ident">next</span>()
             .<span class="ident">unwrap</span>()
             .<span class="ident">as_column</span>()
@@ -721,6 +789,7 @@
         <span class="kw">let</span> <span class="ident">column_b_type</span> <span class="op">=</span> <span class="ident">ctx</span>
             .<span class="ident">walk</span>(<span class="ident">model_b_table_id</span>)
             .<span class="ident">primary_key_columns</span>()
+            .<span class="ident">unwrap</span>()
             .<span class="ident">next</span>()
             .<span class="ident">unwrap</span>()
             .<span class="ident">as_column</span>()
@@ -746,29 +815,40 @@
             },
         );
 
+        <span class="comment">// Unique index on AB</span>
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">table</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">describer_schema</span>[<span class="ident">table_id</span>];
-            <span class="ident">table</span>.<span class="ident">indices</span> <span class="op">=</span> <span class="macro">vec!</span>[
-                <span class="ident">sql::Index</span> {
-                    <span class="ident">name</span>: <span class="macro">format!</span>(
-                        <span class="string">&quot;{}_AB_unique&quot;</span>,
-                        <span class="ident">table</span>.<span class="ident">name</span>.<span class="ident">chars</span>().<span class="ident">take</span>(<span class="ident">max_identifier_length</span> <span class="op">-</span> <span class="number">10</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>()
-                    ),
-                    <span class="ident">columns</span>: <span class="macro">vec!</span>[
-                        <span class="ident">sql::IndexColumn::new</span>(<span class="ident">model_a_column</span>),
-                        <span class="ident">sql::IndexColumn::new</span>(<span class="ident">model_b_column</span>),
-                    ],
-                    <span class="ident">tpe</span>: <span class="ident">sql::IndexType::Unique</span>,
-                },
-                <span class="ident">sql::Index</span> {
-                    <span class="ident">name</span>: <span class="macro">format!</span>(
-                        <span class="string">&quot;{}_B_index&quot;</span>,
-                        <span class="ident">table</span>.<span class="ident">name</span>.<span class="ident">chars</span>().<span class="ident">take</span>(<span class="ident">max_identifier_length</span> <span class="op">-</span> <span class="number">8</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>()
-                    ),
-                    <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="ident">sql::IndexColumn::new</span>(<span class="ident">model_b_column</span>)],
-                    <span class="ident">tpe</span>: <span class="ident">sql::IndexType::Normal</span>,
-                },
-            ];
+            <span class="kw">let</span> <span class="ident">index_name</span> <span class="op">=</span> <span class="macro">format!</span>(
+                <span class="string">&quot;{}_AB_unique&quot;</span>,
+                <span class="ident">table_name</span>.<span class="ident">chars</span>().<span class="ident">take</span>(<span class="ident">max_identifier_length</span> <span class="op">-</span> <span class="number">10</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>()
+            );
+            <span class="kw">let</span> <span class="ident">index_id</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">describer_schema</span>.<span class="ident">push_unique_constraint</span>(<span class="ident">table_id</span>, <span class="ident">index_name</span>);
+            <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">describer_schema</span>.<span class="ident">push_index_column</span>(<span class="ident">sql::IndexColumn</span> {
+                <span class="ident">index_id</span>,
+                <span class="ident">column_id</span>: <span class="ident">column_a_id</span>,
+                <span class="ident">sort_order</span>: <span class="prelude-val">None</span>,
+                <span class="ident">length</span>: <span class="prelude-val">None</span>,
+            });
+            <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">describer_schema</span>.<span class="ident">push_index_column</span>(<span class="ident">sql::IndexColumn</span> {
+                <span class="ident">index_id</span>,
+                <span class="ident">column_id</span>: <span class="ident">column_b_id</span>,
+                <span class="ident">sort_order</span>: <span class="prelude-val">None</span>,
+                <span class="ident">length</span>: <span class="prelude-val">None</span>,
+            });
+        }
+
+        <span class="comment">// Index on B</span>
+        {
+            <span class="kw">let</span> <span class="ident">index_name</span> <span class="op">=</span> <span class="macro">format!</span>(
+                <span class="string">&quot;{}_B_index&quot;</span>,
+                <span class="ident">table_name</span>.<span class="ident">chars</span>().<span class="ident">take</span>(<span class="ident">max_identifier_length</span> <span class="op">-</span> <span class="number">8</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>()
+            );
+            <span class="kw">let</span> <span class="ident">index_id</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">describer_schema</span>.<span class="ident">push_index</span>(<span class="ident">table_id</span>, <span class="ident">index_name</span>);
+            <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">describer_schema</span>.<span class="ident">push_index_column</span>(<span class="ident">sql::IndexColumn</span> {
+                <span class="ident">index_id</span>,
+                <span class="ident">column_id</span>: <span class="ident">column_b_id</span>,
+                <span class="ident">sort_order</span>: <span class="prelude-val">None</span>,
+                <span class="ident">length</span>: <span class="prelude-val">None</span>,
+            });
         }
 
         <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">datamodel</span>.<span class="ident">referential_integrity</span>().<span class="ident">uses_foreign_keys</span>() {
@@ -928,11 +1008,59 @@
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">instance</span><span class="op">|</span> <span class="ident">instance</span>.<span class="ident">serialized_native_type</span>)
         .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">connector</span>.<span class="ident">default_native_type_for_scalar_type</span>(<span class="kw-2">&amp;</span><span class="ident">scalar_type</span>));
 
+    <span class="kw">enum</span> <span class="ident">ColumnDefault</span> {
+        <span class="ident">Available</span>(<span class="ident">sql::DefaultValue</span>),
+        <span class="ident">PrismaGenerated</span>,
+        <span class="ident">NA</span>,
+    }
+
+    <span class="kw">let</span> <span class="ident">default</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnDefault</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">default_value</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> {
+        <span class="kw">let</span> <span class="ident">column_default</span> <span class="op">=</span> {
+            <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">is_dbgenerated</span>() {
+                <span class="ident">unwrap_dbgenerated</span>(<span class="ident">v</span>.<span class="ident">value</span>())
+                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">ColumnDefault::Available</span>(<span class="ident">sql::DefaultValue::new</span>(<span class="ident">sql::DefaultKind::DbGenerated</span>(<span class="ident">v</span>))))
+                    .<span class="ident">unwrap_or</span>(<span class="ident">ColumnDefault::NA</span>)
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">is_now</span>() {
+                <span class="ident">ColumnDefault::Available</span>(<span class="ident">sql::DefaultValue::now</span>())
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">is_autoincrement</span>() {
+                <span class="ident">ctx</span>.<span class="ident">flavour</span>
+                    .<span class="ident">column_default_value_for_autoincrement</span>()
+                    .<span class="ident">map</span>(<span class="ident">ColumnDefault::Available</span>)
+                    .<span class="ident">unwrap_or</span>(<span class="ident">ColumnDefault::NA</span>)
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">is_sequence</span>() {
+                <span class="ident">ColumnDefault::Available</span>(<span class="ident">sql::DefaultValue::new</span>(<span class="ident">sql::DefaultKind::Sequence</span>(<span class="macro">format!</span>(
+                    <span class="string">&quot;prisma_sequence_{}_{}&quot;</span>,
+                    <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">database_name</span>(),
+                    <span class="ident">field</span>.<span class="ident">database_name</span>()
+                ))))
+            } <span class="kw">else</span> {
+                <span class="kw">match</span> <span class="ident">v</span>.<span class="ident">value</span>() {
+                    <span class="ident">ast::Expression::Function</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="ident">ColumnDefault::PrismaGenerated</span>,
+                    <span class="ident">constant</span> =&gt; <span class="ident">ColumnDefault::Available</span>(<span class="ident">sql::DefaultValue::new</span>(<span class="ident">sql::DefaultKind::Value</span>(
+                        <span class="ident">constant_expression_to_sql_default</span>(<span class="ident">constant</span>, <span class="ident">scalar_type</span>),
+                    ))),
+                }
+            }
+        };
+        <span class="kw">match</span> <span class="ident">column_default</span> {
+            <span class="ident">ColumnDefault::Available</span>(<span class="ident">df</span>) =&gt; {
+                <span class="ident">ColumnDefault::Available</span>(<span class="ident">df</span>.<span class="ident">with_constraint_name</span>(<span class="ident">ctx</span>.<span class="ident">flavour</span>.<span class="ident">default_constraint_name</span>(<span class="ident">v</span>)))
+            }
+            <span class="ident">other</span> =&gt; <span class="ident">other</span>,
+        }
+    });
+
+    <span class="kw">let</span> <span class="ident">default_is_prisma_level</span> <span class="op">=</span> <span class="macro">matches!</span>(<span class="ident">default</span>, <span class="prelude-val">Some</span>(<span class="ident">ColumnDefault::PrismaGenerated</span>));
     <span class="kw">let</span> <span class="ident">column_id</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">describer_schema</span>.<span class="ident">push_column</span>(
         <span class="ident">table_id</span>,
         <span class="ident">sql::Column</span> {
             <span class="ident">name</span>: <span class="ident">field</span>.<span class="ident">database_name</span>().<span class="ident">to_owned</span>(),
-            <span class="ident">default</span>: <span class="prelude-val">None</span>,
+            <span class="ident">default</span>: <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ColumnDefault::Available</span>(<span class="ident">d</span>)) <span class="op">=</span> <span class="ident">default</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">d</span>)
+            } <span class="kw">else</span> {
+                <span class="prelude-val">None</span>
+            },
+
             <span class="ident">tpe</span>: <span class="ident">sql::ColumnType</span> {
                 <span class="ident">family</span>,
                 <span class="ident">full_data_type</span>: <span class="ident">String::new</span>(),
@@ -943,36 +1071,8 @@
         },
     );
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="ident">field</span>.<span class="ident">default_value</span>() {
-        <span class="kw">let</span> <span class="ident">default_value</span> <span class="op">=</span> {
-            <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">is_dbgenerated</span>() {
-                <span class="ident">unwrap_dbgenerated</span>(<span class="ident">v</span>.<span class="ident">value</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">sql::DefaultValue::new</span>(<span class="ident">sql::DefaultKind::DbGenerated</span>(<span class="ident">v</span>)))
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">is_now</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">sql::DefaultValue::now</span>())
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">is_autoincrement</span>() {
-                <span class="ident">ctx</span>.<span class="ident">flavour</span>.<span class="ident">column_default_value_for_autoincrement</span>()
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">is_sequence</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">sql::DefaultValue::new</span>(<span class="ident">sql::DefaultKind::Sequence</span>(<span class="macro">format!</span>(
-                    <span class="string">&quot;prisma_sequence_{}_{}&quot;</span>,
-                    <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">database_name</span>(),
-                    <span class="ident">field</span>.<span class="ident">database_name</span>()
-                ))))
-            } <span class="kw">else</span> {
-                <span class="kw">match</span> <span class="ident">v</span>.<span class="ident">value</span>() {
-                    <span class="ident">ast::Expression::Function</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; {
-                        <span class="comment">// prisma-generated</span>
-                        <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">prisma_level_defaults</span>.<span class="ident">push</span>(<span class="ident">column_id</span>);
-                        <span class="kw">return</span>;
-                    }
-                    <span class="ident">constant</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">sql::DefaultValue::new</span>(<span class="ident">sql::DefaultKind::Value</span>(
-                        <span class="ident">constant_expression_to_sql_default</span>(<span class="ident">constant</span>, <span class="ident">scalar_type</span>),
-                    ))),
-                }
-            }
-        };
-
-        <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">column</span>) <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">describer_schema</span>[<span class="ident">column_id</span>];
-        <span class="ident">column</span>.<span class="ident">default</span> <span class="op">=</span> <span class="ident">default_value</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">df</span><span class="op">|</span> <span class="ident">df</span>.<span class="ident">with_constraint_name</span>(<span class="ident">ctx</span>.<span class="ident">flavour</span>.<span class="ident">default_constraint_name</span>(<span class="ident">v</span>)));
+    <span class="kw">if</span> <span class="ident">default_is_prisma_level</span> {
+        <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">prisma_level_defaults</span>.<span class="ident">push</span>(<span class="ident">column_id</span>);
     }
 }
 

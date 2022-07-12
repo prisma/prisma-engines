@@ -91,28 +91,16 @@
 <span id="86">86</span>
 <span id="87">87</span>
 <span id="88">88</span>
-<span id="89">89</span>
-<span id="90">90</span>
-<span id="91">91</span>
-<span id="92">92</span>
-<span id="93">93</span>
-<span id="94">94</span>
-<span id="95">95</span>
-<span id="96">96</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::calculate_datamodel::CalculateDatamodelContext</span> <span class="kw">as</span> <span class="ident">Context</span>;
 <span class="kw">use</span> <span class="ident">datamodel::dml</span>;
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">sql</span>, <span class="ident">postgres::PostgresSchemaExt</span>};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_default</span>(
-    <span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">sql::Table</span>,
-    <span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">sql::Column</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>,
-) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">dml::DefaultValue</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> (<span class="ident">column</span>.<span class="ident">default</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">kind</span>()), <span class="kw-2">&amp;</span><span class="ident">column</span>.<span class="ident">tpe</span>.<span class="ident">family</span>) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_default</span>(<span class="ident">column</span>: <span class="ident">sql::ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">dml::DefaultValue</span><span class="op">&gt;</span> {
+    <span class="kw">match</span> (<span class="ident">column</span>.<span class="ident">default</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">kind</span>()), <span class="kw-2">&amp;</span><span class="ident">column</span>.<span class="ident">column_type_family</span>()) {
         (<span class="prelude-val">Some</span>(<span class="ident">sql::DefaultKind::Sequence</span>(<span class="ident">name</span>)), <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">is_cockroach</span>() =&gt; {
             <span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
 
-            <span class="kw">let</span> <span class="ident">connector_data</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>().<span class="ident">unwrap_or_default</span>();
+            <span class="kw">let</span> <span class="ident">connector_data</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
             <span class="kw">let</span> <span class="ident">sequence_idx</span> <span class="op">=</span> <span class="ident">connector_data</span>
                 .<span class="ident">sequences</span>
                 .<span class="ident">binary_search_by_key</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>, <span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">s</span>.<span class="ident">name</span>)
@@ -145,16 +133,16 @@
                 <span class="ident">args</span>,
             )))
         }
-        (<span class="kw">_</span>, <span class="ident">sql::ColumnTypeFamily::Int</span>) <span class="kw">if</span> <span class="ident">column</span>.<span class="ident">auto_increment</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">dml::DefaultValue::new_expression</span>(
+        (<span class="kw">_</span>, <span class="ident">sql::ColumnTypeFamily::Int</span>) <span class="kw">if</span> <span class="ident">column</span>.<span class="ident">is_autoincrement</span>() =&gt; <span class="prelude-val">Some</span>(<span class="ident">dml::DefaultValue::new_expression</span>(
             <span class="ident">dml::ValueGenerator::new_autoincrement</span>(),
         )),
-        (<span class="kw">_</span>, <span class="ident">sql::ColumnTypeFamily::BigInt</span>) <span class="kw">if</span> <span class="ident">column</span>.<span class="ident">auto_increment</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">dml::DefaultValue::new_expression</span>(
+        (<span class="kw">_</span>, <span class="ident">sql::ColumnTypeFamily::BigInt</span>) <span class="kw">if</span> <span class="ident">column</span>.<span class="ident">is_autoincrement</span>() =&gt; <span class="prelude-val">Some</span>(<span class="ident">dml::DefaultValue::new_expression</span>(
             <span class="ident">dml::ValueGenerator::new_autoincrement</span>(),
         )),
-        (<span class="kw">_</span>, <span class="ident">sql::ColumnTypeFamily::Int</span>) <span class="kw">if</span> <span class="ident">is_sequence</span>(<span class="ident">column</span>, <span class="ident">table</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">dml::DefaultValue::new_expression</span>(
+        (<span class="kw">_</span>, <span class="ident">sql::ColumnTypeFamily::Int</span>) <span class="kw">if</span> <span class="ident">is_sequence</span>(<span class="ident">column</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">dml::DefaultValue::new_expression</span>(
             <span class="ident">dml::ValueGenerator::new_autoincrement</span>(),
         )),
-        (<span class="kw">_</span>, <span class="ident">sql::ColumnTypeFamily::BigInt</span>) <span class="kw">if</span> <span class="ident">is_sequence</span>(<span class="ident">column</span>, <span class="ident">table</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">dml::DefaultValue::new_expression</span>(
+        (<span class="kw">_</span>, <span class="ident">sql::ColumnTypeFamily::BigInt</span>) <span class="kw">if</span> <span class="ident">is_sequence</span>(<span class="ident">column</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">dml::DefaultValue::new_expression</span>(
             <span class="ident">dml::ValueGenerator::new_autoincrement</span>(),
         )),
         (<span class="prelude-val">Some</span>(<span class="ident">sql::DefaultKind::Sequence</span>(<span class="kw">_</span>)), <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">dml::DefaultValue::new_expression</span>(
@@ -178,8 +166,8 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">set_default</span>(<span class="kw-2">mut</span> <span class="ident">default</span>: <span class="ident">dml::DefaultValue</span>, <span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">sql::Column</span>) -&gt; <span class="ident">dml::DefaultValue</span> {
-    <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">column</span>.<span class="ident">default</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">df</span><span class="op">|</span> <span class="ident">df</span>.<span class="ident">constraint_name</span>());
+<span class="kw">fn</span> <span class="ident">set_default</span>(<span class="kw-2">mut</span> <span class="ident">default</span>: <span class="ident">dml::DefaultValue</span>, <span class="ident">column</span>: <span class="ident">sql::ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">dml::DefaultValue</span> {
+    <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">column</span>.<span class="ident">default</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">df</span><span class="op">|</span> <span class="ident">df</span>.<span class="ident">constraint_name</span>());
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">db_name</span> {
         <span class="ident">default</span>.<span class="ident">set_db_name</span>(<span class="ident">name</span>);
@@ -188,12 +176,8 @@
     <span class="ident">default</span>
 }
 
-<span class="kw">fn</span> <span class="ident">is_sequence</span>(<span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">sql::Column</span>, <span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">sql::Table</span>) -&gt; <span class="ident">bool</span> {
-    <span class="ident">table</span>
-        .<span class="ident">primary_key</span>
-        .<span class="ident">as_ref</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">is_single_primary_key</span>(<span class="kw-2">&amp;</span><span class="ident">column</span>.<span class="ident">name</span>) <span class="op">&amp;&amp;</span> <span class="macro">matches!</span>(<span class="kw-2">&amp;</span><span class="ident">column</span>.<span class="ident">default</span>, <span class="prelude-val">Some</span>(<span class="ident">d</span>) <span class="kw">if</span> <span class="ident">d</span>.<span class="ident">is_sequence</span>()))
-        .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+<span class="kw">fn</span> <span class="ident">is_sequence</span>(<span class="ident">column</span>: <span class="ident">sql::ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
+    <span class="ident">column</span>.<span class="ident">is_single_primary_key</span>() <span class="op">&amp;&amp;</span> <span class="macro">matches!</span>(<span class="kw-2">&amp;</span><span class="ident">column</span>.<span class="ident">default</span>(), <span class="prelude-val">Some</span>(<span class="ident">d</span>) <span class="kw">if</span> <span class="ident">d</span>.<span class="ident">is_sequence</span>())
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>

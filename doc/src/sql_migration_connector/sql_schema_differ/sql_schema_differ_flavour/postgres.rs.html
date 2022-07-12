@@ -652,9 +652,6 @@
 <span id="647">647</span>
 <span id="648">648</span>
 <span id="649">649</span>
-<span id="650">650</span>
-<span id="651">651</span>
-<span id="652">652</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SqlSchemaDifferFlavour</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">database_schema::SqlDatabaseSchema</span>,
@@ -750,19 +747,16 @@
             <span class="kw">return</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">schemas</span>: <span class="ident">Pair</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">SqlDatabaseSchema</span>, <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">schemas</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">schema</span><span class="op">|</span> {
-            (
-                <span class="ident">schema</span>,
-                <span class="ident">schema</span>.<span class="ident">describer_schema</span>.<span class="ident">downcast_connector_data</span>().<span class="ident">unwrap_or_default</span>(),
-            )
-        });
+        <span class="kw">let</span> <span class="ident">schemas</span>: <span class="ident">Pair</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">SqlDatabaseSchema</span>, <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">db</span>
+            .<span class="ident">schemas</span>()
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">schema</span><span class="op">|</span> (<span class="ident">schema</span>, <span class="ident">schema</span>.<span class="ident">describer_schema</span>.<span class="ident">downcast_connector_data</span>()));
 
         <span class="kw">let</span> <span class="ident">sequence_pairs</span> <span class="op">=</span> <span class="ident">db</span>
             .<span class="ident">all_column_pairs</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">cols</span><span class="op">|</span> {
                 <span class="ident">schemas</span>
-                    .<span class="ident">combine</span>(<span class="ident">cols</span>)
-                    .<span class="ident">map</span>(<span class="op">|</span>((<span class="ident">schema</span>, <span class="ident">ext</span>), (<span class="ident">_table_id</span>, <span class="ident">column_id</span>))<span class="op">|</span> (<span class="ident">schema</span>.<span class="ident">walk</span>(<span class="ident">column_id</span>), <span class="ident">ext</span>))
+                    .<span class="ident">zip</span>(<span class="ident">cols</span>)
+                    .<span class="ident">map</span>(<span class="op">|</span>((<span class="ident">schema</span>, <span class="ident">ext</span>), <span class="ident">column_id</span>)<span class="op">|</span> (<span class="ident">schema</span>.<span class="ident">walk</span>(<span class="ident">column_id</span>), <span class="ident">ext</span>))
             })
             .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">cols</span><span class="op">|</span> {
                 <span class="ident">cols</span>.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">col</span>, <span class="ident">ext</span>)<span class="op">|</span> {
@@ -811,8 +805,8 @@
         <span class="kw">let</span> <span class="ident">columns_previous</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">columns</span>();
         <span class="kw">let</span> <span class="ident">columns_next</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">columns</span>();
 
-        <span class="kw">let</span> <span class="ident">pg_ext_previous</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>().<span class="ident">unwrap_or_default</span>();
-        <span class="kw">let</span> <span class="ident">pg_ext_next</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>().<span class="ident">unwrap_or_default</span>();
+        <span class="kw">let</span> <span class="ident">pg_ext_previous</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
+        <span class="kw">let</span> <span class="ident">pg_ext_next</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
 
         <span class="kw">let</span> <span class="ident">previous_algo</span> <span class="op">=</span> <span class="ident">pg_ext_previous</span>.<span class="ident">index_algorithm</span>(<span class="ident">a</span>.<span class="ident">id</span>);
         <span class="kw">let</span> <span class="ident">next_algo</span> <span class="op">=</span> <span class="ident">pg_ext_next</span>.<span class="ident">index_algorithm</span>(<span class="ident">b</span>.<span class="ident">id</span>);
@@ -820,8 +814,8 @@
         <span class="ident">columns_previous</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">columns_next</span>.<span class="ident">len</span>()
             <span class="op">&amp;&amp;</span> <span class="ident">previous_algo</span> <span class="op">==</span> <span class="ident">next_algo</span>
             <span class="op">&amp;&amp;</span> <span class="ident">columns_previous</span>.<span class="ident">zip</span>(<span class="ident">columns_next</span>).<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">col_a</span>, <span class="ident">col_b</span>)<span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">a_class</span> <span class="op">=</span> <span class="ident">pg_ext_previous</span>.<span class="ident">get_opclass</span>(<span class="ident">col_a</span>.<span class="ident">index_field_id</span>());
-                <span class="kw">let</span> <span class="ident">b_class</span> <span class="op">=</span> <span class="ident">pg_ext_next</span>.<span class="ident">get_opclass</span>(<span class="ident">col_b</span>.<span class="ident">index_field_id</span>());
+                <span class="kw">let</span> <span class="ident">a_class</span> <span class="op">=</span> <span class="ident">pg_ext_previous</span>.<span class="ident">get_opclass</span>(<span class="ident">col_a</span>.<span class="ident">id</span>);
+                <span class="kw">let</span> <span class="ident">b_class</span> <span class="op">=</span> <span class="ident">pg_ext_next</span>.<span class="ident">get_opclass</span>(<span class="ident">col_b</span>.<span class="ident">id</span>);
                 <span class="kw">let</span> <span class="ident">a_kind</span> <span class="op">=</span> <span class="ident">a_class</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">kind</span>);
                 <span class="kw">let</span> <span class="ident">b_kind</span> <span class="op">=</span> <span class="ident">b_class</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">kind</span>);
                 <span class="kw">let</span> <span class="ident">a_is_default</span> <span class="op">=</span> <span class="ident">a_class</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_default</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>);
@@ -1274,7 +1268,7 @@
 <span class="kw">fn</span> <span class="ident">push_alter_enum_previous_usages_as_default</span>(<span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">DifferDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">alter_enum</span>: <span class="kw-2">&amp;mut</span> <span class="ident">AlterEnum</span>) {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">previous_usages_as_default</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw">_</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
-    <span class="kw">let</span> <span class="ident">enum_names</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">schemas</span>().<span class="ident">enums</span>(<span class="ident">alter_enum</span>.<span class="ident">id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">enm</span><span class="op">|</span> <span class="ident">enm</span>.<span class="ident">name</span>());
+    <span class="kw">let</span> <span class="ident">enum_names</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">schemas</span>().<span class="ident">walk</span>(<span class="ident">alter_enum</span>.<span class="ident">id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">enm</span><span class="op">|</span> <span class="ident">enm</span>.<span class="ident">name</span>());
 
     <span class="kw">for</span> <span class="ident">table</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">dropped_tables</span>() {
         <span class="kw">for</span> <span class="ident">column</span> <span class="kw">in</span> <span class="ident">table</span>

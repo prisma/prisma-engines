@@ -378,7 +378,7 @@
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{<span class="ident">migrations_directory::MigrationDirectory</span>, <span class="kw-2">*</span>};
 <span class="kw">use</span> <span class="ident">pair::Pair</span>;
 <span class="kw">use</span> <span class="ident">sql_migration</span>::{<span class="ident">DropUserDefinedType</span>, <span class="ident">DropView</span>, <span class="ident">SqlMigration</span>, <span class="ident">SqlMigrationStep</span>};
-<span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">describer</span>, <span class="ident">walkers::SqlSchemaExt</span>, <span class="ident">SqlSchema</span>};
+<span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">describer</span>, <span class="ident">walkers::SqlSchemaExt</span>};
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
 <span class="doccomment">/// The top-level SQL migration connector.</span>
@@ -484,7 +484,7 @@
                 .<span class="kw">await</span>
                 .<span class="ident">map</span>(<span class="ident">From::from</span>),
             <span class="ident">DiffTarget::Database</span> =&gt; <span class="self">self</span>.<span class="ident">flavour</span>.<span class="ident">describe_schema</span>().<span class="kw">await</span>.<span class="ident">map</span>(<span class="ident">From::from</span>),
-            <span class="ident">DiffTarget::Empty</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">SqlDatabaseSchema::default</span>()),
+            <span class="ident">DiffTarget::Empty</span> =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">flavour</span>.<span class="ident">empty_database_schema</span>().<span class="ident">into</span>()),
         }
     }
 }
@@ -519,7 +519,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">empty_database_schema</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DatabaseSchema</span> {
-        <span class="ident">SqlDatabaseSchema::default</span>().<span class="ident">into</span>()
+        <span class="ident">DatabaseSchema::new</span>(<span class="ident">SqlDatabaseSchema::from</span>(<span class="self">self</span>.<span class="ident">flavour</span>.<span class="ident">empty_database_schema</span>()))
     }
 
     <span class="kw">fn</span> <span class="ident">ensure_connection_validity</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
@@ -653,7 +653,7 @@
     <span class="macro">tracing::info!</span>(<span class="string">&quot;Attempting best_effort_reset&quot;</span>);
 
     <span class="kw">let</span> <span class="ident">source_schema</span> <span class="op">=</span> <span class="ident">flavour</span>.<span class="ident">describe_schema</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">target_schema</span> <span class="op">=</span> <span class="ident">SqlSchema::default</span>();
+    <span class="kw">let</span> <span class="ident">target_schema</span> <span class="op">=</span> <span class="ident">flavour</span>.<span class="ident">empty_database_schema</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">steps</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
     <span class="comment">// We drop views here, not in the normal migration process to not</span>

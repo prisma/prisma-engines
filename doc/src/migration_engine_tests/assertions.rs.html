@@ -852,25 +852,6 @@
 <span id="847">847</span>
 <span id="848">848</span>
 <span id="849">849</span>
-<span id="850">850</span>
-<span id="851">851</span>
-<span id="852">852</span>
-<span id="853">853</span>
-<span id="854">854</span>
-<span id="855">855</span>
-<span id="856">856</span>
-<span id="857">857</span>
-<span id="858">858</span>
-<span id="859">859</span>
-<span id="860">860</span>
-<span id="861">861</span>
-<span id="862">862</span>
-<span id="863">863</span>
-<span id="864">864</span>
-<span id="865">865</span>
-<span id="866">866</span>
-<span id="867">867</span>
-<span id="868">868</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">migration_assertions</span>;
 <span class="kw">mod</span> <span class="ident">quaint_result_set_ext</span>;
 
@@ -883,13 +864,11 @@
 <span class="kw">use</span> <span class="ident">sql</span>::{
     <span class="ident">postgres::PostgresSchemaExt</span>,
     <span class="ident">walkers</span>::{<span class="ident">ColumnWalker</span>, <span class="ident">ForeignKeyWalker</span>, <span class="ident">IndexWalker</span>, <span class="ident">TableWalker</span>},
-    <span class="ident">IndexFieldId</span>,
 };
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
     <span class="self">self</span> <span class="kw">as</span> <span class="ident">sql</span>,
     <span class="ident">postgres</span>::{<span class="ident">SQLOperatorClassKind</span>, <span class="ident">SqlIndexAlgorithm</span>},
-    <span class="ident">ColumnTypeFamily</span>, <span class="ident">DefaultKind</span>, <span class="ident">DefaultValue</span>, <span class="ident">Enum</span>, <span class="ident">ForeignKeyAction</span>, <span class="ident">IndexType</span>, <span class="ident">PrimaryKey</span>, <span class="ident">SQLSortOrder</span>,
-    <span class="ident">SqlSchema</span>,
+    <span class="ident">ColumnTypeFamily</span>, <span class="ident">DefaultKind</span>, <span class="ident">DefaultValue</span>, <span class="ident">Enum</span>, <span class="ident">ForeignKeyAction</span>, <span class="ident">IndexType</span>, <span class="ident">SQLSortOrder</span>, <span class="ident">SqlSchema</span>,
 };
 <span class="kw">use</span> <span class="ident">test_setup</span>::{<span class="ident">BitFlags</span>, <span class="ident">Tags</span>};
 
@@ -1144,11 +1123,7 @@
     {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">primary_key</span>() {
             <span class="prelude-val">Some</span>(<span class="ident">pk</span>) =&gt; {
-                <span class="ident">pk_assertions</span>(<span class="ident">PrimaryKeyAssertion</span> {
-                    <span class="ident">pk</span>,
-                    <span class="ident">table</span>: <span class="self">self</span>.<span class="ident">table</span>,
-                    <span class="ident">tags</span>: <span class="self">self</span>.<span class="ident">tags</span>,
-                });
+                <span class="ident">pk_assertions</span>(<span class="ident">PrimaryKeyAssertion</span> { <span class="ident">pk</span>, <span class="ident">tags</span>: <span class="self">self</span>.<span class="ident">tags</span> });
                 <span class="self">self</span>
             }
             <span class="prelude-val">None</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Primary key not found on {}.&quot;</span>, <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">name</span>()),
@@ -1157,7 +1132,7 @@
 
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_indexes_count</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">idx_count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">indexes</span>().<span class="ident">len</span>();
+        <span class="kw">let</span> <span class="ident">idx_count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">indexes</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="op">!</span><span class="ident">idx</span>.<span class="ident">is_primary_key</span>()).<span class="ident">count</span>();
         <span class="macro">assert!</span>(<span class="ident">idx_count</span> <span class="op">==</span> <span class="ident">n</span>, <span class="string">&quot;Expected {} indexes, found {}.&quot;</span>, <span class="ident">n</span>, <span class="ident">idx_count</span>);
         <span class="self">self</span>
     }
@@ -1169,6 +1144,7 @@
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">idx</span>) <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">table</span>
             .<span class="ident">indexes</span>()
+            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="op">!</span><span class="ident">idx</span>.<span class="ident">is_primary_key</span>())
             .<span class="ident">find</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">idx</span>.<span class="ident">column_names</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">columns</span>)
         {
             <span class="ident">index_assertions</span>(<span class="ident">IndexAssertion</span> {
@@ -1186,17 +1162,12 @@
         <span class="kw">if</span> <span class="self">self</span>
             .<span class="ident">table</span>
             .<span class="ident">indexes</span>()
-            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">idx</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">name</span> <span class="op">&amp;&amp;</span> <span class="ident">idx</span>.<span class="ident">index_type</span>().<span class="ident">is_unique</span>() <span class="op">==</span> <span class="ident">unique</span>)
+            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">idx</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">name</span> <span class="op">&amp;&amp;</span> <span class="ident">idx</span>.<span class="ident">is_unique</span>() <span class="op">==</span> <span class="ident">unique</span>)
         {
             <span class="self">self</span>
         } <span class="kw">else</span> {
             <span class="macro">panic!</span>(<span class="string">&quot;Could not find index with name {} and correct type&quot;</span>, <span class="ident">name</span>);
         }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">debug_print</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="self">self</span>.<span class="ident">table</span>);
-        <span class="self">self</span>
     }
 }
 
@@ -1507,8 +1478,7 @@
 }
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PrimaryKeyAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">pk</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">PrimaryKey</span>,
-    <span class="ident">table</span>: <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="ident">pk</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
     <span class="ident">tags</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">Tags</span><span class="op">&gt;</span>,
 }
 
@@ -1525,14 +1495,13 @@
     {
         <span class="kw">let</span> <span class="ident">col</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">pk</span>
-            .<span class="ident">columns</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">column_name</span>)
+            .<span class="ident">columns</span>()
+            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">column_name</span>)
             .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;Could not find column {}&quot;</span>, <span class="ident">column_name</span>));
 
         <span class="ident">f</span>(<span class="ident">IndexColumnAssertion</span> {
-            <span class="ident">length</span>: <span class="ident">col</span>.<span class="ident">length</span>,
-            <span class="ident">sort_order</span>: <span class="ident">col</span>.<span class="ident">sort_order</span>,
+            <span class="ident">length</span>: <span class="ident">col</span>.<span class="ident">length</span>(),
+            <span class="ident">sort_order</span>: <span class="ident">col</span>.<span class="ident">sort_order</span>(),
             <span class="ident">operator_class</span>: <span class="prelude-val">None</span>,
         });
 
@@ -1542,12 +1511,11 @@
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_has_autoincrement</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="macro">assert!</span>(
-            <span class="self">self</span>.<span class="ident">table</span>
-                .<span class="ident">columns</span>()
-                .<span class="ident">any</span>(
-                    <span class="op">|</span><span class="ident">column</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">pk</span>.<span class="ident">column_names</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="ident">name</span> <span class="op">==</span> <span class="ident">column</span>.<span class="ident">name</span>()) <span class="op">&amp;&amp;</span> <span class="ident">column</span>.<span class="ident">is_autoincrement</span>()
-                        <span class="op">|</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">column</span>.<span class="ident">default</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">kind</span>()), <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::UniqueRowid</span>))
-                ),
+            <span class="self">self</span>.<span class="ident">pk</span>.<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">column</span><span class="op">|</span> <span class="ident">column</span>.<span class="ident">as_column</span>().<span class="ident">is_autoincrement</span>()
+                <span class="op">|</span><span class="op">|</span> <span class="macro">matches!</span>(
+                    <span class="ident">column</span>.<span class="ident">as_column</span>().<span class="ident">default</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">kind</span>()),
+                    <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::UniqueRowid</span>)
+                )),
             <span class="string">&quot;Assertion failed: expected a sequence on the primary key, found none.&quot;</span>
         );
 
@@ -1556,27 +1524,23 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_has_no_autoincrement</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="macro">assert!</span>(
-            <span class="op">!</span><span class="self">self</span>
-                .<span class="ident">table</span>
-                .<span class="ident">columns</span>()
-                .<span class="ident">any</span>(<span class="op">|</span><span class="ident">column</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">pk</span>.<span class="ident">column_names</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="ident">column</span>.<span class="ident">name</span>()) <span class="op">&amp;&amp;</span> <span class="ident">column</span>.<span class="ident">is_autoincrement</span>()),
+            <span class="op">!</span><span class="self">self</span>.<span class="ident">pk</span>.<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">column</span><span class="op">|</span> <span class="ident">column</span>.<span class="ident">as_column</span>().<span class="ident">is_autoincrement</span>()),
             <span class="string">&quot;Assertion failed: expected no sequence on the primary key, but found one.&quot;</span>
         );
 
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_constraint_name</span>(<span class="self">self</span>, <span class="ident">constraint_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="ident">pk</span>.<span class="ident">constraint_name</span>, <span class="ident">constraint_name</span>);
-
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_constraint_name</span>(<span class="self">self</span>, <span class="ident">constraint_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
+        <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="ident">pk</span>.<span class="ident">name</span>(), <span class="ident">constraint_name</span>);
         <span class="self">self</span>
     }
 
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_non_clustered</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">tags</span>.<span class="ident">contains</span>(<span class="ident">Tags::Mssql</span>) {
-            <span class="kw">let</span> <span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="ident">sql::mssql::MssqlSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>().<span class="ident">unwrap_or_default</span>();
-            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">ext</span>.<span class="ident">pk_is_clustered</span>(<span class="self">self</span>.<span class="ident">table</span>.<span class="ident">id</span>))
+            <span class="kw">let</span> <span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="ident">sql::mssql::MssqlSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pk</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
+            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">ext</span>.<span class="ident">index_is_clustered</span>(<span class="self">self</span>.<span class="ident">pk</span>.<span class="ident">id</span>))
         }
 
         <span class="self">self</span>
@@ -1585,8 +1549,8 @@
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_clustered</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">tags</span>.<span class="ident">contains</span>(<span class="ident">Tags::Mssql</span>) {
-            <span class="kw">let</span> <span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="ident">sql::mssql::MssqlSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>().<span class="ident">unwrap_or_default</span>();
-            <span class="macro">assert!</span>(<span class="ident">ext</span>.<span class="ident">pk_is_clustered</span>(<span class="self">self</span>.<span class="ident">table</span>.<span class="ident">id</span>))
+            <span class="kw">let</span> <span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="ident">sql::mssql::MssqlSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pk</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
+            <span class="macro">assert!</span>(<span class="ident">ext</span>.<span class="ident">index_is_clustered</span>(<span class="self">self</span>.<span class="ident">pk</span>.<span class="ident">id</span>))
         }
 
         <span class="self">self</span>
@@ -1679,7 +1643,7 @@
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_clustered</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">tags</span>.<span class="ident">contains</span>(<span class="ident">Tags::Mssql</span>) {
-            <span class="kw">let</span> <span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="ident">sql::mssql::MssqlSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>().<span class="ident">unwrap_or_default</span>();
+            <span class="kw">let</span> <span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="ident">sql::mssql::MssqlSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
             <span class="macro">assert!</span>(<span class="ident">ext</span>.<span class="ident">index_is_clustered</span>(<span class="self">self</span>.<span class="ident">index</span>.<span class="ident">id</span>))
         }
 
@@ -1689,7 +1653,7 @@
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_non_clustered</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">tags</span>.<span class="ident">contains</span>(<span class="ident">Tags::Mssql</span>) {
-            <span class="kw">let</span> <span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="ident">sql::mssql::MssqlSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>().<span class="ident">unwrap_or_default</span>();
+            <span class="kw">let</span> <span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="ident">sql::mssql::MssqlSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
             <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">ext</span>.<span class="ident">index_is_clustered</span>(<span class="self">self</span>.<span class="ident">index</span>.<span class="ident">id</span>))
         }
 
@@ -1703,7 +1667,7 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_algorithm</span>(<span class="self">self</span>, <span class="ident">algo</span>: <span class="ident">SqlIndexAlgorithm</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">postgres_ext</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>().<span class="ident">unwrap_or_default</span>();
+        <span class="kw">let</span> <span class="ident">postgres_ext</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
         <span class="kw">let</span> <span class="ident">algorithm</span> <span class="op">=</span> <span class="ident">postgres_ext</span>.<span class="ident">index_algorithm</span>(<span class="self">self</span>.<span class="ident">index</span>.<span class="ident">id</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">algorithm</span>, <span class="ident">algo</span>);
 
@@ -1714,18 +1678,16 @@
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">IndexColumnAssertion</span>) -&gt; <span class="ident">IndexColumnAssertion</span>,
     {
-        <span class="kw">let</span> (<span class="ident">col_idx</span>, <span class="ident">col</span>) <span class="op">=</span> <span class="self">self</span>
+        <span class="kw">let</span> <span class="ident">col</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">index</span>
             .<span class="ident">columns</span>()
-            .<span class="ident">enumerate</span>()
-            .<span class="ident">find</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">c</span>)<span class="op">|</span> <span class="ident">c</span>.<span class="ident">as_column</span>().<span class="ident">name</span>() <span class="op">==</span> <span class="ident">column_name</span>)
+            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">as_column</span>().<span class="ident">name</span>() <span class="op">==</span> <span class="ident">column_name</span>)
             .<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">operator_class</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">tags</span>.<span class="ident">contains</span>(<span class="ident">Tags::Postgres</span>) {
-            <span class="kw">let</span> <span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>().<span class="ident">unwrap_or_default</span>();
+            <span class="kw">let</span> <span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
 
-            <span class="ident">ext</span>.<span class="ident">get_opclass</span>(<span class="ident">IndexFieldId</span>(<span class="self">self</span>.<span class="ident">index</span>.<span class="ident">id</span>, <span class="ident">col_idx</span> <span class="kw">as</span> <span class="ident">u32</span>))
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">kind</span>.<span class="ident">clone</span>())
+            <span class="ident">ext</span>.<span class="ident">get_opclass</span>(<span class="ident">col</span>.<span class="ident">id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">kind</span>.<span class="ident">clone</span>())
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         };

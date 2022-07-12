@@ -290,25 +290,6 @@
 <span id="285">285</span>
 <span id="286">286</span>
 <span id="287">287</span>
-<span id="288">288</span>
-<span id="289">289</span>
-<span id="290">290</span>
-<span id="291">291</span>
-<span id="292">292</span>
-<span id="293">293</span>
-<span id="294">294</span>
-<span id="295">295</span>
-<span id="296">296</span>
-<span id="297">297</span>
-<span id="298">298</span>
-<span id="299">299</span>
-<span id="300">300</span>
-<span id="301">301</span>
-<span id="302">302</span>
-<span id="303">303</span>
-<span id="304">304</span>
-<span id="305">305</span>
-<span id="306">306</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::render_default</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">flavour::MssqlFlavour</span>,
@@ -412,27 +393,13 @@
             <span class="kw">let</span> <span class="ident">with_schema</span> <span class="op">=</span> <span class="macro">format!</span>(
                 <span class="string">&quot;{}.{}&quot;</span>,
                 <span class="self">self</span>.<span class="ident">renderer</span>.<span class="ident">schema_name</span>(),
-                <span class="self">self</span>.<span class="ident">tables</span>
-                    .<span class="ident">previous</span>
-                    .<span class="ident">primary_key</span>()
-                    .<span class="ident">unwrap</span>()
-                    .<span class="ident">constraint_name</span>
-                    .<span class="ident">as_ref</span>()
-                    .<span class="ident">unwrap</span>()
+                <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">previous</span>.<span class="ident">primary_key</span>().<span class="ident">unwrap</span>().<span class="ident">name</span>()
             );
 
             <span class="ident">statements</span>.<span class="ident">push</span>(<span class="macro">format!</span>(
                 <span class="string">&quot;EXEC SP_RENAME N{}, N{}&quot;</span>,
-                <span class="ident">Quoted::Single</span>(<span class="ident">with_schema</span>),
-                <span class="ident">Quoted::Single</span>(
-                    <span class="self">self</span>.<span class="ident">tables</span>
-                        .<span class="ident">next</span>
-                        .<span class="ident">primary_key</span>()
-                        .<span class="ident">unwrap</span>()
-                        .<span class="ident">constraint_name</span>
-                        .<span class="ident">as_ref</span>()
-                        .<span class="ident">unwrap</span>()
-                ),
+                <span class="ident">Quoted::mssql_string</span>(<span class="ident">with_schema</span>),
+                <span class="ident">Quoted::mssql_string</span>(<span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">next</span>.<span class="ident">primary_key</span>().<span class="ident">unwrap</span>().<span class="ident">name</span>()),
             ));
         }
 
@@ -472,7 +439,7 @@
             .<span class="ident">tables</span>
             .<span class="ident">previous</span>
             .<span class="ident">primary_key</span>()
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">constraint_name</span>.<span class="ident">as_ref</span>())
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">name</span>())
             .<span class="ident">expect</span>(<span class="string">&quot;Missing constraint name in DropPrimaryKey on MSSQL&quot;</span>);
 
         <span class="self">self</span>.<span class="ident">drop_constraints</span>
@@ -480,19 +447,14 @@
     }
 
     <span class="kw">fn</span> <span class="ident">add_primary_key</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="ident">mssql_schema_ext</span>: <span class="kw-2">&amp;</span><span class="ident">MssqlSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">next</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>().<span class="ident">unwrap_or_default</span>();
-        <span class="kw">let</span> <span class="ident">constraint_name</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">tables</span>
-            .<span class="ident">next</span>
-            .<span class="ident">primary_key</span>()
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">constraint_name</span>.<span class="ident">as_ref</span>())
-            .<span class="ident">expect</span>(<span class="string">&quot;Missing constraint name in AddPrimaryKey on MSSQL&quot;</span>);
+        <span class="kw">let</span> <span class="ident">mssql_schema_ext</span>: <span class="kw-2">&amp;</span><span class="ident">MssqlSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">next</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
+        <span class="kw">let</span> <span class="ident">next_pk</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">next</span>.<span class="ident">primary_key</span>().<span class="ident">unwrap</span>();
 
-        <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">next</span>.<span class="ident">primary_key_columns</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">quoted_columns</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">columns</span>.<span class="ident">len</span>());
+        <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">next</span>.<span class="ident">primary_key_columns</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">quoted_columns</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
         <span class="kw">for</span> <span class="ident">column</span> <span class="kw">in</span> <span class="ident">columns</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">renderer</span>.<span class="ident">quote</span>(<span class="ident">column</span>.<span class="ident">as_column</span>().<span class="ident">name</span>()));
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">Quoted::mssql_ident</span>(<span class="ident">column</span>.<span class="ident">as_column</span>().<span class="ident">name</span>()).<span class="ident">to_string</span>();
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">sort_order</span>) <span class="op">=</span> <span class="ident">column</span>.<span class="ident">sort_order</span>() {
                 <span class="ident">rendered</span>.<span class="ident">push</span>(<span class="string">&#39; &#39;</span>);
@@ -502,7 +464,7 @@
             <span class="ident">quoted_columns</span>.<span class="ident">push</span>(<span class="ident">rendered</span>);
         }
 
-        <span class="kw">let</span> <span class="ident">clustering</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">mssql_schema_ext</span>.<span class="ident">pk_is_clustered</span>(<span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">next</span>.<span class="ident">id</span>) {
+        <span class="kw">let</span> <span class="ident">clustering</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">mssql_schema_ext</span>.<span class="ident">index_is_clustered</span>(<span class="ident">next_pk</span>.<span class="ident">id</span>) {
             <span class="string">&quot; CLUSTERED&quot;</span>
         } <span class="kw">else</span> {
             <span class="string">&quot; NONCLUSTERED&quot;</span>
@@ -510,7 +472,7 @@
 
         <span class="self">self</span>.<span class="ident">add_constraints</span>.<span class="ident">insert</span>(<span class="macro">format!</span>(
             <span class="string">&quot;CONSTRAINT {} PRIMARY KEY{} ({})&quot;</span>,
-            <span class="ident">constraint_name</span>,
+            <span class="ident">next_pk</span>.<span class="ident">name</span>(),
             <span class="ident">clustering</span>,
             <span class="ident">quoted_columns</span>.<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>),
         ));
@@ -528,7 +490,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">drop_and_recreate_column</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">columns</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnId</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">schema</span>).<span class="ident">columns</span>(<span class="ident">columns</span>);
+        <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">walk</span>(<span class="ident">columns</span>);
 
         <span class="self">self</span>.<span class="ident">drop_columns</span>
             .<span class="ident">push</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">renderer</span>.<span class="ident">quote</span>(<span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">name</span>())));
@@ -537,7 +499,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">alter_column</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">columns</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnId</span><span class="op">&gt;</span>, <span class="ident">changes</span>: <span class="kw-2">&amp;</span><span class="ident">ColumnChanges</span>) {
-        <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">schema</span>).<span class="ident">columns</span>(<span class="ident">columns</span>);
+        <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">walk</span>(<span class="ident">columns</span>);
         <span class="kw">let</span> <span class="ident">expanded</span> <span class="op">=</span> <span class="ident">expand_alter_column</span>(<span class="kw-2">&amp;</span><span class="ident">columns</span>, <span class="ident">changes</span>);
 
         <span class="kw">for</span> <span class="ident">alter</span> <span class="kw">in</span> <span class="ident">expanded</span>.<span class="ident">into_iter</span>() {
