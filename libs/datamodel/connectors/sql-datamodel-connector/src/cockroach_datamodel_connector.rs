@@ -89,6 +89,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::WritableAutoincField,
     ConnectorCapability::ImplicitManyToManyRelation,
     ConnectorCapability::DecimalType,
+    ConnectorCapability::OrderByNullsFirstLast,
 ];
 
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, CockroachType)] = &[

@@ -87,7 +87,8 @@ capabilities!(
     AdvancedJsonNullability,    // Connector distinguishes between their null type and JSON null.
     UndefinedType,              // Connector distinguishes `null` and `undefined`
     DecimalType,                // Connector supports Prisma Decimal type.
-    BackwardCompatibleQueryRaw // Temporary SQLite specific capability. Should be removed once https://github.com/prisma/prisma/issues/12784 is fixed
+    BackwardCompatibleQueryRaw, // Temporary SQLite specific capability. Should be removed once https://github.com/prisma/prisma/issues/12784 is fixed,
+    OrderByNullsFirstLast       // Connector supports ORDER BY NULLS LAST/FIRST
 );
 
 /// Contains all capabilities that the connector is able to serve.

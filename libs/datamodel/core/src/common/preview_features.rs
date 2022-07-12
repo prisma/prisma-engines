@@ -65,7 +65,8 @@ features!(
     Cockroachdb,
     Tracing,
     ImprovedQueryRaw,
-    Metrics
+    Metrics,
+    OrderByNulls,
 );
 
 // Mapping of which active, deprecated and hidden
@@ -80,6 +81,7 @@ pub const GENERATOR: FeatureMap = FeatureMap::new()
         FullTextIndex,
         Tracing,
         Metrics,
+        OrderByNulls,
     ])
     .with_deprecated(&[
         AtomicNumberOperations,

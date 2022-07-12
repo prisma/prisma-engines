@@ -116,6 +116,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::MultipleFullTextAttributesPerModel,
     ConnectorCapability::ImplicitManyToManyRelation,
     ConnectorCapability::DecimalType,
+    ConnectorCapability::OrderByNullsFirstLast,
 ];
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalForeignKey, ConstraintScope::ModelKeyIndex];
