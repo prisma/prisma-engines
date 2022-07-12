@@ -60,13 +60,11 @@ impl JoinStage {
     ///
     /// Returns: `(Join document, Unwind document)`
     pub(crate) fn build(self) -> (Document, Option<Document>) {
-        let (filter_doc, filter_joins) = if let Some(filter) = self.filter {
-            let (filter, joins) = filter.render();
-
-            (Some(filter), joins)
-        } else {
-            (None, vec![])
-        };
+        let (filter_doc, filter_joins) = self
+            .filter
+            .map(MongoFilter::render)
+            .map(|(doc, joins)| (Some(doc), joins))
+            .unwrap_or_else(|| (None, vec![]));
 
         let nested_stages: Vec<Document> = self
             .nested
@@ -147,7 +145,7 @@ impl JoinStage {
 
         pipeline.extend(nested_stages);
 
-        // Add
+        // Add inner join filters if there are any (used for relational aggregations)
         if let Some(doc) = filter_doc {
             pipeline.push(doc! { "$match": { "$expr": doc } });
         }
