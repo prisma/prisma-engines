@@ -19,6 +19,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::DecimalType,
     ConnectorCapability::BackwardCompatibleQueryRaw,
     ConnectorCapability::OrderByNullsFirstLast,
+    ConnectorCapability::SupportsTxIsolationSerializable,
 ];
 
 pub struct SqliteDatamodelConnector;

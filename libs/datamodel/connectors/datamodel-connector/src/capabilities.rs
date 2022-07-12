@@ -88,7 +88,13 @@ capabilities!(
     UndefinedType,              // Connector distinguishes `null` and `undefined`
     DecimalType,                // Connector supports Prisma Decimal type.
     BackwardCompatibleQueryRaw, // Temporary SQLite specific capability. Should be removed once https://github.com/prisma/prisma/issues/12784 is fixed,
-    OrderByNullsFirstLast       // Connector supports ORDER BY NULLS LAST/FIRST
+    OrderByNullsFirstLast,      // Connector supports ORDER BY NULLS LAST/FIRST
+    // Block of isolation levels.
+    SupportsTxIsolationReadUncommitted,
+    SupportsTxIsolationReadCommitted,
+    SupportsTxIsolationRepeatableRead,
+    SupportsTxIsolationSerializable,
+    SupportsTxIsolationSnapshot,
 );
 
 /// Contains all capabilities that the connector is able to serve.

@@ -85,3 +85,12 @@ macro_rules! return_cached_output {
         }
     };
 }
+
+/// Convenience cache utility to load and return immediately if an output object type is already cached.
+macro_rules! return_cached_enum {
+    ($ctx:ident, $name:expr) => {
+        if let Some(existing_type) = $ctx.get_enum_type($name) {
+            return existing_type;
+        }
+    };
+}

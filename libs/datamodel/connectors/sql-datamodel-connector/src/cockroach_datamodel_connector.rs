@@ -90,6 +90,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::ImplicitManyToManyRelation,
     ConnectorCapability::DecimalType,
     ConnectorCapability::OrderByNullsFirstLast,
+    ConnectorCapability::SupportsTxIsolationSerializable,
 ];
 
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, CockroachType)] = &[

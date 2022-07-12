@@ -1,6 +1,5 @@
 use super::objects::*;
 use super::*;
-use crate::constants::json_null;
 use constants::{aggregations, filters};
 use datamodel_connector::ConnectorCapability;
 use prisma_models::{dml::DefaultValue, CompositeFieldRef, PrismaValue};
@@ -371,13 +370,14 @@ fn equality_filters(mapped_type: InputType, nullable: bool) -> impl Iterator<Ite
 }
 
 fn json_equality_filters(
-    ctx: &BuilderContext,
+    ctx: &mut BuilderContext,
     mapped_type: InputType,
     nullable: bool,
 ) -> impl Iterator<Item = InputField> {
     let field = if ctx.has_capability(ConnectorCapability::AdvancedJsonNullability) {
-        let enum_type = json_null_filter_enum();
-        input_field(filters::EQUALS, vec![InputType::Enum(enum_type), mapped_type], None).optional()
+        let enum_type = InputType::enum_type(json_null_filter_enum(ctx));
+
+        input_field(filters::EQUALS, vec![enum_type, mapped_type], None).optional()
     } else {
         input_field(filters::EQUALS, vec![mapped_type], None)
             .optional()
@@ -385,17 +385,6 @@ fn json_equality_filters(
     };
 
     std::iter::once(field)
-}
-
-fn json_null_filter_enum() -> EnumTypeRef {
-    Arc::new(string_enum_type(
-        json_null::FILTER_ENUM_NAME,
-        vec![
-            json_null::DB_NULL.to_owned(),
-            json_null::JSON_NULL.to_owned(),
-            json_null::ANY_NULL.to_owned(),
-        ],
-    ))
 }
 
 fn inclusion_filters(mapped_type: InputType, nullable: bool) -> impl Iterator<Item = InputField> {
@@ -463,14 +452,11 @@ fn json_filters(ctx: &mut BuilderContext) -> impl Iterator<Item = InputField> {
     .into_iter()
 }
 
-fn query_mode_field(ctx: &BuilderContext, nested: bool) -> impl Iterator<Item = InputField> {
+fn query_mode_field(ctx: &mut BuilderContext, nested: bool) -> impl Iterator<Item = InputField> {
     // Limit query mode field to the topmost filter level.
     // Only build mode field for connectors with insensitive filter support.
     let fields = if !nested && ctx.capabilities.contains(ConnectorCapability::InsensitiveFilters) {
-        let enum_type = Arc::new(string_enum_type(
-            "QueryMode",
-            vec![filters::DEFAULT.to_owned(), filters::INSENSITIVE.to_owned()],
-        ));
+        let enum_type = query_mode_enum(ctx);
 
         let field = input_field(
             filters::MODE,
@@ -548,14 +534,8 @@ fn not_filter_field(
     match typ {
         // Json is not nullable on dbs with `AdvancedJsonNullability`, only by proxy through an enum.
         TypeIdentifier::Json if has_adv_json => {
-            let enum_type = json_null_filter_enum();
-
-            input_field(
-                filters::NOT_LOWERCASE,
-                vec![InputType::Enum(enum_type), mapped_scalar_type],
-                None,
-            )
-            .optional()
+            let enum_type = InputType::enum_type(json_null_filter_enum(ctx));
+            input_field(filters::NOT_LOWERCASE, vec![enum_type, mapped_scalar_type], None).optional()
         }
 
         TypeIdentifier::Json => input_field(filters::NOT_LOWERCASE, vec![mapped_scalar_type], None)

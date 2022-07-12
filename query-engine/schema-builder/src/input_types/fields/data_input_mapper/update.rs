@@ -1,5 +1,5 @@
 use super::*;
-use crate::constants::*;
+use crate::{constants::*, enum_types::*};
 use prisma_models::CompositeFieldRef;
 
 pub(crate) struct UpdateDataInputFieldMapper {
@@ -40,12 +40,8 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
         let has_adv_json = ctx.has_capability(ConnectorCapability::AdvancedJsonNullability);
         match &sf.type_identifier {
             TypeIdentifier::Json if has_adv_json => {
-                let enum_type = json_null_input_enum(!sf.is_required());
-                let input_field = input_field(
-                    sf.name.clone(),
-                    vec![InputType::Enum(enum_type), base_update_type],
-                    None,
-                );
+                let enum_type = InputType::enum_type(json_null_input_enum(ctx, !sf.is_required()));
+                let input_field = input_field(sf.name.clone(), vec![enum_type, base_update_type], None);
 
                 input_field.optional()
             }

@@ -117,6 +117,10 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::ImplicitManyToManyRelation,
     ConnectorCapability::DecimalType,
     ConnectorCapability::OrderByNullsFirstLast,
+    ConnectorCapability::SupportsTxIsolationReadUncommitted,
+    ConnectorCapability::SupportsTxIsolationReadCommitted,
+    ConnectorCapability::SupportsTxIsolationRepeatableRead,
+    ConnectorCapability::SupportsTxIsolationSerializable,
 ];
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalForeignKey, ConstraintScope::ModelKeyIndex];

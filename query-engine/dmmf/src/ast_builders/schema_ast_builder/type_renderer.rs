@@ -18,10 +18,13 @@ pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderConte
         }
 
         OutputType::Enum(et) => {
+            let et = et.into_arc();
             ctx.mark_to_be_rendered(&et.as_ref());
+
+            let ident = et.identifier();
             let type_reference = DmmfTypeReference {
-                typ: et.name().to_owned(),
-                namespace: Some(et.namespace()),
+                typ: ident.name().to_owned(),
+                namespace: Some(ident.namespace().to_owned()),
                 location: TypeLocation::EnumTypes,
                 is_list: false,
             };
@@ -36,18 +39,19 @@ pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderConte
             type_reference
         }
 
-        OutputType::Scalar(ScalarType::Enum(et)) => {
-            ctx.mark_to_be_rendered(&et.as_ref());
-            let type_reference = DmmfTypeReference {
-                typ: et.name().to_owned(),
-                namespace: Some(et.namespace()),
-                location: TypeLocation::Scalar,
-                is_list: false,
-            };
+        // OutputType::Scalar(ScalarType::Enum(et)) => {
+        //     ctx.mark_to_be_rendered(&et.as_ref());
 
-            type_reference
-        }
+        //     let ident = et.identifier();
+        //     let type_reference = DmmfTypeReference {
+        //         typ: ident.name().to_owned(),
+        //         namespace: Some(ident.namespace().to_owned()),
+        //         location: TypeLocation::Scalar,
+        //         is_list: false,
+        //     };
 
+        //     type_reference
+        // }
         OutputType::Scalar(ref scalar) => {
             let stringified = match scalar {
                 ScalarType::Null => "Null",
@@ -63,7 +67,7 @@ pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderConte
                 ScalarType::JsonList => "Json",
                 ScalarType::Xml => "Xml",
                 ScalarType::Bytes => "Bytes",
-                ScalarType::Enum(_) => unreachable!(), // Handled separately above.
+                // ScalarType::Enum(_) => unreachable!(), // Handled separately above.
             };
 
             DmmfTypeReference {
@@ -100,10 +104,13 @@ pub(super) fn render_input_type(input_type: &InputType, ctx: &mut RenderContext)
         }
 
         InputType::Enum(et) => {
+            let et = et.into_arc();
             ctx.mark_to_be_rendered(&et.as_ref());
+
+            let ident = et.identifier();
             let type_reference = DmmfTypeReference {
-                typ: et.name().to_owned(),
-                namespace: Some(et.namespace()),
+                typ: ident.name().to_owned(),
+                namespace: Some(ident.namespace().to_owned()),
                 location: TypeLocation::EnumTypes,
                 is_list: false,
             };
@@ -118,18 +125,17 @@ pub(super) fn render_input_type(input_type: &InputType, ctx: &mut RenderContext)
             type_reference
         }
 
-        InputType::Scalar(ScalarType::Enum(et)) => {
-            ctx.mark_to_be_rendered(&et.as_ref());
-            let type_reference = DmmfTypeReference {
-                typ: et.name().to_owned(),
-                namespace: Some(et.namespace()),
-                location: TypeLocation::Scalar,
-                is_list: false,
-            };
+        // InputType::Scalar(ScalarType::Enum(et)) => {
+        //     ctx.mark_to_be_rendered(&et.as_ref());
+        //     let type_reference = DmmfTypeReference {
+        //         typ: et.name().to_owned(),
+        //         namespace: Some(et.namespace()),
+        //         location: TypeLocation::Scalar,
+        //         is_list: false,
+        //     };
 
-            type_reference
-        }
-
+        //     type_reference
+        // }
         InputType::Scalar(ref scalar) => {
             let stringified = match scalar {
                 ScalarType::Null => "Null",
@@ -145,7 +151,7 @@ pub(super) fn render_input_type(input_type: &InputType, ctx: &mut RenderContext)
                 ScalarType::JsonList => "Json",
                 ScalarType::Xml => "Xml",
                 ScalarType::Bytes => "Bytes",
-                ScalarType::Enum(_) => unreachable!(), // Handled separately above.
+                // ScalarType::Enum(_) => unreachable!(), // Handled separately above.
             };
 
             DmmfTypeReference {

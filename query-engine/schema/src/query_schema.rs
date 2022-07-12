@@ -36,6 +36,9 @@ pub struct QuerySchema {
 
     /// Internal. Stores all strong Arc refs to the output object types.
     _output_object_types: Vec<ObjectTypeStrongRef>,
+
+    /// Internal. Stores all enum refs.
+    _enum_types: Vec<EnumTypeRef>,
 }
 
 /// Connector meta information, to be used in query execution if necessary.
@@ -72,6 +75,7 @@ impl QuerySchema {
         mutation: OutputTypeRef,
         _input_object_types: Vec<InputObjectTypeStrongRef>,
         _output_object_types: Vec<ObjectTypeStrongRef>,
+        _enum_types: Vec<EnumTypeRef>,
         internal_data_model: InternalDataModelRef,
         capabilities: Vec<ConnectorCapability>,
         features: Vec<PreviewFeature>,
@@ -82,6 +86,7 @@ impl QuerySchema {
             mutation,
             _input_object_types,
             _output_object_types,
+            _enum_types,
             internal_data_model,
             context: ConnectorContext::new(capabilities, features, referential_integrity),
         }
@@ -115,6 +120,10 @@ impl QuerySchema {
             OutputType::Object(ref o) => o.into_arc(),
             _ => unreachable!(),
         }
+    }
+
+    pub fn enum_types(&self) -> &[EnumTypeRef] {
+        &self._enum_types
     }
 
     pub fn context(&self) -> &ConnectorContext {
@@ -213,7 +222,6 @@ pub enum ScalarType {
     Float,
     Decimal,
     Boolean,
-    Enum(EnumTypeRef),
     DateTime,
     Json,
     JsonList,

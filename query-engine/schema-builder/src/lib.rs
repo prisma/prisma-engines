@@ -33,6 +33,7 @@
 #[macro_use]
 mod cache;
 pub mod constants;
+mod enum_types;
 mod input_types;
 mod mutations;
 mod output_types;
@@ -57,6 +58,7 @@ pub(crate) struct BuilderContext {
     preview_features: Vec<PreviewFeature>,
     nested_create_inputs_queue: NestedInputsQueue,
     nested_update_inputs_queue: NestedInputsQueue,
+    // enums?
 }
 
 impl BuilderContext {
@@ -95,6 +97,11 @@ impl BuilderContext {
         self.cache.output_types.get(ident)
     }
 
+    /// Get an enum type.
+    pub fn get_enum_type(&mut self, ident: &Identifier) -> Option<EnumTypeWeakRef> {
+        self.cache.enum_types.get(ident)
+    }
+
     /// Caches an input (object) type.
     pub fn cache_input_type(&mut self, ident: Identifier, typ: InputObjectTypeStrongRef) {
         self.cache.input_types.insert(ident, typ);
@@ -103,6 +110,11 @@ impl BuilderContext {
     /// Caches an output (object) type.
     pub fn cache_output_type(&mut self, ident: Identifier, typ: ObjectTypeStrongRef) {
         self.cache.output_types.insert(ident, typ);
+    }
+
+    /// Caches an enum type.
+    pub fn cache_enum_type(&mut self, ident: Identifier, e: EnumTypeRef) {
+        self.cache.enum_types.insert(ident, e);
     }
 
     pub fn can_full_text_search(&self) -> bool {
@@ -124,6 +136,7 @@ impl BuilderContext {
 struct TypeCache {
     input_types: TypeRefCache<InputObjectType>,
     output_types: TypeRefCache<ObjectType>,
+    enum_types: TypeRefCache<EnumType>,
 }
 
 impl TypeCache {
@@ -131,6 +144,7 @@ impl TypeCache {
         Self {
             input_types: TypeRefCache::new(),
             output_types: TypeRefCache::new(),
+            enum_types: TypeRefCache::new(),
         }
     }
 
@@ -178,6 +192,7 @@ pub fn build(
         mutation_type,
         input_objects,
         output_objects,
+        vec![],
         ctx.internal_data_model,
         ctx.capabilities.capabilities,
         preview_features,
