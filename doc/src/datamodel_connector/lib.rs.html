@@ -312,6 +312,12 @@
 <span id="307">307</span>
 <span id="308">308</span>
 <span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>)]</span>
 
 <span class="doccomment">//! The interface implemented by connectors for Prisma schema validation and interpretation.</span>
@@ -336,21 +342,27 @@
 };
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>, <span class="ident">NativeTypeErrorFactory</span>, <span class="ident">Span</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">empty_connector::EmptyDatamodelConnector</span>;
-<span class="kw">use</span> <span class="ident">lsp_types::CompletionList</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">native_type_constructor::NativeTypeConstructor</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">parser_database</span>::{<span class="self">self</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ScalarType</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">referential_integrity::ReferentialIntegrity</span>;
 
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
+<span class="kw">use</span> <span class="ident">lsp_types::CompletionList</span>;
 <span class="kw">use</span> <span class="ident">parser_database</span>::{<span class="ident">ast::SchemaPosition</span>, <span class="ident">IndexAlgorithm</span>, <span class="ident">ParserDatabase</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">collections::BTreeMap</span>};
 
 <span class="doccomment">/// The datamodel connector API.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Connector</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
+    <span class="doccomment">/// The name of the provider, for string comparisons determining which connector we are on.</span>
+    <span class="kw">fn</span> <span class="ident">provider_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>;
+
+    <span class="doccomment">/// Must return true whenever the passed in provider name is a match.</span>
+    <span class="kw">fn</span> <span class="ident">is_provider</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
+        <span class="ident">name</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">provider_name</span>()
+    }
+
     <span class="doccomment">/// The name of the connector. Can be used in error messages.</span>
     <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span>;
-
-    <span class="comment">// Capabilities</span>
 
     <span class="doccomment">/// The static list of capabilities for the connector.</span>
     <span class="kw">fn</span> <span class="ident">capabilities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">ConnectorCapability</span>];

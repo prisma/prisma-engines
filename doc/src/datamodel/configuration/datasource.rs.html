@@ -180,8 +180,8 @@
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="doccomment">/// The provider string</span>
     <span class="kw">pub</span> <span class="ident">provider</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// the provider that was selected as active from all specified providers</span>
-    <span class="kw">pub</span> <span class="ident">active_provider</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// The provider that was selected as active from all specified providers</span>
+    <span class="kw">pub</span> <span class="ident">active_provider</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
     <span class="kw">pub</span> <span class="ident">url</span>: <span class="ident">StringFromEnvVar</span>,
     <span class="kw">pub</span> <span class="ident">url_span</span>: <span class="ident">Span</span>,
     <span class="kw">pub</span> <span class="ident">documentation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,

@@ -11,15 +11,11 @@
 <span id="6">6</span>
 <span id="7">7</span>
 <span id="8">8</span>
-<span id="9">9</span>
-<span id="10">10</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module is responsible for converting between the AST and DML data structures.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The responsibilities of the sub modules are:</span>
 <span class="doccomment">//! * `ast_to_dml` contains functionality to convert an AST into a DML data structure. This can error as validation is performed during this process.</span>
 <span class="doccomment">//! * `dml_to_ast` contains functionality to convert a DML structure back to an AST. This is used for rendering and cannot fail.</span>
-<span class="doccomment">//! * `helpers` contains helpers to simplify the validation of arguments and values in the AST during validation.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">helpers</span>;
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">ast_to_dml</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">dml_to_ast</span>;

@@ -207,14 +207,6 @@
 <span id="202">202</span>
 <span id="203">203</span>
 <span id="204">204</span>
-<span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
-<span id="208">208</span>
-<span id="209">209</span>
-<span id="210">210</span>
-<span id="211">211</span>
-<span id="212">212</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>, <span class="ident">missing_docs</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::needless_collect</span>)]</span> <span class="comment">// the implementation of that rule is way too eager, it rejects necessary collects</span>
 
@@ -235,23 +227,15 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::{<span class="ident">api::GenericApi</span>, <span class="ident">core_error</span>::<span class="kw-2">*</span>, <span class="ident">rpc::rpc_api</span>, <span class="ident">timings::TimingsLayer</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">migration_connector</span>;
 
-<span class="kw">use</span> <span class="ident">datamodel::parser_database::SourceFile</span>;
 <span class="kw">use</span> <span class="ident">datamodel</span>::{
-    <span class="ident">common</span>::{
-        <span class="ident">preview_features::PreviewFeature</span>,
-        <span class="ident">provider_names</span>::{
-            <span class="ident">COCKROACHDB_SOURCE_NAME</span>, <span class="ident">MONGODB_SOURCE_NAME</span>, <span class="ident">MSSQL_SOURCE_NAME</span>, <span class="ident">MYSQL_SOURCE_NAME</span>, <span class="ident">POSTGRES_SOURCE_NAME</span>,
-            <span class="ident">SQLITE_SOURCE_NAME</span>,
-        },
-    },
-    <span class="ident">Datasource</span>, <span class="ident">ValidatedSchema</span>,
+    <span class="ident">builtin_connectors</span>::<span class="kw-2">*</span>, <span class="ident">common::preview_features::PreviewFeature</span>, <span class="ident">parser_database::SourceFile</span>, <span class="ident">Datasource</span>,
+    <span class="ident">ValidatedSchema</span>,
 };
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">migration_connector::ConnectorParams</span>;
 <span class="kw">use</span> <span class="ident">mongodb_migration_connector::MongoDbMigrationConnector</span>;
 <span class="kw">use</span> <span class="ident">sql_migration_connector::SqlMigrationConnector</span>;
-<span class="kw">use</span> <span class="ident">std::env</span>;
-<span class="kw">use</span> <span class="ident">std::path::Path</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">env</span>, <span class="ident">path::Path</span>};
 <span class="kw">use</span> <span class="ident">user_facing_errors::common::InvalidConnectionString</span>;
 
 <span class="kw">fn</span> <span class="ident">parse_schema</span>(<span class="ident">schema</span>: <span class="ident">SourceFile</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">ValidatedSchema</span><span class="op">&gt;</span> {
@@ -335,7 +319,7 @@
         .<span class="ident">next</span>()
         .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">CoreError::from_msg</span>(<span class="string">&quot;There is no datasource in the schema.&quot;</span>.<span class="ident">into</span>()))<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">connector_for_provider</span>(<span class="ident">source</span>.<span class="ident">active_provider</span>.<span class="ident">as_str</span>())<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">connector_for_provider</span>(<span class="ident">source</span>.<span class="ident">active_provider</span>)<span class="question-mark">?</span>;
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">connection_string</span>) <span class="op">=</span> <span class="ident">source</span>.<span class="ident">load_url</span>(<span class="op">|</span><span class="ident">key</span><span class="op">|</span> <span class="ident">env::var</span>(<span class="ident">key</span>).<span class="ident">ok</span>()) {
         <span class="ident">connector</span>.<span class="ident">set_params</span>(<span class="ident">ConnectorParams</span> {
@@ -365,20 +349,20 @@
         <span class="ident">shadow_database_connection_string</span>: <span class="ident">shadow_database_url</span>,
     };
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">connector_for_provider</span>(<span class="ident">source</span>.<span class="ident">active_provider</span>.<span class="ident">as_str</span>())<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">connector_for_provider</span>(<span class="ident">source</span>.<span class="ident">active_provider</span>)<span class="question-mark">?</span>;
     <span class="ident">connector</span>.<span class="ident">set_params</span>(<span class="ident">params</span>)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(<span class="ident">connector</span>)
 }
 
 <span class="kw">fn</span> <span class="ident">connector_for_provider</span>(<span class="ident">provider</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">migration_connector::MigrationConnector</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">provider</span> {
-        <span class="ident">POSTGRES_SOURCE_NAME</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">SqlMigrationConnector::new_postgres</span>())),
-        <span class="ident">COCKROACHDB_SOURCE_NAME</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">SqlMigrationConnector::new_cockroach</span>())),
-        <span class="ident">MYSQL_SOURCE_NAME</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">SqlMigrationConnector::new_mysql</span>())),
-        <span class="ident">SQLITE_SOURCE_NAME</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">SqlMigrationConnector::new_sqlite</span>())),
-        <span class="ident">MSSQL_SOURCE_NAME</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">SqlMigrationConnector::new_mssql</span>())),
+        <span class="ident">p</span> <span class="kw">if</span> <span class="ident">POSTGRES</span>.<span class="ident">is_provider</span>(<span class="ident">p</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">SqlMigrationConnector::new_postgres</span>())),
+        <span class="ident">p</span> <span class="kw">if</span> <span class="ident">COCKROACH</span>.<span class="ident">is_provider</span>(<span class="ident">p</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">SqlMigrationConnector::new_cockroach</span>())),
+        <span class="ident">p</span> <span class="kw">if</span> <span class="ident">MYSQL</span>.<span class="ident">is_provider</span>(<span class="ident">p</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">SqlMigrationConnector::new_mysql</span>())),
+        <span class="ident">p</span> <span class="kw">if</span> <span class="ident">SQLITE</span>.<span class="ident">is_provider</span>(<span class="ident">p</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">SqlMigrationConnector::new_sqlite</span>())),
+        <span class="ident">p</span> <span class="kw">if</span> <span class="ident">MSSQL</span>.<span class="ident">is_provider</span>(<span class="ident">p</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">SqlMigrationConnector::new_mssql</span>())),
         <span class="comment">// TODO: adopt a state machine pattern in the mongo connector too</span>
-        <span class="ident">MONGODB_SOURCE_NAME</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">MongoDbMigrationConnector::new</span>(<span class="ident">ConnectorParams</span> {
+        <span class="ident">p</span> <span class="kw">if</span> <span class="ident">MONGODB</span>.<span class="ident">is_provider</span>(<span class="ident">p</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">MongoDbMigrationConnector::new</span>(<span class="ident">ConnectorParams</span> {
             <span class="ident">connection_string</span>: <span class="ident">String::new</span>(),
             <span class="ident">preview_features</span>: <span class="ident">Default::default</span>(),
             <span class="ident">shadow_database_connection_string</span>: <span class="prelude-val">None</span>,

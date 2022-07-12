@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["preview_features",""],["provider_names",""]],"struct":[["RelationNames",""]]});
+initSidebarItems({"mod":[["preview_features",""]],"struct":[["RelationNames",""]]});

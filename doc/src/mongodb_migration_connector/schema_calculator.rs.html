@@ -57,6 +57,7 @@
 <span id="52">52</span>
 <span id="53">53</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel</span>::{
+    <span class="ident">builtin_connectors::MONGODB</span>,
     <span class="ident">datamodel_connector::walker_ext_traits</span>::<span class="kw-2">*</span>,
     <span class="ident">parser_database</span>::{<span class="ident">IndexType</span>, <span class="ident">SortOrder</span>},
     <span class="ident">ValidatedSchema</span>,
@@ -66,13 +67,12 @@
 <span class="doccomment">/// Datamodel -&gt; MongoSchema</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">ValidatedSchema</span>) -&gt; <span class="ident">MongoSchema</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">MongoSchema::default</span>();
-    <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">mongodb_datamodel_connector::MongoDbDatamodelConnector</span>;
 
     <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="ident">datamodel</span>.<span class="ident">db</span>.<span class="ident">walk_models</span>() {
         <span class="kw">let</span> <span class="ident">collection_id</span> <span class="op">=</span> <span class="ident">schema</span>.<span class="ident">push_collection</span>(<span class="ident">model</span>.<span class="ident">database_name</span>().<span class="ident">to_owned</span>());
 
         <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">indexes</span>() {
-            <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">constraint_name</span>(<span class="kw-2">&amp;</span><span class="ident">connector</span>);
+            <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">constraint_name</span>(<span class="ident">MONGODB</span>);
 
             <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">index</span>
                 .<span class="ident">scalar_field_attributes</span>()

@@ -188,37 +188,17 @@
 <span id="183">183</span>
 <span id="184">184</span>
 <span id="185">185</span>
-<span id="186">186</span>
-<span id="187">187</span>
-<span id="188">188</span>
-<span id="189">189</span>
-<span id="190">190</span>
-<span id="191">191</span>
-<span id="192">192</span>
-<span id="193">193</span>
-<span id="194">194</span>
-<span id="195">195</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">interpreting_executor::InterpretingExecutor</span>, <span class="ident">QueryExecutor</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::CoreError</span>;
 <span class="kw">use</span> <span class="ident">connection_string::JdbcString</span>;
 <span class="kw">use</span> <span class="ident">connector::Connector</span>;
-<span class="kw">use</span> <span class="ident">datamodel</span>::{
-    <span class="ident">common</span>::{
-        <span class="ident">preview_features::PreviewFeature</span>,
-        <span class="ident">provider_names</span>::{
-            <span class="ident">COCKROACHDB_SOURCE_NAME</span>, <span class="ident">MSSQL_SOURCE_NAME</span>, <span class="ident">MYSQL_SOURCE_NAME</span>, <span class="ident">POSTGRES_SOURCE_NAME</span>, <span class="ident">SQLITE_SOURCE_NAME</span>,
-        },
-    },
-    <span class="ident">Datasource</span>,
-};
+<span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">builtin_connectors</span>::<span class="kw-2">*</span>, <span class="ident">common::preview_features::PreviewFeature</span>, <span class="ident">Datasource</span>};
 <span class="kw">use</span> <span class="ident">mongodb_client::MongoConnectionString</span>;
 <span class="kw">use</span> <span class="ident">sql_connector</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 <span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
 <span class="kw">use</span> <span class="ident">url::Url</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mongodb&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">datamodel::common::provider_names::MONGODB_SOURCE_NAME</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mongodb&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">mongodb_connector::MongoDb</span>;
 
@@ -230,15 +210,15 @@
     <span class="ident">features</span>: <span class="kw-2">&amp;</span>[<span class="ident">PreviewFeature</span>],
     <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
 ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">QueryExecutor</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">source</span>.<span class="ident">active_provider</span>.<span class="ident">as_str</span>() {
-        <span class="ident">SQLITE_SOURCE_NAME</span> =&gt; <span class="ident">sqlite</span>(<span class="ident">source</span>, <span class="ident">url</span>, <span class="ident">features</span>).<span class="kw">await</span>,
-        <span class="ident">MYSQL_SOURCE_NAME</span> =&gt; <span class="ident">mysql</span>(<span class="ident">source</span>, <span class="ident">url</span>, <span class="ident">features</span>).<span class="kw">await</span>,
-        <span class="ident">POSTGRES_SOURCE_NAME</span> =&gt; <span class="ident">postgres</span>(<span class="ident">source</span>, <span class="ident">url</span>, <span class="ident">features</span>).<span class="kw">await</span>,
-        <span class="ident">MSSQL_SOURCE_NAME</span> =&gt; <span class="ident">mssql</span>(<span class="ident">source</span>, <span class="ident">url</span>, <span class="ident">features</span>).<span class="kw">await</span>,
-        <span class="ident">COCKROACHDB_SOURCE_NAME</span> =&gt; <span class="ident">postgres</span>(<span class="ident">source</span>, <span class="ident">url</span>, <span class="ident">features</span>).<span class="kw">await</span>,
+    <span class="kw">match</span> <span class="ident">source</span>.<span class="ident">active_provider</span> {
+        <span class="ident">p</span> <span class="kw">if</span> <span class="ident">SQLITE</span>.<span class="ident">is_provider</span>(<span class="ident">p</span>) =&gt; <span class="ident">sqlite</span>(<span class="ident">source</span>, <span class="ident">url</span>, <span class="ident">features</span>).<span class="kw">await</span>,
+        <span class="ident">p</span> <span class="kw">if</span> <span class="ident">MYSQL</span>.<span class="ident">is_provider</span>(<span class="ident">p</span>) =&gt; <span class="ident">mysql</span>(<span class="ident">source</span>, <span class="ident">url</span>, <span class="ident">features</span>).<span class="kw">await</span>,
+        <span class="ident">p</span> <span class="kw">if</span> <span class="ident">POSTGRES</span>.<span class="ident">is_provider</span>(<span class="ident">p</span>) =&gt; <span class="ident">postgres</span>(<span class="ident">source</span>, <span class="ident">url</span>, <span class="ident">features</span>).<span class="kw">await</span>,
+        <span class="ident">p</span> <span class="kw">if</span> <span class="ident">MSSQL</span>.<span class="ident">is_provider</span>(<span class="ident">p</span>) =&gt; <span class="ident">mssql</span>(<span class="ident">source</span>, <span class="ident">url</span>, <span class="ident">features</span>).<span class="kw">await</span>,
+        <span class="ident">p</span> <span class="kw">if</span> <span class="ident">COCKROACH</span>.<span class="ident">is_provider</span>(<span class="ident">p</span>) =&gt; <span class="ident">postgres</span>(<span class="ident">source</span>, <span class="ident">url</span>, <span class="ident">features</span>).<span class="kw">await</span>,
 
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mongodb&quot;</span>)]</span>
-        <span class="ident">MONGODB_SOURCE_NAME</span> =&gt; <span class="ident">mongodb</span>(<span class="ident">source</span>, <span class="ident">url</span>, <span class="ident">features</span>).<span class="kw">await</span>,
+        <span class="ident">p</span> <span class="kw">if</span> <span class="ident">MONGODB</span>.<span class="ident">is_provider</span>(<span class="ident">p</span>) =&gt; <span class="ident">mongodb</span>(<span class="ident">source</span>, <span class="ident">url</span>, <span class="ident">features</span>).<span class="kw">await</span>,
 
         <span class="ident">x</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">CoreError::ConfigurationError</span>(<span class="macro">format!</span>(
             <span class="string">&quot;Unsupported connector type: {}&quot;</span>,
@@ -248,9 +228,9 @@
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_name</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">Datasource</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">source</span>.<span class="ident">active_provider</span>.<span class="ident">as_str</span>() {
-        <span class="ident">SQLITE_SOURCE_NAME</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">DEFAULT_SQLITE_DB_NAME</span>.<span class="ident">to_string</span>()),
-        <span class="ident">MYSQL_SOURCE_NAME</span> =&gt; {
+    <span class="kw">match</span> <span class="ident">source</span>.<span class="ident">active_provider</span> {
+        <span class="ident">p</span> <span class="kw">if</span> <span class="ident">SQLITE</span>.<span class="ident">is_provider</span>(<span class="ident">p</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">DEFAULT_SQLITE_DB_NAME</span>.<span class="ident">to_string</span>()),
+        <span class="ident">p</span> <span class="kw">if</span> <span class="ident">MYSQL</span>.<span class="ident">is_provider</span>(<span class="ident">p</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">Url::parse</span>(<span class="ident">url</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">err_str</span> <span class="op">=</span> <span class="string">&quot;No database found in connection string&quot;</span>;
 
@@ -262,7 +242,7 @@
 
             <span class="prelude-val">Ok</span>(<span class="ident">db_name</span>)
         }
-        <span class="ident">POSTGRES_SOURCE_NAME</span> <span class="op">|</span> <span class="ident">COCKROACHDB_SOURCE_NAME</span> =&gt; {
+        <span class="ident">p</span> <span class="kw">if</span> <span class="ident">POSTGRES</span>.<span class="ident">is_provider</span>(<span class="ident">p</span>) <span class="op">|</span> <span class="ident">COCKROACH</span>.<span class="ident">is_provider</span>(<span class="ident">p</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">Url::parse</span>(<span class="ident">url</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">params</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">query_pairs</span>().<span class="ident">into_owned</span>().<span class="ident">collect</span>();
 
@@ -273,7 +253,7 @@
 
             <span class="prelude-val">Ok</span>(<span class="ident">db_name</span>)
         }
-        <span class="ident">MSSQL_SOURCE_NAME</span> =&gt; {
+        <span class="ident">p</span> <span class="kw">if</span> <span class="ident">MSSQL</span>.<span class="ident">is_provider</span>(<span class="ident">p</span>) =&gt; {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">JdbcString::from_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;jdbc:{}&quot;</span>, <span class="ident">url</span>))<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">conn</span>
                 .<span class="ident">properties_mut</span>()
@@ -283,7 +263,7 @@
             <span class="prelude-val">Ok</span>(<span class="ident">db_name</span>)
         }
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mongodb&quot;</span>)]</span>
-        <span class="ident">MONGODB_SOURCE_NAME</span> =&gt; {
+        <span class="ident">p</span> <span class="kw">if</span> <span class="ident">MONGODB</span>.<span class="ident">is_provider</span>(<span class="ident">p</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">url</span>: <span class="ident">MongoConnectionString</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">parse</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span>: <span class="ident">mongodb_client::Error</span><span class="op">|</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">kind</span> {
                 <span class="ident">mongodb_client::ErrorKind::InvalidArgument</span> { <span class="ident">message</span> } =&gt; {
                     <span class="ident">CoreError::ConfigurationError</span>(<span class="macro">format!</span>(<span class="string">&quot;Error parsing connection string: {}&quot;</span>, <span class="ident">message</span>))

@@ -251,6 +251,11 @@
 <span id="246">246</span>
 <span id="247">247</span>
 <span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This crate is responsible for parsing, rendering and formatting a Prisma Schema.</span>
 <span class="doccomment">//! A Prisma Schema consists out of two parts:</span>
 <span class="doccomment">//! 1. The `Datamodel` part refers to the model and enum definitions.</span>
@@ -329,6 +334,11 @@
     <span class="ident">ast_to_dml</span>::{<span class="ident">validate</span>, <span class="ident">DatasourceLoader</span>, <span class="ident">GeneratorLoader</span>},
     <span class="ident">dml_to_ast::RenderParams</span>,
 };
+
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">builtin_connectors</span> {
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">mongodb_datamodel_connector</span>::<span class="kw-2">*</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sql_datamodel_connector</span>::<span class="kw-2">*</span>;
+}
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Validated</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {

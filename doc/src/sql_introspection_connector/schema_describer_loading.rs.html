@@ -35,7 +35,9 @@
 <span id="30">30</span>
 <span id="31">31</span>
 <span id="32">32</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">quaint::prelude</span>::{<span class="ident">ConnectionInfo</span>, <span class="ident">Queryable</span>, <span class="ident">SqlFamily</span>};
+<span id="33">33</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel::builtin_connectors::POSTGRES</span>;
+<span class="kw">use</span> <span class="ident">quaint::prelude</span>::{<span class="ident">ConnectionInfo</span>, <span class="ident">Queryable</span>, <span class="ident">SqlFamily</span>};
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="ident">postgres::Circumstances</span>, <span class="ident">SqlSchemaDescriberBackend</span>};
 
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">load_describer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
@@ -52,7 +54,7 @@
             <span class="kw">if</span> <span class="ident">version</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">version</span><span class="op">|</span> <span class="ident">version</span>.<span class="ident">contains</span>(<span class="string">&quot;CockroachDB&quot;</span>)).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
                 <span class="ident">circumstances</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Circumstances::Cockroach</span>;
 
-                <span class="kw">if</span> <span class="ident">provider</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">datamodel::common::provider_names::POSTGRES_SOURCE_NAME</span>) {
+                <span class="kw">if</span> <span class="ident">provider</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">POSTGRES</span>.<span class="ident">provider_name</span>()) {
                     <span class="ident">circumstances</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Circumstances::CockroachWithPostgresNativeTypes</span>;
                 }
             }

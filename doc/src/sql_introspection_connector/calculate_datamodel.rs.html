@@ -97,7 +97,7 @@
     <span class="ident">version_checker::VersionChecker</span>,
     <span class="ident">SqlFamilyTrait</span>, <span class="ident">SqlIntrospectionResult</span>,
 };
-<span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">common::preview_features::PreviewFeature</span>, <span class="ident">dml::Datamodel</span>, <span class="ident">Datasource</span>};
+<span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">builtin_connectors</span>::<span class="kw-2">*</span>, <span class="ident">common::preview_features::PreviewFeature</span>, <span class="ident">dml::Datamodel</span>, <span class="ident">Datasource</span>};
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">introspection_connector</span>::{<span class="ident">IntrospectionContext</span>, <span class="ident">IntrospectionResult</span>};
 <span class="kw">use</span> <span class="ident">quaint::prelude::SqlFamily</span>;
@@ -114,7 +114,7 @@
 
 <span class="kw">impl</span> <span class="ident">CalculateDatamodelContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_cockroach</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">source</span>.<span class="ident">active_provider</span> <span class="op">==</span> <span class="ident">datamodel::common::provider_names::COCKROACHDB_SOURCE_NAME</span>
+        <span class="self">self</span>.<span class="ident">source</span>.<span class="ident">active_connector</span>.<span class="ident">provider_name</span>() <span class="op">==</span> <span class="ident">COCKROACH</span>.<span class="ident">provider_name</span>()
     }
 }
 

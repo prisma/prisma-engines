@@ -159,9 +159,7 @@
 <span id="154">154</span>
 <span id="155">155</span>
 <span id="156">156</span>
-<span id="157">157</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel_connector::Connector</span>;
-<span class="kw">use</span> <span class="ident">mongodb_datamodel_connector::MongoDbDatamodelConnector</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">mongodb_datamodel_connector::MONGODB</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">MongoDbSchemaRenderer</span>, <span class="ident">TestError</span>, <span class="ident">TestResult</span>};
@@ -315,7 +313,7 @@
 }
 
 <span class="kw">fn</span> <span class="ident">mongo_capabilities</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorCapability</span><span class="op">&gt;</span> {
-    <span class="ident">MongoDbDatamodelConnector</span>.<span class="ident">capabilities</span>().<span class="ident">to_owned</span>()
+    <span class="ident">MONGODB</span>.<span class="ident">capabilities</span>().<span class="ident">to_owned</span>()
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_tests_setup" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>

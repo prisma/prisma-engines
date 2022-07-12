@@ -452,6 +452,10 @@
 <span id="447">447</span>
 <span id="448">448</span>
 <span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">validations</span>;
 
 <span class="kw">use</span> <span class="ident">connection_string::JdbcString</span>;
@@ -600,6 +604,10 @@
 ];
 
 <span class="kw">impl</span> <span class="ident">Connector</span> <span class="kw">for</span> <span class="ident">MsSqlDatamodelConnector</span> {
+    <span class="kw">fn</span> <span class="ident">provider_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+        <span class="string">&quot;sqlserver&quot;</span>
+    }
+
     <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="string">&quot;SQL Server&quot;</span>
     }
