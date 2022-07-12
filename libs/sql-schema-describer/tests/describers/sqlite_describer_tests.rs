@@ -1,40 +1,31 @@
 use crate::test_api::*;
-use barrel::{types, Migration};
 use pretty_assertions::assert_eq;
 use sql_schema_describer::*;
 
 #[test_connector(tags(Sqlite))]
 fn multi_column_foreign_keys_must_work(api: TestApi) {
-    let sql_family = api.sql_family();
+    let sql = r#"
+        CREATE TABLE "City" (
+            id INTEGER PRIMARY KEY,
+            name VARCHAR(255)
+        );
 
-    api.execute_barrel(|migration| {
-        migration.create_table("City", move |t| {
-            t.add_column("id", types::primary());
-            t.add_column("name", types::varchar(255));
-        });
-        migration.create_table("User", move |t| {
-            t.add_column("city", types::integer());
-            t.add_column("city_name", types::varchar(255));
+        CREATE TABLE "User" (
+            city INTEGER,
+            city_name VARCHAR(255),
 
-            t.inject_custom("FOREIGN KEY(city_name, city) REFERENCES \"City\"(name, id)");
-        });
-    });
-
+            FOREIGN KEY (city_name, city) REFERENCES "City"(name, id)
+        );
+    "#;
+    api.raw_cmd(sql);
     let schema = api.describe();
 
     schema.assert_table("User", |t| {
-        let t = t
-            .assert_column("city", |c| c.assert_type_is_int_or_bigint())
+        t.assert_column("city", |c| c.assert_type_is_int_or_bigint())
             .assert_column("city_name", |c| c.assert_type_is_string())
             .assert_foreign_key_on_columns(&["city_name", "city"], |fk| {
                 fk.assert_references("City", &["name", "id"])
-            });
-
-        if sql_family.is_mysql() {
-            t.assert_index_on_columns(&["city_name", "city"], |idx| idx.assert_name("city_name"))
-        } else {
-            t
-        }
+            })
     });
 }
 
@@ -58,18 +49,17 @@ fn views_can_be_described(api: TestApi) {
 
 #[test_connector(tags(Sqlite))]
 fn sqlite_column_types_must_work(api: TestApi) {
-    let mut migration = Migration::new();
-    migration.create_table("User", move |t| {
-        t.inject_custom("int_col int not null");
-        t.add_column("int4_col", types::integer());
-        t.add_column("text_col", types::text());
-        t.add_column("real_col", types::float());
-        t.add_column("primary_col", types::primary());
-        t.inject_custom("decimal_col decimal (5, 3) not null");
-    });
-
-    let full_sql = migration.make::<barrel::backend::Sqlite>();
-    api.raw_cmd(&full_sql);
+    let sql = r#"
+        CREATE TABLE "User" (
+            int_col int not null,
+            int4_col INTEGER NOT NULL,
+            text_col TEXT NOT NULL,
+            real_col REAL NOT NULL,
+            primary_col INTEGER PRIMARY KEY,
+            decimal_col DECIMAL (5, 3) NOT NULL
+        );
+    "#;
+    api.raw_cmd(sql);
     let expectation = expect![[r#"
         SqlSchema {
             tables: [
