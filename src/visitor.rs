@@ -90,6 +90,9 @@ pub trait Visitor<'a> {
     /// The `LIMIT` and `OFFSET` statement in the query
     fn visit_limit_and_offset(&mut self, limit: Option<Value<'a>>, offset: Option<Value<'a>>) -> Result;
 
+    /// A visit in the `ORDER BY` section of the query
+    fn visit_ordering(&mut self, ordering: Ordering<'a>) -> Result;
+
     /// A walk through an `INSERT` statement
     fn visit_insert(&mut self, insert: Insert<'a>) -> Result;
 
@@ -923,27 +926,6 @@ pub trait Visitor<'a> {
         self.visit_expression(left)?;
         self.write(" <> ")?;
         self.visit_expression(right)?;
-
-        Ok(())
-    }
-
-    /// A visit in the `ORDER BY` section of the query
-    fn visit_ordering(&mut self, ordering: Ordering<'a>) -> Result {
-        let len = ordering.0.len();
-
-        for (i, (value, ordering)) in ordering.0.into_iter().enumerate() {
-            let direction = ordering.map(|dir| match dir {
-                Order::Asc => " ASC",
-                Order::Desc => " DESC",
-            });
-
-            self.visit_expression(value)?;
-            self.write(direction.unwrap_or(""))?;
-
-            if i < (len - 1) {
-                self.write(", ")?;
-            }
-        }
 
         Ok(())
     }

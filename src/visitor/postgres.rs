@@ -513,6 +513,30 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         self.write(" NOT LIKE ")?;
         self.parameter_substitution()
     }
+
+    fn visit_ordering(&mut self, ordering: Ordering<'a>) -> visitor::Result {
+        let len = ordering.0.len();
+
+        for (i, (value, ordering)) in ordering.0.into_iter().enumerate() {
+            let direction = ordering.map(|dir| match dir {
+                Order::Asc => " ASC",
+                Order::Desc => " DESC",
+                Order::AscNullsFirst => "ASC NULLS FIRST",
+                Order::AscNullsLast => "ASC NULLS LAST",
+                Order::DescNullsFirst => "DESC NULLS FIRST",
+                Order::DescNullsLast => "DESC NULLS LAST",
+            });
+
+            self.visit_expression(value)?;
+            self.write(direction.unwrap_or(""))?;
+
+            if i < (len - 1) {
+                self.write(", ")?;
+            }
+        }
+
+        Ok(())
+    }
 }
 
 #[cfg(test)]

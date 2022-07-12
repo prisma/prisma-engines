@@ -3107,3 +3107,172 @@ async fn query_raw_typed_json(api: &mut dyn TestApi) -> crate::Result<()> {
 
     Ok(())
 }
+
+#[test_each_connector]
+async fn order_by_nulls_first_last(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api.create_table("name varchar(255), age int").await?;
+
+    let insert = Insert::single_into(&table).value("name", "a").value("age", 1);
+    api.conn().insert(insert.into()).await?;
+
+    let insert = Insert::single_into(&table)
+        .value("name", "b")
+        .value("age", Value::Int32(None));
+    api.conn().insert(insert.into()).await?;
+
+    let insert = Insert::single_into(&table)
+        .value("name", Value::Text(None))
+        .value("age", 2);
+    api.conn().insert(insert.into()).await?;
+
+    let insert = Insert::single_into(&table)
+        .value("name", Value::Text(None))
+        .value("age", Value::Text(None));
+    api.conn().insert(insert.into()).await?;
+
+    // name ASC NULLS FIRST
+    let select = Select::from_table(table.clone()).order_by("name".ascend_nulls_first());
+    let res = api.conn().select(select).await?;
+
+    assert_eq!(res.get(0).unwrap()["name"], Value::Text(None));
+    assert_eq!(res.get(1).unwrap()["name"], Value::Text(None));
+    assert_eq!(res.get(2).unwrap()["name"], Value::text("a"));
+    assert_eq!(res.get(3).unwrap()["name"], Value::text("b"));
+
+    // name ASC NULLS LAST
+    let select = Select::from_table(table.clone()).order_by("name".ascend_nulls_last());
+    let res = api.conn().select(select).await?;
+
+    assert_eq!(res.get(0).unwrap()["name"], Value::text("a"));
+    assert_eq!(res.get(1).unwrap()["name"], Value::text("b"));
+    assert_eq!(res.get(2).unwrap()["name"], Value::Text(None));
+    assert_eq!(res.get(3).unwrap()["name"], Value::Text(None));
+
+    // name DESC NULLS FIRST
+    let select = Select::from_table(table.clone()).order_by("name".descend_nulls_first());
+    let res = api.conn().select(select).await?;
+
+    assert_eq!(res.get(0).unwrap()["name"], Value::Text(None));
+    assert_eq!(res.get(1).unwrap()["name"], Value::Text(None));
+    assert_eq!(res.get(2).unwrap()["name"], Value::text("b"));
+    assert_eq!(res.get(3).unwrap()["name"], Value::text("a"));
+
+    // name ASC NULLS LAST
+    let select = Select::from_table(table.clone()).order_by("name".descend_nulls_last());
+    let res = api.conn().select(select).await?;
+
+    assert_eq!(res.get(0).unwrap()["name"], Value::text("b"));
+    assert_eq!(res.get(1).unwrap()["name"], Value::text("a"));
+    assert_eq!(res.get(2).unwrap()["name"], Value::Text(None));
+    assert_eq!(res.get(3).unwrap()["name"], Value::Text(None));
+
+    // name ASC NULLS FIRST, age ASC NULLS FIRST
+    let select = Select::from_table(table.clone())
+        .order_by("name".ascend_nulls_first())
+        .order_by("age".ascend_nulls_first());
+    let res = api.conn().select(select).await?;
+
+    assert_eq!(res.get(0).unwrap()["name"], Value::Text(None));
+    assert_eq!(res.get(0).unwrap()["age"], Value::Int32(None));
+
+    assert_eq!(res.get(1).unwrap()["name"], Value::Text(None));
+    assert_eq!(res.get(1).unwrap()["age"], Value::int32(2));
+
+    assert_eq!(res.get(2).unwrap()["name"], Value::text("a"));
+    assert_eq!(res.get(2).unwrap()["age"], Value::int32(1));
+
+    assert_eq!(res.get(3).unwrap()["name"], Value::text("b"));
+    assert_eq!(res.get(3).unwrap()["age"], Value::Int32(None));
+
+    // name ASC NULLS LAST, age ASC NULLS LAST
+    let select = Select::from_table(table.clone())
+        .order_by("name".ascend_nulls_last())
+        .order_by("age".ascend_nulls_last());
+    let res = api.conn().select(select).await?;
+
+    assert_eq!(res.get(0).unwrap()["name"], Value::text("a"));
+    assert_eq!(res.get(0).unwrap()["age"], Value::int32(1));
+
+    assert_eq!(res.get(1).unwrap()["name"], Value::text("b"));
+    assert_eq!(res.get(1).unwrap()["age"], Value::Int32(None));
+
+    assert_eq!(res.get(2).unwrap()["name"], Value::Text(None));
+    assert_eq!(res.get(2).unwrap()["age"], Value::int32(2));
+
+    assert_eq!(res.get(3).unwrap()["name"], Value::Text(None));
+    assert_eq!(res.get(3).unwrap()["age"], Value::Int32(None));
+
+    // name DESC NULLS FIRST, age DESC NULLS FIRST
+    let select = Select::from_table(table.clone())
+        .order_by("name".descend_nulls_first())
+        .order_by("age".descend_nulls_first());
+    let res = api.conn().select(select).await?;
+
+    assert_eq!(res.get(0).unwrap()["name"], Value::Text(None));
+    assert_eq!(res.get(0).unwrap()["age"], Value::Int32(None));
+
+    assert_eq!(res.get(1).unwrap()["name"], Value::Text(None));
+    assert_eq!(res.get(1).unwrap()["age"], Value::int32(2));
+
+    assert_eq!(res.get(2).unwrap()["name"], Value::text("b"));
+    assert_eq!(res.get(2).unwrap()["age"], Value::Int32(None));
+
+    assert_eq!(res.get(3).unwrap()["name"], Value::text("a"));
+    assert_eq!(res.get(3).unwrap()["age"], Value::int32(1));
+
+    // name DESC NULLS LAST, age DESC NULLS LAST
+    let select = Select::from_table(table.clone())
+        .order_by("name".descend_nulls_last())
+        .order_by("age".descend_nulls_last());
+    let res = api.conn().select(select).await?;
+
+    assert_eq!(res.get(0).unwrap()["name"], Value::text("b"));
+    assert_eq!(res.get(0).unwrap()["age"], Value::Int32(None));
+
+    assert_eq!(res.get(1).unwrap()["name"], Value::text("a"));
+    assert_eq!(res.get(1).unwrap()["age"], Value::int32(1));
+
+    assert_eq!(res.get(2).unwrap()["name"], Value::Text(None));
+    assert_eq!(res.get(2).unwrap()["age"], Value::int32(2));
+
+    assert_eq!(res.get(3).unwrap()["name"], Value::Text(None));
+    assert_eq!(res.get(3).unwrap()["age"], Value::Int32(None));
+
+    // name ASC NULLS LAST, age DESC NULLS FIRST
+    let select = Select::from_table(table.clone())
+        .order_by("name".ascend_nulls_last())
+        .order_by("age".descend_nulls_first());
+    let res = api.conn().select(select).await?;
+
+    assert_eq!(res.get(0).unwrap()["name"], Value::text("a"));
+    assert_eq!(res.get(0).unwrap()["age"], Value::int32(1));
+
+    assert_eq!(res.get(1).unwrap()["name"], Value::text("b"));
+    assert_eq!(res.get(1).unwrap()["age"], Value::Int32(None));
+
+    assert_eq!(res.get(2).unwrap()["name"], Value::Text(None));
+    assert_eq!(res.get(2).unwrap()["age"], Value::Int32(None));
+
+    assert_eq!(res.get(3).unwrap()["name"], Value::Text(None));
+    assert_eq!(res.get(3).unwrap()["age"], Value::int32(2));
+
+    // name DESC NULLS FIRST, age ASC NULLS LAST
+    let select = Select::from_table(table.clone())
+        .order_by("name".descend_nulls_first())
+        .order_by("age".ascend_nulls_last());
+    let res = api.conn().select(select).await?;
+
+    assert_eq!(res.get(0).unwrap()["name"], Value::Text(None));
+    assert_eq!(res.get(0).unwrap()["age"], Value::int32(2));
+
+    assert_eq!(res.get(1).unwrap()["name"], Value::Text(None));
+    assert_eq!(res.get(1).unwrap()["age"], Value::Int32(None));
+
+    assert_eq!(res.get(2).unwrap()["name"], Value::text("b"));
+    assert_eq!(res.get(2).unwrap()["age"], Value::Int32(None));
+
+    assert_eq!(res.get(3).unwrap()["name"], Value::text("a"));
+    assert_eq!(res.get(3).unwrap()["age"], Value::int32(1));
+
+    Ok(())
+}

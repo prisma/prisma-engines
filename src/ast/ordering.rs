@@ -30,6 +30,14 @@ pub enum Order {
     Asc,
     /// Descending
     Desc,
+    /// Ascending Nulls First
+    AscNullsFirst,
+    /// Ascending Nulls Last
+    AscNullsLast,
+    /// Descending Nulls First
+    DescNullsFirst,
+    /// Descending Nulls Last
+    DescNullsLast,
 }
 
 /// An item that can be used in the `ORDER BY` statement
@@ -48,6 +56,26 @@ where
     /// Change the order to `DESC`
     fn descend(self) -> OrderDefinition<'a> {
         self.order(Some(Order::Desc))
+    }
+
+    /// Change the order to `ASC NULLS FIRST`
+    fn ascend_nulls_first(self) -> OrderDefinition<'a> {
+        self.order(Some(Order::AscNullsFirst))
+    }
+
+    /// Change the order to `ASC NULLS LAST`
+    fn ascend_nulls_last(self) -> OrderDefinition<'a> {
+        self.order(Some(Order::AscNullsLast))
+    }
+
+    /// Change the order to `DESC NULLS FIRST`
+    fn descend_nulls_first(self) -> OrderDefinition<'a> {
+        self.order(Some(Order::DescNullsFirst))
+    }
+
+    /// Change the order to `ASC NULLS LAST`
+    fn descend_nulls_last(self) -> OrderDefinition<'a> {
+        self.order(Some(Order::DescNullsLast))
     }
 }
 

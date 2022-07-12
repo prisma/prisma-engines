@@ -84,6 +84,13 @@ impl<'a> Mysql<'a> {
 
         Ok(())
     }
+
+    fn visit_order_by(&mut self, direction: &str, value: Expression<'a>) -> visitor::Result {
+        self.visit_expression(value)?;
+        self.write(format!(" {}", direction))?;
+
+        Ok(())
+    }
 }
 
 impl<'a> Visitor<'a> for Mysql<'a> {
@@ -506,6 +513,52 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         self.write(", ")?;
         self.visit_parameterized(Value::text("$[0]"))?;
         self.write(")")?;
+
+        Ok(())
+    }
+
+    fn visit_ordering(&mut self, ordering: Ordering<'a>) -> visitor::Result {
+        let len = ordering.0.len();
+
+        // ORDER BY <value> IS NOT NULL, <value> <direction> = NULLS FIRST
+        // ORDER BY <value> IS NULL, <value> <direction> = NULLS LAST
+        for (i, (value, ordering)) in ordering.0.into_iter().enumerate() {
+            match ordering {
+                Some(Order::Asc) => {
+                    self.visit_order_by("ASC", value)?;
+                }
+                Some(Order::Desc) => {
+                    self.visit_order_by("DESC", value)?;
+                }
+                Some(Order::AscNullsFirst) => {
+                    self.visit_order_by("IS NOT NULL", value.clone())?;
+                    self.write(", ")?;
+                    self.visit_order_by("ASC", value)?;
+                }
+                Some(Order::AscNullsLast) => {
+                    self.visit_order_by("IS NULL", value.clone())?;
+                    self.write(", ")?;
+                    self.visit_order_by("ASC", value)?;
+                }
+                Some(Order::DescNullsFirst) => {
+                    self.visit_order_by("IS NOT NULL", value.clone())?;
+                    self.write(", ")?;
+                    self.visit_order_by("DESC", value)?;
+                }
+                Some(Order::DescNullsLast) => {
+                    self.visit_order_by("IS NULL", value.clone())?;
+                    self.write(", ")?;
+                    self.visit_order_by("DESC", value)?;
+                }
+                None => {
+                    self.visit_expression(value)?;
+                }
+            };
+
+            if i < (len - 1) {
+                self.write(", ")?;
+            }
+        }
 
         Ok(())
     }

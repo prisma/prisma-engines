@@ -16,6 +16,39 @@ pub struct Sqlite<'a> {
     parameters: Vec<Value<'a>>,
 }
 
+impl<'a> Sqlite<'a> {
+    fn visit_order_by(&mut self, direction: &str, value: Expression<'a>) -> visitor::Result {
+        self.visit_expression(value)?;
+        self.write(format!(" {}", direction))?;
+
+        Ok(())
+    }
+
+    // ORDER BY CASE WHEN <value> IS NULL THEN 0 ELSE 1 END, <value> <direction>
+    fn visit_order_by_nulls_first(&mut self, direction: &str, value: Expression<'a>) -> visitor::Result {
+        self.surround_with("CASE WHEN ", " END", |s| {
+            s.visit_expression(value.clone())?;
+            s.write(" IS NULL THEN 0 ELSE 1")
+        })?;
+        self.write(", ")?;
+        self.visit_order_by(direction, value)?;
+
+        Ok(())
+    }
+
+    // ORDER BY CASE WHEN <value> IS NULL THEN 1 ELSE 0 END, <value> <direction>
+    fn visit_order_by_nulls_last(&mut self, direction: &str, value: Expression<'a>) -> visitor::Result {
+        self.surround_with("CASE WHEN ", " END", |s| {
+            s.visit_expression(value.clone())?;
+            s.write(" IS NULL THEN 1 ELSE 0")
+        })?;
+        self.write(", ")?;
+        self.visit_order_by(direction, value)?;
+
+        Ok(())
+    }
+}
+
 impl<'a> Visitor<'a> for Sqlite<'a> {
     const C_BACKTICK_OPEN: &'static str = "`";
     const C_BACKTICK_CLOSE: &'static str = "`";
@@ -284,6 +317,42 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
     #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     fn visit_json_extract_first_array_item(&mut self, _extract: JsonExtractFirstArrayElem<'a>) -> visitor::Result {
         unimplemented!("JSON filtering is not yet supported on SQLite")
+    }
+
+    fn visit_ordering(&mut self, ordering: Ordering<'a>) -> visitor::Result {
+        let len = ordering.0.len();
+
+        for (i, (value, ordering)) in ordering.0.into_iter().enumerate() {
+            match ordering {
+                Some(Order::Asc) => {
+                    self.visit_order_by("ASC", value)?;
+                }
+                Some(Order::Desc) => {
+                    self.visit_order_by("DESC", value)?;
+                }
+                Some(Order::AscNullsFirst) => {
+                    self.visit_order_by_nulls_first("ASC", value)?;
+                }
+                Some(Order::AscNullsLast) => {
+                    self.visit_order_by_nulls_last("ASC", value)?;
+                }
+                Some(Order::DescNullsFirst) => {
+                    self.visit_order_by_nulls_first("DESC", value)?;
+                }
+                Some(Order::DescNullsLast) => {
+                    self.visit_order_by_nulls_last("DESC", value)?;
+                }
+                None => {
+                    self.visit_expression(value)?;
+                }
+            };
+
+            if i < (len - 1) {
+                self.write(", ")?;
+            }
+        }
+
+        Ok(())
     }
 }
 
