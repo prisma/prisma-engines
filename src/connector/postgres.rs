@@ -31,6 +31,8 @@ pub(crate) const DEFAULT_SCHEMA: &str = "public";
 #[cfg(feature = "expose-drivers")]
 pub use tokio_postgres;
 
+use super::IsolationLevel;
+
 #[derive(Clone)]
 struct Hidden<T>(T);
 
@@ -624,12 +626,6 @@ impl Queryable for PostgreSql {
         self.query_raw(sql.as_str(), &params[..]).await
     }
 
-    async fn execute(&self, q: Query<'_>) -> crate::Result<u64> {
-        let (sql, params) = visitor::Postgres::build(q)?;
-
-        self.execute_raw(sql.as_str(), &params[..]).await
-    }
-
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
         metrics::query("postgres.query_raw", sql, params, move || async move {
             let stmt = self.fetch_cached(sql, &[]).await?;
@@ -684,6 +680,12 @@ impl Queryable for PostgreSql {
             Ok(result)
         })
         .await
+    }
+
+    async fn execute(&self, q: Query<'_>) -> crate::Result<u64> {
+        let (sql, params) = visitor::Postgres::build(q)?;
+
+        self.execute_raw(sql.as_str(), &params[..]).await
     }
 
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
@@ -749,6 +751,10 @@ impl Queryable for PostgreSql {
         Ok(version_string)
     }
 
+    fn is_healthy(&self) -> bool {
+        self.is_healthy.load(Ordering::SeqCst)
+    }
+
     async fn server_reset_query(&self, tx: &Transaction<'_>) -> crate::Result<()> {
         if self.pg_bouncer {
             tx.raw_cmd("DEALLOCATE ALL").await
@@ -757,8 +763,19 @@ impl Queryable for PostgreSql {
         }
     }
 
-    fn is_healthy(&self) -> bool {
-        self.is_healthy.load(Ordering::SeqCst)
+    async fn set_tx_isolation_level(&self, isolation_level: IsolationLevel) -> crate::Result<()> {
+        if matches!(isolation_level, IsolationLevel::Snapshot) {
+            return Err(Error::builder(ErrorKind::invalid_isolation_level(&isolation_level)).build());
+        }
+
+        self.raw_cmd(&format!("SET TRANSACTION ISOLATION LEVEL {}", isolation_level))
+            .await?;
+
+        Ok(())
+    }
+
+    fn requires_isolation_first(&self) -> bool {
+        false
     }
 }
 

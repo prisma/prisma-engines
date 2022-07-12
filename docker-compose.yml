@@ -17,6 +17,7 @@ services:
     image: mysql:5.7
     command: mysqld
     restart: always
+    platform: linux/x86_64
     environment:
       MYSQL_ROOT_PASSWORD: prisma
       MYSQL_DATABASE: prisma
@@ -30,6 +31,7 @@ services:
     image: mysql:8.0.22
     command: mysqld
     restart: always
+    platform: linux/x86_64
     environment:
       MYSQL_USER: root
       MYSQL_ROOT_PASSWORD: prisma

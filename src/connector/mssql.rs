@@ -1,6 +1,7 @@
 mod conversion;
 mod error;
 
+use super::{IsolationLevel, TransactionOptions};
 use crate::{
     ast::{Query, Value},
     connector::{metrics, queryable::*, ResultSet, Transaction},
@@ -87,56 +88,22 @@ pub(crate) struct MssqlQueryParams {
     max_idle_connection_lifetime: Option<Duration>,
 }
 
-#[derive(Debug, Clone, Copy)]
-/// Controls the locking and row versioning behavior of Transact-SQL statements
-/// issued by a connection to SQL Server. Read more from the [SQL Server
-/// documentation].
-///
-/// [SQL Server documentation]: https://docs.microsoft.com/en-us/sql/t-sql/statements/set-transaction-isolation-level-transact-sql?view=sql-server-ver15
-#[cfg_attr(feature = "docs", doc(cfg(feature = "mssql")))]
-pub enum IsolationLevel {
-    ReadUncommitted,
-    ReadCommitted,
-    RepeatableRead,
-    Snapshot,
-    Serializable,
-}
-
-impl fmt::Display for IsolationLevel {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::ReadUncommitted => write!(f, "READ UNCOMMITTED"),
-            Self::ReadCommitted => write!(f, "READ COMMITTED"),
-            Self::RepeatableRead => write!(f, "REPEATABLE READ"),
-            Self::Snapshot => write!(f, "SNAPSHOT"),
-            Self::Serializable => write!(f, "SERIALIZABLE"),
-        }
-    }
-}
-
-impl FromStr for IsolationLevel {
-    type Err = Error;
-
-    fn from_str(s: &str) -> crate::Result<Self> {
-        match s {
-            "READ UNCOMMITTED" => Ok(Self::ReadUncommitted),
-            "READ COMMITTED" => Ok(Self::ReadCommitted),
-            "REPEATABLE READ" => Ok(Self::RepeatableRead),
-            "SNAPSHOT" => Ok(Self::Snapshot),
-            "SERIALIZABLE" => Ok(Self::Serializable),
-            _ => {
-                let kind = ErrorKind::database_url_is_invalid(format!("Invalid isolation level `{}`", s));
-
-                Err(Error::builder(kind).build())
-            }
-        }
-    }
-}
+static SQL_SERVER_DEFAULT_ISOLATION: IsolationLevel = IsolationLevel::ReadCommitted;
 
 #[async_trait]
 impl TransactionCapable for Mssql {
-    async fn start_transaction(&self) -> crate::Result<Transaction<'_>> {
-        Transaction::new(self, "BEGIN TRAN").await
+    async fn start_transaction(&self, isolation: Option<IsolationLevel>) -> crate::Result<Transaction<'_>> {
+        // Isolation levels in SQL Server are set on the connection and live until they're changed.
+        // Always explicitly setting the isolation level each time a tx is started (either to the given value
+        // or by using the default/connection string value) prevents transactions started on connections from
+        // the pool to have unexpected isolation levels set.
+        let isolation = isolation
+            .or(self.url.query_params.transaction_isolation_level)
+            .or(Some(SQL_SERVER_DEFAULT_ISOLATION));
+
+        let opts = TransactionOptions::new(isolation, self.requires_isolation_first());
+
+        Transaction::new(self, "BEGIN TRAN", opts).await
     }
 }
 
@@ -163,7 +130,7 @@ impl MssqlUrl {
     }
 
     /// The isolation level of a transaction.
-    pub fn transaction_isolation_level(&self) -> Option<IsolationLevel> {
+    fn transaction_isolation_level(&self) -> Option<IsolationLevel> {
         self.query_params.transaction_isolation_level
     }
 
@@ -362,11 +329,6 @@ impl Queryable for Mssql {
         self.query_raw(&sql, &params[..]).await
     }
 
-    async fn execute(&self, q: Query<'_>) -> crate::Result<u64> {
-        let (sql, params) = visitor::Mssql::build(q)?;
-        self.execute_raw(&sql, &params[..]).await
-    }
-
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
         metrics::query("mssql.query_raw", sql, params, move || async move {
             let mut client = self.client.lock().await;
@@ -410,6 +372,11 @@ impl Queryable for Mssql {
 
     async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
         self.query_raw(sql, params).await
+    }
+
+    async fn execute(&self, q: Query<'_>) -> crate::Result<u64> {
+        let (sql, params) = visitor::Mssql::build(q)?;
+        self.execute_raw(&sql, &params[..]).await
     }
 
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
@@ -456,8 +423,19 @@ impl Queryable for Mssql {
         self.is_healthy.load(Ordering::SeqCst)
     }
 
+    async fn set_tx_isolation_level(&self, isolation_level: IsolationLevel) -> crate::Result<()> {
+        self.raw_cmd(&format!("SET TRANSACTION ISOLATION LEVEL {}", isolation_level))
+            .await?;
+
+        Ok(())
+    }
+
     fn begin_statement(&self) -> &'static str {
         "BEGIN TRAN"
+    }
+
+    fn requires_isolation_first(&self) -> bool {
+        true
     }
 }
 
@@ -504,7 +482,12 @@ impl MssqlUrl {
         let transaction_isolation_level = props
             .remove("isolationlevel")
             .or_else(|| props.remove("isolation_level"))
-            .map(|level| IsolationLevel::from_str(&level))
+            .map(|level| {
+                IsolationLevel::from_str(&level).map_err(|_| {
+                    let kind = ErrorKind::database_url_is_invalid(format!("Invalid isolation level `{}`", level));
+                    Error::builder(kind).build()
+                })
+            })
             .transpose()?;
 
         let mut connect_timeout = props
