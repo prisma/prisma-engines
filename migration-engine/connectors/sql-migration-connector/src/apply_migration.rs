@@ -4,7 +4,7 @@ use crate::{
     SqlFlavour, SqlMigrationConnector,
 };
 use migration_connector::{ConnectorResult, DestructiveChangeDiagnostics, Migration};
-use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema};
+use sql_schema_describer::SqlSchema;
 
 #[tracing::instrument(skip(flavour, migration))]
 pub(crate) async fn apply_migration(

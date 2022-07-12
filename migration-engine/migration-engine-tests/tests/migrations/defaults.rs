@@ -1,6 +1,6 @@
 use migration_engine_tests::test_api::*;
 use prisma_value::PrismaValue;
-use sql_schema_describer::{DefaultKind, DefaultValue, SqlSchemaExt};
+use sql_schema_describer::{DefaultKind, DefaultValue};
 
 // MySQL 5.7 and MariaDB are skipped, because the datamodel parser gives us a
 // chrono DateTime, and we don't render that in the exact expected format.

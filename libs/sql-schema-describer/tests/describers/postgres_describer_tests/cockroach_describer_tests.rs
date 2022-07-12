@@ -1,6 +1,6 @@
 use crate::test_api::*;
 use prisma_value::PrismaValue;
-use sql_schema_describer::{postgres::PostgresSchemaExt, ColumnTypeFamily, SqlSchemaExt};
+use sql_schema_describer::{postgres::PostgresSchemaExt, ColumnTypeFamily};
 
 #[test_connector(tags(CockroachDb))]
 fn views_can_be_described(api: TestApi) {

@@ -109,7 +109,7 @@ fn parse_unsupported(_parser: &mut Parser<'_>) -> Option<DefaultValue> {
     None
 }
 
-fn parse_datetime_default(parser: &mut Parser) -> Option<DefaultValue> {
+fn parse_datetime_default(parser: &mut Parser<'_>) -> Option<DefaultValue> {
     let value = match parser.peek_token()? {
         Token::Identifier => {
             let func_name = parser.expect(Token::Identifier)?;
@@ -133,7 +133,7 @@ fn parse_datetime_default(parser: &mut Parser) -> Option<DefaultValue> {
     value
 }
 
-fn parse_enum_default(parser: &mut Parser) -> Option<DefaultValue> {
+fn parse_enum_default(parser: &mut Parser<'_>) -> Option<DefaultValue> {
     match parser.peek_token()? {
         Token::Identifier => {
             let s = parser.expect(Token::Identifier)?;
@@ -412,7 +412,7 @@ fn parse_float_default(parser: &mut Parser<'_>) -> Option<DefaultValue> {
     Some(value)
 }
 
-fn parse_bool_default(parser: &mut Parser) -> Option<DefaultValue> {
+fn parse_bool_default(parser: &mut Parser<'_>) -> Option<DefaultValue> {
     let s = parser.expect(Token::Identifier)?;
 
     let bool_value = if s.eq_ignore_ascii_case("t") || s.eq_ignore_ascii_case("true") {
@@ -511,7 +511,7 @@ fn get_list_default_value(parser: &mut Parser<'_>, tpe: &ColumnType) -> DefaultV
 
 /// Some(()) on valid cast or absence of cast. None if we can't make sense of the input.
 #[must_use]
-fn eat_cast(parser: &mut Parser) -> Option<()> {
+fn eat_cast(parser: &mut Parser<'_>) -> Option<()> {
     match parser.peek_token() {
         Some(Token::CastOperator) => {
             parser.expect(Token::CastOperator)?;

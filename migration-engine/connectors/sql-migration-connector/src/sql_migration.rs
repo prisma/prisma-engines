@@ -5,7 +5,7 @@ use crate::{
 };
 use enumflags2::BitFlags;
 use sql_schema_describer::{
-    walkers::{ColumnWalker, SqlSchemaExt, TableWalker},
+    walkers::{ColumnWalker, TableWalker},
     ColumnId, EnumId, ForeignKeyId, IndexId, SqlSchema, TableId,
 };
 use std::{collections::BTreeSet, fmt::Write as _};

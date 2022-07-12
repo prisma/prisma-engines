@@ -1,5 +1,7 @@
 //! Database description. This crate is used heavily in the introspection and migration engines.
 
+#![deny(rust_2018_idioms, unsafe_code)]
+
 pub mod mssql;
 pub mod mysql;
 pub mod postgres;
@@ -43,6 +45,7 @@ pub trait SqlSchemaDescriberBackend: Send + Sync {
     async fn version(&self, schema: &str) -> DescriberResult<Option<String>>;
 }
 
+/// The return type of get_metadata().
 pub struct SqlMetadata {
     pub table_count: usize,
     pub size_in_bytes: usize,
@@ -102,14 +105,17 @@ impl SqlSchema {
         self.procedures.iter().find(|x| x.name == name)
     }
 
+    /// Get a user defined type by name.
     pub fn get_user_defined_type(&self, name: &str) -> Option<&UserDefinedType> {
         self.user_defined_types.iter().find(|x| x.name == name)
     }
 
+    /// The total number of indexes in the schema.
     pub fn indexes_count(&self) -> usize {
         self.indexes.len()
     }
 
+    /// Make all fulltext indexes non-fulltext, for the preview feature's purpose.
     pub fn make_fulltext_indexes_normal(&mut self) {
         for idx in self.indexes.iter_mut() {
             if matches!(idx.tpe, IndexType::Fulltext) {
@@ -118,12 +124,14 @@ impl SqlSchema {
         }
     }
 
+    /// Add a column to the schema.
     pub fn push_column(&mut self, table_id: TableId, column: Column) -> ColumnId {
         let id = ColumnId(self.columns.len() as u32);
         self.columns.push((table_id, column));
         id
     }
 
+    /// Add a fulltext index to the schema.
     pub fn push_fulltext_index(&mut self, table_id: TableId, index_name: String) -> IndexId {
         let id = IndexId(self.indexes.len() as u32);
         self.indexes.push(Index {
@@ -134,6 +142,7 @@ impl SqlSchema {
         id
     }
 
+    /// Add an index to the schema.
     pub fn push_index(&mut self, table_id: TableId, index_name: String) -> IndexId {
         let id = IndexId(self.indexes.len() as u32);
         self.indexes.push(Index {
@@ -144,6 +153,7 @@ impl SqlSchema {
         id
     }
 
+    /// Add a primary key to the schema.
     pub fn push_primary_key(&mut self, table_id: TableId, index_name: String) -> IndexId {
         let id = IndexId(self.indexes.len() as u32);
         self.indexes.push(Index {
@@ -154,6 +164,7 @@ impl SqlSchema {
         id
     }
 
+    /// Add a unique constraint/index to the schema.
     pub fn push_unique_constraint(&mut self, table_id: TableId, index_name: String) -> IndexId {
         let id = IndexId(self.indexes.len() as u32);
         self.indexes.push(Index {
@@ -209,6 +220,11 @@ impl SqlSchema {
         self.tables.len()
     }
 
+    pub fn table_walker<'a>(&'a self, name: &str) -> Option<TableWalker<'a>> {
+        let table_idx = self.tables.iter().position(|table| table.name == name)?;
+        Some(self.walk(TableId(table_idx as u32)))
+    }
+
     pub fn table_walkers(&self) -> impl Iterator<Item = TableWalker<'_>> {
         (0..self.tables.len()).map(move |table_index| TableWalker {
             schema: self,
@@ -241,6 +257,25 @@ impl SqlSchema {
     /// Traverse a schema item by id.
     pub fn walk<I>(&self, id: I) -> Walker<'_, I> {
         Walker { id, schema: self }
+    }
+
+    pub fn udt_walker_at(&self, index: usize) -> UserDefinedTypeWalker<'_> {
+        UserDefinedTypeWalker {
+            udt_index: index,
+            schema: self,
+        }
+    }
+
+    pub fn view_walker_at(&self, index: usize) -> ViewWalker<'_> {
+        ViewWalker {
+            view_index: index,
+            schema: self,
+        }
+    }
+
+    /// Traverse all the columns in the schema.
+    pub fn walk_columns(&self) -> impl Iterator<Item = ColumnWalker<'_>> {
+        (0..self.columns.len()).map(|idx| self.walk(ColumnId(idx as u32)))
     }
 }
 

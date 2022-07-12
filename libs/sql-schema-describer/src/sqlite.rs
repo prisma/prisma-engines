@@ -19,7 +19,7 @@ pub struct SqlSchemaDescriber<'a> {
 
 impl Debug for SqlSchemaDescriber<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct(type_name::<SqlSchemaDescriber>()).finish()
+        f.debug_struct(type_name::<SqlSchemaDescriber<'_>>()).finish()
     }
 }
 
