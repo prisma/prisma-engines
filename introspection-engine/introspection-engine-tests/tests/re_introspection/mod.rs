@@ -1509,24 +1509,22 @@ async fn re_introspecting_mysql_enum_names_if_enum_is_reused(api: &TestApi) -> T
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn custom_repro(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("tag", |t| {
-                t.add_column("id", types::primary());
-                t.add_column("name", types::text().unique(true));
-            });
+    let sql = r#"
+        CREATE TABLE "tag" (
+            id SERIAL PRIMARY KEY,
+            name TEXT NOT NULL UNIQUE
+        );
 
-            migration.create_table("Post", |t| {
-                t.add_column("id", types::primary());
-                t.add_column("tag_id", types::integer().nullable(false));
-                t.add_foreign_key(&["tag_id"], "tag", &["id"]);
-            });
+        CREATE TABLE "Post" (
+            id SERIAL PRIMARY KEY,
+            tag_id INTEGER NOT NULL REFERENCES tag(id)
+        );
 
-            migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::primary());
-            });
-        })
-        .await?;
+        CREATE TABLE "Unrelated" (
+            id SERIAL PRIMARY KEY
+        );
+    "#;
+    api.raw_cmd(sql).await;
 
     let input_dm = indoc! {r#"
         model Post{

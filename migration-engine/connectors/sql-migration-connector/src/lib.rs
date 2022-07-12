@@ -23,7 +23,7 @@ use flavour::{MssqlFlavour, MysqlFlavour, PostgresFlavour, SqlFlavour, SqliteFla
 use migration_connector::{migrations_directory::MigrationDirectory, *};
 use pair::Pair;
 use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};
-use sql_schema_describer::{self as describer, walkers::SqlSchemaExt, SqlSchema};
+use sql_schema_describer::{self as describer, walkers::SqlSchemaExt};
 use std::sync::Arc;
 
 /// The top-level SQL migration connector.
@@ -129,7 +129,7 @@ impl SqlMigrationConnector {
                 .await
                 .map(From::from),
             DiffTarget::Database => self.flavour.describe_schema().await.map(From::from),
-            DiffTarget::Empty => Ok(SqlDatabaseSchema::default()),
+            DiffTarget::Empty => Ok(self.flavour.empty_database_schema().into()),
         }
     }
 }
@@ -164,7 +164,7 @@ impl MigrationConnector for SqlMigrationConnector {
     }
 
     fn empty_database_schema(&self) -> DatabaseSchema {
-        SqlDatabaseSchema::default().into()
+        DatabaseSchema::new(SqlDatabaseSchema::from(self.flavour.empty_database_schema()))
     }
 
     fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
@@ -298,7 +298,7 @@ async fn best_effort_reset_impl(flavour: &mut (dyn SqlFlavour + Send + Sync)) ->
     tracing::info!("Attempting best_effort_reset");
 
     let source_schema = flavour.describe_schema().await?;
-    let target_schema = SqlSchema::default();
+    let target_schema = flavour.empty_database_schema();
     let mut steps = Vec::new();
 
     // We drop views here, not in the normal migration process to not

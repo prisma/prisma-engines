@@ -1,6 +1,5 @@
 use crate::test_api::*;
 use barrel::{types, Migration};
-use indoc::formatdoc;
 use pretty_assertions::assert_eq;
 use sql_schema_describer::{mssql::SqlSchemaDescriber, *};
 
@@ -149,23 +148,6 @@ fn all_mssql_column_types_must_work(api: TestApi) {
             tables: [
                 Table {
                     name: "User",
-                    indices: [],
-                    primary_key: Some(
-                        PrimaryKey {
-                            columns: [
-                                PrimaryKeyColumn {
-                                    name: "primary_col",
-                                    length: None,
-                                    sort_order: Some(
-                                        Asc,
-                                    ),
-                                },
-                            ],
-                            constraint_name: Some(
-                                "thepk",
-                            ),
-                        },
-                    ),
                 },
             ],
             enums: [],
@@ -791,6 +773,29 @@ fn all_mssql_column_types_must_work(api: TestApi) {
             ],
             foreign_keys: [],
             foreign_key_columns: [],
+            indexes: [
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "thepk",
+                    tpe: PrimaryKey,
+                },
+            ],
+            index_columns: [
+                IndexColumn {
+                    index_id: IndexId(
+                        0,
+                    ),
+                    column_id: ColumnId(
+                        0,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+            ],
             views: [],
             procedures: [],
             user_defined_types: [],
@@ -849,9 +854,9 @@ fn primary_key_sort_order_desc_is_handled(api: TestApi) {
     let schema = api.describe();
     let table = schema.table_walkers().next().unwrap();
 
-    assert_eq!(2, table.primary_key_columns().len());
+    assert_eq!(2, table.primary_key_columns_count());
 
-    let columns = table.primary_key_columns().collect::<Vec<_>>();
+    let columns = table.primary_key_columns().unwrap().collect::<Vec<_>>();
 
     assert_eq!("a", columns[0].as_column().name());
     assert_eq!("b", columns[1].as_column().name());
@@ -935,29 +940,9 @@ fn mssql_multi_field_indexes_must_be_inferred(api: TestApi) {
     let full_sql = migration.make::<barrel::backend::MsSql>();
     api.raw_cmd(&full_sql);
     let result = api.describe();
-    let (_, table) = result.table_bang("Employee");
-
-    let columns = vec![
-        IndexColumn {
-            name: "name".to_string(),
-            sort_order: Some(SQLSortOrder::Asc),
-            length: None,
-        },
-        IndexColumn {
-            name: "age".to_string(),
-            sort_order: Some(SQLSortOrder::Asc),
-            length: None,
-        },
-    ];
-
-    assert_eq!(
-        table.indices,
-        &[Index {
-            name: "age_and_name_index".into(),
-            columns,
-            tpe: IndexType::Unique,
-        }]
-    );
+    result.assert_table("Employee", |t| {
+        t.assert_index_on_columns(&["name", "age"], |idx| idx.assert_name("age_and_name_index"))
+    });
 }
 
 #[test_connector(tags(Mssql))]
@@ -984,27 +969,7 @@ fn mssql_join_table_unique_indexes_must_be_inferred(api: TestApi) {
     let full_sql = migration.make::<barrel::backend::MsSql>();
     api.raw_cmd(&full_sql);
     let result = api.describe();
-    let (_, table) = result.table_bang("CatToHuman");
-
-    let columns = vec![
-        IndexColumn {
-            name: "cat".to_string(),
-            sort_order: Some(SQLSortOrder::Asc),
-            length: None,
-        },
-        IndexColumn {
-            name: "human".to_string(),
-            sort_order: Some(SQLSortOrder::Asc),
-            length: None,
-        },
-    ];
-
-    assert_eq!(
-        table.indices,
-        &[Index {
-            name: "cat_and_human_index".into(),
-            columns,
-            tpe: IndexType::Unique,
-        }]
-    );
+    result.assert_table("CatToHuman", |t| {
+        t.assert_index_on_columns(&["cat", "human"], |idx| idx.assert_name("cat_and_human_index"))
+    });
 }

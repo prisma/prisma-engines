@@ -79,7 +79,7 @@ impl<'a> DifferDatabase<'a> {
             // Deal with tables that are both in the previous and the next
             // schema: we are going to look at heir columns.
             if let Some(table_pair) = entry.transpose() {
-                let tables = schemas.tables(&table_pair);
+                let tables = schemas.walk(table_pair);
 
                 columns_cache.clear();
 
@@ -99,7 +99,7 @@ impl<'a> DifferDatabase<'a> {
                     db.columns.insert((table_pair, column_name), *column_ids);
 
                     if let Some(column_ids) = column_ids.transpose() {
-                        let column_walkers = schemas.columns(column_ids);
+                        let column_walkers = schemas.walk(column_ids);
                         let changes = column::all_changes(column_walkers, flavour);
                         db.column_changes.insert(column_ids, changes);
                     }
@@ -112,10 +112,8 @@ impl<'a> DifferDatabase<'a> {
         db
     }
 
-    pub(crate) fn all_column_pairs(&self) -> impl Iterator<Item = Pair<(TableId, ColumnId)>> + '_ {
-        self.columns
-            .iter()
-            .filter_map(|((tables, _), cols)| cols.transpose().map(|cols| tables.combine(cols)))
+    pub(crate) fn all_column_pairs(&self) -> impl Iterator<Item = Pair<ColumnId>> + '_ {
+        self.columns.iter().filter_map(|(_, cols)| cols.transpose())
     }
 
     pub(crate) fn column_pairs(&self, table: Pair<TableId>) -> impl Iterator<Item = Pair<ColumnId>> + '_ {
@@ -173,7 +171,7 @@ impl<'a> DifferDatabase<'a> {
             .values()
             .filter_map(|p| p.transpose())
             .map(move |table_ids| TableDiffer {
-                tables: self.schemas.tables(&table_ids),
+                tables: self.schemas.walk(table_ids),
                 db: self,
             })
     }

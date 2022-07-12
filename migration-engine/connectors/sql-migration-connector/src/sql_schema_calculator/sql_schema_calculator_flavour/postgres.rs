@@ -1,7 +1,8 @@
 use super::SqlSchemaCalculatorFlavour;
-use crate::flavour::PostgresFlavour;
+use crate::flavour::{PostgresFlavour, SqlFlavour};
 use datamodel::{
     builtin_connectors::cockroach_datamodel_connector::SequenceFunction,
+    datamodel_connector::walker_ext_traits::IndexWalkerExt,
     parser_database::{walkers::*, IndexAlgorithm, OperatorClass},
     ValidatedSchema,
 };
@@ -38,12 +39,17 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
         let mut postgres_ext = PostgresSchemaExt::default();
         let db = &context.datamodel.db;
 
-        for (table_idx, model) in db.walk_models().enumerate() {
-            let table_id = sql::TableId(table_idx as u32);
+        for model in db.walk_models() {
+            let table_id = context.model_id_to_table_id[&model.model_id()];
 
             // Add index algorithms and opclasses.
-            for (index_index, index) in model.indexes().enumerate() {
-                let index_id = sql::IndexId(table_id, index_index as u32);
+            for index in model.indexes() {
+                let sql_index = context
+                    .schema
+                    .walk(table_id)
+                    .indexes()
+                    .find(|idx| idx.name() == index.constraint_name(self.datamodel_connector()))
+                    .unwrap();
 
                 let sql_index_algorithm = match index.algorithm() {
                     Some(IndexAlgorithm::BTree) | None => sql::postgres::SqlIndexAlgorithm::BTree,
@@ -53,11 +59,11 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
                     Some(IndexAlgorithm::Gist) => sql::postgres::SqlIndexAlgorithm::Gist,
                     Some(IndexAlgorithm::Brin) => sql::postgres::SqlIndexAlgorithm::Brin,
                 };
-                postgres_ext.indexes.push((index_id, sql_index_algorithm));
+                postgres_ext.indexes.push((sql_index.id, sql_index_algorithm));
 
                 for (field_idx, attrs) in index.scalar_field_attributes().enumerate() {
                     if let Some(opclass) = attrs.operator_class() {
-                        let field_id = sql::IndexFieldId(index_id, field_idx as u32);
+                        let field_id = sql_index.columns().nth(field_idx).unwrap().id;
 
                         let opclass = match opclass.get() {
                             Either::Left(class) => convert_opclass(class, index.algorithm()),
@@ -120,20 +126,6 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
 
                 postgres_ext.sequences.push(sequence);
             }
-        }
-
-        // Add index algorithms for implicit m2m relation tables
-        let models_count = db.models_count();
-        let tables_count = context.schema.describer_schema.tables_count();
-        for table_idx in models_count..tables_count {
-            postgres_ext.indexes.push((
-                sql::IndexId(sql::TableId(table_idx as u32), 0),
-                sql::postgres::SqlIndexAlgorithm::BTree,
-            ));
-            postgres_ext.indexes.push((
-                sql::IndexId(sql::TableId(table_idx as u32), 1),
-                sql::postgres::SqlIndexAlgorithm::BTree,
-            ));
         }
 
         context

@@ -1,8 +1,6 @@
 mod shadow_db;
 
 use crate::{sql_renderer::IteratorJoin, SqlFlavour};
-#[allow(unused_imports)] // wtf, this one is unused on CI, not locally
-use datamodel::common::preview_features::PreviewFeature;
 use enumflags2::BitFlags;
 use indoc::indoc;
 use migration_connector::{
@@ -346,6 +344,12 @@ impl SqlFlavour for PostgresFlavour {
 
     fn drop_migrations_table(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         Box::pin(self.raw_cmd("DROP TABLE _prisma_migrations"))
+    }
+
+    fn empty_database_schema(&self) -> SqlSchema {
+        let mut schema = SqlSchema::default();
+        schema.set_connector_data(Box::new(sql_schema_describer::postgres::PostgresSchemaExt::default()));
+        schema
     }
 
     fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {

@@ -1,4 +1,5 @@
 pub use expect_test::expect;
+pub use indoc::{formatdoc, indoc};
 pub use quaint::{prelude::Queryable, single::Quaint};
 pub use test_macros::test_connector;
 pub use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Capabilities, Tags};
@@ -214,7 +215,7 @@ impl TableAssertion<'_> {
             .indexes()
             .find(|i| {
                 let lengths_match = i.columns().len() == columns.len();
-                let columns_match = i.columns().zip(columns.iter()).all(|(a, b)| a.get().name() == *b);
+                let columns_match = i.columns().zip(columns.iter()).all(|(a, b)| a.as_column().name() == *b);
 
                 lengths_match && columns_match
             })
@@ -230,8 +231,7 @@ impl TableAssertion<'_> {
             .table
             .primary_key()
             .unwrap()
-            .columns
-            .iter()
+            .columns()
             .map(|c| c.name())
             .collect::<Vec<_>>();
 
@@ -253,7 +253,7 @@ impl ColumnAssertion<'_> {
 
     pub fn assert_full_data_type(&self, full_data_type: &str) -> &Self {
         assert_eq!(
-            self.column.column().tpe.full_data_type,
+            self.column.column_type().full_data_type,
             full_data_type,
             "assert_full_data_type() for {}",
             self.column.name()
@@ -304,12 +304,12 @@ impl IndexAssertion<'_> {
     }
 
     pub fn assert_is_unique(&self) -> &Self {
-        assert!(self.index.index_type().is_unique());
+        assert!(self.index.is_unique());
         self
     }
 
     pub fn assert_is_not_unique(&self) -> &Self {
-        assert!(!self.index.index_type().is_unique());
+        assert!(!self.index.is_unique());
         self
     }
 }

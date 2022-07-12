@@ -3,7 +3,7 @@ use crate::SqlFamilyTrait;
 use datamodel::dml::{self, Datamodel, ValueGenerator};
 use introspection_connector::{IntrospectionContext, Version, Warning};
 use native_types::{MySqlType, PostgresType};
-use sql_schema_describer::SqlSchema;
+use sql_schema_describer::{SqlSchema, SqlSchemaExt};
 
 pub fn add_prisma_1_id_defaults(
     version: &Version,
@@ -18,13 +18,13 @@ pub fn add_prisma_1_id_defaults(
         for model in data_model.models().filter(|m| m.has_single_id_field()) {
             let id_field = model.scalar_fields().find(|f| model.field_is_primary(&f.name)).unwrap();
             let table_name = model.database_name.as_ref().unwrap_or(&model.name);
-            let (table_id, _table) = schema.table_bang(table_name);
+            let table = schema.table_walker(table_name).unwrap();
             let column_name = id_field.database_name.as_ref().unwrap_or(&id_field.name);
-            let column = schema.column_bang(table_id, column_name);
+            let column = table.column(column_name).unwrap();
             let model_and_field = ModelAndField::new(&model.name, &id_field.name);
 
             if ctx.sql_family().is_postgres() {
-                if let Some(native_type) = &column.tpe.native_type {
+                if let Some(native_type) = &column.column_type().native_type {
                     let native_type: PostgresType = serde_json::from_value(native_type.clone()).unwrap();
 
                     if native_type == PostgresType::VarChar(Some(25)) {
@@ -34,7 +34,7 @@ pub fn add_prisma_1_id_defaults(
                     }
                 }
             } else if ctx.sql_family().is_mysql() {
-                if let Some(native_type) = &column.tpe.native_type {
+                if let Some(native_type) = &column.column_type().native_type {
                     let native_type: MySqlType = serde_json::from_value(native_type.clone()).unwrap();
 
                     if native_type == MySqlType::Char(25) {

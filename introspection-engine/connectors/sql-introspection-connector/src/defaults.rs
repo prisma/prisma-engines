@@ -2,16 +2,12 @@ use crate::calculate_datamodel::CalculateDatamodelContext as Context;
 use datamodel::dml;
 use sql_schema_describer::{self as sql, postgres::PostgresSchemaExt};
 
-pub(crate) fn calculate_default(
-    table: &sql::Table,
-    column: &sql::Column,
-    ctx: &mut Context,
-) -> Option<dml::DefaultValue> {
-    match (column.default.as_ref().map(|d| d.kind()), &column.tpe.family) {
+pub(crate) fn calculate_default(column: sql::ColumnWalker<'_>, ctx: &mut Context) -> Option<dml::DefaultValue> {
+    match (column.default().map(|d| d.kind()), &column.column_type_family()) {
         (Some(sql::DefaultKind::Sequence(name)), _) if ctx.is_cockroach() => {
             use prisma_value::PrismaValue;
 
-            let connector_data: &PostgresSchemaExt = ctx.schema.downcast_connector_data().unwrap_or_default();
+            let connector_data: &PostgresSchemaExt = ctx.schema.downcast_connector_data();
             let sequence_idx = connector_data
                 .sequences
                 .binary_search_by_key(&name, |s| &s.name)
@@ -44,16 +40,16 @@ pub(crate) fn calculate_default(
                 args,
             )))
         }
-        (_, sql::ColumnTypeFamily::Int) if column.auto_increment => Some(dml::DefaultValue::new_expression(
+        (_, sql::ColumnTypeFamily::Int) if column.is_autoincrement() => Some(dml::DefaultValue::new_expression(
             dml::ValueGenerator::new_autoincrement(),
         )),
-        (_, sql::ColumnTypeFamily::BigInt) if column.auto_increment => Some(dml::DefaultValue::new_expression(
+        (_, sql::ColumnTypeFamily::BigInt) if column.is_autoincrement() => Some(dml::DefaultValue::new_expression(
             dml::ValueGenerator::new_autoincrement(),
         )),
-        (_, sql::ColumnTypeFamily::Int) if is_sequence(column, table) => Some(dml::DefaultValue::new_expression(
+        (_, sql::ColumnTypeFamily::Int) if is_sequence(column) => Some(dml::DefaultValue::new_expression(
             dml::ValueGenerator::new_autoincrement(),
         )),
-        (_, sql::ColumnTypeFamily::BigInt) if is_sequence(column, table) => Some(dml::DefaultValue::new_expression(
+        (_, sql::ColumnTypeFamily::BigInt) if is_sequence(column) => Some(dml::DefaultValue::new_expression(
             dml::ValueGenerator::new_autoincrement(),
         )),
         (Some(sql::DefaultKind::Sequence(_)), _) => Some(dml::DefaultValue::new_expression(
@@ -77,8 +73,8 @@ pub(crate) fn calculate_default(
     }
 }
 
-fn set_default(mut default: dml::DefaultValue, column: &sql::Column) -> dml::DefaultValue {
-    let db_name = column.default.as_ref().and_then(|df| df.constraint_name());
+fn set_default(mut default: dml::DefaultValue, column: sql::ColumnWalker<'_>) -> dml::DefaultValue {
+    let db_name = column.default().and_then(|df| df.constraint_name());
 
     if let Some(name) = db_name {
         default.set_db_name(name);
@@ -87,10 +83,6 @@ fn set_default(mut default: dml::DefaultValue, column: &sql::Column) -> dml::Def
     default
 }
 
-fn is_sequence(column: &sql::Column, table: &sql::Table) -> bool {
-    table
-        .primary_key
-        .as_ref()
-        .map(|pk| pk.is_single_primary_key(&column.name) && matches!(&column.default, Some(d) if d.is_sequence()))
-        .unwrap_or(false)
+fn is_sequence(column: sql::ColumnWalker<'_>) -> bool {
+    column.is_single_primary_key() && matches!(&column.default(), Some(d) if d.is_sequence())
 }

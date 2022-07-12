@@ -10,7 +10,7 @@ use quaint::connector::SqlFamily;
 use sql_schema_describer::ForeignKeyWalker;
 use sql_schema_describer::{
     walkers::{ColumnWalker, TableWalker},
-    ForeignKeyAction, PrimaryKey, SqlSchema,
+    ForeignKeyAction, SqlSchema,
 };
 use tracing::debug;
 
@@ -30,7 +30,7 @@ pub struct VersionChecker {
     has_inline_relations: bool,
 }
 
-const SQLITE_TYPES: &[&str] = &["BOOLEAN", "DATE", "REAL", "INTEGER", "TEXT"];
+const SQLITE_TYPES: &[&str] = &["boolean", "date", "real", "integer", "text"];
 
 const POSTGRES_TYPES: &[PostgresType] = &[
     PostgresType::Boolean,
@@ -55,7 +55,7 @@ const MYSQL_TYPES: &[MySqlType] = &[
 ];
 
 impl VersionChecker {
-    pub fn new(schema: &SqlSchema, ctx: &IntrospectionContext) -> VersionChecker {
+    pub(crate) fn new(schema: &SqlSchema, ctx: &IntrospectionContext) -> VersionChecker {
         VersionChecker {
             sql_family: ctx.sql_family(),
             is_cockroachdb: ctx.source.active_provider == "cockroachdb",
@@ -72,7 +72,7 @@ impl VersionChecker {
         }
     }
 
-    pub fn check_column_for_type_and_default_value(&mut self, column: ColumnWalker<'_>) {
+    pub(crate) fn check_column_for_type_and_default_value(&mut self, column: ColumnWalker<'_>) {
         match self.sql_family {
             SqlFamily::Postgres if self.is_cockroachdb => {
                 self.uses_non_prisma_types = true; // we can be sure it's not prisma 1
@@ -136,10 +136,10 @@ impl VersionChecker {
         }
 
         if !is_prisma_1_or_11_list_table(table) && !is_relay_table(table) {
-            if let Some(PrimaryKey { columns, .. }) = table.primary_key() {
-                if columns.len() == 1 {
-                    let col = table.column(columns.first().unwrap().name()).unwrap();
-                    let tpe = col.column_type();
+            if let Some(pk) = table.primary_key() {
+                if pk.columns().len() == 1 {
+                    let col = pk.columns().next().unwrap();
+                    let tpe = col.as_column().column_type();
 
                     if self.sql_family == SqlFamily::Postgres {
                         if let Some(native_type) = &tpe.native_type {
