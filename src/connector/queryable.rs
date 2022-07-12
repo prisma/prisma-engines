@@ -1,4 +1,4 @@
-use super::{IsolationLevel, ResultSet, Transaction, TransactionOptions};
+use super::{ResultSet, Transaction};
 use crate::ast::*;
 use async_trait::async_trait;
 
@@ -90,13 +90,6 @@ pub trait Queryable: Send + Sync {
     fn begin_statement(&self) -> &'static str {
         "BEGIN"
     }
-
-    /// Sets the transaction isolation level to given value.
-    /// Implementers have to make sure that the passed isolation level is valid for the underlying database.
-    async fn set_tx_isolation_level(&self, isolation_level: IsolationLevel) -> crate::Result<()>;
-
-    /// Signals if the isolation level SET needs to happen before or after the tx BEGIN.
-    fn requires_isolation_first(&self) -> bool;
 }
 
 /// A thing that can start a new transaction.
@@ -106,8 +99,7 @@ where
     Self: Sized,
 {
     /// Starts a new transaction
-    async fn start_transaction(&self, isolation: Option<IsolationLevel>) -> crate::Result<Transaction<'_>> {
-        let opts = TransactionOptions::new(isolation, self.requires_isolation_first());
-        Transaction::new(self, self.begin_statement(), opts).await
+    async fn start_transaction(&self) -> crate::Result<Transaction<'_>> {
+        Transaction::new(self, self.begin_statement()).await
     }
 }

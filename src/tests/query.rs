@@ -4,7 +4,7 @@ use super::test_api::*;
 #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
 use crate::ast::JsonPath;
 use crate::{
-    connector::{IsolationLevel, Queryable, TransactionCapable},
+    connector::{Queryable, TransactionCapable},
     prelude::*,
 };
 use test_macros::test_each_connector;
@@ -63,7 +63,7 @@ async fn select_star_from(api: &mut dyn TestApi) -> crate::Result<()> {
 async fn transactions(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_table("value int").await?;
 
-    let tx = api.conn().start_transaction(None).await?;
+    let tx = api.conn().start_transaction().await?;
     let insert = Insert::single_into(&table).value("value", 10);
 
     let rows_affected = tx.execute(insert.into()).await?;
@@ -80,60 +80,6 @@ async fn transactions(api: &mut dyn TestApi) -> crate::Result<()> {
     let res = api.conn().select(select).await?;
 
     assert_eq!(0, res.len());
-
-    Ok(())
-}
-
-#[test_each_connector(tags("mssql", "postgresql", "mysql"))]
-async fn transactions_with_isolation_works(api: &mut dyn TestApi) -> crate::Result<()> {
-    // This test only tests that the SET isolation level statements are accepted.
-    api.conn()
-        .start_transaction(Some(IsolationLevel::ReadUncommitted))
-        .await?
-        .commit()
-        .await?;
-
-    api.conn()
-        .start_transaction(Some(IsolationLevel::ReadCommitted))
-        .await?
-        .commit()
-        .await?;
-
-    api.conn()
-        .start_transaction(Some(IsolationLevel::RepeatableRead))
-        .await?
-        .commit()
-        .await?;
-
-    api.conn()
-        .start_transaction(Some(IsolationLevel::Serializable))
-        .await?
-        .commit()
-        .await?;
-
-    Ok(())
-}
-
-// SQLite only supports serializable.
-#[test_each_connector(tags("sqlite"))]
-async fn sqlite_serializable_tx(api: &mut dyn TestApi) -> crate::Result<()> {
-    api.conn()
-        .start_transaction(Some(IsolationLevel::Serializable))
-        .await?
-        .commit()
-        .await?;
-
-    Ok(())
-}
-
-// Only SQL Server supports snapshot.
-#[test_each_connector(tags("mssql"))]
-async fn mssql_snapshot_tx(api: &mut dyn TestApi) -> crate::Result<()> {
-    api.conn()
-        .start_transaction(Some(IsolationLevel::Snapshot))
-        .await?
-        .commit()
-        .await?;
 
     Ok(())
 }

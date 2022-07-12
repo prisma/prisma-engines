@@ -6,7 +6,7 @@ use crate::connector::MysqlUrl;
 use crate::connector::PostgresUrl;
 use crate::{
     ast,
-    connector::{self, IsolationLevel, Queryable, Transaction, TransactionCapable},
+    connector::{self, Queryable, Transaction, TransactionCapable},
     error::Error,
 };
 use async_trait::async_trait;
@@ -26,16 +26,16 @@ impl Queryable for PooledConnection {
         self.inner.query(q).await
     }
 
+    async fn execute(&self, q: ast::Query<'_>) -> crate::Result<u64> {
+        self.inner.execute(q).await
+    }
+
     async fn query_raw(&self, sql: &str, params: &[ast::Value<'_>]) -> crate::Result<connector::ResultSet> {
         self.inner.query_raw(sql, params).await
     }
 
     async fn query_raw_typed(&self, sql: &str, params: &[ast::Value<'_>]) -> crate::Result<connector::ResultSet> {
         self.inner.query_raw_typed(sql, params).await
-    }
-
-    async fn execute(&self, q: ast::Query<'_>) -> crate::Result<u64> {
-        self.inner.execute(q).await
     }
 
     async fn execute_raw(&self, sql: &str, params: &[ast::Value<'_>]) -> crate::Result<u64> {
@@ -54,10 +54,6 @@ impl Queryable for PooledConnection {
         self.inner.version().await
     }
 
-    fn is_healthy(&self) -> bool {
-        self.inner.is_healthy()
-    }
-
     async fn server_reset_query(&self, tx: &Transaction<'_>) -> crate::Result<()> {
         self.inner.server_reset_query(tx).await
     }
@@ -66,12 +62,8 @@ impl Queryable for PooledConnection {
         self.inner.begin_statement()
     }
 
-    async fn set_tx_isolation_level(&self, isolation_level: IsolationLevel) -> crate::Result<()> {
-        self.inner.set_tx_isolation_level(isolation_level).await
-    }
-
-    fn requires_isolation_first(&self) -> bool {
-        self.inner.requires_isolation_first()
+    fn is_healthy(&self) -> bool {
+        self.inner.is_healthy()
     }
 }
 

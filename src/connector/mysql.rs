@@ -1,12 +1,6 @@
 mod conversion;
 mod error;
 
-use crate::{
-    ast::{Query, Value},
-    connector::{metrics, queryable::*, ResultSet},
-    error::{Error, ErrorKind},
-    visitor::{self, Visitor},
-};
 use async_trait::async_trait;
 use lru_cache::LruCache;
 use mysql_async::{
@@ -24,12 +18,17 @@ use std::{
 use tokio::sync::Mutex;
 use url::Url;
 
+use crate::{
+    ast::{Query, Value},
+    connector::{metrics, queryable::*, ResultSet},
+    error::{Error, ErrorKind},
+    visitor::{self, Visitor},
+};
+
 /// The underlying MySQL driver. Only available with the `expose-drivers`
 /// Cargo feature.
 #[cfg(feature = "expose-drivers")]
 pub use mysql_async;
-
-use super::IsolationLevel;
 
 /// A connector interface for the MySQL database.
 #[derive(Debug)]
@@ -449,6 +448,11 @@ impl Queryable for Mysql {
         self.query_raw(&sql, &params).await
     }
 
+    async fn execute(&self, q: Query<'_>) -> crate::Result<u64> {
+        let (sql, params) = visitor::Mysql::build(q)?;
+        self.execute_raw(&sql, &params).await
+    }
+
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
         metrics::query("mysql.query_raw", sql, params, move || async move {
             self.prepared(sql, |stmt| async move {
@@ -476,11 +480,6 @@ impl Queryable for Mysql {
 
     async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
         self.query_raw(sql, params).await
-    }
-
-    async fn execute(&self, q: Query<'_>) -> crate::Result<u64> {
-        let (sql, params) = visitor::Mysql::build(q)?;
-        self.execute_raw(&sql, &params).await
     }
 
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
@@ -535,21 +534,6 @@ impl Queryable for Mysql {
 
     fn is_healthy(&self) -> bool {
         self.is_healthy.load(Ordering::SeqCst)
-    }
-
-    async fn set_tx_isolation_level(&self, isolation_level: IsolationLevel) -> crate::Result<()> {
-        if matches!(isolation_level, IsolationLevel::Snapshot) {
-            return Err(Error::builder(ErrorKind::invalid_isolation_level(&isolation_level)).build());
-        }
-
-        self.raw_cmd(&format!("SET TRANSACTION ISOLATION LEVEL {}", isolation_level))
-            .await?;
-
-        Ok(())
-    }
-
-    fn requires_isolation_first(&self) -> bool {
-        true
     }
 }
 
