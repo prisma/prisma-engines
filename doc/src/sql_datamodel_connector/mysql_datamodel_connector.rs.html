@@ -392,6 +392,7 @@
 <span id="387">387</span>
 <span id="388">388</span>
 <span id="389">389</span>
+<span id="390">390</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">validations</span>;
 
 <span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
@@ -510,6 +511,7 @@
     <span class="ident">ConnectorCapability::MultipleFullTextAttributesPerModel</span>,
     <span class="ident">ConnectorCapability::ImplicitManyToManyRelation</span>,
     <span class="ident">ConnectorCapability::DecimalType</span>,
+    <span class="ident">ConnectorCapability::OrderByNullsFirstLast</span>,
 ];
 
 <span class="kw">const</span> <span class="ident">CONSTRAINT_SCOPES</span>: <span class="kw-2">&amp;</span>[<span class="ident">ConstraintScope</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">ConstraintScope::GlobalForeignKey</span>, <span class="ident">ConstraintScope::ModelKeyIndex</span>];

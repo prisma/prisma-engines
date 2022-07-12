@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["ASC",""],["DESC",""],["FIELDS",""],["SEARCH",""],["SORT",""],["SORT_ORDER",""],["UNDERSCORE_RELEVANCE",""]]});
+initSidebarItems({"constant":[["ASC",""],["DESC",""],["FIELDS",""],["FIRST",""],["LAST",""],["NULLS",""],["NULLS_ORDER",""],["SEARCH",""],["SORT",""],["SORT_ORDER",""],["UNDERSCORE_RELEVANCE",""]]});

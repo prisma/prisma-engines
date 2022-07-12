@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/8f9d2c5/src/visitor/mssql.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mssql.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/df52315/src/visitor/mssql.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mssql.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -1760,6 +1760,53 @@
 <span id="1755">1755</span>
 <span id="1756">1756</span>
 <span id="1757">1757</span>
+<span id="1758">1758</span>
+<span id="1759">1759</span>
+<span id="1760">1760</span>
+<span id="1761">1761</span>
+<span id="1762">1762</span>
+<span id="1763">1763</span>
+<span id="1764">1764</span>
+<span id="1765">1765</span>
+<span id="1766">1766</span>
+<span id="1767">1767</span>
+<span id="1768">1768</span>
+<span id="1769">1769</span>
+<span id="1770">1770</span>
+<span id="1771">1771</span>
+<span id="1772">1772</span>
+<span id="1773">1773</span>
+<span id="1774">1774</span>
+<span id="1775">1775</span>
+<span id="1776">1776</span>
+<span id="1777">1777</span>
+<span id="1778">1778</span>
+<span id="1779">1779</span>
+<span id="1780">1780</span>
+<span id="1781">1781</span>
+<span id="1782">1782</span>
+<span id="1783">1783</span>
+<span id="1784">1784</span>
+<span id="1785">1785</span>
+<span id="1786">1786</span>
+<span id="1787">1787</span>
+<span id="1788">1788</span>
+<span id="1789">1789</span>
+<span id="1790">1790</span>
+<span id="1791">1791</span>
+<span id="1792">1792</span>
+<span id="1793">1793</span>
+<span id="1794">1794</span>
+<span id="1795">1795</span>
+<span id="1796">1796</span>
+<span id="1797">1797</span>
+<span id="1798">1798</span>
+<span id="1799">1799</span>
+<span id="1800">1800</span>
+<span id="1801">1801</span>
+<span id="1802">1802</span>
+<span id="1803">1803</span>
+<span id="1804">1804</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Visitor</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>, <span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)))]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">JsonExtract</span>, <span class="ident">JsonType</span>};
@@ -1905,6 +1952,37 @@
         <span class="self">self</span>.<span class="ident">visit_joins</span>(<span class="macro">vec!</span>[<span class="ident">Join::Inner</span>(<span class="ident">join</span>)])<span class="question-mark">?</span>;
 
         <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot; WHERE @@ROWCOUNT &gt; 0&quot;</span>)<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="kw">fn</span> <span class="ident">visit_order_by</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">direction</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">visitor::Result</span> {
+        <span class="self">self</span>.<span class="ident">visit_expression</span>(<span class="ident">value</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot; {}&quot;</span>, <span class="ident">direction</span>))<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="comment">// ORDER BY CASE WHEN &lt;value&gt; IS NULL THEN 0 ELSE 1 END, &lt;value&gt; &lt;direction&gt;</span>
+    <span class="kw">fn</span> <span class="ident">visit_order_by_nulls_first</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">direction</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">visitor::Result</span> {
+        <span class="self">self</span>.<span class="ident">surround_with</span>(<span class="string">&quot;CASE WHEN &quot;</span>, <span class="string">&quot; END&quot;</span>, <span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
+            <span class="ident">s</span>.<span class="ident">visit_expression</span>(<span class="ident">value</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>;
+            <span class="ident">s</span>.<span class="ident">write</span>(<span class="string">&quot; IS NULL THEN 0 ELSE 1&quot;</span>)
+        })<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">visit_order_by</span>(<span class="ident">direction</span>, <span class="ident">value</span>)<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="comment">// ORDER BY CASE WHEN &lt;value&gt; IS NULL THEN 1 ELSE 0 END, &lt;value&gt; &lt;direction&gt;</span>
+    <span class="kw">fn</span> <span class="ident">visit_order_by_nulls_last</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">direction</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">visitor::Result</span> {
+        <span class="self">self</span>.<span class="ident">surround_with</span>(<span class="string">&quot;CASE WHEN &quot;</span>, <span class="string">&quot; END&quot;</span>, <span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
+            <span class="ident">s</span>.<span class="ident">visit_expression</span>(<span class="ident">value</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>;
+            <span class="ident">s</span>.<span class="ident">write</span>(<span class="string">&quot; IS NULL THEN 1 ELSE 0&quot;</span>)
+        })<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">visit_order_by</span>(<span class="ident">direction</span>, <span class="ident">value</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -2312,13 +2390,29 @@
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">ordering</span>.<span class="number">0</span>.<span class="ident">len</span>();
 
         <span class="kw">for</span> (<span class="ident">i</span>, (<span class="ident">value</span>, <span class="ident">ordering</span>)) <span class="kw">in</span> <span class="ident">ordering</span>.<span class="number">0</span>.<span class="ident">into_iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">let</span> <span class="ident">direction</span> <span class="op">=</span> <span class="ident">ordering</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">dir</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">dir</span> {
-                <span class="ident">Order::Asc</span> =&gt; <span class="string">&quot; ASC&quot;</span>,
-                <span class="ident">Order::Desc</span> =&gt; <span class="string">&quot; DESC&quot;</span>,
-            });
-
-            <span class="self">self</span>.<span class="ident">visit_expression</span>(<span class="ident">value</span>)<span class="question-mark">?</span>;
-            <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">direction</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>))<span class="question-mark">?</span>;
+            <span class="kw">match</span> <span class="ident">ordering</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">Order::Asc</span>) =&gt; {
+                    <span class="self">self</span>.<span class="ident">visit_order_by</span>(<span class="string">&quot;ASC&quot;</span>, <span class="ident">value</span>)<span class="question-mark">?</span>;
+                }
+                <span class="prelude-val">Some</span>(<span class="ident">Order::Desc</span>) =&gt; {
+                    <span class="self">self</span>.<span class="ident">visit_order_by</span>(<span class="string">&quot;DESC&quot;</span>, <span class="ident">value</span>)<span class="question-mark">?</span>;
+                }
+                <span class="prelude-val">Some</span>(<span class="ident">Order::AscNullsFirst</span>) =&gt; {
+                    <span class="self">self</span>.<span class="ident">visit_order_by_nulls_first</span>(<span class="string">&quot;ASC&quot;</span>, <span class="ident">value</span>)<span class="question-mark">?</span>;
+                }
+                <span class="prelude-val">Some</span>(<span class="ident">Order::AscNullsLast</span>) =&gt; {
+                    <span class="self">self</span>.<span class="ident">visit_order_by_nulls_last</span>(<span class="string">&quot;ASC&quot;</span>, <span class="ident">value</span>)<span class="question-mark">?</span>;
+                }
+                <span class="prelude-val">Some</span>(<span class="ident">Order::DescNullsFirst</span>) =&gt; {
+                    <span class="self">self</span>.<span class="ident">visit_order_by_nulls_first</span>(<span class="string">&quot;DESC&quot;</span>, <span class="ident">value</span>)<span class="question-mark">?</span>;
+                }
+                <span class="prelude-val">Some</span>(<span class="ident">Order::DescNullsLast</span>) =&gt; {
+                    <span class="self">self</span>.<span class="ident">visit_order_by_nulls_last</span>(<span class="string">&quot;DESC&quot;</span>, <span class="ident">value</span>)<span class="question-mark">?</span>;
+                }
+                <span class="prelude-val">None</span> =&gt; {
+                    <span class="self">self</span>.<span class="ident">visit_expression</span>(<span class="ident">value</span>)<span class="question-mark">?</span>;
+                }
+            };
 
             <span class="kw">if</span> <span class="ident">i</span> <span class="op">&lt;</span> (<span class="ident">len</span> <span class="op">-</span> <span class="number">1</span>) {
                 <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;

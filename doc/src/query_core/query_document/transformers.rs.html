@@ -281,11 +281,11 @@
 <span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">OrderBy</span>, <span class="ident">PrismaValue</span>, <span class="ident">ScalarFieldRef</span>};
 <span class="kw">use</span> <span class="ident">std::convert::TryInto</span>;
 
-<span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParsedInputValue</span> {
+<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">ParsedInputValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PrismaValue</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">QueryParserError</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_into</span>(<span class="self">self</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="ident">value</span> {
             <span class="ident">ParsedInputValue::Single</span>(<span class="ident">val</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">val</span>),
             <span class="ident">ParsedInputValue::List</span>(<span class="ident">values</span>) =&gt; <span class="ident">values</span>
                 .<span class="ident">into_iter</span>()
@@ -310,11 +310,11 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">ParsedInputMap</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParsedInputValue</span> {
+<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">ParsedInputValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParsedInputMap</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">QueryParserError</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_into</span>(<span class="self">self</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">ParsedInputMap</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">ParsedInputMap</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="ident">value</span> {
             <span class="ident">ParsedInputValue::Map</span>(<span class="ident">val</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">val</span>),
             <span class="ident">v</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryParserError</span> {
                 <span class="ident">path</span>: <span class="ident">QueryPath::default</span>(),
@@ -327,11 +327,11 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedInputMap</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParsedInputValue</span> {
+<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">ParsedInputValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedInputMap</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">QueryParserError</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_into</span>(<span class="self">self</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedInputMap</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedInputMap</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="ident">value</span> {
             <span class="ident">ParsedInputValue::Single</span>(<span class="ident">PrismaValue::Null</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
             <span class="ident">ParsedInputValue::Map</span>(<span class="ident">val</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">val</span>)),
             <span class="ident">v</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryParserError</span> {
@@ -345,11 +345,11 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">ParsedInputList</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParsedInputValue</span> {
+<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">ParsedInputValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParsedInputList</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">QueryParserError</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_into</span>(<span class="self">self</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ParsedInputValue</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ParsedInputValue</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="ident">value</span> {
             <span class="ident">ParsedInputValue::List</span>(<span class="ident">vals</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">vals</span>),
             <span class="ident">v</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryParserError</span> {
                 <span class="ident">path</span>: <span class="ident">QueryPath::default</span>(),
@@ -362,11 +362,11 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParsedInputValue</span> {
+<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">ParsedInputValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">QueryParserError</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_into</span>(<span class="self">self</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="ident">value</span> {
             <span class="ident">ParsedInputValue::List</span>(<span class="ident">vals</span>) =&gt; <span class="ident">vals</span>
                 .<span class="ident">into_iter</span>()
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="ident">val</span>.<span class="ident">try_into</span>())
@@ -382,11 +382,11 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParsedInputValue</span> {
+<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">ParsedInputValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">QueryParserError</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_into</span>(<span class="self">self</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">prisma_value</span>: <span class="ident">PrismaValue</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">prisma_value</span> <span class="op">=</span> <span class="ident">PrismaValue::try_from</span>(<span class="ident">value</span>)<span class="question-mark">?</span>;
 
         <span class="kw">match</span> <span class="ident">prisma_value</span> {
             <span class="ident">PrismaValue::String</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">s</span>)),
@@ -403,12 +403,12 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">OrderBy</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParsedInputValue</span> {
+<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">ParsedInputValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OrderBy</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">QueryParserError</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_into</span>(<span class="self">self</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">OrderBy</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::OrderBy</span>(<span class="ident">ord</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ord</span>),
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">OrderBy</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="ident">value</span> {
+            <span class="ident">ParsedInputValue::OrderBy</span>(<span class="ident">ord</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ord</span>),
             <span class="ident">v</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryParserError</span> {
                 <span class="ident">path</span>: <span class="ident">QueryPath::default</span>(),
                 <span class="ident">error_kind</span>: <span class="ident">QueryParserErrorKind::AssertionError</span>(<span class="macro">format!</span>(
@@ -420,12 +420,12 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParsedInputValue</span> {
+<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">ParsedInputValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ScalarFieldRef</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">QueryParserError</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_into</span>(<span class="self">self</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::ScalarField</span>(<span class="ident">f</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">f</span>),
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="ident">value</span> {
+            <span class="ident">ParsedInputValue::ScalarField</span>(<span class="ident">f</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">f</span>),
             <span class="ident">v</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryParserError</span> {
                 <span class="ident">path</span>: <span class="ident">QueryPath::default</span>(),
                 <span class="ident">error_kind</span>: <span class="ident">QueryParserErrorKind::AssertionError</span>(<span class="macro">format!</span>(
@@ -437,11 +437,11 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParsedInputValue</span> {
+<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">ParsedInputValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">QueryParserError</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_into</span>(<span class="self">self</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">prisma_value</span>: <span class="ident">PrismaValue</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">prisma_value</span> <span class="op">=</span> <span class="ident">PrismaValue::try_from</span>(<span class="ident">value</span>)<span class="question-mark">?</span>;
 
         <span class="kw">match</span> <span class="ident">prisma_value</span> {
             <span class="ident">PrismaValue::Float</span>(<span class="ident">d</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">d</span>.<span class="ident">to_f64</span>()),
@@ -457,11 +457,11 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParsedInputValue</span> {
+<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">ParsedInputValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">QueryParserError</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_into</span>(<span class="self">self</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">prisma_value</span>: <span class="ident">PrismaValue</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">prisma_value</span> <span class="op">=</span> <span class="ident">PrismaValue::try_from</span>(<span class="ident">value</span>)<span class="question-mark">?</span>;
 
         <span class="kw">match</span> <span class="ident">prisma_value</span> {
             <span class="ident">PrismaValue::Boolean</span>(<span class="ident">b</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">b</span>)),
@@ -477,11 +477,11 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParsedInputValue</span> {
+<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">ParsedInputValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">QueryParserError</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_into</span>(<span class="self">self</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">prisma_value</span>: <span class="ident">PrismaValue</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">prisma_value</span> <span class="op">=</span> <span class="ident">PrismaValue::try_from</span>(<span class="ident">value</span>)<span class="question-mark">?</span>;
 
         <span class="kw">match</span> <span class="ident">prisma_value</span> {
             <span class="ident">PrismaValue::DateTime</span>(<span class="ident">dt</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">dt</span>)),
@@ -497,11 +497,11 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParsedInputValue</span> {
+<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">ParsedInputValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">QueryParserError</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_into</span>(<span class="self">self</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">prisma_value</span>: <span class="ident">PrismaValue</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">prisma_value</span> <span class="op">=</span> <span class="ident">PrismaValue::try_from</span>(<span class="ident">value</span>)<span class="question-mark">?</span>;
 
         <span class="kw">match</span> <span class="ident">prisma_value</span> {
             <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">i</span>)),
@@ -517,11 +517,11 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParsedInputValue</span> {
+<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">ParsedInputValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">bool</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">QueryParserError</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_into</span>(<span class="self">self</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">prisma_value</span>: <span class="ident">PrismaValue</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">prisma_value</span> <span class="op">=</span> <span class="ident">PrismaValue::try_from</span>(<span class="ident">value</span>)<span class="question-mark">?</span>;
 
         <span class="kw">match</span> <span class="ident">prisma_value</span> {
             <span class="ident">PrismaValue::Boolean</span>(<span class="ident">b</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">b</span>),

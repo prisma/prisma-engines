@@ -193,6 +193,25 @@
 <span id="188">188</span>
 <span id="189">189</span>
 <span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">join_utils</span>::<span class="kw-2">*</span>, <span class="ident">model_extensions</span>::<span class="kw-2">*</span>, <span class="ident">query_arguments_ext::QueryArgumentsExt</span>};
 <span class="kw">use</span> <span class="ident">connector_interface::QueryArguments</span>;
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
@@ -242,7 +261,11 @@
     <span class="ident">index</span>: <span class="ident">usize</span>,
 ) -&gt; <span class="ident">OrderByDefinition</span> {
     <span class="kw">let</span> (<span class="ident">joins</span>, <span class="ident">order_column</span>) <span class="op">=</span> <span class="ident">compute_joins_scalar</span>(<span class="ident">order_by</span>, <span class="ident">index</span>, <span class="ident">base_model</span>);
-    <span class="kw">let</span> <span class="ident">order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">into_order</span>(<span class="ident">order_by</span>.<span class="ident">sort_order</span>, <span class="ident">needs_reversed_order</span>));
+    <span class="kw">let</span> <span class="ident">order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">into_order</span>(
+        <span class="kw-2">&amp;</span><span class="ident">order_by</span>.<span class="ident">sort_order</span>,
+        <span class="ident">order_by</span>.<span class="ident">nulls_order</span>.<span class="ident">as_ref</span>(),
+        <span class="ident">needs_reversed_order</span>,
+    ));
     <span class="kw">let</span> <span class="ident">order_definition</span>: <span class="ident">OrderDefinition</span> <span class="op">=</span> (<span class="ident">order_column</span>.<span class="ident">clone</span>().<span class="ident">into</span>(), <span class="ident">order</span>);
 
     <span class="ident">OrderByDefinition</span> {
@@ -255,7 +278,7 @@
 <span class="kw">fn</span> <span class="ident">build_order_relevance</span>(<span class="ident">order_by</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByRelevance</span>, <span class="ident">needs_reversed_order</span>: <span class="ident">bool</span>) -&gt; <span class="ident">OrderByDefinition</span> {
     <span class="kw">let</span> <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">order_by</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> <span class="ident">sf</span>.<span class="ident">as_column</span>().<span class="ident">into</span>()).<span class="ident">collect</span>();
     <span class="kw">let</span> <span class="ident">order_column</span>: <span class="ident">Expression</span> <span class="op">=</span> <span class="ident">text_search_relevance</span>(<span class="kw-2">&amp;</span><span class="ident">columns</span>, <span class="ident">order_by</span>.<span class="ident">search</span>.<span class="ident">clone</span>()).<span class="ident">into</span>();
-    <span class="kw">let</span> <span class="ident">order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">into_order</span>(<span class="ident">order_by</span>.<span class="ident">sort_order</span>, <span class="ident">needs_reversed_order</span>));
+    <span class="kw">let</span> <span class="ident">order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">into_order</span>(<span class="kw-2">&amp;</span><span class="ident">order_by</span>.<span class="ident">sort_order</span>, <span class="prelude-val">None</span>, <span class="ident">needs_reversed_order</span>));
     <span class="kw">let</span> <span class="ident">order_definition</span>: <span class="ident">OrderDefinition</span> <span class="op">=</span> (<span class="ident">order_column</span>.<span class="ident">clone</span>(), <span class="ident">order</span>);
 
     <span class="ident">OrderByDefinition</span> {
@@ -266,7 +289,7 @@
 }
 
 <span class="kw">fn</span> <span class="ident">build_order_aggr_scalar</span>(<span class="ident">order_by</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByScalarAggregation</span>, <span class="ident">needs_reversed_order</span>: <span class="ident">bool</span>) -&gt; <span class="ident">OrderByDefinition</span> {
-    <span class="kw">let</span> <span class="ident">order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">into_order</span>(<span class="ident">order_by</span>.<span class="ident">sort_order</span>, <span class="ident">needs_reversed_order</span>));
+    <span class="kw">let</span> <span class="ident">order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">into_order</span>(<span class="kw-2">&amp;</span><span class="ident">order_by</span>.<span class="ident">sort_order</span>, <span class="prelude-val">None</span>, <span class="ident">needs_reversed_order</span>));
     <span class="kw">let</span> <span class="ident">order_column</span> <span class="op">=</span> <span class="ident">order_by</span>.<span class="ident">field</span>.<span class="ident">as_column</span>();
     <span class="kw">let</span> <span class="ident">order_definition</span>: <span class="ident">OrderDefinition</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">order_by</span>.<span class="ident">sort_aggregation</span> {
         <span class="ident">SortAggregation::Count</span> =&gt; (<span class="ident">count</span>(<span class="ident">order_column</span>.<span class="ident">clone</span>()).<span class="ident">into</span>(), <span class="ident">order</span>),
@@ -289,7 +312,7 @@
     <span class="ident">needs_reversed_order</span>: <span class="ident">bool</span>,
     <span class="ident">index</span>: <span class="ident">usize</span>,
 ) -&gt; <span class="ident">OrderByDefinition</span> {
-    <span class="kw">let</span> <span class="ident">order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">into_order</span>(<span class="ident">order_by</span>.<span class="ident">sort_order</span>, <span class="ident">needs_reversed_order</span>));
+    <span class="kw">let</span> <span class="ident">order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">into_order</span>(<span class="kw-2">&amp;</span><span class="ident">order_by</span>.<span class="ident">sort_order</span>, <span class="prelude-val">None</span>, <span class="ident">needs_reversed_order</span>));
     <span class="kw">let</span> (<span class="ident">joins</span>, <span class="ident">order_column</span>) <span class="op">=</span> <span class="ident">compute_joins_aggregation</span>(<span class="ident">order_by</span>, <span class="ident">index</span>, <span class="ident">base_model</span>);
     <span class="kw">let</span> <span class="ident">order_definition</span>: <span class="ident">OrderDefinition</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">order_by</span>.<span class="ident">sort_aggregation</span> {
         <span class="ident">SortAggregation::Count</span> =&gt; {
@@ -375,12 +398,27 @@
     (<span class="ident">joins</span>, <span class="ident">order_by_column</span>)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_order</span>(<span class="ident">prisma_order</span>: <span class="ident">SortOrder</span>, <span class="ident">reverse</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Order</span> {
-    <span class="kw">match</span> (<span class="ident">prisma_order</span>, <span class="ident">reverse</span>) {
-        (<span class="ident">SortOrder::Ascending</span>, <span class="bool-val">false</span>) =&gt; <span class="ident">Order::Asc</span>,
-        (<span class="ident">SortOrder::Descending</span>, <span class="bool-val">false</span>) =&gt; <span class="ident">Order::Desc</span>,
-        (<span class="ident">SortOrder::Ascending</span>, <span class="bool-val">true</span>) =&gt; <span class="ident">Order::Desc</span>,
-        (<span class="ident">SortOrder::Descending</span>, <span class="bool-val">true</span>) =&gt; <span class="ident">Order::Asc</span>,
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_order</span>(<span class="ident">prisma_order</span>: <span class="kw-2">&amp;</span><span class="ident">SortOrder</span>, <span class="ident">nulls_order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">NullsOrder</span><span class="op">&gt;</span>, <span class="ident">reverse</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Order</span> {
+    <span class="kw">match</span> (<span class="ident">prisma_order</span>, <span class="ident">nulls_order</span>, <span class="ident">reverse</span>) {
+        <span class="comment">// Without NULLS order</span>
+        (<span class="ident">SortOrder::Ascending</span>, <span class="prelude-val">None</span>, <span class="bool-val">false</span>) =&gt; <span class="ident">Order::Asc</span>,
+        (<span class="ident">SortOrder::Descending</span>, <span class="prelude-val">None</span>, <span class="bool-val">false</span>) =&gt; <span class="ident">Order::Desc</span>,
+
+        <span class="comment">// Without NULLS order reverse</span>
+        (<span class="ident">SortOrder::Ascending</span>, <span class="prelude-val">None</span>, <span class="bool-val">true</span>) =&gt; <span class="ident">Order::Desc</span>,
+        (<span class="ident">SortOrder::Descending</span>, <span class="prelude-val">None</span>, <span class="bool-val">true</span>) =&gt; <span class="ident">Order::Asc</span>,
+
+        <span class="comment">// With NULLS order</span>
+        (<span class="ident">SortOrder::Ascending</span>, <span class="prelude-val">Some</span>(<span class="ident">NullsOrder::First</span>), <span class="bool-val">false</span>) =&gt; <span class="ident">Order::AscNullsFirst</span>,
+        (<span class="ident">SortOrder::Ascending</span>, <span class="prelude-val">Some</span>(<span class="ident">NullsOrder::Last</span>), <span class="bool-val">false</span>) =&gt; <span class="ident">Order::AscNullsLast</span>,
+        (<span class="ident">SortOrder::Descending</span>, <span class="prelude-val">Some</span>(<span class="ident">NullsOrder::First</span>), <span class="bool-val">false</span>) =&gt; <span class="ident">Order::DescNullsFirst</span>,
+        (<span class="ident">SortOrder::Descending</span>, <span class="prelude-val">Some</span>(<span class="ident">NullsOrder::Last</span>), <span class="bool-val">false</span>) =&gt; <span class="ident">Order::DescNullsLast</span>,
+
+        <span class="comment">// With NULLS order reverse</span>
+        (<span class="ident">SortOrder::Ascending</span>, <span class="prelude-val">Some</span>(<span class="ident">NullsOrder::First</span>), <span class="bool-val">true</span>) =&gt; <span class="ident">Order::DescNullsLast</span>,
+        (<span class="ident">SortOrder::Ascending</span>, <span class="prelude-val">Some</span>(<span class="ident">NullsOrder::Last</span>), <span class="bool-val">true</span>) =&gt; <span class="ident">Order::DescNullsFirst</span>,
+        (<span class="ident">SortOrder::Descending</span>, <span class="prelude-val">Some</span>(<span class="ident">NullsOrder::First</span>), <span class="bool-val">true</span>) =&gt; <span class="ident">Order::AscNullsLast</span>,
+        (<span class="ident">SortOrder::Descending</span>, <span class="prelude-val">Some</span>(<span class="ident">NullsOrder::Last</span>), <span class="bool-val">true</span>) =&gt; <span class="ident">Order::AscNullsFirst</span>,
     }
 }
 </code></pre></div>

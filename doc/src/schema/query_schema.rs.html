@@ -225,6 +225,7 @@
 <span id="220">220</span>
 <span id="221">221</span>
 <span id="222">222</span>
+<span id="223">223</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">datamodel_connector</span>::{<span class="ident">ConnectorCapability</span>, <span class="ident">ReferentialIntegrity</span>};
 <span class="kw">use</span> <span class="ident">fmt::Debug</span>;
@@ -405,12 +406,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Identifier</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">String</span>, <span class="ident">namespace</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">T</span>, <span class="ident">namespace</span>: <span class="ident">U</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+        <span class="ident">U</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
         <span class="self">Self</span> {
-            <span class="ident">name</span>,
+            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
             <span class="ident">namespace</span>: <span class="ident">namespace</span>.<span class="ident">into</span>(),
         }
     }
