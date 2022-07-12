@@ -22,7 +22,7 @@ use std::{collections::HashMap, panic::AssertUnwindSafe};
 use crate::sql_trace::trace_parent_to_string;
 
 use opentelemetry::trace::TraceContextExt;
-use tracing::{span, Span};
+use tracing::{info_span, Span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 impl<'t> QueryExt for connector::Transaction<'t> {}
@@ -39,7 +39,7 @@ pub trait QueryExt: Queryable + Send + Sync {
         idents: &[ColumnMetadata<'_>],
         trace_id: Option<String>,
     ) -> crate::Result<Vec<SqlRow>> {
-        let span = span!(tracing::Level::INFO, "filter read query");
+        let span = info_span!("filter read query");
 
         let otel_ctx = span.context();
         let span_ref = otel_ctx.span();

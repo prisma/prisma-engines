@@ -195,7 +195,7 @@ validate:
 	cargo run --bin test-cli -- validate-datamodel dev_datamodel.prisma
 
 qe:
-	cargo run --bin query-engine -- --enable-playground --enable-raw-queries --enable-metrics
+	cargo run --bin query-engine -- --enable-playground --enable-raw-queries --enable-metrics --enable-open-telemetry
 
 qe-dmmf:
 	cargo run --bin query-engine -- cli dmmf > dmmf.json
@@ -225,7 +225,6 @@ use-local-query-engine:
 
 show-metrics:
 	docker-compose -f docker-compose.yml up -d --remove-orphans grafana prometheus
-
 
 ## OpenTelemetry
 otel:
