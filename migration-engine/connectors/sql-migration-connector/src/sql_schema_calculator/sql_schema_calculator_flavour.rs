@@ -4,7 +4,6 @@ mod postgres;
 mod sqlite;
 
 use datamodel::{
-    datamodel_connector::ScalarType,
     parser_database::{ast::FieldArity, walkers::*},
     ValidatedSchema,
 };
@@ -35,8 +34,6 @@ pub(crate) trait SqlSchemaCalculatorFlavour {
     fn default_constraint_name(&self, _default_value: DefaultValueWalker<'_>) -> Option<String> {
         None
     }
-
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value;
 
     fn enum_column_type(&self, _field: ScalarFieldWalker<'_>, _db_name: &str) -> sql::ColumnType {
         unreachable!("unreachable enum_column_type")

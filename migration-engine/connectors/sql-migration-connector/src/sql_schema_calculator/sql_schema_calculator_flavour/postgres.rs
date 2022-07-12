@@ -1,14 +1,12 @@
 use super::SqlSchemaCalculatorFlavour;
-use crate::flavour::{PostgresFlavour, SqlFlavour};
+use crate::flavour::PostgresFlavour;
 use datamodel::{
-    datamodel_connector::ScalarType,
+    builtin_connectors::cockroach_datamodel_connector::SequenceFunction,
     parser_database::{walkers::*, IndexAlgorithm, OperatorClass},
     ValidatedSchema,
 };
 use either::Either;
-use sql::postgres::PostgresSchemaExt;
-use sql_datamodel_connector::cockroach_datamodel_connector::SequenceFunction;
-use sql_schema_describer as sql;
+use sql_schema_describer::{self as sql, postgres::PostgresSchemaExt};
 
 impl SqlSchemaCalculatorFlavour for PostgresFlavour {
     fn calculate_enums(&self, datamodel: &ValidatedSchema) -> Vec<sql::Enum> {
@@ -28,11 +26,6 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
         } else {
             Some(sql::DefaultValue::sequence(""))
         }
-    }
-
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
-        self.datamodel_connector()
-            .default_native_type_for_scalar_type(scalar_type)
     }
 
     fn enum_column_type(&self, field: ScalarFieldWalker<'_>, db_name: &str) -> sql::ColumnType {

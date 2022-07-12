@@ -146,6 +146,10 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MsSqlType)] = &[
 ];
 
 impl Connector for MsSqlDatamodelConnector {
+    fn provider_name(&self) -> &'static str {
+        "sqlserver"
+    }
+
     fn name(&self) -> &str {
         "SQL Server"
     }

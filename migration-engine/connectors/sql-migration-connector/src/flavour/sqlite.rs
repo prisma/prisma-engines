@@ -104,7 +104,7 @@ impl SqlFlavour for SqliteFlavour {
     }
 
     fn datamodel_connector(&self) -> &'static dyn datamodel::datamodel_connector::Connector {
-        sql_datamodel_connector::SQLITE
+        datamodel::builtin_connectors::SQLITE
     }
 
     fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
