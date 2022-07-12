@@ -134,7 +134,7 @@
                 }
             }
             <span class="ident">Rule::BLOCK_LEVEL_CATCH_ALL</span> =&gt; <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
-                <span class="string">&quot;This line is not an enum value definition.&quot;</span>.<span class="ident">to_owned</span>(),
+                <span class="string">&quot;This line is not an enum value definition.&quot;</span>,
                 <span class="ident">current</span>.<span class="ident">as_span</span>().<span class="ident">into</span>(),
             )),
             <span class="kw">_</span> =&gt; <span class="ident">parsing_catch_all</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>, <span class="string">&quot;enum&quot;</span>),

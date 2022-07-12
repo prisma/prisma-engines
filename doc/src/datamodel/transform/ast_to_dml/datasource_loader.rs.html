@@ -570,7 +570,7 @@ generator client {
             }
         }
         <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;Preview features are only supported in the generator block. Please move this field to the generator block.&quot;</span>;
-        <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new</span>(<span class="ident">std::borrow::Cow::Borrowed</span>(<span class="ident">msg</span>), <span class="ident">span</span>));
+        <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_static</span>(<span class="ident">msg</span>, <span class="ident">span</span>));
     }
 }
 </code></pre></div>

@@ -943,8 +943,6 @@
 <span id="938">938</span>
 <span id="939">939</span>
 <span id="940">940</span>
-<span id="941">941</span>
-<span id="942">942</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">context::Context</span>, <span class="ident">interner::StringId</span>, <span class="ident">walkers::IndexFieldWalker</span>, <span class="ident">DatamodelError</span>};
 <span class="kw">use</span> <span class="ident">either::Either</span>;
 <span class="kw">use</span> <span class="ident">enumflags2::bitflags</span>;
@@ -1508,7 +1506,7 @@
             }
             <span class="prelude-val">Ok</span>(<span class="ident">FieldType::Model</span>(<span class="ident">referenced_model_id</span>)) =&gt; {
                 <span class="kw">let</span> <span class="ident">referenced_model_name</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">referenced_model_id</span>].<span class="ident">name</span>();
-                <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_composite_type_validation_error</span>(<span class="macro">format!</span>(<span class="string">&quot;{} refers to a model, making this a relation field. Relation fields inside composite types are not supported.&quot;</span>, <span class="ident">referenced_model_name</span>), <span class="ident">ct</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">ast_field</span>.<span class="ident">field_type</span>.<span class="ident">span</span>()))
+                <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_composite_type_validation_error</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{} refers to a model, making this a relation field. Relation fields inside composite types are not supported.&quot;</span>, <span class="ident">referenced_model_name</span>), <span class="kw-2">&amp;</span><span class="ident">ct</span>.<span class="ident">name</span>.<span class="ident">name</span>, <span class="ident">ast_field</span>.<span class="ident">field_type</span>.<span class="ident">span</span>()))
             }
             <span class="prelude-val">Err</span>(<span class="ident">supported</span>) =&gt; <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_type_not_found_error</span>(
                 <span class="ident">supported</span>,
@@ -1520,10 +1518,8 @@
 
 <span class="kw">fn</span> <span class="ident">visit_enum</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>(<span class="ident">enm</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Enum</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>) {
     <span class="kw">if</span> <span class="ident">enm</span>.<span class="ident">values</span>.<span class="ident">is_empty</span>() {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
-            <span class="string">&quot;An enum must have at least one value.&quot;</span>.<span class="ident">to_owned</span>(),
-            <span class="ident">enm</span>.<span class="ident">span</span>,
-        ))
+        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;An enum must have at least one value.&quot;</span>;
+        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(<span class="ident">msg</span>, <span class="ident">enm</span>.<span class="ident">span</span>))
     }
 }
 

@@ -129,7 +129,7 @@
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">err</span>: <span class="kw-2">&amp;</span><span class="ident">DatamodelError</span><span class="op">|</span> <span class="ident">MiniError</span> {
                     <span class="ident">start</span>: <span class="ident">err</span>.<span class="ident">span</span>().<span class="ident">start</span>,
                     <span class="ident">end</span>: <span class="ident">err</span>.<span class="ident">span</span>().<span class="ident">end</span>,
-                    <span class="ident">text</span>: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">err</span>),
+                    <span class="ident">text</span>: <span class="ident">err</span>.<span class="ident">message</span>().<span class="ident">to_string</span>(),
                     <span class="ident">is_warning</span>: <span class="bool-val">false</span>,
                 })
                 .<span class="ident">collect</span>();

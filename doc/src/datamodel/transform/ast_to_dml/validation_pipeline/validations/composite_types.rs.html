@@ -259,7 +259,7 @@
     }
 
     <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
-        <span class="macro">format!</span>(<span class="string">&quot;Composite types are not supported on {}.&quot;</span>, <span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">name</span>()),
+        <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;Composite types are not supported on {}.&quot;</span>, <span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">name</span>()),
         <span class="ident">composite_type</span>.<span class="ident">ast_composite_type</span>().<span class="ident">span</span>,
     ));
 }
@@ -273,7 +273,7 @@
     }
 
     <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
-        <span class="ident">String::from</span>(<span class="string">&quot;A type must have at least one field defined.&quot;</span>),
+        <span class="string">&quot;A type must have at least one field defined.&quot;</span>,
         <span class="ident">composite_type</span>.<span class="ident">ast_composite_type</span>().<span class="ident">span</span>,
     ));
 }

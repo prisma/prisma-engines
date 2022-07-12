@@ -148,7 +148,7 @@
                     },
                     <span class="ident">Rule::type_alias</span> =&gt; {
                         <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">DatamodelError::new_validation_error</span>(
-                            <span class="string">&quot;Invalid type definition. Please check the documentation in https://pris.ly/d/composite-types&quot;</span>.<span class="ident">to_string</span>(),
+                            <span class="string">&quot;Invalid type definition. Please check the documentation in https://pris.ly/d/composite-types&quot;</span>,
                             <span class="ident">current</span>.<span class="ident">as_span</span>().<span class="ident">into</span>()
                         );
 
@@ -167,11 +167,11 @@
                     },
                     <span class="ident">Rule::EOI</span> =&gt; {}
                     <span class="ident">Rule::CATCH_ALL</span> =&gt; <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
-                        <span class="string">&quot;This line is invalid. It does not start with any known Prisma schema keyword.&quot;</span>.<span class="ident">to_owned</span>(),
+                        <span class="string">&quot;This line is invalid. It does not start with any known Prisma schema keyword.&quot;</span>,
                         <span class="ident">current</span>.<span class="ident">as_span</span>().<span class="ident">into</span>(),
                     )),
                     <span class="ident">Rule::arbitrary_block</span> =&gt; <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
-                        <span class="string">&quot;This block is invalid. It does not start with any known Prisma schema keyword. Valid keywords include \&#39;model\&#39;, \&#39;enum\&#39;, \&#39;datasource\&#39; and \&#39;generator\&#39;.&quot;</span>.<span class="ident">to_owned</span>(),
+                        <span class="string">&quot;This block is invalid. It does not start with any known Prisma schema keyword. Valid keywords include \&#39;model\&#39;, \&#39;enum\&#39;, \&#39;datasource\&#39; and \&#39;generator\&#39;.&quot;</span>,
                         <span class="ident">current</span>.<span class="ident">as_span</span>().<span class="ident">into</span>(),
                     )),
                     <span class="ident">Rule::empty_lines</span> =&gt; (),

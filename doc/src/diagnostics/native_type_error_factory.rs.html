@@ -75,12 +75,6 @@
 <span id="70">70</span>
 <span id="71">71</span>
 <span id="72">72</span>
-<span id="73">73</span>
-<span id="74">74</span>
-<span id="75">75</span>
-<span id="76">76</span>
-<span id="77">77</span>
-<span id="78">78</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Span</span>};
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NativeTypeErrorFactory</span> {
@@ -98,8 +92,7 @@
             <span class="macro">format!</span>(
                 <span class="string">&quot;The scale must not be larger than the precision for the {} native type in {}.&quot;</span>,
                 <span class="self">self</span>.<span class="ident">native_type</span>, <span class="self">self</span>.<span class="ident">connector</span>
-            )
-            .<span class="ident">into</span>(),
+            ),
             <span class="ident">span</span>,
         )
     }
@@ -109,8 +102,7 @@
             <span class="macro">format!</span>(
                 <span class="string">&quot;You cannot define an index on fields with native type `{}` of {}.{message}&quot;</span>,
                 <span class="self">self</span>.<span class="ident">native_type</span>, <span class="self">self</span>.<span class="ident">connector</span>
-            )
-            .<span class="ident">into</span>(),
+            ),
             <span class="ident">span</span>,
         )
     }
@@ -120,8 +112,7 @@
             <span class="macro">format!</span>(
                 <span class="string">&quot;Native type `{}` cannot be unique in {}.{message}&quot;</span>,
                 <span class="self">self</span>.<span class="ident">native_type</span>, <span class="self">self</span>.<span class="ident">connector</span>
-            )
-            .<span class="ident">into</span>(),
+            ),
             <span class="ident">span</span>,
         )
     }
@@ -131,8 +122,7 @@
             <span class="macro">format!</span>(
                 <span class="string">&quot;Native type `{}` of {} cannot be used on a field that is `@id` or `@@id`.{message}&quot;</span>,
                 <span class="self">self</span>.<span class="ident">native_type</span>, <span class="self">self</span>.<span class="ident">connector</span>
-            )
-            .<span class="ident">into</span>(),
+            ),
             <span class="ident">span</span>,
         )
     }
@@ -142,8 +132,7 @@
             <span class="macro">format!</span>(
                 <span class="string">&quot;Argument M is out of range for native type `{}` of {}: {message}&quot;</span>,
                 <span class="self">self</span>.<span class="ident">native_type</span>, <span class="self">self</span>.<span class="ident">connector</span>
-            )
-            .<span class="ident">into</span>(),
+            ),
             <span class="ident">span</span>,
         )
     }
@@ -153,8 +142,7 @@
             <span class="macro">format!</span>(
                 <span class="string">&quot;Native type {} is not supported for {} connector.&quot;</span>,
                 <span class="self">self</span>.<span class="ident">native_type</span>, <span class="self">self</span>.<span class="ident">connector</span>
-            )
-            .<span class="ident">into</span>(),
+            ),
             <span class="ident">span</span>,
         )
     }

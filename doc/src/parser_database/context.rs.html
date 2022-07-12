@@ -455,9 +455,6 @@
 <span id="450">450</span>
 <span id="451">451</span>
 <span id="452">452</span>
-<span id="453">453</span>
-<span id="454">454</span>
-<span id="455">455</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">attributes</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="self">self</span>::attributes::AttributesValidationState</span>;
@@ -740,10 +737,7 @@
         <span class="kw">let</span> <span class="ident">diagnostics</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">diagnostics</span>;
         <span class="kw">for</span> <span class="ident">arg_idx</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">args</span>.<span class="ident">values</span>() {
             <span class="kw">let</span> <span class="ident">arg</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">attr</span>.<span class="ident">arguments</span>.<span class="ident">arguments</span>[<span class="kw-2">*</span><span class="ident">arg_idx</span>];
-            <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_unused_argument_error</span>(
-                <span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()).<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>),
-                <span class="ident">arg</span>.<span class="ident">span</span>,
-            ));
+            <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_unused_argument_error</span>(<span class="ident">arg</span>.<span class="ident">span</span>));
         }
 
         <span class="self">self</span>.<span class="ident">discard_arguments</span>();
