@@ -350,8 +350,24 @@
 <span id="345">345</span>
 <span id="346">346</span>
 <span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">CachedTx</span>, <span class="ident">TransactionError</span>, <span class="ident">TxOpRequest</span>, <span class="ident">TxOpRequestMsg</span>, <span class="ident">TxOpResponse</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">execute_many_operations</span>, <span class="ident">execute_single_operation</span>, <span class="ident">OpenTx</span>, <span class="ident">Operation</span>, <span class="ident">ResponseData</span>, <span class="ident">TxId</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">execute_many_operations</span>, <span class="ident">execute_single_operation</span>, <span class="ident">set_span_context</span>, <span class="ident">OpenTx</span>, <span class="ident">Operation</span>, <span class="ident">ResponseData</span>, <span class="ident">TxId</span>,
+};
 <span class="kw">use</span> <span class="ident">schema::QuerySchemaRef</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">sync::Arc</span>};
 <span class="kw">use</span> <span class="ident">tokio</span>::{
@@ -362,6 +378,8 @@
     <span class="ident">task::JoinHandle</span>,
     <span class="ident">time</span>::{<span class="self">self</span>, <span class="ident">Duration</span>},
 };
+<span class="kw">use</span> <span class="ident">tracing::Span</span>;
+<span class="kw">use</span> <span class="ident">tracing_futures::Instrument</span>;
 <span class="kw">use</span> <span class="ident">tracing_futures::WithSubscriber</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>)]</span>
@@ -422,6 +440,9 @@
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_single</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">operation</span>: <span class="kw-2">&amp;</span><span class="ident">Operation</span>, <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResponseData</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(<span class="string">&quot;prisma:itx_execute&quot;</span>, <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>);
+        <span class="ident">set_span_context</span>(<span class="kw-2">&amp;</span><span class="ident">span</span>, <span class="ident">trace_id</span>.<span class="ident">clone</span>());
+
         <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cached_tx</span>.<span class="ident">as_open</span>()<span class="question-mark">?</span>;
         <span class="ident">execute_single_operation</span>(
             <span class="self">self</span>.<span class="ident">query_schema</span>.<span class="ident">clone</span>(),
@@ -429,6 +450,7 @@
             <span class="ident">operation</span>,
             <span class="ident">trace_id</span>,
         )
+        .<span class="ident">instrument</span>(<span class="ident">span</span>)
         .<span class="kw">await</span>
     }
 
@@ -437,6 +459,9 @@
         <span class="ident">operations</span>: <span class="kw-2">&amp;</span>[<span class="ident">Operation</span>],
         <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResponseData</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(<span class="string">&quot;prisma:itx_execute&quot;</span>, <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>);
+        <span class="ident">set_span_context</span>(<span class="kw-2">&amp;</span><span class="ident">span</span>, <span class="ident">trace_id</span>.<span class="ident">clone</span>());
+
         <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cached_tx</span>.<span class="ident">as_open</span>()<span class="question-mark">?</span>;
         <span class="ident">execute_many_operations</span>(
             <span class="self">self</span>.<span class="ident">query_schema</span>.<span class="ident">clone</span>(),
@@ -444,6 +469,7 @@
             <span class="ident">operations</span>,
             <span class="ident">trace_id</span>,
         )
+        .<span class="ident">instrument</span>(<span class="ident">span</span>)
         .<span class="kw">await</span>
     }
 
@@ -540,7 +566,7 @@
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">send</span>.<span class="ident">send</span>(<span class="ident">req</span>).<span class="kw">await</span> {
             <span class="macro">debug!</span>(<span class="string">&quot;channel send error {err}&quot;</span>);
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TransactionError::Closed</span> {
-                <span class="ident">reason</span>: <span class="string">&quot;Cound not perform operation&quot;</span>.<span class="ident">to_string</span>(),
+                <span class="ident">reason</span>: <span class="string">&quot;Could not perform operation&quot;</span>.<span class="ident">to_string</span>(),
             }
             .<span class="ident">into</span>());
         }
@@ -548,7 +574,7 @@
         <span class="kw">match</span> <span class="ident">receiver</span>.<span class="kw">await</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">resp</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">resp</span>),
             <span class="prelude-val">Err</span>(<span class="ident">_err</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">TransactionError::Closed</span> {
-                <span class="ident">reason</span>: <span class="string">&quot;Cound not perform operation&quot;</span>.<span class="ident">to_string</span>(),
+                <span class="ident">reason</span>: <span class="string">&quot;Could not perform operation&quot;</span>.<span class="ident">to_string</span>(),
             }
             .<span class="ident">into</span>()),
         }
@@ -600,6 +626,7 @@
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">server</span> <span class="op">=</span> <span class="ident">ITXServer::new</span>(<span class="ident">tx_id</span>, <span class="ident">CachedTx::Open</span>(<span class="ident">value</span>), <span class="ident">timeout</span>, <span class="ident">rx_from_client</span>, <span class="ident">query_schema</span>);
     <span class="kw">let</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::get_current_dispatcher</span>();
+    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">Span::current</span>();
 
     <span class="ident">tokio::task::spawn</span>(
         <span class="kw">async</span> <span class="kw">move</span> {
@@ -631,6 +658,7 @@
 
             <span class="macro">trace!</span>(<span class="string">&quot;[{}] has stopped with {}&quot;</span>, <span class="ident">server</span>.<span class="ident">id</span>.<span class="ident">to_string</span>(), <span class="ident">server</span>.<span class="ident">cached_tx</span>);
         }
+        .<span class="ident">instrument</span>(<span class="ident">span</span>)
         .<span class="ident">with_subscriber</span>(<span class="ident">dispatcher</span>),
     );
 

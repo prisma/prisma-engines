@@ -39,7 +39,7 @@ injectors and extractors passed in during initialization.</p>
 
 <span class="comment">// And a given span</span>
 <span class="kw">let</span> <span class="ident">example_span</span> <span class="op">=</span> <span class="ident">sdktrace::TracerProvider::default</span>()
-    .<span class="ident">tracer</span>(<span class="string">&quot;example-component&quot;</span>, <span class="prelude-val">None</span>)
+    .<span class="ident">tracer</span>(<span class="string">&quot;example-component&quot;</span>)
     .<span class="ident">start</span>(<span class="string">&quot;span-name&quot;</span>);
 
 <span class="comment">// with the current context, call inject to add the headers</span>

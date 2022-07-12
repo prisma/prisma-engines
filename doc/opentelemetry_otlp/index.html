@@ -3,8 +3,8 @@
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../opentelemetry_otlp/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"><a href="#">Crate opentelemetry_otlp</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 0.9.0</li><li><a id="all-types" href="all.html">All Items</a></li></div></ul><section><div class="block"><ul><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#constants">Constants</a></li><li><a href="#traits">Traits</a></li><li><a href="#functions">Functions</a></li></ul></div></section><div id="sidebar-vars" data-name="opentelemetry_otlp" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../opentelemetry_otlp/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
-    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">opentelemetry_otlp</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/opentelemetry_otlp/lib.rs.html#1-355">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>The OTLP Exporter supports exporting trace and metric data in the OTLP
+        </a><h2 class="location"><a href="#">Crate opentelemetry_otlp</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 0.10.0</li><li><a id="all-types" href="all.html">All Items</a></li></div></ul><section><div class="block"><ul><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#constants">Constants</a></li><li><a href="#traits">Traits</a></li><li><a href="#functions">Functions</a></li></ul></div></section><div id="sidebar-vars" data-name="opentelemetry_otlp" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../opentelemetry_otlp/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
+    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">opentelemetry_otlp</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/opentelemetry_otlp/lib.rs.html#1-381">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>The OTLP Exporter supports exporting trace and metric data in the OTLP
 format to the OpenTelemetry collector or other compatible backend.</p>
 <p>The OpenTelemetry Collector offers a vendor-agnostic implementation on how
 to receive, process, and export telemetry data. In addition, it removes
@@ -21,8 +21,8 @@ you want to send data to:</p>
 <div class="example-wrap"><pre class="language-shell"><code>$ docker run -p 4317:4317 otel/opentelemetry-collector-dev:latest</code></pre></div>
 <p>Then install a new pipeline with the recommended defaults to start exporting
 telemetry. You will have to build a OTLP exporter first.</p>
-<p>To start a OTLP tracing pipeline. Use <code>new_pipeline().tracing()</code> function.</p>
-<p>To start a OTLP metrics pipeline. Use <code>new_pipeline().metrics()</code> function.</p>
+<p>Tracing and metrics pipelines can be started with <code>new_pipeline().tracing()</code> and
+<code>new_pipeline().metrics()</code> respectively.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">opentelemetry::trace::Tracer</span>;
 
@@ -55,17 +55,18 @@ opentelemetry-otlp = { version = &quot;*&quot;, features = [&quot;grpc-sys&quot;
     .<span class="ident">with_exporter</span>(<span class="ident">opentelemetry_otlp::new_exporter</span>().<span class="ident">tonic</span>())
     .<span class="ident">install_batch</span>(<span class="ident">opentelemetry::runtime::AsyncStd</span>)<span class="question-mark">?</span>;</code></pre></div>
 <h2 id="kitchen-sink-full-configuration"><a href="#kitchen-sink-full-configuration">Kitchen Sink Full Configuration</a></h2>
-<p>Example showing how to override all configuration options. See the
-<a href="struct.OtlpPipeline.html" title="OtlpPipeline"><code>OtlpPipeline</code></a> docs for details of each option.</p>
+<p>Example showing how to override all configuration options.</p>
 <p>Generally there are two parts of configuration. One is metrics config
 or tracing config. Users can config it via <a href="struct.OtlpTracePipeline.html" title="OtlpTracePipeline"><code>OtlpTracePipeline</code></a>
 or [<code>OtlpMetricPipeline</code>]. The other is exporting configuration.
 Users can set those configurations using <a href="struct.OtlpExporterPipeline.html" title="OtlpExporterPipeline"><code>OtlpExporterPipeline</code></a> based
-on the chocie of exporters.</p>
+on the choice of exporters.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">opentelemetry</span>::{<span class="ident">KeyValue</span>, <span class="ident">trace::Tracer</span>};
 <span class="kw">use</span> <span class="ident">opentelemetry::sdk</span>::{<span class="ident">trace</span>::{<span class="self">self</span>, <span class="ident">IdGenerator</span>, <span class="ident">Sampler</span>}, <span class="ident">Resource</span>};
-<span class="kw">use</span> <span class="ident">opentelemetry_otlp</span>::{<span class="ident">Protocol</span>};
+<span class="kw">use</span> <span class="ident">opentelemetry::sdk::metrics</span>::{<span class="ident">selectors</span>, <span class="ident">PushController</span>};
+<span class="kw">use</span> <span class="ident">opentelemetry::util::tokio_interval_stream</span>;
+<span class="kw">use</span> <span class="ident">opentelemetry_otlp</span>::{<span class="ident">Protocol</span>, <span class="ident">WithExportConfig</span>, <span class="ident">ExportConfig</span>};
 <span class="kw">use</span> <span class="ident">std::time::Duration</span>;
 <span class="kw">use</span> <span class="ident">tonic::metadata</span>::<span class="kw-2">*</span>;
 
@@ -95,6 +96,26 @@ on the chocie of exporters.</p>
                 .<span class="ident">with_resource</span>(<span class="ident">Resource::new</span>(<span class="macro">vec!</span>[<span class="ident">KeyValue::new</span>(<span class="string">&quot;service.name&quot;</span>, <span class="string">&quot;example&quot;</span>)])),
         )
         .<span class="ident">install_batch</span>(<span class="ident">opentelemetry::runtime::Tokio</span>)<span class="question-mark">?</span>;
+
+    <span class="kw">let</span> <span class="ident">export_config</span> <span class="op">=</span> <span class="ident">ExportConfig</span> {
+        <span class="ident">endpoint</span>: <span class="string">&quot;http://localhost:4317&quot;</span>.<span class="ident">to_string</span>(),
+        <span class="ident">timeout</span>: <span class="ident">Duration::from_secs</span>(<span class="number">3</span>),
+        <span class="ident">protocol</span>: <span class="ident">Protocol::Grpc</span>
+    };
+
+    <span class="kw">let</span> <span class="ident">meter</span> <span class="op">=</span> <span class="ident">opentelemetry_otlp::new_pipeline</span>()
+        .<span class="ident">metrics</span>(<span class="ident">tokio::spawn</span>, <span class="ident">tokio_interval_stream</span>)
+        .<span class="ident">with_exporter</span>(
+            <span class="ident">opentelemetry_otlp::new_exporter</span>()
+                .<span class="ident">tonic</span>()
+                .<span class="ident">with_export_config</span>(<span class="ident">export_config</span>),
+                <span class="comment">// can also config it using with_* functions like the tracing part above.</span>
+        )
+        .<span class="ident">with_stateful</span>(<span class="bool-val">true</span>)
+        .<span class="ident">with_period</span>(<span class="ident">Duration::from_secs</span>(<span class="number">3</span>))
+        .<span class="ident">with_timeout</span>(<span class="ident">Duration::from_secs</span>(<span class="number">10</span>))
+        .<span class="ident">with_aggregator_selector</span>(<span class="ident">selectors::simple::Selector::Exact</span>)
+        .<span class="ident">build</span>();
 
     <span class="ident">tracer</span>.<span class="ident">in_span</span>(<span class="string">&quot;doing_work&quot;</span>, <span class="op">|</span><span class="ident">cx</span><span class="op">|</span> {
         <span class="comment">// Traced app logic here...</span>
@@ -126,6 +147,7 @@ what’s currently supported.</p>
 <div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.Error.html" title="opentelemetry_otlp::Error enum">Error</a></div><div class="item-right docblock-short"><p>Wrap type for errors from this crate.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.Protocol.html" title="opentelemetry_otlp::Protocol enum">Protocol</a></div><div class="item-right docblock-short"><p>The communication protocol to use when exporting data.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.SpanExporter.html" title="opentelemetry_otlp::SpanExporter enum">SpanExporter</a></div><div class="item-right docblock-short"><p>OTLP exporter that sends tracing information</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.SpanExporterBuilder.html" title="opentelemetry_otlp::SpanExporterBuilder enum">SpanExporterBuilder</a></div><div class="item-right docblock-short"><p>OTLP span exporter builder.</p>
 </div></div></div><h2 id="constants" class="small-section-header"><a href="#constants">Constants</a></h2>
 <div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="constant" href="constant.OTEL_EXPORTER_OTLP_ENDPOINT.html" title="opentelemetry_otlp::OTEL_EXPORTER_OTLP_ENDPOINT constant">OTEL_EXPORTER_OTLP_ENDPOINT</a></div><div class="item-right docblock-short"><p>Target to which the exporter is going to send spans or metrics, defaults to https://localhost:4317.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="constant" href="constant.OTEL_EXPORTER_OTLP_ENDPOINT_DEFAULT.html" title="opentelemetry_otlp::OTEL_EXPORTER_OTLP_ENDPOINT_DEFAULT constant">OTEL_EXPORTER_OTLP_ENDPOINT_DEFAULT</a></div><div class="item-right docblock-short"><p>Default target to which the exporter is going to send spans or metrics.</p>

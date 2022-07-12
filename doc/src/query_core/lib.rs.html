@@ -55,6 +55,8 @@
 <span id="50">50</span>
 <span id="51">51</span>
 <span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(
     <span class="ident">clippy::module_inception</span>,
     <span class="ident">clippy::wrong_self_convention</span>,
@@ -88,6 +90,7 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">query_graph_builder</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">response_ir</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">result_ast</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">trace_helpers</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::metrics</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error</span>::<span class="kw-2">*</span>;
@@ -100,6 +103,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">query_graph_builder</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">response_ir</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">result_ast</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">trace_helpers</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Result type tying all sub-result type hierarchies of the core together.</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">CoreError</span><span class="op">&gt;</span>;

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-opentelemetry-0.16.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-opentelemetry-0.17.4/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tracing_opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -116,6 +116,18 @@
 <span id="109">109</span>
 <span id="110">110</span>
 <span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
 </pre><pre class="rust"><code><span class="doccomment">//! # Tracing OpenTelemetry</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [`tracing`] is a framework for instrumenting Rust programs to collect</span>
@@ -127,7 +139,7 @@
 <span class="doccomment">//! [OpenTelemetry]: https://opentelemetry.io</span>
 <span class="doccomment">//! [`tracing`]: https://github.com/tokio-rs/tracing</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! *Compiler support: [requires `rustc` 1.42+][msrv]*</span>
+<span class="doccomment">//! *Compiler support: [requires `rustc` 1.49+][msrv]*</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [msrv]: #supported-rust-versions</span>
 <span class="doccomment">//!</span>
@@ -144,8 +156,8 @@
 <span class="doccomment">//! * `otel.status_code`: Set the span status code to one of the supported OpenTelemetry [span status codes].</span>
 <span class="doccomment">//! * `otel.status_message`: Set the span status message.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! [span kinds]: https://docs.rs/opentelemetry/latest/opentelemetry/trace/enum.SpanKind.html</span>
-<span class="doccomment">//! [span status codes]: https://docs.rs/opentelemetry/latest/opentelemetry/trace/enum.StatusCode.html</span>
+<span class="doccomment">//! [span kinds]: opentelemetry::trace::SpanKind</span>
+<span class="doccomment">//! [span status codes]: opentelemetry::trace::StatusCode</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ### Semantic Conventions</span>
 <span class="doccomment">//!</span>
@@ -197,7 +209,7 @@
 <span class="doccomment">//! ## Supported Rust Versions</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Tracing is built against the latest stable release. The minimum supported</span>
-<span class="doccomment">//! version is 1.42. The current Tracing version is not guaranteed to build on</span>
+<span class="doccomment">//! version is 1.49. The current Tracing version is not guaranteed to build on</span>
 <span class="doccomment">//! Rust versions earlier than the minimum supported version.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Tracing follows the same compiler support policies as the rest of the Tokio</span>
@@ -210,7 +222,7 @@
 <span class="doccomment">//!</span>
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">unreachable_pub</span>)]</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">test</span>, <span class="ident">deny</span>(<span class="ident">warnings</span>))]</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/tracing-opentelemetry/0.16.0&quot;</span>)]</span>
+<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/tracing-opentelemetry/0.17.4&quot;</span>)]</span>
 <span class="attribute">#![<span class="ident">doc</span>(
     <span class="ident">html_logo_url</span> <span class="op">=</span> <span class="string">&quot;https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png&quot;</span>,
     <span class="ident">issue_tracker_base_url</span> <span class="op">=</span> <span class="string">&quot;https://github.com/tokio-rs/tracing/issues/&quot;</span>
@@ -227,6 +239,18 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">layer</span>::{<span class="ident">layer</span>, <span class="ident">OpenTelemetryLayer</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">span_ext::OpenTelemetrySpanExt</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tracer::PreSampledTracer</span>;
+
+<span class="doccomment">/// Per-span OpenTelemetry data tracked by this crate.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Useful for implementing [PreSampledTracer] in alternate otel SDKs.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OtelData</span> {
+    <span class="doccomment">/// The parent otel `Context` for the current tracing span.</span>
+    <span class="kw">pub</span> <span class="ident">parent_cx</span>: <span class="ident">opentelemetry::Context</span>,
+
+    <span class="doccomment">/// The otel span data recorded during the current tracing span.</span>
+    <span class="kw">pub</span> <span class="ident">builder</span>: <span class="ident">opentelemetry::trace::SpanBuilder</span>,
+}
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
 </body></html>

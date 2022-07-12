@@ -60,11 +60,11 @@
 <span class="kw">use</span> <span class="ident">tracing_opentelemetry::OpenTelemetrySpanExt</span>;
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trace_parent_to_string</span>(<span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">SpanContext</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="ident">trace_id</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">trace_id</span>().<span class="ident">to_hex</span>();
-    <span class="kw">let</span> <span class="ident">span_id</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">span_id</span>().<span class="ident">to_hex</span>();
+    <span class="kw">let</span> <span class="ident">trace_id</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">trace_id</span>();
+    <span class="kw">let</span> <span class="ident">span_id</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">span_id</span>();
 
     <span class="comment">// see https://www.w3.org/TR/trace-context/#traceparent-header-field-values</span>
-    <span class="macro">format!</span>(<span class="string">&quot;traceparent=00-{}-{}-01&quot;</span>, <span class="ident">trace_id</span>, <span class="ident">span_id</span>)
+    <span class="macro">format!</span>(<span class="string">&quot;traceparent=00-{:032x}-{:032x}-01&quot;</span>, <span class="ident">trace_id</span>, <span class="ident">span_id</span>)
 }
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">SqlTraceComment</span>: <span class="ident">Sized</span> {

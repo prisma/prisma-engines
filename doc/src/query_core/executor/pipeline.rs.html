@@ -30,7 +30,18 @@
 <span id="25">25</span>
 <span id="26">26</span>
 <span id="27">27</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Env</span>, <span class="ident">Expressionista</span>, <span class="ident">IrSerializer</span>, <span class="ident">QueryGraph</span>, <span class="ident">QueryInterpreter</span>, <span class="ident">ResponseData</span>};
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">tracing::Instrument</span>;
+
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Env</span>, <span class="ident">Expressionista</span>, <span class="ident">IrSerializer</span>, <span class="ident">QueryGraph</span>, <span class="ident">QueryInterpreter</span>, <span class="ident">ResponseData</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">QueryPipeline</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span> {
@@ -51,7 +62,14 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResponseData</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">serializer</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">serializer</span>;
         <span class="kw">let</span> <span class="ident">expr</span> <span class="op">=</span> <span class="ident">Expressionista::translate</span>(<span class="self">self</span>.<span class="ident">graph</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">interpreter</span>.<span class="ident">interpret</span>(<span class="ident">expr</span>, <span class="ident">Env::default</span>(), <span class="number">0</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>;
+
+        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(<span class="string">&quot;engine:interpret&quot;</span>);
+
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">interpreter</span>
+            .<span class="ident">interpret</span>(<span class="ident">expr</span>, <span class="ident">Env::default</span>(), <span class="number">0</span>, <span class="ident">trace_id</span>)
+            .<span class="ident">instrument</span>(<span class="ident">span</span>)
+            .<span class="kw">await</span>;
 
         <span class="macro">trace!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">interpreter</span>.<span class="ident">log_output</span>());
         <span class="ident">serializer</span>.<span class="ident">serialize</span>(<span class="ident">result</span><span class="question-mark">?</span>)

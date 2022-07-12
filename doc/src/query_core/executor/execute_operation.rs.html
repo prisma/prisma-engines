@@ -152,6 +152,20 @@
 <span id="147">147</span>
 <span id="148">148</span>
 <span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::time::Instant</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::pipeline::QueryPipeline</span>;
@@ -160,6 +174,7 @@
 <span class="kw">use</span> <span class="ident">futures::future</span>;
 <span class="kw">use</span> <span class="ident">metrics</span>::{<span class="ident">histogram</span>, <span class="ident">increment_counter</span>};
 <span class="kw">use</span> <span class="ident">schema::QuerySchemaRef</span>;
+<span class="kw">use</span> <span class="ident">tracing::Instrument</span>;
 <span class="kw">use</span> <span class="ident">tracing_futures::WithSubscriber</span>;
 
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_single_operation</span>(
@@ -218,7 +233,13 @@
     <span class="ident">force_transactions</span>: <span class="ident">bool</span>,
 ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResponseData</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">query_graph</span>, <span class="ident">serializer</span>) <span class="op">=</span> <span class="ident">QueryGraphBuilder::new</span>(<span class="ident">query_schema</span>).<span class="ident">build</span>(<span class="ident">operation</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">get_connection</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">connection_name</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">name</span>();
+    <span class="kw">let</span> <span class="ident">conn_span</span> <span class="op">=</span> <span class="macro">info_span!</span>(
+        <span class="string">&quot;prisma:connection&quot;</span>,
+        <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>,
+        <span class="string">&quot;db.type&quot;</span> <span class="op">=</span> <span class="ident">connection_name</span>.<span class="ident">as_str</span>()
+    );
+    <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">get_connection</span>().<span class="ident">instrument</span>(<span class="ident">conn_span</span>).<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="ident">execute_self_contained</span>(<span class="ident">conn</span>, <span class="ident">query_graph</span>, <span class="ident">serializer</span>, <span class="ident">force_transactions</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>
 }
 
@@ -236,7 +257,14 @@
         <span class="kw">match</span> <span class="ident">QueryGraphBuilder::new</span>(<span class="ident">query_schema</span>.<span class="ident">clone</span>()).<span class="ident">build</span>(<span class="ident">op</span>.<span class="ident">clone</span>()) {
             <span class="prelude-val">Ok</span>((<span class="ident">graph</span>, <span class="ident">serializer</span>)) =&gt; {
                 <span class="macro">increment_counter!</span>(<span class="string">&quot;query_total_operations&quot;</span>);
-                <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">get_connection</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+
+                <span class="kw">let</span> <span class="ident">connection_name</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">name</span>();
+                <span class="kw">let</span> <span class="ident">conn_span</span> <span class="op">=</span> <span class="macro">info_span!</span>(
+                    <span class="string">&quot;prisma:connection&quot;</span>,
+                    <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>,
+                    <span class="string">&quot;db.type&quot;</span> <span class="op">=</span> <span class="ident">connection_name</span>.<span class="ident">as_str</span>()
+                );
+                <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">get_connection</span>().<span class="ident">instrument</span>(<span class="ident">conn_span</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
                 <span class="ident">futures</span>.<span class="ident">push</span>(<span class="ident">tokio::spawn</span>(
                     <span class="ident">execute_self_contained</span>(<span class="ident">conn</span>, <span class="ident">graph</span>, <span class="ident">serializer</span>, <span class="ident">force_transactions</span>, <span class="ident">trace_id</span>.<span class="ident">clone</span>())

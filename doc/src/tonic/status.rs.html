@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.5.2/src/status.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>status.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/status.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>status.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -941,6 +941,44 @@
 <span id="934">934</span>
 <span id="935">935</span>
 <span id="936">936</span>
+<span id="937">937</span>
+<span id="938">938</span>
+<span id="939">939</span>
+<span id="940">940</span>
+<span id="941">941</span>
+<span id="942">942</span>
+<span id="943">943</span>
+<span id="944">944</span>
+<span id="945">945</span>
+<span id="946">946</span>
+<span id="947">947</span>
+<span id="948">948</span>
+<span id="949">949</span>
+<span id="950">950</span>
+<span id="951">951</span>
+<span id="952">952</span>
+<span id="953">953</span>
+<span id="954">954</span>
+<span id="955">955</span>
+<span id="956">956</span>
+<span id="957">957</span>
+<span id="958">958</span>
+<span id="959">959</span>
+<span id="960">960</span>
+<span id="961">961</span>
+<span id="962">962</span>
+<span id="963">963</span>
+<span id="964">964</span>
+<span id="965">965</span>
+<span id="966">966</span>
+<span id="967">967</span>
+<span id="968">968</span>
+<span id="969">969</span>
+<span id="970">970</span>
+<span id="971">971</span>
+<span id="972">972</span>
+<span id="973">973</span>
+<span id="974">974</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::body::BoxBody</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::metadata::MetadataMap</span>;
 <span class="kw">use</span> <span class="ident">bytes::Bytes</span>;
@@ -1248,8 +1286,11 @@
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;transport&quot;</span>), <span class="ident">allow</span>(<span class="ident">dead_code</span>))]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_error</span>(<span class="ident">err</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="ident">Status</span> {
-        <span class="ident">Status::try_from_error</span>(<span class="ident">err</span>)
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">Status::new</span>(<span class="ident">Code::Unknown</span>, <span class="ident">err</span>.<span class="ident">to_string</span>()))
+        <span class="ident">Status::try_from_error</span>(<span class="ident">err</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">Status::new</span>(<span class="ident">Code::Unknown</span>, <span class="ident">err</span>.<span class="ident">to_string</span>());
+            <span class="ident">status</span>.<span class="ident">source</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>);
+            <span class="ident">status</span>
+        })
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">try_from_error</span>(
@@ -1270,7 +1311,8 @@
             <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">err</span>,
         };
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">status</span>) <span class="op">=</span> <span class="ident">find_status_in_source_chain</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">err</span>) {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">status</span>) <span class="op">=</span> <span class="ident">find_status_in_source_chain</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">err</span>) {
+            <span class="ident">status</span>.<span class="ident">source</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>);
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">status</span>);
         }
 
@@ -1315,6 +1357,31 @@
         };
 
         <span class="ident">reason</span>.<span class="ident">into</span>()
+    }
+
+    <span class="doccomment">/// Handles hyper errors specifically, which expose a number of different parameters about the</span>
+    <span class="doccomment">/// http stream&#39;s error: https://docs.rs/hyper/0.14.11/hyper/struct.Error.html.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns Some if there&#39;s a way to handle the error, or None if the information from this</span>
+    <span class="doccomment">/// hyper error, but perhaps not its source, should be ignored.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;transport&quot;</span>)]</span>
+    <span class="kw">fn</span> <span class="ident">from_hyper_error</span>(<span class="ident">err</span>: <span class="kw-2">&amp;</span><span class="ident">hyper::Error</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Status</span><span class="op">&gt;</span> {
+        <span class="comment">// is_timeout results from hyper&#39;s keep-alive logic</span>
+        <span class="comment">// (https://docs.rs/hyper/0.14.11/src/hyper/error.rs.html#192-194).  Per the grpc spec</span>
+        <span class="comment">// &gt; An expired client initiated PING will cause all calls to be closed with an UNAVAILABLE</span>
+        <span class="comment">// &gt; status. Note that the frequency of PINGs is highly dependent on the network</span>
+        <span class="comment">// &gt; environment, implementations are free to adjust PING frequency based on network and</span>
+        <span class="comment">// &gt; application requirements, which is why it&#39;s mapped to unavailable here.</span>
+        <span class="comment">//</span>
+        <span class="comment">// Likewise, if we are unable to connect to the server, map this to UNAVAILABLE.  This is</span>
+        <span class="comment">// consistent with the behavior of a C++ gRPC client when the server is not running, and</span>
+        <span class="comment">// matches the spec of:</span>
+        <span class="comment">// &gt; The service is currently unavailable. This is most likely a transient condition that</span>
+        <span class="comment">// &gt; can be corrected if retried with a backoff.</span>
+        <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">is_timeout</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">is_connect</span>() {
+            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Status::unavailable</span>(<span class="ident">err</span>.<span class="ident">to_string</span>()));
+        }
+        <span class="prelude-val">None</span>
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">map_error</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">err</span>: <span class="ident">E</span>) -&gt; <span class="ident">Status</span>
@@ -1496,11 +1563,20 @@
             <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Status::cancelled</span>(<span class="ident">timeout</span>.<span class="ident">to_string</span>()));
         }
 
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;transport&quot;</span>)]</span>
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">hyper</span>) <span class="op">=</span> <span class="ident">err</span>
+            .<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">hyper::Error</span><span class="op">&gt;</span>()
+            .<span class="ident">and_then</span>(<span class="ident">Status::from_hyper_error</span>)
+        {
+            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">hyper</span>);
+        }
+
         <span class="ident">source</span> <span class="op">=</span> <span class="ident">err</span>.<span class="ident">source</span>();
     }
 
     <span class="prelude-val">None</span>
 }
+
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Status</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="comment">// A manual impl to reduce the noise of frequently empty fields.</span>

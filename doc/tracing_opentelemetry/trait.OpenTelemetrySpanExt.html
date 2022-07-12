@@ -11,7 +11,7 @@
 <span class="item-spacer"></span>    fn <a href="#tymethod.add_link" class="fnname">add_link</a>(&amp;self, cx: <a class="struct" href="../opentelemetry/trace/span_context/struct.SpanContext.html" title="struct opentelemetry::trace::span_context::SpanContext">SpanContext</a>);
 <span class="item-spacer"></span>    fn <a href="#tymethod.add_link_with_attributes" class="fnname">add_link_with_attributes</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&amp;self, <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cx: <a class="struct" href="../opentelemetry/trace/span_context/struct.SpanContext.html" title="struct opentelemetry::trace::span_context::SpanContext">SpanContext</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;attributes: <a class="struct" href="https://doc.rust-lang.org/1.62.0/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../opentelemetry/common/struct.KeyValue.html" title="struct opentelemetry::common::KeyValue">KeyValue</a>&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;);
 <span class="item-spacer"></span>    fn <a href="#tymethod.context" class="fnname">context</a>(&amp;self) -&gt; <a class="struct" href="../opentelemetry/context/struct.Context.html" title="struct opentelemetry::context::Context">Context</a>;
-}</code></pre></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Utility functions to allow tracing <a href="https://docs.rs/tracing/latest/tracing/struct.Span.html"><code>Span</code></a>s to accept and return
+}</code></pre></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Utility functions to allow tracing <a href="../tracing/span/struct.Span.html"><code>Span</code></a>s to accept and return
 <a href="https://opentelemetry.io">OpenTelemetry</a> <a href="../opentelemetry/context/struct.Context.html"><code>Context</code></a>s.</p>
 </div></details><h2 id="required-methods" class="small-section-header">Required Methods<a href="#required-methods" class="anchor"></a></h2><div class="methods"><details class="rustdoc-toggle" open><summary><div id="tymethod.set_parent" class="method has-srclink"><div class="rightside"><a class="srclink" href="../src/tracing_opentelemetry/span_ext.rs.html#43">source</a></div><h4 class="code-header">fn <a href="#tymethod.set_parent" class="fnname">set_parent</a>(&amp;self, cx: <a class="struct" href="../opentelemetry/context/struct.Context.html" title="struct opentelemetry::context::Context">Context</a>)</h4></div></summary><div class="docblock"><p>Associates <code>self</code> with a given OpenTelemetry trace, using the provided
 parent <a href="../opentelemetry/context/struct.Context.html"><code>Context</code></a>.</p>
@@ -22,7 +22,7 @@ parent <a href="../opentelemetry/context/struct.Context.html"><code>Context</cod
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 <span class="kw">use</span> <span class="ident">tracing::Span</span>;
 
-<span class="comment">// Example carrier, could be a framework header map that impls otel&#39;s `Extract`.</span>
+<span class="comment">// Example carrier, could be a framework header map that impls otel&#39;s `Extractor`.</span>
 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carrier</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
 
 <span class="comment">// Propagator can be swapped with b3 propagator, jaeger propagator, etc.</span>
@@ -48,7 +48,7 @@ followed span <a href="../opentelemetry/trace/span_context/struct.SpanContext.ht
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 <span class="kw">use</span> <span class="ident">tracing::Span</span>;
 
-<span class="comment">// Example carrier, could be a framework header map that impls otel&#39;s `Extract`.</span>
+<span class="comment">// Example carrier, could be a framework header map that impls otel&#39;s `Extractor`.</span>
 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carrier</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
 
 <span class="comment">// Propagator can be swapped with b3 propagator, jaeger propagator, etc.</span>

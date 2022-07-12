@@ -1,4 +1,5 @@
 (function() {var implementors = {};
 implementors["opentelemetry"] = [];
 implementors["opentelemetry_otlp"] = [{"text":"impl <a class=\"trait\" href=\"opentelemetry/sdk/export/trace/trait.SpanExporter.html\" title=\"trait opentelemetry::sdk::export::trace::SpanExporter\">SpanExporter</a> for <a class=\"enum\" href=\"opentelemetry_otlp/enum.SpanExporter.html\" title=\"enum opentelemetry_otlp::SpanExporter\">SpanExporter</a>","synthetic":false,"types":["opentelemetry_otlp::span::SpanExporter"]}];
+implementors["query_engine"] = [{"text":"impl <a class=\"trait\" href=\"opentelemetry/sdk/export/trace/trait.SpanExporter.html\" title=\"trait opentelemetry::sdk::export::trace::SpanExporter\">SpanExporter</a> for <a class=\"struct\" href=\"query_engine/tracer/struct.ClientSpanExporter.html\" title=\"struct query_engine::tracer::ClientSpanExporter\">ClientSpanExporter</a>","synthetic":false,"types":["query_engine::tracer::ClientSpanExporter"]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

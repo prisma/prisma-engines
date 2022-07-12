@@ -226,6 +226,8 @@
 <span id="221">221</span>
 <span id="222">222</span>
 <span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::PrismaError</span>, <span class="ident">PrismaResult</span>};
 <span class="kw">use</span> <span class="ident">datamodel::dml::Datamodel</span>;
 <span class="kw">use</span> <span class="ident">datamodel::ValidatedConfiguration</span>;
@@ -334,10 +336,12 @@
 
     <span class="doccomment">/// Enable OpenTelemetry streaming from requests.</span>
     <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">open_telemetry</span>: <span class="ident">bool</span>,
+    <span class="kw">pub</span> <span class="ident">enable_open_telemetry</span>: <span class="ident">bool</span>,
 
     <span class="doccomment">/// The url to the OpenTelemetry collector.</span>
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">default_value</span> <span class="op">=</span> <span class="string">&quot;http://localhost:4317&quot;</span>)]</span>
+    <span class="doccomment">/// Enabling this will send the OpenTelemtry tracing to a collector</span>
+    <span class="doccomment">/// and not via our custom stdout tracer</span>
+    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">default_value</span>)]</span>
     <span class="kw">pub</span> <span class="ident">open_telemetry_endpoint</span>: <span class="ident">String</span>,
 
     <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">subcommand</span>)]</span>

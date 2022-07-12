@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.16.0/src/sdk/trace/sampler.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sampler.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/sdk/trace/sampler.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sampler.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -301,6 +301,24 @@
 <span id="294">294</span>
 <span id="295">295</span>
 <span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
 </pre><pre class="rust"><code><span class="doccomment">//! # OpenTelemetry ShouldSample Interface</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ## Sampling</span>
@@ -341,9 +359,12 @@
 <span class="doccomment">//! MUST NOT allow this combination.</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">sdk::InstrumentationLibrary</span>,
     <span class="ident">trace</span>::{<span class="ident">Link</span>, <span class="ident">SpanKind</span>, <span class="ident">TraceContextExt</span>, <span class="ident">TraceId</span>, <span class="ident">TraceState</span>},
     <span class="ident">Context</span>, <span class="ident">KeyValue</span>,
 };
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
 <span class="doccomment">/// The `ShouldSample` interface allows implementations to provide samplers</span>
 <span class="doccomment">/// which will return a sampling `SamplingResult` based on information that</span>
@@ -359,6 +380,7 @@
         <span class="ident">span_kind</span>: <span class="kw-2">&amp;</span><span class="ident">SpanKind</span>,
         <span class="ident">attributes</span>: <span class="kw-2">&amp;</span>[<span class="ident">KeyValue</span>],
         <span class="ident">links</span>: <span class="kw-2">&amp;</span>[<span class="ident">Link</span>],
+        <span class="ident">instrumentation_library</span>: <span class="kw-2">&amp;</span><span class="ident">InstrumentationLibrary</span>,
     ) -&gt; <span class="ident">SamplingResult</span>;
 }
 
@@ -386,7 +408,8 @@
 }
 
 <span class="doccomment">/// Sampling options</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Sampler</span> {
     <span class="doccomment">/// Always sample the trace</span>
     <span class="ident">AlwaysOn</span>,
@@ -409,6 +432,7 @@
         <span class="ident">span_kind</span>: <span class="kw-2">&amp;</span><span class="ident">SpanKind</span>,
         <span class="ident">attributes</span>: <span class="kw-2">&amp;</span>[<span class="ident">KeyValue</span>],
         <span class="ident">links</span>: <span class="kw-2">&amp;</span>[<span class="ident">Link</span>],
+        <span class="ident">instrumentation_library</span>: <span class="kw-2">&amp;</span><span class="ident">InstrumentationLibrary</span>,
     ) -&gt; <span class="ident">SamplingResult</span> {
         <span class="kw">let</span> <span class="ident">decision</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
             <span class="comment">// Always sample the trace</span>
@@ -419,7 +443,15 @@
             <span class="ident">Sampler::ParentBased</span>(<span class="ident">delegate_sampler</span>) =&gt; {
                 <span class="ident">parent_context</span>.<span class="ident">filter</span>(<span class="op">|</span><span class="ident">cx</span><span class="op">|</span> <span class="ident">cx</span>.<span class="ident">has_active_span</span>()).<span class="ident">map_or</span>(
                     <span class="ident">delegate_sampler</span>
-                        .<span class="ident">should_sample</span>(<span class="ident">parent_context</span>, <span class="ident">trace_id</span>, <span class="ident">name</span>, <span class="ident">span_kind</span>, <span class="ident">attributes</span>, <span class="ident">links</span>)
+                        .<span class="ident">should_sample</span>(
+                            <span class="ident">parent_context</span>,
+                            <span class="ident">trace_id</span>,
+                            <span class="ident">name</span>,
+                            <span class="ident">span_kind</span>,
+                            <span class="ident">attributes</span>,
+                            <span class="ident">links</span>,
+                            <span class="ident">instrumentation_library</span>,
+                        )
                         .<span class="ident">decision</span>,
                     <span class="op">|</span><span class="ident">ctx</span><span class="op">|</span> {
                         <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">span</span>();
@@ -438,8 +470,9 @@
                     <span class="ident">SamplingDecision::RecordAndSample</span>
                 } <span class="kw">else</span> {
                     <span class="kw">let</span> <span class="ident">prob_upper_bound</span> <span class="op">=</span> (<span class="ident">prob</span>.<span class="ident">max</span>(<span class="number">0.0</span>) <span class="op">*</span> (<span class="number">1u64</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">63</span>) <span class="kw">as</span> <span class="ident">f64</span>) <span class="kw">as</span> <span class="ident">u64</span>;
-                    <span class="comment">// The trace_id is already randomly generated, so we don&#39;t need a new one here</span>
-                    <span class="kw">let</span> <span class="ident">rnd_from_trace_id</span> <span class="op">=</span> (<span class="ident">trace_id</span>.<span class="ident">to_u128</span>() <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">1</span>;
+                    <span class="comment">// TODO: update behavior when the spec definition resolves</span>
+                    <span class="comment">// https://github.com/open-telemetry/opentelemetry-specification/issues/1413</span>
+                    <span class="kw">let</span> <span class="ident">rnd_from_trace_id</span> <span class="op">=</span> (<span class="ident">trace_id</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">1</span>;
 
                     <span class="kw">if</span> <span class="ident">rnd_from_trace_id</span> <span class="op">&lt;</span> <span class="ident">prob_upper_bound</span> {
                         <span class="ident">SamplingDecision::RecordAndSample</span>
@@ -543,7 +576,7 @@
                     <span class="prelude-val">None</span>
                 };
 
-                <span class="kw">let</span> <span class="ident">trace_id</span> <span class="op">=</span> <span class="ident">TraceId::from_u128</span>(<span class="ident">rng</span>.<span class="ident">gen</span>());
+                <span class="kw">let</span> <span class="ident">trace_id</span> <span class="op">=</span> <span class="ident">TraceId::from</span>(<span class="ident">rng</span>.<span class="ident">gen</span>::<span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">16</span>]<span class="op">&gt;</span>());
                 <span class="kw">if</span> <span class="ident">sampler</span>
                     .<span class="ident">should_sample</span>(
                         <span class="ident">parent_context</span>.<span class="ident">as_ref</span>(),
@@ -552,6 +585,7 @@
                         <span class="kw-2">&amp;</span><span class="ident">SpanKind::Internal</span>,
                         <span class="kw-2">&amp;</span>[],
                         <span class="kw-2">&amp;</span>[],
+                        <span class="kw-2">&amp;</span><span class="ident">InstrumentationLibrary::default</span>(),
                     )
                     .<span class="ident">decision</span>
                     <span class="op">==</span> <span class="ident">SamplingDecision::RecordAndSample</span>
@@ -585,6 +619,7 @@
     <span class="kw">fn</span> <span class="ident">filter_parent_sampler_for_active_spans</span>() {
         <span class="kw">let</span> <span class="ident">sampler</span> <span class="op">=</span> <span class="ident">Sampler::ParentBased</span>(<span class="ident">Box::new</span>(<span class="ident">Sampler::AlwaysOn</span>));
         <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">Context::current_with_value</span>(<span class="string">&quot;some_value&quot;</span>);
+        <span class="kw">let</span> <span class="ident">instrumentation_library</span> <span class="op">=</span> <span class="ident">InstrumentationLibrary::default</span>();
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">sampler</span>.<span class="ident">should_sample</span>(
             <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">cx</span>),
             <span class="ident">TraceId::from_u128</span>(<span class="number">1</span>),
@@ -592,6 +627,7 @@
             <span class="kw-2">&amp;</span><span class="ident">SpanKind::Internal</span>,
             <span class="kw-2">&amp;</span>[],
             <span class="kw-2">&amp;</span>[],
+            <span class="kw-2">&amp;</span><span class="ident">instrumentation_library</span>,
         );
 
         <span class="macro">assert_eq!</span>(<span class="ident">result</span>.<span class="ident">decision</span>, <span class="ident">SamplingDecision::RecordAndSample</span>);

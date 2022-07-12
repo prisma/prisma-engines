@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.16.0/src/sdk/trace/span.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>span.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/sdk/trace/span.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>span.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -614,6 +614,19 @@
 <span id="607">607</span>
 <span id="608">608</span>
 <span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
 </pre><pre class="rust"><code><span class="doccomment">//! # Span</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! `Span`s represent a single operation within a trace. `Span`s can be nested to form a trace</span>
@@ -709,12 +722,14 @@
     <span class="doccomment">/// Note that the OpenTelemetry project documents certain [&quot;standard event names and</span>
     <span class="doccomment">/// keys&quot;](https://github.com/open-telemetry/opentelemetry-specification/tree/v0.5.0/specification/trace/semantic_conventions/README.md)</span>
     <span class="doccomment">/// which have prescribed semantic meanings.</span>
-    <span class="kw">fn</span> <span class="ident">add_event_with_timestamp</span>(
+    <span class="kw">fn</span> <span class="ident">add_event_with_timestamp</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">name</span>: <span class="ident">String</span>,
+        <span class="ident">name</span>: <span class="ident">T</span>,
         <span class="ident">timestamp</span>: <span class="ident">SystemTime</span>,
         <span class="kw-2">mut</span> <span class="ident">attributes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>,
-    ) {
+    ) <span class="kw">where</span>
+        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    {
         <span class="kw">let</span> <span class="ident">event_attributes_limit</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">span_limits</span>.<span class="ident">max_attributes_per_event</span> <span class="kw">as</span> <span class="ident">usize</span>;
         <span class="self">self</span>.<span class="ident">with_data</span>(<span class="op">|</span><span class="ident">data</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">dropped_attributes_count</span> <span class="op">=</span> <span class="ident">attributes</span>.<span class="ident">len</span>().<span class="ident">saturating_sub</span>(<span class="ident">event_attributes_limit</span>);
@@ -769,7 +784,10 @@
     }
 
     <span class="doccomment">/// Updates the `Span`&#39;s name.</span>
-    <span class="kw">fn</span> <span class="ident">update_name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">new_name</span>: <span class="ident">String</span>) {
+    <span class="kw">fn</span> <span class="ident">update_name</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">new_name</span>: <span class="ident">T</span>)
+    <span class="kw">where</span>
+        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    {
         <span class="self">self</span>.<span class="ident">with_data</span>(<span class="op">|</span><span class="ident">data</span><span class="op">|</span> {
             <span class="ident">data</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">new_name</span>.<span class="ident">into</span>();
         });
@@ -783,36 +801,44 @@
 
 <span class="kw">impl</span> <span class="ident">Span</span> {
     <span class="kw">fn</span> <span class="ident">ensure_ended_and_exported</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SystemTime</span><span class="op">&gt;</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">data</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">take</span>() {
-            <span class="comment">// Ensure end time is set via explicit end or implicitly on drop</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">timestamp</span>) <span class="op">=</span> <span class="ident">timestamp</span> {
-                <span class="ident">data</span>.<span class="ident">end_time</span> <span class="op">=</span> <span class="ident">timestamp</span>;
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">data</span>.<span class="ident">end_time</span> <span class="op">==</span> <span class="ident">data</span>.<span class="ident">start_time</span> {
-                <span class="ident">data</span>.<span class="ident">end_time</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::time::now</span>();
+        <span class="comment">// skip if data has already been exported</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">take</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">data</span>) =&gt; <span class="ident">data</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
+        };
+
+        <span class="comment">// skip if provider has been shut down</span>
+        <span class="kw">let</span> <span class="ident">provider</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">tracer</span>.<span class="ident">provider</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">provider</span>) =&gt; <span class="ident">provider</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
+        };
+
+        <span class="comment">// ensure end time is set via explicit end or implicitly on drop</span>
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">timestamp</span>) <span class="op">=</span> <span class="ident">timestamp</span> {
+            <span class="ident">data</span>.<span class="ident">end_time</span> <span class="op">=</span> <span class="ident">timestamp</span>;
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">data</span>.<span class="ident">end_time</span> <span class="op">==</span> <span class="ident">data</span>.<span class="ident">start_time</span> {
+            <span class="ident">data</span>.<span class="ident">end_time</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::time::now</span>();
+        }
+
+        <span class="kw">match</span> <span class="ident">provider</span>.<span class="ident">span_processors</span>().<span class="ident">as_slice</span>() {
+            [] =&gt; {}
+            [<span class="ident">processor</span>] =&gt; {
+                <span class="ident">processor</span>.<span class="ident">on_end</span>(<span class="ident">build_export_data</span>(
+                    <span class="ident">data</span>,
+                    <span class="self">self</span>.<span class="ident">span_context</span>.<span class="ident">clone</span>(),
+                    <span class="ident">provider</span>.<span class="ident">config</span>().<span class="ident">resource</span>.<span class="ident">clone</span>(),
+                    <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">tracer</span>,
+                ));
             }
-
-            <span class="comment">// Notify each span processor that the span has ended</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">provider</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">tracer</span>.<span class="ident">provider</span>() {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">processors</span> <span class="op">=</span> <span class="ident">provider</span>.<span class="ident">span_processors</span>().<span class="ident">iter</span>().<span class="ident">peekable</span>();
-                <span class="kw">let</span> <span class="ident">resource</span> <span class="op">=</span> <span class="ident">provider</span>.<span class="ident">config</span>().<span class="ident">resource</span>.<span class="ident">clone</span>();
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">span_data</span> <span class="op">=</span> <span class="prelude-val">Some</span>((<span class="ident">data</span>, <span class="ident">resource</span>));
-                <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">processor</span>) <span class="op">=</span> <span class="ident">processors</span>.<span class="ident">next</span>() {
-                    <span class="kw">let</span> <span class="ident">span_data</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">processors</span>.<span class="ident">peek</span>().<span class="ident">is_none</span>() {
-                        <span class="comment">// last loop or single processor/exporter, move data</span>
-                        <span class="ident">span_data</span>.<span class="ident">take</span>()
-                    } <span class="kw">else</span> {
-                        <span class="comment">// clone so each exporter gets owned data</span>
-                        <span class="ident">span_data</span>.<span class="ident">clone</span>()
-                    };
-
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">span_data</span>, <span class="ident">resource</span>)) <span class="op">=</span> <span class="ident">span_data</span> {
-                        <span class="ident">processor</span>.<span class="ident">on_end</span>(<span class="ident">build_export_data</span>(
-                            <span class="ident">span_data</span>,
-                            <span class="self">self</span>.<span class="ident">span_context</span>.<span class="ident">clone</span>(),
-                            <span class="ident">resource</span>,
-                            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">tracer</span>,
-                        ));
-                    }
+            <span class="ident">processors</span> =&gt; {
+                <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">provider</span>.<span class="ident">config</span>();
+                <span class="kw">for</span> <span class="ident">processor</span> <span class="kw">in</span> <span class="ident">processors</span> {
+                    <span class="ident">processor</span>.<span class="ident">on_end</span>(<span class="ident">build_export_data</span>(
+                        <span class="ident">data</span>.<span class="ident">clone</span>(),
+                        <span class="self">self</span>.<span class="ident">span_context</span>.<span class="ident">clone</span>(),
+                        <span class="ident">config</span>.<span class="ident">resource</span>.<span class="ident">clone</span>(),
+                        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">tracer</span>,
+                    ));
                 }
             }
         }
@@ -845,7 +871,7 @@
         <span class="ident">status_code</span>: <span class="ident">data</span>.<span class="ident">status_code</span>,
         <span class="ident">status_message</span>: <span class="ident">data</span>.<span class="ident">status_message</span>,
         <span class="ident">resource</span>,
-        <span class="ident">instrumentation_lib</span>: <span class="kw-2">*</span><span class="ident">tracer</span>.<span class="ident">instrumentation_library</span>(),
+        <span class="ident">instrumentation_lib</span>: <span class="ident">tracer</span>.<span class="ident">instrumentation_library</span>().<span class="ident">clone</span>(),
     }
 }
 
@@ -862,7 +888,7 @@
     <span class="kw">fn</span> <span class="ident">init</span>() -&gt; (<span class="ident">sdk::trace::Tracer</span>, <span class="ident">SpanData</span>) {
         <span class="kw">let</span> <span class="ident">provider</span> <span class="op">=</span> <span class="ident">sdk::trace::TracerProvider::default</span>();
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">provider</span>.<span class="ident">config</span>();
-        <span class="kw">let</span> <span class="ident">tracer</span> <span class="op">=</span> <span class="ident">provider</span>.<span class="ident">tracer</span>(<span class="string">&quot;opentelemetry&quot;</span>, <span class="prelude-val">Some</span>(<span class="macro">env!</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>)));
+        <span class="kw">let</span> <span class="ident">tracer</span> <span class="op">=</span> <span class="ident">provider</span>.<span class="ident">tracer</span>(<span class="string">&quot;opentelemetry&quot;</span>);
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">SpanData</span> {
             <span class="ident">parent_span_id</span>: <span class="ident">SpanId::from_u64</span>(<span class="number">0</span>),
             <span class="ident">span_kind</span>: <span class="ident">trace::SpanKind::Internal</span>,
@@ -1140,7 +1166,7 @@
         <span class="kw">let</span> <span class="ident">exporter</span> <span class="op">=</span> <span class="ident">NoopSpanExporter::new</span>();
         <span class="kw">let</span> <span class="ident">provider_builder</span> <span class="op">=</span> <span class="ident">sdk::trace::TracerProvider::builder</span>().<span class="ident">with_simple_exporter</span>(<span class="ident">exporter</span>);
         <span class="kw">let</span> <span class="ident">provider</span> <span class="op">=</span> <span class="ident">provider_builder</span>.<span class="ident">build</span>();
-        <span class="kw">let</span> <span class="ident">tracer</span> <span class="op">=</span> <span class="ident">provider</span>.<span class="ident">tracer</span>(<span class="string">&quot;opentelemetry-test&quot;</span>, <span class="prelude-val">None</span>);
+        <span class="kw">let</span> <span class="ident">tracer</span> <span class="op">=</span> <span class="ident">provider</span>.<span class="ident">tracer</span>(<span class="string">&quot;opentelemetry-test&quot;</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">event1</span> <span class="op">=</span> <span class="ident">Event::with_name</span>(<span class="string">&quot;test event&quot;</span>);
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..(<span class="ident">DEFAULT_MAX_ATTRIBUTES_PER_EVENT</span> <span class="op">*</span> <span class="number">2</span>) {
@@ -1155,7 +1181,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">tracer</span>.<span class="ident">build</span>(<span class="ident">span_builder</span>);
 
         <span class="comment">// add event after build</span>
-        <span class="ident">span</span>.<span class="ident">add_event</span>(<span class="string">&quot;another test event&quot;</span>.<span class="ident">into</span>(), <span class="ident">event2</span>.<span class="ident">attributes</span>);
+        <span class="ident">span</span>.<span class="ident">add_event</span>(<span class="string">&quot;another test event&quot;</span>, <span class="ident">event2</span>.<span class="ident">attributes</span>);
 
         <span class="kw">let</span> <span class="ident">event_queue</span> <span class="op">=</span> <span class="ident">span</span>
             .<span class="ident">data</span>
@@ -1174,7 +1200,7 @@
         <span class="kw">let</span> <span class="ident">exporter</span> <span class="op">=</span> <span class="ident">NoopSpanExporter::new</span>();
         <span class="kw">let</span> <span class="ident">provider_builder</span> <span class="op">=</span> <span class="ident">sdk::trace::TracerProvider::builder</span>().<span class="ident">with_simple_exporter</span>(<span class="ident">exporter</span>);
         <span class="kw">let</span> <span class="ident">provider</span> <span class="op">=</span> <span class="ident">provider_builder</span>.<span class="ident">build</span>();
-        <span class="kw">let</span> <span class="ident">tracer</span> <span class="op">=</span> <span class="ident">provider</span>.<span class="ident">tracer</span>(<span class="string">&quot;opentelemetry-test&quot;</span>, <span class="prelude-val">None</span>);
+        <span class="kw">let</span> <span class="ident">tracer</span> <span class="op">=</span> <span class="ident">provider</span>.<span class="ident">tracer</span>(<span class="string">&quot;opentelemetry-test&quot;</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">link</span> <span class="op">=</span> <span class="ident">Link::new</span>(
             <span class="ident">SpanContext::new</span>(
@@ -1208,7 +1234,7 @@
         <span class="kw">let</span> <span class="ident">provider</span> <span class="op">=</span> <span class="ident">sdk::trace::TracerProvider::builder</span>()
             .<span class="ident">with_simple_exporter</span>(<span class="ident">NoopSpanExporter::new</span>())
             .<span class="ident">build</span>();
-        <span class="kw">let</span> <span class="ident">tracer</span> <span class="op">=</span> <span class="ident">provider</span>.<span class="ident">tracer</span>(<span class="string">&quot;test&quot;</span>, <span class="prelude-val">None</span>);
+        <span class="kw">let</span> <span class="ident">tracer</span> <span class="op">=</span> <span class="ident">provider</span>.<span class="ident">tracer</span>(<span class="string">&quot;test&quot;</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">tracer</span>.<span class="ident">start</span>(<span class="string">&quot;test_span&quot;</span>);
         <span class="ident">span</span>.<span class="ident">add_event</span>(<span class="string">&quot;test_event&quot;</span>.<span class="ident">to_string</span>(), <span class="macro">vec!</span>[]);

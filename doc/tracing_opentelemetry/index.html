@@ -4,15 +4,15 @@
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../tracing_opentelemetry/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div>
-        </a><h2 class="location"><a href="#">Crate tracing_opentelemetry</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 0.16.0</li><li><a id="all-types" href="all.html">All Items</a></li></div></ul><section><div class="block"><ul><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li><li><a href="#functions">Functions</a></li></ul></div></section><div id="sidebar-vars" data-name="tracing_opentelemetry" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../tracing_opentelemetry/index.html">
+        </a><h2 class="location"><a href="#">Crate tracing_opentelemetry</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 0.17.4</li><li><a id="all-types" href="all.html">All Items</a></li></div></ul><section><div class="block"><ul><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li><li><a href="#functions">Functions</a></li></ul></div></section><div id="sidebar-vars" data-name="tracing_opentelemetry" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../tracing_opentelemetry/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
-    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">tracing_opentelemetry</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/tracing_opentelemetry/lib.rs.html#1-111">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="tracing-opentelemetry"><a href="#tracing-opentelemetry">Tracing OpenTelemetry</a></h2>
+    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">tracing_opentelemetry</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/tracing_opentelemetry/lib.rs.html#1-123">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="tracing-opentelemetry"><a href="#tracing-opentelemetry">Tracing OpenTelemetry</a></h2>
 <p><a href="https://github.com/tokio-rs/tracing"><code>tracing</code></a> is a framework for instrumenting Rust programs to collect
 structured, event-based diagnostic information. This crate provides a layer
 that connects spans from multiple systems into a trace and emits them to
 <a href="https://opentelemetry.io">OpenTelemetry</a>-compatible distributed tracing systems for processing and
 visualization.</p>
-<p><em>Compiler support: <a href="#supported-rust-versions">requires <code>rustc</code> 1.42+</a></em></p>
+<p><em>Compiler support: <a href="#supported-rust-versions">requires <code>rustc</code> 1.49+</a></em></p>
 <h4 id="special-fields"><a href="#special-fields">Special Fields</a></h4>
 <p>Fields with an <code>otel.</code> prefix are reserved for this crate and have specific
 meaning. They are treated as ordinary fields by other layers. The current
@@ -21,8 +21,8 @@ special fields are:</p>
 <li><code>otel.name</code>: Override the span name sent to OpenTelemetry exporters.
 Setting this field is useful if you want to display non-static information
 in your span name.</li>
-<li><code>otel.kind</code>: Set the span kind to one of the supported OpenTelemetry <a href="https://docs.rs/opentelemetry/latest/opentelemetry/trace/enum.SpanKind.html">span kinds</a>.</li>
-<li><code>otel.status_code</code>: Set the span status code to one of the supported OpenTelemetry <a href="https://docs.rs/opentelemetry/latest/opentelemetry/trace/enum.StatusCode.html">span status codes</a>.</li>
+<li><code>otel.kind</code>: Set the span kind to one of the supported OpenTelemetry <a href="../opentelemetry/trace/span/enum.SpanKind.html">span kinds</a>.</li>
+<li><code>otel.status_code</code>: Set the span status code to one of the supported OpenTelemetry <a href="../opentelemetry/trace/span/enum.StatusCode.html">span status codes</a>.</li>
 <li><code>otel.status_message</code>: Set the span status message.</li>
 </ul>
 <h4 id="semantic-conventions"><a href="#semantic-conventions">Semantic Conventions</a></h4>
@@ -62,7 +62,7 @@ the <a href="https://github.com/open-telemetry/opentelemetry-specification">spec
 });</code></pre></div>
 <h3 id="supported-rust-versions"><a href="#supported-rust-versions">Supported Rust Versions</a></h3>
 <p>Tracing is built against the latest stable release. The minimum supported
-version is 1.42. The current Tracing version is not guaranteed to build on
+version is 1.49. The current Tracing version is not guaranteed to build on
 Rust versions earlier than the minimum supported version.</p>
 <p>Tracing follows the same compiler support policies as the rest of the Tokio
 project. The current stable Rust compiler and the three most recent minor
@@ -74,8 +74,9 @@ long as doing so complies with this policy.</p>
 </div></details><h2 id="structs" class="small-section-header"><a href="#structs">Structs</a></h2>
 <div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.OpenTelemetryLayer.html" title="tracing_opentelemetry::OpenTelemetryLayer struct">OpenTelemetryLayer</a></div><div class="item-right docblock-short"><p>An <a href="https://opentelemetry.io">OpenTelemetry</a> propagation layer for use in a project that uses
 <a href="https://github.com/tokio-rs/tracing">tracing</a>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.OtelData.html" title="tracing_opentelemetry::OtelData struct">OtelData</a></div><div class="item-right docblock-short"><p>Per-span OpenTelemetry data tracked by this crate.</p>
 </div></div></div><h2 id="traits" class="small-section-header"><a href="#traits">Traits</a></h2>
-<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.OpenTelemetrySpanExt.html" title="tracing_opentelemetry::OpenTelemetrySpanExt trait">OpenTelemetrySpanExt</a></div><div class="item-right docblock-short"><p>Utility functions to allow tracing <a href="https://docs.rs/tracing/latest/tracing/struct.Span.html"><code>Span</code></a>s to accept and return
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.OpenTelemetrySpanExt.html" title="tracing_opentelemetry::OpenTelemetrySpanExt trait">OpenTelemetrySpanExt</a></div><div class="item-right docblock-short"><p>Utility functions to allow tracing <a href="../tracing/span/struct.Span.html"><code>Span</code></a>s to accept and return
 <a href="https://opentelemetry.io">OpenTelemetry</a> <a href="../opentelemetry/context/struct.Context.html"><code>Context</code></a>s.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.PreSampledTracer.html" title="tracing_opentelemetry::PreSampledTracer trait">PreSampledTracer</a></div><div class="item-right docblock-short"><p>An interface for authors of OpenTelemetry SDKs to build pre-sampled tracers.</p>
 </div></div></div><h2 id="functions" class="small-section-header"><a href="#functions">Functions</a></h2>

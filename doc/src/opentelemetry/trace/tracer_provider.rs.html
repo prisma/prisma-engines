@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.16.0/src/trace/tracer_provider.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tracer_provider.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/trace/tracer_provider.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tracer_provider.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -37,15 +37,51 @@
 <span id="30">30</span>
 <span id="31">31</span>
 <span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::trace</span>::{<span class="ident">TraceResult</span>, <span class="ident">Tracer</span>};
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
 <span class="doccomment">/// Types that can create instances of [`Tracer`].</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">TracerProvider</span>: <span class="ident">fmt::Debug</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">TracerProvider</span> {
     <span class="doccomment">/// The [`Tracer`] type that this provider will return.</span>
     <span class="kw">type</span> <span class="ident">Tracer</span>: <span class="ident">Tracer</span>;
 
-    <span class="doccomment">/// Returns a new tracer with the given name and version.</span>
+    <span class="doccomment">/// Returns a new tracer with the given name.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The `name` should be the application name or the name of the library</span>
     <span class="doccomment">/// providing instrumentation. If the name is empty, then an</span>
@@ -58,13 +94,49 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// let provider = global::tracer_provider();</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// // App tracer</span>
-    <span class="doccomment">/// let tracer = provider.tracer(&quot;my_app&quot;, None);</span>
+    <span class="doccomment">/// // tracer used in applications/binaries</span>
+    <span class="doccomment">/// let tracer = provider.tracer(&quot;my_app&quot;);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// // Library tracer</span>
-    <span class="doccomment">/// let tracer = provider.tracer(&quot;my_library&quot;, Some(env!(&quot;CARGO_PKG_VERSION&quot;)));</span>
+    <span class="doccomment">/// // tracer used in libraries/crates that optionally includes version and schema url</span>
+    <span class="doccomment">/// let tracer = provider.versioned_tracer(</span>
+    <span class="doccomment">///     &quot;my_library&quot;,</span>
+    <span class="doccomment">///     Some(env!(&quot;CARGO_PKG_VERSION&quot;)),</span>
+    <span class="doccomment">///     Some(&quot;https://opentelemetry.io/schema/1.0.0&quot;)</span>
+    <span class="doccomment">/// );</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">tracer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="self">Self</span>::Tracer</span>;
+    <span class="kw">fn</span> <span class="ident">tracer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="self">Self</span>::Tracer</span> {
+        <span class="self">self</span>.<span class="ident">versioned_tracer</span>(<span class="ident">name</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
+    }
+
+    <span class="doccomment">/// Returns a new versioned tracer with a given name.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The `name` should be the application name or the name of the library</span>
+    <span class="doccomment">/// providing instrumentation. If the name is empty, then an</span>
+    <span class="doccomment">/// implementation-defined default name may be used instead.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use opentelemetry::{global, trace::TracerProvider};</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let provider = global::tracer_provider();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // tracer used in applications/binaries</span>
+    <span class="doccomment">/// let tracer = provider.tracer(&quot;my_app&quot;);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // tracer used in libraries/crates that optionally includes version and schema url</span>
+    <span class="doccomment">/// let tracer = provider.versioned_tracer(</span>
+    <span class="doccomment">///     &quot;my_library&quot;,</span>
+    <span class="doccomment">///     Some(env!(&quot;CARGO_PKG_VERSION&quot;)),</span>
+    <span class="doccomment">///     Some(&quot;https://opentelemetry.io/schema/1.0.0&quot;)</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">fn</span> <span class="ident">versioned_tracer</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
+        <span class="ident">schema_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="ident"><span class="self">Self</span>::Tracer</span>;
 
     <span class="doccomment">/// Force flush all remaining spans in span processors and return results.</span>
     <span class="kw">fn</span> <span class="ident">force_flush</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TraceResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>;

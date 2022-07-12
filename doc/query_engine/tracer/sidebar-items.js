@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["new_pipeline","Create a new stdout exporter pipeline builder."]],"struct":[["ClientSpanExporter","A [`ClientSpanExporter`] that sends spans to stdout."],["PipelineBuilder","Pipeline builder"]]});

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-otlp-0.9.0/src/transform/traces.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>traces.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-otlp-0.10.0/src/transform/traces.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>traces.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../opentelemetry_otlp/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -347,70 +347,9 @@
 <span id="342">342</span>
 <span id="343">343</span>
 <span id="344">344</span>
-<span id="345">345</span>
-<span id="346">346</span>
-<span id="347">347</span>
-<span id="348">348</span>
-<span id="349">349</span>
-<span id="350">350</span>
-<span id="351">351</span>
-<span id="352">352</span>
-<span id="353">353</span>
-<span id="354">354</span>
-<span id="355">355</span>
-<span id="356">356</span>
-<span id="357">357</span>
-<span id="358">358</span>
-<span id="359">359</span>
-<span id="360">360</span>
-<span id="361">361</span>
-<span id="362">362</span>
-<span id="363">363</span>
-<span id="364">364</span>
-<span id="365">365</span>
-<span id="366">366</span>
-<span id="367">367</span>
-<span id="368">368</span>
-<span id="369">369</span>
-<span id="370">370</span>
-<span id="371">371</span>
-<span id="372">372</span>
-<span id="373">373</span>
-<span id="374">374</span>
-<span id="375">375</span>
-<span id="376">376</span>
-<span id="377">377</span>
-<span id="378">378</span>
-<span id="379">379</span>
-<span id="380">380</span>
-<span id="381">381</span>
-<span id="382">382</span>
-<span id="383">383</span>
-<span id="384">384</span>
-<span id="385">385</span>
-<span id="386">386</span>
-<span id="387">387</span>
-<span id="388">388</span>
-<span id="389">389</span>
-<span id="390">390</span>
-<span id="391">391</span>
-<span id="392">392</span>
-<span id="393">393</span>
-<span id="394">394</span>
-<span id="395">395</span>
-<span id="396">396</span>
-<span id="397">397</span>
-<span id="398">398</span>
-<span id="399">399</span>
-<span id="400">400</span>
-<span id="401">401</span>
-<span id="402">402</span>
-<span id="403">403</span>
-<span id="404">404</span>
-<span id="405">405</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transform::common::to_nanos</span>;
 <span class="kw">use</span> <span class="ident">opentelemetry::sdk</span>::{<span class="self">self</span>, <span class="ident">export::trace::SpanData</span>};
-<span class="kw">use</span> <span class="ident">opentelemetry::trace</span>::{<span class="ident">Link</span>, <span class="ident">SpanKind</span>, <span class="ident">StatusCode</span>};
+<span class="kw">use</span> <span class="ident">opentelemetry::trace</span>::{<span class="ident">Link</span>, <span class="ident">SpanId</span>, <span class="ident">SpanKind</span>, <span class="ident">StatusCode</span>};
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tonic&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tonic</span> {
@@ -446,18 +385,8 @@
     <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Link</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">span::Link</span> {
         <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">link</span>: <span class="ident">Link</span>) -&gt; <span class="self">Self</span> {
             <span class="ident">span::Link</span> {
-                <span class="ident">trace_id</span>: <span class="ident">link</span>
-                    .<span class="ident">span_context</span>()
-                    .<span class="ident">trace_id</span>()
-                    .<span class="ident">to_u128</span>()
-                    .<span class="ident">to_be_bytes</span>()
-                    .<span class="ident">to_vec</span>(),
-                <span class="ident">span_id</span>: <span class="ident">link</span>
-                    .<span class="ident">span_context</span>()
-                    .<span class="ident">span_id</span>()
-                    .<span class="ident">to_u64</span>()
-                    .<span class="ident">to_be_bytes</span>()
-                    .<span class="ident">to_vec</span>(),
+                <span class="ident">trace_id</span>: <span class="ident">link</span>.<span class="ident">span_context</span>().<span class="ident">trace_id</span>().<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>(),
+                <span class="ident">span_id</span>: <span class="ident">link</span>.<span class="ident">span_context</span>().<span class="ident">span_id</span>().<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>(),
                 <span class="ident">trace_state</span>: <span class="ident">link</span>.<span class="ident">span_context</span>().<span class="ident">trace_state</span>().<span class="ident">header</span>(),
                 <span class="ident">attributes</span>: <span class="ident">Attributes::from</span>(<span class="ident">link</span>.<span class="ident">attributes</span>().<span class="ident">clone</span>()).<span class="number">0</span>,
                 <span class="ident">dropped_attributes_count</span>: <span class="ident">link</span>.<span class="ident">dropped_attributes_count</span>(),
@@ -479,22 +408,12 @@
                 <span class="ident">instrumentation_library_spans</span>: <span class="macro">vec!</span>[<span class="ident">InstrumentationLibrarySpans</span> {
                     <span class="ident">instrumentation_library</span>: <span class="ident">Default::default</span>(),
                     <span class="ident">spans</span>: <span class="macro">vec!</span>[<span class="ident">Span</span> {
-                        <span class="ident">trace_id</span>: <span class="ident">source_span</span>
-                            .<span class="ident">span_context</span>
-                            .<span class="ident">trace_id</span>()
-                            .<span class="ident">to_u128</span>()
-                            .<span class="ident">to_be_bytes</span>()
-                            .<span class="ident">to_vec</span>(),
-                        <span class="ident">span_id</span>: <span class="ident">source_span</span>
-                            .<span class="ident">span_context</span>
-                            .<span class="ident">span_id</span>()
-                            .<span class="ident">to_u64</span>()
-                            .<span class="ident">to_be_bytes</span>()
-                            .<span class="ident">to_vec</span>(),
+                        <span class="ident">trace_id</span>: <span class="ident">source_span</span>.<span class="ident">span_context</span>.<span class="ident">trace_id</span>().<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>(),
+                        <span class="ident">span_id</span>: <span class="ident">source_span</span>.<span class="ident">span_context</span>.<span class="ident">span_id</span>().<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>(),
                         <span class="ident">trace_state</span>: <span class="ident">source_span</span>.<span class="ident">span_context</span>.<span class="ident">trace_state</span>().<span class="ident">header</span>(),
                         <span class="ident">parent_span_id</span>: {
-                            <span class="kw">if</span> <span class="ident">source_span</span>.<span class="ident">parent_span_id</span>.<span class="ident">to_u64</span>() <span class="op">&gt;</span> <span class="number">0</span> {
-                                <span class="ident">source_span</span>.<span class="ident">parent_span_id</span>.<span class="ident">to_u64</span>().<span class="ident">to_be_bytes</span>().<span class="ident">to_vec</span>()
+                            <span class="kw">if</span> <span class="ident">source_span</span>.<span class="ident">parent_span_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">SpanId::INVALID</span> {
+                                <span class="ident">source_span</span>.<span class="ident">parent_span_id</span>.<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>()
                             } <span class="kw">else</span> {
                                 <span class="macro">vec!</span>[]
                             }
@@ -575,18 +494,8 @@
     <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Link</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">span::Link</span> {
         <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">link</span>: <span class="ident">Link</span>) -&gt; <span class="self">Self</span> {
             <span class="ident">span::Link</span> {
-                <span class="ident">trace_id</span>: <span class="ident">link</span>
-                    .<span class="ident">span_context</span>()
-                    .<span class="ident">trace_id</span>()
-                    .<span class="ident">to_u128</span>()
-                    .<span class="ident">to_be_bytes</span>()
-                    .<span class="ident">to_vec</span>(),
-                <span class="ident">span_id</span>: <span class="ident">link</span>
-                    .<span class="ident">span_context</span>()
-                    .<span class="ident">span_id</span>()
-                    .<span class="ident">to_u64</span>()
-                    .<span class="ident">to_be_bytes</span>()
-                    .<span class="ident">to_vec</span>(),
+                <span class="ident">trace_id</span>: <span class="ident">link</span>.<span class="ident">span_context</span>().<span class="ident">trace_id</span>().<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>(),
+                <span class="ident">span_id</span>: <span class="ident">link</span>.<span class="ident">span_context</span>().<span class="ident">span_id</span>().<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>(),
                 <span class="ident">trace_state</span>: <span class="ident">link</span>.<span class="ident">span_context</span>().<span class="ident">trace_state</span>().<span class="ident">header</span>(),
                 <span class="ident">attributes</span>: <span class="ident">Attributes::from</span>(<span class="ident">link</span>.<span class="ident">attributes</span>().<span class="ident">clone</span>()).<span class="number">0</span>,
                 <span class="ident">dropped_attributes_count</span>: <span class="ident">link</span>.<span class="ident">dropped_attributes_count</span>(),
@@ -608,22 +517,12 @@
                 <span class="ident">instrumentation_library_spans</span>: <span class="macro">vec!</span>[<span class="ident">InstrumentationLibrarySpans</span> {
                     <span class="ident">instrumentation_library</span>: <span class="ident">Default::default</span>(),
                     <span class="ident">spans</span>: <span class="macro">vec!</span>[<span class="ident">Span</span> {
-                        <span class="ident">trace_id</span>: <span class="ident">source_span</span>
-                            .<span class="ident">span_context</span>
-                            .<span class="ident">trace_id</span>()
-                            .<span class="ident">to_u128</span>()
-                            .<span class="ident">to_be_bytes</span>()
-                            .<span class="ident">to_vec</span>(),
-                        <span class="ident">span_id</span>: <span class="ident">source_span</span>
-                            .<span class="ident">span_context</span>
-                            .<span class="ident">span_id</span>()
-                            .<span class="ident">to_u64</span>()
-                            .<span class="ident">to_be_bytes</span>()
-                            .<span class="ident">to_vec</span>(),
+                        <span class="ident">trace_id</span>: <span class="ident">source_span</span>.<span class="ident">span_context</span>.<span class="ident">trace_id</span>().<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>(),
+                        <span class="ident">span_id</span>: <span class="ident">source_span</span>.<span class="ident">span_context</span>.<span class="ident">span_id</span>().<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>(),
                         <span class="ident">trace_state</span>: <span class="ident">source_span</span>.<span class="ident">span_context</span>.<span class="ident">trace_state</span>().<span class="ident">header</span>(),
                         <span class="ident">parent_span_id</span>: {
-                            <span class="kw">if</span> <span class="ident">source_span</span>.<span class="ident">parent_span_id</span>.<span class="ident">to_u64</span>() <span class="op">&gt;</span> <span class="number">0</span> {
-                                <span class="ident">source_span</span>.<span class="ident">parent_span_id</span>.<span class="ident">to_u64</span>().<span class="ident">to_be_bytes</span>().<span class="ident">to_vec</span>()
+                            <span class="kw">if</span> <span class="ident">source_span</span>.<span class="ident">parent_span_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">SpanId::INVALID</span> {
+                                <span class="ident">source_span</span>.<span class="ident">parent_span_id</span>.<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>()
                             } <span class="kw">else</span> {
                                 <span class="macro">vec!</span>[]
                             }
@@ -679,7 +578,6 @@
         <span class="ident">Status</span>, <span class="ident">Status_StatusCode</span>,
     };
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transform::common::grpcio::Attributes</span>;
-    <span class="kw">use</span> <span class="ident">protobuf::reflect::ProtobufValue</span>;
     <span class="kw">use</span> <span class="ident">protobuf</span>::{<span class="ident">RepeatedField</span>, <span class="ident">SingularPtrField</span>};
 
     <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SpanKind</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Span_SpanKind</span> {
@@ -707,18 +605,8 @@
     <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Link</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Span_Link</span> {
         <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">link</span>: <span class="ident">Link</span>) -&gt; <span class="self">Self</span> {
             <span class="ident">Span_Link</span> {
-                <span class="ident">trace_id</span>: <span class="ident">link</span>
-                    .<span class="ident">span_context</span>()
-                    .<span class="ident">trace_id</span>()
-                    .<span class="ident">to_u128</span>()
-                    .<span class="ident">to_be_bytes</span>()
-                    .<span class="ident">to_vec</span>(),
-                <span class="ident">span_id</span>: <span class="ident">link</span>
-                    .<span class="ident">span_context</span>()
-                    .<span class="ident">span_id</span>()
-                    .<span class="ident">to_u64</span>()
-                    .<span class="ident">to_be_bytes</span>()
-                    .<span class="ident">to_vec</span>(),
+                <span class="ident">trace_id</span>: <span class="ident">link</span>.<span class="ident">span_context</span>().<span class="ident">trace_id</span>().<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>(),
+                <span class="ident">span_id</span>: <span class="ident">link</span>.<span class="ident">span_context</span>().<span class="ident">span_id</span>().<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>(),
                 <span class="ident">trace_state</span>: <span class="ident">link</span>.<span class="ident">span_context</span>().<span class="ident">trace_state</span>().<span class="ident">header</span>(),
                 <span class="ident">attributes</span>: <span class="ident">Attributes::from</span>(<span class="ident">link</span>.<span class="ident">attributes</span>().<span class="ident">clone</span>()).<span class="number">0</span>,
                 <span class="ident">dropped_attributes_count</span>: <span class="ident">link</span>.<span class="ident">dropped_attributes_count</span>(),
@@ -742,22 +630,12 @@
                     <span class="ident">InstrumentationLibrarySpans</span> {
                         <span class="ident">instrumentation_library</span>: <span class="ident">Default::default</span>(),
                         <span class="ident">spans</span>: <span class="ident">RepeatedField::from_vec</span>(<span class="macro">vec!</span>[<span class="ident">Span</span> {
-                            <span class="ident">trace_id</span>: <span class="ident">source_span</span>
-                                .<span class="ident">span_context</span>
-                                .<span class="ident">trace_id</span>()
-                                .<span class="ident">to_u128</span>()
-                                .<span class="ident">to_be_bytes</span>()
-                                .<span class="ident">to_vec</span>(),
-                            <span class="ident">span_id</span>: <span class="ident">source_span</span>
-                                .<span class="ident">span_context</span>
-                                .<span class="ident">span_id</span>()
-                                .<span class="ident">to_u64</span>()
-                                .<span class="ident">to_be_bytes</span>()
-                                .<span class="ident">to_vec</span>(),
+                            <span class="ident">trace_id</span>: <span class="ident">source_span</span>.<span class="ident">span_context</span>.<span class="ident">trace_id</span>().<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>(),
+                            <span class="ident">span_id</span>: <span class="ident">source_span</span>.<span class="ident">span_context</span>.<span class="ident">span_id</span>().<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>(),
                             <span class="ident">trace_state</span>: <span class="ident">source_span</span>.<span class="ident">span_context</span>.<span class="ident">trace_state</span>().<span class="ident">header</span>(),
                             <span class="ident">parent_span_id</span>: {
-                                <span class="kw">if</span> <span class="ident">source_span</span>.<span class="ident">parent_span_id</span>.<span class="ident">to_u64</span>().<span class="ident">is_non_zero</span>() {
-                                    <span class="ident">source_span</span>.<span class="ident">parent_span_id</span>.<span class="ident">to_u64</span>().<span class="ident">to_be_bytes</span>().<span class="ident">to_vec</span>()
+                                <span class="kw">if</span> <span class="ident">source_span</span>.<span class="ident">parent_span_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">SpanId::INVALID</span> {
+                                    <span class="ident">source_span</span>.<span class="ident">parent_span_id</span>.<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>()
                                 } <span class="kw">else</span> {
                                     <span class="macro">vec!</span>[]
                                 }
