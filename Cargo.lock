@@ -3236,7 +3236,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/weakky/quaint?branch=feat/order-by-nulls-fork#b65e8f8f57f114a75fe8ee4c3329d5499dc1c45a"
+source = "git+https://github.com/prisma/quaint#80d3a238fa751565a5351feee854897dd5e5c879"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
