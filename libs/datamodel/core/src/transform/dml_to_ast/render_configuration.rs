@@ -20,7 +20,7 @@ fn render_datasource(datasource: &Datasource, out: &mut String) -> fmt::Result {
         out,
         "datasource {} {{\nprovider = {}",
         datasource.name,
-        string_literal(&datasource.active_provider)
+        string_literal(datasource.active_provider)
     )?;
 
     out.push_str("url = ");

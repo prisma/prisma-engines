@@ -5,7 +5,6 @@ version = "0.1.0"
 
 [dependencies]
 datamodel = { path = "../../../libs/datamodel/core" }
-sql-datamodel-connector = { path = "../../../libs/datamodel/connectors/sql-datamodel-connector" }
 migration-connector = { path = "../migration-connector" }
 native-types = { path = "../../../libs/native-types" }
 sql-schema-describer = { path = "../../../libs/sql-schema-describer" }

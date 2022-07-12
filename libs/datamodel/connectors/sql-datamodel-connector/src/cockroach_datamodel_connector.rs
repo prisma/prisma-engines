@@ -106,6 +106,10 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, CockroachType)] = &[
 pub(crate) struct CockroachDatamodelConnector;
 
 impl Connector for CockroachDatamodelConnector {
+    fn provider_name(&self) -> &'static str {
+        "cockroachdb"
+    }
+
     fn name(&self) -> &str {
         "CockroachDB"
     }

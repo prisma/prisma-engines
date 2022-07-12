@@ -83,7 +83,7 @@ impl SqlFlavour for MssqlFlavour {
     }
 
     fn datamodel_connector(&self) -> &'static dyn datamodel::datamodel_connector::Connector {
-        sql_datamodel_connector::MSSQL
+        datamodel::builtin_connectors::MSSQL
     }
 
     fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {

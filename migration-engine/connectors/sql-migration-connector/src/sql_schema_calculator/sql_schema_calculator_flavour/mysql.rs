@@ -1,6 +1,6 @@
 use super::SqlSchemaCalculatorFlavour;
 use crate::flavour::MysqlFlavour;
-use datamodel::{datamodel_connector::ScalarType, parser_database::walkers::*, ValidatedSchema};
+use datamodel::{parser_database::walkers::*, ValidatedSchema};
 use sql_schema_describer as sql;
 
 impl SqlSchemaCalculatorFlavour for MysqlFlavour {
@@ -29,10 +29,6 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
         }
 
         enums
-    }
-
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
-        sql_datamodel_connector::MYSQL.default_native_type_for_scalar_type(scalar_type)
     }
 
     fn enum_column_type(&self, field: ScalarFieldWalker<'_>, _db_name: &str) -> sql::ColumnType {

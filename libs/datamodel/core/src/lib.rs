@@ -77,6 +77,11 @@ use transform::{
     dml_to_ast::RenderParams,
 };
 
+pub mod builtin_connectors {
+    pub use mongodb_datamodel_connector::*;
+    pub use sql_datamodel_connector::*;
+}
+
 #[derive(Debug)]
 pub struct Validated<T> {
     pub subject: T,

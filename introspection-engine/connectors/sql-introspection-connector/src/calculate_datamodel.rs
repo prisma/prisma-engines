@@ -8,7 +8,7 @@ use crate::{
     version_checker::VersionChecker,
     SqlFamilyTrait, SqlIntrospectionResult,
 };
-use datamodel::{common::preview_features::PreviewFeature, dml::Datamodel, Datasource};
+use datamodel::{builtin_connectors::*, common::preview_features::PreviewFeature, dml::Datamodel, Datasource};
 use enumflags2::BitFlags;
 use introspection_connector::{IntrospectionContext, IntrospectionResult};
 use quaint::prelude::SqlFamily;
@@ -25,7 +25,7 @@ pub(crate) struct CalculateDatamodelContext<'a> {
 
 impl CalculateDatamodelContext<'_> {
     pub(crate) fn is_cockroach(&self) -> bool {
-        self.source.active_provider == datamodel::common::provider_names::COCKROACHDB_SOURCE_NAME
+        self.source.active_connector.provider_name() == COCKROACH.provider_name()
     }
 }
 

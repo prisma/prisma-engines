@@ -1,3 +1,4 @@
+use datamodel::builtin_connectors::POSTGRES;
 use quaint::prelude::{ConnectionInfo, Queryable, SqlFamily};
 use sql_schema_describer::{postgres::Circumstances, SqlSchemaDescriberBackend};
 
@@ -15,7 +16,7 @@ pub async fn load_describer<'a>(
             if version.map(|version| version.contains("CockroachDB")).unwrap_or(false) {
                 circumstances |= Circumstances::Cockroach;
 
-                if provider == Some(datamodel::common::provider_names::POSTGRES_SOURCE_NAME) {
+                if provider == Some(POSTGRES.provider_name()) {
                     circumstances |= Circumstances::CockroachWithPostgresNativeTypes;
                 }
             }

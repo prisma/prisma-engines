@@ -1,6 +1,5 @@
-use crate::transform::helpers::EnvFunction;
+use crate::parser_database::{ast, ValueValidator};
 use diagnostics::DatamodelError;
-use schema_ast::ast;
 use serde::Serialize;
 use std::convert::TryFrom;
 
@@ -57,5 +56,45 @@ impl TryFrom<&ast::Expression> for StringFromEnvVar {
                 expr.span(),
             )),
         }
+    }
+}
+
+struct EnvFunction {
+    var_name: String,
+}
+
+impl EnvFunction {
+    fn from_ast(expr: &ast::Expression) -> Result<EnvFunction, DatamodelError> {
+        let args = if let ast::Expression::Function(name, args, _) = &expr {
+            if name == "env" {
+                args
+            } else {
+                return Err(DatamodelError::new_functional_evaluation_error(
+                    "Expected this to be an env function.",
+                    expr.span(),
+                ));
+            }
+        } else {
+            return Err(DatamodelError::new_functional_evaluation_error(
+                "This is not a function expression but expected it to be one.",
+                expr.span(),
+            ));
+        };
+
+        if args.arguments.len() != 1 {
+            return Err(DatamodelError::new_functional_evaluation_error(
+                "Exactly one string parameter must be passed to the env function.",
+                expr.span(),
+            ));
+        }
+
+        let var_wrapped = &args.arguments[0];
+        let var_name = ValueValidator::new(&var_wrapped.value).as_str()?.to_owned();
+
+        Ok(Self { var_name })
+    }
+
+    fn var_name(&self) -> &str {
+        &self.var_name
     }
 }

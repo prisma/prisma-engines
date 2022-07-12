@@ -135,6 +135,10 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MySqlType)] = &[
 ];
 
 impl Connector for MySqlDatamodelConnector {
+    fn provider_name(&self) -> &'static str {
+        "mysql"
+    }
+
     fn name(&self) -> &str {
         "MySQL"
     }

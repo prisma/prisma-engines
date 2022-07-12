@@ -151,7 +151,7 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
         previous_data_model: &Datamodel,
         ctx: IntrospectionContext,
     ) -> ConnectorResult<IntrospectionResult> {
-        let sql_schema = self.catch(self.describe(Some(&ctx.source.active_provider))).await?;
+        let sql_schema = self.catch(self.describe(Some(ctx.source.active_provider))).await?;
 
         let introspection_result = calculate_datamodel::calculate_datamodel(&sql_schema, previous_data_model, ctx)
             .map_err(|sql_introspection_error| {
@@ -168,7 +168,7 @@ trait SqlFamilyTrait {
 
 impl SqlFamilyTrait for IntrospectionContext {
     fn sql_family(&self) -> SqlFamily {
-        match self.source.active_provider.as_str() {
+        match self.source.active_provider {
             "postgresql" => SqlFamily::Postgres,
             "cockroachdb" => SqlFamily::Postgres,
             "sqlite" => SqlFamily::Sqlite,

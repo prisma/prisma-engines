@@ -99,7 +99,7 @@ impl SqlFlavour for MysqlFlavour {
     }
 
     fn datamodel_connector(&self) -> &'static dyn datamodel::datamodel_connector::Connector {
-        sql_datamodel_connector::MYSQL
+        datamodel::builtin_connectors::MYSQL
     }
 
     fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {

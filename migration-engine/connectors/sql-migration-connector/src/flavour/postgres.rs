@@ -125,9 +125,9 @@ impl SqlFlavour for PostgresFlavour {
 
     fn datamodel_connector(&self) -> &'static dyn datamodel::datamodel_connector::Connector {
         if self.is_cockroachdb() {
-            sql_datamodel_connector::COCKROACH
+            datamodel::builtin_connectors::COCKROACH
         } else {
-            sql_datamodel_connector::POSTGRES
+            datamodel::builtin_connectors::POSTGRES
         }
     }
 

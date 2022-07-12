@@ -7,6 +7,10 @@ use enumflags2::BitFlags;
 pub struct EmptyDatamodelConnector;
 
 impl Connector for EmptyDatamodelConnector {
+    fn provider_name(&self) -> &'static str {
+        "empty"
+    }
+
     fn name(&self) -> &str {
         std::any::type_name::<EmptyDatamodelConnector>()
     }
