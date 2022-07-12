@@ -611,3 +611,64 @@ fn index_sort_order_is_handled(api: TestApi) {
     assert_eq!(Some(SQLSortOrder::Desc), columns[0].sort_order());
     assert_eq!(Some(SQLSortOrder::Asc), columns[1].sort_order());
 }
+
+// See https://www.sqlite.org/lang_createtable.html for the exact logic.
+#[test_connector(tags(Sqlite))]
+fn integer_primary_keys_autoincrement(api: TestApi) {
+    let sql = indoc! {r#"
+        CREATE TABLE "A" (
+            id INT PRIMARY KEY,
+            published BOOLEAN
+        );
+
+        CREATE TABLE "B" (
+            id integer primary key,
+            age INTEGER
+        );
+
+        CREATE TABLE "C" (
+            pk INTEGER PRIMARY KEY,
+            name STRING
+        );
+    "#};
+
+    api.raw_cmd(sql);
+
+    let schema = api.describe();
+    let expected = expect![[r#"
+        [
+            (
+                "A",
+                [
+                    false,
+                ],
+            ),
+            (
+                "B",
+                [
+                    true,
+                ],
+            ),
+            (
+                "C",
+                [
+                    true,
+                ],
+            ),
+        ]
+    "#]];
+    let found = schema
+        .table_walkers()
+        .map(|t| {
+            (
+                t.name(),
+                t.primary_key_columns()
+                    .unwrap()
+                    .map(|c| c.as_column().is_autoincrement())
+                    .collect::<Vec<_>>(),
+            )
+        })
+        .collect::<Vec<_>>();
+
+    expected.assert_debug_eq(&found);
+}

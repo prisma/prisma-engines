@@ -377,7 +377,8 @@ async fn push_columns(
         if pk_cols.len() == 1 {
             let pk_col_id = *pk_cols.values().next().unwrap();
             let pk_col = &mut schema.columns[pk_col_id.0 as usize];
-            if pk_col.1.tpe.full_data_type.contains("int") {
+            // See https://www.sqlite.org/lang_createtable.html for the exact logic.
+            if pk_col.1.tpe.full_data_type.eq_ignore_ascii_case("INTEGER") {
                 pk_col.1.auto_increment = true;
                 pk_col.1.tpe.arity = ColumnArity::Required;
             }

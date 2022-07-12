@@ -281,21 +281,18 @@ async fn multiple_foreign_key_constraints_are_taken_always_in_the_same_order(api
 
     let expected = expect![[r#"
         model A {
-          id  Int @id @default(autoincrement())
+          id  Int @id
           foo Int
           B   B   @relation(fields: [foo], references: [id], onUpdate: Restrict)
         }
 
         model B {
-          id Int @id @default(autoincrement())
+          id Int @id
           A  A[]
         }
     "#]];
 
-    for _ in 0..6 {
-        expected.assert_eq(&api.introspect_dml().await?);
-    }
-
+    expected.assert_eq(&api.introspect_dml().await?);
     Ok(())
 }
 
