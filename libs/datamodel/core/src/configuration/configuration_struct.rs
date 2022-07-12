@@ -16,7 +16,7 @@ impl Configuration {
     pub fn validate_that_one_datasource_is_provided(&self) -> Result<(), Diagnostics> {
         if self.datasources.is_empty() {
             Err(DatamodelError::new_validation_error(
-                "You defined no datasource. You must define exactly one datasource.".to_owned(),
+                "You defined no datasource. You must define exactly one datasource.",
                 schema_ast::ast::Span::new(0, 0),
             )
             .into())

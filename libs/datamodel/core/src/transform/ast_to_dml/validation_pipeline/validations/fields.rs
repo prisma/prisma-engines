@@ -339,7 +339,7 @@ pub(super) fn validate_unsupported_field_type(field: ScalarFieldWalker<'_>, ctx:
                         unsupported_lit, field.name(), prisma_type.as_str(), &source.name, native_type
                     );
 
-            ctx.push_error(DatamodelError::new_validation_error(msg, field.ast_field().span));
+            ctx.push_error(DatamodelError::new_validation_error(&msg, field.ast_field().span));
         }
     }
 }

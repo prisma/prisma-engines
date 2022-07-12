@@ -117,7 +117,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
     if !connector.supports_enums() {
         for r#enum in db.ast().iter_tops().filter_map(|(_, top)| top.as_enum()) {
             ctx.push_error(DatamodelError::new_validation_error(
-                format!(
+                &format!(
                     "You defined the enum `{}`. But the current connector does not support enums.",
                     &r#enum.name.name
                 ),

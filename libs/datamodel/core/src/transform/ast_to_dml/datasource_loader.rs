@@ -280,6 +280,6 @@ fn preview_features_guardrail(args: &HashMap<&str, (Span, ValueValidator<'_>)>, 
             }
         }
         let msg = "Preview features are only supported in the generator block. Please move this field to the generator block.";
-        diagnostics.push_error(DatamodelError::new(std::borrow::Cow::Borrowed(msg), span));
+        diagnostics.push_error(DatamodelError::new_static(msg, span));
     }
 }

@@ -692,7 +692,7 @@ fn visit_relation(model_id: ast::ModelId, relation_field: &mut RelationField, ct
 
                     let msg = format!("The argument fields must refer only to existing fields. The following fields do not exist in this model: {unresolvable_fields}");
 
-                    ctx.push_error(DatamodelError::new_validation_error(msg, fields.span()))
+                    ctx.push_error(DatamodelError::new_validation_error(&msg, fields.span()))
                 }
 
                 if !relation_fields.is_empty() {
@@ -704,7 +704,7 @@ fn visit_relation(model_id: ast::ModelId, relation_field: &mut RelationField, ct
 
                     let msg = format!("The argument fields must refer only to scalar fields. But it is referencing the following relation fields: {relation_fields}");
 
-                    ctx.push_error(DatamodelError::new_validation_error(msg, fields.span()));
+                    ctx.push_error(DatamodelError::new_validation_error(&msg, fields.span()));
                 }
 
                 Vec::new()
@@ -740,7 +740,7 @@ fn visit_relation(model_id: ast::ModelId, relation_field: &mut RelationField, ct
                         "The argument `references` must refer only to existing fields in the related model `{model_name}`. The following fields do not exist in the related model: {field_names}",
                     );
 
-                    ctx.push_error(DatamodelError::new_validation_error(msg, attr.span));
+                    ctx.push_error(DatamodelError::new_validation_error(&msg, attr.span));
                 }
 
                 if !relation_fields.is_empty() {
@@ -749,7 +749,7 @@ fn visit_relation(model_id: ast::ModelId, relation_field: &mut RelationField, ct
                         ctx.ast[relation_field.referenced_model].name(),
                         relation_fields.iter().map(|(f, _)| f.name()).collect::<Vec<_>>().join(", "),
                     );
-                    ctx.push_error(DatamodelError::new_validation_error(msg, attr.span));
+                    ctx.push_error(DatamodelError::new_validation_error(&msg, attr.span));
                 }
 
                 Vec::new()

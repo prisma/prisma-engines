@@ -15,8 +15,7 @@ impl NativeTypeErrorFactory {
             format!(
                 "The scale must not be larger than the precision for the {} native type in {}.",
                 self.native_type, self.connector
-            )
-            .into(),
+            ),
             span,
         )
     }
@@ -26,8 +25,7 @@ impl NativeTypeErrorFactory {
             format!(
                 "You cannot define an index on fields with native type `{}` of {}.{message}",
                 self.native_type, self.connector
-            )
-            .into(),
+            ),
             span,
         )
     }
@@ -37,8 +35,7 @@ impl NativeTypeErrorFactory {
             format!(
                 "Native type `{}` cannot be unique in {}.{message}",
                 self.native_type, self.connector
-            )
-            .into(),
+            ),
             span,
         )
     }
@@ -48,8 +45,7 @@ impl NativeTypeErrorFactory {
             format!(
                 "Native type `{}` of {} cannot be used on a field that is `@id` or `@@id`.{message}",
                 self.native_type, self.connector
-            )
-            .into(),
+            ),
             span,
         )
     }
@@ -59,8 +55,7 @@ impl NativeTypeErrorFactory {
             format!(
                 "Argument M is out of range for native type `{}` of {}: {message}",
                 self.native_type, self.connector
-            )
-            .into(),
+            ),
             span,
         )
     }
@@ -70,8 +65,7 @@ impl NativeTypeErrorFactory {
             format!(
                 "Native type {} is not supported for {} connector.",
                 self.native_type, self.connector
-            )
-            .into(),
+            ),
             span,
         )
     }
