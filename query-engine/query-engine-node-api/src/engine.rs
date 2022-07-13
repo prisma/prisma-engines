@@ -189,6 +189,7 @@ impl QueryEngine {
 
         let datamodel = EngineDatamodel { ast, raw: datamodel };
         let enable_metrics = config.subject.preview_features().contains(PreviewFeature::Metrics);
+        let enable_tracing = config.subject.preview_features().contains(PreviewFeature::Tracing);
 
         let builder = EngineBuilder {
             datamodel,
@@ -201,7 +202,7 @@ impl QueryEngine {
 
         Ok(Self {
             inner: RwLock::new(Inner::Builder(builder)),
-            logger: Logger::new(log_queries, log_level, log_callback, enable_metrics),
+            logger: Logger::new(log_queries, log_level, log_callback, enable_metrics, enable_tracing),
         })
     }
 

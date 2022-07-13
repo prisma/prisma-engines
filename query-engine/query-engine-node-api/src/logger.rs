@@ -26,6 +26,7 @@ impl Logger {
         log_level: LevelFilter,
         log_callback: ThreadsafeFunction<String>,
         enable_metrics: bool,
+        enable_tracing: bool,
     ) -> Self {
         let is_sql_query = filter_fn(|meta| {
             meta.target() == "quaint::connector::metrics" && meta.fields().iter().any(|f| f.name() == "query")
@@ -45,9 +46,14 @@ impl Logger {
 
         let is_user_trace = filter_fn(is_user_facing_trace_filter);
         let tracer = crate::tracer::new_pipeline().install_simple(log_callback.clone());
-        let telemetry = tracing_opentelemetry::layer()
-            .with_tracer(tracer)
-            .with_filter(is_user_trace);
+        let telemetry = if enable_tracing {
+            let telemetry = tracing_opentelemetry::layer()
+                .with_tracer(tracer)
+                .with_filter(is_user_trace);
+            Some(telemetry)
+        } else {
+            None
+        };
 
         let layer = CallbackLayer::new(log_callback).with_filter(filters);
 
