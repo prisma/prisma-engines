@@ -1,16 +1,15 @@
+use super::{database_name::validate_db_name, names::Names};
 use crate::{
     ast::{self, WithName},
     diagnostics::DatamodelError,
     validate::validation_pipeline::context::Context,
 };
 use itertools::Itertools;
-use std::fmt;
-
-use super::{database_name::validate_db_name, names::Names};
 use parser_database::{
     walkers::{ModelWalker, RelationFieldWalker, RelationName},
     ReferentialAction,
 };
+use std::fmt;
 
 struct Fields<'db> {
     fields: &'db [ast::FieldId],

@@ -9,7 +9,9 @@ WITH rawindex AS (
         unnest(indclass) AS indclass,
         unnest(indoption) AS indoption
     FROM pg_index -- https://www.postgresql.org/docs/current/catalog-pg-index.html
-    WHERE indpred IS NULL -- filter out partial indexes
+    WHERE
+        indpred IS NULL -- filter out partial indexes
+        AND NOT indkey::int2[] @> ARRAY[0]::int2[] -- filter out expression indexes
 )
 SELECT 
     indexinfo.relname AS index_name,
