@@ -6,6 +6,7 @@ use crate::{
 use connector_interface::{Filter, QueryArguments, RelAggregationSelection};
 use mongodb::{bson::doc, options::FindOptions, ClientSession, Database};
 use prisma_models::*;
+use tracing::info_span;
 
 /// Finds a single record. Joins are not required at the moment because the selector is always a unique one.
 pub async fn get_single_record<'conn>(
@@ -17,6 +18,13 @@ pub async fn get_single_record<'conn>(
     aggregation_selections: &[RelAggregationSelection],
 ) -> crate::Result<Option<SingleRecord>> {
     let coll = database.collection(model.db_name());
+
+    let _span = info_span!(
+        "prisma:db_query",
+        user_facing = true,
+        "db.statement" = &format_args!("db.{}.findOne(*)", coll.name())
+    );
+
     let meta_mapping = output_meta::from_selected_fields(selected_fields, aggregation_selections);
     let query_arguments: QueryArguments = (model.clone(), filter.clone()).into();
     let query = MongoReadQueryBuilder::from_args(query_arguments)?
@@ -56,6 +64,13 @@ pub async fn get_many_records<'conn>(
     aggregation_selections: &[RelAggregationSelection],
 ) -> crate::Result<ManyRecords> {
     let coll = database.collection(model.db_name());
+
+    let _span = info_span!(
+        "prisma:db_query",
+        user_facing = true,
+        "db.statement" = &format_args!("db.{}.findMany(*)", coll.name())
+    );
+
     let reverse_order = query_arguments.take.map(|t| t < 0).unwrap_or(false);
     let field_names: Vec<_> = selected_fields
         .db_names()

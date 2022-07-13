@@ -16,6 +16,7 @@ use mongodb::{
 };
 use prisma_models::{ModelRef, PrismaValue, SelectionResult};
 use std::{collections::HashMap, convert::TryInto};
+use tracing::{field, info_span};
 use update::IntoUpdateDocumentExtension;
 
 /// Create a single record to the database resulting in a
@@ -27,6 +28,13 @@ pub async fn create_record<'conn>(
     mut args: WriteArgs,
 ) -> crate::Result<SelectionResult> {
     let coll = database.collection::<Document>(model.db_name());
+
+    let _span = info_span!(
+        "prisma:db_query",
+        user_facing = true,
+        "db.statement" = &format_args!("db.{}.insertOne(*)", coll.name())
+    );
+
     let id_field = pick_singular_id(model);
 
     // Fields to write to the document.
@@ -71,6 +79,13 @@ pub async fn create_records<'conn>(
     skip_duplicates: bool,
 ) -> crate::Result<usize> {
     let coll = database.collection::<Document>(model.db_name());
+
+    let _span = info_span!(
+        "prisma:db_query",
+        user_facing = true,
+        "db.statement" = &format_args!("db.{}.insertMany(*)", coll.name())
+    );
+
     let num_records = args.len();
     let fields: Vec<_> = model.fields().non_relational();
 
@@ -147,12 +162,18 @@ pub async fn update_records<'conn>(
             .collect::<crate::Result<Vec<_>>>()?
     } else {
         let filter = convert_filter(record_filter.filter, false, FilterPrefix::default())?;
-        find_ids(coll.clone(), session, model, filter).await?
+        find_ids(database, coll.clone(), session, model, filter).await?
     };
 
     if ids.is_empty() {
         return Ok(vec![]);
     }
+
+    let _span = info_span!(
+        "prisma:db_query",
+        user_facing = true,
+        "db.statement" = &format_args!("db.{}.updateMany(*)", coll.name())
+    );
 
     let filter = doc! { id_field.db_name(): { "$in": ids.clone() } };
     let fields: Vec<_> = model
@@ -211,12 +232,18 @@ pub async fn delete_records<'conn>(
             .collect::<crate::Result<Vec<_>>>()?
     } else {
         let filter = convert_filter(record_filter.filter, false, FilterPrefix::default())?;
-        find_ids(coll.clone(), session, model, filter).await?
+        find_ids(database, coll.clone(), session, model, filter).await?
     };
 
     if ids.is_empty() {
         return Ok(0);
     }
+
+    let _span = info_span!(
+        "prisma:db_query",
+        user_facing = true,
+        "db.statement" = &format_args!("db.{}.deleteMany(*)", coll.name())
+    );
 
     let filter = doc! { id_field.db_name(): { "$in": ids } };
     logger::log_delete_many(coll.name(), &filter);
@@ -227,11 +254,20 @@ pub async fn delete_records<'conn>(
 
 /// Retrives document ids based on the given filter.
 async fn find_ids(
+    database: &Database,
     collection: Collection<Document>,
     session: &mut ClientSession,
     model: &ModelRef,
     filter: MongoFilter,
 ) -> crate::Result<Vec<Bson>> {
+    let coll = database.collection::<Document>(model.db_name());
+
+    let _span = info_span!(
+        "prisma:db_query",
+        user_facing = true,
+        "db.statement" = &format_args!("db.{}.findMany(*)", coll.name())
+    );
+
     let id_field = model.primary_identifier();
     let mut builder = MongoReadQueryBuilder::new(model.clone());
 
@@ -374,6 +410,24 @@ pub async fn query_raw<'conn>(
     inputs: HashMap<String, PrismaValue>,
     query_type: Option<String>,
 ) -> crate::Result<serde_json::Value> {
+    let span = info_span!("prisma:db_query", user_facing = true, "db.statement" = field::Empty);
+
+    match (query_type.as_deref(), model) {
+        (Some("findRaw"), Some(m)) => span.record(
+            "db.statement",
+            &format_args!("db.{}.findRaw(*)", database.collection::<Document>(m.db_name()).name()),
+        ),
+        (Some("aggregateRaw"), Some(m)) => span.record(
+            "db.statement",
+            &format_args!(
+                "db.{}.aggregateRaw(*)",
+                database.collection::<Document>(m.db_name()).name()
+            ),
+        ),
+        (Some("runCommandRaw"), _) => span.record("db.statement", &format_args!("db.runCommandRaw(*)")),
+        _ => unreachable!("Unexpected MongoDB raw query"),
+    };
+
     let mongo_command = MongoCommand::from_raw_query(model, inputs, query_type)?;
 
     let json_result = match mongo_command {
