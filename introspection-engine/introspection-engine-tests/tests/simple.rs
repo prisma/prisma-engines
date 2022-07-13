@@ -42,13 +42,14 @@ fn run_simple_test(test_file_path: &str) {
     let introspected = tok(api.introspect()).unwrap_or_else(|err| panic!("{}", err));
 
     let last_comment_idx = text
-        .match_indices("\n/*\n")
+        .match_indices("/*")
         .last()
         .map(|(idx, _)| idx)
         .unwrap_or(text.len() - 1);
 
     let last_comment = text[last_comment_idx..]
-        .trim_start_matches("\n/*\n")
+        .trim_start_matches("/*")
+        .trim_start_matches('\n')
         .trim_end_matches("*/\n");
 
     if last_comment == introspected {
