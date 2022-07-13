@@ -7,9 +7,10 @@ const TESTS_ROOT: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/simple");
 fn run_simple_test(test_file_path: &str) {
     let file_path = path::Path::new(TESTS_ROOT).join(test_file_path);
     let text = std::fs::read_to_string(&file_path).unwrap();
+    let mut lines = text.lines();
 
     let tags = {
-        let first_line = text.lines().next().expect("Expected file not to be empty.");
+        let first_line = lines.next().expect("Expected file not to be empty.");
         let expected_tags_prefix = "-- tags=";
         assert!(
             first_line.starts_with(expected_tags_prefix),
@@ -19,10 +20,20 @@ fn run_simple_test(test_file_path: &str) {
         let tags = first_line.trim_start_matches(expected_tags_prefix);
         test_setup::tags_from_comma_separated_list(tags)
     };
+    let excluded = {
+        let second_line = lines.next().expect("Expected test file not to be empty.");
+        let expected_tags_prefix = "-- exclude=";
+        if second_line.starts_with(expected_tags_prefix) {
+            let tags = second_line.trim_start_matches(expected_tags_prefix);
+            test_setup::tags_from_comma_separated_list(tags)
+        } else {
+            Default::default()
+        }
+    };
 
     let test_api_args = TestApiArgs::new("run_simple_test", &[]);
 
-    if test_setup::should_skip_test(&test_api_args, tags, Default::default(), Default::default()) {
+    if test_setup::should_skip_test(&test_api_args, tags, excluded, Default::default()) {
         return;
     }
 
