@@ -216,20 +216,18 @@
 <span id="211">211</span>
 <span id="212">212</span>
 <span id="213">213</span>
-<span id="214">214</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">database_name::validate_db_name</span>, <span class="ident">names::Names</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">WithName</span>},
     <span class="ident">diagnostics::DatamodelError</span>,
     <span class="ident">validate::validation_pipeline::context::Context</span>,
 };
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">database_name::validate_db_name</span>, <span class="ident">names::Names</span>};
 <span class="kw">use</span> <span class="ident">parser_database</span>::{
     <span class="ident">walkers</span>::{<span class="ident">ModelWalker</span>, <span class="ident">RelationFieldWalker</span>, <span class="ident">RelationName</span>},
     <span class="ident">ReferentialAction</span>,
 };
+<span class="kw">use</span> <span class="ident">std::fmt</span>;
 
 <span class="kw">struct</span> <span class="ident">Fields</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> [<span class="ident">ast::FieldId</span>],
