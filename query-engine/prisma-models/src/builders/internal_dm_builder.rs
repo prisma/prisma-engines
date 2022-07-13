@@ -74,7 +74,7 @@ impl InternalDataModelBuilder {
                 println!(
                     "{}: {}",
                     ct.name,
-                    ct.fields().into_iter().map(|f| f.name()).collect_vec().join(", ")
+                    ct.fields().iter().map(|f| f.name()).collect_vec().join(", ")
                 )
             });
 

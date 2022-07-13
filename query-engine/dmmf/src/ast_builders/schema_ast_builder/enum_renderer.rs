@@ -2,7 +2,7 @@ use super::*;
 
 pub(crate) fn render_enum_types(ctx: &mut RenderContext, enum_types: &[EnumTypeRef]) {
     enum_types
-        .into_iter()
+        .iter()
         .for_each(|et| DmmfEnumRenderer::new(et).render(ctx))
 }
 

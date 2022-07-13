@@ -45,7 +45,7 @@ pub(crate) fn map_schema_enum_type(ctx: &mut BuilderContext, enum_name: &str) ->
 
 pub(crate) fn model_field_enum(ctx: &mut BuilderContext, model: &ModelRef) -> EnumTypeWeakRef {
     let name = format!("{}ScalarFieldEnum", capitalize(&model.name));
-    let ident = Identifier::new(name.clone(), PRISMA_NAMESPACE);
+    let ident = Identifier::new(name, PRISMA_NAMESPACE);
     return_cached_enum!(ctx, &ident);
 
     let values = model
@@ -106,7 +106,7 @@ pub(crate) fn order_by_relevance_enum(
     values: Vec<String>,
 ) -> EnumTypeWeakRef {
     let name = format!("{}OrderByRelevanceFieldEnum", container);
-    let ident = Identifier::new(name.clone(), PRISMA_NAMESPACE);
+    let ident = Identifier::new(name, PRISMA_NAMESPACE);
     return_cached_enum!(ctx, &ident);
 
     let typ = Arc::new(EnumType::string(ident.clone(), values));
