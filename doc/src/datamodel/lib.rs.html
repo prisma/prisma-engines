@@ -219,89 +219,13 @@
 <span id="214">214</span>
 <span id="215">215</span>
 <span id="216">216</span>
-<span id="217">217</span>
-<span id="218">218</span>
-<span id="219">219</span>
-<span id="220">220</span>
-<span id="221">221</span>
-<span id="222">222</span>
-<span id="223">223</span>
-<span id="224">224</span>
-<span id="225">225</span>
-<span id="226">226</span>
-<span id="227">227</span>
-<span id="228">228</span>
-<span id="229">229</span>
-<span id="230">230</span>
-<span id="231">231</span>
-<span id="232">232</span>
-<span id="233">233</span>
-<span id="234">234</span>
-<span id="235">235</span>
-<span id="236">236</span>
-<span id="237">237</span>
-<span id="238">238</span>
-<span id="239">239</span>
-<span id="240">240</span>
-<span id="241">241</span>
-<span id="242">242</span>
-<span id="243">243</span>
-<span id="244">244</span>
-<span id="245">245</span>
-<span id="246">246</span>
-<span id="247">247</span>
-<span id="248">248</span>
-<span id="249">249</span>
-<span id="250">250</span>
-<span id="251">251</span>
-<span id="252">252</span>
-<span id="253">253</span>
-</pre><pre class="rust"><code><span class="doccomment">//! This crate is responsible for parsing, rendering and formatting a Prisma Schema.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! PSL — Prisma Schema Language</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! This crate is responsible for parsing, validating, formatting and rendering a PSL documents.</span>
+<span class="doccomment">//!</span>
 <span class="doccomment">//! A Prisma Schema consists out of two parts:</span>
 <span class="doccomment">//! 1. The `Datamodel` part refers to the model and enum definitions.</span>
 <span class="doccomment">//! 2. The `Configuration` part refers to the generator and datasource definitions.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The data structures are organized into 3 layers:</span>
-<span class="doccomment">//! * The AST layer contains the data data structures representing the schema input.</span>
-<span class="doccomment">//! * The model layer contains the data structures that are semantically rich and therefore engines can build upon.</span>
-<span class="doccomment">//! * The JSON layer contains the data structures that represent the contract for the DMMF which is the API for client generators.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The responsibilities of each top level module is as following:</span>
-<span class="doccomment">//! * `common`: contains constants and generic helpers</span>
-<span class="doccomment">//! * `error`: contains the error and result types</span>
-<span class="doccomment">//! * `ast`: contains the data structures for the AST of a Prisma schema. And the parsing functions to turn an input string into an AST.</span>
-<span class="doccomment">//! * `dml`: contains the models representing the Datamodel part of a Prisma schema</span>
-<span class="doccomment">//! * `configuration`: contains the models representing the Datasources and Generators of a Prisma schema</span>
-<span class="doccomment">//! * `transform`: contains the logic to turn an AST into models and vice versa</span>
-<span class="doccomment">//! * `mcf`: contains the logic to turn generators and datasources into their JSON representation</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The flow between the layers is depicted in the following diagram.</span>
-<span class="doccomment">//!&lt;pre&gt;</span>
-<span class="doccomment">//!                ┌──────────────────┐</span>
-<span class="doccomment">//!                │       json       │</span>
-<span class="doccomment">//!                └────────▲─────────┘</span>
-<span class="doccomment">//!                         │</span>
-<span class="doccomment">//!                         │</span>
-<span class="doccomment">//!      ┌──────────────────┐┌──────────────────┐</span>
-<span class="doccomment">//!      │       dml        ││  configuration   │</span>
-<span class="doccomment">//!      └──────────────────┘└──────────────────┘</span>
-<span class="doccomment">//!                        │  ▲</span>
-<span class="doccomment">//!┌─────────────────────┐ │  │ ┌─────────────────────┐</span>
-<span class="doccomment">//!│transform::dml_to_ast│ │  │ │transform::ast_to_dml│</span>
-<span class="doccomment">//!└─────────────────────┘ │  │ └─────────────────────┘</span>
-<span class="doccomment">//!                        │  │</span>
-<span class="doccomment">//!                        ▼  │</span>
-<span class="doccomment">//!                ┌──────────────────┐</span>
-<span class="doccomment">//!                │       ast        │</span>
-<span class="doccomment">//!                └──────────────────┘</span>
-<span class="doccomment">//!                        │  ▲</span>
-<span class="doccomment">//!                        │  │</span>
-<span class="doccomment">//!                        │  │</span>
-<span class="doccomment">//!                        ▼  │</span>
-<span class="doccomment">//!                 ┌──────────────────┐</span>
-<span class="doccomment">//!                 │  schema string   │</span>
-<span class="doccomment">//!                 └──────────────────┘</span>
-<span class="doccomment">//!&lt;/pre&gt;</span>
 <span class="doccomment">//!</span>
 
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>)]</span>
@@ -312,8 +236,10 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">mcf</span>;
 
 <span class="kw">mod</span> <span class="ident">configuration</span>;
+<span class="kw">mod</span> <span class="ident">lift</span>;
 <span class="kw">mod</span> <span class="ident">reformat</span>;
-<span class="kw">mod</span> <span class="ident">transform</span>;
+<span class="kw">mod</span> <span class="ident">render</span>;
+<span class="kw">mod</span> <span class="ident">validate</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">configuration</span>::{<span class="ident">Configuration</span>, <span class="ident">Datasource</span>, <span class="ident">Generator</span>, <span class="ident">StringFromEnvVar</span>},
@@ -325,15 +251,15 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">parser_database</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">parser_database::is_reserved_type_name</span>;
 
+<span class="kw">use</span> <span class="self">self</span>::{
+    <span class="ident">render::RenderParams</span>,
+    <span class="ident">validate</span>::{<span class="ident">validate</span>, <span class="ident">DatasourceLoader</span>, <span class="ident">GeneratorLoader</span>},
+};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common::preview_features::PreviewFeature</span>;
 <span class="kw">use</span> <span class="ident">diagnostics::Diagnostics</span>;
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">parser_database</span>::{<span class="ident">ast</span>, <span class="ident">ParserDatabase</span>, <span class="ident">SourceFile</span>};
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
-<span class="kw">use</span> <span class="ident">transform</span>::{
-    <span class="ident">ast_to_dml</span>::{<span class="ident">validate</span>, <span class="ident">DatasourceLoader</span>, <span class="ident">GeneratorLoader</span>},
-    <span class="ident">dml_to_ast::RenderParams</span>,
-};
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">builtin_connectors</span> {
     <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">mongodb_datamodel_connector</span>::<span class="kw-2">*</span>;
@@ -427,7 +353,7 @@
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">out</span>.<span class="ident">diagnostics</span>);
     }
 
-    <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">transform::ast_to_dml::LiftAstToDml::new</span>(<span class="kw-2">&amp;</span><span class="ident">out</span>.<span class="ident">db</span>, <span class="ident">out</span>.<span class="ident">connector</span>, <span class="ident">out</span>.<span class="ident">referential_integrity</span>).<span class="ident">lift</span>();
+    <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">lift::LiftAstToDml::new</span>(<span class="kw-2">&amp;</span><span class="ident">out</span>.<span class="ident">db</span>, <span class="ident">out</span>.<span class="ident">connector</span>, <span class="ident">out</span>.<span class="ident">referential_integrity</span>).<span class="ident">lift</span>();
 
     <span class="prelude-val">Ok</span>(<span class="ident">Validated</span> {
         <span class="ident">subject</span>: (
@@ -488,7 +414,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">render_datamodel_to_string</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Datamodel</span>, <span class="ident">configuration</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Configuration</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">datasource</span> <span class="op">=</span> <span class="ident">configuration</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">datasources</span>.<span class="ident">first</span>());
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">String::new</span>();
-    <span class="ident">transform::dml_to_ast::render</span>(<span class="ident">RenderParams</span> { <span class="ident">datasource</span>, <span class="ident">datamodel</span> }, <span class="kw-2">&amp;mut</span> <span class="ident">out</span>);
+    <span class="ident">render::render_datamodel</span>(<span class="ident">RenderParams</span> { <span class="ident">datasource</span>, <span class="ident">datamodel</span> }, <span class="kw-2">&amp;mut</span> <span class="ident">out</span>);
     <span class="ident">reformat</span>(<span class="kw-2">&amp;</span><span class="ident">out</span>, <span class="ident">DEFAULT_INDENT_WIDTH</span>).<span class="ident">expect</span>(<span class="string">&quot;Internal error: failed to reformat introspected schema&quot;</span>)
 }
 
@@ -499,8 +425,8 @@
 ) -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">String::new</span>();
     <span class="kw">let</span> <span class="ident">datasource</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">datasources</span>.<span class="ident">first</span>();
-    <span class="ident">transform::dml_to_ast::render_configuration</span>(<span class="ident">config</span>, <span class="kw-2">&amp;mut</span> <span class="ident">out</span>);
-    <span class="ident">transform::dml_to_ast::render</span>(<span class="ident">RenderParams</span> { <span class="ident">datasource</span>, <span class="ident">datamodel</span> }, <span class="kw-2">&amp;mut</span> <span class="ident">out</span>);
+    <span class="ident">render::render_configuration</span>(<span class="ident">config</span>, <span class="kw-2">&amp;mut</span> <span class="ident">out</span>);
+    <span class="ident">render::render_datamodel</span>(<span class="ident">RenderParams</span> { <span class="ident">datasource</span>, <span class="ident">datamodel</span> }, <span class="kw-2">&amp;mut</span> <span class="ident">out</span>);
     <span class="ident">reformat</span>(<span class="kw-2">&amp;</span><span class="ident">out</span>, <span class="ident">DEFAULT_INDENT_WIDTH</span>).<span class="ident">expect</span>(<span class="string">&quot;Internal error: failed to reformat introspected schema&quot;</span>)
 }
 
