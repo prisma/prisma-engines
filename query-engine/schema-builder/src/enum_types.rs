@@ -1,5 +1,5 @@
 use super::*;
-use crate::constants::{filters, json_null, ordering};
+use crate::constants::{filters, itx, json_null, ordering};
 use schema::EnumType;
 
 pub(crate) fn sort_order_enum(ctx: &mut BuilderContext) -> EnumTypeWeakRef {
@@ -126,4 +126,42 @@ pub(crate) fn query_mode_enum(ctx: &mut BuilderContext) -> EnumTypeWeakRef {
 
     ctx.cache_enum_type(ident, typ.clone());
     Arc::downgrade(&typ)
+}
+
+pub(crate) fn itx_isolation_levels(ctx: &mut BuilderContext) -> Option<EnumTypeWeakRef> {
+    let ident = Identifier::new("TransactionIsolationLevel", PRISMA_NAMESPACE);
+    if let e @ Some(_) = ctx.get_enum_type(&ident) {
+        return e;
+    }
+
+    let mut values = vec![];
+
+    if ctx.has_capability(ConnectorCapability::SupportsTxIsolationReadUncommitted) {
+        values.push(itx::READ_UNCOMMITTED.to_owned());
+    }
+
+    if ctx.has_capability(ConnectorCapability::SupportsTxIsolationReadCommitted) {
+        values.push(itx::READ_COMMITTED.to_owned());
+    }
+
+    if ctx.has_capability(ConnectorCapability::SupportsTxIsolationRepeatableRead) {
+        values.push(itx::REPEATABLE_READ.to_owned());
+    }
+
+    if ctx.has_capability(ConnectorCapability::SupportsTxIsolationSerializable) {
+        values.push(itx::SERIALIZABLE.to_owned());
+    }
+
+    if ctx.has_capability(ConnectorCapability::SupportsTxIsolationSnapshot) {
+        values.push(itx::SNAPSHOT.to_owned());
+    }
+
+    if values.is_empty() {
+        return None;
+    }
+
+    let typ = Arc::new(EnumType::string(ident.clone(), values));
+    ctx.cache_enum_type(ident, typ.clone());
+
+    Some(Arc::downgrade(&typ))
 }
