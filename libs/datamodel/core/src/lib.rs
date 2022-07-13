@@ -1,4 +1,4 @@
-//! PSL — Prisma Schema Language
+//! # PSL — Prisma Schema Language
 //!
 //! This crate is responsible for parsing, validating, formatting and rendering a PSL documents.
 //!
@@ -27,13 +27,9 @@ pub use crate::{
 pub use datamodel_connector;
 pub use diagnostics;
 pub use dml;
-pub use parser_database;
-pub use parser_database::is_reserved_type_name;
+pub use parser_database::{self, is_reserved_type_name};
 
-use self::{
-    render::RenderParams,
-    validate::{validate, DatasourceLoader, GeneratorLoader},
-};
+use self::validate::{validate, DatasourceLoader, GeneratorLoader};
 use crate::common::preview_features::PreviewFeature;
 use diagnostics::Diagnostics;
 use enumflags2::BitFlags;
@@ -193,7 +189,7 @@ fn load_sources(
 pub fn render_datamodel_to_string(datamodel: &dml::Datamodel, configuration: Option<&Configuration>) -> String {
     let datasource = configuration.and_then(|c| c.datasources.first());
     let mut out = String::new();
-    render::render_datamodel(RenderParams { datasource, datamodel }, &mut out);
+    render::render_datamodel(render::RenderParams { datasource, datamodel }, &mut out);
     reformat(&out, DEFAULT_INDENT_WIDTH).expect("Internal error: failed to reformat introspected schema")
 }
 
@@ -205,7 +201,7 @@ pub fn render_datamodel_and_config_to_string(
     let mut out = String::new();
     let datasource = config.datasources.first();
     render::render_configuration(config, &mut out);
-    render::render_datamodel(RenderParams { datasource, datamodel }, &mut out);
+    render::render_datamodel(render::RenderParams { datasource, datamodel }, &mut out);
     reformat(&out, DEFAULT_INDENT_WIDTH).expect("Internal error: failed to reformat introspected schema")
 }
 

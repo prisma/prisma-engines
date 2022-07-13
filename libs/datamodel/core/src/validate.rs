@@ -1,4 +1,3 @@
-mod common;
 mod datasource_loader;
 mod generator_loader;
 mod validation_pipeline;

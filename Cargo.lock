@@ -4479,6 +4479,7 @@ name = "test-setup"
 version = "0.1.0"
 dependencies = [
  "connection-string",
+ "dissimilar",
  "enumflags2",
  "once_cell",
  "quaint",

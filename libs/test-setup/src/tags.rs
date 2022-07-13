@@ -1,8 +1,24 @@
-/// Test-relevant connector tags.
-#[enumflags2::bitflags]
-#[derive(Copy, Clone, Debug, PartialEq)]
-#[repr(u32)]
-pub enum Tags {
+use enumflags2::*;
+
+macro_rules! tags {
+    ($($name:ident = $pattern:expr,)*) => {
+        /// Test-relevant connector tags.
+        #[bitflags]
+        #[derive(Copy, Clone, Debug, PartialEq)]
+        #[repr(u32)]
+        pub enum Tags {
+            $($name = $pattern,)*
+        }
+
+        const ALL_TAG_NAMES: &[(&str, Tags)] = &[
+            $(
+                (stringify!($name), Tags::$name),
+            )*
+        ];
+    }
+}
+
+tags![
     LowerCasesTableNames = 1 << 0,
     Mysql = 1 << 1,
     Mariadb = 1 << 2,
@@ -20,4 +36,17 @@ pub enum Tags {
     Postgres14 = 1 << 14,
     Postgres9 = 1 << 15,
     Postgres15 = 1 << 16,
+];
+
+pub fn tags_from_comma_separated_list(input: &str) -> BitFlags<Tags> {
+    let mut tags = Default::default();
+
+    for s in input.split(',').map(|s| s.trim()) {
+        match ALL_TAG_NAMES.iter().find(|(name, _t)| name.eq_ignore_ascii_case(s)) {
+            Some((_, tag)) => tags |= *tag,
+            None => panic!("unknown tag: {s}"),
+        }
+    }
+
+    tags
 }
