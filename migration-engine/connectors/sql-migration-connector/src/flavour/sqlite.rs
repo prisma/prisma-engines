@@ -1,15 +1,13 @@
+mod connection;
+
+use self::connection::*;
 use crate::flavour::SqlFlavour;
 use indoc::indoc;
 use migration_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult,
 };
-use quaint::{
-    connector::Sqlite as Connection,
-    prelude::{ConnectionInfo, Queryable},
-};
-use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
+use sql_schema_describer::SqlSchema;
 use std::{future, path::Path};
-use user_facing_errors::migration_engine::ApplyMigrationError;
 
 type State = super::State<Params, Connection>;
 
@@ -80,7 +78,7 @@ impl SqlFlavour for SqliteFlavour {
                     .map_err(|err| ConnectorError::from_source(err, "Creating SQLite database parent directory."))?;
             }
 
-            Connection::new(&params.file_path).map_err(quaint_err(params))?;
+            Connection::new(params)?;
 
             Ok(params.file_path.clone())
         })
@@ -108,17 +106,8 @@ impl SqlFlavour for SqliteFlavour {
     }
 
     fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
-        use sql_schema_describer::{sqlite as describer, DescriberErrorKind};
         with_connection(&mut self.state, |params, connection| async move {
-            describer::SqlSchemaDescriber::new(connection)
-                .describe(&params.attached_name)
-                .await
-                .map_err(|err| match err.into_kind() {
-                    DescriberErrorKind::QuaintError(err) => quaint_err(params)(err),
-                    DescriberErrorKind::CrossSchemaReference { .. } => {
-                        unreachable!("No schemas on SQLite")
-                    }
-                })
+            connection.describe_schema(params).await
         })
     }
 
@@ -163,7 +152,7 @@ impl SqlFlavour for SqliteFlavour {
         query: quaint::ast::Query<'a>,
     ) -> BoxFuture<'a, ConnectorResult<quaint::prelude::ResultSet>> {
         with_connection(&mut self.state, |params, conn| async {
-            conn.query(query).await.map_err(quaint_err(params))
+            conn.query(query, params).await
         })
     }
 
@@ -172,14 +161,15 @@ impl SqlFlavour for SqliteFlavour {
         sql: &'a str,
         params: &'a [quaint::Value<'a>],
     ) -> BoxFuture<'a, ConnectorResult<quaint::prelude::ResultSet>> {
-        with_connection(&mut self.state, |conn_params, conn: &'_ mut Connection| async {
-            conn.query_raw(sql, params).await.map_err(quaint_err(conn_params))
+        tracing::debug!(sql, params = ?params, query_type = "query_raw");
+        with_connection(&mut self.state, |conn_params, conn: &mut Connection| async {
+            conn.query_raw(sql, params, conn_params).await
         })
     }
 
     fn raw_cmd<'a>(&'a mut self, sql: &'a str) -> BoxFuture<'a, ConnectorResult<()>> {
         with_connection(&mut self.state, |params, conn| async {
-            conn.raw_cmd(sql).await.map_err(quaint_err(params))
+            conn.raw_cmd(sql, params).await
         })
     }
 
@@ -187,8 +177,8 @@ impl SqlFlavour for SqliteFlavour {
         with_connection(&mut self.state, move |params, connection| async move {
             let file_path = &params.file_path;
 
-            raw_cmd("PRAGMA main.locking_mode=NORMAL", connection, params).await?;
-            raw_cmd("PRAGMA main.quick_check", connection, params).await?;
+            connection.raw_cmd("PRAGMA main.locking_mode=NORMAL", params).await?;
+            connection.raw_cmd("PRAGMA main.quick_check", params).await?;
 
             tracing::debug!("Truncating {:?}", file_path);
             std::fs::File::create(file_path).expect("failed to truncate sqlite file");
@@ -220,10 +210,15 @@ impl SqlFlavour for SqliteFlavour {
     ) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
         Box::pin(async move {
             tracing::debug!("Applying migrations to temporary in-memory SQLite database.");
-            let conn = Connection::new_in_memory().unwrap();
-            let conn_info = ConnectionInfo::Sqlite {
-                file_path: "<in_memory>".into(),
-                db_name: "<in_memory>".into(),
+            let mut shadow_db_conn = Connection::new_in_memory();
+            let shadow_db_params = Params {
+                connector_params: ConnectorParams {
+                    connection_string: String::new(),
+                    preview_features: Default::default(),
+                    shadow_database_connection_string: None,
+                },
+                file_path: String::new(),
+                attached_name: String::new(),
             };
 
             for migration in migrations {
@@ -234,19 +229,15 @@ impl SqlFlavour for SqliteFlavour {
                     migration.migration_name()
                 );
 
-                conn.raw_cmd(&script)
+                shadow_db_conn
+                    .raw_cmd(&script, &shadow_db_params)
                     .await
-                    .map_err(|err| super::quaint_error_to_connector_error(err, &conn_info))
-                    .map_err(ConnectorError::from)
                     .map_err(|connector_error| {
                         connector_error.into_migration_does_not_apply_cleanly(migration.migration_name().to_owned())
                     })?;
             }
 
-            let sql_schema = sql_schema_describer::sqlite::SqlSchemaDescriber::new(&conn)
-                .describe("")
-                .await
-                .unwrap();
+            let sql_schema = shadow_db_conn.describe_schema(&shadow_db_params).await?;
 
             Ok(sql_schema)
         })
@@ -257,11 +248,8 @@ impl SqlFlavour for SqliteFlavour {
     }
 }
 
-async fn acquire_lock(connection: &Connection, params: &Params) -> ConnectorResult<()> {
-    connection
-        .raw_cmd("PRAGMA main.locking_mode=EXCLUSIVE")
-        .await
-        .map_err(quaint_err(params))
+async fn acquire_lock(connection: &mut Connection, params: &Params) -> ConnectorResult<()> {
+    connection.raw_cmd("PRAGMA main.locking_mode=EXCLUSIVE", params).await
 }
 
 fn with_connection<'a, O, F, C>(state: &'a mut State, f: C) -> BoxFuture<'a, ConnectorResult<O>>
@@ -275,42 +263,9 @@ where
         super::State::Connected(p, c) => Box::pin(f(p, c)),
         state @ super::State::WithParams(_) => Box::pin(async move {
             state
-                .try_connect(|params| {
-                    Box::pin(std::future::ready(
-                        Connection::new(&params.file_path).map_err(quaint_err(params)),
-                    ))
-                })
+                .try_connect(|params| Box::pin(std::future::ready(Connection::new(params))))
                 .await?;
             with_connection(state, f).await
         }),
     }
-}
-
-async fn raw_cmd(sql: &str, connection: &Connection, params: &Params) -> ConnectorResult<()> {
-    connection.raw_cmd(sql).await.map_err(quaint_err(params))
-}
-
-fn quaint_err(params: &Params) -> impl (Fn(quaint::error::Error) -> ConnectorError) + '_ {
-    |err| {
-        super::quaint_error_to_connector_error(
-            err,
-            &ConnectionInfo::Sqlite {
-                file_path: params.file_path.clone(),
-                db_name: params.attached_name.clone(),
-            },
-        )
-    }
-}
-
-async fn generic_apply_migration_script(migration_name: &str, script: &str, conn: &Connection) -> ConnectorResult<()> {
-    conn.raw_cmd(script).await.map_err(|sql_error| {
-        ConnectorError::user_facing(ApplyMigrationError {
-            migration_name: migration_name.to_owned(),
-            database_error_code: String::from(sql_error.original_code().unwrap_or("none")),
-            database_error: sql_error
-                .original_message()
-                .map(String::from)
-                .unwrap_or_else(|| sql_error.to_string()),
-        })
-    })
 }
