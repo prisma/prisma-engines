@@ -5,6 +5,7 @@ use crate::{
 };
 use migration_connector::{ConnectorResult, DestructiveChangeDiagnostics, Migration};
 use sql_schema_describer::SqlSchema;
+use tracing_futures::Instrument;
 
 #[tracing::instrument(skip(flavour, migration))]
 pub(crate) async fn apply_migration(
@@ -14,11 +15,11 @@ pub(crate) async fn apply_migration(
     let migration: &SqlMigration = migration.downcast_ref();
     tracing::debug!("{} steps to execute", migration.steps.len());
 
-    for (index, step) in migration.steps.iter().enumerate() {
+    for step in &migration.steps {
         for sql_string in render_raw_sql(step, flavour, Pair::new(&migration.before, &migration.after)) {
             assert!(!sql_string.is_empty());
-            tracing::debug!(index, %sql_string);
-            flavour.run_query_script(&sql_string).await?;
+            let span = tracing::info_span!("migration_step", ?step);
+            flavour.raw_cmd(&sql_string).instrument(span).await?;
         }
     }
 
