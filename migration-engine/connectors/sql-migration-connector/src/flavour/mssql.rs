@@ -89,7 +89,7 @@ impl SqlFlavour for MssqlFlavour {
     }
 
     fn migrations_table(&self) -> Table<'static> {
-        (self.schema_name().to_owned(), self.migrations_table_name().to_owned()).into()
+        (self.schema_name().to_owned(), crate::MIGRATIONS_TABLE_NAME.to_owned()).into()
     }
 
     fn connection_string(&self) -> Option<&str> {
@@ -129,7 +129,7 @@ impl SqlFlavour for MssqlFlavour {
             // dbo is created automatically
             if params.url.schema() != "dbo" {
                 let query = format!("CREATE SCHEMA {}", params.url.schema());
-                conn.raw_cmd(&query, &params).await?;
+                conn.raw_cmd(&query, params).await?;
             }
 
             Ok(db_name)
@@ -148,7 +148,7 @@ impl SqlFlavour for MssqlFlavour {
                 started_at              DATETIMEOFFSET NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 applied_steps_count     INT NOT NULL DEFAULT 0
             );
-        "#, self.schema_name(), self.migrations_table_name()};
+        "#, self.schema_name(), crate::MIGRATIONS_TABLE_NAME};
 
         Box::pin(async move { self.raw_cmd(&sql).await })
     }
@@ -193,7 +193,7 @@ impl SqlFlavour for MssqlFlavour {
     }
 
     fn drop_migrations_table(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
-        let sql = format!("DROP TABLE [{}].[{}]", self.schema_name(), self.migrations_table_name());
+        let sql = format!("DROP TABLE [{}].[{}]", self.schema_name(), crate::MIGRATIONS_TABLE_NAME);
         Box::pin(async move { self.raw_cmd(&sql).await })
     }
 
@@ -202,7 +202,7 @@ impl SqlFlavour for MssqlFlavour {
         query: quaint::ast::Query<'a>,
     ) -> BoxFuture<'a, ConnectorResult<quaint::prelude::ResultSet>> {
         with_connection(&mut self.state, move |params, conn| async move {
-            conn.query(query, &params).await
+            conn.query(query, params).await
         })
     }
 
@@ -212,12 +212,8 @@ impl SqlFlavour for MssqlFlavour {
         params: &'a [quaint::Value<'a>],
     ) -> BoxFuture<'a, ConnectorResult<quaint::prelude::ResultSet>> {
         with_connection(&mut self.state, move |conn_params, conn| async move {
-            conn.query_raw(sql, params, &conn_params).await
+            conn.query_raw(sql, params, conn_params).await
         })
-    }
-
-    fn run_query_script<'a>(&'a mut self, sql: &'a str) -> BoxFuture<'a, ConnectorResult<()>> {
-        self.raw_cmd(sql)
     }
 
     fn reset(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
@@ -327,12 +323,12 @@ impl SqlFlavour for MssqlFlavour {
                 schema_name
             );
 
-            connection.raw_cmd(&drop_procedures, &params).await?;
-            connection.raw_cmd(&drop_views, &params).await?;
-            connection.raw_cmd(&drop_shared_defaults, &params).await?;
-            connection.raw_cmd(&drop_fks, &params).await?;
-            connection.raw_cmd(&drop_tables, &params).await?;
-            connection.raw_cmd(&drop_types, &params).await?;
+            connection.raw_cmd(&drop_procedures, params).await?;
+            connection.raw_cmd(&drop_views, params).await?;
+            connection.raw_cmd(&drop_shared_defaults, params).await?;
+            connection.raw_cmd(&drop_fks, params).await?;
+            connection.raw_cmd(&drop_tables, params).await?;
+            connection.raw_cmd(&drop_types, params).await?;
 
             Ok(())
         })

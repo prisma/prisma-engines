@@ -24,9 +24,10 @@ impl Connection {
         ))
     }
 
+    #[tracing::instrument(skip(self, params))]
     pub(super) async fn describe_schema(&mut self, params: &super::Params) -> ConnectorResult<SqlSchema> {
         let mut schema = describer::SqlSchemaDescriber::new(&self.0)
-            .describe(&params.url.schema())
+            .describe(params.url.schema())
             .await
             .map_err(|err| match err.into_kind() {
                 DescriberErrorKind::QuaintError(err) => quaint_err_url(&params.url)(err),
@@ -70,7 +71,7 @@ impl Connection {
         params: &[quaint::prelude::Value<'_>],
         conn_params: &super::Params,
     ) -> ConnectorResult<quaint::prelude::ResultSet> {
-        tracing::debug!(query_type = "raw_cmd", sql);
+        tracing::debug!(query_type = "query_raw", sql, ?params);
         self.0.query_raw(sql, params).await.map_err(quaint_err(conn_params))
     }
 }

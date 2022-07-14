@@ -31,10 +31,8 @@ impl Connection {
         ))
     }
 
-    pub(super) async fn describe_schema(
-        &mut self,
-        params: &super::Params,
-    ) -> ConnectorResult<SqlSchema> {
+    #[tracing::instrument(skip(self, params))]
+    pub(super) async fn describe_schema(&mut self, params: &super::Params) -> ConnectorResult<SqlSchema> {
         let mut schema = sql_schema_describer::mysql::SqlSchemaDescriber::new(&self.0)
             .describe(params.url.dbname())
             .await
@@ -79,38 +77,8 @@ impl Connection {
         params: &[quaint::prelude::Value<'_>],
         url: &MysqlUrl,
     ) -> ConnectorResult<quaint::prelude::ResultSet> {
-        tracing::debug!(query_type = "raw_cmd", sql);
+        tracing::debug!(query_type = "query_raw", sql, ?params);
         self.0.query_raw(sql, params).await.map_err(quaint_err(url))
-    }
-
-    pub(super) async fn run_query_script(
-        &mut self,
-        sql: &str,
-        url: &MysqlUrl,
-        circumstances: BitFlags<super::Circumstances>,
-    ) -> ConnectorResult<()> {
-        let convert_error = |error: my::Error| match convert_server_error(circumstances, &error) {
-            Some(e) => ConnectorError::from(e),
-            None => quaint_err(url)(error.into()),
-        };
-
-        let mut conn = self.0.conn().lock().await;
-
-        let mut result = sql.run(&mut *conn).await.map_err(convert_error)?;
-
-        loop {
-            match result.map(drop).await {
-                Ok(_) => {
-                    if result.is_empty() {
-                        result.map(drop).await.map_err(convert_error)?;
-                        return Ok(());
-                    }
-                }
-                Err(e) => {
-                    return Err(convert_error(e));
-                }
-            }
-        }
     }
 
     pub(super) async fn apply_migration_script(
@@ -148,6 +116,7 @@ impl Connection {
 
         let mut migration_idx = 0_usize;
 
+        tracing::debug!(sql = script, query_type = "raw_cmd");
         let mut result = script
             .run(&mut *conn)
             .await

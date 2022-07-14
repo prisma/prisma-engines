@@ -97,12 +97,6 @@ impl SqlFlavour for MysqlFlavour {
         })
     }
 
-    fn run_query_script<'a>(&'a mut self, sql: &'a str) -> BoxFuture<'a, ConnectorResult<()>> {
-        with_connection(&mut self.state, move |params, circumstances, connection| async move {
-            connection.run_query_script(sql, &params.url, circumstances).await
-        })
-    }
-
     fn apply_migration_script<'a>(
         &'a mut self,
         migration_name: &'a str,
@@ -187,7 +181,7 @@ impl SqlFlavour for MysqlFlavour {
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
         "#};
 
-        self.run_query_script(sql)
+        self.raw_cmd(sql)
     }
 
     fn drop_database(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {

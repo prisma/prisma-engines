@@ -149,10 +149,6 @@ impl SqlFlavour for PostgresFlavour {
         })
     }
 
-    fn run_query_script<'a>(&'a mut self, sql: &'a str) -> BoxFuture<'a, ConnectorResult<()>> {
-        self.raw_cmd(sql)
-    }
-
     fn apply_migration_script<'a>(
         &'a mut self,
         migration_name: &'a str,

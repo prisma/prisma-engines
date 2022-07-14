@@ -24,6 +24,8 @@ use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationSte
 use sql_schema_describer as sql;
 use std::sync::Arc;
 
+const MIGRATIONS_TABLE_NAME: &str = "_prisma_migrations";
+
 /// The top-level SQL migration connector.
 pub struct SqlMigrationConnector {
     flavour: Box<dyn SqlFlavour + Send + Sync + 'static>,
@@ -328,7 +330,7 @@ async fn best_effort_reset_impl(flavour: &mut (dyn SqlFlavour + Send + Sync)) ->
         steps,
     };
 
-    if migration.before.table_walker("_prisma_migrations").is_some() {
+    if migration.before.table_walker(crate::MIGRATIONS_TABLE_NAME).is_some() {
         flavour.drop_migrations_table().await?;
     }
 

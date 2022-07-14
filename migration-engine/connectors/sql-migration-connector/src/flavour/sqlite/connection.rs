@@ -54,7 +54,7 @@ impl Connection {
         params: &[quaint::prelude::Value<'_>],
         conn_params: &super::Params,
     ) -> ConnectorResult<quaint::prelude::ResultSet> {
-        tracing::debug!(query_type = "raw_cmd", sql);
+        tracing::debug!(query_type = "query_raw", sql);
         self.0.query_raw(sql, params).await.map_err(quaint_err(conn_params))
     }
 }

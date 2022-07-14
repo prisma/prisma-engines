@@ -42,8 +42,9 @@ impl<'a> DifferDatabase<'a> {
         };
 
         let mut columns_cache = HashMap::new();
-        let table_is_ignored =
-            |table_name: &str| table_name == "_prisma_migrations" || flavour.table_should_be_ignored(table_name);
+        let table_is_ignored = |table_name: &str| {
+            table_name == crate::MIGRATIONS_TABLE_NAME || flavour.table_should_be_ignored(table_name)
+        };
 
         // First insert all tables from the previous schema.
         for table in schemas

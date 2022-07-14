@@ -179,20 +179,12 @@ pub(crate) trait SqlFlavour:
         shadow_database_url: Option<String>,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>>;
 
-    /// Runs a single SQL script.
-    fn run_query_script<'a>(&'a mut self, sql: &'a str) -> BoxFuture<'a, ConnectorResult<()>>;
-
     /// Receive and validate connector params.
     fn set_params(&mut self, connector_params: ConnectorParams) -> ConnectorResult<()>;
 
-    /// Table to store applied migrations, the name part.
-    fn migrations_table_name(&self) -> &'static str {
-        "_prisma_migrations"
-    }
-
     /// Table to store applied migrations.
     fn migrations_table(&self) -> Table<'static> {
-        self.migrations_table_name().into()
+        crate::MIGRATIONS_TABLE_NAME.into()
     }
 
     fn version(&mut self) -> BoxFuture<'_, ConnectorResult<Option<String>>>;
