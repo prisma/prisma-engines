@@ -1,7 +1,5 @@
 use super::{CachedTx, TransactionError, TxOpRequest, TxOpRequestMsg, TxOpResponse};
-use crate::{
-    execute_many_operations, execute_single_operation, set_span_context, OpenTx, Operation, ResponseData, TxId,
-};
+use crate::{execute_many_operations, execute_single_operation, OpenTx, Operation, ResponseData, TxId};
 use schema::QuerySchemaRef;
 use std::{collections::HashMap, sync::Arc};
 use tokio::{
@@ -74,8 +72,7 @@ impl ITXServer {
     }
 
     async fn execute_single(&mut self, operation: &Operation, trace_id: Option<String>) -> crate::Result<ResponseData> {
-        let span = info_span!("prisma:itx_execute", user_facing = true);
-        set_span_context(&span, trace_id.clone());
+        let span = info_span!("prisma:itx_query_builder", user_facing = true);
 
         let conn = self.cached_tx.as_open()?;
         execute_single_operation(
@@ -94,7 +91,6 @@ impl ITXServer {
         trace_id: Option<String>,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
         let span = info_span!("prisma:itx_execute", user_facing = true);
-        set_span_context(&span, trace_id.clone());
 
         let conn = self.cached_tx.as_open()?;
         execute_many_operations(
@@ -258,9 +254,18 @@ pub fn spawn_itx_actor(
         tx_id: tx_id.clone(),
     };
 
-    let mut server = ITXServer::new(tx_id, CachedTx::Open(value), timeout, rx_from_client, query_schema);
+    let mut server = ITXServer::new(
+        tx_id.clone(),
+        CachedTx::Open(value),
+        timeout,
+        rx_from_client,
+        query_schema,
+    );
     let dispatcher = crate::get_current_dispatcher();
     let span = Span::current();
+
+    let tx_id_str = tx_id.to_string();
+    span.record("itx_id", &tx_id_str.as_str());
 
     tokio::task::spawn(
         async move {

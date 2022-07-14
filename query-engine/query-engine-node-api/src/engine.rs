@@ -18,7 +18,7 @@ use std::{
     sync::Arc,
 };
 use tokio::sync::RwLock;
-use tracing::{instrument::WithSubscriber, Instrument};
+use tracing::{field, instrument::WithSubscriber, Instrument, Span};
 use tracing_subscriber::filter::LevelFilter;
 use user_facing_errors::Error;
 
@@ -299,8 +299,13 @@ impl QueryEngine {
             let dispatcher = self.logger.dispatcher();
 
             async move {
-                let span = tracing::info_span!("prisma:query_builder", user_facing = true);
-                let trace_id = set_parent_context_from_json_str(&span, trace);
+                let (span, trace_id) = if tx_id.is_none() {
+                    let span = tracing::info_span!("prisma:query_builder", user_facing = true);
+                    let trace_id = set_parent_context_from_json_str(&span, trace);
+                    (span, trace_id)
+                } else {
+                    (Span::none(), None)
+                };
 
                 let handler = GraphQlHandler::new(engine.executor(), engine.query_schema());
                 let response = handler
@@ -326,7 +331,7 @@ impl QueryEngine {
             let dispatcher = self.logger.dispatcher();
 
             async move {
-                let span = tracing::info_span!("prisma:itx_runner", user_facing = true, itx_id = "");
+                let span = tracing::info_span!("prisma:itx_runner", user_facing = true, itx_id = field::Empty);
                 set_parent_context_from_json_str(&span, trace);
 
                 let input: TxInput = serde_json::from_str(&input)?;
