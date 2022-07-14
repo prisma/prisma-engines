@@ -1149,6 +1149,10 @@
 <span id="1144">1144</span>
 <span id="1145">1145</span>
 <span id="1146">1146</span>
+<span id="1147">1147</span>
+<span id="1148">1148</span>
+<span id="1149">1149</span>
+<span id="1150">1150</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SqlSchemaDifferFlavour</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">flavour::MssqlFlavour</span>,
@@ -2289,10 +2293,14 @@
         },
     };
 
-    <span class="kw">if</span> <span class="ident">previous</span> <span class="op">==</span> <span class="ident">next</span> {
-        <span class="prelude-val">None</span>
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">cast</span>())
+    <span class="kw">match</span> (<span class="ident">previous</span>, <span class="ident">next</span>) {
+        (<span class="ident">p</span>, <span class="ident">n</span>) <span class="kw">if</span> <span class="ident">p</span> <span class="op">==</span> <span class="ident">n</span> =&gt; <span class="prelude-val">None</span>,
+        <span class="comment">// https://docs.microsoft.com/en-us/sql/t-sql/data-types/float-and-real-transact-sql?view=sql-server-ver16#syntax</span>
+        (<span class="ident">MsSqlType::Float</span>(<span class="prelude-val">Some</span>(<span class="number">53</span>)), <span class="ident">MsSqlType::Float</span>(<span class="prelude-val">None</span>))
+        <span class="op">|</span> (<span class="ident">MsSqlType::Float</span>(<span class="prelude-val">None</span>), <span class="ident">MsSqlType::Float</span>(<span class="prelude-val">Some</span>(<span class="number">53</span>)))
+        <span class="op">|</span> (<span class="ident">MsSqlType::Float</span>(<span class="prelude-val">Some</span>(<span class="number">24</span>)), <span class="ident">MsSqlType::Real</span>)
+        <span class="op">|</span> (<span class="ident">MsSqlType::Real</span>, <span class="ident">MsSqlType::Float</span>(<span class="prelude-val">Some</span>(<span class="number">24</span>))) =&gt; <span class="prelude-val">None</span>,
+        <span class="kw">_</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">cast</span>()),
     }
 }
 </code></pre></div>
