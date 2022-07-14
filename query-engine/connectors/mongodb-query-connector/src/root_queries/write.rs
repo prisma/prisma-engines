@@ -16,7 +16,7 @@ use mongodb::{
 };
 use prisma_models::{ModelRef, PrismaValue, SelectionResult};
 use std::{collections::HashMap, convert::TryInto};
-use tracing::{field, info_span};
+use tracing::{info_span, Instrument};
 use update::IntoUpdateDocumentExtension;
 
 /// Create a single record to the database resulting in a
@@ -29,7 +29,7 @@ pub async fn create_record<'conn>(
 ) -> crate::Result<SelectionResult> {
     let coll = database.collection::<Document>(model.db_name());
 
-    let _span = info_span!(
+    let span = info_span!(
         "prisma:db_query",
         user_facing = true,
         "db.statement" = &format_args!("db.{}.insertOne(*)", coll.name())
@@ -65,7 +65,9 @@ pub async fn create_record<'conn>(
 
     logger::log_insert_one(coll.name(), &doc);
 
-    let insert_result = metrics(|| coll.insert_one_with_session(doc, None, session)).await?;
+    let insert_result = metrics(|| coll.insert_one_with_session(doc, None, session))
+        .instrument(span)
+        .await?;
     let id_value = value_from_bson(insert_result.inserted_id, &id_meta)?;
 
     Ok(SelectionResult::from((id_field, id_value)))
@@ -80,7 +82,7 @@ pub async fn create_records<'conn>(
 ) -> crate::Result<usize> {
     let coll = database.collection::<Document>(model.db_name());
 
-    let _span = info_span!(
+    let span = info_span!(
         "prisma:db_query",
         user_facing = true,
         "db.statement" = &format_args!("db.{}.insertMany(*)", coll.name())
@@ -117,7 +119,7 @@ pub async fn create_records<'conn>(
 
     logger::log_insert_many(coll.name(), &docs, ordered);
 
-    let insert = metrics(|| coll.insert_many_with_session(docs, options, session));
+    let insert = metrics(|| coll.insert_many_with_session(docs, options, session)).instrument(span);
 
     match insert.await {
         Ok(insert_result) => Ok(insert_result.inserted_ids.len()),
@@ -169,7 +171,7 @@ pub async fn update_records<'conn>(
         return Ok(vec![]);
     }
 
-    let _span = info_span!(
+    let span = info_span!(
         "prisma:db_query",
         user_facing = true,
         "db.statement" = &format_args!("db.{}.updateMany(*)", coll.name())
@@ -196,7 +198,9 @@ pub async fn update_records<'conn>(
 
     if !update_docs.is_empty() {
         logger::log_update_many_vec(coll.name(), &filter, &update_docs);
-        metrics(|| coll.update_many_with_session(filter, update_docs, None, session)).await?;
+        metrics(|| coll.update_many_with_session(filter, update_docs, None, session))
+            .instrument(span)
+            .await?;
     }
 
     let ids = ids
@@ -239,7 +243,7 @@ pub async fn delete_records<'conn>(
         return Ok(0);
     }
 
-    let _span = info_span!(
+    let span = info_span!(
         "prisma:db_query",
         user_facing = true,
         "db.statement" = &format_args!("db.{}.deleteMany(*)", coll.name())
@@ -247,7 +251,9 @@ pub async fn delete_records<'conn>(
 
     let filter = doc! { id_field.db_name(): { "$in": ids } };
     logger::log_delete_many(coll.name(), &filter);
-    let delete_result = metrics(|| coll.delete_many_with_session(filter, None, session)).await?;
+    let delete_result = metrics(|| coll.delete_many_with_session(filter, None, session))
+        .instrument(span)
+        .await?;
 
     Ok(delete_result.deleted_count as usize)
 }
@@ -262,7 +268,7 @@ async fn find_ids(
 ) -> crate::Result<Vec<Bson>> {
     let coll = database.collection::<Document>(model.db_name());
 
-    let _span = info_span!(
+    let span = info_span!(
         "prisma:db_query",
         user_facing = true,
         "db.statement" = &format_args!("db.{}.findMany(*)", coll.name())
@@ -282,7 +288,7 @@ async fn find_ids(
 
     let builder = builder.with_model_projection(id_field)?;
     let query = builder.build()?;
-    let docs = query.execute(collection, session).await?;
+    let docs = query.execute(collection, session).instrument(span).await?;
     let ids = docs.into_iter().map(|mut doc| doc.remove("_id").unwrap()).collect();
 
     Ok(ids)
@@ -410,58 +416,61 @@ pub async fn query_raw<'conn>(
     inputs: HashMap<String, PrismaValue>,
     query_type: Option<String>,
 ) -> crate::Result<serde_json::Value> {
-    let span = info_span!("prisma:db_query", user_facing = true, "db.statement" = field::Empty);
-
-    match (query_type.as_deref(), model) {
-        (Some("findRaw"), Some(m)) => span.record(
-            "db.statement",
-            &format_args!("db.{}.findRaw(*)", database.collection::<Document>(m.db_name()).name()),
-        ),
-        (Some("aggregateRaw"), Some(m)) => span.record(
-            "db.statement",
-            &format_args!(
-                "db.{}.aggregateRaw(*)",
-                database.collection::<Document>(m.db_name()).name()
-            ),
-        ),
-        (Some("runCommandRaw"), _) => span.record("db.statement", &format_args!("db.runCommandRaw(*)")),
-        _ => unreachable!("Unexpected MongoDB raw query"),
-    };
+    let db_statement = get_raw_db_statement(&query_type, &model, database);
+    let span = info_span!(
+        "prisma:db_query",
+        user_facing = true,
+        "db.statement" = &&db_statement.as_str()
+    );
 
     let mongo_command = MongoCommand::from_raw_query(model, inputs, query_type)?;
 
-    let json_result = match mongo_command {
-        MongoCommand::Raw { cmd } => {
-            let mut result = metrics(|| database.run_command_with_session(cmd, None, session)).await?;
+    async {
+        let json_result = match mongo_command {
+            MongoCommand::Raw { cmd } => {
+                let mut result = metrics(|| database.run_command_with_session(cmd, None, session)).await?;
 
-            // Removes unnecessary properties from raw response
-            // See https://docs.mongodb.com/v5.0/reference/method/db.runCommand
-            result.remove("operationTime");
-            result.remove("$clusterTime");
-            result.remove("opTime");
-            result.remove("electionId");
+                // Removes unnecessary properties from raw response
+                // See https://docs.mongodb.com/v5.0/reference/method/db.runCommand
+                result.remove("operationTime");
+                result.remove("$clusterTime");
+                result.remove("opTime");
+                result.remove("electionId");
 
-            let json_result: serde_json::Value = Bson::Document(result).into();
+                let json_result: serde_json::Value = Bson::Document(result).into();
 
-            json_result
-        }
-        MongoCommand::Handled { collection, operation } => {
-            let coll = database.collection::<Document>(collection.as_str());
+                json_result
+            }
+            MongoCommand::Handled { collection, operation } => {
+                let coll = database.collection::<Document>(collection.as_str());
 
-            match operation {
-                MongoOperation::Find(filter, options) => {
-                    let cursor = coll.find_with_session(filter, options, session).await?;
+                match operation {
+                    MongoOperation::Find(filter, options) => {
+                        let cursor = coll.find_with_session(filter, options, session).await?;
 
-                    raw::cursor_to_json(cursor, session).await?
-                }
-                MongoOperation::Aggregate(pipeline, options) => {
-                    let cursor = coll.aggregate_with_session(pipeline, options, session).await?;
+                        raw::cursor_to_json(cursor, session).await?
+                    }
+                    MongoOperation::Aggregate(pipeline, options) => {
+                        let cursor = coll.aggregate_with_session(pipeline, options, session).await?;
 
-                    raw::cursor_to_json(cursor, session).await?
+                        raw::cursor_to_json(cursor, session).await?
+                    }
                 }
             }
-        }
-    };
+        };
+        Ok(json_result)
+    }
+    .instrument(span)
+    .await
+}
 
-    Ok(json_result)
+fn get_raw_db_statement(query_type: &Option<String>, model: &Option<&ModelRef>, database: &Database) -> String {
+    match (query_type.as_deref(), model) {
+        (Some("findRaw"), Some(m)) => format!("db.{}.findRaw(*)", database.collection::<Document>(m.db_name()).name()),
+        (Some("aggregateRaw"), Some(m)) => format!(
+            "db.{}.aggregateRaw(*)",
+            database.collection::<Document>(m.db_name()).name()
+        ),
+        _ => "db.runCommandRaw(*)".to_string(),
+    }
 }

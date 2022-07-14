@@ -6,7 +6,7 @@ use crate::{
 use connector_interface::{Filter, QueryArguments, RelAggregationSelection};
 use mongodb::{bson::doc, options::FindOptions, ClientSession, Database};
 use prisma_models::*;
-use tracing::info_span;
+use tracing::{info_span, Instrument};
 
 /// Finds a single record. Joins are not required at the moment because the selector is always a unique one.
 pub async fn get_single_record<'conn>(
@@ -19,7 +19,7 @@ pub async fn get_single_record<'conn>(
 ) -> crate::Result<Option<SingleRecord>> {
     let coll = database.collection(model.db_name());
 
-    let _span = info_span!(
+    let span = info_span!(
         "prisma:db_query",
         user_facing = true,
         "db.statement" = &format_args!("db.{}.findOne(*)", coll.name())
@@ -32,7 +32,7 @@ pub async fn get_single_record<'conn>(
         .with_aggregation_selections(aggregation_selections)?
         .build()?;
 
-    let docs = query.execute(coll, session).await?;
+    let docs = query.execute(coll, session).instrument(span).await?;
 
     if docs.is_empty() {
         Ok(None)
@@ -65,7 +65,7 @@ pub async fn get_many_records<'conn>(
 ) -> crate::Result<ManyRecords> {
     let coll = database.collection(model.db_name());
 
-    let _span = info_span!(
+    let span = info_span!(
         "prisma:db_query",
         user_facing = true,
         "db.statement" = &format_args!("db.{}.findMany(*)", coll.name())
@@ -89,7 +89,7 @@ pub async fn get_many_records<'conn>(
         .with_aggregation_selections(aggregation_selections)?
         .build()?;
 
-    let docs = query.execute(coll, session).await?;
+    let docs = query.execute(coll, session).instrument(span).await?;
     for doc in docs {
         let record = document_to_record(doc, &field_names, &meta_mapping)?;
         records.push(record)
