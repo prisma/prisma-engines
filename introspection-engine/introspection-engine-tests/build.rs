@@ -19,7 +19,7 @@ fn main() {
         let file_path = sql_file.trim_start_matches('/');
         writeln!(
             out_file,
-            "#[test] fn {test_name}() {{ run_simple_test(\"{file_path}\"); }}"
+            "#[test] fn {test_name}() {{ run_simple_test(\"{file_path}\", \"{test_name}\"); }}"
         )
         .unwrap();
     }

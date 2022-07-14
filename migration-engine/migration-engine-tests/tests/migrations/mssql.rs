@@ -302,3 +302,51 @@ fn bigint_defaults_work(api: TestApi) {
     api.schema_push(schema).send().assert_green();
     api.schema_push(schema).send().assert_green().assert_no_steps();
 }
+
+#[test_connector(tags(Mssql))]
+fn float_columns(api: TestApi) {
+    let schema = r#"
+        datasource mypg {
+            provider = "sqlserver"
+            url = env("TEST_DATABASE_URL")
+        }
+
+        model foo {
+          id  String @id
+          bar Float @mypg.Float @default(0.90001)
+          baz Float? @mypg.Float
+          qux Float? @mypg.Real
+        }
+    "#;
+    let sql = expect![[r#"
+        BEGIN TRY
+
+        BEGIN TRAN;
+
+        -- CreateTable
+        CREATE TABLE [float_columns].[foo] (
+            [id] NVARCHAR(1000) NOT NULL,
+            [bar] FLOAT NOT NULL CONSTRAINT [foo_bar_df] DEFAULT 0.90001,
+            [baz] FLOAT,
+            [qux] REAL,
+            CONSTRAINT [foo_pkey] PRIMARY KEY CLUSTERED ([id])
+        );
+
+        COMMIT TRAN;
+
+        END TRY
+        BEGIN CATCH
+
+        IF @@TRANCOUNT > 0
+        BEGIN
+            ROLLBACK TRAN;
+        END;
+        THROW
+
+        END CATCH
+    "#]];
+    api.expect_sql_for_schema(schema, &sql);
+
+    api.schema_push(schema).send().assert_green();
+    api.schema_push(schema).send().assert_green().assert_no_steps();
+}
