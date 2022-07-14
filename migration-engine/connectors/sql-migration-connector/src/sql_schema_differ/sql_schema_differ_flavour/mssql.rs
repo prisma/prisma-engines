@@ -1138,9 +1138,13 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
         },
     };
 
-    if previous == next {
-        None
-    } else {
-        Some(cast())
+    match (previous, next) {
+        (p, n) if p == n => None,
+        // https://docs.microsoft.com/en-us/sql/t-sql/data-types/float-and-real-transact-sql?view=sql-server-ver16#syntax
+        (MsSqlType::Float(Some(53)), MsSqlType::Float(None))
+        | (MsSqlType::Float(None), MsSqlType::Float(Some(53)))
+        | (MsSqlType::Float(Some(24)), MsSqlType::Real)
+        | (MsSqlType::Real, MsSqlType::Float(Some(24))) => None,
+        _ => Some(cast()),
     }
 }
