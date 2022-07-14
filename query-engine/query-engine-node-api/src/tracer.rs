@@ -1,14 +1,18 @@
 use async_trait::async_trait;
-use napi::threadsafe_function::{ThreadsafeFunction, ThreadsafeFunctionCallMode};
 use opentelemetry::{
     global, sdk,
     sdk::{
         export::trace::{ExportResult, SpanData, SpanExporter},
         propagation::TraceContextPropagator,
     },
-    trace::TracerProvider,
+    trace::{TraceError, TracerProvider},
 };
-use std::fmt::{self, Debug};
+use std::{
+    fmt::{self, Debug},
+    sync::Arc,
+};
+
+use crate::log_callback::LogCallback;
 
 /// Pipeline builder
 #[derive(Debug)]
@@ -38,7 +42,7 @@ impl PipelineBuilder {
 }
 
 impl PipelineBuilder {
-    pub fn install_simple(mut self, log_callback: ThreadsafeFunction<String>) -> sdk::trace::Tracer {
+    pub fn install_simple(mut self, log_callback: Arc<LogCallback>) -> sdk::trace::Tracer {
         global::set_text_map_propagator(TraceContextPropagator::new());
         let exporter = ClientSpanExporter::new(log_callback);
 
@@ -60,11 +64,11 @@ impl PipelineBuilder {
 
 /// A [`ClientSpanExporter`] that sends spans to the JS callback.
 pub struct ClientSpanExporter {
-    callback: ThreadsafeFunction<String>,
+    callback: Arc<LogCallback>,
 }
 
 impl ClientSpanExporter {
-    pub fn new(callback: ThreadsafeFunction<String>) -> Self {
+    pub fn new(callback: Arc<LogCallback>) -> Self {
         Self { callback }
     }
 }
@@ -80,8 +84,8 @@ impl SpanExporter for ClientSpanExporter {
     /// Export spans to stdout
     async fn export(&mut self, batch: Vec<SpanData>) -> ExportResult {
         let result = query_core::spans_to_json(&batch);
-        self.callback.call(Ok(result), ThreadsafeFunctionCallMode::Blocking);
-
-        Ok(())
+        self.callback
+            .call(result)
+            .map_err(|err| TraceError::from(format!("Could not call JS callback: {}", &err.reason)))
     }
 }
