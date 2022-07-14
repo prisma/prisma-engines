@@ -76,17 +76,6 @@
 <span id="71">71</span>
 <span id="72">72</span>
 <span id="73">73</span>
-<span id="74">74</span>
-<span id="75">75</span>
-<span id="76">76</span>
-<span id="77">77</span>
-<span id="78">78</span>
-<span id="79">79</span>
-<span id="80">80</span>
-<span id="81">81</span>
-<span id="82">82</span>
-<span id="83">83</span>
-<span id="84">84</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">opentelemetry::sdk::export::trace::SpanData</span>;
 <span class="kw">use</span> <span class="ident">serde_json</span>::{<span class="ident">json</span>, <span class="ident">Value</span>};
 <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
@@ -138,17 +127,6 @@
         <span class="string">&quot;end_time&quot;</span>: <span class="ident">span</span>.<span class="ident">end_time</span>.<span class="ident">duration_since</span>(<span class="ident">SystemTime::UNIX_EPOCH</span>).<span class="ident">unwrap</span>().<span class="ident">as_millis</span>().<span class="ident">to_string</span>(),
         <span class="string">&quot;attributes&quot;</span>: <span class="ident">attributes</span>
     })
-}
-
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_span_context</span>(<span class="ident">span</span>: <span class="kw-2">&amp;</span><span class="ident">Span</span>, <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="ident">trace_id</span>.<span class="ident">is_none</span>() {
-        <span class="kw">return</span>;
-    }
-
-    <span class="kw">let</span> <span class="ident">trace</span> <span class="op">=</span> <span class="ident">HashMap::from</span>([(<span class="string">&quot;traceparent&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">trace_id</span>.<span class="ident">unwrap</span>())]);
-    <span class="kw">let</span> <span class="ident">parent_context</span> <span class="op">=</span> <span class="ident">opentelemetry::global::get_text_map_propagator</span>(<span class="op">|</span><span class="ident">propagator</span><span class="op">|</span> <span class="ident">propagator</span>.<span class="ident">extract</span>(<span class="kw-2">&amp;</span><span class="ident">trace</span>));
-
-    <span class="ident">span</span>.<span class="ident">set_parent</span>(<span class="ident">parent_context</span>)
 }
 
 <span class="comment">// set the parent context and return the traceparent</span>

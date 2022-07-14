@@ -453,6 +453,11 @@
 <span id="448">448</span>
 <span id="449">449</span>
 <span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">context::PrismaContext</span>, <span class="ident">opt::PrismaOpt</span>, <span class="ident">PrismaResult</span>};
 <span class="kw">use</span> <span class="ident">datamodel::common::preview_features::PreviewFeature</span>;
 <span class="kw">use</span> <span class="ident">hyper::service</span>::{<span class="ident">make_service_fn</span>, <span class="ident">service_fn</span>};
@@ -466,7 +471,7 @@
 <span class="kw">use</span> <span class="ident">std::net::SocketAddr</span>;
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">std::time::Instant</span>;
-<span class="kw">use</span> <span class="ident">tracing::Instrument</span>;
+<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">field</span>, <span class="ident">Instrument</span>, <span class="ident">Span</span>};
 <span class="kw">use</span> <span class="ident">tracing_opentelemetry::OpenTelemetrySpanExt</span>;
 
 <span class="kw">const</span> <span class="ident">TRANSACTION_ID_HEADER</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;X-transaction-id&quot;</span>;
@@ -644,9 +649,14 @@
 
     <span class="kw">let</span> <span class="ident">tx_id</span> <span class="op">=</span> <span class="ident">get_transaction_id_from_header</span>(<span class="kw-2">&amp;</span><span class="ident">req</span>);
 
-    <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">get_parent_span_context</span>(<span class="kw-2">&amp;</span><span class="ident">req</span>);
-    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(<span class="string">&quot;prisma:query_builder&quot;</span>, <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>);
-    <span class="ident">span</span>.<span class="ident">set_parent</span>(<span class="ident">cx</span>);
+    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">tx_id</span>.<span class="ident">is_none</span>() {
+        <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">get_parent_span_context</span>(<span class="kw-2">&amp;</span><span class="ident">req</span>);
+        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(<span class="string">&quot;prisma:query_builder&quot;</span>, <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>);
+        <span class="ident">span</span>.<span class="ident">set_parent</span>(<span class="ident">cx</span>);
+        <span class="ident">span</span>
+    } <span class="kw">else</span> {
+        <span class="ident">Span::none</span>()
+    };
 
     <span class="kw">let</span> <span class="ident">trace_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">req</span>.<span class="ident">headers</span>().<span class="ident">get</span>(<span class="string">&quot;traceparent&quot;</span>) {
         <span class="prelude-val">Some</span>(<span class="ident">traceparent</span>) =&gt; {
@@ -664,7 +674,7 @@
         <span class="kw">match</span> <span class="ident">serde_json::from_slice</span>(<span class="ident">full_body</span>.<span class="ident">as_ref</span>()) {
             <span class="prelude-val">Ok</span>(<span class="ident">body</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">handler</span> <span class="op">=</span> <span class="ident">GraphQlHandler::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">state</span>.<span class="ident">cx</span>.<span class="ident">executor</span>, <span class="ident">state</span>.<span class="ident">cx</span>.<span class="ident">query_schema</span>());
-                <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">handler</span>.<span class="ident">handle</span>(<span class="ident">body</span>, <span class="ident">tx_id</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>;
+                <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">handler</span>.<span class="ident">handle</span>(<span class="ident">body</span>, <span class="ident">tx_id</span>, <span class="ident">trace_id</span>).<span class="ident">instrument</span>(<span class="ident">span</span>).<span class="kw">await</span>;
 
                 <span class="kw">let</span> <span class="ident">result_bytes</span> <span class="op">=</span> <span class="ident">serde_json::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">result</span>).<span class="ident">unwrap</span>();
 
@@ -687,7 +697,7 @@
         }
     };
 
-    <span class="ident">work</span>.<span class="ident">instrument</span>(<span class="ident">span</span>).<span class="kw">await</span>
+    <span class="ident">work</span>.<span class="kw">await</span>
 }
 
 <span class="doccomment">/// Expose the GraphQL playground if enabled.</span>
@@ -804,7 +814,7 @@
     <span class="kw">let</span> <span class="ident">full_body</span> <span class="op">=</span> <span class="ident">hyper::body::to_bytes</span>(<span class="ident">body_start</span>).<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">input</span>: <span class="ident">TxInput</span> <span class="op">=</span> <span class="ident">serde_json::from_slice</span>(<span class="ident">full_body</span>.<span class="ident">as_ref</span>()).<span class="ident">unwrap</span>();
 
-    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::info_span!</span>(<span class="string">&quot;prisma:itx_runner&quot;</span>, <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>);
+    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::info_span!</span>(<span class="string">&quot;prisma:itx_runner&quot;</span>, <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>, <span class="ident">itx_id</span> <span class="op">=</span> <span class="ident">field::Empty</span>);
     <span class="ident">span</span>.<span class="ident">set_parent</span>(<span class="ident">cx</span>);
 
     <span class="kw">match</span> <span class="ident">state</span>
