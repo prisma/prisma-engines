@@ -4,7 +4,7 @@ use test_setup::{runtime::run_with_thread_local_runtime as tok, TestApiArgs};
 
 const TESTS_ROOT: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/simple");
 
-fn run_simple_test(test_file_path: &str) {
+fn run_simple_test(test_file_path: &str, test_function_name: &'static str) {
     let file_path = path::Path::new(TESTS_ROOT).join(test_file_path);
     let text = std::fs::read_to_string(&file_path).unwrap();
     let mut lines = text.lines();
@@ -31,7 +31,7 @@ fn run_simple_test(test_file_path: &str) {
         }
     };
 
-    let test_api_args = TestApiArgs::new("run_simple_test", &[]);
+    let test_api_args = TestApiArgs::new(test_function_name, &[]);
 
     if test_setup::should_skip_test(&test_api_args, tags, excluded, Default::default()) {
         return;
