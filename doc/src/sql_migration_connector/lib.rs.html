@@ -351,6 +351,8 @@
 <span id="346">346</span>
 <span id="347">347</span>
 <span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The SQL migration connector.</span>
 
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>, <span class="ident">missing_docs</span>)]</span>
@@ -376,6 +378,8 @@
 <span class="kw">use</span> <span class="ident">sql_migration</span>::{<span class="ident">DropUserDefinedType</span>, <span class="ident">DropView</span>, <span class="ident">SqlMigration</span>, <span class="ident">SqlMigrationStep</span>};
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span> <span class="kw">as</span> <span class="ident">sql</span>;
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+
+<span class="kw">const</span> <span class="ident">MIGRATIONS_TABLE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;_prisma_migrations&quot;</span>;
 
 <span class="doccomment">/// The top-level SQL migration connector.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SqlMigrationConnector</span> {
@@ -681,7 +685,7 @@
         <span class="ident">steps</span>,
     };
 
-    <span class="kw">if</span> <span class="ident">migration</span>.<span class="ident">before</span>.<span class="ident">table_walker</span>(<span class="string">&quot;_prisma_migrations&quot;</span>).<span class="ident">is_some</span>() {
+    <span class="kw">if</span> <span class="ident">migration</span>.<span class="ident">before</span>.<span class="ident">table_walker</span>(<span class="ident"><span class="kw">crate</span>::MIGRATIONS_TABLE_NAME</span>).<span class="ident">is_some</span>() {
         <span class="ident">flavour</span>.<span class="ident">drop_migrations_table</span>().<span class="kw">await</span><span class="question-mark">?</span>;
     }
 

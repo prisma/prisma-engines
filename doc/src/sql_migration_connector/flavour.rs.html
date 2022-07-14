@@ -224,14 +224,6 @@
 <span id="219">219</span>
 <span id="220">220</span>
 <span id="221">221</span>
-<span id="222">222</span>
-<span id="223">223</span>
-<span id="224">224</span>
-<span id="225">225</span>
-<span id="226">226</span>
-<span id="227">227</span>
-<span id="228">228</span>
-<span id="229">229</span>
 </pre><pre class="rust"><code><span class="doccomment">//! SQL flavours implement behaviour specific to a given SQL implementation (PostgreSQL, SQLite...),</span>
 <span class="doccomment">//! in order to avoid cluttering the connector with conditionals. This is a private implementation</span>
 <span class="doccomment">//! detail of the SQL connector.</span>
@@ -413,20 +405,12 @@
         <span class="ident">shadow_database_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
-    <span class="doccomment">/// Runs a single SQL script.</span>
-    <span class="kw">fn</span> <span class="ident">run_query_script</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>;
-
     <span class="doccomment">/// Receive and validate connector params.</span>
     <span class="kw">fn</span> <span class="ident">set_params</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">connector_params</span>: <span class="ident">ConnectorParams</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 
-    <span class="doccomment">/// Table to store applied migrations, the name part.</span>
-    <span class="kw">fn</span> <span class="ident">migrations_table_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="string">&quot;_prisma_migrations&quot;</span>
-    }
-
     <span class="doccomment">/// Table to store applied migrations.</span>
     <span class="kw">fn</span> <span class="ident">migrations_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">migrations_table_name</span>().<span class="ident">into</span>()
+        <span class="ident"><span class="kw">crate</span>::MIGRATIONS_TABLE_NAME</span>.<span class="ident">into</span>()
     }
 
     <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>;

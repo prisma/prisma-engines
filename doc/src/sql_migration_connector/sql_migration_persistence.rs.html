@@ -224,7 +224,7 @@
 
             <span class="kw">if</span> <span class="ident">schema</span>
                 .<span class="ident">table_walkers</span>()
-                .<span class="ident">any</span>(<span class="op">|</span><span class="ident">table</span><span class="op">|</span> <span class="ident">table</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="self">self</span>.<span class="ident">flavour</span>().<span class="ident">migrations_table_name</span>())
+                .<span class="ident">any</span>(<span class="op">|</span><span class="ident">table</span><span class="op">|</span> <span class="ident">table</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident"><span class="kw">crate</span>::MIGRATIONS_TABLE_NAME</span>)
             {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
             }
