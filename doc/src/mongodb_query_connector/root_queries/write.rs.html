@@ -416,6 +416,69 @@
 <span id="411">411</span>
 <span id="412">412</span>
 <span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">error::DecorateErrorWithFieldInformationExtension</span>,
@@ -434,6 +497,7 @@
 };
 <span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">ModelRef</span>, <span class="ident">PrismaValue</span>, <span class="ident">SelectionResult</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">convert::TryInto</span>};
+<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">info_span</span>, <span class="ident">Instrument</span>};
 <span class="kw">use</span> <span class="ident">update::IntoUpdateDocumentExtension</span>;
 
 <span class="doccomment">/// Create a single record to the database resulting in a</span>
@@ -445,6 +509,13 @@
     <span class="kw-2">mut</span> <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
 ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">coll</span> <span class="op">=</span> <span class="ident">database</span>.<span class="ident">collection</span>::<span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>(<span class="ident">model</span>.<span class="ident">db_name</span>());
+
+    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(
+        <span class="string">&quot;prisma:db_query&quot;</span>,
+        <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>,
+        <span class="string">&quot;db.statement&quot;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;db.{}.insertOne(*)&quot;</span>, <span class="ident">coll</span>.<span class="ident">name</span>())
+    );
+
     <span class="kw">let</span> <span class="ident">id_field</span> <span class="op">=</span> <span class="ident">pick_singular_id</span>(<span class="ident">model</span>);
 
     <span class="comment">// Fields to write to the document.</span>
@@ -475,7 +546,9 @@
 
     <span class="ident">logger::log_insert_one</span>(<span class="ident">coll</span>.<span class="ident">name</span>(), <span class="kw-2">&amp;</span><span class="ident">doc</span>);
 
-    <span class="kw">let</span> <span class="ident">insert_result</span> <span class="op">=</span> <span class="ident">metrics</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">coll</span>.<span class="ident">insert_one_with_session</span>(<span class="ident">doc</span>, <span class="prelude-val">None</span>, <span class="ident">session</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">insert_result</span> <span class="op">=</span> <span class="ident">metrics</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">coll</span>.<span class="ident">insert_one_with_session</span>(<span class="ident">doc</span>, <span class="prelude-val">None</span>, <span class="ident">session</span>))
+        .<span class="ident">instrument</span>(<span class="ident">span</span>)
+        .<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">id_value</span> <span class="op">=</span> <span class="ident">value_from_bson</span>(<span class="ident">insert_result</span>.<span class="ident">inserted_id</span>, <span class="kw-2">&amp;</span><span class="ident">id_meta</span>)<span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(<span class="ident">SelectionResult::from</span>((<span class="ident">id_field</span>, <span class="ident">id_value</span>)))
@@ -489,6 +562,13 @@
     <span class="ident">skip_duplicates</span>: <span class="ident">bool</span>,
 ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">coll</span> <span class="op">=</span> <span class="ident">database</span>.<span class="ident">collection</span>::<span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>(<span class="ident">model</span>.<span class="ident">db_name</span>());
+
+    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(
+        <span class="string">&quot;prisma:db_query&quot;</span>,
+        <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>,
+        <span class="string">&quot;db.statement&quot;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;db.{}.insertMany(*)&quot;</span>, <span class="ident">coll</span>.<span class="ident">name</span>())
+    );
+
     <span class="kw">let</span> <span class="ident">num_records</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">len</span>();
     <span class="kw">let</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">non_relational</span>();
 
@@ -520,7 +600,7 @@
 
     <span class="ident">logger::log_insert_many</span>(<span class="ident">coll</span>.<span class="ident">name</span>(), <span class="kw-2">&amp;</span><span class="ident">docs</span>, <span class="ident">ordered</span>);
 
-    <span class="kw">let</span> <span class="ident">insert</span> <span class="op">=</span> <span class="ident">metrics</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">coll</span>.<span class="ident">insert_many_with_session</span>(<span class="ident">docs</span>, <span class="ident">options</span>, <span class="ident">session</span>));
+    <span class="kw">let</span> <span class="ident">insert</span> <span class="op">=</span> <span class="ident">metrics</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">coll</span>.<span class="ident">insert_many_with_session</span>(<span class="ident">docs</span>, <span class="ident">options</span>, <span class="ident">session</span>)).<span class="ident">instrument</span>(<span class="ident">span</span>);
 
     <span class="kw">match</span> <span class="ident">insert</span>.<span class="kw">await</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">insert_result</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">insert_result</span>.<span class="ident">inserted_ids</span>.<span class="ident">len</span>()),
@@ -565,12 +645,18 @@
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>
     } <span class="kw">else</span> {
         <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">convert_filter</span>(<span class="ident">record_filter</span>.<span class="ident">filter</span>, <span class="bool-val">false</span>, <span class="ident">FilterPrefix::default</span>())<span class="question-mark">?</span>;
-        <span class="ident">find_ids</span>(<span class="ident">coll</span>.<span class="ident">clone</span>(), <span class="ident">session</span>, <span class="ident">model</span>, <span class="ident">filter</span>).<span class="kw">await</span><span class="question-mark">?</span>
+        <span class="ident">find_ids</span>(<span class="ident">database</span>, <span class="ident">coll</span>.<span class="ident">clone</span>(), <span class="ident">session</span>, <span class="ident">model</span>, <span class="ident">filter</span>).<span class="kw">await</span><span class="question-mark">?</span>
     };
 
     <span class="kw">if</span> <span class="ident">ids</span>.<span class="ident">is_empty</span>() {
         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[]);
     }
+
+    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(
+        <span class="string">&quot;prisma:db_query&quot;</span>,
+        <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>,
+        <span class="string">&quot;db.statement&quot;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;db.{}.updateMany(*)&quot;</span>, <span class="ident">coll</span>.<span class="ident">name</span>())
+    );
 
     <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="macro">doc!</span> { <span class="ident">id_field</span>.<span class="ident">db_name</span>(): { <span class="string">&quot;$in&quot;</span>: <span class="ident">ids</span>.<span class="ident">clone</span>() } };
     <span class="kw">let</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">model</span>
@@ -593,7 +679,9 @@
 
     <span class="kw">if</span> <span class="op">!</span><span class="ident">update_docs</span>.<span class="ident">is_empty</span>() {
         <span class="ident">logger::log_update_many_vec</span>(<span class="ident">coll</span>.<span class="ident">name</span>(), <span class="kw-2">&amp;</span><span class="ident">filter</span>, <span class="kw-2">&amp;</span><span class="ident">update_docs</span>);
-        <span class="ident">metrics</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">coll</span>.<span class="ident">update_many_with_session</span>(<span class="ident">filter</span>, <span class="ident">update_docs</span>, <span class="prelude-val">None</span>, <span class="ident">session</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="ident">metrics</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">coll</span>.<span class="ident">update_many_with_session</span>(<span class="ident">filter</span>, <span class="ident">update_docs</span>, <span class="prelude-val">None</span>, <span class="ident">session</span>))
+            .<span class="ident">instrument</span>(<span class="ident">span</span>)
+            .<span class="kw">await</span><span class="question-mark">?</span>;
     }
 
     <span class="kw">let</span> <span class="ident">ids</span> <span class="op">=</span> <span class="ident">ids</span>
@@ -629,27 +717,44 @@
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>
     } <span class="kw">else</span> {
         <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">convert_filter</span>(<span class="ident">record_filter</span>.<span class="ident">filter</span>, <span class="bool-val">false</span>, <span class="ident">FilterPrefix::default</span>())<span class="question-mark">?</span>;
-        <span class="ident">find_ids</span>(<span class="ident">coll</span>.<span class="ident">clone</span>(), <span class="ident">session</span>, <span class="ident">model</span>, <span class="ident">filter</span>).<span class="kw">await</span><span class="question-mark">?</span>
+        <span class="ident">find_ids</span>(<span class="ident">database</span>, <span class="ident">coll</span>.<span class="ident">clone</span>(), <span class="ident">session</span>, <span class="ident">model</span>, <span class="ident">filter</span>).<span class="kw">await</span><span class="question-mark">?</span>
     };
 
     <span class="kw">if</span> <span class="ident">ids</span>.<span class="ident">is_empty</span>() {
         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="number">0</span>);
     }
 
+    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(
+        <span class="string">&quot;prisma:db_query&quot;</span>,
+        <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>,
+        <span class="string">&quot;db.statement&quot;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;db.{}.deleteMany(*)&quot;</span>, <span class="ident">coll</span>.<span class="ident">name</span>())
+    );
+
     <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="macro">doc!</span> { <span class="ident">id_field</span>.<span class="ident">db_name</span>(): { <span class="string">&quot;$in&quot;</span>: <span class="ident">ids</span> } };
     <span class="ident">logger::log_delete_many</span>(<span class="ident">coll</span>.<span class="ident">name</span>(), <span class="kw-2">&amp;</span><span class="ident">filter</span>);
-    <span class="kw">let</span> <span class="ident">delete_result</span> <span class="op">=</span> <span class="ident">metrics</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">coll</span>.<span class="ident">delete_many_with_session</span>(<span class="ident">filter</span>, <span class="prelude-val">None</span>, <span class="ident">session</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">delete_result</span> <span class="op">=</span> <span class="ident">metrics</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">coll</span>.<span class="ident">delete_many_with_session</span>(<span class="ident">filter</span>, <span class="prelude-val">None</span>, <span class="ident">session</span>))
+        .<span class="ident">instrument</span>(<span class="ident">span</span>)
+        .<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(<span class="ident">delete_result</span>.<span class="ident">deleted_count</span> <span class="kw">as</span> <span class="ident">usize</span>)
 }
 
 <span class="doccomment">/// Retrives document ids based on the given filter.</span>
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">find_ids</span>(
+    <span class="ident">database</span>: <span class="kw-2">&amp;</span><span class="ident">Database</span>,
     <span class="ident">collection</span>: <span class="ident">Collection</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>,
     <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
     <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
     <span class="ident">filter</span>: <span class="ident">MongoFilter</span>,
 ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">coll</span> <span class="op">=</span> <span class="ident">database</span>.<span class="ident">collection</span>::<span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>(<span class="ident">model</span>.<span class="ident">db_name</span>());
+
+    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(
+        <span class="string">&quot;prisma:db_query&quot;</span>,
+        <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>,
+        <span class="string">&quot;db.statement&quot;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;db.{}.findMany(*)&quot;</span>, <span class="ident">coll</span>.<span class="ident">name</span>())
+    );
+
     <span class="kw">let</span> <span class="ident">id_field</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_identifier</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">MongoReadQueryBuilder::new</span>(<span class="ident">model</span>.<span class="ident">clone</span>());
 
@@ -664,7 +769,7 @@
 
     <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">with_model_projection</span>(<span class="ident">id_field</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">build</span>()<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">docs</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">execute</span>(<span class="ident">collection</span>, <span class="ident">session</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">docs</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">execute</span>(<span class="ident">collection</span>, <span class="ident">session</span>).<span class="ident">instrument</span>(<span class="ident">span</span>).<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">ids</span> <span class="op">=</span> <span class="ident">docs</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">doc</span><span class="op">|</span> <span class="ident">doc</span>.<span class="ident">remove</span>(<span class="string">&quot;_id&quot;</span>).<span class="ident">unwrap</span>()).<span class="ident">collect</span>();
 
     <span class="prelude-val">Ok</span>(<span class="ident">ids</span>)
@@ -792,42 +897,63 @@
     <span class="ident">inputs</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     <span class="ident">query_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">db_statement</span> <span class="op">=</span> <span class="ident">get_raw_db_statement</span>(<span class="kw-2">&amp;</span><span class="ident">query_type</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>, <span class="ident">database</span>);
+    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(
+        <span class="string">&quot;prisma:db_query&quot;</span>,
+        <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>,
+        <span class="string">&quot;db.statement&quot;</span> <span class="op">=</span> <span class="op">&amp;&amp;</span><span class="ident">db_statement</span>.<span class="ident">as_str</span>()
+    );
+
     <span class="kw">let</span> <span class="ident">mongo_command</span> <span class="op">=</span> <span class="ident">MongoCommand::from_raw_query</span>(<span class="ident">model</span>, <span class="ident">inputs</span>, <span class="ident">query_type</span>)<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">json_result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">mongo_command</span> {
-        <span class="ident">MongoCommand::Raw</span> { <span class="ident">cmd</span> } =&gt; {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">metrics</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">database</span>.<span class="ident">run_command_with_session</span>(<span class="ident">cmd</span>, <span class="prelude-val">None</span>, <span class="ident">session</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">async</span> {
+        <span class="kw">let</span> <span class="ident">json_result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">mongo_command</span> {
+            <span class="ident">MongoCommand::Raw</span> { <span class="ident">cmd</span> } =&gt; {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">metrics</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">database</span>.<span class="ident">run_command_with_session</span>(<span class="ident">cmd</span>, <span class="prelude-val">None</span>, <span class="ident">session</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
 
-            <span class="comment">// Removes unnecessary properties from raw response</span>
-            <span class="comment">// See https://docs.mongodb.com/v5.0/reference/method/db.runCommand</span>
-            <span class="ident">result</span>.<span class="ident">remove</span>(<span class="string">&quot;operationTime&quot;</span>);
-            <span class="ident">result</span>.<span class="ident">remove</span>(<span class="string">&quot;$clusterTime&quot;</span>);
-            <span class="ident">result</span>.<span class="ident">remove</span>(<span class="string">&quot;opTime&quot;</span>);
-            <span class="ident">result</span>.<span class="ident">remove</span>(<span class="string">&quot;electionId&quot;</span>);
+                <span class="comment">// Removes unnecessary properties from raw response</span>
+                <span class="comment">// See https://docs.mongodb.com/v5.0/reference/method/db.runCommand</span>
+                <span class="ident">result</span>.<span class="ident">remove</span>(<span class="string">&quot;operationTime&quot;</span>);
+                <span class="ident">result</span>.<span class="ident">remove</span>(<span class="string">&quot;$clusterTime&quot;</span>);
+                <span class="ident">result</span>.<span class="ident">remove</span>(<span class="string">&quot;opTime&quot;</span>);
+                <span class="ident">result</span>.<span class="ident">remove</span>(<span class="string">&quot;electionId&quot;</span>);
 
-            <span class="kw">let</span> <span class="ident">json_result</span>: <span class="ident">serde_json::Value</span> <span class="op">=</span> <span class="ident">Bson::Document</span>(<span class="ident">result</span>).<span class="ident">into</span>();
+                <span class="kw">let</span> <span class="ident">json_result</span>: <span class="ident">serde_json::Value</span> <span class="op">=</span> <span class="ident">Bson::Document</span>(<span class="ident">result</span>).<span class="ident">into</span>();
 
-            <span class="ident">json_result</span>
-        }
-        <span class="ident">MongoCommand::Handled</span> { <span class="ident">collection</span>, <span class="ident">operation</span> } =&gt; {
-            <span class="kw">let</span> <span class="ident">coll</span> <span class="op">=</span> <span class="ident">database</span>.<span class="ident">collection</span>::<span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>(<span class="ident">collection</span>.<span class="ident">as_str</span>());
+                <span class="ident">json_result</span>
+            }
+            <span class="ident">MongoCommand::Handled</span> { <span class="ident">collection</span>, <span class="ident">operation</span> } =&gt; {
+                <span class="kw">let</span> <span class="ident">coll</span> <span class="op">=</span> <span class="ident">database</span>.<span class="ident">collection</span>::<span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>(<span class="ident">collection</span>.<span class="ident">as_str</span>());
 
-            <span class="kw">match</span> <span class="ident">operation</span> {
-                <span class="ident">MongoOperation::Find</span>(<span class="ident">filter</span>, <span class="ident">options</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">coll</span>.<span class="ident">find_with_session</span>(<span class="ident">filter</span>, <span class="ident">options</span>, <span class="ident">session</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">match</span> <span class="ident">operation</span> {
+                    <span class="ident">MongoOperation::Find</span>(<span class="ident">filter</span>, <span class="ident">options</span>) =&gt; {
+                        <span class="kw">let</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">coll</span>.<span class="ident">find_with_session</span>(<span class="ident">filter</span>, <span class="ident">options</span>, <span class="ident">session</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-                    <span class="ident">raw::cursor_to_json</span>(<span class="ident">cursor</span>, <span class="ident">session</span>).<span class="kw">await</span><span class="question-mark">?</span>
-                }
-                <span class="ident">MongoOperation::Aggregate</span>(<span class="ident">pipeline</span>, <span class="ident">options</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">coll</span>.<span class="ident">aggregate_with_session</span>(<span class="ident">pipeline</span>, <span class="ident">options</span>, <span class="ident">session</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                        <span class="ident">raw::cursor_to_json</span>(<span class="ident">cursor</span>, <span class="ident">session</span>).<span class="kw">await</span><span class="question-mark">?</span>
+                    }
+                    <span class="ident">MongoOperation::Aggregate</span>(<span class="ident">pipeline</span>, <span class="ident">options</span>) =&gt; {
+                        <span class="kw">let</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">coll</span>.<span class="ident">aggregate_with_session</span>(<span class="ident">pipeline</span>, <span class="ident">options</span>, <span class="ident">session</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-                    <span class="ident">raw::cursor_to_json</span>(<span class="ident">cursor</span>, <span class="ident">session</span>).<span class="kw">await</span><span class="question-mark">?</span>
+                        <span class="ident">raw::cursor_to_json</span>(<span class="ident">cursor</span>, <span class="ident">session</span>).<span class="kw">await</span><span class="question-mark">?</span>
+                    }
                 }
             }
-        }
-    };
+        };
+        <span class="prelude-val">Ok</span>(<span class="ident">json_result</span>)
+    }
+    .<span class="ident">instrument</span>(<span class="ident">span</span>)
+    .<span class="kw">await</span>
+}
 
-    <span class="prelude-val">Ok</span>(<span class="ident">json_result</span>)
+<span class="kw">fn</span> <span class="ident">get_raw_db_statement</span>(<span class="ident">query_type</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ModelRef</span><span class="op">&gt;</span>, <span class="ident">database</span>: <span class="kw-2">&amp;</span><span class="ident">Database</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">match</span> (<span class="ident">query_type</span>.<span class="ident">as_deref</span>(), <span class="ident">model</span>) {
+        (<span class="prelude-val">Some</span>(<span class="string">&quot;findRaw&quot;</span>), <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; <span class="macro">format!</span>(<span class="string">&quot;db.{}.findRaw(*)&quot;</span>, <span class="ident">database</span>.<span class="ident">collection</span>::<span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>(<span class="ident">m</span>.<span class="ident">db_name</span>()).<span class="ident">name</span>()),
+        (<span class="prelude-val">Some</span>(<span class="string">&quot;aggregateRaw&quot;</span>), <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; <span class="macro">format!</span>(
+            <span class="string">&quot;db.{}.aggregateRaw(*)&quot;</span>,
+            <span class="ident">database</span>.<span class="ident">collection</span>::<span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>(<span class="ident">m</span>.<span class="ident">db_name</span>()).<span class="ident">name</span>()
+        ),
+        <span class="kw">_</span> =&gt; <span class="string">&quot;db.runCommandRaw(*)&quot;</span>.<span class="ident">to_string</span>(),
+    }
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
