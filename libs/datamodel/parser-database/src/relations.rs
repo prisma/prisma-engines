@@ -411,8 +411,6 @@ pub(super) fn ingest_relation<'db>(evidence: RelationEvidence<'db>, relations: &
 pub enum ReferentialAction {
     /// Deletes record if dependent record is deleted. Updates relation scalar
     /// fields if referenced scalar fields of the dependent record are updated.
-    /// Prevents operation (both updates and deletes) from succeeding if any
-    /// records are connected.
     Cascade,
     /// Prevents operation (both updates and deletes) from succeeding if any
     /// records are connected. This behavior will always result in a runtime
