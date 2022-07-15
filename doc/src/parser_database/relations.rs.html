@@ -467,8 +467,6 @@
 <span id="462">462</span>
 <span id="463">463</span>
 <span id="464">464</span>
-<span id="465">465</span>
-<span id="466">466</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">interner::StringId</span>,
@@ -882,8 +880,6 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ReferentialAction</span> {
     <span class="doccomment">/// Deletes record if dependent record is deleted. Updates relation scalar</span>
     <span class="doccomment">/// fields if referenced scalar fields of the dependent record are updated.</span>
-    <span class="doccomment">/// Prevents operation (both updates and deletes) from succeeding if any</span>
-    <span class="doccomment">/// records are connected.</span>
     <span class="ident">Cascade</span>,
     <span class="doccomment">/// Prevents operation (both updates and deletes) from succeeding if any</span>
     <span class="doccomment">/// records are connected. This behavior will always result in a runtime</span>
