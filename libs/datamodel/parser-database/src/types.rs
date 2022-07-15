@@ -119,7 +119,7 @@ impl ScalarFieldType {
         matches!(self, Self::BuiltInScalar(ScalarType::Json))
     }
 
-    /// True if the field's type is Json.
+    /// True if the field's type is String.
     pub fn is_string(self) -> bool {
         matches!(self, Self::BuiltInScalar(ScalarType::String))
     }
