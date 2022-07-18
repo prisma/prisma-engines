@@ -203,8 +203,6 @@
 <span id="198">198</span>
 <span id="199">199</span>
 <span id="200">200</span>
-<span id="201">201</span>
-<span id="202">202</span>
 </pre><pre class="rust"><code><span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
 
 <span class="kw">use</span> <span class="ident">proc_macro::TokenStream</span>;
@@ -284,7 +282,6 @@
                 <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">test_setup::TestApiArgs::new</span>(#<span class="ident">test_function_name_lit</span>, <span class="kw-2">&amp;</span>[#(#<span class="ident">preview_features</span>,)<span class="kw-2">*</span>]);
 
                 <span class="kw">if</span> <span class="ident">test_setup::should_skip_test</span>(
-                    <span class="kw-2">&amp;</span><span class="ident">args</span>,
                     <span class="ident">BitFlags::empty</span>() #(<span class="op">|</span> <span class="ident">Tags</span>::#<span class="ident">include_tagged</span>)<span class="kw-2">*</span>,
                     <span class="ident">BitFlags::empty</span>() #(<span class="op">|</span> <span class="ident">Tags</span>::#<span class="ident">exclude_tagged</span>)<span class="kw-2">*</span>,
                     <span class="ident">BitFlags::empty</span>() #(<span class="op">|</span> <span class="ident">Capabilities</span>::#<span class="ident">capabilities</span>)<span class="kw-2">*</span>,
@@ -306,7 +303,6 @@
                 <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">test_setup::TestApiArgs::new</span>(#<span class="ident">test_function_name_lit</span>, <span class="kw-2">&amp;</span>[#(#<span class="ident">preview_features</span>,)<span class="kw-2">*</span>]);
 
                 <span class="kw">if</span> <span class="ident">test_setup::should_skip_test</span>(
-                    <span class="kw-2">&amp;</span><span class="ident">args</span>,
                     <span class="ident">BitFlags::empty</span>() #(<span class="op">|</span> <span class="ident">Tags</span>::#<span class="ident">include_tagged</span>)<span class="kw-2">*</span>,
                     <span class="ident">BitFlags::empty</span>() #(<span class="op">|</span> <span class="ident">Tags</span>::#<span class="ident">exclude_tagged</span>)<span class="kw-2">*</span>,
                     <span class="ident">BitFlags::empty</span>() #(<span class="op">|</span> <span class="ident">Capabilities</span>::#<span class="ident">capabilities</span>)<span class="kw-2">*</span>,
