@@ -23,6 +23,10 @@ use tiberius::*;
 use tokio::net::TcpStream;
 use tokio_util::compat::{Compat, TokioAsyncWriteCompatExt};
 
+/// The underlying SQL Server driver. Only available with the `expose-drivers` Cargo feature.
+#[cfg(feature = "expose-drivers")]
+pub use tiberius;
+
 /// Wraps a connection url and exposes the parsing logic used by Quaint,
 /// including default values.
 #[derive(Debug, Clone)]
