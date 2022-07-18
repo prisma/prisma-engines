@@ -108,6 +108,7 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
         })
         .collect();
 
+    // TODO: problem 1, remove the index.fields.len limitation (this conflicts with @@unique([location.address]))
     // @@unique compound fields.
     let compound_unique_fields: Vec<InputField> = model
         .unique_indexes()

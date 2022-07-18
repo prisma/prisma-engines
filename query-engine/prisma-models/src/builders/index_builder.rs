@@ -1,18 +1,18 @@
-use crate::{Index, IndexType, ScalarFieldRef, ScalarFieldWeak};
+use crate::{Field, Index, IndexType, ScalarFieldRef, ScalarFieldWeak};
 use std::sync::Arc;
 
 #[derive(Debug)]
 pub struct IndexBuilder {
     pub name: Option<String>,
-    pub fields: Vec<String>,
+    pub field_paths: Vec<Vec<String>>,
     pub typ: IndexType,
 }
 
 impl IndexBuilder {
-    pub fn build(self, fields: &[ScalarFieldRef]) -> Index {
+    pub fn build(self, all_fields: &[Field]) -> Index {
         let fields = match self.typ {
-            IndexType::Unique => Self::map_fields(self.fields, fields),
-            IndexType::Normal => Self::map_fields(self.fields, fields),
+            IndexType::Unique => Self::map_fields(self.field_paths, all_fields),
+            IndexType::Normal => Self::map_fields(self.field_paths, all_fields),
         };
 
         Index {
@@ -22,17 +22,36 @@ impl IndexBuilder {
         }
     }
 
-    fn map_fields(field_names: Vec<String>, fields: &[ScalarFieldRef]) -> Vec<ScalarFieldWeak> {
-        field_names
+    fn map_fields(field_paths: Vec<Vec<String>>, all_fields: &[Field]) -> Vec<ScalarFieldWeak> {
+        field_paths
             .into_iter()
-            .map(|name| {
-                let field = fields
-                    .iter()
-                    .find(|sf| sf.name == name)
-                    .unwrap_or_else(|| panic!("Unable to resolve field '{}'", name));
+            .map(|path| {
+                let field = if path.len() == 1 {
+                    let name = path.first().unwrap();
+                    all_fields.into_iter()
+                        .find(|&f| f.name() == name)
+                        .map(|f| f.clone())
+                        .and_then(|f| f.into_scalar())
+                } else {
+                    find_scalar_in_composite_fields(path.as_slice(), &all_fields)
+                }.unwrap_or_else(|| panic!("Unable to resolve field path '{}'", path.join(".")));
 
-                Arc::downgrade(field)
+                Arc::downgrade(&field)
             })
             .collect()
     }
+}
+
+fn find_scalar_in_composite_fields(path: &[String], fields: &[Field]) -> Option<ScalarFieldRef> {
+    let name = path.first();
+    if let Some(field) = fields.iter().find(|f| f.name() == name.unwrap()) {
+        match (path, field) {
+            ([_], Field::Composite(_)) => None,
+            ([_], Field::Scalar(field_ref)) => Some(field_ref.clone()),
+            (_, Field::Composite(field_ref)) => {
+                find_scalar_in_composite_fields(&path[1..], &field_ref.typ.fields())
+            },
+            (_, _) => None
+        }
+    } else { None }
 }

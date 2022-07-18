@@ -11,6 +11,7 @@ use crate::{
 use datamodel::dml::{self, CompositeTypeFieldType, Datamodel, Ignorable, WithDatabaseName};
 use once_cell::sync::OnceCell;
 use std::sync::Arc;
+use itertools::Itertools;
 
 #[derive(Debug, Default)]
 pub struct InternalDataModelBuilder {
@@ -63,6 +64,7 @@ impl InternalDataModelBuilder {
 
         internal_data_model.relations.set(relations).unwrap();
         internal_data_model.finalize();
+
         internal_data_model
     }
 }
@@ -220,23 +222,23 @@ fn index_builders(model: &dml::Model) -> Vec<IndexBuilder> {
     model
         .indices
         .iter()
-        .filter(|i| i.fields.len() > 1 && model.is_compound_index_supported(i)) // @@unique for 1 field are transformed to is_unique instead
-        .filter(|i| i.fields.iter().all(|f| f.path.len() <= 1)) // TODO: we do not take indices with composite fields for now
-        .map(|i| IndexBuilder {
-            name: i.name.clone(),
-            fields: i
+        .filter(|i| model.is_compound_index_supported(i))
+        .map(|idx| IndexBuilder {
+            name: idx.name.clone(),
+            field_paths: idx
                 .fields
                 .clone()
                 .into_iter()
-                .map(|mut f| f.path.pop().unwrap().0)
+                .map(|f| f.path.iter().map(|p| p.0.clone()).collect_vec())
                 .collect(),
-            typ: match i.tpe {
+            typ: match idx.tpe {
                 dml::IndexType::Unique => IndexType::Unique,
                 dml::IndexType::Normal => IndexType::Normal,
                 // TODO: When introducing the indexes in QE, change this.
                 dml::IndexType::Fulltext => IndexType::Normal,
             },
         })
+        .filter(|builder| builder.field_paths.clone().into_iter().any(|p| p.len() > 1))
         .collect()
 }
 
