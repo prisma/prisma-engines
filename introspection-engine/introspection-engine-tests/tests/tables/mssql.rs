@@ -4,7 +4,7 @@ use introspection_engine_tests::test_api::*;
 #[test_connector(tags(Mssql))]
 async fn default_values(api: &TestApi) -> TestResult {
     let setup = r#"
-        CREATE TABLE [default_values].[Test] (
+        CREATE TABLE [dbo].[Test] (
             id INTEGER,
 
             string_static_char CHAR(5) CONSTRAINT [charconstraint] DEFAULT 'test',
@@ -41,9 +41,8 @@ async fn default_values(api: &TestApi) -> TestResult {
 
 #[test_connector(tags(Mssql))]
 async fn negative_default_values_should_work(api: &TestApi) -> TestResult {
-    let setup = format!(
-        r#"
-        CREATE TABLE [{schema_name}].[Blog] (
+    let setup = r#"
+        CREATE TABLE [Blog] (
             id INTEGER IDENTITY,
 
             int INTEGER CONSTRAINT [intdefault] DEFAULT 1,
@@ -54,12 +53,10 @@ async fn negative_default_values_should_work(api: &TestApi) -> TestResult {
             neg_big_int BIGINT CONSTRAINT [neg_bigint_def] DEFAULT -3,
 
             CONSTRAINT [Blog_pkey] PRIMARY KEY (id)
-        );
-        "#,
-        schema_name = api.schema_name()
-    );
+        )
+        "#;
 
-    api.raw_cmd(&setup).await;
+    api.raw_cmd(setup).await;
 
     let expectation = expect![[r#"
         model Blog {
