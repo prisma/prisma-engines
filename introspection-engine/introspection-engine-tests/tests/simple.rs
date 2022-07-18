@@ -33,7 +33,7 @@ fn run_simple_test(test_file_path: &str, test_function_name: &'static str) {
 
     let test_api_args = TestApiArgs::new(test_function_name, &[]);
 
-    if test_setup::should_skip_test(&test_api_args, tags, excluded, Default::default()) {
+    if test_setup::should_skip_test(tags, excluded, Default::default()) {
         return;
     }
 
