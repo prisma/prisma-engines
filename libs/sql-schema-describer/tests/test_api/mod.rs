@@ -117,12 +117,7 @@ impl TestApi {
     }
 
     pub(crate) fn schema_name(&self) -> &str {
-        match self.sql_family() {
-            // It is not possible to connect to a specific schema in MSSQL. The
-            // user has a dedicated schema from the admin, that's all.
-            SqlFamily::Mssql => self.db_name(),
-            _ => self.database.connection_info().schema_name(),
-        }
+        self.database.connection_info().schema_name()
     }
 
     #[track_caller]

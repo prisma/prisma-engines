@@ -153,31 +153,14 @@ fn soft_resets_work_on_sql_server(api: TestApi) {
     {
         let mut engine = api.new_engine_with_connection_strings(test_user_connection_string, None);
 
-        let create_schema = format!("CREATE SCHEMA [{}];", engine.schema_name());
-        engine.raw_cmd(&create_schema);
-
         engine
             .apply_migrations(&migrations_directory)
             .send_sync()
             .assert_applied_migrations(&["01init"]);
 
-        let add_view = format!(
-            r#"CREATE VIEW [{0}].[catcat] AS SELECT * FROM [{0}].[Cat]"#,
-            engine.schema_name(),
-        );
-
-        engine.raw_cmd(&add_view);
-
-        let add_type = format!(r#"CREATE TYPE [{0}].[Litter] FROM int"#, engine.schema_name(),);
-
-        engine.raw_cmd(&add_type);
-
-        let add_table_with_type = format!(
-            r#"CREATE TABLE [{0}].specialLitter (id int primary key, litterAmount [{0}].Litter)"#,
-            engine.schema_name()
-        );
-
-        engine.raw_cmd(&add_table_with_type);
+        engine.raw_cmd("CREATE TYPE [dbo].[Litter] FROM int;");
+        engine.raw_cmd("CREATE VIEW [dbo].[catcat] AS (SELECT * FROM [dbo].[Cat]);");
+        engine.raw_cmd(r#"CREATE TABLE [dbo].specialLitter (id int primary key, litterAmount [dbo].[Litter]);"#);
 
         engine
             .assert_schema()

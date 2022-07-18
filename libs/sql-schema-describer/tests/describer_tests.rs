@@ -122,7 +122,7 @@ fn names_with_hyphens_must_work(api: TestApi) {
     });
 }
 
-#[test_connector]
+#[test_connector(exclude(Mssql))]
 fn composite_primary_keys_must_work(api: TestApi) {
     let sql = match api.sql_family() {
         SqlFamily::Mysql => format!(
@@ -132,14 +132,6 @@ fn composite_primary_keys_must_work(api: TestApi) {
                 PRIMARY KEY(id, name)
             )",
             api.db_name()
-        ),
-        SqlFamily::Mssql => format!(
-            "CREATE TABLE [{}].[User] (
-                [id] INT NOT NULL,
-                [name] VARCHAR(255) NOT NULL,
-                CONSTRAINT [PK_User] PRIMARY KEY ([id], [name])
-            )",
-            api.schema_name(),
         ),
         _ => format!(
             "CREATE TABLE \"{0}\".\"User\" (

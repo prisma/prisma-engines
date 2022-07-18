@@ -3,8 +3,7 @@ use std::{env, fs, io::Write as _, path};
 const ROOT_DIR: &str = "tests/simple";
 
 fn main() {
-    println!("cargo:rerun-if-changed={}", ROOT_DIR);
-    println!("cargo:rerun-if-changed={}", file!());
+    println!("cargo:rerun-if-changed={ROOT_DIR}");
 
     let mut all_sql_files = Vec::new();
     find_all_sql_files("", &mut all_sql_files);
