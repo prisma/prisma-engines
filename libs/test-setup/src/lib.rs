@@ -27,22 +27,22 @@ pub use test_api_args::{DatasourceBlock, TestApiArgs};
 type AnyError = Box<dyn std::error::Error + Send + Sync + 'static>;
 
 pub fn should_skip_test(
-    args: &TestApiArgs,
     include_tagged: BitFlags<Tags>,
     exclude_tags: BitFlags<Tags>,
     capabilities: BitFlags<Capabilities>,
 ) -> bool {
-    if !capabilities.is_empty() && !args.capabilities().contains(capabilities) {
+    let db = test_api_args::db_under_test();
+    if !capabilities.is_empty() && !db.capabilities.contains(capabilities) {
         println!("Test skipped");
         return true;
     }
 
-    if !include_tagged.is_empty() && !include_tagged.intersects(args.tags()) {
+    if !include_tagged.is_empty() && !include_tagged.intersects(db.tags) {
         println!("Test skipped");
         return true;
     }
 
-    if exclude_tags.intersects(args.tags()) {
+    if exclude_tags.intersects(db.tags) {
         println!("Test skipped");
         return true;
     }

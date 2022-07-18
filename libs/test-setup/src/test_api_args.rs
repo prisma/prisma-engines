@@ -6,11 +6,11 @@ use std::{fmt::Display, io::Write as _};
 
 #[derive(Debug)]
 pub(crate) struct DbUnderTest {
-    capabilities: BitFlags<Capabilities>,
+    pub(crate) capabilities: BitFlags<Capabilities>,
     database_url: String,
     shadow_database_url: Option<String>,
     provider: &'static str,
-    tags: BitFlags<Tags>,
+    pub(crate) tags: BitFlags<Tags>,
 }
 
 const MISSING_TEST_DATABASE_URL_MSG: &str = r#"
