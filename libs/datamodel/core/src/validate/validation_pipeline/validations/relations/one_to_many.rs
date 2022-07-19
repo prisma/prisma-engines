@@ -1,6 +1,9 @@
 use super::*;
 use crate::{diagnostics::DatamodelError, validate::validation_pipeline::context::Context};
-use parser_database::walkers::{InlineRelationWalker, RelationFieldWalker};
+use parser_database::{
+    ast::WithSpan,
+    walkers::{InlineRelationWalker, RelationFieldWalker},
+};
 
 /// A relation must be defined from both sides, one defining the fields, references and possible
 /// referential actions, the other side just as a list.
@@ -17,7 +20,7 @@ pub(crate) fn both_sides_are_defined(relation: InlineRelationWalker<'_>, ctx: &m
             &message,
             relation_field.model().name(),
             relation_field.name(),
-            relation_field.ast_field().span,
+            relation_field.ast_field().span(),
         ));
     };
 
@@ -48,7 +51,7 @@ pub(crate) fn fields_and_references_are_defined(relation: InlineRelationWalker<'
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
-            forward.ast_field().span,
+            forward.ast_field().span(),
         ));
     }
 
@@ -62,7 +65,7 @@ pub(crate) fn fields_and_references_are_defined(relation: InlineRelationWalker<'
                 RELATION_ATTRIBUTE_NAME
             ),
             RELATION_ATTRIBUTE_NAME,
-            forward.ast_field().span,
+            forward.ast_field().span(),
         ));
     }
 
@@ -79,7 +82,7 @@ pub(crate) fn fields_and_references_are_defined(relation: InlineRelationWalker<'
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
-            back.ast_field().span,
+            back.ast_field().span(),
         ));
     }
 }
@@ -100,7 +103,7 @@ pub(crate) fn referential_actions(relation: InlineRelationWalker<'_>, ctx: &mut 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             message,
             RELATION_ATTRIBUTE_NAME,
-            back.ast_field().span,
+            back.ast_field().span(),
         ));
     }
 }

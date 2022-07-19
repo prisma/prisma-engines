@@ -9,6 +9,7 @@ use crate::{diagnostics::DatamodelError, validate::validation_pipeline::context:
 use datamodel_connector::{walker_ext_traits::*, Connector, ConnectorCapability, ReferentialIntegrity};
 use itertools::Itertools;
 use parser_database::{
+    ast::WithSpan,
     walkers::{CompleteInlineRelationWalker, InlineRelationWalker, RelationFieldWalker},
     ScalarFieldType,
 };
@@ -41,9 +42,9 @@ pub(super) fn has_a_unique_constraint_name(
             .map(|rf| {
                 rf.ast_field()
                     .span_for_argument("relation", "map")
-                    .unwrap_or_else(|| rf.ast_field().span)
+                    .unwrap_or_else(|| rf.ast_field().span())
             })
-            .unwrap_or_else(|| relation.referenced_model().ast_model().span);
+            .unwrap_or_else(|| relation.referenced_model().ast_model().span());
 
         let message = format!(
             "The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.",
@@ -87,7 +88,7 @@ pub(super) fn field_arity(relation: InlineRelationWalker<'_>, ctx: &mut Context<
             forward_relation_field.name(),
             scalar_field_names.join(", "),
         ),
-        forward_relation_field.ast_field().span
+        forward_relation_field.ast_field().span()
     ));
 }
 
@@ -149,7 +150,7 @@ pub(super) fn references_unique_fields(relation: InlineRelationWalker<'_>, ctx: 
     ctx.push_error(DatamodelError::new_attribute_validation_error(
         &message,
         RELATION_ATTRIBUTE_NAME,
-        relation_field.ast_field().span,
+        relation_field.ast_field().span(),
     ));
 }
 
@@ -199,7 +200,7 @@ fn referencing_fields_in_correct_order(relation: InlineRelationWalker<'_>, ctx: 
             relation.referenced_model().name(),
             relation.referenced_fields().map(|f| f.name()).join(", ")
         ),
-        relation_field.ast_field().span
+        relation_field.ast_field().span()
     ));
 }
 
@@ -482,7 +483,7 @@ fn cascade_error_with_default_values(
 
     msg.push_str(" Read more at https://pris.ly/d/cyclic-referential-actions");
 
-    DatamodelError::new_validation_error(&msg, relation.referencing_field().ast_field().span)
+    DatamodelError::new_validation_error(&msg, relation.referencing_field().ast_field().span())
 }
 
 /// The types of the referencing and referenced scalar fields in a relation must be compatible.
@@ -504,7 +505,7 @@ pub(super) fn referencing_scalar_field_types(relation: InlineRelationWalker<'_>,
                     referenced.model().name(),
                 ),
                 RELATION_ATTRIBUTE_NAME,
-                relation.forward_relation_field().unwrap().ast_field().span,
+                relation.forward_relation_field().unwrap().ast_field().span(),
             ))
         }
     }

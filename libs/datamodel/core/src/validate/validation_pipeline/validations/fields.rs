@@ -23,7 +23,8 @@ pub(super) fn validate_client_name(field: FieldWalker<'_>, names: &Names<'_>, ct
                     field.name()
                 );
 
-                let error = DatamodelError::new_model_validation_error(&message, model.name(), model.ast_model().span);
+                let error =
+                    DatamodelError::new_model_validation_error(&message, model.name(), model.ast_model().span());
                 ctx.push_error(error);
             }
             NameTaken::Unique => {
@@ -32,7 +33,8 @@ pub(super) fn validate_client_name(field: FieldWalker<'_>, names: &Names<'_>, ct
                     field.name()
                 );
 
-                let error = DatamodelError::new_model_validation_error(&message, model.name(), model.ast_model().span);
+                let error =
+                    DatamodelError::new_model_validation_error(&message, model.name(), model.ast_model().span());
                 ctx.push_error(error);
             }
             NameTaken::PrimaryKey => {
@@ -41,7 +43,8 @@ pub(super) fn validate_client_name(field: FieldWalker<'_>, names: &Names<'_>, ct
                     field.name()
                 );
 
-                let error = DatamodelError::new_model_validation_error(&message, model.name(), model.ast_model().span);
+                let error =
+                    DatamodelError::new_model_validation_error(&message, model.name(), model.ast_model().span());
                 ctx.push_error(error);
             }
         }
@@ -73,7 +76,7 @@ pub(super) fn has_a_unique_default_constraint_name(
         let span = field
             .ast_field()
             .span_for_argument("default", "map")
-            .unwrap_or(field.ast_field().span);
+            .unwrap_or_else(|| field.ast_field().span());
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message, "@default", span,
@@ -242,7 +245,7 @@ pub(super) fn validate_scalar_field_connector_specific(field: ScalarFieldWalker<
                     ),
                     field.model().name(),
                     field.name(),
-                    field.ast_field().span,
+                    field.ast_field().span(),
                 ));
             }
 
@@ -255,7 +258,7 @@ pub(super) fn validate_scalar_field_connector_specific(field: ScalarFieldWalker<
                     ),
                     field.model().name(),
                     field.name(),
-                    field.ast_field().span,
+                    field.ast_field().span(),
                 ));
             }
         }
@@ -270,7 +273,7 @@ pub(super) fn validate_scalar_field_connector_specific(field: ScalarFieldWalker<
                     ),
                     field.model().name(),
                     field.name(),
-                    field.ast_field().span,
+                    field.ast_field().span(),
                 ));
             }
         }
@@ -282,7 +285,7 @@ pub(super) fn validate_scalar_field_connector_specific(field: ScalarFieldWalker<
         ctx.push_error(DatamodelError::new_scalar_list_fields_are_not_supported(
             field.model().name(),
             field.name(),
-            field.ast_field().span,
+            field.ast_field().span(),
         ));
     }
 }
@@ -319,7 +322,7 @@ pub(super) fn validate_unsupported_field_type(field: ScalarFieldWalker<'_>, ctx:
             Some(params) => params.as_str().split(',').map(|s| s.trim().to_string()).collect(),
         };
 
-        if let Ok(native_type) = connector.parse_native_type(prefix, args, field.ast_field().span) {
+        if let Ok(native_type) = connector.parse_native_type(prefix, args, field.ast_field().span()) {
             let prisma_type = connector.scalar_type_for_native_type(native_type.serialized_native_type.clone());
 
             let msg = format!(
@@ -327,7 +330,7 @@ pub(super) fn validate_unsupported_field_type(field: ScalarFieldWalker<'_>, ctx:
                         unsupported_lit, field.name(), prisma_type.as_str(), &source.name, native_type
                     );
 
-            ctx.push_error(DatamodelError::new_validation_error(&msg, field.ast_field().span));
+            ctx.push_error(DatamodelError::new_validation_error(&msg, field.ast_field().span()));
         }
     }
 }
@@ -344,7 +347,7 @@ pub(crate) fn id_supports_clustering_setting(pk: PrimaryKeyWalker<'_>, ctx: &mut
     ctx.push_error(DatamodelError::new_attribute_validation_error(
         "Defining clustering is not supported in the current connector.",
         pk.attribute_name(),
-        *pk.ast_attribute().span(),
+        pk.ast_attribute().span(),
     ));
 }
 
@@ -368,7 +371,7 @@ pub(crate) fn clustering_can_be_defined_only_once(pk: PrimaryKeyWalker<'_>, ctx:
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             "A model can only hold one clustered index or id.",
             pk.attribute_name(),
-            *pk.ast_attribute().span(),
+            pk.ast_attribute().span(),
         ));
 
         return;

@@ -1,5 +1,5 @@
 use datamodel_connector::{
-    parser_database::{walkers::IndexWalker, IndexAlgorithm, OperatorClass},
+    parser_database::{ast::WithSpan, walkers::IndexWalker, IndexAlgorithm, OperatorClass},
     walker_ext_traits::*,
     Connector, DatamodelError, Diagnostics,
 };
@@ -8,7 +8,7 @@ use native_types::PostgresType;
 pub(super) fn compatible_native_types(index: IndexWalker<'_>, connector: &dyn Connector, errors: &mut Diagnostics) {
     for field in index.fields() {
         if let Some(native_type) = field.native_type_instance(connector) {
-            let span = field.ast_field().span;
+            let span = field.ast_field().span();
             let r#type: PostgresType = serde_json::from_value(native_type.serialized_native_type.clone()).unwrap();
             let error = connector.native_instance_error(&native_type);
 

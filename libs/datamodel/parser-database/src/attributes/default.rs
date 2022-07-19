@@ -324,12 +324,12 @@ fn validate_invalid_function_default(fn_name: &str, scalar_type: ScalarType, ctx
 
 fn validate_default_value_on_composite_type(ctid: ast::CompositeTypeId, ast_field: &ast::Field, ctx: &mut Context<'_>) {
     let attr = ctx.current_attribute();
-    let ct_name = &ctx.ast[ctid].name.name;
+    let ct_name = ctx.ast[ctid].name();
 
     ctx.push_error(DatamodelError::new_composite_type_field_validation_error(
         "Defaults on fields of type composite are not supported. Please remove the `@default` attribute.",
         ct_name,
-        &ast_field.name.name,
+        ast_field.name(),
         attr.span,
     ));
 }

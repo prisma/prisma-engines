@@ -40,8 +40,8 @@ impl WithIdentifier for Attribute {
 }
 
 impl WithSpan for Attribute {
-    fn span(&self) -> &Span {
-        &self.span
+    fn span(&self) -> Span {
+        self.span
     }
 }
 

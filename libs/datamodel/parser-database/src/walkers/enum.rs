@@ -1,3 +1,5 @@
+use schema_ast::ast::WithDocumentation;
+
 use crate::{ast, walkers::Walker};
 
 /// An `enum` declaration in the schema.
@@ -58,10 +60,7 @@ impl<'db> EnumValueWalker<'db> {
 
     /// The enum documentation
     pub fn documentation(self) -> Option<&'db str> {
-        self.r#enum().ast_enum().values[self.id.1]
-            .documentation
-            .as_ref()
-            .map(|doc| doc.text.as_str())
+        self.r#enum().ast_enum().values[self.id.1].documentation()
     }
 
     /// The name of the value.

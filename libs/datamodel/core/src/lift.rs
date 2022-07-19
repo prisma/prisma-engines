@@ -1,4 +1,9 @@
-use crate::parser_database::{self as db, ast, walkers::*, IndexAlgorithm};
+use crate::parser_database::{
+    self as db,
+    ast::{self, WithDocumentation, WithName, WithSpan},
+    walkers::*,
+    IndexAlgorithm,
+};
 use datamodel_connector::{walker_ext_traits::*, Connector, ReferentialIntegrity, ScalarType};
 use dml::*;
 use either::Either;
@@ -89,7 +94,7 @@ impl<'a> LiftAstToDml<'a> {
                 .explicit_on_update()
                 .map(parser_database_referential_action_to_dml_referential_action);
             field.relation_info.name = relation_field.relation_name().to_string();
-            field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
+            field.documentation = ast_field.documentation().map(String::from);
             field.is_ignored = relation_field.is_ignored();
             field.supports_restrict_action(
                 active_connector
@@ -297,9 +302,9 @@ impl<'a> LiftAstToDml<'a> {
         field_ids_for_sorting: &mut HashMap<(&'a str, &'a str), ast::FieldId>,
     ) -> dml::Model {
         let ast_model = walker.ast_model();
-        let mut model = dml::Model::new(ast_model.name.name.clone(), None);
+        let mut model = dml::Model::new(ast_model.name().to_owned(), None);
 
-        model.documentation = ast_model.documentation.clone().map(|comment| comment.text);
+        model.documentation = ast_model.documentation().map(String::from);
         model.database_name = walker.mapped_name().map(String::from);
         model.is_ignored = walker.is_ignored();
 
@@ -382,14 +387,14 @@ impl<'a> LiftAstToDml<'a> {
             let ast_field = &ast_model[field_id];
             let arity = self.lift_arity(&ast_field.arity);
 
-            field_ids_for_sorting.insert((&ast_model.name.name, &ast_field.name.name), field_id);
+            field_ids_for_sorting.insert((ast_model.name(), ast_field.name()), field_id);
 
             let field_type = match &scalar_field.scalar_field_type() {
                 db::ScalarFieldType::CompositeType(ctid) => {
                     let mut field = dml::CompositeField::new();
                     field.name = scalar_field.name().to_owned();
-                    field.composite_type = self.db.ast()[*ctid].name.name.to_owned();
-                    field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
+                    field.composite_type = self.db.ast()[*ctid].name().to_owned();
+                    field.documentation = ast_field.documentation().map(String::from);
                     field.is_ignored = scalar_field.is_ignored();
                     field.database_name = scalar_field.mapped_name().map(String::from);
                     field.arity = arity;
@@ -400,9 +405,9 @@ impl<'a> LiftAstToDml<'a> {
                 _ => self.lift_scalar_field_type(ast_field, &scalar_field.scalar_field_type(), scalar_field),
             };
 
-            let mut field = dml::ScalarField::new(&ast_field.name.name, arity, field_type);
+            let mut field = dml::ScalarField::new(ast_field.name(), arity, field_type);
 
-            field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
+            field.documentation = ast_field.documentation().map(String::from);
             field.is_ignored = scalar_field.is_ignored();
             field.is_updated_at = scalar_field.is_updated_at();
             field.database_name = scalar_field.mapped_name().map(String::from);
@@ -426,7 +431,7 @@ impl<'a> LiftAstToDml<'a> {
             en.add_value(self.lift_enum_value(value));
         }
 
-        en.documentation = r#enum.ast_enum().documentation.clone().map(|comment| comment.text);
+        en.documentation = r#enum.ast_enum().documentation().map(String::from);
         en.database_name = r#enum.mapped_name().map(String::from);
         en
     }
@@ -468,7 +473,7 @@ impl<'a> LiftAstToDml<'a> {
             db::ScalarFieldType::BuiltInScalar(scalar_type) => {
                 let native_type = scalar_field.raw_native_type().map(|(_, name, args, _)| {
                     self.connector
-                        .parse_native_type(name, args.to_owned(), scalar_field.ast_field().span)
+                        .parse_native_type(name, args.to_owned(), scalar_field.ast_field().span())
                         .unwrap()
                 });
                 dml::FieldType::Scalar(
@@ -486,12 +491,12 @@ impl<'a> LiftAstToDml<'a> {
     ) -> CompositeTypeFieldType {
         match scalar_field_type {
             db::ScalarFieldType::CompositeType(ctid) => {
-                CompositeTypeFieldType::CompositeType(self.db.ast()[*ctid].name.name.to_owned())
+                CompositeTypeFieldType::CompositeType(self.db.ast()[*ctid].name().to_owned())
             }
             db::ScalarFieldType::BuiltInScalar(scalar_type) => {
                 let native_type = composite_type_field.raw_native_type().map(|(_, name, args, _)| {
                     self.connector
-                        .parse_native_type(name, args.to_owned(), composite_type_field.ast_field().span)
+                        .parse_native_type(name, args.to_owned(), composite_type_field.ast_field().span())
                         .unwrap()
                 });
 

@@ -1,6 +1,6 @@
 use super::{database_name::validate_db_name, names::Names};
 use crate::{
-    ast::{self, WithName},
+    ast::{self, WithName, WithSpan},
     diagnostics::DatamodelError,
     validate::validation_pipeline::context::Context,
 };
@@ -108,7 +108,7 @@ pub(super) fn ambiguity(field: RelationFieldWalker<'_>, names: &Names<'_>) -> Re
             Err(DatamodelError::new_model_validation_error(
                 &message,
                 model.name(),
-                field.ast_field().span,
+                field.ast_field().span(),
             ))
         }
         _ => Ok(()),
@@ -132,7 +132,7 @@ pub(super) fn ignored_related_model(field: RelationFieldWalker<'_>, ctx: &mut Co
     ctx.push_error(DatamodelError::new_attribute_validation_error(
         &message,
         "@ignore",
-        field.ast_field().span,
+        field.ast_field().span(),
     ));
 }
 
@@ -162,7 +162,7 @@ pub(super) fn referential_actions(field: RelationFieldWalker<'_>, ctx: &mut Cont
             let span = field
                 .ast_field()
                 .span_for_argument("relation", "onDelete")
-                .unwrap_or_else(|| field.ast_field().span);
+                .unwrap_or_else(|| field.ast_field().span());
 
             ctx.push_error(DatamodelError::new_validation_error(&msg(on_delete), span));
         }
@@ -176,7 +176,7 @@ pub(super) fn referential_actions(field: RelationFieldWalker<'_>, ctx: &mut Cont
             let span = field
                 .ast_field()
                 .span_for_argument("relation", "onUpdate")
-                .unwrap_or_else(|| field.ast_field().span);
+                .unwrap_or_else(|| field.ast_field().span());
 
             ctx.push_error(DatamodelError::new_validation_error(&msg(on_update), span));
         }

@@ -1,5 +1,7 @@
 use crate::{
-    diagnostics::DatamodelError, parser_database::walkers::ModelWalker, validate::validation_pipeline::context::Context,
+    diagnostics::DatamodelError,
+    parser_database::{ast::WithSpan, walkers::ModelWalker},
+    validate::validation_pipeline::context::Context,
 };
 
 pub(super) fn validate_auto_increment(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
@@ -31,7 +33,7 @@ pub(super) fn validate_auto_increment(model: ModelWalker<'_>, ctx: &mut Context<
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             msg,
             "@default",
-            model.ast_model().span,
+            model.ast_model().span(),
         ))
     }
 
@@ -45,7 +47,7 @@ pub(super) fn validate_auto_increment(model: ModelWalker<'_>, ctx: &mut Context<
             ctx.push_error(DatamodelError::new_attribute_validation_error(
                 msg,
                 "@default",
-                field.ast_field().span,
+                field.ast_field().span(),
             ))
         }
 
@@ -55,7 +57,7 @@ pub(super) fn validate_auto_increment(model: ModelWalker<'_>, ctx: &mut Context<
             ctx.push_error(DatamodelError::new_attribute_validation_error(
                 msg,
                 "@default",
-                field.ast_field().span,
+                field.ast_field().span(),
             ))
         }
     }

@@ -1,7 +1,10 @@
 use crate::{
     constraint_names::ConstraintNames, Connector, NativeTypeInstance, ReferentialAction, ReferentialIntegrity,
 };
-use parser_database::{ast, walkers::*};
+use parser_database::{
+    ast::{self, WithSpan},
+    walkers::*,
+};
 use std::borrow::Cow;
 
 pub trait IndexWalkerExt<'db> {
@@ -119,7 +122,7 @@ impl ScalarFieldWalkerExt for ScalarFieldWalker<'_> {
     fn native_type_instance(&self, connector: &dyn Connector) -> Option<NativeTypeInstance> {
         self.raw_native_type().and_then(|(_, name, args, _)| {
             connector
-                .parse_native_type(name, args.to_owned(), self.ast_field().span)
+                .parse_native_type(name, args.to_owned(), self.ast_field().span())
                 .ok()
         })
     }
@@ -129,7 +132,7 @@ impl ScalarFieldWalkerExt for CompositeTypeFieldWalker<'_> {
     fn native_type_instance(&self, connector: &dyn Connector) -> Option<NativeTypeInstance> {
         self.raw_native_type().and_then(|(_, name, args, _)| {
             connector
-                .parse_native_type(name, args.to_owned(), self.ast_field().span)
+                .parse_native_type(name, args.to_owned(), self.ast_field().span())
                 .ok()
         })
     }
@@ -139,7 +142,7 @@ impl ScalarFieldWalkerExt for IndexFieldWalker<'_> {
     fn native_type_instance(&self, connector: &dyn Connector) -> Option<NativeTypeInstance> {
         self.raw_native_type().and_then(|(_, name, args, _)| {
             connector
-                .parse_native_type(name, args.to_owned(), self.ast_field().span)
+                .parse_native_type(name, args.to_owned(), self.ast_field().span())
                 .ok()
         })
     }

@@ -1,6 +1,6 @@
 use crate::{diagnostics::DatamodelError, validate::validation_pipeline::context::Context};
 use datamodel_connector::ConnectorCapability;
-use parser_database::walkers::TwoWayEmbeddedManyToManyRelationWalker;
+use parser_database::{ast::WithSpan, walkers::TwoWayEmbeddedManyToManyRelationWalker};
 
 /// Only MongoDb should support embedded M:N relations.
 pub(crate) fn supports_embedded_relations(relation: TwoWayEmbeddedManyToManyRelationWalker<'_>, ctx: &mut Context<'_>) {
@@ -13,7 +13,7 @@ pub(crate) fn supports_embedded_relations(relation: TwoWayEmbeddedManyToManyRela
 
     let spans = [relation.field_a(), relation.field_b()]
         .into_iter()
-        .map(|r| r.ast_field().span);
+        .map(|r| r.ast_field().span());
 
     let connector_name = ctx.connector.name();
 
@@ -48,7 +48,7 @@ pub(crate) fn defines_references_on_both_sides(
                 let span = ast_field
                     .span_for_argument("relation", "references")
                     .or_else(|| ast_field.span_for_attribute("relation"))
-                    .unwrap_or(ast_field.span);
+                    .unwrap_or_else(|| ast_field.span());
 
                 Some(span)
             }
@@ -84,7 +84,7 @@ pub(crate) fn defines_fields_on_both_sides(
                 let span = ast_field
                     .span_for_argument("relation", "fields")
                     .or_else(|| ast_field.span_for_attribute("relation"))
-                    .unwrap_or(ast_field.span);
+                    .unwrap_or_else(|| ast_field.span());
 
                 Some(span)
             }
@@ -115,7 +115,7 @@ pub(crate) fn references_id_from_both_sides(
                 let span = r
                     .ast_field()
                     .span_for_argument("relation", "references")
-                    .unwrap_or_else(|| r.ast_field().span);
+                    .unwrap_or_else(|| r.ast_field().span());
 
                 Some(span)
             }
@@ -166,7 +166,9 @@ pub(crate) fn referencing_with_an_array_field_of_correct_type(
         }
 
         let ast_field = field.ast_field();
-        let span = ast_field.span_for_attribute("relation").unwrap_or(ast_field.span);
+        let span = ast_field
+            .span_for_attribute("relation")
+            .unwrap_or_else(|| ast_field.span());
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             error_msg,

@@ -1,6 +1,6 @@
 use super::database_name::validate_db_name;
 use crate::{
-    common::preview_features::PreviewFeature, diagnostics::DatamodelError,
+    common::preview_features::PreviewFeature, diagnostics::DatamodelError, parser_database::ast::WithSpan,
     validate::validation_pipeline::context::Context,
 };
 use datamodel_connector::{walker_ext_traits::*, ConnectorCapability};
@@ -47,7 +47,7 @@ pub(super) fn has_a_strict_unique_criteria(model: ModelWalker<'_>, ctx: &mut Con
     ctx.push_error(DatamodelError::new_model_validation_error(
         msg.as_ref(),
         model.name(),
-        model.ast_model().span,
+        model.ast_model().span(),
     ))
 }
 
@@ -222,7 +222,7 @@ pub(crate) fn primary_key_connector_specific(model: ModelWalker<'_>, ctx: &mut C
         ctx.push_error(DatamodelError::new_model_validation_error(
             "You defined a database name for the primary key on the model. This is not supported by the provider.",
             model.name(),
-            model.ast_model().span,
+            model.ast_model().span(),
         ));
     }
 
