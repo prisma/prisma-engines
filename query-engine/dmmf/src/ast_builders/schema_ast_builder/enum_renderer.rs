@@ -1,9 +1,7 @@
 use super::*;
 
 pub(crate) fn render_enum_types(ctx: &mut RenderContext, enum_types: &[EnumTypeRef]) {
-    enum_types
-        .iter()
-        .for_each(|et| DmmfEnumRenderer::new(et).render(ctx))
+    enum_types.iter().for_each(|et| DmmfEnumRenderer::new(et).render(ctx))
 }
 
 pub struct DmmfEnumRenderer {
