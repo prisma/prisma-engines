@@ -531,6 +531,7 @@
 <span id="526">526</span>
 <span id="527">527</span>
 <span id="528">528</span>
+<span id="529">529</span>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">many_to_many</span>;
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">one_to_many</span>;
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">one_to_one</span>;
@@ -542,6 +543,7 @@
 <span class="kw">use</span> <span class="ident">datamodel_connector</span>::{<span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>, <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ReferentialIntegrity</span>};
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 <span class="kw">use</span> <span class="ident">parser_database</span>::{
+    <span class="ident">ast::WithSpan</span>,
     <span class="ident">walkers</span>::{<span class="ident">CompleteInlineRelationWalker</span>, <span class="ident">InlineRelationWalker</span>, <span class="ident">RelationFieldWalker</span>},
     <span class="ident">ScalarFieldType</span>,
 };
@@ -574,9 +576,9 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> {
                 <span class="ident">rf</span>.<span class="ident">ast_field</span>()
                     .<span class="ident">span_for_argument</span>(<span class="string">&quot;relation&quot;</span>, <span class="string">&quot;map&quot;</span>)
-                    .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">rf</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>)
+                    .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">rf</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>())
             })
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">relation</span>.<span class="ident">referenced_model</span>().<span class="ident">ast_model</span>().<span class="ident">span</span>);
+            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">relation</span>.<span class="ident">referenced_model</span>().<span class="ident">ast_model</span>().<span class="ident">span</span>());
 
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
             <span class="string">&quot;The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.&quot;</span>,
@@ -620,7 +622,7 @@
             <span class="ident">forward_relation_field</span>.<span class="ident">name</span>(),
             <span class="ident">scalar_field_names</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>),
         ),
-        <span class="ident">forward_relation_field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>
+        <span class="ident">forward_relation_field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>()
     ));
 }
 
@@ -682,7 +684,7 @@
     <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
         <span class="kw-2">&amp;</span><span class="ident">message</span>,
         <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
-        <span class="ident">relation_field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>,
+        <span class="ident">relation_field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
     ));
 }
 
@@ -732,7 +734,7 @@
             <span class="ident">relation</span>.<span class="ident">referenced_model</span>().<span class="ident">name</span>(),
             <span class="ident">relation</span>.<span class="ident">referenced_fields</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>()).<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>)
         ),
-        <span class="ident">relation_field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>
+        <span class="ident">relation_field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>()
     ));
 }
 
@@ -1015,7 +1017,7 @@
 
     <span class="ident">msg</span>.<span class="ident">push_str</span>(<span class="string">&quot; Read more at https://pris.ly/d/cyclic-referential-actions&quot;</span>);
 
-    <span class="ident">DatamodelError::new_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">relation</span>.<span class="ident">referencing_field</span>().<span class="ident">ast_field</span>().<span class="ident">span</span>)
+    <span class="ident">DatamodelError::new_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">relation</span>.<span class="ident">referencing_field</span>().<span class="ident">ast_field</span>().<span class="ident">span</span>())
 }
 
 <span class="doccomment">/// The types of the referencing and referenced scalar fields in a relation must be compatible.</span>
@@ -1037,7 +1039,7 @@
                     <span class="ident">referenced</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
                 ),
                 <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
-                <span class="ident">relation</span>.<span class="ident">forward_relation_field</span>().<span class="ident">unwrap</span>().<span class="ident">ast_field</span>().<span class="ident">span</span>,
+                <span class="ident">relation</span>.<span class="ident">forward_relation_field</span>().<span class="ident">unwrap</span>().<span class="ident">ast_field</span>().<span class="ident">span</span>(),
             ))
         }
     }

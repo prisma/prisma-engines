@@ -65,8 +65,12 @@
 <span id="60">60</span>
 <span id="61">61</span>
 <span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">diagnostics::DatamodelError</span>, <span class="ident">parser_database::walkers::ModelWalker</span>, <span class="ident">validate::validation_pipeline::context::Context</span>,
+    <span class="ident">diagnostics::DatamodelError</span>,
+    <span class="ident">parser_database</span>::{<span class="ident">ast::WithSpan</span>, <span class="ident">walkers::ModelWalker</span>},
+    <span class="ident">validate::validation_pipeline::context::Context</span>,
 };
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">validate_auto_increment</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
@@ -98,7 +102,7 @@
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
             <span class="ident">msg</span>,
             <span class="string">&quot;@default&quot;</span>,
-            <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>,
+            <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>(),
         ))
     }
 
@@ -112,7 +116,7 @@
             <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
                 <span class="ident">msg</span>,
                 <span class="string">&quot;@default&quot;</span>,
-                <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>,
+                <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
             ))
         }
 
@@ -122,7 +126,7 @@
             <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
                 <span class="ident">msg</span>,
                 <span class="string">&quot;@default&quot;</span>,
-                <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>,
+                <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
             ))
         }
     }

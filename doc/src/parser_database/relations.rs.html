@@ -468,7 +468,7 @@
 <span id="463">463</span>
 <span id="464">464</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">ast</span>,
+    <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">WithName</span>},
     <span class="ident">interner::StringId</span>,
     {<span class="ident">context::Context</span>, <span class="ident">types::RelationField</span>},
 };
@@ -727,7 +727,7 @@
             <span class="comment">// We will meet the relation twice when we walk over all relation</span>
             <span class="comment">// fields, so we only instantiate it when the relation field is that</span>
             <span class="comment">// of model A, and the opposite is model B.</span>
-            <span class="kw">if</span> <span class="ident">evidence</span>.<span class="ident">ast_model</span>.<span class="ident">name</span>.<span class="ident">name</span> <span class="op">&gt;</span> <span class="ident">evidence</span>.<span class="ident">opposite_model</span>.<span class="ident">name</span>.<span class="ident">name</span> {
+            <span class="kw">if</span> <span class="ident">evidence</span>.<span class="ident">ast_model</span>.<span class="ident">name</span>() <span class="op">&gt;</span> <span class="ident">evidence</span>.<span class="ident">opposite_model</span>.<span class="ident">name</span>() {
                 <span class="kw">return</span>;
             }
 
@@ -759,8 +759,8 @@
             <span class="comment">// This is a 1:1 relation that is required on both sides. We are going to reject this later,</span>
             <span class="comment">// so which model is model A doesn&#39;t matter.</span>
 
-            <span class="kw">if</span> [<span class="ident">evidence</span>.<span class="ident">ast_model</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>(), <span class="ident">evidence</span>.<span class="ident">ast_field</span>.<span class="ident">name</span>()]
-                <span class="op">&gt;</span> [<span class="ident">evidence</span>.<span class="ident">opposite_model</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>(), <span class="ident">opp_field</span>.<span class="ident">name</span>()]
+            <span class="kw">if</span> [<span class="ident">evidence</span>.<span class="ident">ast_model</span>.<span class="ident">name</span>(), <span class="ident">evidence</span>.<span class="ident">ast_field</span>.<span class="ident">name</span>()]
+                <span class="op">&gt;</span> [<span class="ident">evidence</span>.<span class="ident">opposite_model</span>.<span class="ident">name</span>(), <span class="ident">opp_field</span>.<span class="ident">name</span>()]
             {
                 <span class="kw">return</span>;
             }
@@ -781,8 +781,8 @@
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">opp_field_attributes</span>.<span class="ident">fields</span>.<span class="ident">is_none</span>() {
                 <span class="comment">// No fields defined, we have to break the tie: take the first model name / field name (self relations)</span>
                 <span class="comment">// in lexicographic order.</span>
-                <span class="kw">if</span> [<span class="ident">evidence</span>.<span class="ident">ast_model</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>(), <span class="ident">evidence</span>.<span class="ident">ast_field</span>.<span class="ident">name</span>()]
-                    <span class="op">&gt;</span> [<span class="ident">evidence</span>.<span class="ident">opposite_model</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>(), <span class="ident">opp_field</span>.<span class="ident">name</span>()]
+                <span class="kw">if</span> [<span class="ident">evidence</span>.<span class="ident">ast_model</span>.<span class="ident">name</span>(), <span class="ident">evidence</span>.<span class="ident">ast_field</span>.<span class="ident">name</span>()]
+                    <span class="op">&gt;</span> [<span class="ident">evidence</span>.<span class="ident">opposite_model</span>.<span class="ident">name</span>(), <span class="ident">opp_field</span>.<span class="ident">name</span>()]
                 {
                     <span class="kw">return</span>;
                 }

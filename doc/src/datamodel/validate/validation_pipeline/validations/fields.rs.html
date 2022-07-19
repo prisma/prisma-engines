@@ -379,6 +379,9 @@
 <span id="374">374</span>
 <span id="375">375</span>
 <span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">constraint_namespace::ConstraintName</span>,
     <span class="ident">database_name::validate_db_name</span>,
@@ -404,7 +407,8 @@
                     <span class="ident">field</span>.<span class="ident">name</span>()
                 );
 
-                <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">DatamodelError::new_model_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>, <span class="ident">model</span>.<span class="ident">name</span>(), <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>);
+                <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span>
+                    <span class="ident">DatamodelError::new_model_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>, <span class="ident">model</span>.<span class="ident">name</span>(), <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>());
                 <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">error</span>);
             }
             <span class="ident">NameTaken::Unique</span> =&gt; {
@@ -413,7 +417,8 @@
                     <span class="ident">field</span>.<span class="ident">name</span>()
                 );
 
-                <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">DatamodelError::new_model_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>, <span class="ident">model</span>.<span class="ident">name</span>(), <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>);
+                <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span>
+                    <span class="ident">DatamodelError::new_model_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>, <span class="ident">model</span>.<span class="ident">name</span>(), <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>());
                 <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">error</span>);
             }
             <span class="ident">NameTaken::PrimaryKey</span> =&gt; {
@@ -422,7 +427,8 @@
                     <span class="ident">field</span>.<span class="ident">name</span>()
                 );
 
-                <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">DatamodelError::new_model_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>, <span class="ident">model</span>.<span class="ident">name</span>(), <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>);
+                <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span>
+                    <span class="ident">DatamodelError::new_model_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>, <span class="ident">model</span>.<span class="ident">name</span>(), <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>());
                 <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">error</span>);
             }
         }
@@ -454,7 +460,7 @@
         <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">field</span>
             .<span class="ident">ast_field</span>()
             .<span class="ident">span_for_argument</span>(<span class="string">&quot;default&quot;</span>, <span class="string">&quot;map&quot;</span>)
-            .<span class="ident">unwrap_or</span>(<span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>);
+            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>());
 
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
             <span class="kw-2">&amp;</span><span class="ident">message</span>, <span class="string">&quot;@default&quot;</span>, <span class="ident">span</span>,
@@ -623,7 +629,7 @@
                     ),
                     <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
                     <span class="ident">field</span>.<span class="ident">name</span>(),
-                    <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>,
+                    <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
                 ));
             }
 
@@ -636,7 +642,7 @@
                     ),
                     <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
                     <span class="ident">field</span>.<span class="ident">name</span>(),
-                    <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>,
+                    <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
                 ));
             }
         }
@@ -651,7 +657,7 @@
                     ),
                     <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
                     <span class="ident">field</span>.<span class="ident">name</span>(),
-                    <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>,
+                    <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
                 ));
             }
         }
@@ -663,7 +669,7 @@
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_scalar_list_fields_are_not_supported</span>(
             <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
             <span class="ident">field</span>.<span class="ident">name</span>(),
-            <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>,
+            <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
         ));
     }
 }
@@ -700,7 +706,7 @@
             <span class="prelude-val">Some</span>(<span class="ident">params</span>) =&gt; <span class="ident">params</span>.<span class="ident">as_str</span>().<span class="ident">split</span>(<span class="string">&#39;,&#39;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">trim</span>().<span class="ident">to_string</span>()).<span class="ident">collect</span>(),
         };
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">native_type</span>) <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">parse_native_type</span>(<span class="ident">prefix</span>, <span class="ident">args</span>, <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>) {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">native_type</span>) <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">parse_native_type</span>(<span class="ident">prefix</span>, <span class="ident">args</span>, <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>()) {
             <span class="kw">let</span> <span class="ident">prisma_type</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">scalar_type_for_native_type</span>(<span class="ident">native_type</span>.<span class="ident">serialized_native_type</span>.<span class="ident">clone</span>());
 
             <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(
@@ -708,7 +714,7 @@
                         <span class="ident">unsupported_lit</span>, <span class="ident">field</span>.<span class="ident">name</span>(), <span class="ident">prisma_type</span>.<span class="ident">as_str</span>(), <span class="kw-2">&amp;</span><span class="ident">source</span>.<span class="ident">name</span>, <span class="ident">native_type</span>
                     );
 
-            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>));
+            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>()));
         }
     }
 }
@@ -725,7 +731,7 @@
     <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
         <span class="string">&quot;Defining clustering is not supported in the current connector.&quot;</span>,
         <span class="ident">pk</span>.<span class="ident">attribute_name</span>(),
-        <span class="kw-2">*</span><span class="ident">pk</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>(),
+        <span class="ident">pk</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>(),
     ));
 }
 
@@ -749,7 +755,7 @@
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
             <span class="string">&quot;A model can only hold one clustered index or id.&quot;</span>,
             <span class="ident">pk</span>.<span class="ident">attribute_name</span>(),
-            <span class="kw-2">*</span><span class="ident">pk</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>(),
+            <span class="ident">pk</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>(),
         ));
 
         <span class="kw">return</span>;

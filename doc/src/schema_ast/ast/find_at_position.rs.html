@@ -336,12 +336,12 @@
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">spans</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">ast::Span</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">attr</span>
                     .<span class="ident">arguments</span>
                     .<span class="ident">iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> (<span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()), <span class="kw-2">*</span><span class="ident">arg</span>.<span class="ident">span</span>()))
+                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> (<span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()), <span class="ident">arg</span>.<span class="ident">span</span>()))
                     .<span class="ident">chain</span>(
                         <span class="ident">attr</span>.<span class="ident">arguments</span>
                             .<span class="ident">empty_arguments</span>
                             .<span class="ident">iter</span>()
-                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> (<span class="prelude-val">Some</span>(<span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()), <span class="kw-2">*</span><span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">span</span>())),
+                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> (<span class="prelude-val">Some</span>(<span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()), <span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">span</span>())),
                     )
                     .<span class="ident">collect</span>();
                 <span class="ident">spans</span>.<span class="ident">sort_by_key</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">span</span>)<span class="op">|</span> <span class="ident">span</span>.<span class="ident">start</span>);
@@ -385,12 +385,12 @@
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">spans</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">ast::Span</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">attr</span>
                 .<span class="ident">arguments</span>
                 .<span class="ident">iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> (<span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()), <span class="kw-2">*</span><span class="ident">arg</span>.<span class="ident">span</span>()))
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> (<span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()), <span class="ident">arg</span>.<span class="ident">span</span>()))
                 .<span class="ident">chain</span>(
                     <span class="ident">attr</span>.<span class="ident">arguments</span>
                         .<span class="ident">empty_arguments</span>
                         .<span class="ident">iter</span>()
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> (<span class="prelude-val">Some</span>(<span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()), <span class="kw-2">*</span><span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">span</span>())),
+                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> (<span class="prelude-val">Some</span>(<span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()), <span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">span</span>())),
                 )
                 .<span class="ident">collect</span>();
 
@@ -441,11 +441,11 @@
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">spans</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">ast::Span</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">args</span>
                     .<span class="ident">arguments</span>
                     .<span class="ident">iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> (<span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()), <span class="kw-2">*</span><span class="ident">arg</span>.<span class="ident">span</span>()))
+                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> (<span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()), <span class="ident">arg</span>.<span class="ident">span</span>()))
                     .<span class="ident">chain</span>(
                         <span class="ident">args</span>.<span class="ident">empty_arguments</span>
                             .<span class="ident">iter</span>()
-                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> (<span class="prelude-val">Some</span>(<span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()), <span class="kw-2">*</span><span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">span</span>())),
+                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> (<span class="prelude-val">Some</span>(<span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()), <span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">span</span>())),
                     )
                     .<span class="ident">collect</span>();
 

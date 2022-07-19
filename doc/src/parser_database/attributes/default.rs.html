@@ -795,12 +795,12 @@
 
 <span class="kw">fn</span> <span class="ident">validate_default_value_on_composite_type</span>(<span class="ident">ctid</span>: <span class="ident">ast::CompositeTypeId</span>, <span class="ident">ast_field</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Field</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> <span class="ident">attr</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">current_attribute</span>();
-    <span class="kw">let</span> <span class="ident">ct_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">ctid</span>].<span class="ident">name</span>.<span class="ident">name</span>;
+    <span class="kw">let</span> <span class="ident">ct_name</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">ctid</span>].<span class="ident">name</span>();
 
     <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_composite_type_field_validation_error</span>(
         <span class="string">&quot;Defaults on fields of type composite are not supported. Please remove the `@default` attribute.&quot;</span>,
         <span class="ident">ct_name</span>,
-        <span class="kw-2">&amp;</span><span class="ident">ast_field</span>.<span class="ident">name</span>.<span class="ident">name</span>,
+        <span class="ident">ast_field</span>.<span class="ident">name</span>(),
         <span class="ident">attr</span>.<span class="ident">span</span>,
     ));
 }

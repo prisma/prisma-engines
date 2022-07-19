@@ -138,7 +138,7 @@
     <span class="doccomment">/// model Foo { .. }</span>
     <span class="doccomment">///       ^^^</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">Identifier</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">name</span>: <span class="ident">Identifier</span>,
     <span class="doccomment">/// The fields of the model.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```ignore</span>
@@ -149,7 +149,7 @@
     <span class="doccomment">///   ^^^^^^^^^^^^</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The attributes of this model.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```ignore</span>
@@ -174,9 +174,9 @@
     <span class="doccomment">///   field String</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="ident">documentation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Comment</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">documentation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Comment</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The location of this model in the text representation.</span>
-    <span class="kw">pub</span> <span class="ident">span</span>: <span class="ident">Span</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">span</span>: <span class="ident">Span</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Model</span> {
@@ -195,8 +195,8 @@
 }
 
 <span class="kw">impl</span> <span class="ident">WithSpan</span> <span class="kw">for</span> <span class="ident">Model</span> {
-    <span class="kw">fn</span> <span class="ident">span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Span</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">span</span>
+    <span class="kw">fn</span> <span class="ident">span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Span</span> {
+        <span class="self">self</span>.<span class="ident">span</span>
     }
 }
 
@@ -207,8 +207,8 @@
 }
 
 <span class="kw">impl</span> <span class="ident">WithDocumentation</span> <span class="kw">for</span> <span class="ident">Model</span> {
-    <span class="kw">fn</span> <span class="ident">documentation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Comment</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">documentation</span>
+    <span class="kw">fn</span> <span class="ident">documentation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">documentation</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">doc</span><span class="op">|</span> <span class="ident">doc</span>.<span class="ident">text</span>.<span class="ident">as_str</span>())
     }
 }
 </code></pre></div>

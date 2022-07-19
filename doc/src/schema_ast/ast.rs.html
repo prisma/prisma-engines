@@ -182,6 +182,7 @@
 <span id="177">177</span>
 <span id="178">178</span>
 <span id="179">179</span>
+<span id="180">180</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">argument</span>;
 <span class="kw">mod</span> <span class="ident">attribute</span>;
 <span class="kw">mod</span> <span class="ident">comment</span>;
@@ -200,9 +201,10 @@
 <span class="kw">mod</span> <span class="ident">top</span>;
 <span class="kw">mod</span> <span class="ident">traits</span>;
 
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="self">self</span>::comment::Comment</span>;
+
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">argument</span>::{<span class="ident">Argument</span>, <span class="ident">ArgumentsList</span>, <span class="ident">EmptyArgument</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">attribute</span>::{<span class="ident">Attribute</span>, <span class="ident">AttributeContainer</span>, <span class="ident">AttributeId</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">comment::Comment</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">composite_type</span>::{<span class="ident">CompositeType</span>, <span class="ident">CompositeTypeId</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">config::ConfigBlockProperty</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">diagnostics::Span</span>;

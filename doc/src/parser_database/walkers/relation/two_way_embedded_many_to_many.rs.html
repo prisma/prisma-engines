@@ -50,14 +50,10 @@
 <span id="45">45</span>
 <span id="46">46</span>
 <span id="47">47</span>
-<span id="48">48</span>
-<span id="49">49</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">relations</span>::{<span class="ident">Relation</span>, <span class="ident">RelationAttributes</span>},
-    <span class="ident">walkers</span>::{<span class="ident">ModelWalker</span>, <span class="ident">RelationFieldWalker</span>},
+    <span class="ident">walkers</span>::{<span class="ident">ModelWalker</span>, <span class="ident">RelationFieldWalker</span>, <span class="ident">RelationWalker</span>},
 };
-
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::RelationWalker</span>;
 
 <span class="doccomment">/// Describes an explicit m:n relation between two models. Both sides define</span>
 <span class="doccomment">/// `fields` which must be a single array scalar field, and `references` that</span>

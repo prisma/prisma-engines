@@ -193,7 +193,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">reserved_model_names::is_reserved_type_name</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">ConfigBlockProperty</span>, <span class="ident">TopId</span>, <span class="ident">WithAttributes</span>, <span class="ident">WithIdentifier</span>},
+    <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">ConfigBlockProperty</span>, <span class="ident">TopId</span>, <span class="ident">WithAttributes</span>, <span class="ident">WithIdentifier</span>, <span class="ident">WithName</span>, <span class="ident">WithSpan</span>},
     <span class="ident">types::ScalarType</span>,
     <span class="ident">Context</span>, <span class="ident">DatamodelError</span>, <span class="ident">StringId</span>,
 };
@@ -251,19 +251,19 @@
                 <span class="kw-2">&amp;mut</span> <span class="ident">names</span>.<span class="ident">tops</span>
             }
             (<span class="ident">ast::TopId::Model</span>(<span class="ident">model_id</span>), <span class="ident">ast::Top::Model</span>(<span class="ident">model</span>)) =&gt; {
-                <span class="ident">validate_identifier</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">name</span>, <span class="string">&quot;Model&quot;</span>, <span class="ident">ctx</span>);
+                <span class="ident">validate_identifier</span>(<span class="ident">model</span>.<span class="ident">identifier</span>(), <span class="string">&quot;Model&quot;</span>, <span class="ident">ctx</span>);
                 <span class="ident">validate_model_name</span>(<span class="ident">model</span>, <span class="ident">ctx</span>.<span class="ident">diagnostics</span>);
                 <span class="ident">validate_attribute_identifiers</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
 
                 <span class="kw">for</span> (<span class="ident">field_id</span>, <span class="ident">field</span>) <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">iter_fields</span>() {
-                    <span class="ident">validate_identifier</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">name</span>, <span class="string">&quot;Field&quot;</span>, <span class="ident">ctx</span>);
+                    <span class="ident">validate_identifier</span>(<span class="ident">field</span>.<span class="ident">identifier</span>(), <span class="string">&quot;Field&quot;</span>, <span class="ident">ctx</span>);
                     <span class="ident">validate_attribute_identifiers</span>(<span class="ident">field</span>, <span class="ident">ctx</span>);
                     <span class="kw">let</span> <span class="ident">field_name_id</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">interner</span>.<span class="ident">intern</span>(<span class="ident">field</span>.<span class="ident">name</span>());
 
                     <span class="kw">if</span> <span class="ident">names</span>.<span class="ident">model_fields</span>.<span class="ident">insert</span>((<span class="ident">model_id</span>, <span class="ident">field_name_id</span>), <span class="ident">field_id</span>).<span class="ident">is_some</span>() {
                         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_duplicate_field_error</span>(
-                            <span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">name</span>.<span class="ident">name</span>,
-                            <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">name</span>,
+                            <span class="ident">model</span>.<span class="ident">name</span>(),
+                            <span class="ident">field</span>.<span class="ident">name</span>(),
                             <span class="ident">field</span>.<span class="ident">identifier</span>().<span class="ident">span</span>,
                         ))
                     }
@@ -272,7 +272,7 @@
                 <span class="kw-2">&amp;mut</span> <span class="ident">names</span>.<span class="ident">tops</span>
             }
             (<span class="ident">ast::TopId::CompositeType</span>(<span class="ident">ctid</span>), <span class="ident">ast::Top::CompositeType</span>(<span class="ident">ct</span>)) =&gt; {
-                <span class="ident">validate_identifier</span>(<span class="kw-2">&amp;</span><span class="ident">ct</span>.<span class="ident">name</span>, <span class="string">&quot;Composite type&quot;</span>, <span class="ident">ctx</span>);
+                <span class="ident">validate_identifier</span>(<span class="ident">ct</span>.<span class="ident">identifier</span>(), <span class="string">&quot;Composite type&quot;</span>, <span class="ident">ctx</span>);
 
                 <span class="kw">for</span> (<span class="ident">field_id</span>, <span class="ident">field</span>) <span class="kw">in</span> <span class="ident">ct</span>.<span class="ident">iter_fields</span>() {
                     <span class="kw">let</span> <span class="ident">field_name_id</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">interner</span>.<span class="ident">intern</span>(<span class="ident">field</span>.<span class="ident">name</span>());
@@ -283,9 +283,9 @@
                         .<span class="ident">is_some</span>()
                     {
                         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_composite_type_duplicate_field_error</span>(
-                            <span class="kw-2">&amp;</span><span class="ident">ct</span>.<span class="ident">name</span>.<span class="ident">name</span>,
-                            <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">name</span>,
-                            <span class="ident">field</span>.<span class="ident">identifier</span>().<span class="ident">span</span>,
+                            <span class="ident">ct</span>.<span class="ident">name</span>(),
+                            <span class="ident">field</span>.<span class="ident">name</span>(),
+                            <span class="ident">field</span>.<span class="ident">identifier</span>().<span class="ident">span</span>(),
                         ))
                     }
                 }

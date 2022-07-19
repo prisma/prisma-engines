@@ -250,17 +250,15 @@
 <span id="245">245</span>
 <span id="246">246</span>
 <span id="247">247</span>
-<span id="248">248</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
-
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">FieldResolutionError</span>, <span class="ident">FieldResolvingSetup</span>};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">FieldResolutionError</span>, <span class="ident">FieldResolvingSetup</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">WithName</span>},
+    <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">WithName</span>, <span class="ident">WithSpan</span>},
     <span class="ident">attributes::resolve_field_array_with_args</span>,
     <span class="ident">context::Context</span>,
     <span class="ident">types</span>::{<span class="ident">FieldWithArgs</span>, <span class="ident">IdAttribute</span>, <span class="ident">IndexFieldPath</span>, <span class="ident">ModelAttributes</span>, <span class="ident">SortOrder</span>},
     <span class="ident">DatamodelError</span>, <span class="ident">StringId</span>,
 };
+<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
 <span class="doccomment">/// @@id on models</span>
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">model</span>(<span class="ident">model_data</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ModelAttributes</span>, <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
@@ -284,7 +282,7 @@
                     .<span class="ident">into_iter</span>()
                     .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">top_id</span>, <span class="ident">field_name</span>)<span class="op">|</span> <span class="kw">match</span> <span class="ident">top_id</span> {
                         <span class="ident">ast::TopId::CompositeType</span>(<span class="ident">ctid</span>) =&gt; {
-                            <span class="kw">let</span> <span class="ident">ct_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">ctid</span>].<span class="ident">name</span>.<span class="ident">name</span>;
+                            <span class="kw">let</span> <span class="ident">ct_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">ctid</span>].<span class="ident">name</span>();
 
                             <span class="ident">Cow::from</span>(<span class="macro">format!</span>(<span class="string">&quot;{field_name} in type {ct_name}&quot;</span>))
                         }
@@ -357,7 +355,7 @@
                 <span class="string">&quot;The id definition refers to the optional fields {}. ID definitions must reference only required fields.&quot;</span>,
                 <span class="ident">fields_that_are_not_required</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>)
             ),
-            <span class="kw-2">&amp;</span><span class="ident">ast_model</span>.<span class="ident">name</span>.<span class="ident">name</span>,
+            <span class="ident">ast_model</span>.<span class="ident">name</span>(),
             <span class="ident">attr</span>.<span class="ident">span</span>,
         ))
     }
@@ -366,7 +364,7 @@
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_model_validation_error</span>(
             <span class="string">&quot;Each model must have at most one id criteria. You can&#39;t have `@id` and `@@id` at the same time.&quot;</span>,
             <span class="ident">ast_model</span>.<span class="ident">name</span>(),
-            <span class="ident">ast_model</span>.<span class="ident">span</span>,
+            <span class="ident">ast_model</span>.<span class="ident">span</span>(),
         ))
     }
 
@@ -375,7 +373,7 @@
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::get_name_argument</span>(<span class="ident">ctx</span>);
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">name</span> {
-            <span class="ident"><span class="kw">super</span>::validate_client_name</span>(<span class="ident">attr</span>.<span class="ident">span</span>, <span class="kw-2">&amp;</span><span class="ident">ast_model</span>.<span class="ident">name</span>.<span class="ident">name</span>, <span class="ident">name</span>, <span class="string">&quot;@@id&quot;</span>, <span class="ident">ctx</span>);
+            <span class="ident"><span class="kw">super</span>::validate_client_name</span>(<span class="ident">attr</span>.<span class="ident">span</span>(), <span class="ident">ast_model</span>.<span class="ident">name</span>(), <span class="ident">name</span>, <span class="string">&quot;@@id&quot;</span>, <span class="ident">ctx</span>);
         }
 
         (<span class="ident">name</span>, <span class="ident">mapped_name</span>)
@@ -403,7 +401,7 @@
         <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_model_validation_error</span>(
             <span class="string">&quot;At most one field must be marked as the id field with the `@id` attribute.&quot;</span>,
             <span class="ident">ast_model</span>.<span class="ident">name</span>(),
-            <span class="ident">ast_model</span>.<span class="ident">span</span>,
+            <span class="ident">ast_model</span>.<span class="ident">span</span>(),
         )),
         <span class="prelude-val">None</span> =&gt; {
             <span class="kw">let</span> <span class="ident">mapped_name</span> <span class="op">=</span> <span class="ident">primary_key_mapped_name</span>(<span class="ident">ctx</span>);

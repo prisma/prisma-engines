@@ -691,7 +691,17 @@
 <span id="686">686</span>
 <span id="687">687</span>
 <span id="688">688</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parser_database</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">db</span>, <span class="ident">ast</span>, <span class="ident">walkers</span>::<span class="kw-2">*</span>, <span class="ident">IndexAlgorithm</span>};
+<span id="689">689</span>
+<span id="690">690</span>
+<span id="691">691</span>
+<span id="692">692</span>
+<span id="693">693</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parser_database</span>::{
+    <span class="self">self</span> <span class="kw">as</span> <span class="ident">db</span>,
+    <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">WithDocumentation</span>, <span class="ident">WithName</span>, <span class="ident">WithSpan</span>},
+    <span class="ident">walkers</span>::<span class="kw-2">*</span>,
+    <span class="ident">IndexAlgorithm</span>,
+};
 <span class="kw">use</span> <span class="ident">datamodel_connector</span>::{<span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>, <span class="ident">Connector</span>, <span class="ident">ReferentialIntegrity</span>, <span class="ident">ScalarType</span>};
 <span class="kw">use</span> <span class="ident">dml</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">either::Either</span>;
@@ -782,7 +792,7 @@
                 .<span class="ident">explicit_on_update</span>()
                 .<span class="ident">map</span>(<span class="ident">parser_database_referential_action_to_dml_referential_action</span>);
             <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">relation_name</span>().<span class="ident">to_string</span>();
-            <span class="ident">field</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">ast_field</span>.<span class="ident">documentation</span>.<span class="ident">clone</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">comment</span><span class="op">|</span> <span class="ident">comment</span>.<span class="ident">text</span>);
+            <span class="ident">field</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">ast_field</span>.<span class="ident">documentation</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
             <span class="ident">field</span>.<span class="ident">is_ignored</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">is_ignored</span>();
             <span class="ident">field</span>.<span class="ident">supports_restrict_action</span>(
                 <span class="ident">active_connector</span>
@@ -990,9 +1000,9 @@
         <span class="ident">field_ids_for_sorting</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>), <span class="ident">ast::FieldId</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">dml::Model</span> {
         <span class="kw">let</span> <span class="ident">ast_model</span> <span class="op">=</span> <span class="ident">walker</span>.<span class="ident">ast_model</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">dml::Model::new</span>(<span class="ident">ast_model</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">dml::Model::new</span>(<span class="ident">ast_model</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(), <span class="prelude-val">None</span>);
 
-        <span class="ident">model</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">ast_model</span>.<span class="ident">documentation</span>.<span class="ident">clone</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">comment</span><span class="op">|</span> <span class="ident">comment</span>.<span class="ident">text</span>);
+        <span class="ident">model</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">ast_model</span>.<span class="ident">documentation</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
         <span class="ident">model</span>.<span class="ident">database_name</span> <span class="op">=</span> <span class="ident">walker</span>.<span class="ident">mapped_name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
         <span class="ident">model</span>.<span class="ident">is_ignored</span> <span class="op">=</span> <span class="ident">walker</span>.<span class="ident">is_ignored</span>();
 
@@ -1075,14 +1085,14 @@
             <span class="kw">let</span> <span class="ident">ast_field</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ast_model</span>[<span class="ident">field_id</span>];
             <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lift_arity</span>(<span class="kw-2">&amp;</span><span class="ident">ast_field</span>.<span class="ident">arity</span>);
 
-            <span class="ident">field_ids_for_sorting</span>.<span class="ident">insert</span>((<span class="kw-2">&amp;</span><span class="ident">ast_model</span>.<span class="ident">name</span>.<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">ast_field</span>.<span class="ident">name</span>.<span class="ident">name</span>), <span class="ident">field_id</span>);
+            <span class="ident">field_ids_for_sorting</span>.<span class="ident">insert</span>((<span class="ident">ast_model</span>.<span class="ident">name</span>(), <span class="ident">ast_field</span>.<span class="ident">name</span>()), <span class="ident">field_id</span>);
 
             <span class="kw">let</span> <span class="ident">field_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">scalar_field</span>.<span class="ident">scalar_field_type</span>() {
                 <span class="ident">db::ScalarFieldType::CompositeType</span>(<span class="ident">ctid</span>) =&gt; {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">dml::CompositeField::new</span>();
                     <span class="ident">field</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">scalar_field</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>();
-                    <span class="ident">field</span>.<span class="ident">composite_type</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>()[<span class="kw-2">*</span><span class="ident">ctid</span>].<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">to_owned</span>();
-                    <span class="ident">field</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">ast_field</span>.<span class="ident">documentation</span>.<span class="ident">clone</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">comment</span><span class="op">|</span> <span class="ident">comment</span>.<span class="ident">text</span>);
+                    <span class="ident">field</span>.<span class="ident">composite_type</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>()[<span class="kw-2">*</span><span class="ident">ctid</span>].<span class="ident">name</span>().<span class="ident">to_owned</span>();
+                    <span class="ident">field</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">ast_field</span>.<span class="ident">documentation</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
                     <span class="ident">field</span>.<span class="ident">is_ignored</span> <span class="op">=</span> <span class="ident">scalar_field</span>.<span class="ident">is_ignored</span>();
                     <span class="ident">field</span>.<span class="ident">database_name</span> <span class="op">=</span> <span class="ident">scalar_field</span>.<span class="ident">mapped_name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
                     <span class="ident">field</span>.<span class="ident">arity</span> <span class="op">=</span> <span class="ident">arity</span>;
@@ -1093,9 +1103,9 @@
                 <span class="kw">_</span> =&gt; <span class="self">self</span>.<span class="ident">lift_scalar_field_type</span>(<span class="ident">ast_field</span>, <span class="kw-2">&amp;</span><span class="ident">scalar_field</span>.<span class="ident">scalar_field_type</span>(), <span class="ident">scalar_field</span>),
             };
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">dml::ScalarField::new</span>(<span class="kw-2">&amp;</span><span class="ident">ast_field</span>.<span class="ident">name</span>.<span class="ident">name</span>, <span class="ident">arity</span>, <span class="ident">field_type</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">dml::ScalarField::new</span>(<span class="ident">ast_field</span>.<span class="ident">name</span>(), <span class="ident">arity</span>, <span class="ident">field_type</span>);
 
-            <span class="ident">field</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">ast_field</span>.<span class="ident">documentation</span>.<span class="ident">clone</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">comment</span><span class="op">|</span> <span class="ident">comment</span>.<span class="ident">text</span>);
+            <span class="ident">field</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">ast_field</span>.<span class="ident">documentation</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
             <span class="ident">field</span>.<span class="ident">is_ignored</span> <span class="op">=</span> <span class="ident">scalar_field</span>.<span class="ident">is_ignored</span>();
             <span class="ident">field</span>.<span class="ident">is_updated_at</span> <span class="op">=</span> <span class="ident">scalar_field</span>.<span class="ident">is_updated_at</span>();
             <span class="ident">field</span>.<span class="ident">database_name</span> <span class="op">=</span> <span class="ident">scalar_field</span>.<span class="ident">mapped_name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
@@ -1119,7 +1129,7 @@
             <span class="ident">en</span>.<span class="ident">add_value</span>(<span class="self">self</span>.<span class="ident">lift_enum_value</span>(<span class="ident">value</span>));
         }
 
-        <span class="ident">en</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">r#enum</span>.<span class="ident">ast_enum</span>().<span class="ident">documentation</span>.<span class="ident">clone</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">comment</span><span class="op">|</span> <span class="ident">comment</span>.<span class="ident">text</span>);
+        <span class="ident">en</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">r#enum</span>.<span class="ident">ast_enum</span>().<span class="ident">documentation</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
         <span class="ident">en</span>.<span class="ident">database_name</span> <span class="op">=</span> <span class="ident">r#enum</span>.<span class="ident">mapped_name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
         <span class="ident">en</span>
     }
@@ -1161,7 +1171,7 @@
             <span class="ident">db::ScalarFieldType::BuiltInScalar</span>(<span class="ident">scalar_type</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">native_type</span> <span class="op">=</span> <span class="ident">scalar_field</span>.<span class="ident">raw_native_type</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">name</span>, <span class="ident">args</span>, <span class="kw">_</span>)<span class="op">|</span> {
                     <span class="self">self</span>.<span class="ident">connector</span>
-                        .<span class="ident">parse_native_type</span>(<span class="ident">name</span>, <span class="ident">args</span>.<span class="ident">to_owned</span>(), <span class="ident">scalar_field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>)
+                        .<span class="ident">parse_native_type</span>(<span class="ident">name</span>, <span class="ident">args</span>.<span class="ident">to_owned</span>(), <span class="ident">scalar_field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>())
                         .<span class="ident">unwrap</span>()
                 });
                 <span class="ident">dml::FieldType::Scalar</span>(
@@ -1179,12 +1189,12 @@
     ) -&gt; <span class="ident">CompositeTypeFieldType</span> {
         <span class="kw">match</span> <span class="ident">scalar_field_type</span> {
             <span class="ident">db::ScalarFieldType::CompositeType</span>(<span class="ident">ctid</span>) =&gt; {
-                <span class="ident">CompositeTypeFieldType::CompositeType</span>(<span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>()[<span class="kw-2">*</span><span class="ident">ctid</span>].<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">to_owned</span>())
+                <span class="ident">CompositeTypeFieldType::CompositeType</span>(<span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>()[<span class="kw-2">*</span><span class="ident">ctid</span>].<span class="ident">name</span>().<span class="ident">to_owned</span>())
             }
             <span class="ident">db::ScalarFieldType::BuiltInScalar</span>(<span class="ident">scalar_type</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">native_type</span> <span class="op">=</span> <span class="ident">composite_type_field</span>.<span class="ident">raw_native_type</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">name</span>, <span class="ident">args</span>, <span class="kw">_</span>)<span class="op">|</span> {
                     <span class="self">self</span>.<span class="ident">connector</span>
-                        .<span class="ident">parse_native_type</span>(<span class="ident">name</span>, <span class="ident">args</span>.<span class="ident">to_owned</span>(), <span class="ident">composite_type_field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>)
+                        .<span class="ident">parse_native_type</span>(<span class="ident">name</span>, <span class="ident">args</span>.<span class="ident">to_owned</span>(), <span class="ident">composite_type_field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>())
                         .<span class="ident">unwrap</span>()
                 });
 

@@ -205,9 +205,11 @@
 <span id="200">200</span>
 <span id="201">201</span>
 <span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">diagnostics::DatamodelError</span>, <span class="ident">validate::validation_pipeline::context::Context</span>};
 <span class="kw">use</span> <span class="ident">datamodel_connector::ConnectorCapability</span>;
-<span class="kw">use</span> <span class="ident">parser_database::walkers::TwoWayEmbeddedManyToManyRelationWalker</span>;
+<span class="kw">use</span> <span class="ident">parser_database</span>::{<span class="ident">ast::WithSpan</span>, <span class="ident">walkers::TwoWayEmbeddedManyToManyRelationWalker</span>};
 
 <span class="doccomment">/// Only MongoDb should support embedded M:N relations.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">supports_embedded_relations</span>(<span class="ident">relation</span>: <span class="ident">TwoWayEmbeddedManyToManyRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
@@ -220,7 +222,7 @@
 
     <span class="kw">let</span> <span class="ident">spans</span> <span class="op">=</span> [<span class="ident">relation</span>.<span class="ident">field_a</span>(), <span class="ident">relation</span>.<span class="ident">field_b</span>()]
         .<span class="ident">into_iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>);
+        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>());
 
     <span class="kw">let</span> <span class="ident">connector_name</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">name</span>();
 
@@ -255,7 +257,7 @@
                 <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">ast_field</span>
                     .<span class="ident">span_for_argument</span>(<span class="string">&quot;relation&quot;</span>, <span class="string">&quot;references&quot;</span>)
                     .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">ast_field</span>.<span class="ident">span_for_attribute</span>(<span class="string">&quot;relation&quot;</span>))
-                    .<span class="ident">unwrap_or</span>(<span class="ident">ast_field</span>.<span class="ident">span</span>);
+                    .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">ast_field</span>.<span class="ident">span</span>());
 
                 <span class="prelude-val">Some</span>(<span class="ident">span</span>)
             }
@@ -291,7 +293,7 @@
                 <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">ast_field</span>
                     .<span class="ident">span_for_argument</span>(<span class="string">&quot;relation&quot;</span>, <span class="string">&quot;fields&quot;</span>)
                     .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">ast_field</span>.<span class="ident">span_for_attribute</span>(<span class="string">&quot;relation&quot;</span>))
-                    .<span class="ident">unwrap_or</span>(<span class="ident">ast_field</span>.<span class="ident">span</span>);
+                    .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">ast_field</span>.<span class="ident">span</span>());
 
                 <span class="prelude-val">Some</span>(<span class="ident">span</span>)
             }
@@ -322,7 +324,7 @@
                 <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">r</span>
                     .<span class="ident">ast_field</span>()
                     .<span class="ident">span_for_argument</span>(<span class="string">&quot;relation&quot;</span>, <span class="string">&quot;references&quot;</span>)
-                    .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>);
+                    .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>());
 
                 <span class="prelude-val">Some</span>(<span class="ident">span</span>)
             }
@@ -373,7 +375,9 @@
         }
 
         <span class="kw">let</span> <span class="ident">ast_field</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">ast_field</span>();
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">ast_field</span>.<span class="ident">span_for_attribute</span>(<span class="string">&quot;relation&quot;</span>).<span class="ident">unwrap_or</span>(<span class="ident">ast_field</span>.<span class="ident">span</span>);
+        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">ast_field</span>
+            .<span class="ident">span_for_attribute</span>(<span class="string">&quot;relation&quot;</span>)
+            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">ast_field</span>.<span class="ident">span</span>());
 
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
             <span class="ident">error_msg</span>,

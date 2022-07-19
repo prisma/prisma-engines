@@ -200,8 +200,10 @@
 <span id="195">195</span>
 <span id="196">196</span>
 <span id="197">197</span>
+<span id="198">198</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast</span>, <span class="ident">types</span>, <span class="ident">ParserDatabase</span>, <span class="ident">ScalarFieldType</span>, <span class="ident">ScalarType</span>};
 <span class="kw">use</span> <span class="ident">diagnostics::Span</span>;
+<span class="kw">use</span> <span class="ident">schema_ast::ast</span>::{<span class="ident">WithDocumentation</span>, <span class="ident">WithName</span>};
 
 <span class="doccomment">/// A composite type, introduced with the `type` keyword in the schema.</span>
 <span class="doccomment">///</span>
@@ -242,7 +244,7 @@
 
     <span class="doccomment">/// The name of the composite type in the schema.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="self">self</span>.<span class="ident">ctid</span>].<span class="ident">name</span>.<span class="ident">name</span>
+        <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="self">self</span>.<span class="ident">ctid</span>].<span class="ident">name</span>()
     }
 
     <span class="doccomment">/// Get the field with the given ID.</span>
@@ -303,7 +305,7 @@
 
     <span class="doccomment">/// The optional documentation string of the field.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">documentation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">ast_field</span>().<span class="ident">documentation</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">text</span>.<span class="ident">as_str</span>())
+        <span class="self">self</span>.<span class="ident">ast_field</span>().<span class="ident">documentation</span>()
     }
 
     <span class="doccomment">/// The name contained in the `@map()` attribute of the field, if any.</span>
@@ -318,7 +320,7 @@
 
     <span class="doccomment">/// The name of the field.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ast_field</span>().<span class="ident">name</span>.<span class="ident">name</span>
+        <span class="self">self</span>.<span class="ident">ast_field</span>().<span class="ident">name</span>()
     }
 
     <span class="doccomment">/// Is the field required, optional or a list?</span>
@@ -386,7 +388,7 @@
         <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">composite_type_fields</span>[<span class="kw-2">&amp;</span>(<span class="self">self</span>.<span class="ident">ctid</span>, <span class="ident">field_id</span>)]
             .<span class="ident">mapped_name</span>
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>[<span class="ident">id</span>])
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="self">self</span>.<span class="ident">ctid</span>][<span class="ident">field_id</span>].<span class="ident">name</span>.<span class="ident">name</span>)
+            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="self">self</span>.<span class="ident">ctid</span>][<span class="ident">field_id</span>].<span class="ident">name</span>())
     }
 
     <span class="doccomment">/// The final database name of the field. See crate docs for explanations on database names.</span>

@@ -40,8 +40,8 @@
 }
 
 <span class="kw">impl</span> <span class="ident">WithSpan</span> <span class="kw">for</span> <span class="ident">Identifier</span> {
-    <span class="kw">fn</span> <span class="ident">span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Span</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">span</span>
+    <span class="kw">fn</span> <span class="ident">span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Span</span> {
+        <span class="self">self</span>.<span class="ident">span</span>
     }
 }
 

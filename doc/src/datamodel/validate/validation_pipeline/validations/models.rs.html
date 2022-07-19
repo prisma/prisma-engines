@@ -277,7 +277,7 @@
 <span id="272">272</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::database_name::validate_db_name</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">common::preview_features::PreviewFeature</span>, <span class="ident">diagnostics::DatamodelError</span>,
+    <span class="ident">common::preview_features::PreviewFeature</span>, <span class="ident">diagnostics::DatamodelError</span>, <span class="ident">parser_database::ast::WithSpan</span>,
     <span class="ident">validate::validation_pipeline::context::Context</span>,
 };
 <span class="kw">use</span> <span class="ident">datamodel_connector</span>::{<span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>, <span class="ident">ConnectorCapability</span>};
@@ -324,7 +324,7 @@
     <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_model_validation_error</span>(
         <span class="ident">msg</span>.<span class="ident">as_ref</span>(),
         <span class="ident">model</span>.<span class="ident">name</span>(),
-        <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>,
+        <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>(),
     ))
 }
 
@@ -499,7 +499,7 @@
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_model_validation_error</span>(
             <span class="string">&quot;You defined a database name for the primary key on the model. This is not supported by the provider.&quot;</span>,
             <span class="ident">model</span>.<span class="ident">name</span>(),
-            <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>,
+            <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>(),
         ));
     }
 

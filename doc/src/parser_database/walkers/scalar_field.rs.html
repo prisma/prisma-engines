@@ -441,17 +441,15 @@
 <span id="436">436</span>
 <span id="437">437</span>
 <span id="438">438</span>
-<span id="439">439</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">ast</span>,
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::IndexFieldWalker</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">WithName</span>},
     <span class="ident">types</span>::{<span class="ident">DefaultAttribute</span>, <span class="ident">FieldWithArgs</span>, <span class="ident">OperatorClassStore</span>, <span class="ident">ScalarField</span>, <span class="ident">ScalarType</span>, <span class="ident">SortOrder</span>},
     <span class="ident">walkers</span>::{<span class="ident">EnumWalker</span>, <span class="ident">ModelWalker</span>, <span class="ident">Walker</span>},
     <span class="ident">OperatorClass</span>, <span class="ident">ParserDatabase</span>, <span class="ident">ScalarFieldType</span>,
 };
 <span class="kw">use</span> <span class="ident">diagnostics::Span</span>;
 <span class="kw">use</span> <span class="ident">either::Either</span>;
-
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::IndexFieldWalker</span>;
 
 <span class="doccomment">/// A scalar field, as part of a model.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
@@ -827,15 +825,15 @@
     <span class="doccomment">/// writing to the database.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_path_to_indexed_field</span>(<span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">args</span>().<span class="ident">path</span>;
-        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="self">self</span>.<span class="ident">model_id</span>][<span class="ident">path</span>.<span class="ident">root</span>()].<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>();
+        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="self">self</span>.<span class="ident">model_id</span>][<span class="ident">path</span>.<span class="ident">root</span>()].<span class="ident">name</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="ident">root</span>, <span class="prelude-val">None</span>)];
 
         <span class="kw">for</span> (<span class="ident">ctid</span>, <span class="ident">field_id</span>) <span class="kw">in</span> <span class="ident">path</span>.<span class="ident">path</span>() {
             <span class="kw">let</span> <span class="ident">ct</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="kw-2">*</span><span class="ident">ctid</span>];
-            <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">ct</span>[<span class="kw-2">*</span><span class="ident">field_id</span>].<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>();
+            <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">ct</span>[<span class="kw-2">*</span><span class="ident">field_id</span>].<span class="ident">name</span>();
 
-            <span class="ident">result</span>.<span class="ident">push</span>((<span class="ident">field</span>, <span class="prelude-val">Some</span>(<span class="ident">ct</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>())));
+            <span class="ident">result</span>.<span class="ident">push</span>((<span class="ident">field</span>, <span class="prelude-val">Some</span>(<span class="ident">ct</span>.<span class="ident">name</span>())));
         }
 
         <span class="ident">result</span>
@@ -852,7 +850,7 @@
 
             <span class="ident">mapped</span>
                 .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">interner</span>.<span class="ident">get</span>(<span class="ident">id</span>))
-                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="self">self</span>.<span class="ident">model_id</span>][<span class="ident">path</span>.<span class="ident">root</span>()].<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>())
+                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="self">self</span>.<span class="ident">model_id</span>][<span class="ident">path</span>.<span class="ident">root</span>()].<span class="ident">name</span>())
         };
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="ident">root</span>, <span class="prelude-val">None</span>)];
@@ -863,9 +861,9 @@
             <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">composite_type_fields</span>[<span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="ident">ctid</span>, <span class="kw-2">*</span><span class="ident">field_id</span>)]
                 .<span class="ident">mapped_name</span>
                 .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">interner</span>.<span class="ident">get</span>(<span class="ident">id</span>))
-                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">ct</span>[<span class="kw-2">*</span><span class="ident">field_id</span>].<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>());
+                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">ct</span>[<span class="kw-2">*</span><span class="ident">field_id</span>].<span class="ident">name</span>());
 
-            <span class="ident">result</span>.<span class="ident">push</span>((<span class="ident">field</span>, <span class="prelude-val">Some</span>(<span class="ident">ct</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>())));
+            <span class="ident">result</span>.<span class="ident">push</span>((<span class="ident">field</span>, <span class="prelude-val">Some</span>(<span class="ident">ct</span>.<span class="ident">name</span>())));
         }
 
         <span class="ident">result</span>
