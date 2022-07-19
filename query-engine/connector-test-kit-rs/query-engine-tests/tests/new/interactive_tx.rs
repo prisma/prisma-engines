@@ -369,3 +369,84 @@ mod interactive_tx {
         Ok(())
     }
 }
+
+#[test_suite(schema(generic))]
+mod itx_isolation {
+    use query_engine_tests::*;
+
+    // All (SQL) connectors support serializable.
+    #[connector_test(exclude(MongoDb))]
+    async fn basic_serializable(mut runner: Runner) -> TestResult<()> {
+        let tx_id = runner.start_tx(5000, 5000, Some("Serializable".to_owned())).await?;
+        runner.set_active_tx(tx_id.clone());
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1 }) { id }}"#),
+          @r###"{"data":{"createOneTestModel":{"id":1}}}"###
+        );
+
+        let res = runner.commit_tx(tx_id).await?;
+        assert!(res.is_ok());
+        runner.clear_active_tx();
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel { id field }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1,"field":null}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(exclude(MongoDb))]
+    async fn casing_doesnt_matter(mut runner: Runner) -> TestResult<()> {
+        let tx_id = runner.start_tx(5000, 5000, Some("sErIaLiZaBlE".to_owned())).await?;
+        runner.set_active_tx(tx_id.clone());
+
+        let res = runner.commit_tx(tx_id).await?;
+        assert!(res.is_ok());
+
+        Ok(())
+    }
+
+    #[connector_test(only(Postgres))]
+    async fn spacing_doesnt_matter(mut runner: Runner) -> TestResult<()> {
+        let tx_id = runner.start_tx(5000, 5000, Some("Repeatable Read".to_owned())).await?;
+        runner.set_active_tx(tx_id.clone());
+
+        let res = runner.commit_tx(tx_id).await?;
+        assert!(res.is_ok());
+
+        let tx_id = runner.start_tx(5000, 5000, Some("RepeatableRead".to_owned())).await?;
+        runner.set_active_tx(tx_id.clone());
+
+        let res = runner.commit_tx(tx_id).await?;
+        assert!(res.is_ok());
+
+        Ok(())
+    }
+
+    #[connector_test(exclude(MongoDb))]
+    async fn invalid_isolation(runner: Runner) -> TestResult<()> {
+        let tx_id = runner.start_tx(5000, 5000, Some("test".to_owned())).await;
+
+        match tx_id {
+            Ok(_) => panic!("Expected invalid isolation level string to throw an error, but it succeeded instead."),
+            Err(err) => assert!(err.to_string().contains("Invalid isolation level `test`")),
+        };
+
+        Ok(())
+    }
+
+    // Mongo doesn't support isolation levels.
+    #[connector_test(only(MongoDb))]
+    async fn mongo_failure(runner: Runner) -> TestResult<()> {
+        let tx_id = runner.start_tx(5000, 5000, Some("Serializable".to_owned())).await;
+
+        match tx_id {
+          Ok(_) => panic!("Expected mongo to throw an unsupported error, but it succeeded instead."),
+          Err(err) => assert!(dbg!(err.to_string()).contains("Unsupported connector feature: Mongo does not support setting transaction isolation levels")),
+        };
+
+        Ok(())
+    }
+}
