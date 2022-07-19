@@ -157,12 +157,12 @@ impl FromStr for IsolationLevel {
     type Err = Error;
 
     fn from_str(s: &str) -> crate::Result<Self> {
-        match s {
-            "READ UNCOMMITTED" => Ok(Self::ReadUncommitted),
-            "READ COMMITTED" => Ok(Self::ReadCommitted),
-            "REPEATABLE READ" => Ok(Self::RepeatableRead),
-            "SNAPSHOT" => Ok(Self::Snapshot),
-            "SERIALIZABLE" => Ok(Self::Serializable),
+        match s.to_lowercase().as_str() {
+            "read uncommitted" | "readuncommitted" => Ok(Self::ReadUncommitted),
+            "read committed" | "readcommitted" => Ok(Self::ReadCommitted),
+            "repeatable read" | "repeatableread" => Ok(Self::RepeatableRead),
+            "snapshot" => Ok(Self::Snapshot),
+            "serializable" => Ok(Self::Serializable),
             _ => {
                 let kind = ErrorKind::conversion(format!("Invalid isolation level `{}`", s));
                 Err(Error::builder(kind).build())
