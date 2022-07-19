@@ -443,8 +443,10 @@ mod itx_isolation {
         let tx_id = runner.start_tx(5000, 5000, Some("Serializable".to_owned())).await;
 
         match tx_id {
-          Ok(_) => panic!("Expected mongo to throw an unsupported error, but it succeeded instead."),
-          Err(err) => assert!(dbg!(err.to_string()).contains("Unsupported connector feature: Mongo does not support setting transaction isolation levels")),
+            Ok(_) => panic!("Expected mongo to throw an unsupported error, but it succeeded instead."),
+            Err(err) => assert!(dbg!(err.to_string()).contains(
+                "Unsupported connector feature: Mongo does not support setting transaction isolation levels"
+            )),
         };
 
         Ok(())
