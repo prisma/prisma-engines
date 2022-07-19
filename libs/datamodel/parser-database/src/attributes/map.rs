@@ -1,5 +1,5 @@
 use crate::{
-    ast::{self, WithName},
+    ast::{self, WithName, WithSpan},
     context::Context,
     types::{CompositeTypeField, ModelAttributes, ScalarField},
     DatamodelError, StringId,
@@ -18,7 +18,7 @@ pub(super) fn model(model_attributes: &mut ModelAttributes, model_id: ast::Model
         ctx.push_error(DatamodelError::new_duplicate_model_database_name_error(
             &ctx[mapped_name],
             existing_model_name,
-            ctx.ast[model_id].span,
+            ctx.ast[model_id].span(),
         ));
     }
 
@@ -54,8 +54,8 @@ pub(super) fn scalar_field(
     {
         ctx.push_error(DatamodelError::new_duplicate_field_error(
             ast_model.name(),
-            &ast_field.name.name,
-            ast_field.span,
+            ast_field.name(),
+            ast_field.span(),
         ));
     }
 
@@ -73,9 +73,9 @@ pub(super) fn scalar_field(
         {
             Some(name) if name != mapped_name => {}
             _ => ctx.push_error(DatamodelError::new_duplicate_field_error(
-                &ast_model.name.name,
-                &ast_field.name.name,
-                ast_field.span,
+                ast_model.name(),
+                ast_field.name(),
+                ast_field.span(),
             )),
         }
     }
@@ -102,9 +102,9 @@ pub(super) fn composite_type_field(
         .is_some()
     {
         ctx.push_error(DatamodelError::new_composite_type_duplicate_field_error(
-            &ct.name.name,
+            ct.name(),
             &ctx[mapped_name_id],
-            ast_field.span,
+            ast_field.span(),
         ));
     }
 
@@ -118,9 +118,9 @@ pub(super) fn composite_type_field(
         }
 
         ctx.push_error(DatamodelError::new_composite_type_duplicate_field_error(
-            &ct.name.name,
-            &ast_field.name.name,
-            ast_field.span,
+            ct.name(),
+            ast_field.name(),
+            ast_field.span(),
         ));
     }
 }

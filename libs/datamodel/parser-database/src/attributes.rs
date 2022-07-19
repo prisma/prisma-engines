@@ -410,7 +410,7 @@ fn visit_model_ignore(model_id: ast::ModelId, model_data: &mut ModelAttributes, 
             DatamodelError::new_attribute_validation_error(
                 "Fields on an already ignored Model do not need an `@ignore` annotation.",
                 "@ignore",
-                *ctx.ast[model_id][field_id].span(),
+                ctx.ast[model_id][field_id].span(),
             )
         })
         .collect();
@@ -574,7 +574,7 @@ fn model_unique(data: &mut ModelAttributes, model_id: ast::ModelId, ctx: &mut Co
         };
 
         if let Some(name) = name {
-            validate_client_name(current_attribute.span, &ast_model.name.name, name, "@@unique", ctx);
+            validate_client_name(current_attribute.span, ast_model.name(), name, "@@unique", ctx);
         }
 
         mapped_name
@@ -615,7 +615,7 @@ fn common_index_validations(
                     .iter()
                     .map(|(top_id, field_name)| match top_id {
                         ast::TopId::CompositeType(ctid) => {
-                            let composite_type = &ctx.ast[*ctid].name.name;
+                            let composite_type = &ctx.ast[*ctid].name();
 
                             Cow::from(format!("{field_name} in type {composite_type}"))
                         }
@@ -1007,8 +1007,8 @@ fn resolve_field_array_with_args<'db>(
                 None => Cow::from(attrs.field_name),
                 Some(ctid) => {
                     let field_id = path.field_in_index();
-                    let field_name = &ctx.ast[ctid][field_id].name.name;
-                    let composite_type = &ctx.ast[ctid].name.name;
+                    let field_name = &ctx.ast[ctid][field_id].name();
+                    let composite_type = &ctx.ast[ctid].name();
 
                     Cow::from(format!("{field_name} in type {composite_type}"))
                 }

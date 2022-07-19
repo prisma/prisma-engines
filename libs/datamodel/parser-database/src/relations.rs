@@ -1,5 +1,5 @@
 use crate::{
-    ast,
+    ast::{self, WithName},
     interner::StringId,
     {context::Context, types::RelationField},
 };
@@ -258,7 +258,7 @@ pub(super) fn ingest_relation<'db>(evidence: RelationEvidence<'db>, relations: &
             // We will meet the relation twice when we walk over all relation
             // fields, so we only instantiate it when the relation field is that
             // of model A, and the opposite is model B.
-            if evidence.ast_model.name.name > evidence.opposite_model.name.name {
+            if evidence.ast_model.name() > evidence.opposite_model.name() {
                 return;
             }
 
@@ -290,8 +290,8 @@ pub(super) fn ingest_relation<'db>(evidence: RelationEvidence<'db>, relations: &
             // This is a 1:1 relation that is required on both sides. We are going to reject this later,
             // so which model is model A doesn't matter.
 
-            if [evidence.ast_model.name.name.as_str(), evidence.ast_field.name()]
-                > [evidence.opposite_model.name.name.as_str(), opp_field.name()]
+            if [evidence.ast_model.name(), evidence.ast_field.name()]
+                > [evidence.opposite_model.name(), opp_field.name()]
             {
                 return;
             }
@@ -312,8 +312,8 @@ pub(super) fn ingest_relation<'db>(evidence: RelationEvidence<'db>, relations: &
             } else if opp_field_attributes.fields.is_none() {
                 // No fields defined, we have to break the tie: take the first model name / field name (self relations)
                 // in lexicographic order.
-                if [evidence.ast_model.name.name.as_str(), evidence.ast_field.name()]
-                    > [evidence.opposite_model.name.name.as_str(), opp_field.name()]
+                if [evidence.ast_model.name(), evidence.ast_field.name()]
+                    > [evidence.opposite_model.name(), opp_field.name()]
                 {
                     return;
                 }

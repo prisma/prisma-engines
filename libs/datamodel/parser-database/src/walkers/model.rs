@@ -5,7 +5,7 @@ pub use primary_key::*;
 
 pub(crate) use unique_criteria::*;
 
-use schema_ast::ast::{IndentationType, NewlineType};
+use schema_ast::ast::{IndentationType, NewlineType, WithSpan};
 
 use super::{
     CompleteInlineRelationWalker, IndexWalker, InlineRelationWalker, RelationFieldWalker, RelationWalker,
@@ -100,7 +100,7 @@ impl<'db> ModelWalker<'db> {
         self.model_attributes
             .mapped_name
             .map(|id| &self.db[id])
-            .unwrap_or_else(|| &self.db.ast[self.model_id].name.name)
+            .unwrap_or_else(|| self.db.ast[self.model_id].name())
     }
 
     /// Get the database name of the scalar field.
@@ -108,7 +108,7 @@ impl<'db> ModelWalker<'db> {
         self.db.types.scalar_fields[&(self.model_id, field_id)]
             .mapped_name
             .map(|id| &self.db[id])
-            .unwrap_or_else(|| &self.db.ast[self.model_id][field_id].name.name)
+            .unwrap_or_else(|| self.db.ast[self.model_id][field_id].name())
     }
 
     /// Get the database names of the constrained scalar fields.
@@ -284,7 +284,7 @@ impl<'db> ModelWalker<'db> {
         };
 
         let src = self.db.source();
-        let start = field.ast_field().span.start;
+        let start = field.ast_field().span().start;
 
         let mut spaces = 0;
 
@@ -309,7 +309,7 @@ impl<'db> ModelWalker<'db> {
         };
 
         let src = self.db.source();
-        let start = field.ast_field().span.end - 2;
+        let start = field.ast_field().span().end - 2;
 
         match src.chars().nth(start) {
             Some('\r') => NewlineType::Windows,

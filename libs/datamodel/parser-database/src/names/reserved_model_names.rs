@@ -1,4 +1,7 @@
-use crate::{ast, DatamodelError, Diagnostics};
+use crate::{
+    ast::{self, WithName, WithSpan},
+    DatamodelError, Diagnostics,
+};
 
 /// Is this a valid type name for the Prisma client API?
 pub fn is_reserved_type_name(name: &str) -> bool {
@@ -6,17 +9,17 @@ pub fn is_reserved_type_name(name: &str) -> bool {
 }
 
 pub(crate) fn validate_model_name(ast_model: &ast::Model, diagnostics: &mut Diagnostics) {
-    if !is_reserved_type_name(&ast_model.name.name) {
+    if !is_reserved_type_name(ast_model.name()) {
         return;
     }
 
     diagnostics.push_error(DatamodelError::new_model_validation_error(
         &format!(
             "The model name `{}` is invalid. It is a reserved name. Please change it. Read more at https://pris.ly/d/naming-models",
-            &ast_model.name.name
+            ast_model.name()
         ),
-        &ast_model.name.name,
-        ast_model.span,
+        ast_model.name(),
+        ast_model.span(),
     ))
 }
 
@@ -28,10 +31,10 @@ pub(crate) fn validate_enum_name(ast_enum: &ast::Enum, diagnostics: &mut Diagnos
     diagnostics.push_error(DatamodelError::new_enum_validation_error(
         &format!(
           "The enum name `{}` is invalid. It is a reserved name. Please change it. Read more at https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-schema/data-model#naming-enums",
-          &ast_enum.name.name
+          ast_enum.name()
         ),
-        &ast_enum.name.name,
-        ast_enum.span,
+        ast_enum.name(),
+        ast_enum.span(),
 ));
 }
 

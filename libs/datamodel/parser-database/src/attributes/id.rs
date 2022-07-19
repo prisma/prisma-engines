@@ -1,13 +1,12 @@
-use std::borrow::Cow;
-
 use super::{FieldResolutionError, FieldResolvingSetup};
 use crate::{
-    ast::{self, WithName},
+    ast::{self, WithName, WithSpan},
     attributes::resolve_field_array_with_args,
     context::Context,
     types::{FieldWithArgs, IdAttribute, IndexFieldPath, ModelAttributes, SortOrder},
     DatamodelError, StringId,
 };
+use std::borrow::Cow;
 
 /// @@id on models
 pub(super) fn model(model_data: &mut ModelAttributes, model_id: ast::ModelId, ctx: &mut Context<'_>) {
@@ -31,7 +30,7 @@ pub(super) fn model(model_data: &mut ModelAttributes, model_id: ast::ModelId, ct
                     .into_iter()
                     .map(|(top_id, field_name)| match top_id {
                         ast::TopId::CompositeType(ctid) => {
-                            let ct_name = &ctx.ast[ctid].name.name;
+                            let ct_name = &ctx.ast[ctid].name();
 
                             Cow::from(format!("{field_name} in type {ct_name}"))
                         }
@@ -104,7 +103,7 @@ pub(super) fn model(model_data: &mut ModelAttributes, model_id: ast::ModelId, ct
                 "The id definition refers to the optional fields {}. ID definitions must reference only required fields.",
                 fields_that_are_not_required.join(", ")
             ),
-            &ast_model.name.name,
+            ast_model.name(),
             attr.span,
         ))
     }
@@ -113,7 +112,7 @@ pub(super) fn model(model_data: &mut ModelAttributes, model_id: ast::ModelId, ct
         ctx.push_error(DatamodelError::new_model_validation_error(
             "Each model must have at most one id criteria. You can't have `@id` and `@@id` at the same time.",
             ast_model.name(),
-            ast_model.span,
+            ast_model.span(),
         ))
     }
 
@@ -122,7 +121,7 @@ pub(super) fn model(model_data: &mut ModelAttributes, model_id: ast::ModelId, ct
         let name = super::get_name_argument(ctx);
 
         if let Some(name) = name {
-            super::validate_client_name(attr.span, &ast_model.name.name, name, "@@id", ctx);
+            super::validate_client_name(attr.span(), ast_model.name(), name, "@@id", ctx);
         }
 
         (name, mapped_name)
@@ -150,7 +149,7 @@ pub(super) fn field<'db>(
         Some(_) => ctx.push_error(DatamodelError::new_model_validation_error(
             "At most one field must be marked as the id field with the `@id` attribute.",
             ast_model.name(),
-            ast_model.span,
+            ast_model.span(),
         )),
         None => {
             let mapped_name = primary_key_mapped_name(ctx);

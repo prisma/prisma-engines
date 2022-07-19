@@ -561,7 +561,7 @@ fn visit_composite_type<'db>(ct_id: ast::CompositeTypeId, ct: &'db ast::Composit
             }
             Ok(FieldType::Model(referenced_model_id)) => {
                 let referenced_model_name = ctx.ast[referenced_model_id].name();
-                ctx.push_error(DatamodelError::new_composite_type_validation_error(&format!("{} refers to a model, making this a relation field. Relation fields inside composite types are not supported.", referenced_model_name), &ct.name.name, ast_field.field_type.span()))
+                ctx.push_error(DatamodelError::new_composite_type_validation_error(&format!("{} refers to a model, making this a relation field. Relation fields inside composite types are not supported.", referenced_model_name), ct.name(), ast_field.field_type.span()))
             }
             Err(supported) => ctx.push_error(DatamodelError::new_type_not_found_error(
                 supported,

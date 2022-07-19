@@ -2,7 +2,7 @@ use super::default_value;
 use crate::validate::validation_pipeline::context::Context;
 use diagnostics::DatamodelError;
 use parser_database::{
-    ast,
+    ast::{self, WithSpan},
     walkers::{CompositeTypeFieldWalker, CompositeTypeWalker},
     ScalarFieldType,
 };
@@ -40,7 +40,7 @@ pub(super) fn detect_composite_cycles(ctx: &mut Context<'_>) {
                         msg,
                         field.composite_type().name(),
                         field.name(),
-                        field.ast_field().span,
+                        field.ast_field().span(),
                     ),
                 ));
             }
@@ -56,7 +56,7 @@ pub(super) fn detect_composite_cycles(ctx: &mut Context<'_>) {
                         &msg,
                         field.composite_type().name(),
                         field.name(),
-                        field.ast_field().span,
+                        field.ast_field().span(),
                     ),
                 ));
             }

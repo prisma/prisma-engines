@@ -9,6 +9,7 @@ use crate::{
 use datamodel_connector::ReferentialIntegrity;
 use enumflags2::BitFlags;
 use mongodb_datamodel_connector::*;
+use parser_database::ast::WithDocumentation;
 use sql_datamodel_connector::*;
 use std::{borrow::Cow, collections::HashMap, convert::TryFrom};
 
@@ -140,7 +141,7 @@ impl DatasourceLoader {
 
         preview_features_guardrail(&args, diagnostics);
 
-        let documentation = ast_source.documentation.as_ref().map(|comment| comment.text.clone());
+        let documentation = ast_source.documentation().map(String::from);
         let referential_integrity = get_referential_integrity(&args, preview_features, ast_source, diagnostics);
 
         let active_connector: &'static dyn datamodel_connector::Connector = match provider {

@@ -1,6 +1,6 @@
 use crate::validate::validation_pipeline::{context::Context, validations::relations::RELATION_ATTRIBUTE_NAME};
 use datamodel_connector::{ConnectorCapability, DatamodelError};
-use parser_database::walkers::ImplicitManyToManyRelationWalker;
+use parser_database::{ast::WithSpan, walkers::ImplicitManyToManyRelationWalker};
 
 /// Our weird many-to-many requirement.
 pub(crate) fn validate_singular_id(relation: ImplicitManyToManyRelationWalker<'_>, ctx: &mut Context<'_>) {
@@ -17,7 +17,7 @@ pub(crate) fn validate_singular_id(relation: ImplicitManyToManyRelationWalker<'_
                 &message,
                 relation_field.model().name(),
                 relation_field.name(),
-                relation_field.ast_field().span,
+                relation_field.ast_field().span(),
             ));
 
             continue;
@@ -30,7 +30,7 @@ pub(crate) fn validate_singular_id(relation: ImplicitManyToManyRelationWalker<'_
                 &relation_field.related_model().name(),
                 relation_field.referenced_fields().into_iter().flatten().map(|f| f.name()).collect::<Vec<_>>().join(", ")
             ),
-            relation_field.ast_field().span)
+            relation_field.ast_field().span())
         );
         }
     }
@@ -62,7 +62,7 @@ pub(crate) fn supports_implicit_relations(relation: ImplicitManyToManyRelationWa
 
     let spans = [relation.field_a(), relation.field_b()]
         .into_iter()
-        .map(|r| r.ast_field().span);
+        .map(|r| r.ast_field().span());
 
     let msg = format!(
         "Implicit many-to-many relations are not supported on {}. Please use the syntax defined in https://pris.ly/d/document-database-many-to-many",
@@ -81,7 +81,7 @@ pub(crate) fn cannot_define_references_argument(relation: ImplicitManyToManyRela
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             msg,
             RELATION_ATTRIBUTE_NAME,
-            relation.field_a().ast_field().span,
+            relation.field_a().ast_field().span(),
         ));
     }
 
@@ -89,7 +89,7 @@ pub(crate) fn cannot_define_references_argument(relation: ImplicitManyToManyRela
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             msg,
             RELATION_ATTRIBUTE_NAME,
-            relation.field_b().ast_field().span,
+            relation.field_b().ast_field().span(),
         ));
     }
 }

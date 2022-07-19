@@ -1,7 +1,9 @@
-use std::collections::HashMap;
-
-use datamodel::parser_database::walkers::{CompleteInlineRelationWalker, ModelWalker, ScalarFieldWalker};
+use datamodel::parser_database::{
+    ast::WithSpan,
+    walkers::{CompleteInlineRelationWalker, ModelWalker, ScalarFieldWalker},
+};
 use lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand, CodeActionParams, Range, TextEdit, WorkspaceEdit};
+use std::collections::HashMap;
 
 /// If the referencing side of the one-to-one relation does not point
 /// to a unique constraint, the action adds the attribute.
@@ -78,7 +80,7 @@ pub(super) fn add_referencing_side_unique(
     let diagnostics = super::diagnostics_for_span(
         schema,
         &params.context.diagnostics,
-        relation.referencing_field().ast_field().span,
+        relation.referencing_field().ast_field().span(),
     );
 
     let action = CodeAction {
@@ -164,7 +166,7 @@ pub(super) fn add_referenced_side_unique(
     let diagnostics = super::diagnostics_for_span(
         schema,
         &params.context.diagnostics,
-        relation.referencing_field().ast_field().span,
+        relation.referencing_field().ast_field().span(),
     );
 
     let action = CodeAction {
@@ -187,7 +189,7 @@ fn create_missing_unique<'a>(
         let new_text = String::from(" @unique");
 
         let field = fields.next().unwrap();
-        let position = crate::position_after_span(field.ast_field().span, schema);
+        let position = crate::position_after_span(field.ast_field().span(), schema);
 
         let range = Range {
             start: position,
@@ -209,8 +211,8 @@ fn create_missing_unique<'a>(
 
         let new_text = format!("{separator}{indentation}@@unique([{fields}]){newline}}}");
 
-        let start = crate::offset_to_position(model.ast_model().span.end - 1, schema).unwrap();
-        let end = crate::offset_to_position(model.ast_model().span.end, schema).unwrap();
+        let start = crate::offset_to_position(model.ast_model().span().end - 1, schema).unwrap();
+        let end = crate::offset_to_position(model.ast_model().span().end, schema).unwrap();
 
         let range = Range { start, end };
 

@@ -1,5 +1,6 @@
 use super::*;
 use crate::{diagnostics::DatamodelError, validate::validation_pipeline::context::Context};
+use parser_database::ast::WithSpan;
 
 /// A relation should have the explicit and back-relation side defined.
 pub(crate) fn both_sides_are_defined(relation: InlineRelationWalker<'_>, ctx: &mut Context<'_>) {
@@ -20,7 +21,7 @@ pub(crate) fn both_sides_are_defined(relation: InlineRelationWalker<'_>, ctx: &m
         &message,
         field.model().name(),
         field.name(),
-        field.ast_field().span,
+        field.ast_field().span(),
     ));
 }
 
@@ -40,7 +41,7 @@ pub(crate) fn fields_and_references_are_defined(relation: InlineRelationWalker<'
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
-            forward.ast_field().span,
+            forward.ast_field().span(),
         ));
 
         // Do the same on the other field.
@@ -53,7 +54,7 @@ pub(crate) fn fields_and_references_are_defined(relation: InlineRelationWalker<'
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
-            back.ast_field().span,
+            back.ast_field().span(),
         ));
     }
 
@@ -66,7 +67,7 @@ pub(crate) fn fields_and_references_are_defined(relation: InlineRelationWalker<'
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
-            forward.ast_field().span,
+            forward.ast_field().span(),
         ));
 
         // Same message on the other field.
@@ -79,7 +80,7 @@ pub(crate) fn fields_and_references_are_defined(relation: InlineRelationWalker<'
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
-            back.ast_field().span,
+            back.ast_field().span(),
         ));
     }
 }
@@ -103,13 +104,13 @@ pub(crate) fn fields_and_references_defined_on_one_side_only(
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
-            forward.ast_field().span,
+            forward.ast_field().span(),
         ));
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
-            back.ast_field().span,
+            back.ast_field().span(),
         ));
     }
 
@@ -122,13 +123,13 @@ pub(crate) fn fields_and_references_defined_on_one_side_only(
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
-            forward.ast_field().span,
+            forward.ast_field().span(),
         ));
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
-            back.ast_field().span,
+            back.ast_field().span(),
         ));
     }
 }
@@ -152,7 +153,7 @@ pub(crate) fn referential_actions(relation: InlineRelationWalker<'_>, ctx: &mut 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
-            back.ast_field().span,
+            back.ast_field().span(),
         ));
 
         let message = format!(
@@ -163,7 +164,7 @@ pub(crate) fn referential_actions(relation: InlineRelationWalker<'_>, ctx: &mut 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
-            forward.ast_field().span,
+            forward.ast_field().span(),
         ));
     } else if back.explicit_on_delete().is_some() || back.explicit_on_update().is_some() {
         let message = &format!(
@@ -174,7 +175,7 @@ pub(crate) fn referential_actions(relation: InlineRelationWalker<'_>, ctx: &mut 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             message,
             RELATION_ATTRIBUTE_NAME,
-            back.ast_field().span,
+            back.ast_field().span(),
         ));
     }
 }
@@ -196,13 +197,13 @@ pub(crate) fn fields_references_mixups(relation: InlineRelationWalker<'_>, ctx: 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
-            forward.ast_field().span,
+            forward.ast_field().span(),
         ));
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
-            back.ast_field().span,
+            back.ast_field().span(),
         ));
     }
 
@@ -215,7 +216,7 @@ pub(crate) fn fields_references_mixups(relation: InlineRelationWalker<'_>, ctx: 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
-            forward.ast_field().span,
+            forward.ast_field().span(),
         ));
     }
 }
@@ -236,7 +237,7 @@ pub(crate) fn back_relation_arity_is_optional(relation: InlineRelationWalker<'_>
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
-            back.ast_field().span,
+            back.ast_field().span(),
         ));
     }
 }
@@ -259,7 +260,7 @@ pub(crate) fn fields_and_references_on_wrong_side(relation: InlineRelationWalker
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             RELATION_ATTRIBUTE_NAME,
-            back.ast_field().span,
+            back.ast_field().span(),
         ));
     }
 }
@@ -304,6 +305,6 @@ pub(crate) fn fields_must_be_a_unique_constraint(relation: InlineRelationWalker<
     ctx.push_error(DatamodelError::new_attribute_validation_error(
         &message,
         RELATION_ATTRIBUTE_NAME,
-        forward.ast_field().span,
+        forward.ast_field().span(),
     ));
 }

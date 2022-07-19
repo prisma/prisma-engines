@@ -85,9 +85,9 @@ impl Top {
 }
 
 impl WithSpan for Top {
-    fn span(&self) -> &Span {
+    fn span(&self) -> Span {
         match self {
-            Top::CompositeType(ct) => &ct.span,
+            Top::CompositeType(ct) => ct.span,
             Top::Enum(en) => en.span(),
             Top::Model(model) => model.span(),
             Top::Source(source) => source.span(),

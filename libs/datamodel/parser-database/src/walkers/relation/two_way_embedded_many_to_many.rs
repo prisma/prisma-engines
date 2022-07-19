@@ -1,9 +1,7 @@
 use crate::{
     relations::{Relation, RelationAttributes},
-    walkers::{ModelWalker, RelationFieldWalker},
+    walkers::{ModelWalker, RelationFieldWalker, RelationWalker},
 };
-
-use super::RelationWalker;
 
 /// Describes an explicit m:n relation between two models. Both sides define
 /// `fields` which must be a single array scalar field, and `references` that

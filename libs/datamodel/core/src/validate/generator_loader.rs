@@ -5,7 +5,10 @@ use crate::{
     diagnostics::*,
 };
 use itertools::Itertools;
-use parser_database::{ast, ValueListValidator, ValueValidator};
+use parser_database::{
+    ast::{self, WithDocumentation},
+    ValueListValidator, ValueValidator,
+};
 use std::{collections::HashMap, convert::TryFrom};
 
 const PROVIDER_KEY: &str = "provider";
@@ -69,7 +72,7 @@ impl GeneratorLoader {
                 diagnostics.push_error(DatamodelError::new_generator_argument_not_found_error(
                     PROVIDER_KEY,
                     &ast_generator.name.name,
-                    *ast_generator.span(),
+                    ast_generator.span(),
                 ));
                 return None;
             }
@@ -144,7 +147,7 @@ impl GeneratorLoader {
             binary_targets,
             preview_features,
             config: properties,
-            documentation: ast_generator.documentation.clone().map(|comment| comment.text),
+            documentation: ast_generator.documentation().map(String::from),
         })
     }
 }

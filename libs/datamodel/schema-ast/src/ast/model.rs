@@ -29,7 +29,7 @@ pub struct Model {
     /// model Foo { .. }
     ///       ^^^
     /// ```
-    pub name: Identifier,
+    pub(crate) name: Identifier,
     /// The fields of the model.
     ///
     /// ```ignore
@@ -40,7 +40,7 @@ pub struct Model {
     ///   ^^^^^^^^^^^^
     /// }
     /// ```
-    pub fields: Vec<Field>,
+    pub(crate) fields: Vec<Field>,
     /// The attributes of this model.
     ///
     /// ```ignore
@@ -65,9 +65,9 @@ pub struct Model {
     ///   field String
     /// }
     /// ```
-    pub documentation: Option<Comment>,
+    pub(crate) documentation: Option<Comment>,
     /// The location of this model in the text representation.
-    pub span: Span,
+    pub(crate) span: Span,
 }
 
 impl Model {
@@ -86,8 +86,8 @@ impl WithIdentifier for Model {
 }
 
 impl WithSpan for Model {
-    fn span(&self) -> &Span {
-        &self.span
+    fn span(&self) -> Span {
+        self.span
     }
 }
 
@@ -98,7 +98,7 @@ impl WithAttributes for Model {
 }
 
 impl WithDocumentation for Model {
-    fn documentation(&self) -> &Option<Comment> {
-        &self.documentation
+    fn documentation(&self) -> Option<&str> {
+        self.documentation.as_ref().map(|doc| doc.text.as_str())
     }
 }

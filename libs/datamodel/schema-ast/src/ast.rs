@@ -16,9 +16,10 @@ mod source_config;
 mod top;
 mod traits;
 
+pub(crate) use self::comment::Comment;
+
 pub use argument::{Argument, ArgumentsList, EmptyArgument};
 pub use attribute::{Attribute, AttributeContainer, AttributeId};
-pub use comment::Comment;
 pub use composite_type::{CompositeType, CompositeTypeId};
 pub use config::ConfigBlockProperty;
 pub use diagnostics::Span;
