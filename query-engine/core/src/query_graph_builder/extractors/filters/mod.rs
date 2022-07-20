@@ -134,7 +134,7 @@ where
                     Err(_) => {
                         let filters = match container.find_field(&key).expect("Invalid field passed validation.") {
                             Field::Relation(rf) => extract_relation_filters(&rf, value),
-                            Field::Scalar(sf) => extract_scalar_filters(&sf, value),
+                            Field::Scalar(sf) => extract_scalar_filters(container, &sf, value),
                             Field::Composite(cf) => extract_composite_filters(&cf, value),
                         }?;
 
@@ -199,8 +199,9 @@ fn fold_search_filters(filters: &Vec<Filter>) -> Vec<Filter> {
         match filter {
             Filter::Scalar(ref sf) => match sf.condition {
                 ScalarCondition::Search(ref pv, _) => {
+                    let pv = pv.as_value().unwrap();
                     // If there's already an entry, then store the "additional" projections that will need to be merged
-                    if let Some(projections) = projections_by_val.get_mut(&pv) {
+                    if let Some(projections) = projections_by_val.get_mut(pv) {
                         projections.push(sf.projection.clone());
                     } else {
                         // Otherwise, store the first search filter found on which we'll merge the additional projections
@@ -249,7 +250,11 @@ fn fold_search_filters(filters: &Vec<Filter>) -> Vec<Filter> {
 
 /// Field is the field the filter is refering to and `value` is the passed filter. E.g. `where: { <field>: <value> }.
 /// `value` can be either a flat scalar (for shorthand filter notation) or an object (full filter syntax).
-fn extract_scalar_filters(field: &ScalarFieldRef, value: ParsedInputValue) -> QueryGraphBuilderResult<Vec<Filter>> {
+fn extract_scalar_filters(
+    container: &ParentContainer,
+    field: &ScalarFieldRef,
+    value: ParsedInputValue,
+) -> QueryGraphBuilderResult<Vec<Filter>> {
     match value {
         ParsedInputValue::Single(pv) => Ok(vec![field.equals(pv)]),
         ParsedInputValue::Map(mut filter_map) => {

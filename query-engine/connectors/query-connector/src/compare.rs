@@ -1,71 +1,71 @@
-use crate::{filter::Filter, JsonFilterPath, JsonTargetType};
+use crate::{filter::Filter, ConditionListValue, ConditionValue, JsonFilterPath, JsonTargetType};
 use prisma_models::PrismaValue;
 
 /// Comparing methods for scalar fields.
 pub trait ScalarCompare {
-    fn is_in<T>(&self, val: Vec<T>) -> Filter
+    fn is_in<T>(&self, val: T) -> Filter
     where
-        T: Into<PrismaValue>;
+        T: Into<ConditionListValue>;
 
-    fn not_in<T>(&self, val: Vec<T>) -> Filter
+    fn not_in<T>(&self, val: T) -> Filter
     where
-        T: Into<PrismaValue>;
+        T: Into<ConditionListValue>;
 
     fn equals<T>(&self, val: T) -> Filter
     where
-        T: Into<PrismaValue>;
+        T: Into<ConditionValue>;
 
     fn not_equals<T>(&self, val: T) -> Filter
     where
-        T: Into<PrismaValue>;
+        T: Into<ConditionValue>;
 
     fn contains<T>(&self, val: T) -> Filter
     where
-        T: Into<PrismaValue>;
+        T: Into<ConditionValue>;
 
     fn not_contains<T>(&self, val: T) -> Filter
     where
-        T: Into<PrismaValue>;
+        T: Into<ConditionValue>;
 
     fn starts_with<T>(&self, val: T) -> Filter
     where
-        T: Into<PrismaValue>;
+        T: Into<ConditionValue>;
 
     fn not_starts_with<T>(&self, val: T) -> Filter
     where
-        T: Into<PrismaValue>;
+        T: Into<ConditionValue>;
 
     fn ends_with<T>(&self, val: T) -> Filter
     where
-        T: Into<PrismaValue>;
+        T: Into<ConditionValue>;
 
     fn not_ends_with<T>(&self, val: T) -> Filter
     where
-        T: Into<PrismaValue>;
+        T: Into<ConditionValue>;
 
     fn less_than<T>(&self, val: T) -> Filter
     where
-        T: Into<PrismaValue>;
+        T: Into<ConditionValue>;
 
     fn less_than_or_equals<T>(&self, val: T) -> Filter
     where
-        T: Into<PrismaValue>;
+        T: Into<ConditionValue>;
 
     fn greater_than<T>(&self, val: T) -> Filter
     where
-        T: Into<PrismaValue>;
+        T: Into<ConditionValue>;
 
     fn greater_than_or_equals<T>(&self, val: T) -> Filter
     where
-        T: Into<PrismaValue>;
+        T: Into<ConditionValue>;
 
     fn search<T>(&self, val: T) -> Filter
     where
-        T: Into<PrismaValue>;
+        T: Into<ConditionValue>;
 
     fn not_search<T>(&self, val: T) -> Filter
     where
-        T: Into<PrismaValue>;
+        T: Into<ConditionValue>;
 
     fn is_set(&self, val: bool) -> Filter;
 }
@@ -95,15 +95,15 @@ pub trait RelationCompare {
 pub trait ScalarListCompare {
     fn contains_element<T>(&self, value: T) -> Filter
     where
-        T: Into<PrismaValue>;
+        T: Into<ConditionValue>;
 
-    fn contains_every_element<T>(&self, filter: Vec<T>) -> Filter
+    fn contains_every_element<T>(&self, filter: T) -> Filter
     where
-        T: Into<PrismaValue>;
+        T: Into<ConditionListValue>;
 
-    fn contains_some_element<T>(&self, filter: Vec<T>) -> Filter
+    fn contains_some_element<T>(&self, filter: T) -> Filter
     where
-        T: Into<PrismaValue>;
+        T: Into<ConditionListValue>;
 
     fn is_empty_list(&self, b: bool) -> Filter;
 }
@@ -112,51 +112,51 @@ pub trait ScalarListCompare {
 pub trait JsonCompare {
     fn json_equals<T>(&self, value: T, path: Option<JsonFilterPath>) -> Filter
     where
-        T: Into<PrismaValue>;
+        T: Into<ConditionValue>;
 
     fn json_not_equals<T>(&self, value: T, path: Option<JsonFilterPath>) -> Filter
     where
-        T: Into<PrismaValue>;
+        T: Into<ConditionValue>;
 
     fn json_less_than<T>(&self, value: T, path: Option<JsonFilterPath>) -> Filter
     where
-        T: Into<PrismaValue>;
+        T: Into<ConditionValue>;
 
     fn json_less_than_or_equals<T>(&self, value: T, path: Option<JsonFilterPath>) -> Filter
     where
-        T: Into<PrismaValue>;
+        T: Into<ConditionValue>;
 
     fn json_greater_than<T>(&self, value: T, path: Option<JsonFilterPath>) -> Filter
     where
-        T: Into<PrismaValue>;
+        T: Into<ConditionValue>;
 
     fn json_greater_than_or_equals<T>(&self, value: T, path: Option<JsonFilterPath>) -> Filter
     where
-        T: Into<PrismaValue>;
+        T: Into<ConditionValue>;
 
     fn json_contains<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
     where
-        T: Into<PrismaValue>;
+        T: Into<ConditionValue>;
 
     fn json_not_contains<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
     where
-        T: Into<PrismaValue>;
+        T: Into<ConditionValue>;
 
     fn json_starts_with<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
     where
-        T: Into<PrismaValue>;
+        T: Into<ConditionValue>;
 
     fn json_not_starts_with<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
     where
-        T: Into<PrismaValue>;
+        T: Into<ConditionValue>;
 
     fn json_ends_with<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
     where
-        T: Into<PrismaValue>;
+        T: Into<ConditionValue>;
 
     fn json_not_ends_with<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
     where
-        T: Into<PrismaValue>;
+        T: Into<ConditionValue>;
 }
 
 /// Comparison methods for composite fields.

@@ -208,16 +208,37 @@ fn scalar_list_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> Inp
 
     let mapped_nonlist_type = map_scalar_input_type(ctx, &sf.type_identifier, false);
     let mapped_list_type = InputType::list(mapped_nonlist_type.clone());
-    let mut fields: Vec<_> = equality_filters(mapped_list_type.clone(), !sf.is_required()).collect();
+    let mut fields: Vec<_> = equality_filters(ctx, mapped_list_type.clone(), !sf.is_required()).collect();
 
     fields.push(
-        input_field(filters::HAS, mapped_nonlist_type, None)
-            .optional()
-            .nullable_if(!sf.is_required()),
+        input_field(
+            filters::HAS,
+            vec![mapped_nonlist_type, InputType::object(field_reference_object_type(ctx))],
+            None,
+        )
+        .optional()
+        .nullable_if(!sf.is_required()),
     );
 
-    fields.push(input_field(filters::HAS_EVERY, mapped_list_type.clone(), None).optional());
-    fields.push(input_field(filters::HAS_SOME, mapped_list_type, None).optional());
+    fields.push(
+        input_field(
+            filters::HAS_EVERY,
+            vec![
+                mapped_list_type.clone(),
+                InputType::object(field_reference_object_type(ctx)),
+            ],
+            None,
+        )
+        .optional(),
+    );
+    fields.push(
+        input_field(
+            filters::HAS_SOME,
+            vec![mapped_list_type, InputType::object(field_reference_object_type(ctx))],
+            None,
+        )
+        .optional(),
+    );
     fields.push(input_field(filters::IS_EMPTY, InputType::boolean(), None).optional());
 
     object.set_fields(fields);
@@ -245,9 +266,9 @@ fn full_scalar_filter_type(
     let mapped_scalar_type = map_scalar_input_type(ctx, typ, list);
 
     let mut fields: Vec<_> = match typ {
-        TypeIdentifier::String | TypeIdentifier::UUID => equality_filters(mapped_scalar_type.clone(), nullable)
-            .chain(inclusion_filters(mapped_scalar_type.clone(), nullable))
-            .chain(alphanumeric_filters(mapped_scalar_type.clone()))
+        TypeIdentifier::String | TypeIdentifier::UUID => equality_filters(ctx, mapped_scalar_type.clone(), nullable)
+            .chain(inclusion_filters(ctx, mapped_scalar_type.clone(), nullable))
+            .chain(alphanumeric_filters(ctx, mapped_scalar_type.clone()))
             .chain(string_filters(ctx, mapped_scalar_type.clone()))
             .chain(query_mode_field(ctx, nested))
             .collect(),
@@ -256,9 +277,9 @@ fn full_scalar_filter_type(
         | TypeIdentifier::BigInt
         | TypeIdentifier::Float
         | TypeIdentifier::DateTime
-        | TypeIdentifier::Decimal => equality_filters(mapped_scalar_type.clone(), nullable)
-            .chain(inclusion_filters(mapped_scalar_type.clone(), nullable))
-            .chain(alphanumeric_filters(mapped_scalar_type.clone()))
+        | TypeIdentifier::Decimal => equality_filters(ctx, mapped_scalar_type.clone(), nullable)
+            .chain(inclusion_filters(ctx, mapped_scalar_type.clone(), nullable))
+            .chain(alphanumeric_filters(ctx, mapped_scalar_type.clone()))
             .collect(),
 
         TypeIdentifier::Json => {
@@ -275,7 +296,7 @@ fn full_scalar_filter_type(
                     .capabilities
                     .contains(ConnectorCapability::JsonFilteringAlphanumeric)
                 {
-                    filters.extend(alphanumeric_filters(mapped_scalar_type.clone()))
+                    filters.extend(alphanumeric_filters(ctx, mapped_scalar_type.clone()))
                 }
             }
 
@@ -283,11 +304,11 @@ fn full_scalar_filter_type(
         }
 
         TypeIdentifier::Boolean | TypeIdentifier::Xml => {
-            equality_filters(mapped_scalar_type.clone(), nullable).collect()
+            equality_filters(ctx, mapped_scalar_type.clone(), nullable).collect()
         }
 
-        TypeIdentifier::Bytes | TypeIdentifier::Enum(_) => equality_filters(mapped_scalar_type.clone(), nullable)
-            .chain(inclusion_filters(mapped_scalar_type.clone(), nullable))
+        TypeIdentifier::Bytes | TypeIdentifier::Enum(_) => equality_filters(ctx, mapped_scalar_type.clone(), nullable)
+            .chain(inclusion_filters(ctx, mapped_scalar_type.clone(), nullable))
             .collect(),
 
         TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
@@ -361,11 +382,19 @@ fn is_set_input_field() -> InputField {
     input_field(filters::IS_SET, InputType::boolean(), None).optional()
 }
 
-fn equality_filters(mapped_type: InputType, nullable: bool) -> impl Iterator<Item = InputField> {
+fn equality_filters(
+    ctx: &mut BuilderContext,
+    mapped_type: InputType,
+    nullable: bool,
+) -> impl Iterator<Item = InputField> {
     std::iter::once(
-        input_field(filters::EQUALS, mapped_type, None)
-            .optional()
-            .nullable_if(nullable),
+        input_field(
+            filters::EQUALS,
+            vec![mapped_type, InputType::object(field_reference_object_type(ctx))],
+            None,
+        )
+        .optional()
+        .nullable_if(nullable),
     )
 }
 
@@ -387,37 +416,60 @@ fn json_equality_filters(
     std::iter::once(field)
 }
 
-fn inclusion_filters(mapped_type: InputType, nullable: bool) -> impl Iterator<Item = InputField> {
+fn inclusion_filters(
+    ctx: &mut BuilderContext,
+    mapped_type: InputType,
+    nullable: bool,
+) -> impl Iterator<Item = InputField> {
     let typ = InputType::list(mapped_type);
 
     vec![
-        input_field(filters::IN, typ.clone(), None)
-            .optional()
-            .nullable_if(nullable),
-        input_field(filters::NOT_IN, typ, None).optional().nullable_if(nullable), // Kept for legacy reasons!
+        input_field(
+            filters::IN,
+            vec![typ.clone(), InputType::object(field_reference_object_type(ctx))],
+            None,
+        )
+        .optional()
+        .nullable_if(nullable),
+        input_field(
+            filters::NOT_IN,
+            vec![typ, InputType::object(field_reference_object_type(ctx))],
+            None,
+        )
+        .optional()
+        .nullable_if(nullable), // Kept for legacy reasons!
     ]
     .into_iter()
 }
 
-fn alphanumeric_filters(mapped_type: InputType) -> impl Iterator<Item = InputField> {
+fn alphanumeric_filters(ctx: &mut BuilderContext, mapped_type: InputType) -> impl Iterator<Item = InputField> {
+    let ref_type = InputType::object(field_reference_object_type(ctx));
+
     vec![
-        input_field(filters::LOWER_THAN, mapped_type.clone(), None).optional(),
-        input_field(filters::LOWER_THAN_OR_EQUAL, mapped_type.clone(), None).optional(),
-        input_field(filters::GREATER_THAN, mapped_type.clone(), None).optional(),
-        input_field(filters::GREATER_THAN_OR_EQUAL, mapped_type, None).optional(),
+        input_field(filters::LOWER_THAN, vec![mapped_type.clone(), ref_type.clone()], None).optional(),
+        input_field(
+            filters::LOWER_THAN_OR_EQUAL,
+            vec![mapped_type.clone(), ref_type.clone()],
+            None,
+        )
+        .optional(),
+        input_field(filters::GREATER_THAN, vec![mapped_type.clone(), ref_type.clone()], None).optional(),
+        input_field(filters::GREATER_THAN_OR_EQUAL, vec![mapped_type, ref_type], None).optional(),
     ]
     .into_iter()
 }
 
 fn string_filters(ctx: &mut BuilderContext, mapped_type: InputType) -> impl Iterator<Item = InputField> {
+    let ref_type = InputType::object(field_reference_object_type(ctx));
+
     let mut string_filters = vec![
-        input_field(filters::CONTAINS, mapped_type.clone(), None).optional(),
-        input_field(filters::STARTS_WITH, mapped_type.clone(), None).optional(),
-        input_field(filters::ENDS_WITH, mapped_type.clone(), None).optional(),
+        input_field(filters::CONTAINS, vec![mapped_type.clone(), ref_type.clone()], None).optional(),
+        input_field(filters::STARTS_WITH, vec![mapped_type.clone(), ref_type.clone()], None).optional(),
+        input_field(filters::ENDS_WITH, vec![mapped_type.clone(), ref_type.clone()], None).optional(),
     ];
 
     if ctx.can_full_text_search() {
-        string_filters.push(input_field(filters::SEARCH, mapped_type, None).optional());
+        string_filters.push(input_field(filters::SEARCH, vec![mapped_type, ref_type], None).optional());
     }
 
     string_filters.into_iter()
@@ -433,19 +485,24 @@ fn json_filters(ctx: &mut BuilderContext) -> impl Iterator<Item = InputField> {
     } else {
         unreachable!()
     };
+    let ref_type = InputType::object(field_reference_object_type(ctx));
 
     vec![
         input_field(filters::PATH, vec![path_type], None).optional(),
         input_field(filters::STRING_CONTAINS, InputType::string(), None).optional(),
         input_field(filters::STRING_STARTS_WITH, InputType::string(), None).optional(),
         input_field(filters::STRING_ENDS_WITH, InputType::string(), None).optional(),
-        input_field(filters::ARRAY_CONTAINS, InputType::json(), None)
+        input_field(filters::ARRAY_CONTAINS, vec![InputType::json(), ref_type.clone()], None)
             .optional()
             .nullable(),
-        input_field(filters::ARRAY_STARTS_WITH, InputType::json(), None)
-            .optional()
-            .nullable(),
-        input_field(filters::ARRAY_ENDS_WITH, InputType::json(), None)
+        input_field(
+            filters::ARRAY_STARTS_WITH,
+            vec![InputType::json(), ref_type.clone()],
+            None,
+        )
+        .optional()
+        .nullable(),
+        input_field(filters::ARRAY_ENDS_WITH, vec![InputType::json(), ref_type], None)
             .optional()
             .nullable(),
     ]
@@ -558,4 +615,17 @@ fn not_filter_field(
                 .nullable_if(is_nullable)
         }
     }
+}
+
+fn field_reference_object_type(ctx: &mut BuilderContext) -> InputObjectTypeWeakRef {
+    let ident = Identifier::new("FieldRefInput", PRISMA_NAMESPACE);
+
+    return_cached_input!(ctx, &ident);
+
+    let object = Arc::new(init_input_object_type(ident.clone()));
+    ctx.cache_input_type(ident, object.clone());
+
+    object.set_fields(vec![input_field(filters::REF, InputType::string(), None)]);
+
+    Arc::downgrade(&object)
 }

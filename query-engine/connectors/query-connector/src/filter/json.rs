@@ -1,7 +1,9 @@
 use std::sync::Arc;
 
-use crate::{Filter, JsonCompare, JsonCondition, QueryMode, ScalarCondition, ScalarFilter, ScalarProjection};
-use prisma_models::{PrismaValue, ScalarFieldRef};
+use crate::{
+    Filter, JsonCompare, JsonCondition, QueryMode, ScalarCondition, ScalarFilter, ScalarProjection, ConditionValue,
+};
+use prisma_models::ScalarFieldRef;
 
 #[derive(Debug, Clone, Eq, Hash, PartialEq)]
 pub enum JsonTargetType {
@@ -18,7 +20,7 @@ pub enum JsonFilterPath {
 impl JsonCompare for ScalarFieldRef {
     fn json_contains<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
     where
-        T: Into<PrismaValue>,
+        T: Into<ConditionValue>,
     {
         Filter::from(ScalarFilter {
             condition: ScalarCondition::JsonCompare(JsonCondition {
@@ -33,7 +35,7 @@ impl JsonCompare for ScalarFieldRef {
 
     fn json_not_contains<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
     where
-        T: Into<PrismaValue>,
+        T: Into<ConditionValue>,
     {
         Filter::from(ScalarFilter {
             condition: ScalarCondition::JsonCompare(JsonCondition {
@@ -48,7 +50,7 @@ impl JsonCompare for ScalarFieldRef {
 
     fn json_starts_with<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
     where
-        T: Into<PrismaValue>,
+        T: Into<ConditionValue>,
     {
         Filter::from(ScalarFilter {
             condition: ScalarCondition::JsonCompare(JsonCondition {
@@ -63,7 +65,7 @@ impl JsonCompare for ScalarFieldRef {
 
     fn json_not_starts_with<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
     where
-        T: Into<PrismaValue>,
+        T: Into<ConditionValue>,
     {
         Filter::from(ScalarFilter {
             condition: ScalarCondition::JsonCompare(JsonCondition {
@@ -78,7 +80,7 @@ impl JsonCompare for ScalarFieldRef {
 
     fn json_ends_with<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
     where
-        T: Into<PrismaValue>,
+        T: Into<ConditionValue>,
     {
         Filter::from(ScalarFilter {
             condition: ScalarCondition::JsonCompare(JsonCondition {
@@ -93,7 +95,7 @@ impl JsonCompare for ScalarFieldRef {
 
     fn json_not_ends_with<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
     where
-        T: Into<PrismaValue>,
+        T: Into<ConditionValue>,
     {
         Filter::from(ScalarFilter {
             condition: ScalarCondition::JsonCompare(JsonCondition {
@@ -108,7 +110,7 @@ impl JsonCompare for ScalarFieldRef {
 
     fn json_equals<T>(&self, value: T, path: Option<JsonFilterPath>) -> Filter
     where
-        T: Into<PrismaValue>,
+        T: Into<ConditionValue>,
     {
         Filter::from(ScalarFilter {
             condition: ScalarCondition::JsonCompare(JsonCondition {
@@ -123,7 +125,7 @@ impl JsonCompare for ScalarFieldRef {
 
     fn json_not_equals<T>(&self, value: T, path: Option<JsonFilterPath>) -> Filter
     where
-        T: Into<PrismaValue>,
+        T: Into<ConditionValue>,
     {
         Filter::from(ScalarFilter {
             condition: ScalarCondition::JsonCompare(JsonCondition {
@@ -138,7 +140,7 @@ impl JsonCompare for ScalarFieldRef {
 
     fn json_less_than<T>(&self, value: T, path: Option<JsonFilterPath>) -> Filter
     where
-        T: Into<PrismaValue>,
+        T: Into<ConditionValue>,
     {
         Filter::from(ScalarFilter {
             condition: ScalarCondition::JsonCompare(JsonCondition {
@@ -153,7 +155,7 @@ impl JsonCompare for ScalarFieldRef {
 
     fn json_less_than_or_equals<T>(&self, value: T, path: Option<JsonFilterPath>) -> Filter
     where
-        T: Into<PrismaValue>,
+        T: Into<ConditionValue>,
     {
         Filter::from(ScalarFilter {
             condition: ScalarCondition::JsonCompare(JsonCondition {
@@ -168,7 +170,7 @@ impl JsonCompare for ScalarFieldRef {
 
     fn json_greater_than<T>(&self, value: T, path: Option<JsonFilterPath>) -> Filter
     where
-        T: Into<PrismaValue>,
+        T: Into<ConditionValue>,
     {
         Filter::from(ScalarFilter {
             condition: ScalarCondition::JsonCompare(JsonCondition {
@@ -183,7 +185,7 @@ impl JsonCompare for ScalarFieldRef {
 
     fn json_greater_than_or_equals<T>(&self, value: T, path: Option<JsonFilterPath>) -> Filter
     where
-        T: Into<PrismaValue>,
+        T: Into<ConditionValue>,
     {
         Filter::from(ScalarFilter {
             condition: ScalarCondition::JsonCompare(JsonCondition {

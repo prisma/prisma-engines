@@ -1,7 +1,8 @@
 use super::{inmemory_record_processor::InMemoryRecordProcessor, read};
 use crate::{interpreter::InterpretationResult, query_ast::*};
 use connector::{
-    self, filter::Filter, ConnectionLike, QueryArguments, RelAggregationRow, RelAggregationSelection, ScalarCompare,
+    self, filter::Filter, ConnectionLike, ConditionListValue, QueryArguments, RelAggregationRow, RelAggregationSelection,
+    ScalarCompare,
 };
 use prisma_models::{FieldSelection, ManyRecords, Record, RelationFieldRef, SelectionResult};
 use prisma_value::PrismaValue;
@@ -59,7 +60,7 @@ pub async fn m2m(
             ManyRecords::from((child_ids, &query.selected_fields)).with_unique_records()
         } else {
             let mut args = query.args.clone();
-            let filter = child_link_id.is_in(child_ids);
+            let filter = child_link_id.is_in(ConditionListValue::list(child_ids));
 
             args.filter = match args.filter {
                 Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
@@ -193,7 +194,7 @@ pub async fn one2m(
     }
 
     let mut scalars = {
-        let filter = child_link_id.is_in(uniq_selections);
+        let filter = child_link_id.is_in(ConditionListValue::list(uniq_selections));
         let mut args = query_args;
 
         args.filter = match args.filter {

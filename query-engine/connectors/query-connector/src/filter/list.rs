@@ -1,6 +1,6 @@
 use super::Filter;
-use crate::compare::ScalarListCompare;
-use prisma_models::{PrismaValue, ScalarField};
+use crate::{compare::ScalarListCompare, ConditionListValue, ConditionValue};
+use prisma_models::ScalarField;
 use std::sync::Arc;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -12,13 +12,13 @@ pub struct ScalarListFilter {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ScalarListCondition {
     /// List contains the given value
-    Contains(PrismaValue),
+    Contains(ConditionValue),
 
     /// List contains all the given values
-    ContainsEvery(Vec<PrismaValue>),
+    ContainsEvery(ConditionListValue),
 
     /// List contains some of the given values
-    ContainsSome(Vec<PrismaValue>),
+    ContainsSome(ConditionListValue),
 
     /// List emptiness check
     IsEmpty(bool),
@@ -28,7 +28,7 @@ pub enum ScalarListCondition {
 impl ScalarListCompare for Arc<ScalarField> {
     fn contains_element<T>(&self, value: T) -> Filter
     where
-        T: Into<PrismaValue>,
+        T: Into<ConditionValue>,
     {
         Filter::from(ScalarListFilter {
             field: Arc::clone(self),
@@ -36,23 +36,23 @@ impl ScalarListCompare for Arc<ScalarField> {
         })
     }
 
-    fn contains_every_element<T>(&self, values: Vec<T>) -> Filter
+    fn contains_every_element<T>(&self, values: T) -> Filter
     where
-        T: Into<PrismaValue>,
+        T: Into<ConditionListValue>,
     {
         Filter::from(ScalarListFilter {
             field: Arc::clone(self),
-            condition: ScalarListCondition::ContainsEvery(values.into_iter().map(Into::into).collect()),
+            condition: ScalarListCondition::ContainsEvery(values.into()),
         })
     }
 
-    fn contains_some_element<T>(&self, values: Vec<T>) -> Filter
+    fn contains_some_element<T>(&self, values: T) -> Filter
     where
-        T: Into<PrismaValue>,
+        T: Into<ConditionListValue>,
     {
         Filter::from(ScalarListFilter {
             field: Arc::clone(self),
-            condition: ScalarListCondition::ContainsSome(values.into_iter().map(Into::into).collect()),
+            condition: ScalarListCondition::ContainsSome(values.into()),
         })
     }
 
