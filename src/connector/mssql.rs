@@ -312,6 +312,13 @@ impl Mssql {
         Ok(this)
     }
 
+    /// The underlying Tiberius client. Only available with the `expose-drivers` Cargo feature.
+    /// This is a lower level API when you need to get into database specific features.
+    #[cfg(feature = "expose-drivers")]
+    pub fn client(&self) -> &Mutex<Client<Compat<TcpStream>>> {
+        &self.client
+    }
+
     async fn perform_io<F, T>(&self, fut: F) -> crate::Result<T>
     where
         F: Future<Output = std::result::Result<T, tiberius::error::Error>>,
