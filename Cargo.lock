@@ -2165,6 +2165,7 @@ dependencies = [
 [[package]]
 name = "mobc"
 version = "0.7.3"
+source = "git+https://github.com/prisma/mobc?tag=1.0.5#d50fd5de25f80880b0f533bcb48cc65f2c4960b0"
 dependencies = [
  "async-trait",
  "futures-channel",
@@ -5012,7 +5013,7 @@ version = "1.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "97fee6b57c6a41524a810daee9286c02d7752c4253064d0b05472833a438f675"
 dependencies = [
- "cfg-if 0.1.10",
+ "cfg-if 1.0.0",
  "rand 0.8.5",
  "static_assertions",
 ]
