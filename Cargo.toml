@@ -90,7 +90,7 @@ serde_json = { version = "1.0.48", optional = true, features = ["float_roundtrip
 native-tls = { version = "0.2", optional = true }
 bit-vec = { version = "0.6.1", optional = true }
 bytes = { version = "1.0", optional = true }
-mobc = { git = "https://github.com/prisma/mobc",  tag = "1.0.4", optional = true }
+mobc = { git = "https://github.com/prisma/mobc",  tag = "1.0.5", optional = true }
 serde = { version = "1.0", optional = true }
 sqlformat = { version = "0.2.0", optional = true }
 

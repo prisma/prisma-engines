@@ -49,14 +49,14 @@ impl<'a> Transaction<'a> {
         }
 
         inner.server_reset_query(&this).await?;
-        increment_gauge!("query_active_transactions", 1.0);
 
+        increment_gauge!("prisma_client_queries_active", 1.0);
         Ok(this)
     }
 
     /// Commit the changes to the database and consume the transaction.
     pub async fn commit(&self) -> crate::Result<()> {
-        decrement_gauge!("query_active_transactions", 1.0);
+        decrement_gauge!("prisma_client_queries_active", 1.0);
         self.inner.raw_cmd("COMMIT").await?;
 
         Ok(())
@@ -64,7 +64,7 @@ impl<'a> Transaction<'a> {
 
     /// Rolls back the changes to the database.
     pub async fn rollback(&self) -> crate::Result<()> {
-        decrement_gauge!("query_active_transactions", 1.0);
+        decrement_gauge!("prisma_client_queries_active", 1.0);
         self.inner.raw_cmd("ROLLBACK").await?;
 
         Ok(())

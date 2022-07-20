@@ -43,8 +43,8 @@ where
     }
 
     histogram!(format!("{}.query.time", tag), start.elapsed());
-    histogram!("query_total_elapsed_time_ms", start.elapsed());
-    increment_counter!("query_total_queries");
+    histogram!("prisma_datasource_queries_duration_histogram_ms", start.elapsed());
+    increment_counter!("prisma_datasource_queries_total");
 
     res
 }
