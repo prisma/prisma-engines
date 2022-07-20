@@ -21,7 +21,7 @@ pub enum TestError {
     TemplatingError(#[from] TemplatingError),
 
     #[error("Error during interactive transaction processing: {}", _0)]
-    InteractiveTransactionError(String)
+    InteractiveTransactionError(String),
 }
 
 impl TestError {

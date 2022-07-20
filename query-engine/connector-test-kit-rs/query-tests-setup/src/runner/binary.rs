@@ -1,4 +1,4 @@
-use crate::{ConnectorTag, RunnerInterface, TestResult, TxResult, TestError};
+use crate::{ConnectorTag, RunnerInterface, TestError, TestResult, TxResult};
 use hyper::{Body, Method, Request, Response};
 use query_core::{MetricRegistry, TxId};
 use query_engine::opt::PrismaOpt;
@@ -112,7 +112,9 @@ impl RunnerInterface for BinaryRunner {
         let json_obj = json_resp.as_object().unwrap();
 
         match json_obj.get("error_code") {
-            Some(_) => Err(TestError::InteractiveTransactionError(serde_json::to_string(json_obj).unwrap())),
+            Some(_) => Err(TestError::InteractiveTransactionError(
+                serde_json::to_string(json_obj).unwrap(),
+            )),
             None => Ok(json_obj.get("id").unwrap().as_str().unwrap().into()),
         }
     }
