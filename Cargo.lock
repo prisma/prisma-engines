@@ -2165,7 +2165,6 @@ dependencies = [
 [[package]]
 name = "mobc"
 version = "0.7.3"
-source = "git+https://github.com/prisma/mobc?tag=1.0.4#4d0d2daa5a0424577a5011a4bc6db928e5b2b694"
 dependencies = [
  "async-trait",
  "futures-channel",
@@ -2176,6 +2175,8 @@ dependencies = [
  "metrics 0.18.1",
  "thiserror",
  "tokio",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]
@@ -3234,7 +3235,6 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#df52315fae3f366509da3e5d0815ebc13f445e31"
 dependencies = [
  "async-trait",
  "base64 0.12.3",

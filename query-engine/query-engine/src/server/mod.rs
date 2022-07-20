@@ -201,6 +201,7 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
         _ => None,
     };
 
+    println!("GRAPQH HANDLE TRACE {:?}", trace_id);
     let work = async move {
         let body_start = req.into_body();
         // block and buffer request until the request has completed

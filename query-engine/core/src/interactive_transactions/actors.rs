@@ -75,6 +75,7 @@ impl ITXServer {
 
     async fn execute_single(&mut self, operation: &Operation, trace_id: Option<String>) -> crate::Result<ResponseData> {
         let span = info_span!("prisma:itx_execute", user_facing = true);
+        println!("itx execute TRACE INFO {:?}", trace_id);
         set_span_context(&span, trace_id.clone());
 
         let conn = self.cached_tx.as_open()?;

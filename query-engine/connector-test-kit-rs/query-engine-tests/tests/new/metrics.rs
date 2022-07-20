@@ -20,8 +20,8 @@ mod metrics {
 
         let json = runner.get_metrics().to_json(Default::default());
         // We cannot assert the full response it will be slightly different per database
-        let total_queries = get_counter(&json, "query_total_queries");
-        let total_operations = get_counter(&json, "query_total_operations");
+        let total_queries = get_counter(&json, "prisma_datasource_queries_total");
+        let total_operations = get_counter(&json, "prisma_client_queries_total");
 
         match runner.connector_version() {
             Sqlite => assert_eq!(total_queries, 9),
@@ -49,7 +49,7 @@ mod metrics {
         let _ = runner.commit_tx(tx_id).await?;
 
         let json = runner.get_metrics().to_json(Default::default());
-        let active_transactions = get_gauge(&json, "query_active_transactions");
+        let active_transactions = get_gauge(&json, "prisma_client_queries_active");
         assert_eq!(active_transactions, 0.0);
 
         let tx_id = runner.start_tx(5000, 5000).await?;
@@ -66,7 +66,7 @@ mod metrics {
         let _ = runner.rollback_tx(tx_id.clone()).await?;
 
         let json = runner.get_metrics().to_json(Default::default());
-        let active_transactions = get_gauge(&json, "query_active_transactions");
+        let active_transactions = get_gauge(&json, "prisma_client_queries_active");
         assert_eq!(active_transactions, 0.0);
         Ok(())
     }
