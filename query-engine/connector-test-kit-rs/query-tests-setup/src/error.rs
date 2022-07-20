@@ -19,6 +19,9 @@ pub enum TestError {
 
     #[error("Error processing schema template: {0}")]
     TemplatingError(#[from] TemplatingError),
+
+    #[error("Error during interactive transaction processing: {}", _0)]
+    InteractiveTransactionError(String)
 }
 
 impl TestError {

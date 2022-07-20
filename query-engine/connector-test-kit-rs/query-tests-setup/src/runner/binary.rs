@@ -1,4 +1,4 @@
-use crate::{ConnectorTag, RunnerInterface, TestResult, TxResult};
+use crate::{ConnectorTag, RunnerInterface, TestResult, TxResult, TestError};
 use hyper::{Body, Method, Request, Response};
 use query_core::{MetricRegistry, TxId};
 use query_engine::opt::PrismaOpt;
@@ -109,9 +109,12 @@ impl RunnerInterface for BinaryRunner {
 
         let resp = routes(self.state.clone(), req).await.unwrap();
         let json_resp = response_to_json(resp).await;
-        let tx_id = json_resp.as_object().unwrap().get("id").unwrap().as_str().unwrap();
+        let json_obj = json_resp.as_object().unwrap();
 
-        Ok(tx_id.into())
+        match json_obj.get("error_code") {
+            Some(_) => Err(TestError::InteractiveTransactionError(serde_json::to_string(json_obj).unwrap())),
+            None => Ok(json_obj.get("id").unwrap().as_str().unwrap().into()),
+        }
     }
 
     async fn commit_tx(&self, tx_id: TxId) -> TestResult<TxResult> {
