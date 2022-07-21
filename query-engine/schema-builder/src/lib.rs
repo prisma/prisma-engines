@@ -40,8 +40,8 @@ mod utils;
 use cache::TypeRefCache;
 use datamodel_connector::{ConnectorCapabilities, ConnectorCapability, ReferentialIntegrity};
 use prisma_models::{
-    datamodel::common::preview_features::PreviewFeature, Field as ModelField, Index, InternalDataModelRef, ModelRef,
-    RelationFieldRef, TypeIdentifier,
+    datamodel::common::preview_features::PreviewFeature, CompositeTypeRef, Field as ModelField, Index,
+    InternalDataModelRef, ModelRef, RelationFieldRef, TypeIdentifier,
 };
 use schema::*;
 use std::sync::Arc;
@@ -108,6 +108,14 @@ impl BuilderContext {
         self.has_feature(&PreviewFeature::FullTextSearch)
             && (self.has_capability(ConnectorCapability::FullTextSearchWithoutIndex)
                 || self.has_capability(ConnectorCapability::FullTextSearchWithIndex))
+    }
+
+    pub fn models(&self) -> Vec<ModelRef> {
+        self.internal_data_model.models_cloned()
+    }
+
+    pub fn composite_types(&self) -> Vec<CompositeTypeRef> {
+        self.internal_data_model.composite_types().to_owned()
     }
 }
 
