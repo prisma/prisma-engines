@@ -126,15 +126,6 @@
 <span id="121">121</span>
 <span id="122">122</span>
 <span id="123">123</span>
-<span id="124">124</span>
-<span id="125">125</span>
-<span id="126">126</span>
-<span id="127">127</span>
-<span id="128">128</span>
-<span id="129">129</span>
-<span id="130">130</span>
-<span id="131">131</span>
-<span id="132">132</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">PrismaError</span>, <span class="ident">PrismaResult</span>};
 <span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">dml::Datamodel</span>, <span class="ident">Configuration</span>};
 <span class="kw">use</span> <span class="ident">prisma_models::InternalDataModelBuilder</span>;
@@ -160,7 +151,6 @@
 }
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ContextBuilder</span> {
-    <span class="ident">legacy</span>: <span class="ident">bool</span>,
     <span class="ident">enable_raw_queries</span>: <span class="ident">bool</span>,
     <span class="ident">datamodel</span>: <span class="ident">Datamodel</span>,
     <span class="ident">config</span>: <span class="ident">Configuration</span>,
@@ -168,11 +158,6 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ContextBuilder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">legacy</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">legacy</span> <span class="op">=</span> <span class="ident">val</span>;
-        <span class="self">self</span>
-    }
-
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enable_raw_queries</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">enable_raw_queries</span> <span class="op">=</span> <span class="ident">val</span>;
         <span class="self">self</span>
@@ -187,7 +172,6 @@
         <span class="ident">PrismaContext::new</span>(
             <span class="self">self</span>.<span class="ident">config</span>,
             <span class="self">self</span>.<span class="ident">datamodel</span>,
-            <span class="self">self</span>.<span class="ident">legacy</span>,
             <span class="self">self</span>.<span class="ident">enable_raw_queries</span>,
             <span class="self">self</span>.<span class="ident">metrics</span>.<span class="ident">unwrap</span>(),
         )
@@ -200,7 +184,6 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(
         <span class="ident">config</span>: <span class="ident">Configuration</span>,
         <span class="ident">dm</span>: <span class="ident">Datamodel</span>,
-        <span class="ident">_legacy</span>: <span class="ident">bool</span>,
         <span class="ident">enable_raw_queries</span>: <span class="ident">bool</span>,
         <span class="ident">metrics</span>: <span class="ident">MetricRegistry</span>,
     ) -&gt; <span class="ident">PrismaResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
@@ -247,7 +230,6 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>(<span class="ident">config</span>: <span class="ident">Configuration</span>, <span class="ident">datamodel</span>: <span class="ident">Datamodel</span>) -&gt; <span class="ident">ContextBuilder</span> {
         <span class="ident">ContextBuilder</span> {
-            <span class="ident">legacy</span>: <span class="bool-val">false</span>,
             <span class="ident">enable_raw_queries</span>: <span class="bool-val">false</span>,
             <span class="ident">datamodel</span>,
             <span class="ident">config</span>,

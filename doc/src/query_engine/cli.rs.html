@@ -160,9 +160,6 @@
 <span id="155">155</span>
 <span id="156">156</span>
 <span id="157">157</span>
-<span id="158">158</span>
-<span id="159">159</span>
-<span id="160">160</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">context::PrismaContext</span>,
     <span class="ident">opt</span>::{<span class="ident">CliOpt</span>, <span class="ident">PrismaOpt</span>, <span class="ident">Subcommand</span>},
@@ -177,7 +174,6 @@
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">env</span>, <span class="ident">sync::Arc</span>};
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ExecuteRequest</span> {
-    <span class="ident">legacy</span>: <span class="ident">bool</span>,
     <span class="ident">query</span>: <span class="ident">String</span>,
     <span class="ident">datamodel</span>: <span class="ident">Datamodel</span>,
     <span class="ident">config</span>: <span class="ident">Configuration</span>,
@@ -229,7 +225,6 @@
                 <span class="ident">CliOpt::ExecuteRequest</span>(<span class="ident">input</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">CliCommand::ExecuteRequest</span>(<span class="ident">ExecuteRequest</span> {
                     <span class="ident">query</span>: <span class="ident">input</span>.<span class="ident">query</span>.<span class="ident">clone</span>(),
                     <span class="ident">enable_raw_queries</span>: <span class="ident">opts</span>.<span class="ident">enable_raw_queries</span>,
-                    <span class="ident">legacy</span>: <span class="ident">input</span>.<span class="ident">legacy</span>,
                     <span class="ident">datamodel</span>: <span class="ident">opts</span>.<span class="ident">datamodel</span>()<span class="question-mark">?</span>,
                     <span class="ident">config</span>: <span class="ident">opts</span>.<span class="ident">configuration</span>(<span class="bool-val">false</span>)<span class="question-mark">?</span>.<span class="ident">subject</span>,
                 }))),
@@ -304,7 +299,6 @@
         <span class="ident">request</span>.<span class="ident">config</span>.<span class="ident">validate_that_one_datasource_is_provided</span>()<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">PrismaContext::builder</span>(<span class="ident">request</span>.<span class="ident">config</span>, <span class="ident">request</span>.<span class="ident">datamodel</span>)
-            .<span class="ident">legacy</span>(<span class="ident">request</span>.<span class="ident">legacy</span>)
             .<span class="ident">enable_raw_queries</span>(<span class="ident">request</span>.<span class="ident">enable_raw_queries</span>)
             .<span class="ident">build</span>()
             .<span class="kw">await</span><span class="question-mark">?</span>;

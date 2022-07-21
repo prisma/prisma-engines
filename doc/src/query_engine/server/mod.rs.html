@@ -457,7 +457,6 @@
 <span id="452">452</span>
 <span id="453">453</span>
 <span id="454">454</span>
-<span id="455">455</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">context::PrismaContext</span>, <span class="ident">opt::PrismaOpt</span>, <span class="ident">PrismaResult</span>};
 <span class="kw">use</span> <span class="ident">datamodel::common::preview_features::PreviewFeature</span>;
 <span class="kw">use</span> <span class="ident">hyper::service</span>::{<span class="ident">make_service_fn</span>, <span class="ident">service_fn</span>};
@@ -532,7 +531,6 @@
 
     <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">datamodel</span>()<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">PrismaContext::builder</span>(<span class="ident">config</span>, <span class="ident">datamodel</span>)
-        .<span class="ident">legacy</span>(<span class="ident">opts</span>.<span class="ident">legacy</span>)
         .<span class="ident">set_metrics</span>(<span class="ident">metrics</span>)
         .<span class="ident">enable_raw_queries</span>(<span class="ident">opts</span>.<span class="ident">enable_raw_queries</span>)
         .<span class="ident">build</span>()

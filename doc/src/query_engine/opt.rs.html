@@ -221,13 +221,6 @@
 <span id="216">216</span>
 <span id="217">217</span>
 <span id="218">218</span>
-<span id="219">219</span>
-<span id="220">220</span>
-<span id="221">221</span>
-<span id="222">222</span>
-<span id="223">223</span>
-<span id="224">224</span>
-<span id="225">225</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::PrismaError</span>, <span class="ident">PrismaResult</span>};
 <span class="kw">use</span> <span class="ident">datamodel::dml::Datamodel</span>;
 <span class="kw">use</span> <span class="ident">datamodel::ValidatedConfiguration</span>;
@@ -246,9 +239,6 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ExecuteRequestInput</span> {
     <span class="doccomment">/// GraphQL query to execute</span>
     <span class="kw">pub</span> <span class="ident">query</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// Run in the legacy GraphQL mode</span>
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">legacy</span>: <span class="ident">bool</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">StructOpt</span>)]</span>
@@ -305,10 +295,6 @@
     <span class="doccomment">/// Base64 encoded datasource urls, overwriting the ones in the schema</span>
     <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">env</span> <span class="op">=</span> <span class="string">&quot;OVERWRITE_DATASOURCES&quot;</span>, <span class="ident">parse</span>(<span class="ident">try_from_str</span> <span class="op">=</span> <span class="ident">parse_base64_string</span>))]</span>
     <span class="kw">pub</span> <span class="ident">overwrite_datasources</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-
-    <span class="doccomment">/// Switches query schema generation to Prisma 1 compatible mode.</span>
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">short</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">legacy</span>: <span class="ident">bool</span>,
 
     <span class="doccomment">/// Enables raw SQL queries with executeRaw/queryRaw mutation</span>
     <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">short</span> <span class="op">=</span> <span class="string">&quot;r&quot;</span>)]</span>
