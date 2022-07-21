@@ -125,7 +125,7 @@ impl<'db> RelationFieldWalker<'db> {
     }
 
     /// The fields in the `@relation(references: ...)` argument.
-    pub fn referenced_fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'db>> + 'db> {
+    pub fn referenced_fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'db>>> {
         self.attributes().references.as_ref().map(|references| {
             references
                 .iter()
