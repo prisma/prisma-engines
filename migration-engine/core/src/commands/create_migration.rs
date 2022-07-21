@@ -1,6 +1,6 @@
 use crate::{json_rpc::types::*, CoreError, CoreResult};
-use datamodel::parser_database::SourceFile;
 use migration_connector::{migrations_directory::*, DiffTarget, MigrationConnector};
+use psl::parser_database::SourceFile;
 use std::{path::Path, sync::Arc};
 use user_facing_errors::migration_engine::MigrationNameTooLong;
 

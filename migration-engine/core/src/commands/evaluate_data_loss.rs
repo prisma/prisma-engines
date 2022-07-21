@@ -1,6 +1,6 @@
 use crate::{json_rpc::types::*, CoreResult};
-use datamodel::parser_database::SourceFile;
 use migration_connector::{migrations_directory::*, DiffTarget, MigrationConnector};
+use psl::parser_database::SourceFile;
 use std::sync::Arc;
 
 /// Development command for migrations. Evaluate the data loss induced by the

@@ -18,19 +18,19 @@ mod timings;
 pub use self::{api::GenericApi, core_error::*, rpc::rpc_api, timings::TimingsLayer};
 pub use migration_connector;
 
-use datamodel::{
-    builtin_connectors::*, common::preview_features::PreviewFeature, parser_database::SourceFile, Datasource,
-    ValidatedSchema,
-};
 use enumflags2::BitFlags;
 use migration_connector::ConnectorParams;
 use mongodb_migration_connector::MongoDbMigrationConnector;
+use psl::{
+    builtin_connectors::*, common::preview_features::PreviewFeature, parser_database::SourceFile, Datasource,
+    ValidatedSchema,
+};
 use sql_migration_connector::SqlMigrationConnector;
 use std::{env, path::Path};
 use user_facing_errors::common::InvalidConnectionString;
 
 fn parse_schema(schema: SourceFile) -> CoreResult<ValidatedSchema> {
-    datamodel::parse_schema_parserdb(schema).map_err(CoreError::new_schema_parser_error)
+    psl::parse_schema_parserdb(schema).map_err(CoreError::new_schema_parser_error)
 }
 
 fn connector_for_connection_string(
@@ -99,7 +99,7 @@ fn connector_for_connection_string(
 
 /// Same as schema_to_connector, but it will only read the provider, not the connector params.
 fn schema_to_connector_unchecked(schema: &str) -> CoreResult<Box<dyn migration_connector::MigrationConnector>> {
-    let config = datamodel::parse_configuration(schema)
+    let config = psl::parse_configuration(schema)
         .map(|validated_config| validated_config.subject)
         .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", schema)))?;
 
@@ -180,7 +180,7 @@ pub fn migration_api(
 }
 
 fn parse_configuration(datamodel: &str) -> CoreResult<(Datasource, String, BitFlags<PreviewFeature>, Option<String>)> {
-    let config = datamodel::parse_configuration(datamodel)
+    let config = psl::parse_configuration(datamodel)
         .map(|validated_config| validated_config.subject)
         .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
 

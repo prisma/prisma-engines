@@ -1,6 +1,6 @@
 use crate::{json_rpc::types::*, parse_schema, CoreResult};
-use datamodel::parser_database::SourceFile;
 use migration_connector::{ConnectorError, DiffTarget, MigrationConnector};
+use psl::parser_database::SourceFile;
 use std::sync::Arc;
 use tracing_futures::Instrument;
 

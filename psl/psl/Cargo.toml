@@ -1,0 +1,7 @@
+[package]
+name = "psl"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+psl-core = { path = "../../libs/datamodel/core", package = "datamodel" }
