@@ -72,7 +72,6 @@ pub async fn setup(opts: &PrismaOpt, metrics: MetricRegistry) -> PrismaResult<St
 
     let datamodel = opts.datamodel()?;
     let cx = PrismaContext::builder(config, datamodel)
-        .legacy(opts.legacy)
         .set_metrics(metrics)
         .enable_raw_queries(opts.enable_raw_queries)
         .build()

@@ -97,7 +97,6 @@ USAGE:
 FLAGS:
         --enable-raw-queries           Enables raw SQL queries with executeRaw/queryRaw mutation
     -h, --help                         Prints help information
-        --legacy                       Switches query schema generation to Prisma 1 compatible mode
     -V, --version                      Prints version information
 
 OPTIONS:
