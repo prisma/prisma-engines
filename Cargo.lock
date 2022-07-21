@@ -2062,12 +2062,12 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "chrono",
- "datamodel",
  "enumflags2",
  "json-rpc-api-build",
  "jsonrpc-core",
  "migration-connector",
  "mongodb-migration-connector",
+ "psl",
  "serde",
  "serde_json",
  "sql-migration-connector",
@@ -3214,6 +3214,13 @@ checksum = "534b7a0e836e3c482d2693070f982e39e7611da9695d4d1f5a4b186b51faef0a"
 dependencies = [
  "bytes",
  "prost",
+]
+
+[[package]]
+name = "psl"
+version = "0.1.0"
+dependencies = [
+ "datamodel",
 ]
 
 [[package]]

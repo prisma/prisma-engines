@@ -2,9 +2,9 @@ use crate::{
     core_error::CoreResult,
     json_rpc::types::{DiffParams, DiffResult, DiffTarget, PathContainer, SchemaContainer, UrlContainer},
 };
-use datamodel::parser_database::SourceFile;
 use enumflags2::BitFlags;
 use migration_connector::{ConnectorError, ConnectorHost, DatabaseSchema, DiffTarget as McDiff, MigrationConnector};
+use psl::parser_database::SourceFile;
 use std::{path::Path, sync::Arc};
 
 pub async fn diff(params: DiffParams, host: Arc<dyn ConnectorHost>) -> CoreResult<DiffResult> {

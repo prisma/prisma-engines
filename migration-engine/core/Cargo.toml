@@ -4,7 +4,7 @@ name = "migration-core"
 version = "0.1.0"
 
 [dependencies]
-datamodel = { path = "../../libs/datamodel/core" }
+psl = { path = "../../psl/psl" }
 migration-connector = { path = "../connectors/migration-connector" }
 mongodb-migration-connector = { path = "../connectors/mongodb-migration-connector" }
 sql-migration-connector = { path = "../connectors/sql-migration-connector" }
