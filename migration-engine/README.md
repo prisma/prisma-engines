@@ -1,5 +1,7 @@
 # Prisma Migration Engine
 
+Testing integration/ auto-release: see https://github.com/prisma/schema-team/issues/358
+
 This directory contains the crates that belong to the migration engine behind
 [prisma-migrate](https://www.prisma.io/docs/concepts/components/prisma-migrate).
 
