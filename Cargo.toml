@@ -36,7 +36,6 @@ members = [
   "libs/datamodel/schema-ast",
   "libs/json-rpc-stdio",
   "libs/native-types",
-  "libs/prisma-inflector",
   "libs/prisma-value",
   "libs/sql-ddl",
   "libs/sql-schema-describer",
