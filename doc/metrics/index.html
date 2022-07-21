@@ -168,7 +168,7 @@ values, and so on.</p>
 same <a href="struct.Key.html" title="Key"><code>Key</code></a> as well as the value being emitted.</p>
 <p>For recorders which temporarily buffer or hold on to values before exporting, a typical approach
 would be to utilize atomic variables for the storage.  For counters and gauges, this can be done
-simply by using types like <a href="https://doc.rust-lang.org/1.62.0/core/sync/atomic/struct.AtomicU64.html"><code>AtomicU64</code></a>.  For histograms, this can be
+simply by using types like <a href="https://doc.rust-lang.org/1.62.1/core/sync/atomic/struct.AtomicU64.html"><code>AtomicU64</code></a>.  For histograms, this can be
 slightly tricky as you must hold on to all of the distinct values.  In our helper crate,
 <a href="https://docs.rs/metrics-util"><code>metrics-util</code></a>, we’ve provided a type called <a href="https://docs.rs/metrics-util/0.5.0/metrics_util/struct.AtomicBucket.html"><code>AtomicBucket</code></a>.  For
 exporters that will want to get all of the current values in a batch, while clearing the bucket so
@@ -233,5 +233,5 @@ hide the nitty gritty details.  These methods will usually be aptly named, such 
 </div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.try_recorder.html" title="metrics::try_recorder fn">try_recorder</a></div><div class="item-right docblock-short"><p>Returns a reference to the recorder.</p>
 </div></div></div><h2 id="types" class="small-section-header"><a href="#types">Type Definitions</a></h2>
 <div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="type" href="type.SharedString.html" title="metrics::SharedString type">SharedString</a></div><div class="item-right docblock-short"><p>An allocation-optimized string.</p>
-</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="metrics" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
+</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="metrics" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.1 (e092d0b6b 2022-07-16)" ></div>
 </body></html>

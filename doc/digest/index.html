@@ -25,7 +25,7 @@ They are intended to be implemented by low-level algorithm providers only.
 Usually they should not be used in application-level code.</li>
 </ul>
 <p>Additionally hash functions implement traits from the standard library:
-<a href="https://doc.rust-lang.org/1.62.0/core/default/trait.Default.html" title="Default"><code>Default</code></a>, <a href="https://doc.rust-lang.org/1.62.0/core/clone/trait.Clone.html" title="Clone"><code>Clone</code></a>, <a href="https://doc.rust-lang.org/1.62.0/std/io/trait.Write.html" title="std::io::Write"><code>Write</code></a>. The latter is
+<a href="https://doc.rust-lang.org/1.62.1/core/default/trait.Default.html" title="Default"><code>Default</code></a>, <a href="https://doc.rust-lang.org/1.62.1/core/clone/trait.Clone.html" title="Clone"><code>Clone</code></a>, <a href="https://doc.rust-lang.org/1.62.1/std/io/trait.Write.html" title="std::io::Write"><code>Write</code></a>. The latter is
 feature-gated behind <code>std</code> feature, which is usually enabled by default
 by hash implementation crates.</p>
 </div></details><h2 id="reexports" class="small-section-header"><a href="#reexports">Re-exports</a></h2>
@@ -33,7 +33,7 @@ by hash implementation crates.</p>
 <div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="consts/index.html" title="digest::consts mod">consts</a></div><div class="item-right docblock-short"><p>Type aliases for many constants.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="core_api/index.html" title="digest::core_api mod">core_api</a></div><div class="item-right docblock-short"><p>Low-level traits operating on blocks and wrappers around them.</p>
 </div></div></div><h2 id="structs" class="small-section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.CtOutput.html" title="digest::CtOutput struct">CtOutput</a></div><div class="item-right docblock-short"><p>Fixed size output value which provides a safe <a href="https://doc.rust-lang.org/1.62.0/core/cmp/trait.Eq.html" title="Eq"><code>Eq</code></a> implementation that
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.CtOutput.html" title="digest::CtOutput struct">CtOutput</a></div><div class="item-right docblock-short"><p>Fixed size output value which provides a safe <a href="https://doc.rust-lang.org/1.62.1/core/cmp/trait.Eq.html" title="Eq"><code>Eq</code></a> implementation that
 runs in constant time.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.InvalidBufferSize.html" title="digest::InvalidBufferSize struct">InvalidBufferSize</a></div><div class="item-right docblock-short"><p>Buffer length is not equal to hash output size.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.InvalidLength.html" title="digest::InvalidLength struct">InvalidLength</a></div><div class="item-right docblock-short"><p>The error type returned when key and/or IV used in the <a href="trait.KeyInit.html" title="KeyInit"><code>KeyInit</code></a>,
@@ -65,5 +65,5 @@ from a XOF (extendable-output function) result.</p>
 </div></div></div><h2 id="types" class="small-section-header"><a href="#types">Type Definitions</a></h2>
 <div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="type" href="type.Key.html" title="digest::Key type">Key</a></div><div class="item-right docblock-short"><p>Key used by <a href="../crypto_common/trait.KeySizeUser.html" title="KeySizeUser"><code>KeySizeUser</code></a> implementors.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="type" href="type.Output.html" title="digest::Output type">Output</a></div><div class="item-right docblock-short"><p>Output array of <a href="trait.OutputSizeUser.html" title="OutputSizeUser"><code>OutputSizeUser</code></a> implementors.</p>
-</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="digest" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
+</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="digest" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.1 (e092d0b6b 2022-07-16)" ></div>
 </body></html>

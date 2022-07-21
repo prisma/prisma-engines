@@ -10,7 +10,7 @@ initial values.</p>
 <h2 id="implicit-conversions"><a href="#implicit-conversions">Implicit conversions</a></h2>
 <p>Histograms are represented as <code>f64</code> values, but often come from another source, such as a time
 measurement.  By default, <code>histogram!</code> will accept a <code>f64</code> directly or a
-<a href="https://doc.rust-lang.org/1.62.0/core/time/struct.Duration.html"><code>Duration</code></a>, which uses the floating-point number of seconds represents by
+<a href="https://doc.rust-lang.org/1.62.1/core/time/struct.Duration.html"><code>Duration</code></a>, which uses the floating-point number of seconds represents by
 the duration.</p>
 <p>External libraries and applications can create their own conversions by implementing the
 <a href="trait.IntoF64.html" title="IntoF64"><code>IntoF64</code></a> trait for their types, which is required for the value being passed to <code>histogram!</code>.</p>
@@ -43,5 +43,5 @@ preferred for performance where possible.</p>
 <span class="macro">histogram!</span>(<span class="ident">name</span>, <span class="number">800.85</span>);
 
 <span class="macro">histogram!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}_via_format&quot;</span>, <span class="string">&quot;name&quot;</span>), <span class="number">3.14</span>);</code></pre></div>
-</div></details></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="metrics" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
+</div></details></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="metrics" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.1 (e092d0b6b 2022-07-16)" ></div>
 </body></html>

@@ -8,25 +8,25 @@
     () =&gt; { ... };
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">first</span>:<span class="ident">expr</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">expr</span> )<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; { ... };
 }</code></pre></div>
-</div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p><a href="https://doc.rust-lang.org/1.62.0/core/iter/traits/iterator/trait.Iterator.html#method.chain">Chain</a> zero or more iterators together into one sequence.</p>
-<p>The comma-separated arguments must implement <a href="https://doc.rust-lang.org/1.62.0/core/iter/traits/collect/trait.IntoIterator.html" title="IntoIterator"><code>IntoIterator</code></a>.
+</div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p><a href="https://doc.rust-lang.org/1.62.1/core/iter/traits/iterator/trait.Iterator.html#method.chain">Chain</a> zero or more iterators together into one sequence.</p>
+<p>The comma-separated arguments must implement <a href="https://doc.rust-lang.org/1.62.1/core/iter/traits/collect/trait.IntoIterator.html" title="IntoIterator"><code>IntoIterator</code></a>.
 The final argument may be followed by a trailing comma.</p>
 <h2 id="examples"><a href="#examples">Examples</a></h2>
-<p>Empty invocations of <code>chain!</code> expand to an invocation of <a href="https://doc.rust-lang.org/1.62.0/core/iter/sources/empty/fn.empty.html" title="std::iter::empty"><code>std::iter::empty</code></a>:</p>
+<p>Empty invocations of <code>chain!</code> expand to an invocation of <a href="https://doc.rust-lang.org/1.62.1/core/iter/sources/empty/fn.empty.html" title="std::iter::empty"><code>std::iter::empty</code></a>:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std::iter</span>;
 <span class="kw">use</span> <span class="ident">itertools::chain</span>;
 
 <span class="kw">let</span> <span class="kw">_</span>: <span class="ident">iter::Empty</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">=</span> <span class="macro">chain!</span>();
 <span class="kw">let</span> <span class="kw">_</span>: <span class="ident">iter::Empty</span><span class="op">&lt;</span><span class="ident">i8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">chain!</span>();</code></pre></div>
-<p>Invocations of <code>chain!</code> with one argument expand to <a href="https://doc.rust-lang.org/1.62.0/core/iter/traits/collect/trait.IntoIterator.html"><code>arg.into_iter()</code></a>:</p>
+<p>Invocations of <code>chain!</code> with one argument expand to <a href="https://doc.rust-lang.org/1.62.1/core/iter/traits/collect/trait.IntoIterator.html"><code>arg.into_iter()</code></a>:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">ops::Range</span>, <span class="ident">slice</span>};
 <span class="kw">use</span> <span class="ident">itertools::chain</span>;
 <span class="kw">let</span> <span class="kw">_</span>: <span class="op">&lt;</span><span class="ident">Range</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">IntoIterator</span><span class="op">&gt;</span><span class="ident">::IntoIter</span> <span class="op">=</span> <span class="macro">chain!</span>((<span class="number">2</span>..<span class="number">6</span>),); <span class="comment">// trailing comma optional!</span>
 <span class="kw">let</span> <span class="kw">_</span>:     <span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="kw">_</span>] <span class="kw">as</span> <span class="ident">IntoIterator</span><span class="op">&gt;</span><span class="ident">::IntoIter</span> <span class="op">=</span> <span class="macro">chain!</span>(<span class="kw-2">&amp;</span>[<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]);</code></pre></div>
-<p>Invocations of <code>chain!</code> with multiple arguments <a href="https://doc.rust-lang.org/1.62.0/core/iter/traits/collect/trait.IntoIterator.html"><code>.into_iter()</code></a> each
-argument, and then <a href="https://doc.rust-lang.org/1.62.0/core/iter/traits/iterator/trait.Iterator.html#method.chain"><code>chain</code></a> them together:</p>
+<p>Invocations of <code>chain!</code> with multiple arguments <a href="https://doc.rust-lang.org/1.62.1/core/iter/traits/collect/trait.IntoIterator.html"><code>.into_iter()</code></a> each
+argument, and then <a href="https://doc.rust-lang.org/1.62.1/core/iter/traits/iterator/trait.Iterator.html#method.chain"><code>chain</code></a> them together:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">iter</span>::<span class="kw-2">*</span>, <span class="ident">ops::Range</span>, <span class="ident">slice</span>};
 <span class="kw">use</span> <span class="ident">itertools</span>::{<span class="ident">assert_equal</span>, <span class="ident">chain</span>};
@@ -42,5 +42,5 @@ argument, and then <a href="https://doc.rust-lang.org/1.62.0/core/iter/traits/it
         .<span class="ident">chain</span>(<span class="kw-2">&amp;</span>[<span class="number">2</span>, <span class="number">3</span>, <span class="number">5</span>]);
 
 <span class="ident">assert_equal</span>(<span class="ident">with_macro</span>, <span class="ident">with_method</span>);</code></pre></div>
-</div></details></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="itertools" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
+</div></details></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="itertools" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.1 (e092d0b6b 2022-07-16)" ></div>
 </body></html>

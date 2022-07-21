@@ -46,7 +46,7 @@ synchronous code you will need to use the <a href="struct.Sender.html#method.blo
 <a href="struct.Receiver.html#method.blocking_recv"><code>blocking_recv</code></a> methods.</p>
 <p><strong>Unbounded channel</strong>: You should use the kind of channel that matches where
 the receiver is. So for sending a message <em>from async to sync</em>, you should
-use <a href="https://doc.rust-lang.org/1.62.0/std/sync/mpsc/fn.channel.html">the standard library unbounded channel</a> or
+use <a href="https://doc.rust-lang.org/1.62.1/std/sync/mpsc/fn.channel.html">the standard library unbounded channel</a> or
 <a href="https://docs.rs/crossbeam/*/crossbeam/channel/fn.unbounded.html">crossbeam</a>.  Similarly, for sending a message <em>from sync
 to async</em>, you should use an unbounded Tokio <code>mpsc</code> channel.</p>
 <p>Please be aware that the above remarks were written with the <code>mpsc</code> channel
@@ -75,5 +75,5 @@ runtime, and the sender may be moved from one Tokio runtime to another.</p>
 with backpressure.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.unbounded_channel.html" title="tokio::sync::mpsc::unbounded_channel fn">unbounded_channel</a></div><div class="item-right docblock-short"><p>Creates an unbounded mpsc channel for communicating between asynchronous
 tasks without backpressure.</p>
-</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
+</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.1 (e092d0b6b 2022-07-16)" ></div>
 </body></html>

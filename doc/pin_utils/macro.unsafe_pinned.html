@@ -11,10 +11,10 @@
 <h2 id="safety"><a href="#safety">Safety</a></h2>
 <p>To make using this macro safe, three things need to be ensured:</p>
 <ul>
-<li>If the struct implements <a href="https://doc.rust-lang.org/1.62.0/core/ops/drop/trait.Drop.html#tymethod.drop"><code>Drop</code></a>, the <a href="https://doc.rust-lang.org/1.62.0/core/ops/drop/trait.Drop.html#tymethod.drop"><code>drop</code></a> method is not allowed to
+<li>If the struct implements <a href="https://doc.rust-lang.org/1.62.1/core/ops/drop/trait.Drop.html#tymethod.drop"><code>Drop</code></a>, the <a href="https://doc.rust-lang.org/1.62.1/core/ops/drop/trait.Drop.html#tymethod.drop"><code>drop</code></a> method is not allowed to
 move the value of the field.</li>
-<li>If the struct wants to implement <a href="https://doc.rust-lang.org/1.62.0/core/marker/trait.Unpin.html"><code>Unpin</code></a>, it has to do so conditionally:
-The struct can only implement <a href="https://doc.rust-lang.org/1.62.0/core/marker/trait.Unpin.html"><code>Unpin</code></a> if the field’s type is <a href="https://doc.rust-lang.org/1.62.0/core/marker/trait.Unpin.html"><code>Unpin</code></a>.</li>
+<li>If the struct wants to implement <a href="https://doc.rust-lang.org/1.62.1/core/marker/trait.Unpin.html"><code>Unpin</code></a>, it has to do so conditionally:
+The struct can only implement <a href="https://doc.rust-lang.org/1.62.1/core/marker/trait.Unpin.html"><code>Unpin</code></a> if the field’s type is <a href="https://doc.rust-lang.org/1.62.1/core/marker/trait.Unpin.html"><code>Unpin</code></a>.</li>
 <li>The struct must not be <code>#[repr(packed)]</code>.</li>
 </ul>
 <h2 id="example"><a href="#example">Example</a></h2>
@@ -37,5 +37,5 @@ The struct can only implement <a href="https://doc.rust-lang.org/1.62.0/core/mar
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Unpin</span><span class="op">&gt;</span> <span class="ident">Unpin</span> <span class="kw">for</span> <span class="ident">Foo</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {} <span class="comment">// Conditional Unpin impl</span></code></pre></div>
 <p>Note: borrowing the field multiple times requires using <code>.as_mut()</code> to
 avoid consuming the <code>Pin</code>.</p>
-</div></details></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="pin_utils" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
+</div></details></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="pin_utils" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.1 (e092d0b6b 2022-07-16)" ></div>
 </body></html>

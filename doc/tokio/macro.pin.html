@@ -11,11 +11,11 @@
     )<span class="kw-2">*</span>) =&gt; { ... };
 }</code></pre></div>
 </div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Pins a value on the stack.</p>
-<p>Calls to <code>async fn</code> return anonymous <a href="https://doc.rust-lang.org/1.62.0/core/future/future/trait.Future.html"><code>Future</code></a> values that are <code>!Unpin</code>.
+<p>Calls to <code>async fn</code> return anonymous <a href="https://doc.rust-lang.org/1.62.1/core/future/future/trait.Future.html"><code>Future</code></a> values that are <code>!Unpin</code>.
 These values must be pinned before they can be polled. Calling <code>.await</code> will
 handle this, but consumes the future. If it is required to call <code>.await</code> on
 a <code>&amp;mut _</code> reference, the caller is responsible for pinning the future.</p>
-<p>Pinning may be done by allocating with <a href="https://doc.rust-lang.org/1.62.0/alloc/boxed/struct.Box.html#method.pin"><code>Box::pin</code></a> or by using the stack
+<p>Pinning may be done by allocating with <a href="https://doc.rust-lang.org/1.62.1/alloc/boxed/struct.Box.html#method.pin"><code>Box::pin</code></a> or by using the stack
 with the <code>pin!</code> macro.</p>
 <p>The following will <strong>fail to compile</strong>:</p>
 
@@ -108,5 +108,5 @@ a variant of the macro that supports doing both in one go.</p>
         <span class="kw">_</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">future2</span> =&gt; {}
     }
 }</code></pre></div>
-</div></details></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
+</div></details></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.1 (e092d0b6b 2022-07-16)" ></div>
 </body></html>

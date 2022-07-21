@@ -4,7 +4,7 @@
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"><a href="#">Module ptr</a></h2><div class="sidebar-elems"><section><div class="block"><ul><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#traits">Traits</a></li><li><a href="#functions">Functions</a></li></ul></div></section><div id="sidebar-vars" data-name="ptr" data-ty="mod" data-relpath="./"></div><script defer src="./sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../bitvec/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
-    <h1 class="fqn"><span class="in-band">Module <a href="../index.html">bitvec</a>::<wbr><a class="mod" href="#">ptr</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../../src/bitvec/ptr.rs.html#1-765">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Mirror of the <a href="https://doc.rust-lang.org/1.62.0/core/ptr/index.html"><code>core::ptr</code></a> module and <code>bitvec</code>-specific pointer structures.</p>
+    <h1 class="fqn"><span class="in-band">Module <a href="../index.html">bitvec</a>::<wbr><a class="mod" href="#">ptr</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../../src/bitvec/ptr.rs.html#1-765">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Mirror of the <a href="https://doc.rust-lang.org/1.62.1/core/ptr/index.html"><code>core::ptr</code></a> module and <code>bitvec</code>-specific pointer structures.</p>
 <h2 id="types"><a href="#types">Types</a></h2>
 <p>As <code>bitvec</code> is not the standard library, it does not have the freedom to use
 language builtins such as actual pointers. Instead, <code>bitvec</code> uses its own
@@ -20,7 +20,7 @@ the location.</p>
 </li>
 <li>
 <p><a href="../prelude/struct.BitPtrRange.html"><code>BitPtrRange&lt;M, O, T&gt;</code></a>: This is equivalent to <code>Range&lt;BitPtr&lt;M, O, T&gt;&gt;</code>. It
-exists because <a href="https://doc.rust-lang.org/1.62.0/core/ops/range/struct.Range.html"><code>Range</code></a> has some associated types that are still unstable to
+exists because <a href="https://doc.rust-lang.org/1.62.1/core/ops/range/struct.Range.html"><code>Range</code></a> has some associated types that are still unstable to
 implement for its type parameters. It is also smaller than the <code>Range</code> would
 be, because it can take advantage of layout optimizations.</p>
 </li>
@@ -39,7 +39,7 @@ a length counter into a two-word structure that can be transmuted into
 the source of the limitation that <code>bitvec</code> region types can only address ⅛ of
 a <code>usize</code>, rather than the ½ limitation of the standard library collections.</p>
 <p>This type is not public API; it will only ever appear in its transmuted form,
-<code>*BitSlice&lt;O, T&gt;</code>. Users are <strong>not permitted</strong> to use any of the <a href="https://doc.rust-lang.org/1.62.0/core/ptr/index.html"><code>core::ptr</code></a>
+<code>*BitSlice&lt;O, T&gt;</code>. Users are <strong>not permitted</strong> to use any of the <a href="https://doc.rust-lang.org/1.62.1/core/ptr/index.html"><code>core::ptr</code></a>
 or <a href="https://doc.rust-lang.org/std/primitive.pointer.html"><code>pointer</code></a> functions to view or modify <code>*BitSlice</code> pointers, or their
 referent locations, in any way.</p>
 </li>
@@ -69,7 +69,7 @@ their referent type, even if your usage never touches the span encoding.</p>
 <p>As such, the pointer types in this module can essentially only be sourced from
 references, not from arbitrary address values. While this module attempts to
 rely on actual Rust references as much as possible, and instead use only the
-ordinary <a href="https://doc.rust-lang.org/1.62.0/core/ptr/index.html"><code>core::ptr</code></a> and <a href="https://doc.rust-lang.org/std/primitive.pointer.html"><code>pointer</code></a> functions. This is not always possible;
+ordinary <a href="https://doc.rust-lang.org/1.62.1/core/ptr/index.html"><code>core::ptr</code></a> and <a href="https://doc.rust-lang.org/std/primitive.pointer.html"><code>pointer</code></a> functions. This is not always possible;
 in particular, Rust does not offer stable atomic intrinsics, and instead only
 allows them to be used on references.</p>
 <p>!</p>
@@ -106,5 +106,5 @@ overlap.</p>
 <code>y</code>. The two regions must <em>not</em> overlap.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.write.html" title="bitvec::ptr::write fn">write</a><a title="unsafe function" href="#"><sup>⚠</sup></a></div><div class="item-right docblock-short"><p>Overwrites a memory location with the given bit.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.write_volatile.html" title="bitvec::ptr::write_volatile fn">write_volatile</a><a title="unsafe function" href="#"><sup>⚠</sup></a></div><div class="item-right docblock-short"><p>Performs a volatile write of a memory location with the given bit.</p>
-</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bitvec" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
+</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bitvec" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.1 (e092d0b6b 2022-07-16)" ></div>
 </body></html>

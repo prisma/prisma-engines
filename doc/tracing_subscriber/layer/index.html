@@ -120,7 +120,7 @@ work:</p>
 
 <span class="ident">tracing::subscriber::set_global_default</span>(<span class="ident">subscriber</span>)
     .<span class="ident">expect</span>(<span class="string">&quot;Unable to set global subscriber&quot;</span>);</code></pre></div>
-<p>However, a <a href="trait.Layer.html" title="Layer"><code>Layer</code></a> wrapped in an <a href="https://doc.rust-lang.org/1.62.0/core/option/enum.Option.html" title="Option"><code>Option</code></a> <a href="trait.Layer.html#impl-Layer%3CS%3E-for-Option%3CL%3E">also implements the <code>Layer</code>
+<p>However, a <a href="trait.Layer.html" title="Layer"><code>Layer</code></a> wrapped in an <a href="https://doc.rust-lang.org/1.62.1/core/option/enum.Option.html" title="Option"><code>Option</code></a> <a href="trait.Layer.html#impl-Layer%3CS%3E-for-Option%3CL%3E">also implements the <code>Layer</code>
 trait</a>. This allows individual layers to be enabled or disabled at
 runtime while always producing a <a href="https://docs.rs/tracing-core/latest/tracing_core/subscriber/trait.Subscriber.html"><code>Subscriber</code></a> of the same type. For
 example:</p>
@@ -196,7 +196,7 @@ several outputs might return a <code>Box&lt;dyn Layer&lt;S&gt; + Send + Sync + '
     .<span class="ident">with</span>(<span class="ident">config</span>.<span class="ident">layer</span>())
     .<span class="ident">init</span>();</code></pre></div>
 <p>The <a href="trait.Layer.html#method.boxed" title="Layer::boxed"><code>Layer::boxed</code></a> method is provided to make boxing a <code>Layer</code>
-more convenient, but <a href="https://doc.rust-lang.org/1.62.0/alloc/boxed/struct.Box.html#method.new" title="Box::new"><code>Box::new</code></a> may be used as well.</p>
+more convenient, but <a href="https://doc.rust-lang.org/1.62.1/alloc/boxed/struct.Box.html#method.new" title="Box::new"><code>Box::new</code></a> may be used as well.</p>
 <p>When the number of <code>Layer</code>s varies at runtime, note that a
 [<code>Vec&lt;L&gt; where L: </code>Layer`` also implements <code>Layer</code>][vec-impl]. This
 can be used to add a variable number of <code>Layer</code>s to a <code>Subscriber</code>:</p>
@@ -515,5 +515,5 @@ wrapped <a href="https://docs.rs/tracing-core/latest/tracing_core/trait.Subscrib
 for an individual layer.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Layer.html" title="tracing_subscriber::layer::Layer trait">Layer</a></div><div class="item-right docblock-short"><p>A composable handler for <code>tracing</code> events.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.SubscriberExt.html" title="tracing_subscriber::layer::SubscriberExt trait">SubscriberExt</a></div><div class="item-right docblock-short"><p>Extension trait adding a <code>with(Layer)</code> combinator to <code>Subscriber</code>s.</p>
-</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
+</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.1 (e092d0b6b 2022-07-16)" ></div>
 </body></html>

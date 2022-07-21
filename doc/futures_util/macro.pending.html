@@ -8,12 +8,12 @@
     () =&gt; { ... };
 }</code></pre></div>
 </div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>A macro which yields to the event loop once.</p>
-<p>This is equivalent to returning <a href="https://doc.rust-lang.org/1.62.0/core/task/poll/enum.Poll.html"><code>Poll::Pending</code></a>
-from a <a href="https://doc.rust-lang.org/1.62.0/core/future/future/trait.Future.html#tymethod.poll"><code>Future::poll</code></a> implementation.
-Similarly, when using this macro, it must be ensured that <a href="https://doc.rust-lang.org/1.62.0/core/task/wake/struct.Waker.html#method.wake"><code>wake</code></a>
+<p>This is equivalent to returning <a href="https://doc.rust-lang.org/1.62.1/core/task/poll/enum.Poll.html"><code>Poll::Pending</code></a>
+from a <a href="https://doc.rust-lang.org/1.62.1/core/future/future/trait.Future.html#tymethod.poll"><code>Future::poll</code></a> implementation.
+Similarly, when using this macro, it must be ensured that <a href="https://doc.rust-lang.org/1.62.1/core/task/wake/struct.Waker.html#method.wake"><code>wake</code></a>
 is called somewhere when further progress can be made.</p>
 <p>This macro is only usable inside of async functions, closures, and blocks.
 It is also gated behind the <code>async-await</code> feature of this library, which is
 activated by default.</p>
-</div></details></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="futures_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
+</div></details></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="futures_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.1 (e092d0b6b 2022-07-16)" ></div>
 </body></html>

@@ -4,24 +4,24 @@
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../pin_project/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div>
         </a><div class="sidebar-elems"><h2 class="location"><a href="index.html">In pin_project</a></h2><div id="sidebar-vars" data-name="pinned_drop" data-ty="attr" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../pin_project/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
-    <h1 class="fqn"><span class="in-band">Attribute Macro <a href="index.html">pin_project</a>::<wbr><a class="attr" href="#">pinned_drop</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/pin_project_internal/lib.rs.html#568">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><div class="docblock item-decl"><pre class="rust attr"><code>#[pinned_drop]</code></pre></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>An attribute used for custom implementations of <a href="https://doc.rust-lang.org/1.62.0/core/ops/drop/trait.Drop.html" title="Drop"><code>Drop</code></a>.</p>
+    <h1 class="fqn"><span class="in-band">Attribute Macro <a href="index.html">pin_project</a>::<wbr><a class="attr" href="#">pinned_drop</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/pin_project_internal/lib.rs.html#568">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><div class="docblock item-decl"><pre class="rust attr"><code>#[pinned_drop]</code></pre></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>An attribute used for custom implementations of <a href="https://doc.rust-lang.org/1.62.1/core/ops/drop/trait.Drop.html" title="Drop"><code>Drop</code></a>.</p>
 <p>This attribute is used in conjunction with the <code>PinnedDrop</code> argument to
 the <a href="attr.pin_project.html" title="pin_project"><code>#[pin_project]</code></a> attribute.</p>
 <p>The impl block annotated with this attribute acts just like a normal
-<a href="https://doc.rust-lang.org/1.62.0/core/ops/drop/trait.Drop.html" title="Drop"><code>Drop</code></a> impl, except for the following two:</p>
+<a href="https://doc.rust-lang.org/1.62.1/core/ops/drop/trait.Drop.html" title="Drop"><code>Drop</code></a> impl, except for the following two:</p>
 <ul>
-<li><code>drop</code> method takes <a href="https://doc.rust-lang.org/1.62.0/core/pin/struct.Pin.html"><code>Pin</code></a><code>&lt;&amp;mut Self&gt;</code></li>
+<li><code>drop</code> method takes <a href="https://doc.rust-lang.org/1.62.1/core/pin/struct.Pin.html"><code>Pin</code></a><code>&lt;&amp;mut Self&gt;</code></li>
 <li>Name of the trait is <code>PinnedDrop</code>.</li>
 </ul>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">PinnedDrop</span> {
     <span class="kw">fn</span> <span class="ident">drop</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>);
 }</code></pre></div>
-<p><code>#[pin_project]</code> implements the actual <a href="https://doc.rust-lang.org/1.62.0/core/ops/drop/trait.Drop.html" title="Drop"><code>Drop</code></a> trait via <code>PinnedDrop</code> you
-implemented. To drop a type that implements <code>PinnedDrop</code>, use the <a href="https://doc.rust-lang.org/1.62.0/core/mem/fn.drop.html" title="drop"><code>drop</code></a>
-function just like dropping a type that directly implements <a href="https://doc.rust-lang.org/1.62.0/core/ops/drop/trait.Drop.html" title="Drop"><code>Drop</code></a>.</p>
+<p><code>#[pin_project]</code> implements the actual <a href="https://doc.rust-lang.org/1.62.1/core/ops/drop/trait.Drop.html" title="Drop"><code>Drop</code></a> trait via <code>PinnedDrop</code> you
+implemented. To drop a type that implements <code>PinnedDrop</code>, use the <a href="https://doc.rust-lang.org/1.62.1/core/mem/fn.drop.html" title="drop"><code>drop</code></a>
+function just like dropping a type that directly implements <a href="https://doc.rust-lang.org/1.62.1/core/ops/drop/trait.Drop.html" title="Drop"><code>Drop</code></a>.</p>
 <p>In particular, it will never be called more than once, just like
-<a href="https://doc.rust-lang.org/1.62.0/core/ops/drop/trait.Drop.html#tymethod.drop" title="Drop::drop"><code>Drop::drop</code></a>.</p>
+<a href="https://doc.rust-lang.org/1.62.1/core/ops/drop/trait.Drop.html#tymethod.drop" title="Drop::drop"><code>Drop::drop</code></a>.</p>
 <h2 id="examples"><a href="#examples">Examples</a></h2>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
 
@@ -49,15 +49,15 @@ function just like dropping a type that directly implements <a href="https://doc
 This is because destructors can be called multiple times in safe code and
 <a href="https://github.com/rust-lang/rust/pull/62360">double dropping is unsound</a>.</p>
 <p>Ideally, it would be desirable to be able to forbid manual calls in
-the same way as <a href="https://doc.rust-lang.org/1.62.0/core/ops/drop/trait.Drop.html#tymethod.drop" title="Drop::drop"><code>Drop::drop</code></a>, but the library cannot do it. So, by using
+the same way as <a href="https://doc.rust-lang.org/1.62.1/core/ops/drop/trait.Drop.html#tymethod.drop" title="Drop::drop"><code>Drop::drop</code></a>, but the library cannot do it. So, by using
 macros and replacing them with private traits like the following,
 this crate prevent users from calling <code>PinnedDrop::drop</code> in safe code.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">PinnedDrop</span> {
     <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">drop</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>);
 }</code></pre></div>
-<p>This allows implementing <a href="https://doc.rust-lang.org/1.62.0/core/ops/drop/trait.Drop.html" title="Drop"><code>Drop</code></a> safely using <code>#[pinned_drop]</code>.
-Also by using the <a href="https://doc.rust-lang.org/1.62.0/core/mem/fn.drop.html" title="drop"><code>drop</code></a> function just like dropping a type that directly
-implements <a href="https://doc.rust-lang.org/1.62.0/core/ops/drop/trait.Drop.html" title="Drop"><code>Drop</code></a>, can drop safely a type that implements <code>PinnedDrop</code>.</p>
-</div></details></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="pin_project" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
+<p>This allows implementing <a href="https://doc.rust-lang.org/1.62.1/core/ops/drop/trait.Drop.html" title="Drop"><code>Drop</code></a> safely using <code>#[pinned_drop]</code>.
+Also by using the <a href="https://doc.rust-lang.org/1.62.1/core/mem/fn.drop.html" title="drop"><code>drop</code></a> function just like dropping a type that directly
+implements <a href="https://doc.rust-lang.org/1.62.1/core/ops/drop/trait.Drop.html" title="Drop"><code>Drop</code></a>, can drop safely a type that implements <code>PinnedDrop</code>.</p>
+</div></details></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="pin_project" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.1 (e092d0b6b 2022-07-16)" ></div>
 </body></html>

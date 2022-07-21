@@ -104,8 +104,8 @@ returned from the method.</p>
     }
 }</code></pre></div>
 <p>If you want to call the <code>project()</code> method multiple times or later use the
-original <a href="https://doc.rust-lang.org/1.62.0/core/pin/struct.Pin.html"><code>Pin</code></a> type, it needs to use <a href="https://doc.rust-lang.org/1.62.0/core/pin/struct.Pin.html#method.as_mut"><code>.as_mut()</code></a> to avoid
-consuming the <a href="https://doc.rust-lang.org/1.62.0/core/pin/struct.Pin.html"><code>Pin</code></a>.</p>
+original <a href="https://doc.rust-lang.org/1.62.1/core/pin/struct.Pin.html"><code>Pin</code></a> type, it needs to use <a href="https://doc.rust-lang.org/1.62.1/core/pin/struct.Pin.html#method.as_mut"><code>.as_mut()</code></a> to avoid
+consuming the <a href="https://doc.rust-lang.org/1.62.1/core/pin/struct.Pin.html"><code>Pin</code></a>.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
 
@@ -126,8 +126,8 @@ consuming the <a href="https://doc.rust-lang.org/1.62.0/core/pin/struct.Pin.html
     }
 }</code></pre></div>
 <h2 id="unpin"><a href="#unpin"><code>!Unpin</code></a></h2>
-<p>If you want to ensure that <a href="https://doc.rust-lang.org/1.62.0/core/marker/trait.Unpin.html" title="Unpin"><code>Unpin</code></a> is not implemented, use <code>#[pin]</code>
-attribute for a <a href="https://doc.rust-lang.org/1.62.0/core/marker/struct.PhantomPinned.html"><code>PhantomPinned</code></a> field.</p>
+<p>If you want to ensure that <a href="https://doc.rust-lang.org/1.62.1/core/marker/trait.Unpin.html" title="Unpin"><code>Unpin</code></a> is not implemented, use <code>#[pin]</code>
+attribute for a <a href="https://doc.rust-lang.org/1.62.1/core/marker/struct.PhantomPinned.html"><code>PhantomPinned</code></a> field.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std::marker::PhantomPinned</span>;
 
@@ -140,6 +140,6 @@ attribute for a <a href="https://doc.rust-lang.org/1.62.0/core/marker/struct.Pha
         <span class="ident">_pin</span>: <span class="ident">PhantomPinned</span>,
     }
 }</code></pre></div>
-<p>Note that using <a href="https://doc.rust-lang.org/1.62.0/core/marker/struct.PhantomPinned.html"><code>PhantomPinned</code></a> without <code>#[pin]</code> attribute has no effect.</p>
-</div></details></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="pin_project_lite" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
+<p>Note that using <a href="https://doc.rust-lang.org/1.62.1/core/marker/struct.PhantomPinned.html"><code>PhantomPinned</code></a> without <code>#[pin]</code> attribute has no effect.</p>
+</div></details></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="pin_project_lite" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.1 (e092d0b6b 2022-07-16)" ></div>
 </body></html>
