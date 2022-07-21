@@ -3077,15 +3077,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "prisma-inflector"
-version = "0.1.0"
-dependencies = [
- "once_cell",
- "regex",
- "unicode-segmentation",
-]
-
-[[package]]
 name = "prisma-models"
 version = "0.0.0"
 dependencies = [
@@ -3343,7 +3334,6 @@ dependencies = [
  "parking_lot 0.12.1",
  "petgraph 0.4.13",
  "pin-utils",
- "prisma-inflector",
  "prisma-models",
  "prisma-value",
  "query-connector",
