@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["classical","Inflector, classical mode."],["default","Default inflector, anglicized mode."]]});
