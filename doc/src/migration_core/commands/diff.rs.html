@@ -149,9 +149,9 @@
     <span class="ident">core_error::CoreResult</span>,
     <span class="ident">json_rpc::types</span>::{<span class="ident">DiffParams</span>, <span class="ident">DiffResult</span>, <span class="ident">DiffTarget</span>, <span class="ident">PathContainer</span>, <span class="ident">SchemaContainer</span>, <span class="ident">UrlContainer</span>},
 };
-<span class="kw">use</span> <span class="ident">datamodel::parser_database::SourceFile</span>;
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ConnectorHost</span>, <span class="ident">DatabaseSchema</span>, <span class="ident">DiffTarget</span> <span class="kw">as</span> <span class="ident">McDiff</span>, <span class="ident">MigrationConnector</span>};
+<span class="kw">use</span> <span class="ident">psl::parser_database::SourceFile</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">path::Path</span>, <span class="ident">sync::Arc</span>};
 
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">diff</span>(<span class="ident">params</span>: <span class="ident">DiffParams</span>, <span class="ident">host</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ConnectorHost</span><span class="op">&gt;</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">DiffResult</span><span class="op">&gt;</span> {
