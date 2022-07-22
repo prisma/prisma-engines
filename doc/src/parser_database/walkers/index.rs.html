@@ -384,7 +384,7 @@
     }
 
     <span class="doccomment">/// The scalar fields covered by the index.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">IndexFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">IndexFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">index_attribute</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">attributes</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">attributes</span>.<span class="ident">path</span>;
             <span class="kw">let</span> <span class="ident">field_id</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">field_in_index</span>();
@@ -403,7 +403,7 @@
     }
 
     <span class="doccomment">/// The scalar fields covered by the index, and their arguments.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_field_attributes</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldAttributeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_field_attributes</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldAttributeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">attribute</span>()
             .<span class="ident">fields</span>
             .<span class="ident">iter</span>()
@@ -420,7 +420,7 @@
     <span class="doccomment">/// and with the same attributes.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains_exactly_the_fields</span>(
         <span class="self">self</span>,
-        <span class="ident">fields</span>: <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldAttributeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span>,
+        <span class="ident">fields</span>: <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldAttributeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">bool</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">scalar_field_attributes</span>().<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">fields</span>.<span class="ident">len</span>() {
             <span class="kw">return</span> <span class="bool-val">false</span>;
