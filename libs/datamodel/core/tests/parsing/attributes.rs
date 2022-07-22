@@ -1,5 +1,4 @@
-use datamodel::parse_schema;
-use expect_test::expect;
+use crate::common::*;
 
 #[test]
 fn empty_arguments_are_rejected_with_nice_error() {
@@ -25,7 +24,7 @@ fn empty_arguments_are_rejected_with_nice_error() {
         [1;94m   | [0m
     "#]];
 
-    expected.assert_eq(&parse_schema(schema).map(|_| ()).unwrap_err());
+    expect_error(schema, &expected)
 }
 
 #[test]
@@ -47,7 +46,7 @@ fn empty_model_attribute_arguments_are_rejected_with_nice_error() {
         [1;94m   | [0m
     "#]];
 
-    expected.assert_eq(&parse_schema(schema).map(|_| ()).unwrap_err());
+    expect_error(schema, &expected)
 }
 
 #[test]
@@ -71,7 +70,7 @@ fn empty_enum_attribute_arguments_are_rejected_with_nice_error() {
         [1;94m   | [0m
     "#]];
 
-    expected.assert_eq(&parse_schema(schema).map(|_| ()).unwrap_err());
+    expect_error(schema, &expected)
 }
 
 #[test]
@@ -95,7 +94,7 @@ fn trailing_commas_without_space_are_rejected_with_nice_error() {
         [1;94m   | [0m
     "#]];
 
-    expected.assert_eq(&parse_schema(schema).map(|_| ()).unwrap_err());
+    expect_error(schema, &expected)
 }
 
 #[test]
@@ -119,5 +118,5 @@ fn trailing_commas_with_space_are_rejected_with_nice_error() {
         [1;94m   | [0m
     "#]];
 
-    expected.assert_eq(&parse_schema(schema).map(|_| ()).unwrap_err());
+    expect_error(schema, &expected)
 }

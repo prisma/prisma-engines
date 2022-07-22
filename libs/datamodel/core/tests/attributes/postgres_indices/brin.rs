@@ -3,6 +3,11 @@ use crate::{common::*, with_header, Provider};
 #[test]
 fn on_mysql() {
     let dml = indoc! {r#"
+        datasource db {
+          provider = "mysql"
+          url      = env("DATABASE_URL")
+        }
+
         model A {
           id Int  @id
           a  Int
@@ -11,19 +16,16 @@ fn on_mysql() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
-
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given index type is not supported with the current connector[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  @@index([a(ops: raw("whatever_ops"))], [1;91mtype: Brin[0m)
+        [1;94m 9 | [0m
+        [1;94m10 | [0m  @@index([a(ops: raw("whatever_ops"))], [1;91mtype: Brin[0m)
         [1;94m   | [0m
     "#]];
 
-    expectation.assert_eq(&error)
+    expect_error(dml, &expectation);
 }
 
 #[test]

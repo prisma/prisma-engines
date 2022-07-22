@@ -20,7 +20,7 @@ fn enum_support() {
         }
     "#};
 
-    assert!(datamodel::parse_schema(dml).is_ok());
+    assert_valid(dml)
 }
 
 #[test]
@@ -37,7 +37,7 @@ fn scalar_list_support() {
         }
     "#};
 
-    assert!(datamodel::parse_schema(dml).is_ok());
+    assert_valid(dml)
 }
 
 #[test]
@@ -54,7 +54,7 @@ fn json_support() {
         }
     "#};
 
-    assert!(datamodel::parse_schema(dml).is_ok());
+    assert_valid(dml)
 }
 
 #[test]
@@ -107,7 +107,7 @@ fn auto_increment_on_non_primary_column_support() {
         }
     "#};
 
-    assert!(datamodel::parse_schema(dml).is_ok());
+    assert_valid(dml)
 }
 
 #[test]
@@ -135,7 +135,7 @@ fn key_order_enforcement_support() {
         }
     "#};
 
-    assert!(datamodel::parse_schema(dml).is_ok());
+    assert_valid(dml)
 }
 
 #[test]
