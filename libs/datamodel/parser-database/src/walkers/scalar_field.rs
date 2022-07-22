@@ -432,7 +432,7 @@ impl<'db> ScalarFieldAttributeWalker<'db> {
     /// @@index(name(sort: Desc))
     ///                    ^^^^
     /// ```
-    pub fn sort_order(&self) -> Option<SortOrder> {
+    pub fn sort_order(self) -> Option<SortOrder> {
         self.args().sort_order
     }
 }
