@@ -154,15 +154,13 @@
 <span id="149">149</span>
 <span id="150">150</span>
 <span id="151">151</span>
-<span id="152">152</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">input_types::fields::arguments</span>;
 
 <span class="doccomment">/// Builds the root `Query` type.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">build</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>) -&gt; (<span class="ident">OutputType</span>, <span class="ident">ObjectTypeStrongRef</span>) {
     <span class="kw">let</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ctx</span>
-        .<span class="ident">internal_data_model</span>
-        .<span class="ident">models_cloned</span>()
+        .<span class="ident">models</span>()
         .<span class="ident">into_iter</span>()
         .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">vec</span> <span class="op">=</span> <span class="macro">vec!</span>[

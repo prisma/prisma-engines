@@ -182,6 +182,14 @@
 <span id="177">177</span>
 <span id="178">178</span>
 <span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Query schema builder. Root for query schema building.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The schema builder creates all builders necessary for the process,</span>
@@ -224,8 +232,8 @@
 <span class="kw">use</span> <span class="ident">cache::TypeRefCache</span>;
 <span class="kw">use</span> <span class="ident">datamodel_connector</span>::{<span class="ident">ConnectorCapabilities</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ReferentialIntegrity</span>};
 <span class="kw">use</span> <span class="ident">prisma_models</span>::{
-    <span class="ident">datamodel::common::preview_features::PreviewFeature</span>, <span class="ident">Field</span> <span class="kw">as</span> <span class="ident">ModelField</span>, <span class="ident">Index</span>, <span class="ident">InternalDataModelRef</span>, <span class="ident">ModelRef</span>,
-    <span class="ident">RelationFieldRef</span>, <span class="ident">TypeIdentifier</span>,
+    <span class="ident">datamodel::common::preview_features::PreviewFeature</span>, <span class="ident">CompositeTypeRef</span>, <span class="ident">Field</span> <span class="kw">as</span> <span class="ident">ModelField</span>, <span class="ident">Index</span>,
+    <span class="ident">InternalDataModelRef</span>, <span class="ident">ModelRef</span>, <span class="ident">RelationFieldRef</span>, <span class="ident">TypeIdentifier</span>,
 };
 <span class="kw">use</span> <span class="ident">schema</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
@@ -292,6 +300,14 @@
         <span class="self">self</span>.<span class="ident">has_feature</span>(<span class="kw-2">&amp;</span><span class="ident">PreviewFeature::FullTextSearch</span>)
             <span class="op">&amp;&amp;</span> (<span class="self">self</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::FullTextSearchWithoutIndex</span>)
                 <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::FullTextSearchWithIndex</span>))
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">models</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ModelRef</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">internal_data_model</span>.<span class="ident">models_cloned</span>()
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">composite_types</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CompositeTypeRef</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">internal_data_model</span>.<span class="ident">composite_types</span>().<span class="ident">to_owned</span>()
     }
 }
 
