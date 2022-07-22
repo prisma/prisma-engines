@@ -60,7 +60,7 @@ fn relation_must_error_when_base_field_does_not_exist() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect_error(dml, &expect)
 }
 
 #[test]
@@ -97,7 +97,7 @@ fn relation_must_error_when_base_field_is_not_scalar() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect_error(dml, &expect)
 }
 
 #[test]
@@ -158,7 +158,7 @@ fn required_relation_field_must_error_when_one_underlying_field_is_optional() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect_error(dml, &expect)
 }
 
 #[test]
@@ -219,7 +219,7 @@ fn required_relation_field_must_error_when_all_underlying_fields_are_optional() 
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect_error(dml, &expect)
 }
 
 #[test]
@@ -247,7 +247,7 @@ fn required_relation_field_must_error_if_it_is_virtual() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect_error(dml, &expect)
 }
 
 #[test]
@@ -276,7 +276,7 @@ fn relation_must_error_when_referenced_field_does_not_exist() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect_error(dml, &expect)
 }
 
 #[test]
@@ -305,7 +305,7 @@ fn relation_must_error_when_referenced_field_is_not_scalar() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect_error(dml, &expect)
 }
 
 #[test]
@@ -335,7 +335,7 @@ fn relation_must_error_when_referenced_fields_are_not_a_unique_criteria() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect_error(dml, &expect)
 }
 
 #[test]
@@ -367,7 +367,7 @@ fn relation_must_error_when_referenced_compound_fields_are_not_a_unique_criteria
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect_error(dml, &expect)
 }
 
 #[test]
@@ -421,7 +421,7 @@ fn relation_must_error_when_referenced_fields_are_multiple_uniques() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect_error(dml, &expect)
 }
 
 #[test]
@@ -450,7 +450,7 @@ fn relation_must_error_when_types_of_base_field_and_referenced_field_do_not_matc
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect_error(dml, &expect)
 }
 
 #[test]
@@ -479,7 +479,7 @@ fn relation_must_error_when_number_of_fields_and_references_is_not_equal() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect_error(dml, &expect)
 }
 
 #[test]
@@ -508,7 +508,7 @@ fn must_error_when_references_argument_is_missing_for_one_to_many() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect_error(dml, &expect)
 }
 
 #[test]
@@ -542,7 +542,7 @@ fn must_error_fields_or_references_argument_is_placed_on_wrong_side_for_one_to_m
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect_error(dml, &expect)
 }
 
 #[test]
@@ -578,7 +578,7 @@ fn must_error_when_both_arguments_are_missing_for_one_to_many() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect_error(dml, &expect)
 }
 
 #[test]
@@ -614,7 +614,7 @@ fn must_error_when_fields_argument_is_missing_for_one_to_one() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect_error(dml, &expect)
 }
 
 #[test]
@@ -650,7 +650,7 @@ fn must_error_when_references_argument_is_missing_for_one_to_one() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect_error(dml, &expect)
 }
 
 #[test]
@@ -687,7 +687,7 @@ fn must_error_when_fields_and_references_argument_are_placed_on_different_sides_
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect_error(dml, &expect)
 }
 
 #[test]
@@ -738,7 +738,7 @@ fn must_error_when_fields_or_references_argument_is_placed_on_both_sides_for_one
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect_error(dml, &expect)
 }
 
 #[test]
@@ -762,7 +762,7 @@ fn must_error_for_required_one_to_one_self_relations() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect_error(dml, &expect)
 }
 
 #[test]
@@ -792,7 +792,7 @@ fn must_error_nicely_when_a_many_to_many_is_not_possible() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect_error(dml, &expect)
 }
 
 #[test]
@@ -820,7 +820,7 @@ fn must_error_when_many_to_many_is_not_possible_due_to_missing_id() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect_error(dml, &expect)
 }
 
 #[test]
@@ -897,7 +897,7 @@ fn must_allow_relations_with_default_native_types_with_annotation_on_one_side() 
 
 #[test]
 fn a_one_on_one_relation_with_fields_on_the_wrong_side_should_not_pass() {
-    let schema = r#"
+    let dml = r#"
 datasource db {
   provider = "postgresql"
   url      = env("TEST_DATABASE_URL")
@@ -926,5 +926,5 @@ model Bam {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(schema).map(drop).unwrap_err());
+    expect_error(dml, &expect)
 }
