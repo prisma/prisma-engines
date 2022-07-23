@@ -155,7 +155,7 @@ fn create_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField 
     let args = arguments::create_one_arguments(ctx, model).unwrap_or_default();
     let field_name = format!("createOne{}", model.name);
 
-    field(
+    let out = field(
         field_name,
         args,
         OutputType::object(objects::model::map_type(ctx, model)),
@@ -163,7 +163,10 @@ fn create_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField 
             model: Some(Arc::clone(model)),
             tag: QueryTag::CreateOne,
         }),
-    )
+    );
+    println!("HUH {:?}", out);
+
+    out
 }
 
 /// Builds a delete mutation field (e.g. deleteUser) for given model.
