@@ -34,6 +34,7 @@
 mod cache;
 pub mod constants;
 mod input_types;
+mod mutations;
 mod output_types;
 mod utils;
 
