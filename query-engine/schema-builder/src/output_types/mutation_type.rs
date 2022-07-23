@@ -1,3 +1,5 @@
+use crate::mutations::create_one::create_one;
+
 use super::*;
 use datamodel_connector::ConnectorCapability;
 use input_types::fields::{arguments, input_fields};
@@ -12,7 +14,7 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
             let mut vec = vec![];
 
             if model.supports_create_operation {
-                vec.push(create_item_field(ctx, &model));
+                vec.push(create_one(ctx, &model));
 
                 append_opt(&mut vec, upsert_item_field(ctx, &model));
                 append_opt(&mut vec, create_many_field(ctx, &model));
@@ -148,25 +150,6 @@ fn create_mongodb_run_command_raw() -> OutputField {
             model: None,
         }),
     )
-}
-
-/// Builds a create mutation field (e.g. createUser) for given model.
-fn create_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
-    let args = arguments::create_one_arguments(ctx, model).unwrap_or_default();
-    let field_name = format!("createOne{}", model.name);
-
-    let out = field(
-        field_name,
-        args,
-        OutputType::object(objects::model::map_type(ctx, model)),
-        Some(QueryInfo {
-            model: Some(Arc::clone(model)),
-            tag: QueryTag::CreateOne,
-        }),
-    );
-    println!("HUH {:?}", out);
-
-    out
 }
 
 /// Builds a delete mutation field (e.g. deleteUser) for given model.

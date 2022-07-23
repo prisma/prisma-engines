@@ -1,5 +1,48 @@
-use super::fields::data_input_mapper::*;
-use super::*;
+use std::sync::Arc;
+
+use crate::{
+    capitalize,
+    constants::args,
+    field, init_input_object_type, input_field,
+    input_types::fields::data_input_mapper::{CreateDataInputFieldMapper, DataInputFieldMapper},
+    output_types::objects,
+    BuilderContext, ModelField,
+};
+use prisma_models::{ModelRef, RelationFieldRef};
+use schema::{
+    Identifier, InputField, InputObjectTypeWeakRef, InputType, OutputField, OutputType, QueryInfo, QueryTag,
+    PRISMA_NAMESPACE,
+};
+
+/// Builds a create mutation field (e.g. createUser) for given model.
+pub(crate) fn create_one(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
+    let args = create_one_arguments(ctx, model).unwrap_or_default();
+    let field_name = format!("createOne{}", model.name);
+
+    field(
+        field_name,
+        args,
+        OutputType::object(objects::model::map_type(ctx, model)),
+        Some(QueryInfo {
+            model: Some(Arc::clone(model)),
+            tag: QueryTag::CreateOne,
+        }),
+    )
+}
+
+/// Builds "data" argument intended for the create field.
+/// The data argument is not present if no data can be created.
+pub(crate) fn create_one_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Vec<InputField>> {
+    let create_types = create_one_input_types(ctx, model, None);
+    let any_empty = create_types.iter().any(|typ| typ.is_empty());
+    let all_empty = create_types.iter().all(|typ| typ.is_empty());
+
+    if all_empty {
+        None
+    } else {
+        Some(vec![input_field(args::DATA, create_types, None).optional_if(any_empty)])
+    }
+}
 
 pub(crate) fn create_one_input_types(
     ctx: &mut BuilderContext,
