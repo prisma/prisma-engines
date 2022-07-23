@@ -74,6 +74,10 @@ impl Model {
         self.manifestation.as_ref().map(|m| m.as_ref())
     }
 
+    pub fn find_relation(&self, relation_name: &str) -> crate::Result<RelationWeakRef> {
+        self.internal_data_model().find_relation(relation_name)
+    }
+
     pub fn internal_data_model(&self) -> InternalDataModelRef {
         self.internal_data_model
             .upgrade()
