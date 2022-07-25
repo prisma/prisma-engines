@@ -280,7 +280,7 @@ where
             },
             val => filter_fn(val.into(), json_path),
         },
-        ConditionValue::Ref(ref_field) => filter_fn(ref_field.into(), json_path),
+        ConditionValue::FieldRef(ref_field) => filter_fn(ref_field.into(), json_path),
     };
 
     filter
@@ -318,8 +318,8 @@ fn parse_internal_scalar(
 
                     _ => unreachable!(), // Validation guarantees this.
                 },
-                ConditionValue::Ref(ref_field) if reverse => field.not_in(ref_field),
-                ConditionValue::Ref(ref_field) => field.is_in(ref_field),
+                ConditionValue::FieldRef(ref_field) if reverse => field.not_in(ref_field),
+                ConditionValue::FieldRef(ref_field) => field.is_in(ref_field),
             };
 
             Ok(vec![filter])
@@ -339,8 +339,8 @@ fn parse_internal_scalar(
 
                     _ => unreachable!(), // Validation guarantees this.
                 },
-                ConditionValue::Ref(ref_field) if reverse => field.is_in(ref_field),
-                ConditionValue::Ref(ref_field) => field.not_in(ref_field),
+                ConditionValue::FieldRef(ref_field) if reverse => field.is_in(ref_field),
+                ConditionValue::FieldRef(ref_field) => field.not_in(ref_field),
             };
 
             Ok(vec![filter])
@@ -422,7 +422,9 @@ fn as_condition_value(
             let ref_field = field.container().find_field(&ref_field_name);
 
             match ref_field {
-                Some(Field::Scalar(sf)) if expect_scalar_list_ref && field.type_identifier == sf.type_identifier => {
+                Some(Field::Scalar(sf))
+                    if sf.is_list() == expect_scalar_list_ref && field.type_identifier == sf.type_identifier =>
+                {
                     Ok(ConditionValue::reference(sf))
                 }
                 Some(Field::Scalar(sf)) => Err(QueryGraphBuilderError::InputError(format!(
