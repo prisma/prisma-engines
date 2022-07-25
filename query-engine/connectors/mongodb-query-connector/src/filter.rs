@@ -1,7 +1,8 @@
 use crate::{error::MongoError, join::JoinStage, IntoBson};
 use connector_interface::{
-    AggregationFilter, CompositeCondition, CompositeFilter, Filter, OneRelationIsNullFilter, QueryMode, RelationFilter,
-    ScalarCompare, ScalarCondition, ScalarFilter, ScalarListFilter, ScalarProjection,
+    AggregationFilter, CompositeCondition, CompositeFilter, ConditionListValue, ConditionValue, Filter,
+    OneRelationIsNullFilter, QueryMode, RelationFilter, ScalarCompare, ScalarCondition, ScalarFilter, ScalarListFilter,
+    ScalarProjection,
 };
 use mongodb::bson::{doc, Bson, Document};
 use prisma_models::{CompositeFieldRef, PrismaValue, ScalarFieldRef, TypeIdentifier};
@@ -87,7 +88,7 @@ fn fold_compounds(filter: Filter) -> Filter {
     match filter {
         Filter::Scalar(ScalarFilter {
             projection: ScalarProjection::Compound(fields),
-            condition: ScalarCondition::In(value_tuples),
+            condition: ScalarCondition::In(ConditionListValue::List(value_tuples)),
             mode: _,
         }) if fields.len() > 1 => {
             let mut filters = vec![];
@@ -165,6 +166,7 @@ fn scalar_filter(
     is_count: bool,
     prefix: FilterPrefix,
 ) -> crate::Result<MongoFilter> {
+    let field_ref = filter.as_ref_field().cloned();
     let field = match filter.projection {
         connector_interface::ScalarProjection::Single(sf) => sf,
         connector_interface::ScalarProjection::Compound(mut c) if c.len() == 1 => c.pop().unwrap(),
@@ -178,6 +180,7 @@ fn scalar_filter(
     let filter = match filter.mode {
         QueryMode::Default => default_scalar_filter(
             &field,
+            field_ref,
             prefix,
             filter.condition.invert(invert),
             invert_undefined_exclusion,
@@ -192,6 +195,7 @@ fn scalar_filter(
 // Note contains / startsWith / endsWith are only applicable to String types in the schema.
 fn default_scalar_filter(
     field: &ScalarFieldRef,
+    field_ref: Option<ScalarFieldRef>,
     prefix: FilterPrefix,
     condition: ScalarCondition,
     invert_undefined_exclusion: bool,
@@ -234,36 +238,46 @@ fn default_scalar_filter(
         }
         // Todo: The nested list unpack looks like a bug somewhere.
         //       Likely join code mistakenly repacks a list into a list of PrismaValue somewhere in the core.
-        ScalarCondition::In(vals) => match vals.split_first() {
-            // List is list of lists, we need to flatten.
-            Some((PrismaValue::List(_), _)) => {
-                let mut bson_values = Vec::with_capacity(vals.len());
+        ScalarCondition::In(vals) => match vals {
+            ConditionListValue::List(vals) => match vals.split_first() {
+                // List is list of lists, we need to flatten.
+                Some((PrismaValue::List(_), _)) => {
+                    let mut bson_values = Vec::with_capacity(vals.len());
 
-                for pv in vals {
-                    if let PrismaValue::List(inner) = pv {
-                        bson_values.extend(
-                            inner
-                                .into_iter()
-                                .map(|val| into_bson_coerce_count(field, val, is_count))
-                                .collect::<crate::Result<Vec<_>>>()?,
-                        )
+                    for pv in vals {
+                        if let PrismaValue::List(inner) = pv {
+                            bson_values.extend(
+                                inner
+                                    .into_iter()
+                                    .map(|val| into_bson_coerce_count(field, val, is_count))
+                                    .collect::<crate::Result<Vec<_>>>()?,
+                            )
+                        }
                     }
-                }
 
-                doc! { "$in": [&field_name, bson_values] }
-            }
-            _ => {
-                doc! { "$in": [&field_name, into_bson_coerce_count(field, PrismaValue::List(vals), is_count)?] }
+                    doc! { "$in": [&field_name, bson_values] }
+                }
+                _ => {
+                    doc! { "$in": [&field_name, into_bson_coerce_count(field, PrismaValue::List(vals), is_count)?] }
+                }
+            },
+            ConditionListValue::FieldRef(field_ref) => {
+                doc! { "$in": [&field_name, coerce_as_array(field_ref.into_bson()?)] }
             }
         },
-        ScalarCondition::NotIn(vals) => {
-            let bson_values = vals
-                .into_iter()
-                .map(|val| into_bson_coerce_count(field, val, is_count))
-                .collect::<crate::Result<Vec<_>>>()?;
+        ScalarCondition::NotIn(vals) => match vals {
+            ConditionListValue::List(vals) => {
+                let bson_values = vals
+                    .into_iter()
+                    .map(|val| into_bson_coerce_count(field, val, is_count))
+                    .collect::<crate::Result<Vec<_>>>()?;
 
-            doc! { "$not": { "$in": [&field_name, bson_values] } }
-        }
+                doc! { "$not": { "$in": [&field_name, bson_values] } }
+            }
+            ConditionListValue::FieldRef(field_ref) => {
+                doc! { "$not": { "$in": [&field_name, coerce_as_array(field_ref.into_bson()?)] } }
+            }
+        },
         ScalarCondition::JsonCompare(jc) => match *jc.condition {
             ScalarCondition::Equals(value) => {
                 let bson = (field, value).into_bson()?;
@@ -286,6 +300,12 @@ fn default_scalar_filter(
         exclude_undefineds(&field_name, invert_undefined_exclusion, filter_doc)
     } else {
         filter_doc
+    };
+
+    let cond = if let Some(field_ref) = field_ref {
+        exclude_undefineds(field_ref.into_bson()?, invert_undefined_exclusion, cond)
+    } else {
+        cond
     };
 
     Ok(cond)
@@ -319,39 +339,57 @@ fn insensitive_scalar_filter(
         ScalarCondition::GreaterThanOrEquals(val) => Ok(doc! { "$gte": [&field_name, (field, val).into_bson()?] }),
         // Todo: The nested list unpack looks like a bug somewhere.
         // Likely join code mistakenly repacks a list into a list of PrismaValue somewhere in the core.
-        ScalarCondition::In(vals) => match vals.split_first() {
-            // List is list of lists, we need to flatten.
-            Some((PrismaValue::List(_), _)) => {
-                let mut matches = Vec::with_capacity(vals.len());
+        ScalarCondition::In(vals) => match vals {
+            ConditionListValue::List(vals) => match vals.split_first() {
+                // List is list of lists, we need to flatten.
+                Some((PrismaValue::List(_), _)) => {
+                    let mut matches = Vec::with_capacity(vals.len());
 
-                for pv in vals {
-                    if let PrismaValue::List(inner) = pv {
-                        for val in inner {
-                            matches.push(regex_match(&field_name, field, "^", val, "$", true)?)
+                    for pv in vals {
+                        if let PrismaValue::List(inner) = pv {
+                            for val in inner {
+                                matches.push(regex_match(&field_name, field, "^", val, "$", true)?)
+                            }
                         }
                     }
+
+                    Ok(doc! { "$or": matches })
                 }
 
-                Ok(doc! { "$or": matches })
-            }
+                _ => {
+                    let matches = vals
+                        .into_iter()
+                        .map(|val| regex_match(&field_name, field, "^", val, "$", true))
+                        .collect::<crate::Result<Vec<_>>>()?;
 
-            _ => {
+                    Ok(doc! { "$or": matches })
+                }
+            },
+            ConditionListValue::FieldRef(field_ref) => Ok(render_some(
+                field_ref.into_bson()?,
+                "elem",
+                regex_match("$$elem", field, "^", field, "$", true)?,
+                true,
+            )),
+        },
+        ScalarCondition::NotIn(vals) => match vals {
+            ConditionListValue::List(vals) => {
                 let matches = vals
                     .into_iter()
-                    .map(|val| regex_match(&field_name, field, "^", val, "$", true))
+                    .map(|val| {
+                        regex_match(&field_name, field, "^", val, "$", true).map(|rgx_doc| doc! { "$not": rgx_doc })
+                    })
                     .collect::<crate::Result<Vec<_>>>()?;
 
-                Ok(doc! { "$or": matches })
+                Ok(doc! { "$and": matches })
             }
+            ConditionListValue::FieldRef(field_ref) => Ok(render_every(
+                field_ref.into_bson()?,
+                "elem",
+                regex_match("$$elem", field, "^", field, "$", true).map(|rgx_doc| doc! { "$not": rgx_doc })?,
+                true,
+            )),
         },
-        ScalarCondition::NotIn(vals) => {
-            let matches = vals
-                .into_iter()
-                .map(|val| regex_match(&field_name, field, "^", val, "$", true).map(|doc| doc! { "$not": doc }))
-                .collect::<crate::Result<Vec<_>>>()?;
-
-            Ok(doc! { "$and": matches })
-        }
         ScalarCondition::IsSet(is_set) => Ok(render_is_set(&field_name, is_set)),
         ScalarCondition::JsonCompare(_) => Err(MongoError::Unsupported(
             "JSON filtering is not yet supported on MongoDB".to_string(),
@@ -369,23 +407,24 @@ fn scalar_list_filter(
     invert_undefined_exclusion: bool,
     prefix: FilterPrefix,
 ) -> crate::Result<MongoFilter> {
-    let field = filter.field;
+    let field = &filter.field;
     let field_name = prefix.render_with(field.db_name().into());
+    let field_ref = filter.get_field_ref().cloned();
 
     // Of course Mongo needs special filters for the inverted case, everything else would be too easy.
     let filter_doc = if invert {
         match filter.condition {
             // "Contains element" -> "Does not contain element"
             connector_interface::ScalarListCondition::Contains(val) => {
-                doc! { "$not": { "$in": [(&field, val).into_bson()?, coerce_as_array(&field_name)] } }
+                doc! { "$not": { "$in": [(field, val).into_bson()?, coerce_as_array(&field_name)] } }
             }
 
             // "Contains all elements" -> "Does not contain any of the elements"
-            connector_interface::ScalarListCondition::ContainsEvery(vals) => {
+            connector_interface::ScalarListCondition::ContainsEvery(ConditionListValue::List(vals)) => {
                 let ins = vals
                     .into_iter()
                     .map(|val| {
-                        (&field, val)
+                        (field, val)
                             .into_bson()
                             .map(|bson_val| doc! { "$not": { "$in": [bson_val, coerce_as_array(&field_name)] } })
                     })
@@ -395,21 +434,37 @@ fn scalar_list_filter(
                     "$and": ins
                 }
             }
+            connector_interface::ScalarListCondition::ContainsEvery(ConditionListValue::FieldRef(field_ref)) => {
+                render_none(
+                    &field_name,
+                    "elem",
+                    doc! { "$in": ["$$elem", coerce_as_array(field_ref.into_bson()?)] },
+                    true,
+                )
+            }
 
-            // "Contains some of the elements" -> "Does not contain some of the elements"
-            connector_interface::ScalarListCondition::ContainsSome(vals) => {
+            // "Contains some of the elements" -> "Contains none of the elements"
+            connector_interface::ScalarListCondition::ContainsSome(ConditionListValue::List(vals)) => {
                 let ins = vals
                     .into_iter()
                     .map(|val| {
-                        (&field, val)
+                        (field, val)
                             .into_bson()
                             .map(|bson_val| doc! { "$not": { "$in": [bson_val, coerce_as_array(&field_name)] } })
                     })
                     .collect::<crate::Result<Vec<_>>>()?;
 
                 doc! {
-                    "$or": ins
+                    "$and": ins
                 }
+            }
+            connector_interface::ScalarListCondition::ContainsSome(ConditionListValue::FieldRef(field_ref)) => {
+                render_none(
+                    &field_name,
+                    "elem",
+                    doc! { "$in": ["$$elem", coerce_as_array(field_ref.into_bson()?)] },
+                    true,
+                )
             }
 
             // Empty -> not empty and vice versa
@@ -424,19 +479,18 @@ fn scalar_list_filter(
     } else {
         match filter.condition {
             connector_interface::ScalarListCondition::Contains(val) => {
-                doc! { "$in": [(&field, val).into_bson()?, coerce_as_array(&field_name)] }
+                doc! { "$in": [(field, val).into_bson()?, coerce_as_array(&field_name)] }
             }
 
-            connector_interface::ScalarListCondition::ContainsEvery(vals) if vals.is_empty() => {
+            connector_interface::ScalarListCondition::ContainsEvery(vals) if vals.len() == 0 => {
                 // Empty hasEvery: Return all records.
                 render_stub_condition(true)
             }
-
-            connector_interface::ScalarListCondition::ContainsEvery(vals) => {
+            connector_interface::ScalarListCondition::ContainsEvery(ConditionListValue::List(vals)) => {
                 let ins = vals
                     .into_iter()
                     .map(|val| {
-                        (&field, val)
+                        (field, val)
                             .into_bson()
                             .map(|bson_val| doc! { "$in": [bson_val, coerce_as_array(&field_name)] })
                     })
@@ -444,17 +498,24 @@ fn scalar_list_filter(
 
                 doc! { "$and": ins }
             }
+            connector_interface::ScalarListCondition::ContainsEvery(ConditionListValue::FieldRef(field_ref)) => {
+                render_every(
+                    &field_name,
+                    "elem",
+                    doc! { "$in": ["$$elem", coerce_as_array(field_ref.into_bson()?)] },
+                    true,
+                )
+            }
 
-            connector_interface::ScalarListCondition::ContainsSome(vals) if vals.is_empty() => {
+            connector_interface::ScalarListCondition::ContainsSome(vals) if vals.len() == 0 => {
                 // Empty hasSome: Return no records.
                 render_stub_condition(false)
             }
-
-            connector_interface::ScalarListCondition::ContainsSome(vals) => {
+            connector_interface::ScalarListCondition::ContainsSome(ConditionListValue::List(vals)) => {
                 let ins = vals
                     .into_iter()
                     .map(|val| {
-                        (&field, val)
+                        (field, val)
                             .into_bson()
                             .map(|bson_val| doc! { "$in": [bson_val, coerce_as_array(&field_name)] })
                     })
@@ -462,18 +523,31 @@ fn scalar_list_filter(
 
                 doc! { "$or": ins }
             }
+            connector_interface::ScalarListCondition::ContainsSome(ConditionListValue::FieldRef(field_ref)) => {
+                render_some(
+                    &field_name,
+                    "elem",
+                    doc! { "$in": ["$$elem", coerce_as_array(field_ref.into_bson()?)] },
+                    true,
+                )
+            }
 
-            connector_interface::ScalarListCondition::IsEmpty(should_be_empty) => {
-                if should_be_empty {
-                    doc! { "$eq": [render_size(&field_name, true), 0] }
-                } else {
-                    doc! { "$gt": [render_size(&field_name, true), 0] }
-                }
+            connector_interface::ScalarListCondition::IsEmpty(true) => {
+                doc! { "$eq": [render_size(&field_name, true), 0] }
+            }
+            connector_interface::ScalarListCondition::IsEmpty(false) => {
+                doc! { "$gt": [render_size(&field_name, true), 0] }
             }
         }
     };
 
     let filter_doc = exclude_undefineds(&field_name, invert_undefined_exclusion, filter_doc);
+
+    let filter_doc = if let Some(field_ref) = field_ref.as_ref() {
+        exclude_undefineds(field_ref.into_bson()?, invert_undefined_exclusion, filter_doc)
+    } else {
+        filter_doc
+    };
 
     Ok(MongoFilter::Scalar(filter_doc))
 }
@@ -506,14 +580,14 @@ fn relation_filter(filter: RelationFilter, prefix: FilterPrefix) -> crate::Resul
 
     let filter_doc = match filter.condition {
         connector_interface::RelationCondition::EveryRelatedRecord => {
-            let (every, nested_joins) = render_every(&field_name, nested_filter, false, false)?;
+            let (every, nested_joins) = render_every_from_filter(&field_name, nested_filter, false, false)?;
 
             join_stage.extend_nested(nested_joins);
 
             every
         }
         connector_interface::RelationCondition::AtLeastOneRelatedRecord => {
-            let (some, nested_joins) = render_some(&field_name, nested_filter, false, false)?;
+            let (some, nested_joins) = render_some_from_filter(&field_name, nested_filter, false, false)?;
 
             join_stage.extend_nested(nested_joins);
 
@@ -524,7 +598,7 @@ fn relation_filter(filter: RelationFilter, prefix: FilterPrefix) -> crate::Resul
                 // Doesn't need coercing the array since joins always return arrays
                 doc! { "$eq": [render_size(&field_name, false), 0] }
             } else {
-                let (none, nested_joins) = render_none(&field_name, nested_filter, true, false)?;
+                let (none, nested_joins) = render_none_from_filter(&field_name, nested_filter, true, false)?;
 
                 join_stage.extend_nested(nested_joins);
 
@@ -545,7 +619,7 @@ fn relation_filter(filter: RelationFilter, prefix: FilterPrefix) -> crate::Resul
                 // Doesn't need coercing the array since joins always return arrays
                 doc! { "$eq": [render_size(&field_name, false), 0] }
             } else {
-                let (none, nested_joins) = render_none(&field_name, nested_filter, true, false)?;
+                let (none, nested_joins) = render_none_from_filter(&field_name, nested_filter, true, false)?;
 
                 join_stage.extend_nested(nested_joins);
 
@@ -555,7 +629,7 @@ fn relation_filter(filter: RelationFilter, prefix: FilterPrefix) -> crate::Resul
         connector_interface::RelationCondition::ToOneRelatedRecord => {
             // To-ones are coerced to single-element arrays via the join.
             // We render an "every" expression on that array to ensure that the predicate is matched.
-            let (every, nested_joins) = render_every(&field_name, nested_filter, false, false)?;
+            let (every, nested_joins) = render_every_from_filter(&field_name, nested_filter, false, false)?;
 
             join_stage.extend_nested(nested_joins);
 
@@ -627,19 +701,19 @@ fn composite_filter(
     let filter_doc = match *filter.condition {
         CompositeCondition::Every(filter) => {
             // let is_empty = matches!(filter, Filter::Empty);
-            let (every, _) = render_every(&field_name, filter, invert_undefined_exclusion, true)?;
+            let (every, _) = render_every_from_filter(&field_name, filter, invert_undefined_exclusion, true)?;
 
             every
         }
 
         CompositeCondition::Some(filter) => {
-            let (some, _) = render_some(&field_name, filter, invert_undefined_exclusion, true)?;
+            let (some, _) = render_some_from_filter(&field_name, filter, invert_undefined_exclusion, true)?;
 
             some
         }
 
         CompositeCondition::None(filter) => {
-            let (none, _) = render_none(&field_name, filter, !invert_undefined_exclusion, true)?;
+            let (none, _) = render_none_from_filter(&field_name, filter, !invert_undefined_exclusion, true)?;
 
             none
         }
@@ -718,20 +792,27 @@ fn regex_match(
     field_name: &str,
     field: &ScalarFieldRef,
     prefix: &str,
-    val: PrismaValue,
+    value: impl Into<ConditionValue>,
     suffix: &str,
     insensitive: bool,
 ) -> crate::Result<Document> {
+    let value: ConditionValue = value.into();
     let options = if insensitive { "i" } else { "" }.to_owned();
-    let pattern = format!(
-        "{}{}{}",
-        prefix,
-        (field, val)
-            .into_bson()?
-            .as_str()
-            .expect("Only reachable with String types."),
-        suffix
-    );
+
+    let pattern = match value {
+        ConditionValue::Value(value) => Bson::from(format!(
+            "{}{}{}",
+            prefix,
+            (field, value)
+                .into_bson()?
+                .as_str()
+                .expect("Only reachable with String types."),
+            suffix
+        )),
+        ConditionValue::FieldRef(field_ref) => Bson::from(
+            doc! { "$concat": [doc! { "$literal": prefix }, field_ref.into_bson()?, doc! { "$literal": suffix }] },
+        ),
+    };
 
     Ok(doc! {
         "$regexMatch": {
@@ -744,136 +825,145 @@ fn regex_match(
 
 /// Renders a `$size` expression to compute the length of an array.
 /// If `coerce_array` is true, the array will be coerced to an empty array in case it's `null` or `undefined`.
-fn render_size(field_name: &str, coerce_array: bool) -> Document {
+fn render_size(field_name: impl Into<Bson>, coerce_array: bool) -> Document {
     if coerce_array {
         doc! { "$size": coerce_as_array(field_name) }
     } else {
-        doc! { "$size": field_name }
+        doc! { "$size": field_name.into() }
     }
 }
 
 /// Coerces a field to an empty array if it's `null` or `undefined`.
 /// Renders an `$ifNull` expression.
-fn coerce_as_array(field_name: &str) -> Document {
-    doc! { "$ifNull": [field_name, []] }
+fn coerce_as_array(field_name: impl Into<Bson>) -> Document {
+    doc! { "$ifNull": [field_name.into(), []] }
 }
 
 /// Coerces a field to `null` if it's `null` or `undefined`.
 /// Used to convert `undefined` fields to `null`.
 /// Renders an `$ifNull` expression.
-fn coerce_as_null(field_name: &str) -> Document {
-    doc! { "$ifNull": [field_name, null] }
+fn coerce_as_null(field_name: impl Into<Bson>) -> Document {
+    doc! { "$ifNull": [field_name.into(), null] }
 }
 
 /// Renders an expression that computes whether _some_ of the elements of an array matches the `Filter`.
 /// If `coerce_array` is true, the array will be coerced to an empty array in case it's `null` or `undefined`.
-fn render_some(
-    field_name: &str,
+fn render_some_from_filter(
+    field_name: impl Into<Bson>,
     filter: Filter,
     invert_undefined_exclusion: bool,
     coerce_array: bool,
 ) -> crate::Result<(Document, Vec<JoinStage>)> {
-    let input = if coerce_array {
-        Bson::from(coerce_as_array(field_name))
-    } else {
-        Bson::from(field_name)
-    };
-
     // Nested filters needs to be prefixed with `$$elem` so that they refer to the "elem" alias defined in the $filter operator below.
     let prefix = FilterPrefix::from("$elem");
     let (nested_filter, nested_joins) =
         convert_filter_internal(filter, false, invert_undefined_exclusion, prefix)?.render();
+    let doc = render_some(field_name, "elem", nested_filter, coerce_array);
 
-    let doc = doc! {
+    Ok((doc, nested_joins))
+}
+
+fn render_some(input: impl Into<Bson>, alias: impl Into<Bson>, cond: impl Into<Bson>, coerce_array: bool) -> Document {
+    let input: Bson = if coerce_array {
+        coerce_as_array(input).into()
+    } else {
+        input.into()
+    };
+
+    doc! {
       "$gt": [
         {
           "$size": {
             "$filter": {
               "input": input,
-              "as": "elem",
-              "cond": nested_filter
+              "as": alias.into(),
+              "cond": cond.into()
             }
           }
         },
         0
       ]
-    };
-
-    Ok((doc, nested_joins))
+    }
 }
 
 /// Renders an expression that computes whether _all_ of the elements of an array matches the `Filter`.
 /// If `coerce_array` is true, the array will be coerced to an empty array in case it's `null` or `undefined`.
-fn render_every(
+fn render_every_from_filter(
     field_name: &str,
     filter: Filter,
     invert_undefined_exclusion: bool,
     coerce_array: bool,
 ) -> crate::Result<(Document, Vec<JoinStage>)> {
-    let input = if coerce_array {
-        Bson::from(coerce_as_array(field_name))
-    } else {
-        Bson::from(field_name)
-    };
-
     // Nested filters needs to be prefixed with `$$elem` so that they refer to the "elem" alias defined in the $filter operator below.
     let prefix = FilterPrefix::from("$elem");
     let (nested_filter, nested_joins) =
         convert_filter_internal(filter, false, invert_undefined_exclusion, prefix)?.render();
-
-    let doc = doc! {
-      "$eq": [
-        {
-          "$size": {
-            "$filter": {
-              "input": input,
-              "as": "elem",
-              "cond": nested_filter,
-            }
-          }
-        },
-        render_size(field_name, true)
-      ]
-    };
+    let doc = render_every(field_name, "elem", nested_filter, coerce_array);
 
     Ok((doc, nested_joins))
 }
 
+fn render_every(input: impl Into<Bson>, alias: impl Into<Bson>, cond: impl Into<Bson>, coerce_array: bool) -> Document {
+    let input: Bson = if coerce_array {
+        coerce_as_array(input).into()
+    } else {
+        input.into()
+    };
+
+    doc! {
+      "$eq": [
+        {
+          "$size": {
+            "$filter": {
+              "input": input.clone(),
+              "as": alias.into(),
+              "cond": cond.into(),
+            }
+          }
+        },
+        render_size(input, true)
+      ]
+    }
+}
+
 /// Renders an expression that computes whether _none_ of the elements of an array matches the `Filter`.
 /// If `coerce_array` is true, the array will be coerced to an empty array in case it's `null` or `undefined`.
-fn render_none(
+fn render_none_from_filter(
     field_name: &str,
     filter: Filter,
     invert_undefined_exclusion: bool,
     coerce_array: bool,
 ) -> crate::Result<(Document, Vec<JoinStage>)> {
-    let input = if coerce_array {
-        Bson::from(coerce_as_array(field_name))
-    } else {
-        Bson::from(field_name)
-    };
-
     // Nested filters needs to be prefixed with `$$elem` so that they refer to the "elem" alias defined in the $filter operator below.
     let prefix = FilterPrefix::from("$elem");
     let (nested_filter, nested_joins) =
         convert_filter_internal(filter, false, invert_undefined_exclusion, prefix)?.render();
+    let doc = render_none(field_name, "elem", nested_filter, coerce_array);
 
-    let doc = doc! {
+    Ok((doc, nested_joins))
+}
+
+fn render_none(input: impl Into<Bson>, alias: impl Into<Bson>, cond: impl Into<Bson>, coerce_array: bool) -> Document {
+    let input: Bson = if coerce_array {
+        coerce_as_array(input).into()
+    } else {
+        input.into()
+    };
+
+    doc! {
       "$eq": [
         {
           "$size": {
             "$filter": {
               "input": input,
-              "as": "elem",
-              "cond": nested_filter
+              "as": alias.into(),
+              "cond": cond.into()
             }
           }
         },
         0
       ]
-    };
-
-    Ok((doc, nested_joins))
+    }
 }
 
 /// Renders a stub condition that's either true or false
@@ -881,27 +971,21 @@ fn render_stub_condition(truthy: bool) -> Document {
     doc! { "$and": truthy }
 }
 
-fn render_is_set(field_name: &str, is_set: bool) -> Document {
+fn render_is_set(field_name: impl Into<Bson>, is_set: bool) -> Document {
     if is_set {
-        // To check whether a field is undefined, we need to coerce it to `null` first.
-        // This is why we _also_ need to check whether the field is equal to null
+        // To check whether a field is undefined, we can compare the value against "$$REMOVE"
+        // Which returns true for missing values or undefined values
         doc! {
-            "$or": [
-                { "$ne": [coerce_as_null(field_name), null] },
-                { "$eq": [field_name, null] }
-              ]
+            "$ne": [field_name.into(), "$$REMOVE"]
         }
     } else {
         doc! {
-            "$and": [
-                { "$eq": [coerce_as_null(&field_name), null] },
-                { "$ne": [&field_name, null] }
-              ]
+            "$eq": [field_name.into(), "$$REMOVE"]
         }
     }
 }
 
-fn exclude_undefineds(field_name: &str, invert: bool, filter: Document) -> Document {
+fn exclude_undefineds(field_name: impl Into<Bson>, invert: bool, filter: Document) -> Document {
     let is_set_filter = render_is_set(field_name, !invert);
 
     if invert {
@@ -915,11 +999,20 @@ fn exclude_undefineds(field_name: &str, invert: bool, filter: Document) -> Docum
 ///
 /// When converting the value of a `_count` aggregation filter for a field that's _not_ numerical,
 /// we force the `TypeIdentifier` to be `Int` to prevent panics.
-fn into_bson_coerce_count(sf: &ScalarFieldRef, value: PrismaValue, is_count_aggregation: bool) -> crate::Result<Bson> {
-    if is_count_aggregation && !sf.is_numeric() {
-        (&TypeIdentifier::Int, value).into_bson()
-    } else {
-        (sf, value).into_bson()
+fn into_bson_coerce_count(
+    sf: &ScalarFieldRef,
+    value: impl Into<ConditionValue>,
+    is_count_aggregation: bool,
+) -> crate::Result<Bson> {
+    match value.into() {
+        ConditionValue::Value(value) => {
+            if is_count_aggregation && !sf.is_numeric() {
+                (&TypeIdentifier::Int, value).into_bson()
+            } else {
+                (sf, value).into_bson()
+            }
+        }
+        ConditionValue::FieldRef(field_ref) => field_ref.into_bson(),
     }
 }
 

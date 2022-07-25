@@ -1,12 +1,19 @@
 use super::Filter;
 use crate::{compare::ScalarListCompare, ConditionListValue, ConditionValue};
-use prisma_models::ScalarField;
+use prisma_models::{ScalarField, ScalarFieldRef};
 use std::sync::Arc;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ScalarListFilter {
-    pub field: Arc<ScalarField>,
+    pub field: ScalarFieldRef,
     pub condition: ScalarListCondition,
+}
+
+impl ScalarListFilter {
+    /// Returns the referenced field of the filter condition if there's one
+    pub fn get_field_ref(&self) -> Option<&ScalarFieldRef> {
+        self.condition.get_field_ref()
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -22,6 +29,18 @@ pub enum ScalarListCondition {
 
     /// List emptiness check
     IsEmpty(bool),
+}
+
+impl ScalarListCondition {
+    /// Returns the referenced field of the filter condition if there's one
+    pub fn get_field_ref(&self) -> Option<&ScalarFieldRef> {
+        match self {
+            ScalarListCondition::Contains(v) => v.as_field_ref(),
+            ScalarListCondition::ContainsEvery(v) => v.as_field_ref(),
+            ScalarListCondition::ContainsSome(v) => v.as_field_ref(),
+            ScalarListCondition::IsEmpty(_) => todo!(),
+        }
+    }
 }
 
 #[allow(warnings)]

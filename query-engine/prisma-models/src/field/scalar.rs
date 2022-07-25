@@ -83,7 +83,7 @@ impl Debug for ScalarField {
             .field("arity", &self.arity)
             .field("db_name", &self.db_name)
             .field("default_value", &self.default_value)
-            .field("model", &self.container().name())
+            .field("container", &self.container().name())
             .field("is_unique", &self.is_unique)
             .field("read_only", &self.read_only)
             .finish()

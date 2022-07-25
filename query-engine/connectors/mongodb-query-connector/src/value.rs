@@ -4,6 +4,7 @@ use crate::{
 };
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{TimeZone, Utc};
+use connector_interface::ConditionValue;
 use itertools::Itertools;
 use mongodb::bson::{oid::ObjectId, spec::BinarySubtype, Binary, Bson, Document, Timestamp};
 use native_types::MongoDbType;
@@ -78,6 +79,29 @@ fn convert_composite_object(cf: &CompositeFieldRef, pairs: Vec<(String, PrismaVa
     }
 
     Ok(Bson::Document(doc))
+}
+
+impl IntoBson for (&ScalarFieldRef, ConditionValue) {
+    fn into_bson(self) -> crate::Result<Bson> {
+        let (sf, value) = self;
+
+        match value {
+            ConditionValue::Value(pv) => (sf, pv).into_bson(),
+            ConditionValue::FieldRef(ref_field) => ref_field.into_bson(),
+        }
+    }
+}
+
+impl IntoBson for &ScalarFieldRef {
+    fn into_bson(self) -> crate::Result<Bson> {
+        Ok(Bson::String(format!("${}", self.db_name())))
+    }
+}
+
+impl IntoBson for (&ScalarFieldRef, &ScalarFieldRef) {
+    fn into_bson(self) -> crate::Result<Bson> {
+        todo!()
+    }
 }
 
 impl IntoBson for (&ScalarFieldRef, PrismaValue) {

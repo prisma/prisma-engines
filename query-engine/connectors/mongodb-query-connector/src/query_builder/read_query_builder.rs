@@ -165,6 +165,7 @@ impl MongoReadQueryBuilder {
         let query = match args.filter {
             Some(filter) => {
                 // If a filter comes with joins, it needs to be run _after_ the initial filter query / $matches.
+                dbg!(&filter);
                 let (filter, filter_joins) = convert_filter(filter, false, FilterPrefix::default())?.render();
                 if !filter_joins.is_empty() {
                     joins.extend(filter_joins);

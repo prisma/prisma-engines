@@ -224,22 +224,22 @@ fn convert_scalar_list_filter(
         ScalarListCondition::Contains(ConditionValue::Value(val)) => {
             comparable.compare_raw("@>", convert_list_value(field, vec![val]))
         }
-        ScalarListCondition::Contains(ConditionValue::Ref(ref_field)) => {
-            let ref_field_expr: Expression = ref_field.as_column().into();
+        ScalarListCondition::Contains(ConditionValue::FieldRef(field_ref)) => {
+            let field_ref_expr: Expression = field_ref.as_column().into();
 
-            ref_field_expr.equals(array_any(comparable))
+            field_ref_expr.equals(array_any(comparable))
         }
         ScalarListCondition::ContainsEvery(ConditionListValue::List(vals)) => {
             comparable.compare_raw("@>", convert_list_value(field, vals))
         }
-        ScalarListCondition::ContainsEvery(ConditionListValue::Ref(ref_field)) => {
-            comparable.compare_raw("@>", ref_field.as_column())
+        ScalarListCondition::ContainsEvery(ConditionListValue::FieldRef(field_ref)) => {
+            comparable.compare_raw("@>", field_ref.as_column())
         }
         ScalarListCondition::ContainsSome(ConditionListValue::List(vals)) => {
             comparable.compare_raw("&&", convert_list_value(field, vals))
         }
-        ScalarListCondition::ContainsSome(ConditionListValue::Ref(ref_field)) => {
-            comparable.compare_raw("&&", ref_field.as_column())
+        ScalarListCondition::ContainsSome(ConditionListValue::FieldRef(field_ref)) => {
+            comparable.compare_raw("&&", field_ref.as_column())
         }
         ScalarListCondition::IsEmpty(cond) if cond => comparable.compare_raw("=", Value::Array(Some(vec![])).raw()),
         ScalarListCondition::IsEmpty(_) => comparable.compare_raw("<>", Value::Array(Some(vec![])).raw()),
@@ -561,7 +561,7 @@ fn filter_json_type(comparable: Expression<'static>, value: ConditionValue) -> C
             }
             _ => unreachable!(),
         },
-        ConditionValue::Ref(ref_field) => comparable.json_type_equals(ref_field.as_column()),
+        ConditionValue::FieldRef(field_ref) => comparable.json_type_equals(field_ref.as_column()),
     }
 }
 
@@ -577,45 +577,45 @@ fn default_scalar_filter(
         ScalarCondition::NotEquals(value) => comparable.not_equals(convert_first_value(fields, value)),
         ScalarCondition::Contains(value) => match value {
             ConditionValue::Value(value) => comparable.like(format!("%{}%", value)),
-            ConditionValue::Ref(ref_field) => comparable.like(quaint::ast::concat::<'_, Expression<'_>>(vec![
+            ConditionValue::FieldRef(field_ref) => comparable.like(quaint::ast::concat::<'_, Expression<'_>>(vec![
                 Value::text("%").raw().into(),
-                ref_field.as_column().into(),
+                field_ref.as_column().into(),
                 Value::text("%").raw().into(),
             ])),
         },
         ScalarCondition::NotContains(value) => match value {
             ConditionValue::Value(value) => comparable.not_like(format!("%{}%", value)),
-            ConditionValue::Ref(ref_field) => comparable.not_like(quaint::ast::concat::<'_, Expression<'_>>(vec![
+            ConditionValue::FieldRef(field_ref) => comparable.not_like(quaint::ast::concat::<'_, Expression<'_>>(vec![
                 Value::text("%").raw().into(),
-                ref_field.as_column().into(),
+                field_ref.as_column().into(),
                 Value::text("%").raw().into(),
             ])),
         },
         ScalarCondition::StartsWith(value) => match value {
             ConditionValue::Value(value) => comparable.like(format!("%{}", value)),
-            ConditionValue::Ref(ref_field) => comparable.like(quaint::ast::concat::<'_, Expression<'_>>(vec![
+            ConditionValue::FieldRef(field_ref) => comparable.like(quaint::ast::concat::<'_, Expression<'_>>(vec![
                 Value::text("%").raw().into(),
-                ref_field.as_column().into(),
+                field_ref.as_column().into(),
             ])),
         },
         ScalarCondition::NotStartsWith(value) => match value {
             ConditionValue::Value(value) => comparable.not_like(format!("%{}", value)),
-            ConditionValue::Ref(ref_field) => comparable.not_like(quaint::ast::concat::<'_, Expression<'_>>(vec![
+            ConditionValue::FieldRef(field_ref) => comparable.not_like(quaint::ast::concat::<'_, Expression<'_>>(vec![
                 Value::text("%").raw().into(),
-                ref_field.as_column().into(),
+                field_ref.as_column().into(),
             ])),
         },
         ScalarCondition::EndsWith(value) => match value {
             ConditionValue::Value(value) => comparable.like(format!("{}%", value)),
-            ConditionValue::Ref(ref_field) => comparable.like(quaint::ast::concat::<'_, Expression<'_>>(vec![
-                ref_field.as_column().into(),
+            ConditionValue::FieldRef(field_ref) => comparable.like(quaint::ast::concat::<'_, Expression<'_>>(vec![
+                field_ref.as_column().into(),
                 Value::text("%").raw().into(),
             ])),
         },
         ScalarCondition::NotEndsWith(value) => match value {
             ConditionValue::Value(value) => comparable.not_like(format!("{}%", value)),
-            ConditionValue::Ref(ref_field) => comparable.not_like(quaint::ast::concat::<'_, Expression<'_>>(vec![
-                ref_field.as_column().into(),
+            ConditionValue::FieldRef(field_ref) => comparable.not_like(quaint::ast::concat::<'_, Expression<'_>>(vec![
+                field_ref.as_column().into(),
                 Value::text("%").raw().into(),
             ])),
         },
@@ -638,7 +638,7 @@ fn default_scalar_filter(
             }
             _ => comparable.in_selection(convert_values(fields, values)),
         },
-        ScalarCondition::In(ConditionListValue::Ref(ref_field)) => comparable.equals(array_any(ref_field.as_column())),
+        ScalarCondition::In(ConditionListValue::FieldRef(field_ref)) => comparable.equals(array_any(field_ref.as_column())),
         ScalarCondition::NotIn(ConditionListValue::List(values)) => match values.split_first() {
             Some((PrismaValue::List(_), _)) => {
                 let mut sql_values = Values::with_capacity(values.len());
@@ -652,8 +652,8 @@ fn default_scalar_filter(
             }
             _ => comparable.not_in_selection(convert_values(fields, values)),
         },
-        ScalarCondition::NotIn(ConditionListValue::Ref(ref_field)) => {
-            comparable.not_equals(array_all(ref_field.as_column()))
+        ScalarCondition::NotIn(ConditionListValue::FieldRef(field_ref)) => {
+            comparable.not_equals(array_all(field_ref.as_column()))
         }
         ScalarCondition::Search(value, _) => {
             let query: String = value
@@ -692,61 +692,61 @@ fn insensitive_scalar_filter(
         ScalarCondition::Equals(ConditionValue::Value(PrismaValue::Null)) => comparable.is_null(),
         ScalarCondition::Equals(value) => match value {
             ConditionValue::Value(value) => comparable.compare_raw("ILIKE", format!("{}", value)),
-            ConditionValue::Ref(ref_field) => comparable.compare_raw("ILIKE", ref_field.as_column()),
+            ConditionValue::FieldRef(field_ref) => comparable.compare_raw("ILIKE", field_ref.as_column()),
         },
         ScalarCondition::NotEquals(ConditionValue::Value(PrismaValue::Null)) => comparable.is_not_null(),
         ScalarCondition::NotEquals(value) => match value {
             ConditionValue::Value(value) => comparable.compare_raw("NOT ILIKE", format!("{}", value)),
-            ConditionValue::Ref(ref_field) => comparable.compare_raw("NOT ILIKE", ref_field.as_column()),
+            ConditionValue::FieldRef(field_ref) => comparable.compare_raw("NOT ILIKE", field_ref.as_column()),
         },
         ScalarCondition::Contains(value) => match value {
             ConditionValue::Value(value) => comparable.compare_raw("ILIKE", format!("%{}%", value)),
-            ConditionValue::Ref(ref_field) => comparable.compare_raw(
+            ConditionValue::FieldRef(field_ref) => comparable.compare_raw(
                 "ILIKE",
                 concat::<'_, Expression<'_>>(vec![
                     Value::text("%").into(),
-                    ref_field.as_column().into(),
+                    field_ref.as_column().into(),
                     Value::text("%").into(),
                 ]),
             ),
         },
         ScalarCondition::NotContains(value) => match value {
             ConditionValue::Value(value) => comparable.compare_raw("NOT ILIKE", format!("%{}%", value)),
-            ConditionValue::Ref(ref_field) => comparable.compare_raw(
+            ConditionValue::FieldRef(field_ref) => comparable.compare_raw(
                 "NOT ILIKE",
                 concat::<'_, Expression<'_>>(vec![
                     Value::text("%").into(),
-                    ref_field.as_column().into(),
+                    field_ref.as_column().into(),
                     Value::text("%").into(),
                 ]),
             ),
         },
         ScalarCondition::StartsWith(value) => match value {
             ConditionValue::Value(value) => comparable.compare_raw("ILIKE", format!("{}%", value)),
-            ConditionValue::Ref(ref_field) => comparable.compare_raw(
+            ConditionValue::FieldRef(field_ref) => comparable.compare_raw(
                 "ILIKE",
-                concat::<'_, Expression<'_>>(vec![ref_field.as_column().into(), Value::text("%").into()]),
+                concat::<'_, Expression<'_>>(vec![field_ref.as_column().into(), Value::text("%").into()]),
             ),
         },
         ScalarCondition::NotStartsWith(value) => match value {
             ConditionValue::Value(value) => comparable.compare_raw("NOT ILIKE", format!("{}%", value)),
-            ConditionValue::Ref(ref_field) => comparable.compare_raw(
+            ConditionValue::FieldRef(field_ref) => comparable.compare_raw(
                 "NOT ILIKE",
-                concat::<'_, Expression<'_>>(vec![ref_field.as_column().into(), Value::text("%").into()]),
+                concat::<'_, Expression<'_>>(vec![field_ref.as_column().into(), Value::text("%").into()]),
             ),
         },
         ScalarCondition::EndsWith(value) => match value {
             ConditionValue::Value(value) => comparable.compare_raw("ILIKE", format!("%{}", value)),
-            ConditionValue::Ref(ref_field) => comparable.compare_raw(
+            ConditionValue::FieldRef(field_ref) => comparable.compare_raw(
                 "ILIKE",
-                concat::<'_, Expression<'_>>(vec![Value::text("%").into(), ref_field.as_column().into()]),
+                concat::<'_, Expression<'_>>(vec![Value::text("%").into(), field_ref.as_column().into()]),
             ),
         },
         ScalarCondition::NotEndsWith(value) => match value {
             ConditionValue::Value(value) => comparable.compare_raw("NOT ILIKE", format!("%{}", value)),
-            ConditionValue::Ref(ref_field) => comparable.compare_raw(
+            ConditionValue::FieldRef(field_ref) => comparable.compare_raw(
                 "NOT ILIKE",
-                concat::<'_, Expression<'_>>(vec![Value::text("%").into(), ref_field.as_column().into()]),
+                concat::<'_, Expression<'_>>(vec![Value::text("%").into(), field_ref.as_column().into()]),
             ),
         },
         ScalarCondition::LessThan(value) => {
@@ -796,8 +796,8 @@ fn insensitive_scalar_filter(
                 )
             }
         },
-        ScalarCondition::In(ConditionListValue::Ref(ref_field)) => {
-            comparable.compare_raw("ILIKE", array_any(ref_field.as_column()))
+        ScalarCondition::In(ConditionListValue::FieldRef(field_ref)) => {
+            comparable.compare_raw("ILIKE", array_any(field_ref.as_column()))
         }
         ScalarCondition::NotIn(ConditionListValue::List(values)) => match values.split_first() {
             Some((PrismaValue::List(_), _)) => {
@@ -826,8 +826,8 @@ fn insensitive_scalar_filter(
                 )
             }
         },
-        ScalarCondition::NotIn(ConditionListValue::Ref(ref_field)) => {
-            comparable.compare_raw("NOT ILIKE", array_all(ref_field.as_column()))
+        ScalarCondition::NotIn(ConditionListValue::FieldRef(field_ref)) => {
+            comparable.compare_raw("NOT ILIKE", array_all(field_ref.as_column()))
         }
         ScalarCondition::Search(value, _) => {
             let query: String = value
@@ -865,14 +865,14 @@ fn lower_if<'a>(expr: Expression<'a>, cond: bool) -> Expression<'a> {
 fn convert_value<'a>(field: &ScalarFieldRef, value: impl Into<ConditionValue>) -> Expression<'a> {
     match value.into() {
         ConditionValue::Value(pv) => field.value(pv).into(),
-        ConditionValue::Ref(ref_field) => ref_field.as_column().into(),
+        ConditionValue::FieldRef(field_ref) => field_ref.as_column().into(),
     }
 }
 
 fn convert_first_value<'a>(fields: &[ScalarFieldRef], value: impl Into<ConditionValue>) -> Expression<'a> {
     match value.into() {
         ConditionValue::Value(pv) => convert_value(fields.first().unwrap(), pv).into(),
-        ConditionValue::Ref(ref_field) => ref_field.as_column().into(),
+        ConditionValue::FieldRef(field_ref) => field_ref.as_column().into(),
     }
 }
 

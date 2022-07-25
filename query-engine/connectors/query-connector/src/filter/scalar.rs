@@ -144,6 +144,10 @@ impl ScalarFilter {
             _ => vec![self],
         }
     }
+
+    pub fn as_ref_field(&self) -> Option<&ScalarFieldRef> {
+        self.condition.as_ref_field()
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -171,7 +175,7 @@ pub enum ScalarCondition {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ConditionValue {
     Value(PrismaValue),
-    Ref(ScalarFieldRef),
+    FieldRef(ScalarFieldRef),
 }
 
 impl ConditionValue {
@@ -180,7 +184,7 @@ impl ConditionValue {
     }
 
     pub fn reference(sf: ScalarFieldRef) -> Self {
-        Self::Ref(sf)
+        Self::FieldRef(sf)
     }
 
     pub fn into_value(self) -> Option<PrismaValue> {
@@ -192,7 +196,7 @@ impl ConditionValue {
     }
 
     pub fn into_reference(self) -> Option<ScalarFieldRef> {
-        if let Self::Ref(sf) = self {
+        if let Self::FieldRef(sf) = self {
             Some(sf)
         } else {
             None
@@ -201,6 +205,14 @@ impl ConditionValue {
 
     pub fn as_value(&self) -> Option<&PrismaValue> {
         if let Self::Value(v) = self {
+            Some(v)
+        } else {
+            None
+        }
+    }
+
+    pub fn as_field_ref(&self) -> Option<&ScalarFieldRef> {
+        if let Self::FieldRef(v) = self {
             Some(v)
         } else {
             None
@@ -229,7 +241,7 @@ impl From<&ScalarFieldRef> for ConditionValue {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ConditionListValue {
     List(PrismaListValue),
-    Ref(ScalarFieldRef),
+    FieldRef(ScalarFieldRef),
 }
 
 impl ConditionListValue {
@@ -241,13 +253,21 @@ impl ConditionListValue {
     }
 
     pub fn reference(sf: ScalarFieldRef) -> Self {
-        Self::Ref(sf)
+        Self::FieldRef(sf)
     }
 
     pub fn len(&self) -> usize {
         match self {
             ConditionListValue::List(list) => list.len(),
-            ConditionListValue::Ref(_) => 1,
+            ConditionListValue::FieldRef(_) => 1,
+        }
+    }
+
+    pub fn as_field_ref(&self) -> Option<&ScalarFieldRef> {
+        if let Self::FieldRef(v) = self {
+            Some(v)
+        } else {
+            None
         }
     }
 }
@@ -304,6 +324,29 @@ impl ScalarCondition {
             }
         } else {
             self
+        }
+    }
+
+    pub fn as_ref_field(&self) -> Option<&ScalarFieldRef> {
+        match self {
+            ScalarCondition::Equals(v) => v.as_field_ref(),
+            ScalarCondition::NotEquals(v) => v.as_field_ref(),
+            ScalarCondition::Contains(v) => v.as_field_ref(),
+            ScalarCondition::NotContains(v) => v.as_field_ref(),
+            ScalarCondition::StartsWith(v) => v.as_field_ref(),
+            ScalarCondition::NotStartsWith(v) => v.as_field_ref(),
+            ScalarCondition::EndsWith(v) => v.as_field_ref(),
+            ScalarCondition::NotEndsWith(v) => v.as_field_ref(),
+            ScalarCondition::LessThan(v) => v.as_field_ref(),
+            ScalarCondition::LessThanOrEquals(v) => v.as_field_ref(),
+            ScalarCondition::GreaterThan(v) => v.as_field_ref(),
+            ScalarCondition::GreaterThanOrEquals(v) => v.as_field_ref(),
+            ScalarCondition::In(v) => v.as_field_ref(),
+            ScalarCondition::NotIn(v) => v.as_field_ref(),
+            ScalarCondition::JsonCompare(json_cond) => json_cond.condition.as_ref_field(),
+            ScalarCondition::Search(v, _) => v.as_field_ref(),
+            ScalarCondition::NotSearch(v, _) => v.as_field_ref(),
+            ScalarCondition::IsSet(_) => None,
         }
     }
 }
