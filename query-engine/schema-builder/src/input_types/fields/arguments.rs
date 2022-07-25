@@ -2,7 +2,6 @@ use super::*;
 use crate::input_types::objects::order_by_objects::OrderByOptions;
 use crate::mutations::create_one;
 use constants::args;
-use datamodel_connector::ConnectorCapability;
 use objects::*;
 use prisma_models::{prelude::ParentContainer, CompositeFieldRef};
 
@@ -54,20 +53,6 @@ pub(crate) fn upsert_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Op
             ])
         }
     })
-}
-
-/// Builds "skip_duplicates" and "data" arguments intended for the create many field.
-pub(crate) fn create_many_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<InputField> {
-    let create_many_type = InputType::object(create_many_objects::create_many_object_type(ctx, model, None));
-    let data_arg = input_field("data", InputType::list(create_many_type), None);
-
-    if ctx.capabilities.contains(ConnectorCapability::CreateSkipDuplicates) {
-        let skip_arg = input_field(args::SKIP_DUPLICATES, InputType::boolean(), None).optional();
-
-        vec![data_arg, skip_arg]
-    } else {
-        vec![data_arg]
-    }
 }
 
 /// Builds "where" and "data" arguments intended for the update many field.

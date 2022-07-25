@@ -52,6 +52,10 @@ impl Model {
             .unwrap()
     }
 
+    pub fn supports_create_operation(&self) -> bool {
+        self.supports_create_operation
+    }
+
     pub fn indexes(&self) -> &[Index] {
         self.indexes
             .get()
@@ -72,10 +76,6 @@ impl Model {
 
     pub fn db_name_opt(&self) -> Option<&str> {
         self.manifestation.as_ref().map(|m| m.as_ref())
-    }
-
-    pub fn find_relation(&self, relation_name: &str) -> crate::Result<RelationWeakRef> {
-        self.internal_data_model().find_relation(relation_name)
     }
 
     pub fn internal_data_model(&self) -> InternalDataModelRef {
