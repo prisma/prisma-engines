@@ -52,12 +52,28 @@ fn handle_compound_field(fields: Vec<ScalarFieldRef>, value: ParsedInputValue) -
     let filters: Vec<Filter> = fields
         .into_iter()
         .map(|sf| {
-            let pv: PrismaValue = input_map.remove(&sf.name).unwrap().try_into()?;
+            let pv: PrismaValue = if sf.in_composite() {
+                extract_from_input_map(&sf.path.get().unwrap(), &mut input_map)
+            } else {
+                input_map.remove(&sf.name).unwrap().try_into()?
+            };
+
             Ok(sf.equals(pv))
         })
         .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
 
     Ok(Filter::And(filters))
+}
+
+fn extract_from_input_map(path: &[String], map: &mut ParsedInputMap) -> PrismaValue {
+    let name = path.first().expect("I was expecting a path to unwrap");
+    let mut entry = map.remove(name).unwrap();
+
+    match entry {
+        ParsedInputValue::Map(ref mut map) => extract_from_input_map(&path[1..], map),
+        ParsedInputValue::Single(value) => value,
+        _ => panic!("Was not expected a non map or single value in this expression")
+    }
 }
 
 /// Extracts a regular filter potentially matching many records.

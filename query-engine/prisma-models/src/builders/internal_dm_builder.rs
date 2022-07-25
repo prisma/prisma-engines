@@ -238,7 +238,8 @@ fn index_builders(model: &dml::Model) -> Vec<IndexBuilder> {
                 dml::IndexType::Fulltext => IndexType::Normal,
             },
         })
-        .filter(|builder| builder.field_paths.clone().into_iter().any(|p| p.len() > 1))
+        // TODO: Fix the case when only a composite is set
+        //.filter(|builder| builder.field_paths.clone().into_iter().any(|p| p.len() > 1))
         .collect()
 }
 

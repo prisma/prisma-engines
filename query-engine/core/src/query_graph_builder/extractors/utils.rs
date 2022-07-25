@@ -1,17 +1,17 @@
 use crate::schema_builder;
-use prisma_models::{ModelRef, ScalarFieldRef};
+use prisma_models::{Field, ModelRef, ScalarFieldRef};
 
 /// Attempts to resolve a field name to a compound field.
-pub fn resolve_compound_field(name: &str, model: &ModelRef) -> Option<Vec<ScalarFieldRef>> {
+pub fn resolve_compound_field(name: &str, model: &ModelRef) -> Option<Vec<Field>> {
     resolve_compound_id(name, model).or_else(|| resolve_index_fields(name, model))
 }
 
 /// Attempts to match a given name to the (schema) name of a compound id field on the model.
-pub fn resolve_compound_id(name: &str, model: &ModelRef) -> Option<Vec<ScalarFieldRef>> {
-    model
-        .fields()
-        .compound_id()
-        .and_then(|pk| (name == schema_builder::compound_id_field_name(pk)).then(|| pk.fields()))
+pub fn resolve_compound_id(name: &str, model: &ModelRef) -> Option<Vec<Field>> {
+    model.fields().compound_id().and_then(|pk| {
+        (name == schema_builder::compound_id_field_name(pk))
+            .then(|| pk.fields().into_iter().map(|f| f.into()).collect())
+    })
 }
 
 /// Attempts to match a given name to the (schema) name of a compound indexes on the model and returns the first match.
