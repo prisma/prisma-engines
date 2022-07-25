@@ -38,7 +38,7 @@ pub fn extract_unique_filter(value_map: ParsedInputMap, model: &ModelRef) -> Que
                             field_name, model.name
                         ))
                     })
-                    .and_then(|fields| handle_compound_field(fields, value)),
+                    .and_then(|fields| handle_compound_field(model, fields, value)),
             }
         })
         .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?;
@@ -46,23 +46,45 @@ pub fn extract_unique_filter(value_map: ParsedInputMap, model: &ModelRef) -> Que
     Ok(Filter::and(filters))
 }
 
-fn handle_compound_field(fields: Vec<ScalarFieldRef>, value: ParsedInputValue) -> QueryGraphBuilderResult<Filter> {
+fn handle_compound_field(
+    model: &ModelRef,
+    fields: Vec<(Vec<String>, ScalarFieldRef)>, // todo: Alias type for path + scalar `type PathedScalarField = ...`
+    value: ParsedInputValue,
+) -> QueryGraphBuilderResult<Filter> {
     let mut input_map: ParsedInputMap = value.try_into()?;
+    let mut filters = Vec::with_capacity(fields.len());
 
-    let filters: Vec<Filter> = fields
-        .into_iter()
-        .map(|sf| {
-            let pv: PrismaValue = if sf.in_composite() {
-                extract_from_input_map(&sf.path.get().unwrap(), &mut input_map)
-            } else {
-                input_map.remove(&sf.name).unwrap().try_into()?
-            };
+    for (path, field) in fields {
+        if path.len() > 0 {
+            filters.push(traverse_composite_filter(model, &path, field, input_map.clone())?);
+        } else {
+            let pv: PrismaValue = input_map.remove(&field.name).unwrap().try_into()?;
+            filters.push(field.equals(pv));
+        }
+    }
 
-            Ok(sf.equals(pv))
-        })
-        .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
+    Ok(dbg!(Filter::And(filters)))
+}
 
-    Ok(Filter::And(filters))
+fn traverse_composite_filter(
+    model: &ModelRef,
+    path: &[String],
+    field: ScalarFieldRef,
+    mut input_map: ParsedInputMap,
+) -> QueryGraphBuilderResult<Filter> {
+    if path.len() == 0 {
+        let pv: PrismaValue = input_map.remove(&field.name).unwrap().try_into()?;
+        return Ok(field.equals(pv));
+    }
+
+    let composite_field_name = path.first().unwrap();
+    let cf = model.fields().find_from_composite(composite_field_name)?;
+
+    let input_map = input_map.remove(composite_field_name).unwrap().try_into()?; // [geo.location].city => { geo: { location: { city: "" } }}
+    let path = &path[1..];
+    let inner = traverse_composite_filter(model, path, field, input_map)?;
+
+    Ok(cf.is(inner))
 }
 
 fn extract_from_input_map(path: &[String], map: &mut ParsedInputMap) -> PrismaValue {
@@ -72,7 +94,7 @@ fn extract_from_input_map(path: &[String], map: &mut ParsedInputMap) -> PrismaVa
     match entry {
         ParsedInputValue::Map(ref mut map) => extract_from_input_map(&path[1..], map),
         ParsedInputValue::Single(value) => value,
-        _ => panic!("Was not expected a non map or single value in this expression")
+        _ => panic!("Was not expected a non map or single value in this expression"),
     }
 }
 

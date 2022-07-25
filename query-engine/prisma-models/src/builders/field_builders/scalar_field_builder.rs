@@ -36,7 +36,6 @@ impl ScalarFieldBuilder {
             container,
             is_unique: self.is_unique,
             read_only: OnceCell::new(),
-            path: OnceCell::new(),
         };
 
         Arc::new(scalar)

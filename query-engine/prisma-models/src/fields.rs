@@ -191,6 +191,18 @@ impl Fields {
             })
     }
 
+    pub fn find_from_composite(&self, name: &str) -> crate::Result<CompositeFieldRef> {
+        self.composite_weak()
+            .iter()
+            .map(|field| field.upgrade().unwrap())
+            .find(|field| field.name == name)
+            .ok_or_else(|| DomainError::CompositeFieldNotFound {
+                name: name.to_string(),
+                container_name: self.model().name.clone(),
+                container_type: "model",
+            })
+    }
+
     fn model(&self) -> ModelRef {
         self.model.upgrade().unwrap()
     }

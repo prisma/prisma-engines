@@ -1,9 +1,9 @@
 pub(crate) mod fields;
 pub(crate) mod objects;
 
-use itertools::Itertools;
 use super::*;
 use fields::*;
+use itertools::Itertools;
 use prisma_models::ScalarFieldRef;
 use schema::*;
 
@@ -63,13 +63,11 @@ fn list_union_type(input_type: InputType, as_list: bool) -> Vec<InputType> {
     }
 }
 
-fn compound_object_name(alias: Option<&String>, from_fields: &[ScalarFieldRef]) -> String {
+fn compound_object_name(alias: Option<&String>, from_fields: &[(Vec<String>, ScalarFieldRef)]) -> String {
     alias.map(capitalize).unwrap_or_else(|| {
         let field_names: Vec<String> = from_fields
             .iter()
-            .map(|field|
-                field.path.get().unwrap().iter().map(capitalize).join("")
-            )
+            .map(|(path, field)| path.iter().map(capitalize).join(""))
             .collect();
 
         field_names.join("")

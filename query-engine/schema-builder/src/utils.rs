@@ -116,11 +116,12 @@ pub fn append_opt<T>(vec: &mut Vec<T>, opt: Option<T>) {
 pub fn compound_index_field_name(index: &Index) -> String {
     index.name.clone().unwrap_or_else(|| {
         let index_fields = index.fields();
-        let field_names: Vec<&str> = index_fields.iter().map(|f| f.path.get().unwrap())
+        let field_names: Vec<&str> = index_fields
+            .iter()
+            .map(|(path, _field)| path)
             .flatten()
             .map(|fp| fp.as_ref())
             .collect();
-        //let field_names: Vec<&str> = index_fields.iter().map(|sf| if sf.in_composite() { sf.path.get().unwrap().join("_") }).collect();
 
         field_names.join("_")
     })

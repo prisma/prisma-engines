@@ -263,7 +263,7 @@ fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilde
         let additional_pairs = match model.fields().find_from_scalar(&field_name) {
             Ok(field) => extract_cursor_field(field, map_value)?,
             Err(_) => match utils::resolve_compound_field(&field_name, &model) {
-                Some(fields) => extract_compound_cursor_field(fields, map_value)?,
+                Some(fields) => extract_compound_cursor_field(todo!(), map_value)?,
                 None => {
                     return Err(QueryGraphBuilderError::AssertionError(format!(
                         "Unable to resolve field {} to a field or a set of fields on model {}",

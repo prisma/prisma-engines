@@ -24,14 +24,14 @@ pub(crate) fn scalar_filter_object_type(
             vec![object_type.clone(), InputType::list(object_type.clone())],
             None,
         )
-            .optional(),
+        .optional(),
         input_field(filters::OR, vec![InputType::list(object_type.clone())], None).optional(),
         input_field(
             filters::NOT,
             vec![object_type.clone(), InputType::list(object_type)],
             None,
         )
-            .optional(),
+        .optional(),
     ];
 
     input_fields.extend(model.fields().all.iter().filter_map(|f| match f {
@@ -45,8 +45,8 @@ pub(crate) fn scalar_filter_object_type(
 }
 
 pub(crate) fn where_object_type<T>(ctx: &mut BuilderContext, container: T) -> InputObjectTypeWeakRef
-    where
-        T: Into<ParentContainer>,
+where
+    T: Into<ParentContainer>,
 {
     let container = container.into();
     let ident = Identifier::new(format!("{}WhereInput", container.name()), PRISMA_NAMESPACE);
@@ -64,14 +64,14 @@ pub(crate) fn where_object_type<T>(ctx: &mut BuilderContext, container: T) -> In
             vec![object_type.clone(), InputType::list(object_type.clone())],
             None,
         )
-            .optional(),
+        .optional(),
         input_field(filters::OR, vec![InputType::list(object_type.clone())], None).optional(),
         input_field(
             filters::NOT,
             vec![object_type.clone(), InputType::list(object_type)],
             None,
         )
-            .optional(),
+        .optional(),
     ];
 
     let input_fields = container
@@ -125,7 +125,12 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
     // @@id compound field (there can be only one per model).
     let compound_id_field = model.fields().compound_id().map(|pk| {
         let name = compound_id_field_name(pk);
-        let typ = compound_field_unique_object_type(ctx, model, pk.alias.as_ref(), pk.fields());
+        let typ = compound_field_unique_object_type(
+            ctx,
+            model,
+            pk.alias.as_ref(),
+            pk.fields().into_iter().map(|f| (vec![], f)).collect(), // todo: Beautify
+        );
 
         input_field(name, InputType::object(typ), None).optional()
     });
@@ -143,7 +148,7 @@ fn compound_field_unique_object_type(
     ctx: &mut BuilderContext,
     model: &ModelRef,
     alias: Option<&String>,
-    from_fields: Vec<ScalarFieldRef>,
+    from_fields: Vec<(Vec<String>, ScalarFieldRef)>,
 ) -> InputObjectTypeWeakRef {
     let ident = Identifier::new(
         format!(
@@ -161,52 +166,63 @@ fn compound_field_unique_object_type(
 
     let fields = from_fields
         .into_iter()
-        .map(|field| {
-            if field.in_composite() {
-                let path = field.path.get().unwrap();
-                compound_field_unique_input_type(path.as_slice(), &field, ctx)
+        .map(|(path, field)| {
+            if path.len() > 0 {
+                composite_field_unique_input_type(ctx, &path, &field)
             } else {
                 let name = field.name.clone();
                 let typ = map_scalar_input_type_for_field(ctx, &field);
 
                 input_field(name, typ, None)
             }
-        }).collect();
+        })
+        .collect();
 
     input_object.set_fields(fields);
     Arc::downgrade(&input_object)
 }
 
-fn compound_field_unique_input_type(path: &[String], field: &ScalarFieldRef, ctx: &mut BuilderContext) -> InputField {
-    if path.len() == 1 {
-        // We are in the last path, return that field
+fn composite_field_unique_input_type(ctx: &mut BuilderContext, path: &[String], field: &ScalarFieldRef) -> InputField {
+    if path.len() == 0 {
+        // We build the entire path, return that field
         let name = field.name.clone();
         let typ = map_scalar_input_type_for_field(ctx, &field);
 
         input_field(name, typ, None)
     } else {
         // Build the composite _inside_ the field
-        let ident = Identifier::new(
-            format!("{}CompoundUniqueInput",
-                    path.iter().map(capitalize).join("")),
-            PRISMA_NAMESPACE);
 
-        let composite_obj = init_input_object_type(ident.clone());
+        // @@unique([location.address]) => LocationAddressCompoundUniqueInput { LocationAddressCompositeUniqueInput }
+        // @@unique([location.street]) => LocationStreetCompoundUniqueInput { LocationStreetCompositeUniqueInput }
+        // @@unique([location.geo.address, location.geo.street]) => LocationAddressLocationStreetCompoundUniqueInput { location: { geo: { street: "", address: "" }}}
 
-        let field_name = path.first().unwrap();
-
+        let composite_name = path.first().unwrap();
         let path = &path[1..];
-        // TODO: (cprieto) what if the compound object has multiple fields?
-        let inner_field = compound_field_unique_input_type(path, field, ctx);
-        composite_obj.set_fields(vec![inner_field]);
+        let object_type = composite_field_unique_object_type(ctx, path, field);
 
-        let composite_obj = Arc::new(composite_obj);
-        ctx.cache_input_type(ident, composite_obj.clone());
-
-        let field_type = InputType::object(Arc::downgrade(&composite_obj));
-
-        input_field(field_name, field_type, None)
+        input_field(composite_name, InputType::object(object_type), None)
     }
+}
+
+fn composite_field_unique_object_type(
+    ctx: &mut BuilderContext,
+    path: &[String],
+    field: &ScalarFieldRef,
+) -> InputObjectTypeWeakRef {
+    let ident = Identifier::new(
+        format!("{}CompositeUniqueInput", path.iter().map(capitalize).join("")),
+        PRISMA_NAMESPACE,
+    );
+    return_cached_input!(ctx, &ident);
+
+    let obj = Arc::new(init_input_object_type(ident.clone()));
+    ctx.cache_input_type(ident, obj.clone());
+
+    let path = &path[1..];
+    let inner_field = composite_field_unique_input_type(ctx, path, field);
+    obj.set_fields(vec![inner_field]);
+
+    Arc::downgrade(&obj)
 }
 
 /// Object used for full composite equality, e.g. `{ field: "value", field2: 123 } == { field: "value" }`.

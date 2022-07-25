@@ -24,9 +24,6 @@ pub struct ScalarField {
     pub native_type: Option<NativeTypeInstance>,
     pub container: ParentContainer,
 
-    // NOTE: What if I place the path as part of the field?
-    pub path: OnceCell<Vec<String>>,
-
     pub(crate) is_unique: bool,
     pub(crate) read_only: OnceCell<bool>,
 }
@@ -71,8 +68,6 @@ impl ScalarField {
     pub fn container(&self) -> &ParentContainer {
         &self.container
     }
-
-    pub fn in_composite(&self) -> bool { self.path.get().map_or(false, |p| p.len() > 1) }
 }
 
 impl Debug for ScalarField {
@@ -91,7 +86,6 @@ impl Debug for ScalarField {
             .field("model", &self.container().name())
             .field("is_unique", &self.is_unique)
             .field("read_only", &self.read_only)
-            .field("path", &self.path)
             .finish()
     }
 }
