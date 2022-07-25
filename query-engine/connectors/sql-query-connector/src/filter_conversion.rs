@@ -585,11 +585,13 @@ fn default_scalar_filter(
         },
         ScalarCondition::NotContains(value) => match value {
             ConditionValue::Value(value) => comparable.not_like(format!("%{}%", value)),
-            ConditionValue::FieldRef(field_ref) => comparable.not_like(quaint::ast::concat::<'_, Expression<'_>>(vec![
-                Value::text("%").raw().into(),
-                field_ref.as_column().into(),
-                Value::text("%").raw().into(),
-            ])),
+            ConditionValue::FieldRef(field_ref) => {
+                comparable.not_like(quaint::ast::concat::<'_, Expression<'_>>(vec![
+                    Value::text("%").raw().into(),
+                    field_ref.as_column().into(),
+                    Value::text("%").raw().into(),
+                ]))
+            }
         },
         ScalarCondition::StartsWith(value) => match value {
             ConditionValue::Value(value) => comparable.like(format!("%{}", value)),
@@ -600,10 +602,12 @@ fn default_scalar_filter(
         },
         ScalarCondition::NotStartsWith(value) => match value {
             ConditionValue::Value(value) => comparable.not_like(format!("%{}", value)),
-            ConditionValue::FieldRef(field_ref) => comparable.not_like(quaint::ast::concat::<'_, Expression<'_>>(vec![
-                Value::text("%").raw().into(),
-                field_ref.as_column().into(),
-            ])),
+            ConditionValue::FieldRef(field_ref) => {
+                comparable.not_like(quaint::ast::concat::<'_, Expression<'_>>(vec![
+                    Value::text("%").raw().into(),
+                    field_ref.as_column().into(),
+                ]))
+            }
         },
         ScalarCondition::EndsWith(value) => match value {
             ConditionValue::Value(value) => comparable.like(format!("{}%", value)),
@@ -614,10 +618,12 @@ fn default_scalar_filter(
         },
         ScalarCondition::NotEndsWith(value) => match value {
             ConditionValue::Value(value) => comparable.not_like(format!("{}%", value)),
-            ConditionValue::FieldRef(field_ref) => comparable.not_like(quaint::ast::concat::<'_, Expression<'_>>(vec![
-                field_ref.as_column().into(),
-                Value::text("%").raw().into(),
-            ])),
+            ConditionValue::FieldRef(field_ref) => {
+                comparable.not_like(quaint::ast::concat::<'_, Expression<'_>>(vec![
+                    field_ref.as_column().into(),
+                    Value::text("%").raw().into(),
+                ]))
+            }
         },
         ScalarCondition::LessThan(value) => comparable.less_than(convert_first_value(fields, value)),
         ScalarCondition::LessThanOrEquals(value) => comparable.less_than_or_equals(convert_first_value(fields, value)),
@@ -638,7 +644,9 @@ fn default_scalar_filter(
             }
             _ => comparable.in_selection(convert_values(fields, values)),
         },
-        ScalarCondition::In(ConditionListValue::FieldRef(field_ref)) => comparable.equals(array_any(field_ref.as_column())),
+        ScalarCondition::In(ConditionListValue::FieldRef(field_ref)) => {
+            comparable.equals(array_any(field_ref.as_column()))
+        }
         ScalarCondition::NotIn(ConditionListValue::List(values)) => match values.split_first() {
             Some((PrismaValue::List(_), _)) => {
                 let mut sql_values = Values::with_capacity(values.len());

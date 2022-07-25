@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use crate::{
-    Filter, JsonCompare, JsonCondition, QueryMode, ScalarCondition, ScalarFilter, ScalarProjection, ConditionValue,
+    ConditionValue, Filter, JsonCompare, JsonCondition, QueryMode, ScalarCondition, ScalarFilter, ScalarProjection,
 };
 use prisma_models::ScalarFieldRef;
 

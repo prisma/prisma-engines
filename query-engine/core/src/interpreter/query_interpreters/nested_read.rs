@@ -1,8 +1,8 @@
 use super::{inmemory_record_processor::InMemoryRecordProcessor, read};
 use crate::{interpreter::InterpretationResult, query_ast::*};
 use connector::{
-    self, filter::Filter, ConnectionLike, ConditionListValue, QueryArguments, RelAggregationRow, RelAggregationSelection,
-    ScalarCompare,
+    self, filter::Filter, ConditionListValue, ConnectionLike, QueryArguments, RelAggregationRow,
+    RelAggregationSelection, ScalarCompare,
 };
 use prisma_models::{FieldSelection, ManyRecords, Record, RelationFieldRef, SelectionResult};
 use prisma_value::PrismaValue;
