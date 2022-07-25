@@ -1,6 +1,6 @@
 use super::objects::*;
 use super::*;
-use crate::mutations::create_one;
+use crate::mutations::{create_many, create_one};
 use constants::{args, operations};
 use datamodel_connector::ConnectorCapability;
 
@@ -51,8 +51,7 @@ pub(crate) fn nested_create_many_input_field(
 }
 
 fn nested_create_many_envelope(ctx: &mut BuilderContext, parent_field: &RelationFieldRef) -> InputObjectTypeWeakRef {
-    let create_type =
-        create_many_objects::create_many_object_type(ctx, &parent_field.related_model(), Some(parent_field));
+    let create_type = create_many::create_many_object_type(ctx, &parent_field.related_model(), Some(parent_field));
 
     let nested_ident = &create_type.into_arc().identifier;
     let name = format!("{}Envelope", nested_ident.name());

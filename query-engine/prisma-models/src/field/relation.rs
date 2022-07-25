@@ -108,7 +108,12 @@ impl RelationField {
 
     pub fn relation(&self) -> RelationRef {
         self.relation
-            .get_or_init(|| self.model().find_relation(&self.relation_name).unwrap())
+            .get_or_init(|| {
+                self.model()
+                    .internal_data_model()
+                    .find_relation(&self.relation_name)
+                    .unwrap()
+            })
             .upgrade()
             .unwrap()
     }

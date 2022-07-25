@@ -1,4 +1,4 @@
-use crate::mutations::create_one::create_one;
+use crate::mutations::{create_many, create_one};
 
 use super::*;
 use datamodel_connector::ConnectorCapability;
@@ -13,11 +13,11 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
         .flat_map(|model| {
             let mut vec = vec![];
 
-            if model.supports_create_operation {
+            if model.supports_create_operation() {
                 vec.push(create_one(ctx, &model));
 
                 append_opt(&mut vec, upsert_item_field(ctx, &model));
-                append_opt(&mut vec, create_many_field(ctx, &model));
+                append_opt(&mut vec, create_many(ctx, &model));
             }
 
             append_opt(&mut vec, delete_item_field(ctx, &model));
@@ -57,7 +57,7 @@ fn create_nested_inputs(ctx: &mut BuilderContext) {
         for (input_object, rf) in nested_create_inputs_queue.drain(..) {
             let mut fields = vec![];
 
-            if rf.related_model().supports_create_operation {
+            if rf.related_model().supports_create_operation() {
                 fields.push(input_fields::nested_create_one_input_field(ctx, &rf));
 
                 append_opt(&mut fields, input_fields::nested_connect_or_create_field(ctx, &rf));
@@ -72,7 +72,7 @@ fn create_nested_inputs(ctx: &mut BuilderContext) {
         for (input_object, rf) in nested_update_inputs_queue.drain(..) {
             let mut fields = vec![];
 
-            if rf.related_model().supports_create_operation {
+            if rf.related_model().supports_create_operation() {
                 fields.push(input_fields::nested_create_one_input_field(ctx, &rf));
 
                 append_opt(&mut fields, input_fields::nested_connect_or_create_field(ctx, &rf));
@@ -202,26 +202,6 @@ fn update_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
         )
         .nullable()
     })
-}
-
-/// Builds a create many mutation field (e.g. createManyUsers) for given model.
-fn create_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputField> {
-    let arguments = arguments::create_many_arguments(ctx, model);
-    let field_name = format!("createMany{}", model.name);
-
-    if ctx.capabilities.contains(ConnectorCapability::CreateMany) {
-        Some(field(
-            field_name,
-            arguments,
-            OutputType::object(objects::affected_records_object_type(ctx)),
-            Some(QueryInfo {
-                model: Some(Arc::clone(model)),
-                tag: QueryTag::CreateMany,
-            }),
-        ))
-    } else {
-        None
-    }
 }
 
 /// Builds an update many mutation field (e.g. updateManyUsers) for given model.
