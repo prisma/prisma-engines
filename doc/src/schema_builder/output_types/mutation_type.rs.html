@@ -241,41 +241,9 @@
 <span id="236">236</span>
 <span id="237">237</span>
 <span id="238">238</span>
-<span id="239">239</span>
-<span id="240">240</span>
-<span id="241">241</span>
-<span id="242">242</span>
-<span id="243">243</span>
-<span id="244">244</span>
-<span id="245">245</span>
-<span id="246">246</span>
-<span id="247">247</span>
-<span id="248">248</span>
-<span id="249">249</span>
-<span id="250">250</span>
-<span id="251">251</span>
-<span id="252">252</span>
-<span id="253">253</span>
-<span id="254">254</span>
-<span id="255">255</span>
-<span id="256">256</span>
-<span id="257">257</span>
-<span id="258">258</span>
-<span id="259">259</span>
-<span id="260">260</span>
-<span id="261">261</span>
-<span id="262">262</span>
-<span id="263">263</span>
-<span id="264">264</span>
-<span id="265">265</span>
-<span id="266">266</span>
-<span id="267">267</span>
-<span id="268">268</span>
-<span id="269">269</span>
-<span id="270">270</span>
-<span id="271">271</span>
-<span id="272">272</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mutations</span>::{<span class="ident">create_many</span>, <span class="ident">create_one</span>};
+
+<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">datamodel_connector::ConnectorCapability</span>;
 <span class="kw">use</span> <span class="ident">input_types::fields</span>::{<span class="ident">arguments</span>, <span class="ident">input_fields</span>};
 <span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">dml</span>, <span class="ident">PrismaValue</span>};
@@ -288,11 +256,11 @@
         .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">vec</span> <span class="op">=</span> <span class="macro">vec!</span>[];
 
-            <span class="kw">if</span> <span class="ident">model</span>.<span class="ident">supports_create_operation</span> {
-                <span class="ident">vec</span>.<span class="ident">push</span>(<span class="ident">create_item_field</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>));
+            <span class="kw">if</span> <span class="ident">model</span>.<span class="ident">supports_create_operation</span>() {
+                <span class="ident">vec</span>.<span class="ident">push</span>(<span class="ident">create_one</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>));
 
                 <span class="ident">append_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">vec</span>, <span class="ident">upsert_item_field</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>));
-                <span class="ident">append_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">vec</span>, <span class="ident">create_many_field</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>));
+                <span class="ident">append_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">vec</span>, <span class="ident">create_many</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>));
             }
 
             <span class="ident">append_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">vec</span>, <span class="ident">delete_item_field</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>));
@@ -332,7 +300,7 @@
         <span class="kw">for</span> (<span class="ident">input_object</span>, <span class="ident">rf</span>) <span class="kw">in</span> <span class="ident">nested_create_inputs_queue</span>.<span class="ident">drain</span>(..) {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span> <span class="op">=</span> <span class="macro">vec!</span>[];
 
-            <span class="kw">if</span> <span class="ident">rf</span>.<span class="ident">related_model</span>().<span class="ident">supports_create_operation</span> {
+            <span class="kw">if</span> <span class="ident">rf</span>.<span class="ident">related_model</span>().<span class="ident">supports_create_operation</span>() {
                 <span class="ident">fields</span>.<span class="ident">push</span>(<span class="ident">input_fields::nested_create_one_input_field</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">rf</span>));
 
                 <span class="ident">append_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">fields</span>, <span class="ident">input_fields::nested_connect_or_create_field</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">rf</span>));
@@ -347,7 +315,7 @@
         <span class="kw">for</span> (<span class="ident">input_object</span>, <span class="ident">rf</span>) <span class="kw">in</span> <span class="ident">nested_update_inputs_queue</span>.<span class="ident">drain</span>(..) {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span> <span class="op">=</span> <span class="macro">vec!</span>[];
 
-            <span class="kw">if</span> <span class="ident">rf</span>.<span class="ident">related_model</span>().<span class="ident">supports_create_operation</span> {
+            <span class="kw">if</span> <span class="ident">rf</span>.<span class="ident">related_model</span>().<span class="ident">supports_create_operation</span>() {
                 <span class="ident">fields</span>.<span class="ident">push</span>(<span class="ident">input_fields::nested_create_one_input_field</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">rf</span>));
 
                 <span class="ident">append_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">fields</span>, <span class="ident">input_fields::nested_connect_or_create_field</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">rf</span>));
@@ -427,22 +395,6 @@
     )
 }
 
-<span class="doccomment">/// Builds a create mutation field (e.g. createUser) for given model.</span>
-<span class="kw">fn</span> <span class="ident">create_item_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">OutputField</span> {
-    <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">arguments::create_one_arguments</span>(<span class="ident">ctx</span>, <span class="ident">model</span>).<span class="ident">unwrap_or_default</span>();
-    <span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;createOne{}&quot;</span>, <span class="ident">model</span>.<span class="ident">name</span>);
-
-    <span class="ident">field</span>(
-        <span class="ident">field_name</span>,
-        <span class="ident">args</span>,
-        <span class="ident">OutputType::object</span>(<span class="ident">objects::model::map_type</span>(<span class="ident">ctx</span>, <span class="ident">model</span>)),
-        <span class="prelude-val">Some</span>(<span class="ident">QueryInfo</span> {
-            <span class="ident">model</span>: <span class="prelude-val">Some</span>(<span class="ident">Arc::clone</span>(<span class="ident">model</span>)),
-            <span class="ident">tag</span>: <span class="ident">QueryTag::CreateOne</span>,
-        }),
-    )
-}
-
 <span class="doccomment">/// Builds a delete mutation field (e.g. deleteUser) for given model.</span>
 <span class="kw">fn</span> <span class="ident">delete_item_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutputField</span><span class="op">&gt;</span> {
     <span class="ident">arguments::delete_one_arguments</span>(<span class="ident">ctx</span>, <span class="ident">model</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">args</span><span class="op">|</span> {
@@ -493,26 +445,6 @@
         )
         .<span class="ident">nullable</span>()
     })
-}
-
-<span class="doccomment">/// Builds a create many mutation field (e.g. createManyUsers) for given model.</span>
-<span class="kw">fn</span> <span class="ident">create_many_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutputField</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">arguments</span> <span class="op">=</span> <span class="ident">arguments::create_many_arguments</span>(<span class="ident">ctx</span>, <span class="ident">model</span>);
-    <span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;createMany{}&quot;</span>, <span class="ident">model</span>.<span class="ident">name</span>);
-
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">capabilities</span>.<span class="ident">contains</span>(<span class="ident">ConnectorCapability::CreateMany</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">field</span>(
-            <span class="ident">field_name</span>,
-            <span class="ident">arguments</span>,
-            <span class="ident">OutputType::object</span>(<span class="ident">objects::affected_records_object_type</span>(<span class="ident">ctx</span>)),
-            <span class="prelude-val">Some</span>(<span class="ident">QueryInfo</span> {
-                <span class="ident">model</span>: <span class="prelude-val">Some</span>(<span class="ident">Arc::clone</span>(<span class="ident">model</span>)),
-                <span class="ident">tag</span>: <span class="ident">QueryTag::CreateMany</span>,
-            }),
-        ))
-    } <span class="kw">else</span> {
-        <span class="prelude-val">None</span>
-    }
 }
 
 <span class="doccomment">/// Builds an update many mutation field (e.g. updateManyUsers) for given model.</span>

@@ -173,38 +173,10 @@
 <span id="168">168</span>
 <span id="169">169</span>
 <span id="170">170</span>
-<span id="171">171</span>
-<span id="172">172</span>
-<span id="173">173</span>
-<span id="174">174</span>
-<span id="175">175</span>
-<span id="176">176</span>
-<span id="177">177</span>
-<span id="178">178</span>
-<span id="179">179</span>
-<span id="180">180</span>
-<span id="181">181</span>
-<span id="182">182</span>
-<span id="183">183</span>
-<span id="184">184</span>
-<span id="185">185</span>
-<span id="186">186</span>
-<span id="187">187</span>
-<span id="188">188</span>
-<span id="189">189</span>
-<span id="190">190</span>
-<span id="191">191</span>
-<span id="192">192</span>
-<span id="193">193</span>
-<span id="194">194</span>
-<span id="195">195</span>
-<span id="196">196</span>
-<span id="197">197</span>
-<span id="198">198</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::input_types::objects::order_by_objects::OrderByOptions</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mutations::create_one</span>;
 <span class="kw">use</span> <span class="ident">constants::args</span>;
-<span class="kw">use</span> <span class="ident">datamodel_connector::ConnectorCapability</span>;
 <span class="kw">use</span> <span class="ident">objects</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">prelude::ParentContainer</span>, <span class="ident">CompositeFieldRef</span>};
 
@@ -226,20 +198,6 @@
     }
 }
 
-<span class="doccomment">/// Builds &quot;data&quot; argument intended for the create field.</span>
-<span class="doccomment">/// The data argument is not present if no data can be created.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">create_one_arguments</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">create_types</span> <span class="op">=</span> <span class="ident">create_one_objects::create_one_input_types</span>(<span class="ident">ctx</span>, <span class="ident">model</span>, <span class="prelude-val">None</span>);
-    <span class="kw">let</span> <span class="ident">any_empty</span> <span class="op">=</span> <span class="ident">create_types</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">typ</span><span class="op">|</span> <span class="ident">typ</span>.<span class="ident">is_empty</span>());
-    <span class="kw">let</span> <span class="ident">all_empty</span> <span class="op">=</span> <span class="ident">create_types</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">typ</span><span class="op">|</span> <span class="ident">typ</span>.<span class="ident">is_empty</span>());
-
-    <span class="kw">if</span> <span class="ident">all_empty</span> {
-        <span class="prelude-val">None</span>
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="ident">input_field</span>(<span class="ident">args::DATA</span>, <span class="ident">create_types</span>, <span class="prelude-val">None</span>).<span class="ident">optional_if</span>(<span class="ident">any_empty</span>)])
-    }
-}
-
 <span class="doccomment">/// Builds &quot;where&quot; (unique) argument intended for the delete field.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">delete_one_arguments</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="ident">where_unique_argument</span>(<span class="ident">ctx</span>, <span class="ident">model</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="macro">vec!</span>[<span class="ident">arg</span>])
@@ -258,7 +216,7 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">upsert_arguments</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="ident">where_unique_argument</span>(<span class="ident">ctx</span>, <span class="ident">model</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">where_unique_arg</span><span class="op">|</span> {
         <span class="kw">let</span> <span class="ident">update_types</span> <span class="op">=</span> <span class="ident">update_one_objects::update_one_input_types</span>(<span class="ident">ctx</span>, <span class="ident">model</span>, <span class="prelude-val">None</span>);
-        <span class="kw">let</span> <span class="ident">create_types</span> <span class="op">=</span> <span class="ident">create_one_objects::create_one_input_types</span>(<span class="ident">ctx</span>, <span class="ident">model</span>, <span class="prelude-val">None</span>);
+        <span class="kw">let</span> <span class="ident">create_types</span> <span class="op">=</span> <span class="ident">create_one::create_one_input_types</span>(<span class="ident">ctx</span>, <span class="ident">model</span>, <span class="prelude-val">None</span>);
 
         <span class="kw">if</span> <span class="ident">update_types</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">typ</span><span class="op">|</span> <span class="ident">typ</span>.<span class="ident">is_empty</span>()) <span class="op">|</span><span class="op">|</span> <span class="ident">create_types</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">typ</span><span class="op">|</span> <span class="ident">typ</span>.<span class="ident">is_empty</span>()) {
             <span class="prelude-val">None</span>
@@ -270,20 +228,6 @@
             ])
         }
     })
-}
-
-<span class="doccomment">/// Builds &quot;skip_duplicates&quot; and &quot;data&quot; arguments intended for the create many field.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">create_many_arguments</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">create_many_type</span> <span class="op">=</span> <span class="ident">InputType::object</span>(<span class="ident">create_many_objects::create_many_object_type</span>(<span class="ident">ctx</span>, <span class="ident">model</span>, <span class="prelude-val">None</span>));
-    <span class="kw">let</span> <span class="ident">data_arg</span> <span class="op">=</span> <span class="ident">input_field</span>(<span class="string">&quot;data&quot;</span>, <span class="ident">InputType::list</span>(<span class="ident">create_many_type</span>), <span class="prelude-val">None</span>);
-
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">capabilities</span>.<span class="ident">contains</span>(<span class="ident">ConnectorCapability::CreateSkipDuplicates</span>) {
-        <span class="kw">let</span> <span class="ident">skip_arg</span> <span class="op">=</span> <span class="ident">input_field</span>(<span class="ident">args::SKIP_DUPLICATES</span>, <span class="ident">InputType::boolean</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>();
-
-        <span class="macro">vec!</span>[<span class="ident">data_arg</span>, <span class="ident">skip_arg</span>]
-    } <span class="kw">else</span> {
-        <span class="macro">vec!</span>[<span class="ident">data_arg</span>]
-    }
 }
 
 <span class="doccomment">/// Builds &quot;where&quot; and &quot;data&quot; arguments intended for the update many field.</span>
