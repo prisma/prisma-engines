@@ -67,7 +67,7 @@ fn compound_object_name(alias: Option<&String>, from_fields: &[(Vec<String>, Sca
     alias.map(capitalize).unwrap_or_else(|| {
         let field_names: Vec<String> = from_fields
             .iter()
-            .map(|(path, field)| path.iter().map(capitalize).join(""))
+            .map(|(path, _)| path.iter().map(capitalize).join(""))
             .collect();
 
         field_names.join("")

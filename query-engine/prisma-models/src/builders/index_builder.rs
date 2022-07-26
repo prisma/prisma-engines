@@ -1,4 +1,6 @@
-use crate::{Field, Index, IndexType};
+use std::sync::Arc;
+
+use crate::{Field, Index, IndexType, ScalarFieldWeak, ScalarFieldRef};
 
 #[derive(Debug)]
 pub struct IndexBuilder {
@@ -8,7 +10,7 @@ pub struct IndexBuilder {
 }
 
 impl IndexBuilder {
-    pub fn build(self, _all_fields: &[Field]) -> Index {
+    pub fn build(self, all_fields: &[Field]) -> Index {
         let fields = match self.typ {
             IndexType::Unique => Self::map_fields(self.field_paths, all_fields),
             IndexType::Normal => Self::map_fields(self.field_paths, all_fields),
@@ -21,7 +23,7 @@ impl IndexBuilder {
         }
     }
 
-    fn map_fields(field_paths: Vec<Vec<String>>, all_fields: &[Field]) -> Vec<ScalarFieldWeak> {
+    fn map_fields(field_paths: Vec<Vec<String>>, all_fields: &[Field]) -> Vec<(Vec<String>, ScalarFieldWeak)> {
         field_paths
             .into_iter()
             .map(|path| {
@@ -37,10 +39,7 @@ impl IndexBuilder {
                 }
                 .unwrap_or_else(|| panic!("Unable to resolve field path '{}'", path.join(".")));
 
-                // We have the field path, set it to be used later
-                field.path.set(path).unwrap();
-
-                Arc::downgrade(&field)
+                (path, Arc::downgrade(&field))
             })
             .collect()
     }

@@ -167,7 +167,8 @@ fn compound_field_unique_object_type(
     let fields = from_fields
         .into_iter()
         .map(|(path, field)| {
-            if path.len() > 0 {
+            dbg!(&path);
+            if path.len() > 1 {
                 composite_field_unique_input_type(ctx, &path, &field)
             } else {
                 let name = field.name.clone();

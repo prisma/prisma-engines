@@ -263,7 +263,7 @@ fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilde
         let additional_pairs = match model.fields().find_from_scalar(&field_name) {
             Ok(field) => extract_cursor_field(field, map_value)?,
             Err(_) => match utils::resolve_compound_field(&field_name, &model) {
-                Some(fields) => extract_compound_cursor_field(todo!(), map_value)?,
+                Some(path_fields) => extract_compound_cursor_field(path_fields, map_value)?,
                 None => {
                     return Err(QueryGraphBuilderError::AssertionError(format!(
                         "Unable to resolve field {} to a field or a set of fields on model {}",
@@ -279,6 +279,7 @@ fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilde
     Ok(Some(SelectionResult::new(pairs)))
 }
 
+// NOTE: This is probably not needed anymore
 fn extract_cursor_field(
     field: ScalarFieldRef,
     input_value: ParsedInputValue,
@@ -288,18 +289,29 @@ fn extract_cursor_field(
 }
 
 fn extract_compound_cursor_field(
-    fields: Vec<ScalarFieldRef>,
+    path_fields: Vec<(Vec<String>, ScalarFieldRef)>,
     input_value: ParsedInputValue,
 ) -> QueryGraphBuilderResult<Vec<(ScalarFieldRef, PrismaValue)>> {
     let mut map: ParsedInputMap = input_value.try_into()?;
     let mut pairs = vec![];
 
-    for field in fields {
-        let value = map.remove(&field.name).unwrap();
-        pairs.extend(extract_cursor_field(field, value)?);
+    for (path, field) in path_fields {
+        let value = extract_from_input_map(&path, &mut map);
+        pairs.extend(vec![(field, value)]);
     }
 
     Ok(pairs)
+}
+
+fn extract_from_input_map(path: &[String], map: &mut ParsedInputMap) -> PrismaValue {
+    let name = path.first().expect("I was expecting a path to unwrap");
+    let mut entry = map.remove(name).unwrap();
+
+    match entry {
+        ParsedInputValue::Map(ref mut map) => extract_from_input_map(&path[1..], map),
+        ParsedInputValue::Single(value) => value,
+        _ => panic!("Was not expected a non map or single value in this expression"),
+    }
 }
 
 /// Runs final transformations on the QueryArguments.

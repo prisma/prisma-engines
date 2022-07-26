@@ -55,7 +55,7 @@ fn handle_compound_field(
     let mut filters = Vec::with_capacity(fields.len());
 
     for (path, field) in fields {
-        if path.len() > 0 {
+        if path.len() > 1 {
             filters.push(traverse_composite_filter(model, &path, field, input_map.clone())?);
         } else {
             let pv: PrismaValue = input_map.remove(&field.name).unwrap().try_into()?;
@@ -72,7 +72,7 @@ fn traverse_composite_filter(
     field: ScalarFieldRef,
     mut input_map: ParsedInputMap,
 ) -> QueryGraphBuilderResult<Filter> {
-    if path.len() == 0 {
+    if path.len() == 1 {
         let pv: PrismaValue = input_map.remove(&field.name).unwrap().try_into()?;
         return Ok(field.equals(pv));
     }
@@ -85,17 +85,6 @@ fn traverse_composite_filter(
     let inner = traverse_composite_filter(model, path, field, input_map)?;
 
     Ok(cf.is(inner))
-}
-
-fn extract_from_input_map(path: &[String], map: &mut ParsedInputMap) -> PrismaValue {
-    let name = path.first().expect("I was expecting a path to unwrap");
-    let mut entry = map.remove(name).unwrap();
-
-    match entry {
-        ParsedInputValue::Map(ref mut map) => extract_from_input_map(&path[1..], map),
-        ParsedInputValue::Single(value) => value,
-        _ => panic!("Was not expected a non map or single value in this expression"),
-    }
 }
 
 /// Extracts a regular filter potentially matching many records.
