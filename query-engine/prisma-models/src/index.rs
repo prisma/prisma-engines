@@ -9,7 +9,10 @@ pub struct Index {
 
 impl Index {
     pub fn fields(&self) -> Vec<(Vec<String>, ScalarFieldRef)> {
-        self.fields.iter().map(|(path, field)| (path.clone(), field.upgrade().unwrap())).collect()
+        self.fields
+            .iter()
+            .map(|(path, field)| (path.clone(), field.upgrade().unwrap()))
+            .collect()
     }
 }
 

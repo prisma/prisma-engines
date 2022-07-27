@@ -261,12 +261,12 @@ fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilde
 
     for (field_name, map_value) in input_map {
         let additional_pairs = match model.fields().find_from_scalar(&field_name) {
-            Ok(field) => { 
+            Ok(field) => {
                 let value = map_value.try_into()?;
                 vec![(field, value)]
-            },
+            }
             Err(_) => match utils::resolve_compound_field(&field_name, &model) {
-                Some(path_fields) => { 
+                Some(path_fields) => {
                     let mut map: ParsedInputMap = map_value.try_into()?;
                     let mut pairs = vec![];
 
@@ -276,7 +276,7 @@ fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilde
                     }
 
                     pairs
-                },
+                }
                 None => {
                     return Err(QueryGraphBuilderError::AssertionError(format!(
                         "Unable to resolve field {} to a field or a set of fields on model {}",

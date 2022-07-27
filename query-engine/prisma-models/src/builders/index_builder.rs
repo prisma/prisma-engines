@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::{Field, Index, IndexType, ScalarFieldWeak, ScalarFieldRef};
+use crate::{Field, Index, IndexType, ScalarFieldRef, ScalarFieldWeak};
 
 #[derive(Debug)]
 pub struct IndexBuilder {

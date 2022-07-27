@@ -9,9 +9,9 @@ use crate::{
     RelationLinkManifestation, RelationSide, RelationTable, TypeIdentifier,
 };
 use datamodel::dml::{self, CompositeTypeFieldType, Datamodel, Ignorable, WithDatabaseName};
+use itertools::Itertools;
 use once_cell::sync::OnceCell;
 use std::sync::Arc;
-use itertools::Itertools;
 
 #[derive(Debug, Default)]
 pub struct InternalDataModelBuilder {

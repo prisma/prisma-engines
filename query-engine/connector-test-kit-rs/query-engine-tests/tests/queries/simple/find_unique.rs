@@ -103,18 +103,22 @@ mod find_unique {
 
             @@unique([location.address])
         }
-        "#}.to_string()
+        "#}
+        .to_string()
     }
 
     #[connector_test(schema(simple_uniq_idx_with_embedded), only(MongoDb))]
     async fn simple_embedded_type(runner: Runner) -> TestResult<()> {
-        run_query!(runner, indoc! {r#"mutation {
+        run_query!(
+            runner,
+            indoc! {r#"mutation {
             createManyA(data: [
                 {id: 1 name: "foo" location: {set: {address: "a"}}},
                 {id: 2 name: "foo" location: {set: {address: "b"}}},
                 {id: 3 name: "foo" location: {set: {address: "c"}}},
             ]) { count }
-        }"#});
+        }"#}
+        );
 
         assert_query!(
             runner,
@@ -144,18 +148,22 @@ mod find_unique {
 
             @@unique([name, location.address])
         }
-        "#}.to_string()
+        "#}
+        .to_string()
     }
 
     #[connector_test(schema(composite_uniq_idx_with_embedded), only(MongoDb))]
     async fn composite_embedded_type(runner: Runner) -> TestResult<()> {
-        run_query!(runner, indoc! {r#"mutation {
+        run_query!(
+            runner,
+            indoc! {r#"mutation {
             createManyA(data: [
                 {id: 1 name: "foo" location: {set: {address: "a"}}},
                 {id: 2 name: "foo" location: {set: {address: "b"}}},
                 {id: 3 name: "bar" location: {set: {address: "c"}}},
             ]) { count }
-        }"#});
+        }"#}
+        );
 
         assert_query!(
             runner,
