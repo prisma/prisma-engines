@@ -144,7 +144,7 @@ impl QueryArguments {
             index
                 .fields()
                 .into_iter()
-                .all(|(_path, f)| on_model.iter().any(|o| o.field == f))
+                .all(|(_, f)| on_model.iter().any(|o| o.field == f))
         });
 
         let source_contains_unique = on_model.iter().any(|o| o.field.unique());

@@ -70,7 +70,7 @@ fn to_many_relation_filter_object(ctx: &mut BuilderContext, rf: &RelationFieldRe
         PRISMA_NAMESPACE,
     );
 
-    return_cached_input!(ctx, &ident);
+    return_if_cached!(ctx, &ident);
     let object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, object.clone());
 
@@ -92,7 +92,7 @@ fn to_one_relation_filter_object(ctx: &mut BuilderContext, rf: &RelationFieldRef
         PRISMA_NAMESPACE,
     );
 
-    return_cached_input!(ctx, &ident);
+    return_if_cached!(ctx, &ident);
     let object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, object.clone());
 
@@ -122,7 +122,7 @@ fn to_one_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeFieldR
         format!("{}{}CompositeFilter", capitalize(&cf.typ.name), nullable),
         PRISMA_NAMESPACE,
     );
-    return_cached_input!(ctx, &ident);
+    return_if_cached!(ctx, &ident);
 
     let mut object = init_input_object_type(ident.clone());
     object.require_exactly_one_field();
@@ -160,7 +160,7 @@ fn to_many_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeField
         format!("{}CompositeListFilter", capitalize(&cf.typ.name)),
         PRISMA_NAMESPACE,
     );
-    return_cached_input!(ctx, &ident);
+    return_if_cached!(ctx, &ident);
 
     let mut object = init_input_object_type(ident.clone());
     object.require_exactly_one_field();
@@ -199,7 +199,7 @@ fn scalar_list_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> Inp
         scalar_filter_name(&sf.type_identifier, true, !sf.is_required(), false, false),
         PRISMA_NAMESPACE,
     );
-    return_cached_input!(ctx, &ident);
+    return_if_cached!(ctx, &ident);
 
     let mut object = init_input_object_type(ident.clone());
     object.require_exactly_one_field();
@@ -238,7 +238,7 @@ fn full_scalar_filter_type(
         PRISMA_NAMESPACE,
     );
 
-    return_cached_input!(ctx, &ident);
+    return_if_cached!(ctx, &ident);
 
     let object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, object.clone());

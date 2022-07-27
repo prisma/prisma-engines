@@ -21,7 +21,10 @@ impl AsTable for Model {
         let table = table.add_unique_index(id_cols);
 
         self.unique_indexes().into_iter().fold(table, |table, index| {
-            let index: Vec<Column<'static>> = index.fields().iter().map(|(_path, field)| field.as_column()).collect();
+            let index: Vec<Column<'static>> = index.fields().iter()
+                .map(|(_, field)| field.as_column())
+                .collect();
+
             table.add_unique_index(index)
         })
     }

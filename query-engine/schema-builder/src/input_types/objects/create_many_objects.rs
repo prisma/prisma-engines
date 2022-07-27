@@ -17,7 +17,7 @@ pub(crate) fn create_many_object_type(
     };
 
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
-    return_cached_input!(ctx, &ident);
+    return_if_cached!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());

@@ -48,13 +48,13 @@ pub fn extract_unique_filter(value_map: ParsedInputMap, model: &ModelRef) -> Que
 
 fn handle_compound_field(
     model: &ModelRef,
-    fields: Vec<(Vec<String>, ScalarFieldRef)>, // todo: Alias type for path + scalar `type PathedScalarField = ...`
+    path_fields: Vec<(Vec<String>, ScalarFieldRef)>,
     value: ParsedInputValue,
 ) -> QueryGraphBuilderResult<Filter> {
     let mut input_map: ParsedInputMap = value.try_into()?;
-    let mut filters = Vec::with_capacity(fields.len());
+    let mut filters = Vec::with_capacity(path_fields.len());
 
-    for (path, field) in fields {
+    for (path, field) in path_fields {
         if path.len() > 1 {
             filters.push(traverse_composite_filter(model, &path, field, input_map.clone())?);
         } else {
@@ -80,7 +80,8 @@ fn traverse_composite_filter(
     let composite_field_name = path.first().unwrap();
     let cf = model.fields().find_from_composite(composite_field_name)?;
 
-    let input_map = input_map.remove(composite_field_name).unwrap().try_into()?; // [geo.location].city => { geo: { location: { city: "" } }}
+    // NOTE: [geo.location.city] => { geo: { location: { city: "" } }}
+    let input_map = input_map.remove(composite_field_name).unwrap().try_into()?;
     let path = &path[1..];
     let inner = traverse_composite_filter(model, path, field, input_map)?;
 

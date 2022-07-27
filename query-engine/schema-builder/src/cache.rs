@@ -69,7 +69,7 @@ impl<T> From<Vec<(Identifier, Arc<T>)>> for TypeRefCache<T> {
 }
 
 /// Convenience cache utility to load and return immediately if an input object type is already cached.
-macro_rules! return_cached_input {
+macro_rules! return_if_cached {
     ($ctx:expr, $ident:expr) => {
         if let Some(existing_type) = $ctx.get_input_type($ident) {
             return existing_type;

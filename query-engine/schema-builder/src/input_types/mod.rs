@@ -63,9 +63,9 @@ fn list_union_type(input_type: InputType, as_list: bool) -> Vec<InputType> {
     }
 }
 
-fn compound_object_name(alias: Option<&String>, from_fields: &[(Vec<String>, ScalarFieldRef)]) -> String {
+fn compound_object_name(alias: Option<&String>, path_fields: &[(Vec<String>, ScalarFieldRef)]) -> String {
     alias.map(capitalize).unwrap_or_else(|| {
-        let field_names: Vec<String> = from_fields
+        let field_names: Vec<String> = path_fields
             .iter()
             .map(|(path, _)| path.iter().map(capitalize).join(""))
             .collect();

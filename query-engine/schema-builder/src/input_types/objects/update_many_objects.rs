@@ -21,7 +21,7 @@ pub(crate) fn update_many_input_types(
 /// Builds "<x>UpdateManyMutationInput" input object type.
 pub(crate) fn checked_update_many_input_type(ctx: &mut BuilderContext, model: &ModelRef) -> InputObjectTypeWeakRef {
     let ident = Identifier::new(format!("{}UpdateManyMutationInput", model.name), PRISMA_NAMESPACE);
-    return_cached_input!(ctx, &ident);
+    return_if_cached!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());
@@ -54,7 +54,7 @@ pub(crate) fn unchecked_update_many_input_type(
     };
 
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
-    return_cached_input!(ctx, &ident);
+    return_if_cached!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());
@@ -85,7 +85,7 @@ pub(crate) fn update_many_where_combination_object(
     );
 
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
-    return_cached_input!(ctx, &ident);
+    return_if_cached!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());

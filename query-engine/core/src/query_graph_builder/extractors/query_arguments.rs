@@ -261,9 +261,22 @@ fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilde
 
     for (field_name, map_value) in input_map {
         let additional_pairs = match model.fields().find_from_scalar(&field_name) {
-            Ok(field) => extract_cursor_field(field, map_value)?,
+            Ok(field) => { 
+                let value = map_value.try_into()?;
+                vec![(field, value)]
+            },
             Err(_) => match utils::resolve_compound_field(&field_name, &model) {
-                Some(path_fields) => extract_compound_cursor_field(path_fields, map_value)?,
+                Some(path_fields) => { 
+                    let mut map: ParsedInputMap = map_value.try_into()?;
+                    let mut pairs = vec![];
+
+                    for (path, field) in path_fields {
+                        let value = extract_from_input_map(&path, &mut map);
+                        pairs.extend(vec![(field, value)]);
+                    }
+
+                    pairs
+                },
                 None => {
                     return Err(QueryGraphBuilderError::AssertionError(format!(
                         "Unable to resolve field {} to a field or a set of fields on model {}",
@@ -279,34 +292,11 @@ fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilde
     Ok(Some(SelectionResult::new(pairs)))
 }
 
-// NOTE: This is probably not needed anymore
-fn extract_cursor_field(
-    field: ScalarFieldRef,
-    input_value: ParsedInputValue,
-) -> QueryGraphBuilderResult<Vec<(ScalarFieldRef, PrismaValue)>> {
-    let value = input_value.try_into()?;
-    Ok(vec![(field, value)])
-}
-
-fn extract_compound_cursor_field(
-    path_fields: Vec<(Vec<String>, ScalarFieldRef)>,
-    input_value: ParsedInputValue,
-) -> QueryGraphBuilderResult<Vec<(ScalarFieldRef, PrismaValue)>> {
-    let mut map: ParsedInputMap = input_value.try_into()?;
-    let mut pairs = vec![];
-
-    for (path, field) in path_fields {
-        let value = extract_from_input_map(&path, &mut map);
-        pairs.extend(vec![(field, value)]);
-    }
-
-    Ok(pairs)
-}
-
 fn extract_from_input_map(path: &[String], map: &mut ParsedInputMap) -> PrismaValue {
     let name = path.first().expect("I was expecting a path to unwrap");
     let mut entry = map.remove(name).unwrap();
 
+    // Recursively go through the map until finding the single value
     match entry {
         ParsedInputValue::Map(ref mut map) => extract_from_input_map(&path[1..], map),
         ParsedInputValue::Single(value) => value,

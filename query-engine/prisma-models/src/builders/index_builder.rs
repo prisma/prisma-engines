@@ -46,6 +46,7 @@ impl IndexBuilder {
 }
 
 fn find_scalar_in_composite_fields(path: &[String], fields: &[Field]) -> Option<ScalarFieldRef> {
+    // Recursively go through the embedded fields until finding the scalar
     let name = path.first();
     if let Some(field) = fields.iter().find(|f| f.name() == name.unwrap()) {
         match (path, field) {

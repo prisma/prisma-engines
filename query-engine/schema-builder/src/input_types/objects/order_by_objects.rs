@@ -53,7 +53,7 @@ pub(crate) fn order_by_object_type(
         format!("{}OrderBy{}Input", container.name(), options.type_suffix()),
         PRISMA_NAMESPACE,
     );
-    return_cached_input!(ctx, &ident);
+    return_if_cached!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
     input_object.allow_at_most_one_field();
@@ -195,7 +195,7 @@ fn order_by_object_type_aggregate(
         PRISMA_NAMESPACE,
     );
 
-    return_cached_input!(ctx, &ident);
+    return_if_cached!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
     input_object.require_exactly_one_field();
@@ -225,7 +225,7 @@ fn order_by_to_many_aggregate_object_type(
         format!("{}OrderBy{}AggregateInput", container.name(), container_type),
         PRISMA_NAMESPACE,
     );
-    return_cached_input!(ctx, &ident);
+    return_if_cached!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
     input_object.require_exactly_one_field();
@@ -276,7 +276,7 @@ fn order_by_object_type_text_search(
 ) -> InputObjectTypeWeakRef {
     let ident = Identifier::new(format!("{}OrderByRelevanceInput", container.name()), PRISMA_NAMESPACE);
 
-    return_cached_input!(ctx, &ident);
+    return_if_cached!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());
