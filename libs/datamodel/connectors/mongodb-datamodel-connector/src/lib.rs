@@ -10,6 +10,8 @@ use mongodb_types::*;
 use native_types::{MongoDbType, NativeType};
 use std::result::Result as StdResult;
 
+pub const MONGODB: &'static dyn Connector = &MongoDbDatamodelConnector;
+
 const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::Json,
     ConnectorCapability::Enums,
@@ -30,9 +32,13 @@ const CAPABILITIES: &[ConnectorCapability] = &[
 
 type Result<T> = std::result::Result<T, DatamodelError>;
 
-pub struct MongoDbDatamodelConnector;
+struct MongoDbDatamodelConnector;
 
 impl Connector for MongoDbDatamodelConnector {
+    fn provider_name(&self) -> &'static str {
+        "mongodb"
+    }
+
     fn name(&self) -> &str {
         "MongoDB"
     }

@@ -1,13 +1,10 @@
+use super::Name;
+use crate::sampler::field_type::FieldType;
 use convert_case::{Case, Casing};
+use datamodel::dml::{self, WithDatabaseName, WithName};
 use introspection_connector::Warning;
 use mongodb_schema_describer::{IndexFieldProperty, IndexWalker};
 use std::collections::BTreeMap;
-
-use datamodel::dml::{self, WithDatabaseName, WithName};
-
-use crate::sampler::field_type::FieldType;
-
-use super::Name;
 
 /// Add described indices to the models.
 pub(super) fn add_to_models(
@@ -245,10 +242,7 @@ fn add_missing_types_from_index(
                     } else {
                         unknown_fields.push((Name::CompositeType(type_name.clone()), field_name.clone()));
 
-                        (
-                            dml::CompositeTypeFieldType::Scalar(dml::ScalarType::Json, None, None),
-                            None,
-                        )
+                        (dml::CompositeTypeFieldType::Scalar(dml::ScalarType::Json, None), None)
                     };
 
                     let ct = types.get_mut(&type_name).unwrap();

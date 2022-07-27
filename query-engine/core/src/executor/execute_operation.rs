@@ -6,6 +6,7 @@ use connector::{Connection, ConnectionLike, Connector};
 use futures::future;
 use metrics::{histogram, increment_counter};
 use schema::QuerySchemaRef;
+use tracing::Instrument;
 use tracing_futures::WithSubscriber;
 
 pub async fn execute_single_operation(
@@ -64,7 +65,13 @@ pub async fn execute_single_self_contained<C: Connector + Send + Sync>(
     force_transactions: bool,
 ) -> crate::Result<ResponseData> {
     let (query_graph, serializer) = QueryGraphBuilder::new(query_schema).build(operation)?;
-    let conn = connector.get_connection().await?;
+    let connection_name = connector.name();
+    let conn_span = info_span!(
+        "prisma:connection",
+        user_facing = true,
+        "db.type" = connection_name.as_str()
+    );
+    let conn = connector.get_connection().instrument(conn_span).await?;
     execute_self_contained(conn, query_graph, serializer, force_transactions, trace_id).await
 }
 
@@ -82,7 +89,14 @@ pub async fn execute_many_self_contained<C: Connector + Send + Sync>(
         match QueryGraphBuilder::new(query_schema.clone()).build(op.clone()) {
             Ok((graph, serializer)) => {
                 increment_counter!("query_total_operations");
-                let conn = connector.get_connection().await?;
+
+                let connection_name = connector.name();
+                let conn_span = info_span!(
+                    "prisma:connection",
+                    user_facing = true,
+                    "db.type" = connection_name.as_str()
+                );
+                let conn = connector.get_connection().instrument(conn_span).await?;
 
                 futures.push(tokio::spawn(
                     execute_self_contained(conn, graph, serializer, force_transactions, trace_id.clone())

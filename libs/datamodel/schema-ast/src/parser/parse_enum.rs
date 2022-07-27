@@ -33,7 +33,7 @@ pub fn parse_enum(pair: Pair<'_>, doc_comment: Option<Pair<'_>>, diagnostics: &m
                 }
             }
             Rule::BLOCK_LEVEL_CATCH_ALL => diagnostics.push_error(DatamodelError::new_validation_error(
-                "This line is not an enum value definition.".to_owned(),
+                "This line is not an enum value definition.",
                 current.as_span().into(),
             )),
             _ => parsing_catch_all(&current, "enum"),
@@ -87,7 +87,6 @@ fn parse_enum_value(
             attributes,
             documentation: comment,
             span: Span::from(pair_span),
-            commented_out: false,
         }),
         _ => panic!(
             "Encountered impossible enum value declaration during parsing, name is missing: {:?}",

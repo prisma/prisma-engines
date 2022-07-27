@@ -19,12 +19,12 @@ fn test_must_not_render_relation_fields_with_many_to_many() {
     let expected = expect![[r#"
         model Post {
           id   Int    @id @default(autoincrement())
-          User User[]
+          User User[] @relation(references: [id])
         }
 
         model User {
           id   Int    @id @default(autoincrement())
-          Post Post[]
+          Post Post[] @relation(references: [id])
         }
     "#]];
 
@@ -83,8 +83,8 @@ fn test_render_relation_name_on_self_relations() {
           id         String     @id
           name       String
           updatedAt  DateTime
-          Category_A Category[] @relation("CategoryToCategory")
-          Category_B Category[] @relation("CategoryToCategory")
+          Category_A Category[] @relation("CategoryToCategory", references: [id])
+          Category_B Category[] @relation("CategoryToCategory", references: [id])
         }
     "#]];
 

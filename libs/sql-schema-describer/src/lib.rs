@@ -1,6 +1,6 @@
 //! Database description. This crate is used heavily in the introspection and migration engines.
-#![allow(clippy::trivial_regex)] // this is allowed, because we want to do CoW replaces and these regexes will grow.
-#![allow(clippy::match_bool)] // we respectfully disagree that it makes the code less readable.
+
+#![deny(rust_2018_idioms, unsafe_code)]
 
 pub mod mssql;
 pub mod mysql;
@@ -45,6 +45,7 @@ pub trait SqlSchemaDescriberBackend: Send + Sync {
     async fn version(&self, schema: &str) -> DescriberResult<Option<String>>;
 }
 
+/// The return type of get_metadata().
 pub struct SqlMetadata {
     pub table_count: usize,
     pub size_in_bytes: usize,
@@ -63,6 +64,10 @@ pub struct SqlSchema {
     foreign_keys: Vec<ForeignKey>,
     /// Constrained and referenced columns of foreign keys.
     foreign_key_columns: Vec<ForeignKeyColumn>,
+    /// All indexes and unique constraints.
+    indexes: Vec<Index>,
+    /// All columns of indexes.
+    index_columns: Vec<IndexColumn>,
     /// The schema's views,
     views: Vec<View>,
     /// The stored procedures.
@@ -76,38 +81,13 @@ pub struct SqlSchema {
 impl SqlSchema {
     /// Extract connector-specific constructs. The type parameter must be the right one.
     #[track_caller]
-    pub fn downcast_connector_data<T: 'static>(&self) -> Option<&T> {
-        self.connector_data.data.as_ref()?.downcast_ref()
+    pub fn downcast_connector_data<T: 'static>(&self) -> &T {
+        self.connector_data.data.as_ref().unwrap().downcast_ref().unwrap()
     }
 
-    /// Extract connector-specific constructs. The type parameter must be the right one.
-    pub fn downcast_connector_data_mut<T: Default + Send + Sync + 'static>(&mut self) -> &mut T {
-        if self.connector_data.data.is_none() {
-            self.connector_data.data = Some(Box::new(T::default()));
-        }
-
-        self.connector_data.data.as_mut().unwrap().downcast_mut().unwrap()
-    }
-
+    /// Insert connector-specific data into the schema. This will replace existing connector data.
     pub fn set_connector_data(&mut self, data: Box<dyn Any + Send + Sync>) {
         self.connector_data.data = Some(data);
-    }
-
-    /// Find a column by table and name. Prefer `walk_column()` if possible.
-    pub fn find_column<'a>(&'a self, table_id: TableId, name: &str) -> Option<(ColumnId, &'a Column)> {
-        self.walk(table_id)
-            .columns()
-            .find(|col| col.name() == name)
-            .map(|col| (col.id, col.column()))
-    }
-
-    /// Find a column or panic. For tests.
-    pub fn column_bang(&self, table_id: TableId, name: &str) -> &Column {
-        self.walk(table_id)
-            .columns()
-            .find(|col| col.name() == name)
-            .map(|col| col.column())
-            .unwrap()
     }
 
     /// Get a view.
@@ -125,27 +105,79 @@ impl SqlSchema {
         self.procedures.iter().find(|x| x.name == name)
     }
 
+    /// Get a user defined type by name.
     pub fn get_user_defined_type(&self, name: &str) -> Option<&UserDefinedType> {
         self.user_defined_types.iter().find(|x| x.name == name)
     }
 
-    pub fn iter_tables(&self) -> impl Iterator<Item = (TableId, &Table)> {
-        self.tables
-            .iter()
-            .enumerate()
-            .map(|(table_index, table)| (TableId(table_index as u32), table))
+    /// The total number of indexes in the schema.
+    pub fn indexes_count(&self) -> usize {
+        self.indexes.len()
     }
 
-    pub fn iter_tables_mut(&mut self) -> impl Iterator<Item = (TableId, &mut Table)> {
-        self.tables
-            .iter_mut()
-            .enumerate()
-            .map(|(table_index, table)| (TableId(table_index as u32), table))
+    /// Make all fulltext indexes non-fulltext, for the preview feature's purpose.
+    pub fn make_fulltext_indexes_normal(&mut self) {
+        for idx in self.indexes.iter_mut() {
+            if matches!(idx.tpe, IndexType::Fulltext) {
+                idx.tpe = IndexType::Normal;
+            }
+        }
     }
 
+    /// Add a column to the schema.
     pub fn push_column(&mut self, table_id: TableId, column: Column) -> ColumnId {
         let id = ColumnId(self.columns.len() as u32);
         self.columns.push((table_id, column));
+        id
+    }
+
+    /// Add a fulltext index to the schema.
+    pub fn push_fulltext_index(&mut self, table_id: TableId, index_name: String) -> IndexId {
+        let id = IndexId(self.indexes.len() as u32);
+        self.indexes.push(Index {
+            table_id,
+            index_name,
+            tpe: IndexType::Fulltext,
+        });
+        id
+    }
+
+    /// Add an index to the schema.
+    pub fn push_index(&mut self, table_id: TableId, index_name: String) -> IndexId {
+        let id = IndexId(self.indexes.len() as u32);
+        self.indexes.push(Index {
+            table_id,
+            index_name,
+            tpe: IndexType::Normal,
+        });
+        id
+    }
+
+    /// Add a primary key to the schema.
+    pub fn push_primary_key(&mut self, table_id: TableId, index_name: String) -> IndexId {
+        let id = IndexId(self.indexes.len() as u32);
+        self.indexes.push(Index {
+            table_id,
+            index_name,
+            tpe: IndexType::PrimaryKey,
+        });
+        id
+    }
+
+    /// Add a unique constraint/index to the schema.
+    pub fn push_unique_constraint(&mut self, table_id: TableId, index_name: String) -> IndexId {
+        let id = IndexId(self.indexes.len() as u32);
+        self.indexes.push(Index {
+            table_id,
+            index_name,
+            tpe: IndexType::Unique,
+        });
+        id
+    }
+
+    pub fn push_index_column(&mut self, column: IndexColumn) -> IndexColumnId {
+        let id = IndexColumnId(self.index_columns.len() as u32);
+        self.index_columns.push(column);
         id
     }
 
@@ -180,20 +212,17 @@ impl SqlSchema {
 
     pub fn push_table(&mut self, name: String) -> TableId {
         let id = TableId(self.tables.len() as u32);
-        self.tables.push(Table {
-            name,
-            ..Default::default()
-        });
+        self.tables.push(Table { name });
         id
-    }
-
-    #[track_caller]
-    pub fn table_bang(&self, name: &str) -> (TableId, &Table) {
-        self.iter_tables().find(|(_, t)| t.name == name).unwrap()
     }
 
     pub fn tables_count(&self) -> usize {
         self.tables.len()
+    }
+
+    pub fn table_walker<'a>(&'a self, name: &str) -> Option<TableWalker<'a>> {
+        let table_idx = self.tables.iter().position(|table| table.name == name)?;
+        Some(self.walk(TableId(table_idx as u32)))
     }
 
     pub fn table_walkers(&self) -> impl Iterator<Item = TableWalker<'_>> {
@@ -229,17 +258,31 @@ impl SqlSchema {
     pub fn walk<I>(&self, id: I) -> Walker<'_, I> {
         Walker { id, schema: self }
     }
+
+    pub fn udt_walker_at(&self, index: usize) -> UserDefinedTypeWalker<'_> {
+        UserDefinedTypeWalker {
+            udt_index: index,
+            schema: self,
+        }
+    }
+
+    pub fn view_walker_at(&self, index: usize) -> ViewWalker<'_> {
+        ViewWalker {
+            view_index: index,
+            schema: self,
+        }
+    }
+
+    /// Traverse all the columns in the schema.
+    pub fn walk_columns(&self) -> impl Iterator<Item = ColumnWalker<'_>> {
+        (0..self.columns.len()).map(|idx| self.walk(ColumnId(idx as u32)))
+    }
 }
 
 /// A table found in a schema.
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct Table {
-    /// The table's name.
-    pub name: String,
-    /// The table's indices.
-    pub indices: Vec<Index>,
-    /// The table's primary key, if there is one.
-    pub primary_key: Option<PrimaryKey>,
+    name: String,
 }
 
 /// The type of an index.
@@ -251,16 +294,8 @@ pub enum IndexType {
     Normal,
     /// Fulltext type.
     Fulltext,
-}
-
-impl IndexType {
-    pub fn is_unique(self) -> bool {
-        matches!(self, IndexType::Unique)
-    }
-
-    pub fn is_fulltext(self) -> bool {
-        matches!(self, IndexType::Fulltext)
-    }
+    /// The table's primary key
+    PrimaryKey,
 }
 
 /// The sort order of an index.
@@ -291,39 +326,20 @@ impl fmt::Display for SQLSortOrder {
     }
 }
 
-#[derive(Default, Serialize, Deserialize, PartialEq, Debug, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct IndexColumn {
-    pub name: String,
+    pub index_id: IndexId,
+    pub column_id: ColumnId,
     pub sort_order: Option<SQLSortOrder>,
     pub length: Option<u32>,
 }
 
-impl IndexColumn {
-    pub fn new(name: impl ToString) -> Self {
-        Self {
-            name: name.to_string(),
-            ..Default::default()
-        }
-    }
-
-    pub fn name(&self) -> &str {
-        &self.name
-    }
-
-    pub fn set_sort_order(&mut self, sort_order: SQLSortOrder) {
-        self.sort_order = Some(sort_order);
-    }
-}
-
-/// An index of a table.
+/// An index on a table.
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
-pub struct Index {
-    /// Index name.
-    pub name: String,
-    /// Index columns.
-    pub columns: Vec<IndexColumn>,
-    /// Type of index.
-    pub tpe: IndexType,
+struct Index {
+    table_id: TableId,
+    index_name: String,
+    tpe: IndexType,
 }
 
 /// A stored procedure (like, the function inside your database).
@@ -344,60 +360,6 @@ pub struct UserDefinedType {
     pub definition: Option<String>,
 }
 
-#[derive(Default, Serialize, Deserialize, Debug, Clone)]
-pub struct PrimaryKeyColumn {
-    pub name: String,
-    pub length: Option<u32>,
-    pub sort_order: Option<SQLSortOrder>,
-}
-
-impl PartialEq for PrimaryKeyColumn {
-    fn eq(&self, other: &Self) -> bool {
-        self.name == other.name && self.length == other.length && self.sort_order() == other.sort_order()
-    }
-}
-
-impl PrimaryKeyColumn {
-    pub fn new(name: impl ToString) -> Self {
-        Self {
-            name: name.to_string(),
-            ..Default::default()
-        }
-    }
-
-    pub fn name(&self) -> &str {
-        &self.name
-    }
-
-    pub fn set_sort_order(&mut self, sort_order: SQLSortOrder) {
-        self.sort_order = Some(sort_order);
-    }
-
-    pub fn sort_order(&self) -> SQLSortOrder {
-        self.sort_order.unwrap_or(SQLSortOrder::Asc)
-    }
-}
-
-/// The primary key of a table.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
-pub struct PrimaryKey {
-    /// Columns.
-    pub columns: Vec<PrimaryKeyColumn>,
-    /// The name of the primary key constraint, when available.
-    pub constraint_name: Option<String>,
-}
-
-impl PrimaryKey {
-    pub fn is_single_primary_key(&self, column: &str) -> bool {
-        self.columns.len() == 1 && self.columns.iter().any(|col| col.name() == column)
-    }
-
-    pub fn column_names(&self) -> impl ExactSizeIterator<Item = &str> + '_ {
-        self.columns.iter().map(|c| c.name())
-    }
-}
-
-/// A column of a table.
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub struct Column {
     /// Column name.
@@ -408,12 +370,6 @@ pub struct Column {
     pub default: Option<DefaultValue>,
     /// Is the column auto-incrementing?
     pub auto_increment: bool,
-}
-
-impl Column {
-    pub fn is_required(&self) -> bool {
-        self.tpe.arity == ColumnArity::Required
-    }
 }
 
 /// The type of a column.
@@ -451,7 +407,6 @@ impl ColumnType {
 
 /// Enumeration of column type families.
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
-// TODO: this name feels weird.
 pub enum ColumnTypeFamily {
     /// Integer types.
     Int,
@@ -517,7 +472,7 @@ impl ColumnTypeFamily {
 }
 
 /// A column's arity.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, Copy)]
 pub enum ColumnArity {
     /// Required column.
     Required,

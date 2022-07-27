@@ -6,6 +6,9 @@ let
   moldy-cargo = pkgs.writeShellScriptBin "moldy-cargo" ''
     mold -run cargo $@
   '';
+  comment-out-qe-crates = pkgs.writeShellScriptBin "disable-qe-crates" ''
+    sed -i 's/.*query-engine.*/#&/' Cargo.toml
+  '';
   lib = pkgs.lib;
   stdenv = pkgs.stdenv;
 in
@@ -15,6 +18,7 @@ mkShell {
   PROTOC_INCLUDE="${pkgs.protobuf}/include";
 
   buildInputs = with pkgs; [
+    comment-out-qe-crates
     moldy-cargo
 
     gcc
@@ -26,6 +30,5 @@ mkShell {
     protobuf
 
     rust-bin.stable.latest.default
-    
   ] ++ lib.optionals stdenv.isLinux [ mold ] ++ lib.optionals stdenv.isDarwin [ darwin.apple_sdk.frameworks.Security ];
 }

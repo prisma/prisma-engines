@@ -1,4 +1,4 @@
-use datamodel::schema_ast::source_file::SourceFile;
+use datamodel::parser_database::SourceFile;
 use migration_core::migration_connector::DiffTarget;
 use migration_engine_tests::test_api::*;
 
@@ -120,7 +120,7 @@ fn mssql_apply_migrations_error_output(api: TestApi) {
         Database error code: 3701
 
         Database error:
-        Cannot drop the table 'mssql_apply_migrations_error_output.Emu', because it does not exist or you do not have permission."#]];
+        Cannot drop the table 'dbo.Emu', because it does not exist or you do not have permission."#]];
 
     let first_segment = err
         .split_terminator("   0: ")
@@ -183,7 +183,7 @@ fn foreign_key_renaming_to_default_works(api: TestApi) {
         BEGIN TRAN;
 
         -- RenameForeignKey
-        EXEC sp_rename 'foreign_key_renaming_to_default_works.favouriteFood', 'Dog_favourite_food_id_fkey', 'OBJECT';
+        EXEC sp_rename 'dbo.favouriteFood', 'Dog_favourite_food_id_fkey', 'OBJECT';
 
         COMMIT TRAN;
 
@@ -278,9 +278,57 @@ fn bigint_defaults_work(api: TestApi) {
         BEGIN TRAN;
 
         -- CreateTable
-        CREATE TABLE [bigint_defaults_work].[foo] (
+        CREATE TABLE [dbo].[foo] (
             [id] NVARCHAR(1000) NOT NULL,
             [bar] BIGINT NOT NULL CONSTRAINT [foo_bar_df] DEFAULT 0,
+            CONSTRAINT [foo_pkey] PRIMARY KEY CLUSTERED ([id])
+        );
+
+        COMMIT TRAN;
+
+        END TRY
+        BEGIN CATCH
+
+        IF @@TRANCOUNT > 0
+        BEGIN
+            ROLLBACK TRAN;
+        END;
+        THROW
+
+        END CATCH
+    "#]];
+    api.expect_sql_for_schema(schema, &sql);
+
+    api.schema_push(schema).send().assert_green();
+    api.schema_push(schema).send().assert_green().assert_no_steps();
+}
+
+#[test_connector(tags(Mssql))]
+fn float_columns(api: TestApi) {
+    let schema = r#"
+        datasource mypg {
+            provider = "sqlserver"
+            url = env("TEST_DATABASE_URL")
+        }
+
+        model foo {
+          id  String @id
+          bar Float @mypg.Float @default(0.90001)
+          baz Float? @mypg.Float
+          qux Float? @mypg.Real
+        }
+    "#;
+    let sql = expect![[r#"
+        BEGIN TRY
+
+        BEGIN TRAN;
+
+        -- CreateTable
+        CREATE TABLE [dbo].[foo] (
+            [id] NVARCHAR(1000) NOT NULL,
+            [bar] FLOAT NOT NULL CONSTRAINT [foo_bar_df] DEFAULT 0.90001,
+            [baz] FLOAT,
+            [qux] REAL,
             CONSTRAINT [foo_pkey] PRIMARY KEY CLUSTERED ([id])
         );
 

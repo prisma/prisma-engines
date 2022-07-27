@@ -1,5 +1,7 @@
 use crate::ast::{Comment, Field, FieldId, Identifier, SchemaAst, Span};
 
+use super::{WithDocumentation, WithIdentifier};
+
 /// A type declaration in the data model. Defined by a type keyword and a block
 /// of fields that can be embedded in a model.
 ///
@@ -13,7 +15,7 @@ pub struct CompositeType {
     /// type Foo { .. }
     ///      ^^^
     /// ```
-    pub name: Identifier,
+    pub(crate) name: Identifier,
     /// The fields of the type.
     ///
     /// ```ignore
@@ -22,7 +24,7 @@ pub struct CompositeType {
     ///   ^^^^^^^^^^
     /// }
     /// ```
-    pub fields: Vec<Field>,
+    pub(crate) fields: Vec<Field>,
     /// The documentation for this type.
     ///
     /// ```ignore
@@ -32,7 +34,7 @@ pub struct CompositeType {
     ///   bar String
     /// }
     /// ```
-    pub documentation: Option<Comment>,
+    pub(crate) documentation: Option<Comment>,
     /// The location of this type in the text representation.
     pub span: Span,
 }
@@ -68,5 +70,17 @@ impl std::ops::Index<FieldId> for CompositeType {
 
     fn index(&self, index: FieldId) -> &Self::Output {
         &self.fields[index.0 as usize]
+    }
+}
+
+impl WithDocumentation for CompositeType {
+    fn documentation(&self) -> Option<&str> {
+        self.documentation.as_ref().map(|doc| doc.text.as_str())
+    }
+}
+
+impl WithIdentifier for CompositeType {
+    fn identifier(&self) -> &Identifier {
+        &self.name
     }
 }

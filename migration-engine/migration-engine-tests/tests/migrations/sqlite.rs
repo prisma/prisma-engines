@@ -122,3 +122,29 @@ fn bigint_defaults_work(api: TestApi) {
     api.schema_push(schema).send().assert_green();
     api.schema_push(schema).send().assert_green().assert_no_steps();
 }
+
+#[test_connector(tags(Sqlite))]
+fn default_string_with_escaped_unicode(api: TestApi) {
+    let dm = r#"
+        datasource mypg {
+            provider = "sqlite"
+            url = env("TEST_DATABASE_URL")
+        }
+
+        model test {
+            name String @id @default("\uFA44\ufa44")
+        }
+    "#;
+
+    let expected = expect![[r#"
+        -- CreateTable
+        CREATE TABLE "test" (
+            "name" TEXT NOT NULL PRIMARY KEY DEFAULT '梅梅'
+        );
+    "#]];
+
+    api.expect_sql_for_schema(dm, &expected);
+
+    api.schema_push(dm).send().assert_green().assert_has_executed_steps();
+    api.schema_push(dm).send().assert_green().assert_no_steps();
+}

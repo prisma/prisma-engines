@@ -1,4 +1,4 @@
-use datamodel::schema_ast::source_file::SourceFile;
+use datamodel::parser_database::SourceFile;
 use migration_core::migration_connector::DiffTarget;
 use migration_engine_tests::test_api::*;
 use quaint::Value;
@@ -70,6 +70,7 @@ fn existing_postgis_tables_must_not_be_migrated(api: TestApi) {
         CREATE TABLE IF NOT EXISTS "spatial_ref_sys" ( id SERIAL PRIMARY KEY );
         /* The capitalized Geometry is intentional here, because we want the matching to be case-insensitive. */
         CREATE TABLE IF NOT EXISTS "Geometry_columns" ( id SERIAL PRIMARY KEY );
+        CREATE TABLE IF NOT EXISTS "geography_columns" ( id SERIAL PRIMARY KEY );
     "#;
 
     api.raw_cmd(create_tables);
@@ -77,7 +78,8 @@ fn existing_postgis_tables_must_not_be_migrated(api: TestApi) {
 
     api.assert_schema()
         .assert_has_table("spatial_ref_sys")
-        .assert_has_table("Geometry_columns");
+        .assert_has_table("Geometry_columns")
+        .assert_has_table("geography_columns");
 }
 
 // Reference for the views created by PostGIS: https://postgis.net/docs/manual-1.4/ch04.html#id418599

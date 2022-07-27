@@ -363,14 +363,14 @@ async fn a_table_with_non_id_autoincrement(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let dm = indoc! {r#"
+    let dm = expect![[r#"
         model Test {
-            id       Int @id
-            authorId Int @default(autoincrement()) @unique
+          id       Int @id
+          authorId Int @unique @default(autoincrement())
         }
-    "#};
+    "#]];
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    api.expect_re_introspected_datamodel("", dm).await;
 
     Ok(())
 }
@@ -824,19 +824,16 @@ async fn unique_and_id_on_same_field_works_sqlite(api: &TestApi) -> TestResult {
 
 #[test_connector(tags(Mssql))]
 async fn unique_and_id_on_same_field_works_mssql(api: &TestApi) -> TestResult {
-    let setup = format!(
-        r#"
-        CREATE TABLE [{}].users (
+    let setup = r#"
+        CREATE TABLE users (
             id INT IDENTITY,
 
             CONSTRAINT users_id_key UNIQUE (id),
             CONSTRAINT users_pkey PRIMARY KEY (id)
         );
-        "#,
-        schema = api.schema_name(),
-    );
+        "#;
 
-    api.raw_cmd(&setup).await;
+    api.raw_cmd(setup).await;
 
     let dm = indoc! {r##"
         model users {

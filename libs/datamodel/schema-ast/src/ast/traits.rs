@@ -1,9 +1,9 @@
-use super::{Attribute, Comment, Identifier, Span};
+use super::{Attribute, Identifier, Span};
 
 /// An AST node with a span.
 pub trait WithSpan {
     /// The span of the node.
-    fn span(&self) -> &Span;
+    fn span(&self) -> Span;
 }
 
 /// An AST node with a name (from the identifier).
@@ -27,10 +27,7 @@ pub trait WithAttributes {
 /// An AST node with documentation.
 pub trait WithDocumentation {
     /// The documentation string, if defined.
-    fn documentation(&self) -> &Option<Comment>;
-
-    /// Is this node commented out?
-    fn is_commented_out(&self) -> bool;
+    fn documentation(&self) -> Option<&str>;
 }
 
 /// An AST node with a name.

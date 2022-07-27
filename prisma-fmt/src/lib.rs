@@ -6,7 +6,7 @@ mod native;
 mod preview;
 mod text_document_completion;
 
-use datamodel::ast;
+use datamodel::parser_database::ast;
 use log::*;
 use lsp_types::{Position, Range};
 

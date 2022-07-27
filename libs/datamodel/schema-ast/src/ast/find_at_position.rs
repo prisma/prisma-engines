@@ -91,12 +91,12 @@ impl<'ast> FieldPosition<'ast> {
                 let mut spans: Vec<(Option<&str>, ast::Span)> = attr
                     .arguments
                     .iter()
-                    .map(|arg| (arg.name.as_ref().map(|n| n.name.as_str()), *arg.span()))
+                    .map(|arg| (arg.name.as_ref().map(|n| n.name.as_str()), arg.span()))
                     .chain(
                         attr.arguments
                             .empty_arguments
                             .iter()
-                            .map(|arg| (Some(arg.name.name.as_str()), *arg.name.span())),
+                            .map(|arg| (Some(arg.name.name.as_str()), arg.name.span())),
                     )
                     .collect();
                 spans.sort_by_key(|(_, span)| span.start);
@@ -140,12 +140,12 @@ impl<'ast> AttributePosition<'ast> {
             let mut spans: Vec<(Option<&str>, ast::Span)> = attr
                 .arguments
                 .iter()
-                .map(|arg| (arg.name.as_ref().map(|n| n.name.as_str()), *arg.span()))
+                .map(|arg| (arg.name.as_ref().map(|n| n.name.as_str()), arg.span()))
                 .chain(
                     attr.arguments
                         .empty_arguments
                         .iter()
-                        .map(|arg| (Some(arg.name.name.as_str()), *arg.name.span())),
+                        .map(|arg| (Some(arg.name.name.as_str()), arg.name.span())),
                 )
                 .collect();
 
@@ -196,11 +196,11 @@ impl<'ast> ExpressionPosition<'ast> {
                 let mut spans: Vec<(Option<&str>, ast::Span)> = args
                     .arguments
                     .iter()
-                    .map(|arg| (arg.name.as_ref().map(|n| n.name.as_str()), *arg.span()))
+                    .map(|arg| (arg.name.as_ref().map(|n| n.name.as_str()), arg.span()))
                     .chain(
                         args.empty_arguments
                             .iter()
-                            .map(|arg| (Some(arg.name.name.as_str()), *arg.name.span())),
+                            .map(|arg| (Some(arg.name.name.as_str()), arg.name.span())),
                     )
                     .collect();
 

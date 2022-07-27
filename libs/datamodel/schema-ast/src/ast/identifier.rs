@@ -9,19 +9,9 @@ pub struct Identifier {
     pub span: Span,
 }
 
-impl Identifier {
-    /// Instantiate a new identifier with an empty span.
-    pub fn new(name: &str) -> Identifier {
-        Identifier {
-            name: String::from(name),
-            span: Span::empty(),
-        }
-    }
-}
-
 impl WithSpan for Identifier {
-    fn span(&self) -> &Span {
-        &self.span
+    fn span(&self) -> Span {
+        self.span
     }
 }
 

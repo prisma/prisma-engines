@@ -119,7 +119,7 @@ impl ScalarFieldType {
         matches!(self, Self::BuiltInScalar(ScalarType::Json))
     }
 
-    /// True if the field's type is Json.
+    /// True if the field's type is String.
     pub fn is_string(self) -> bool {
         matches!(self, Self::BuiltInScalar(ScalarType::String))
     }
@@ -561,7 +561,7 @@ fn visit_composite_type<'db>(ct_id: ast::CompositeTypeId, ct: &'db ast::Composit
             }
             Ok(FieldType::Model(referenced_model_id)) => {
                 let referenced_model_name = ctx.ast[referenced_model_id].name();
-                ctx.push_error(DatamodelError::new_composite_type_validation_error(format!("{} refers to a model, making this a relation field. Relation fields inside composite types are not supported.", referenced_model_name), ct.name.name.clone(), ast_field.field_type.span()))
+                ctx.push_error(DatamodelError::new_composite_type_validation_error(&format!("{} refers to a model, making this a relation field. Relation fields inside composite types are not supported.", referenced_model_name), ct.name(), ast_field.field_type.span()))
             }
             Err(supported) => ctx.push_error(DatamodelError::new_type_not_found_error(
                 supported,
@@ -573,10 +573,8 @@ fn visit_composite_type<'db>(ct_id: ast::CompositeTypeId, ct: &'db ast::Composit
 
 fn visit_enum<'db>(enm: &'db ast::Enum, ctx: &mut Context<'db>) {
     if enm.values.is_empty() {
-        ctx.push_error(DatamodelError::new_validation_error(
-            "An enum must have at least one value.".to_owned(),
-            enm.span,
-        ))
+        let msg = "An enum must have at least one value.";
+        ctx.push_error(DatamodelError::new_validation_error(msg, enm.span))
     }
 }
 
@@ -612,117 +610,508 @@ fn field_type<'db>(field: &'db ast::Field, ctx: &mut Context<'db>) -> Result<Fie
 /// GiST/SP-GiST/GIN/BRIN indices.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum OperatorClass {
-    /// GiST + inet type
+    /// An operator class for `Gist` index and `inet` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `<< (inet, inet)`
+    /// - `<<= (inet, inet)`
+    /// - `>> (inet, inet)`
+    /// - `>>= (inet, inet)`
+    /// - `= (inet, inet)`
+    /// - `<> (inet, inet)`
+    /// - `< (inet, inet)`
+    /// - `<= (inet, inet)`
+    /// - `> (inet, inet)`
+    /// - `>= (inet, inet)`
+    /// - `&& (inet, inet)`
     InetOps,
-    /// GIN + jsonb type
+    /// An operator class for `Gin` index and `jsonb` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `@> (jsonb,jsonb)`
+    /// - `@? (jsonb,jsonpath)`
+    /// - `@@ (jsonb,jsonpath)`
+    /// - `? (jsonb,text)`
+    /// - `?| (jsonb,text[])`
+    /// - `?& (jsonb,text[])`
     JsonbOps,
-    /// GIN + jsonb type
+    /// An operator class for `Gin` index and `jsonb` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `@> (jsonb,jsonb)`
+    /// - `@? (jsonb,jsonpath)`
+    /// - `@@ (jsonb,jsonpath)`
     JsonbPathOps,
-    /// GIN + array type
+    /// An operator class for `Gin` index and any array type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `&& (anyarray,anyarray)`
+    /// - `@> (anyarray,anyarray)`
+    /// - `<@ (anyarray,anyarray)`
+    /// - `= (anyarray,anyarray)`
     ArrayOps,
-    /// SP-GiST + text type
+    /// An operator class for `SpGist` index and `text`, `char` and
+    /// `varchar` types.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (text,text)`
+    /// - `< (text,text)`
+    /// - `<= (text,text)`
+    /// - `> (text,text)`
+    /// - `>= (text,text)`
+    /// - `~<~ (text,text)`
+    /// - `~<=~ (text,text)`
+    /// - `~>=~ (text,text)`
+    /// - `~>~ (text,text)`
+    /// - `^@ (text,text)`
     TextOps,
-    /// BRIN + bit
+    /// An operator class for `Brin` index and `bit` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (bit,bit)`
+    /// - `< (bit,bit)`
+    /// - `> (bit,bit)`
+    /// - `<= (bit,bit)`
+    /// - `>= (bit,bit)`
     BitMinMaxOps,
-    /// BRIN + varbit
+    /// An operator class for `Brin` index and `varbit` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (varbit,varbit)`
+    /// - `< (varbit,varbit)`
+    /// - `> (varbit,varbit)`
+    /// - `<= (varbit,varbit)`
+    /// - `>= (varbit,varbit)`
     VarBitMinMaxOps,
-    /// BRIN + char
+    /// An operator class for `Brin` index and `char` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (character,character)`
     BpcharBloomOps,
-    /// BRIN + char
+    /// An operator class for `Brin` index and `char` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (character,character)`
+    /// - `< (character,character)`
+    /// - `<= (character,character)`
+    /// - `> (character,character)`
+    /// - `>= (character,character)`
     BpcharMinMaxOps,
-    /// BRIN + bytea
+    /// An operator class for `Brin` index and `bytea` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (bytea,bytea)`
     ByteaBloomOps,
-    /// BRIN + bytea
+    /// An operator class for `Brin` index and `bytea` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (bytea,bytea)`
+    /// - `< (bytea,bytea)`
+    /// - `<= (bytea,bytea)`
+    /// - `> (bytea,bytea)`
+    /// - `>= (bytea,bytea)`
     ByteaMinMaxOps,
-    /// BRIN + date
+    /// An operator class for `Brin` index and `date` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (date,date)`
     DateBloomOps,
-    /// BRIN + date
+    /// An operator class for `Brin` index and `date` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (date,date)`
+    /// - `< (date,date)`
+    /// - `<= (date,date)`
+    /// - `> (date,date)`
+    /// - `>= (date,date)`
     DateMinMaxOps,
-    /// BRIN + date
+    /// An operator class for `Brin` index and `date` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (date,date)`
+    /// - `< (date,date)`
+    /// - `<= (date,date)`
+    /// - `> (date,date)`
+    /// - `>= (date,date)`
     DateMinMaxMultiOps,
-    /// BRIN + float
+    /// An operator class for `Brin` index and `real` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (float4,float4)`
     Float4BloomOps,
-    /// BRIN + float
+    /// An operator class for `Brin` index and `real` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (float4,float4)`
+    /// - `< (float4,float4)`
+    /// - `> (float4,float4)`
+    /// - `<= (float4,float4)`
+    /// - `>= (float4,float4)`
     Float4MinMaxOps,
-    /// BRIN + float
+    /// An operator class for `Brin` index and `real` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (float4,float4)`
+    /// - `< (float4,float4)`
+    /// - `> (float4,float4)`
+    /// - `<= (float4,float4)`
+    /// - `>= (float4,float4)`
     Float4MinMaxMultiOps,
-    /// BRIN + double
+    /// An operator class for `Brin` index and `double precision` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (float8,float8)`
     Float8BloomOps,
-    /// BRIN + double
+    /// An operator class for `Brin` index and `double precision` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (float8,float8)`
+    /// - `< (float8,float8)`
+    /// - `> (float8,float8)`
+    /// - `<= (float8,float8)`
+    /// - `>= (float8,float8)`
     Float8MinMaxOps,
-    /// BRIN + double
+    /// An operator class for `Brin` index and `double precision` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (float8,float8)`
+    /// - `< (float8,float8)`
+    /// - `> (float8,float8)`
+    /// - `<= (float8,float8)`
+    /// - `>= (float8,float8)`
     Float8MinMaxMultiOps,
-    /// BRIN + inet
+    /// An operator class for `Brin` index and `inet` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `<< (inet,inet)`
+    /// - `<<= (inet,inet)`
+    /// - `>> (inet,inet)`
+    /// - `>>= (inet,inet)`
+    /// - `= (inet,inet)`
+    /// - `&& (inet,inet)`
     InetInclusionOps,
-    /// BRIN + inet
+    /// An operator class for `Brin` index and `inet` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (inet,inet)`
     InetBloomOps,
-    /// BRIN + inet
+    /// An operator class for `Brin` index and `inet` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (inet,inet)`
+    /// - `< (inet,inet)`
+    /// - `> (inet,inet)`
+    /// - `<= (inet,inet)`
+    /// - `>= (inet,inet)`
     InetMinMaxOps,
-    /// BRIN + inet
+    /// An operator class for `Brin` index and `inet` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (inet,inet)`
+    /// - `< (inet,inet)`
+    /// - `> (inet,inet)`
+    /// - `<= (inet,inet)`
+    /// - `>= (inet,inet)`
     InetMinMaxMultiOps,
-    /// BRIN + int2
+    /// An operator class for `Brin` index and `int2` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (int2,int2)`
     Int2BloomOps,
-    /// BRIN + int2
+    /// An operator class for `Brin` index and `int2` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (int2,int2)`
+    /// - `< (int2,int2)`
+    /// - `> (int2,int2)`
+    /// - `<= (int2,int2)`
+    /// - `>= (int2,int2)`
     Int2MinMaxOps,
-    /// BRIN + int2
+    /// An operator class for `Brin` index and `int2` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (int2,int2)`
+    /// - `< (int2,int2)`
+    /// - `> (int2,int2)`
+    /// - `<= (int2,int2)`
+    /// - `>= (int2,int2)`
     Int2MinMaxMultiOps,
-    /// BRIN + int4
+    /// An operator class for `Brin` index and `int4` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (int4,int4)`
     Int4BloomOps,
-    /// BRIN + int4
+    /// An operator class for `Brin` index and `int4` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (int4,int4)`
+    /// - `< (int4,int4)`
+    /// - `> (int4,int4)`
+    /// - `<= (int4,int4)`
+    /// - `>= (int4,int4)`
     Int4MinMaxOps,
-    /// BRIN + int4
+    /// An operator class for `Brin` index and `int4` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (int4,int4)`
+    /// - `< (int4,int4)`
+    /// - `> (int4,int4)`
+    /// - `<= (int4,int4)`
+    /// - `>= (int4,int4)`
     Int4MinMaxMultiOps,
-    /// BRIN + int8
+    /// An operator class for `Brin` index and `int8` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (int8,int8)`
     Int8BloomOps,
-    /// BRIN + int8
+    /// An operator class for `Brin` index and `int8` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (int8,int8)`
+    /// - `< (int8,int8)`
+    /// - `> (int8,int8)`
+    /// - `<= (int8,int8)`
+    /// - `>= (int8,int8)`
     Int8MinMaxOps,
-    /// BRIN + int8
+    /// An operator class for `Brin` index and `int8` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (int8,int8)`
+    /// - `< (int8,int8)`
+    /// - `> (int8,int8)`
+    /// - `<= (int8,int8)`
+    /// - `>= (int8,int8)`
     Int8MinMaxMultiOps,
-    /// BRIN + numeric
+    /// An operator class for `Brin` index and `numeric` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (numeric,numeric)`
     NumericBloomOps,
-    /// BRIN + numeric
+    /// An operator class for `Brin` index and `numeric` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (numeric,numeric)`
+    /// - `< (numeric,numeric)`
+    /// - `> (numeric,numeric)`
+    /// - `<= (numeric,numeric)`
+    /// - `>= (numeric,numeric)`
     NumericMinMaxOps,
-    /// BRIN + numeric
+    /// An operator class for `Brin` index and `numeric` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (numeric,numeric)`
+    /// - `< (numeric,numeric)`
+    /// - `> (numeric,numeric)`
+    /// - `<= (numeric,numeric)`
+    /// - `>= (numeric,numeric)`
     NumericMinMaxMultiOps,
-    /// BRIN + oid
+    /// An operator class for `Brin` index and `oid` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (oid,oid)`
     OidBloomOps,
-    /// BRIN + oid
+    /// An operator class for `Brin` index and `oid` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (oid,oid)`
+    /// - `< (oid,oid)`
+    /// - `> (oid,oid)`
+    /// - `<= (oid,oid)`
+    /// - `>= (oid,oid)`
     OidMinMaxOps,
-    /// BRIN + oid
+    /// An operator class for `Brin` index and `oid` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (oid,oid)`
+    /// - `< (oid,oid)`
+    /// - `> (oid,oid)`
+    /// - `<= (oid,oid)`
+    /// - `>= (oid,oid)`
     OidMinMaxMultiOps,
-    /// BRIN + text
+    /// An operator class for `Brin` index and `text` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (text,text)`
     TextBloomOps,
-    /// BRIN + text
+    /// An operator class for `Brin` index and `text` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (text,text)`
+    /// - `< (text,text)`
+    /// - `> (text,text)`
+    /// - `<= (text,text)`
+    /// - `>= (text,text)`
     TextMinMaxOps,
-    /// BRIN + timestamp
+    /// An operator class for `Brin` index and `timestamp` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (timestamp,timestamp)`
     TimestampBloomOps,
-    /// BRIN + timestamp
+    /// An operator class for `Brin` index and `timestamp` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (timestamp,timestamp)`
+    /// - `< (timestamp,timestamp)`
+    /// - `> (timestamp,timestamp)`
+    /// - `<= (timestamp,timestamp)`
+    /// - `>= (timestamp,timestamp)`
     TimestampMinMaxOps,
-    /// BRIN + timestamp
+    /// An operator class for `Brin` index and `timestamp` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (timestamp,timestamp)`
+    /// - `< (timestamp,timestamp)`
+    /// - `> (timestamp,timestamp)`
+    /// - `<= (timestamp,timestamp)`
+    /// - `>= (timestamp,timestamp)`
     TimestampMinMaxMultiOps,
-    /// BRIN + timestamptz
+    /// An operator class for `Brin` index and `timestamptz` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (timestamptz,timestamptz)`
     TimestampTzBloomOps,
-    /// BRIN + timestamptz
+    /// An operator class for `Brin` index and `timestamptz` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (timestamptz,timestamptz)`
+    /// - `< (timestamptz,timestamptz)`
+    /// - `> (timestamptz,timestamptz)`
+    /// - `<= (timestamptz,timestamptz)`
+    /// - `>= (timestamptz,timestamptz)`
     TimestampTzMinMaxOps,
-    /// BRIN + timestamptz
+    /// An operator class for `Brin` index and `timestamptz` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (timestamptz,timestamptz)`
+    /// - `< (timestamptz,timestamptz)`
+    /// - `> (timestamptz,timestamptz)`
+    /// - `<= (timestamptz,timestamptz)`
+    /// - `>= (timestamptz,timestamptz)`
     TimestampTzMinMaxMultiOps,
-    /// BRIN + time
+    /// An operator class for `Brin` index and `time` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (time,time)`
     TimeBloomOps,
-    /// BRIN + time
+    /// An operator class for `Brin` index and `time` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (time,time)`
+    /// - `< (time,time)`
+    /// - `> (time,time)`
+    /// - `<= (time,time)`
+    /// - `>= (time,time)`
     TimeMinMaxOps,
-    /// BRIN + time
+    /// An operator class for `Brin` index and `time` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (time,time)`
+    /// - `< (time,time)`
+    /// - `> (time,time)`
+    /// - `<= (time,time)`
+    /// - `>= (time,time)`
     TimeMinMaxMultiOps,
-    /// BRIN + timetz
+    /// An operator class for `Brin` index and `timetz` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (timetz,timetz)`
     TimeTzBloomOps,
-    /// BRIN + timetz
+    /// An operator class for `Brin` index and `timetz` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (timetz,timetz)`
+    /// - `< (timetz,timetz)`
+    /// - `> (timetz,timetz)`
+    /// - `<= (timetz,timetz)`
+    /// - `>= (timetz,timetz)`
     TimeTzMinMaxOps,
-    /// BRIN + timetz
+    /// An operator class for `Brin` index and `timetz` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (timetz,timetz)`
+    /// - `< (timetz,timetz)`
+    /// - `> (timetz,timetz)`
+    /// - `<= (timetz,timetz)`
+    /// - `>= (timetz,timetz)`
     TimeTzMinMaxMultiOps,
-    /// BRIN + uuid
+    /// An operator class for `Brin` index and `uuid` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (uuid,uuid)`
     UuidBloomOps,
-    /// BRIN + uuid
+    /// An operator class for `Brin` index and `uuid` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (uuid,uuid)`
+    /// - `< (uuid,uuid)`
+    /// - `> (uuid,uuid)`
+    /// - `<= (uuid,uuid)`
+    /// - `>= (uuid,uuid)`
     UuidMinMaxOps,
-    /// BRIN + uuid
+    /// An operator class for `Brin` index and `uuid` type.
+    ///
+    /// # Indexable Operators
+    ///
+    /// - `= (uuid,uuid)`
+    /// - `< (uuid,uuid)`
+    /// - `> (uuid,uuid)`
+    /// - `<= (uuid,uuid)`
+    /// - `>= (uuid,uuid)`
     UuidMinMaxMultiOps,
 }
 

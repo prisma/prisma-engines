@@ -16,7 +16,7 @@ use crate::{
     SqlFlavour,
 };
 use column::ColumnTypeChange;
-use sql_schema_describer::{walkers::ForeignKeyWalker, ColumnId, IndexId, TableId};
+use sql_schema_describer::{walkers::ForeignKeyWalker, ColumnId, IndexId};
 use std::collections::HashSet;
 use table::TableDiffer;
 
@@ -52,7 +52,7 @@ fn push_created_table_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDataba
         if db.flavour.should_create_indexes_from_created_tables() {
             let create_indexes_from_created_tables = table
                 .indexes()
-                .filter(|index| !db.flavour.should_skip_index_for_new_table(*index))
+                .filter(|index| !index.is_primary_key() && !db.flavour.should_skip_index_for_new_table(*index))
                 .map(|index| SqlMigrationStep::CreateIndex {
                     table_id: (None, index.table().id),
                     index_id: index.id,
@@ -107,13 +107,12 @@ fn push_altered_table_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDataba
             .index_pairs()
             .filter(|pair| db.flavour.index_should_be_renamed(*pair))
         {
-            let table: Pair<TableId> = table.tables.map(|t| t.id);
             let index: Pair<IndexId> = i.map(|i| i.id);
 
             let step = if db.flavour.can_rename_index() {
-                SqlMigrationStep::RenameIndex { table, index }
+                SqlMigrationStep::RenameIndex { index }
             } else {
-                SqlMigrationStep::RedefineIndex { table, index }
+                SqlMigrationStep::RedefineIndex { index }
             };
 
             steps.push(step);
@@ -225,7 +224,6 @@ fn added_primary_key(differ: &TableDiffer<'_, '_>) -> Option<TableChange> {
 
     let from_psl_change = differ
         .created_primary_key()
-        .filter(|pk| !pk.columns.is_empty())
         .map(|_| TableChange::AddPrimaryKey)
         .or_else(|| Some(TableChange::AddPrimaryKey).filter(|_| differ.primary_key_changed()));
 
@@ -289,7 +287,7 @@ fn dropped_primary_key(differ: &TableDiffer<'_, '_>) -> Option<TableChange> {
 fn renamed_primary_key(differ: &TableDiffer<'_, '_>) -> Option<TableChange> {
     differ
         .tables
-        .map(|pk| pk.primary_key().and_then(|pk| pk.constraint_name.as_ref()))
+        .map(|pk| pk.primary_key().map(|pk| pk.name()))
         .transpose()
         .filter(|names| names.previous != names.next)
         .map(|_| TableChange::RenamePrimaryKey)
@@ -363,7 +361,7 @@ fn push_dropped_index_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDataba
                 continue;
             }
 
-            drop_indexes.insert((index.table().id, index.id));
+            drop_indexes.insert(index.id);
         }
     }
 
@@ -371,14 +369,14 @@ fn push_dropped_index_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDataba
     // because they are needed for implementing new foreign key constraints.
     if !db.tables_to_redefine.is_empty() && db.flavour.should_drop_indexes_from_dropped_tables() {
         for table in db.dropped_tables() {
-            for index in table.indexes() {
-                drop_indexes.insert((index.table().id, index.id));
+            for index in table.indexes().filter(|idx| !idx.is_primary_key()) {
+                drop_indexes.insert(index.id);
             }
         }
     }
 
-    for (table_id, index_id) in drop_indexes.into_iter() {
-        steps.push(SqlMigrationStep::DropIndex { table_id, index_id })
+    for index_id in drop_indexes.into_iter() {
+        steps.push(SqlMigrationStep::DropIndex { index_id })
     }
 }
 
@@ -495,7 +493,7 @@ fn push_foreign_key_pair_changes(
         // many-to-many relation tables, but we used not to (we did not provide a constraint
         // names), and we do not want to cause new migrations on upgrade, we ignore the foreign
         // keys of implicit many-to-many relation tables for renamings.
-        if fk.map(|fk| is_prisma_implicit_m2m_fk(fk)).into_tuple() == (true, true) {
+        if fk.map(is_prisma_implicit_m2m_fk).into_tuple() == (true, true) {
             return;
         }
 

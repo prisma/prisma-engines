@@ -75,20 +75,21 @@ pub(crate) fn introspect(version_check: &mut VersionChecker, ctx: &mut Context) 
         }
 
         for index in table.indexes() {
-            model.add_index(calculate_index(index, ctx));
+            if let Some(index) = calculate_index(index, ctx) {
+                model.add_index(index);
+            }
         }
 
         if let Some(pk) = table.primary_key() {
-            let clustered = primary_key_is_clustered(table.id, ctx);
+            let clustered = primary_key_is_clustered(pk.id, ctx);
 
             model.primary_key = Some(PrimaryKeyDefinition {
                 name: None,
-                db_name: pk.constraint_name.clone(),
+                db_name: Some(pk.name().to_owned()),
                 fields: pk
-                    .columns
-                    .iter()
+                    .columns()
                     .map(|c| {
-                        let sort_order = c.sort_order.map(|sort| match sort {
+                        let sort_order = c.sort_order().map(|sort| match sort {
                             SQLSortOrder::Asc => SortOrder::Asc,
                             SQLSortOrder::Desc => SortOrder::Desc,
                         });
@@ -96,11 +97,11 @@ pub(crate) fn introspect(version_check: &mut VersionChecker, ctx: &mut Context) 
                         PrimaryKeyField {
                             name: c.name().to_string(),
                             sort_order,
-                            length: c.length,
+                            length: c.length(),
                         }
                     })
                     .collect(),
-                defined_on_field: pk.columns.len() == 1,
+                defined_on_field: pk.columns().len() == 1,
                 clustered,
             });
         }

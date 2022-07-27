@@ -9,7 +9,7 @@ pub struct GeneratorConfig {
     /// Top-level configuration properties for this generator.
     pub properties: Vec<ConfigBlockProperty>,
     /// The comments for this generator block.
-    pub documentation: Option<Comment>,
+    pub(crate) documentation: Option<Comment>,
     /// The location of this generator block in the text representation.
     pub span: Span,
 }
@@ -21,17 +21,13 @@ impl WithIdentifier for GeneratorConfig {
 }
 
 impl WithSpan for GeneratorConfig {
-    fn span(&self) -> &Span {
-        &self.span
+    fn span(&self) -> Span {
+        self.span
     }
 }
 
 impl WithDocumentation for GeneratorConfig {
-    fn documentation(&self) -> &Option<Comment> {
-        &self.documentation
-    }
-
-    fn is_commented_out(&self) -> bool {
-        false
+    fn documentation(&self) -> Option<&str> {
+        self.documentation.as_ref().map(|doc| doc.text.as_str())
     }
 }

@@ -280,10 +280,7 @@ impl<'db> Context<'db> {
         let diagnostics = &mut self.diagnostics;
         for arg_idx in self.attributes.args.values() {
             let arg = &attr.arguments.arguments[*arg_idx];
-            diagnostics.push_error(DatamodelError::new_unused_argument_error(
-                arg.name.as_ref().map(|n| n.name.as_str()).unwrap_or(""),
-                arg.span,
-            ));
+            diagnostics.push_error(DatamodelError::new_unused_argument_error(arg.span));
         }
 
         self.discard_arguments();
@@ -412,12 +409,10 @@ impl<'db> Context<'db> {
                 if arg.is_unnamed() {
                     if unnamed_arguments.is_empty() {
                         let existing_arg_value = &attribute.arguments.arguments[existing_argument].value;
-                        let rendered = schema_ast::renderer::Renderer::render_value_to_string(existing_arg_value);
-                        unnamed_arguments.push(rendered)
+                        unnamed_arguments.push(existing_arg_value.to_string())
                     }
 
-                    let rendered = schema_ast::renderer::Renderer::render_value_to_string(&arg.value);
-                    unnamed_arguments.push(rendered)
+                    unnamed_arguments.push(arg.value.to_string())
                 } else {
                     self.push_error(DatamodelError::new_duplicate_argument_error(
                         &arg.name.as_ref().unwrap().name,

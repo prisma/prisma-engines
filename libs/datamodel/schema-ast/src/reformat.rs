@@ -1,13 +1,13 @@
 use crate::{
     parser::{PrismaDatamodelParser, Rule},
-    renderer::{get_sort_index_of_attribute, LineWriteable, Renderer, TableFormat},
+    renderer::{LineWriteable, Renderer, TableFormat},
 };
 use pest::Parser;
 use std::iter::Peekable;
 
 type Pair<'a> = pest::iterators::Pair<'a, Rule>;
 
-/// Reformat the AST to a string, standardizing alignment and indentation.
+/// Reformat a PSL string.
 pub fn reformat(input: &str, indent_width: usize) -> Option<String> {
     let mut ast = PrismaDatamodelParser::parse(Rule::schema, input).ok()?;
     let mut renderer = Renderer::new(indent_width);
@@ -61,6 +61,7 @@ fn reformat_key_value(pair: Pair<'_>, table: &mut TableFormat) {
                 writer.write("= ");
                 reformat_expression(current, &mut writer);
             }
+            Rule::trailing_comment => table.append_suffix_to_current_row(current.as_str()),
             _ => unreachable(&current),
         }
     }
@@ -201,8 +202,8 @@ fn reformat_enum_entry(pair: Pair<'_>, table: &mut TableFormat) {
 
 fn sort_attributes(attributes: &mut [(Option<Pair<'_>>, Pair<'_>)]) {
     attributes.sort_by(|(_, a), (_, b)| {
-        let sort_index_a = get_sort_index_of_attribute(a.as_str());
-        let sort_index_b = get_sort_index_of_attribute(b.as_str());
+        let sort_index_a = get_sort_index_of_attribute(a.clone());
+        let sort_index_b = get_sort_index_of_attribute(b.clone());
         sort_index_a.cmp(&sort_index_b)
     });
 }
@@ -431,3 +432,23 @@ fn eat_empty_lines<'a>(pairs: &mut Peekable<impl Iterator<Item = Pair<'a>>>) -> 
 const FIELD_NAME_COLUMN: usize = 0;
 const FIELD_TYPE_COLUMN: usize = 1;
 const FIELD_ATTRIBUTES_COLUMN: usize = 2;
+
+fn get_sort_index_of_attribute(attribute: Pair<'_>) -> usize {
+    let path = attribute.into_inner().next().unwrap();
+    debug_assert_eq!(path.as_rule(), Rule::path);
+    let path = path.as_str();
+    let correct_order: &[&str] = &[
+        "id",
+        "unique",
+        "default",
+        "updatedAt",
+        "index",
+        "fulltext",
+        "map",
+        "relation",
+        "ignore",
+    ];
+
+    let pos = correct_order.iter().position(|p| path == *p);
+    pos.unwrap_or(usize::MAX)
+}

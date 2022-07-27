@@ -6,7 +6,7 @@ use crate::ast::*;
 use diagnostics::{DatamodelError, Diagnostics};
 use pest::Parser;
 
-/// Parses a Prisma V2 datamodel document into an internal AST representation.
+/// Parse a PSL string and return its AST.
 pub fn parse_schema(datamodel_string: &str, diagnostics: &mut Diagnostics) -> SchemaAst {
     let datamodel_result = PrismaDatamodelParser::parse(Rule::schema, datamodel_string);
 
@@ -39,7 +39,7 @@ pub fn parse_schema(datamodel_string: &str, diagnostics: &mut Diagnostics) -> Sc
                     },
                     Rule::type_alias => {
                         let error = DatamodelError::new_validation_error(
-                            "Invalid type definition. Please check the documentation in https://pris.ly/d/composite-types".to_string(),
+                            "Invalid type definition. Please check the documentation in https://pris.ly/d/composite-types",
                             current.as_span().into()
                         );
 
@@ -58,11 +58,11 @@ pub fn parse_schema(datamodel_string: &str, diagnostics: &mut Diagnostics) -> Sc
                     },
                     Rule::EOI => {}
                     Rule::CATCH_ALL => diagnostics.push_error(DatamodelError::new_validation_error(
-                        "This line is invalid. It does not start with any known Prisma schema keyword.".to_owned(),
+                        "This line is invalid. It does not start with any known Prisma schema keyword.",
                         current.as_span().into(),
                     )),
                     Rule::arbitrary_block => diagnostics.push_error(DatamodelError::new_validation_error(
-                        "This block is invalid. It does not start with any known Prisma schema keyword. Valid keywords include \'model\', \'enum\', \'datasource\' and \'generator\'.".to_owned(),
+                        "This block is invalid. It does not start with any known Prisma schema keyword. Valid keywords include \'model\', \'enum\', \'datasource\' and \'generator\'.",
                         current.as_span().into(),
                     )),
                     Rule::empty_lines => (),

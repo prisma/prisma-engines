@@ -1,4 +1,4 @@
-use super::{Argument, ArgumentsList, Identifier, Span, WithIdentifier, WithSpan};
+use super::{ArgumentsList, Identifier, Span, WithIdentifier, WithSpan};
 use std::ops::Index;
 
 /// An attribute (following `@` or `@@``) on a model, model field, enum, enum value or composite
@@ -24,18 +24,6 @@ pub struct Attribute {
 }
 
 impl Attribute {
-    /// Create a new attribute node from a name and a list of arguments.
-    pub fn new(name: &str, arguments: Vec<Argument>) -> Attribute {
-        Attribute {
-            name: Identifier::new(name),
-            arguments: ArgumentsList {
-                arguments,
-                ..Default::default()
-            },
-            span: Span::empty(),
-        }
-    }
-
     /// Try to find the argument and return its span.
     pub fn span_for_argument(&self, argument: &str) -> Option<Span> {
         self.arguments
@@ -52,8 +40,8 @@ impl WithIdentifier for Attribute {
 }
 
 impl WithSpan for Attribute {
-    fn span(&self) -> &Span {
-        &self.span
+    fn span(&self) -> Span {
+        self.span
     }
 }
 

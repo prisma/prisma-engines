@@ -27,7 +27,7 @@ pub(crate) fn parse_config_block(pair: Pair<'_>, diagnostics: &mut Diagnostics) 
                     kw.unwrap_or("configuration block")
                 );
 
-                let err = DatamodelError::new_validation_error(msg, current.as_span().into());
+                let err = DatamodelError::new_validation_error(&msg, current.as_span().into());
                 diagnostics.push_error(err);
             }
             _ => parsing_catch_all(&current, "source"),
@@ -60,6 +60,7 @@ fn parse_key_value(pair: Pair<'_>, diagnostics: &mut Diagnostics) -> ConfigBlock
         match current.as_rule() {
             Rule::identifier => name = Some(current.into()),
             Rule::expression => value = Some(parse_expression(current, diagnostics)),
+            Rule::trailing_comment => (),
             _ => unreachable!(
                 "Encountered impossible source property declaration during parsing: {:?}",
                 current.tokens()

@@ -1,6 +1,6 @@
 use crate::ParserDatabase;
-use parser_database::walkers;
-use schema_ast::{ast, source_file::SourceFile};
+use parser_database::{ast::WithSpan, walkers};
+use schema_ast::{ast, SourceFile};
 use std::{borrow::Cow, sync::Arc};
 
 /// Returns either the reformatted schema, or the original input if we can't reformat. This happens
@@ -137,7 +137,7 @@ fn push_missing_relation_attribute(inline_relation: walkers::InlineRelationWalke
         content.push(')');
 
         ctx.missing_bits.push(MissingBit {
-            position: before_newline(forward.ast_field().span.end, ctx.original_schema),
+            position: before_newline(forward.ast_field().span().end, ctx.original_schema),
             content,
         })
     }
@@ -168,7 +168,7 @@ fn push_missing_relation_fields(inline: walkers::InlineRelationWalker<'_>, ctx: 
         let arity = if inline.is_one_to_one() { "?" } else { "[]" };
 
         ctx.missing_bits.push(MissingBit {
-            position: inline.referenced_model().ast_model().span.end - 1,
+            position: inline.referenced_model().ast_model().span().end - 1,
             content: format!("{referencing_model_name} {referencing_model_name}{arity} {ignore}\n"),
         });
     }
@@ -180,7 +180,7 @@ fn push_missing_relation_fields(inline: walkers::InlineRelationWalker<'_>, ctx: 
         let fields_arg = fields_argument(inline);
         let references_arg = references_argument(inline);
         ctx.missing_bits.push(MissingBit {
-            position: inline.referencing_model().ast_model().span.end - 1,
+            position: inline.referencing_model().ast_model().span().end - 1,
             content: format!("{field_name} {field_type}{arity} @relation({fields_arg}, {references_arg})\n"),
         })
     }
@@ -215,7 +215,7 @@ fn push_missing_scalar_fields(inline: walkers::InlineRelationWalker<'_>, ctx: &m
         }
 
         ctx.missing_bits.push(MissingBit {
-            position: inline.referencing_model().ast_model().span.end - 1,
+            position: inline.referencing_model().ast_model().span().end - 1,
             content: format!("{field_name} {field_type}{arity} {attributes}\n"),
         });
     }

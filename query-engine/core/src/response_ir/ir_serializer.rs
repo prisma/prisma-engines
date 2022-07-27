@@ -16,6 +16,7 @@ pub struct IrSerializer {
 
 impl IrSerializer {
     pub fn serialize(&self, result: ExpressionResult) -> crate::Result<ResponseData> {
+        let _span = info_span!("engine:serialize");
         match result {
             ExpressionResult::Query(QueryResult::Json(json)) => {
                 Ok(ResponseData::new(self.key.clone(), Item::Json(json)))

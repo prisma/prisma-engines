@@ -22,21 +22,27 @@ pub use self::{
 };
 pub use diagnostics::{DatamodelError, Diagnostics, NativeTypeErrorFactory, Span};
 pub use empty_connector::EmptyDatamodelConnector;
-use lsp_types::CompletionList;
 pub use native_type_constructor::NativeTypeConstructor;
 pub use parser_database::{self, ReferentialAction, ScalarType};
 pub use referential_integrity::ReferentialIntegrity;
 
 use enumflags2::BitFlags;
+use lsp_types::CompletionList;
 use parser_database::{ast::SchemaPosition, IndexAlgorithm, ParserDatabase};
 use std::{borrow::Cow, collections::BTreeMap};
 
 /// The datamodel connector API.
 pub trait Connector: Send + Sync {
+    /// The name of the provider, for string comparisons determining which connector we are on.
+    fn provider_name(&self) -> &'static str;
+
+    /// Must return true whenever the passed in provider name is a match.
+    fn is_provider(&self, name: &str) -> bool {
+        name == self.provider_name()
+    }
+
     /// The name of the connector. Can be used in error messages.
     fn name(&self) -> &str;
-
-    // Capabilities
 
     /// The static list of capabilities for the connector.
     fn capabilities(&self) -> &'static [ConnectorCapability];

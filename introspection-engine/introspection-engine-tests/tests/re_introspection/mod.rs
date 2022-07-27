@@ -4,12 +4,10 @@ mod sqlite;
 mod vitess;
 
 use barrel::types;
-use expect_test::expect;
 use indoc::{formatdoc, indoc};
 use introspection_engine_tests::{assert_eq_json, test_api::*};
 use quaint::prelude::Queryable;
 use serde_json::json;
-use test_macros::test_connector;
 
 #[test_connector(exclude(CockroachDb))]
 async fn mapped_model_name(api: &TestApi) -> TestResult {
@@ -1374,25 +1372,25 @@ async fn multiple_many_to_many_on_same_model(api: &TestApi) -> TestResult {
         }
     "#};
 
-    let final_dm = indoc! {r#"
+    let final_dm = expect![[r#"
         model B {
-            id              Int @id @default(autoincrement())
-            custom_A        A[]
-            special_A       A[] @relation("AToB2")
+          id        Int @id @default(autoincrement())
+          custom_A  A[]
+          special_A A[] @relation("AToB2")
         }
 
         model A {
-            id              Int @id @default(autoincrement())
-            custom_B        B[]
-            special_B       B[] @relation("AToB2")
+          id        Int @id @default(autoincrement())
+          custom_B  B[]
+          special_B B[] @relation("AToB2")
         }
 
         model Unrelated {
-            id Int @id @default(autoincrement())
+          id Int @id @default(autoincrement())
         }
-    "#};
+    "#]];
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
+    api.expect_re_introspected_datamodel(input_dm, final_dm).await;
 
     Ok(())
 }
@@ -1511,24 +1509,22 @@ async fn re_introspecting_mysql_enum_names_if_enum_is_reused(api: &TestApi) -> T
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn custom_repro(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("tag", |t| {
-                t.add_column("id", types::primary());
-                t.add_column("name", types::text().unique(true));
-            });
+    let sql = r#"
+        CREATE TABLE "tag" (
+            id SERIAL PRIMARY KEY,
+            name TEXT NOT NULL UNIQUE
+        );
 
-            migration.create_table("Post", |t| {
-                t.add_column("id", types::primary());
-                t.add_column("tag_id", types::integer().nullable(false));
-                t.add_foreign_key(&["tag_id"], "tag", &["id"]);
-            });
+        CREATE TABLE "Post" (
+            id SERIAL PRIMARY KEY,
+            tag_id INTEGER NOT NULL REFERENCES tag(id)
+        );
 
-            migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::primary());
-            });
-        })
-        .await?;
+        CREATE TABLE "Unrelated" (
+            id SERIAL PRIMARY KEY
+        );
+    "#;
+    api.raw_cmd(sql).await;
 
     let input_dm = indoc! {r#"
         model Post{

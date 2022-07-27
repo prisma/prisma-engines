@@ -8,7 +8,7 @@ pub struct SourceConfig {
     /// Top-level configuration properties for this source.
     pub properties: Vec<ConfigBlockProperty>,
     /// The comments for this source block.
-    pub documentation: Option<Comment>,
+    pub(crate) documentation: Option<Comment>,
     /// The location of this source block in the text representation.
     pub span: Span,
 }
@@ -20,17 +20,13 @@ impl WithIdentifier for SourceConfig {
 }
 
 impl WithSpan for SourceConfig {
-    fn span(&self) -> &Span {
-        &self.span
+    fn span(&self) -> Span {
+        self.span
     }
 }
 
 impl WithDocumentation for SourceConfig {
-    fn documentation(&self) -> &Option<Comment> {
-        &self.documentation
-    }
-
-    fn is_commented_out(&self) -> bool {
-        false
+    fn documentation(&self) -> Option<&str> {
+        self.documentation.as_ref().map(|doc| doc.text.as_str())
     }
 }

@@ -62,10 +62,8 @@ jobs:
         database:
           - name: mssql_2017
             url: "sqlserver://localhost:1434;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED"
-            single_threaded: true
           - name: mssql_2019
             url: "sqlserver://localhost:1433;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED"
-            single_threaded: true
           - name: mysql_5_6
             url: "mysql://root:prisma@localhost:3309"
           - name: mysql_5_7

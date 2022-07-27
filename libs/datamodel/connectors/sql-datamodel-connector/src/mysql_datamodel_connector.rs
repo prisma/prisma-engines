@@ -116,6 +116,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::MultipleFullTextAttributesPerModel,
     ConnectorCapability::ImplicitManyToManyRelation,
     ConnectorCapability::DecimalType,
+    ConnectorCapability::OrderByNullsFirstLast,
 ];
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalForeignKey, ConstraintScope::ModelKeyIndex];
@@ -135,6 +136,10 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MySqlType)] = &[
 ];
 
 impl Connector for MySqlDatamodelConnector {
+    fn provider_name(&self) -> &'static str {
+        "mysql"
+    }
+
     fn name(&self) -> &str {
         "MySQL"
     }

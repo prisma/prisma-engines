@@ -77,7 +77,6 @@ pub fn test_connector(attr: TokenStream, input: TokenStream) -> TokenStream {
                 let args = test_setup::TestApiArgs::new(#test_function_name_lit, &[#(#preview_features,)*]);
 
                 if test_setup::should_skip_test(
-                    &args,
                     BitFlags::empty() #(| Tags::#include_tagged)*,
                     BitFlags::empty() #(| Tags::#exclude_tagged)*,
                     BitFlags::empty() #(| Capabilities::#capabilities)*,
@@ -99,7 +98,6 @@ pub fn test_connector(attr: TokenStream, input: TokenStream) -> TokenStream {
                 let args = test_setup::TestApiArgs::new(#test_function_name_lit, &[#(#preview_features,)*]);
 
                 if test_setup::should_skip_test(
-                    &args,
                     BitFlags::empty() #(| Tags::#include_tagged)*,
                     BitFlags::empty() #(| Tags::#exclude_tagged)*,
                     BitFlags::empty() #(| Capabilities::#capabilities)*,

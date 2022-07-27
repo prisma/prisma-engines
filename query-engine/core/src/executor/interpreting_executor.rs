@@ -7,6 +7,7 @@ use async_trait::async_trait;
 use connector::Connector;
 use schema::QuerySchemaRef;
 use tokio::time::{self, Duration};
+use tracing_futures::Instrument;
 
 /// Central query executor and main entry point into the query core.
 pub struct InterpretingExecutor<C> {
@@ -84,7 +85,13 @@ where
         if let Some(tx_id) = tx_id {
             self.itx_manager.batch_execute(&tx_id, operations, trace_id).await
         } else if transactional {
-            let mut conn = self.connector.get_connection().await?;
+            let connection_name = self.connector.name();
+            let conn_span = info_span!(
+                "prisma:connection",
+                user_facing = true,
+                "db.type" = connection_name.as_str()
+            );
+            let mut conn = self.connector.get_connection().instrument(conn_span).await?;
             let mut tx = conn.start_transaction().await?;
 
             let results = execute_many_operations(query_schema, tx.as_connection_like(), &operations, trace_id).await;
@@ -126,10 +133,17 @@ where
     ) -> crate::Result<TxId> {
         let id = TxId::default();
         trace!("[{}] Starting...", id);
+        let connection_name = self.connector.name();
+        let conn_span = info_span!(
+            "prisma:connection",
+            user_facing = true,
+            "db.type" = connection_name.as_str()
+        );
         let conn = time::timeout(
             Duration::from_millis(max_acquisition_millis),
             self.connector.get_connection(),
         )
+        .instrument(conn_span)
         .await;
 
         let conn = conn.map_err(|_| TransactionError::AcquisitionTimeout)??;

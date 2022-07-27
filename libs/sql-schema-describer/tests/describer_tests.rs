@@ -5,7 +5,6 @@ use crate::test_api::*;
 use barrel::types;
 use pretty_assertions::assert_eq;
 use quaint::prelude::SqlFamily;
-use sql_schema_describer::*;
 
 #[test_connector]
 fn is_required_must_work(api: TestApi) {
@@ -123,7 +122,7 @@ fn names_with_hyphens_must_work(api: TestApi) {
     });
 }
 
-#[test_connector]
+#[test_connector(exclude(Mssql))]
 fn composite_primary_keys_must_work(api: TestApi) {
     let sql = match api.sql_family() {
         SqlFamily::Mysql => format!(
@@ -133,14 +132,6 @@ fn composite_primary_keys_must_work(api: TestApi) {
                 PRIMARY KEY(id, name)
             )",
             api.db_name()
-        ),
-        SqlFamily::Mssql => format!(
-            "CREATE TABLE [{}].[User] (
-                [id] INT NOT NULL,
-                [name] VARCHAR(255) NOT NULL,
-                CONSTRAINT [PK_User] PRIMARY KEY ([id], [name])
-            )",
-            api.schema_name(),
         ),
         _ => format!(
             "CREATE TABLE \"{0}\".\"User\" (
@@ -153,40 +144,15 @@ fn composite_primary_keys_must_work(api: TestApi) {
     };
 
     api.raw_cmd(&sql);
-
     let schema = api.describe();
-    let (_, table) = schema.table_bang("User");
-
-    let columns = if api.sql_family().is_mssql() {
-        vec![
-            PrimaryKeyColumn {
-                name: "id".to_string(),
-                sort_order: Some(SQLSortOrder::Asc),
-                length: None,
-            },
-            PrimaryKeyColumn {
-                name: "name".to_string(),
-                sort_order: Some(SQLSortOrder::Asc),
-                length: None,
-            },
-        ]
-    } else {
-        vec![PrimaryKeyColumn::new("id"), PrimaryKeyColumn::new("name")]
-    };
-
+    let table = schema.table_walkers().next().unwrap();
+    assert_eq!(table.name(), "User");
     assert_eq!(
-        table,
-        &Table {
-            name: "User".to_string(),
-            indices: vec![],
-            primary_key: Some(PrimaryKey {
-                columns,
-                constraint_name: match api.sql_family() {
-                    SqlFamily::Postgres => Some("User_pkey".into()),
-                    SqlFamily::Mssql => Some("PK_User".into()),
-                    _ => None,
-                },
-            }),
-        }
+        table
+            .primary_key_columns()
+            .unwrap()
+            .map(|c| c.name())
+            .collect::<Vec<_>>(),
+        &["id", "name"]
     );
 }

@@ -193,3 +193,73 @@ async fn scalar_list_defaults_work(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_connector(tags(CockroachDb))]
+async fn string_col_with_length(api: &TestApi) -> TestResult {
+    let schema = r#"
+        CREATE TABLE "User" (
+          id INT8 PRIMARY KEY DEFAULT unique_rowid(),
+          name STRING(255),
+          email STRING(255) UNIQUE NOT NULL
+        );
+
+        CREATE TABLE "Post" (
+          id INT8 PRIMARY KEY DEFAULT unique_rowid(),
+          title STRING(255) UNIQUE NOT NULL,
+          "createdAt" TIMESTAMP NOT NULL DEFAULT now(),
+          content STRING,
+          published BOOLEAN NOT NULL DEFAULT false,
+          "authorId" INT8 NOT NULL,
+          FOREIGN KEY ("authorId") REFERENCES "User"(id)
+        );
+
+        CREATE TABLE "Profile" (
+          id INT8 PRIMARY KEY DEFAULT unique_rowid(),
+          bio STRING,
+          "userId" INT8 UNIQUE NOT NULL,
+          FOREIGN KEY ("userId") REFERENCES "User"(id)
+        );
+    "#;
+
+    api.raw_cmd(schema).await;
+
+    let expectation = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "cockroachdb"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model Post {
+          id        BigInt   @id @default(autoincrement())
+          title     String   @unique @db.String(255)
+          createdAt DateTime @default(now()) @db.Timestamp(6)
+          content   String?
+          published Boolean  @default(false)
+          authorId  BigInt
+          User      User     @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+        }
+
+        model Profile {
+          id     BigInt  @id @default(autoincrement())
+          bio    String?
+          userId BigInt  @unique
+          User   User    @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+        }
+
+        model User {
+          id      BigInt   @id @default(autoincrement())
+          name    String?  @db.String(255)
+          email   String   @unique @db.String(255)
+          Post    Post[]
+          Profile Profile?
+        }
+    "#]];
+
+    api.expect_datamodel(&expectation).await;
+
+    Ok(())
+}

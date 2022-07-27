@@ -101,7 +101,7 @@ impl DatamodelFieldExtensions for dml::ScalarField {
             dml::FieldType::CompositeType(_) => todo!("composite type support in datamodel_converter"),
             dml::FieldType::Enum(x) => TypeIdentifier::Enum(x.clone()),
             dml::FieldType::Relation(_) => TypeIdentifier::String, // Todo: Unused
-            dml::FieldType::Scalar(scalar, _, _) => (*scalar).into(),
+            dml::FieldType::Scalar(scalar, _) => (*scalar).into(),
             dml::FieldType::Unsupported(_) => TypeIdentifier::Unsupported,
         }
     }
@@ -125,7 +125,7 @@ impl DatamodelFieldExtensions for dml::ScalarField {
 
     fn native_type(&self) -> Option<NativeTypeInstance> {
         match &self.field_type {
-            dml::FieldType::Scalar(_, _, nt) => nt.clone(),
+            dml::FieldType::Scalar(_, nt) => nt.clone(),
             _ => None,
         }
     }
@@ -137,7 +137,7 @@ impl DatamodelFieldExtensions for dml::CompositeTypeField {
             dml::CompositeTypeFieldType::CompositeType(_) => {
                 unreachable!("Composite fields should not use type identifiers")
             }
-            dml::CompositeTypeFieldType::Scalar(scalar, _, _) => (*scalar).into(),
+            dml::CompositeTypeFieldType::Scalar(scalar, _) => (*scalar).into(),
             dml::CompositeTypeFieldType::Enum(e) => TypeIdentifier::Enum(e.clone()),
             dml::CompositeTypeFieldType::Unsupported(_) => TypeIdentifier::Unsupported,
         }
@@ -164,7 +164,7 @@ impl DatamodelFieldExtensions for dml::CompositeTypeField {
 
     fn native_type(&self) -> Option<NativeTypeInstance> {
         match &self.r#type {
-            dml::CompositeTypeFieldType::Scalar(_, _, nt) => nt.clone(),
+            dml::CompositeTypeFieldType::Scalar(_, nt) => nt.clone(),
             _ => None,
         }
     }

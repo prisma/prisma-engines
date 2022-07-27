@@ -31,7 +31,7 @@ pub(crate) fn parse_model(pair: Pair<'_>, doc_comment: Option<Pair<'_>>, diagnos
             },
             Rule::comment_block => pending_field_comment = Some(current),
             Rule::BLOCK_LEVEL_CATCH_ALL => diagnostics.push_error(DatamodelError::new_validation_error(
-                "This line is not a valid field or attribute definition.".to_owned(),
+                "This line is not a valid field or attribute definition.",
                 current.as_span().into(),
             )),
             _ => parsing_catch_all(&current, "model"),
@@ -45,7 +45,6 @@ pub(crate) fn parse_model(pair: Pair<'_>, doc_comment: Option<Pair<'_>>, diagnos
             attributes,
             documentation: doc_comment.and_then(parse_comment_block),
             span: Span::from(pair_span),
-            commented_out: false,
         },
         _ => panic!("Encountered impossible model declaration during parsing",),
     }

@@ -1,8 +1,6 @@
 //! The SQL migration connector.
 
 #![deny(rust_2018_idioms, unsafe_code, missing_docs)]
-#![allow(clippy::trivial_regex)] // these will grow
-#![allow(clippy::redundant_closure)] // too eager, sometimes wrong
 #![allow(clippy::ptr_arg)] // remove after https://github.com/rust-lang/rust-clippy/issues/8482 is fixed and shipped
 
 mod apply_migration;
@@ -23,8 +21,10 @@ use flavour::{MssqlFlavour, MysqlFlavour, PostgresFlavour, SqlFlavour, SqliteFla
 use migration_connector::{migrations_directory::MigrationDirectory, *};
 use pair::Pair;
 use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};
-use sql_schema_describer::{self as describer, walkers::SqlSchemaExt, SqlSchema};
+use sql_schema_describer as sql;
 use std::sync::Arc;
+
+const MIGRATIONS_TABLE_NAME: &str = "_prisma_migrations";
 
 /// The top-level SQL migration connector.
 pub struct SqlMigrationConnector {
@@ -78,7 +78,7 @@ impl SqlMigrationConnector {
     }
 
     /// Made public for tests.
-    pub fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<describer::SqlSchema>> {
+    pub fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<sql::SqlSchema>> {
         self.flavour.describe_schema()
     }
 
@@ -129,7 +129,7 @@ impl SqlMigrationConnector {
                 .await
                 .map(From::from),
             DiffTarget::Database => self.flavour.describe_schema().await.map(From::from),
-            DiffTarget::Empty => Ok(SqlDatabaseSchema::default()),
+            DiffTarget::Empty => Ok(self.flavour.empty_database_schema().into()),
         }
     }
 }
@@ -164,7 +164,7 @@ impl MigrationConnector for SqlMigrationConnector {
     }
 
     fn empty_database_schema(&self) -> DatabaseSchema {
-        SqlDatabaseSchema::default().into()
+        DatabaseSchema::new(SqlDatabaseSchema::from(self.flavour.empty_database_schema()))
     }
 
     fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
@@ -298,7 +298,7 @@ async fn best_effort_reset_impl(flavour: &mut (dyn SqlFlavour + Send + Sync)) ->
     tracing::info!("Attempting best_effort_reset");
 
     let source_schema = flavour.describe_schema().await?;
-    let target_schema = SqlSchema::default();
+    let target_schema = flavour.empty_database_schema();
     let mut steps = Vec::new();
 
     // We drop views here, not in the normal migration process to not
@@ -330,7 +330,7 @@ async fn best_effort_reset_impl(flavour: &mut (dyn SqlFlavour + Send + Sync)) ->
         steps,
     };
 
-    if migration.before.table_walker("_prisma_migrations").is_some() {
+    if migration.before.table_walker(crate::MIGRATIONS_TABLE_NAME).is_some() {
         flavour.drop_migrations_table().await?;
     }
 

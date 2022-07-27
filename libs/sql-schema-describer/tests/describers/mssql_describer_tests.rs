@@ -1,14 +1,10 @@
 use crate::test_api::*;
 use barrel::{types, Migration};
-use indoc::formatdoc;
 use pretty_assertions::assert_eq;
-use sql_schema_describer::{mssql::SqlSchemaDescriber, *};
+use sql_schema_describer::*;
 
 #[test_connector(tags(Mssql))]
 fn udts_can_be_described(api: TestApi) {
-    let conn = api.database();
-    let db_name = api.db_name();
-
     let types = &[
         "bigint",
         "binary(255)",
@@ -44,9 +40,7 @@ fn udts_can_be_described(api: TestApi) {
     ];
 
     for r#type in types {
-        api.block_on(test_setup::reset_mssql_schema(conn, db_name)).unwrap();
-
-        api.raw_cmd(&format!("CREATE TYPE {}.a FROM {}", db_name, r#type));
+        api.raw_cmd(&format!("DROP TYPE IF EXISTS a; CREATE TYPE a FROM {type}"));
 
         let result = api.describe();
         let udt = result
@@ -61,54 +55,43 @@ fn udts_can_be_described(api: TestApi) {
 
 #[test_connector(tags(Mssql))]
 fn views_can_be_described(api: TestApi) {
-    let db_name = api.db_name();
-    let conn = api.database();
-
-    api.block_on(test_setup::reset_mssql_schema(conn, db_name)).unwrap();
-
-    api.raw_cmd(&format!("CREATE TABLE {}.a (a_id int)", db_name));
-    api.raw_cmd(&format!("CREATE TABLE {}.b (b_id int)", db_name));
-
-    let create_view = format!(
-        r#"
-            CREATE VIEW {0}.ab AS
+    let view_definition = r#"
+        CREATE VIEW ab AS
             SELECT a_id
-            FROM {0}.a
+            FROM a
             UNION ALL
             SELECT b_id
-            FROM {0}.b"#,
-        db_name
-    );
+            FROM b;
+    "#;
+    let create_tables = r#"
+        CREATE TABLE a (a_id int);
+        CREATE TABLE b (b_id int);
+    "#;
+    api.raw_cmd(create_tables);
+    api.raw_cmd(view_definition);
 
-    api.raw_cmd(&create_view);
-
-    let inspector = SqlSchemaDescriber::new(conn);
-    let result = api.block_on(inspector.describe(db_name)).unwrap();
+    let result = api.describe();
     let view = result.get_view("ab").expect("couldn't get ab view").to_owned();
 
     assert_eq!("ab", &view.name);
-    assert_eq!(create_view, view.definition.unwrap());
+    assert_eq!(view_definition, view.definition.unwrap());
 }
 
 #[test_connector(tags(Mssql))]
 fn procedures_can_be_described(api: TestApi) {
-    let sql = format!(
-        "CREATE PROCEDURE [{}].foo @ID INT AS SELECT DB_NAME(@ID) AS bar",
-        api.db_name()
-    );
-
-    api.raw_cmd(&sql);
+    let sql = "CREATE PROCEDURE [dbo].foo @ID INT AS SELECT DB_NAME(@ID) AS bar";
+    api.raw_cmd(sql);
 
     let result = api.describe();
     let procedure = result.get_procedure("foo").unwrap();
 
     assert_eq!("foo", &procedure.name);
-    assert_eq!(Some(sql), procedure.definition);
+    assert_eq!(Some(sql), procedure.definition.as_deref());
 }
 
 #[test_connector(tags(Mssql))]
 fn all_mssql_column_types_must_work(api: TestApi) {
-    let mut migration = Migration::new().schema(api.db_name());
+    let mut migration = Migration::new();
     migration.create_table("User", move |t| {
         t.add_column("primary_col", types::integer());
         t.add_column("bit_col", types::custom("bit"));
@@ -149,23 +132,6 @@ fn all_mssql_column_types_must_work(api: TestApi) {
             tables: [
                 Table {
                     name: "User",
-                    indices: [],
-                    primary_key: Some(
-                        PrimaryKey {
-                            columns: [
-                                PrimaryKeyColumn {
-                                    name: "primary_col",
-                                    length: None,
-                                    sort_order: Some(
-                                        Asc,
-                                    ),
-                                },
-                            ],
-                            constraint_name: Some(
-                                "thepk",
-                            ),
-                        },
-                    ),
                 },
             ],
             enums: [],
@@ -791,6 +757,29 @@ fn all_mssql_column_types_must_work(api: TestApi) {
             ],
             foreign_keys: [],
             foreign_key_columns: [],
+            indexes: [
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "thepk",
+                    tpe: PrimaryKey,
+                },
+            ],
+            index_columns: [
+                IndexColumn {
+                    index_id: IndexId(
+                        0,
+                    ),
+                    column_id: ColumnId(
+                        0,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+            ],
             views: [],
             procedures: [],
             user_defined_types: [],
@@ -802,34 +791,29 @@ fn all_mssql_column_types_must_work(api: TestApi) {
 
 #[test_connector(tags(Mssql))]
 fn mssql_cross_schema_references_are_not_allowed(api: TestApi) {
-    let db_name = api.db_name();
-    let secondary = "mssql_foreign_key_on_delete_must_be_handled_B";
-    let conn = api.database();
-
-    api.raw_cmd("DROP DATABASE IF EXISTS \"mssql_foreign_key_on_delete_must_be_handled_B\"");
-    api.block_on(test_setup::reset_mssql_schema(conn, secondary)).unwrap();
+    api.raw_cmd("CREATE SCHEMA mssql_foreign_key_on_delete_must_be_handled_B");
 
     let sql = format!(
         "
-            CREATE TABLE [{1}].[City] (id INT NOT NULL IDENTITY(1,1), CONSTRAINT [PK__City] PRIMARY KEY ([id]));
-            CREATE TABLE [{0}].[User]
+            CREATE TABLE [{0}].[City] (id INT NOT NULL IDENTITY(1,1), CONSTRAINT [PK__City] PRIMARY KEY ([id]));
+            CREATE TABLE [dbo].[User]
             (
                 id           INT NOT NULL IDENTITY (1,1),
                 city         INT,
                 city_cascade INT,
-                CONSTRAINT [FK__city] FOREIGN KEY (city) REFERENCES [{1}].[City] (id) ON DELETE NO ACTION,
+                CONSTRAINT [FK__city] FOREIGN KEY (city) REFERENCES [{0}].[City] (id) ON DELETE NO ACTION,
                 CONSTRAINT [PK__User] PRIMARY KEY ([id])
             );
         ",
-        db_name, secondary
+        "mssql_foreign_key_on_delete_must_be_handled_B"
     );
 
     api.raw_cmd(&sql);
     let err = api.describe_error();
 
     assert_eq!(
-        "Illegal cross schema reference from `mssql_cross_schema_references_are_not_allowed.User` to `mssql_foreign_key_on_delete_must_be_handled_B.City` in constraint `FK__city`. Foreign keys between database schemas are not supported in Prisma. Please follow the GitHub ticket: https://github.com/prisma/prisma/issues/1175".to_string(),
-        format!("{}", err),
+        "Illegal cross schema reference from `dbo.User` to `mssql_foreign_key_on_delete_must_be_handled_B.City` in constraint `FK__city`. Foreign keys between database schemas are not supported in Prisma. Please follow the GitHub ticket: https://github.com/prisma/prisma/issues/1175",
+        err.to_string(),
     );
 }
 
@@ -849,9 +833,9 @@ fn primary_key_sort_order_desc_is_handled(api: TestApi) {
     let schema = api.describe();
     let table = schema.table_walkers().next().unwrap();
 
-    assert_eq!(2, table.primary_key_columns().len());
+    assert_eq!(2, table.primary_key_columns_count());
 
-    let columns = table.primary_key_columns().collect::<Vec<_>>();
+    let columns = table.primary_key_columns().unwrap().collect::<Vec<_>>();
 
     assert_eq!("a", columns[0].as_column().name());
     assert_eq!("b", columns[1].as_column().name());
@@ -892,23 +876,20 @@ fn index_sort_order_desc_is_handled(api: TestApi) {
 
 #[test_connector(tags(Mssql))]
 fn mssql_foreign_key_on_delete_must_be_handled(api: TestApi) {
-    let sql = format!(
-        "
-            CREATE TABLE [{0}].[City] (id INT NOT NULL IDENTITY(1,1), CONSTRAINT [PK__City] PRIMARY KEY ([id]));
-            CREATE TABLE [{0}].[User]
-            (
-                id           INT NOT NULL IDENTITY (1,1),
-                city         INT,
-                city_cascade INT,
-                CONSTRAINT [FK__city] FOREIGN KEY (city) REFERENCES [{0}].[City] (id) ON DELETE NO ACTION,
-                CONSTRAINT [FK__city_cascade] FOREIGN KEY (city_cascade) REFERENCES [{0}].[City] (id) ON DELETE CASCADE,
-                CONSTRAINT [PK__User] PRIMARY KEY ([id])
-            );
-        ",
-        api.db_name()
-    );
+    let sql = "
+        CREATE TABLE [dbo].[City] (id INT NOT NULL IDENTITY(1,1), CONSTRAINT [PK__City] PRIMARY KEY ([id]));
+    CREATE TABLE [dbo].[User]
+        (
+            id           INT NOT NULL IDENTITY (1,1),
+            city         INT,
+            city_cascade INT,
+            CONSTRAINT [FK__city] FOREIGN KEY (city) REFERENCES [dbo].[City] (id) ON DELETE NO ACTION,
+            CONSTRAINT [FK__city_cascade] FOREIGN KEY (city_cascade) REFERENCES [dbo].[City] (id) ON DELETE CASCADE,
+            CONSTRAINT [PK__User] PRIMARY KEY ([id])
+        );
+    ";
 
-    api.raw_cmd(&sql);
+    api.raw_cmd(sql);
     let schema = api.describe();
     let table = schema.table_walker("User").unwrap();
     let expectations = [
@@ -924,7 +905,7 @@ fn mssql_foreign_key_on_delete_must_be_handled(api: TestApi) {
 
 #[test_connector(tags(Mssql))]
 fn mssql_multi_field_indexes_must_be_inferred(api: TestApi) {
-    let mut migration = Migration::new().schema(api.db_name());
+    let mut migration = Migration::new();
     migration.create_table("Employee", move |t| {
         t.add_column("id", types::primary());
         t.add_column("age", types::integer());
@@ -935,34 +916,14 @@ fn mssql_multi_field_indexes_must_be_inferred(api: TestApi) {
     let full_sql = migration.make::<barrel::backend::MsSql>();
     api.raw_cmd(&full_sql);
     let result = api.describe();
-    let (_, table) = result.table_bang("Employee");
-
-    let columns = vec![
-        IndexColumn {
-            name: "name".to_string(),
-            sort_order: Some(SQLSortOrder::Asc),
-            length: None,
-        },
-        IndexColumn {
-            name: "age".to_string(),
-            sort_order: Some(SQLSortOrder::Asc),
-            length: None,
-        },
-    ];
-
-    assert_eq!(
-        table.indices,
-        &[Index {
-            name: "age_and_name_index".into(),
-            columns,
-            tpe: IndexType::Unique,
-        }]
-    );
+    result.assert_table("Employee", |t| {
+        t.assert_index_on_columns(&["name", "age"], |idx| idx.assert_name("age_and_name_index"))
+    });
 }
 
 #[test_connector(tags(Mssql))]
 fn mssql_join_table_unique_indexes_must_be_inferred(api: TestApi) {
-    let mut migration = Migration::new().schema(api.db_name());
+    let mut migration = Migration::new();
 
     migration.create_table("Cat", move |t| {
         t.add_column("id", types::primary());
@@ -984,27 +945,7 @@ fn mssql_join_table_unique_indexes_must_be_inferred(api: TestApi) {
     let full_sql = migration.make::<barrel::backend::MsSql>();
     api.raw_cmd(&full_sql);
     let result = api.describe();
-    let (_, table) = result.table_bang("CatToHuman");
-
-    let columns = vec![
-        IndexColumn {
-            name: "cat".to_string(),
-            sort_order: Some(SQLSortOrder::Asc),
-            length: None,
-        },
-        IndexColumn {
-            name: "human".to_string(),
-            sort_order: Some(SQLSortOrder::Asc),
-            length: None,
-        },
-    ];
-
-    assert_eq!(
-        table.indices,
-        &[Index {
-            name: "cat_and_human_index".into(),
-            columns,
-            tpe: IndexType::Unique,
-        }]
-    );
+    result.assert_table("CatToHuman", |t| {
+        t.assert_index_on_columns(&["cat", "human"], |idx| idx.assert_name("cat_and_human_index"))
+    });
 }

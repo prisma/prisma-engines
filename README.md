@@ -97,7 +97,6 @@ USAGE:
 FLAGS:
         --enable-raw-queries           Enables raw SQL queries with executeRaw/queryRaw mutation
     -h, --help                         Prints help information
-        --legacy                       Switches query schema generation to Prisma 1 compatible mode
     -V, --version                      Prints version information
 
 OPTIONS:
@@ -199,6 +198,23 @@ rust-analyzer. To avoid this. Open VSCode settings and search for `Check on Save
 ```
 --target-dir:/tmp/rust-analyzer-check
 ```
+
+### Automated integration releases from this repository to npm
+
+(Since July 2022). Any branch name starting with `integration/` will, first, run the full test suite and, second, if passing, run the publish pipeline (build and upload engines to S3)
+
+The journey through the pipeline is the same as a commit on the `main` branch.
+- It will trigger [prisma/engines-wrapper](https://github.com/prisma/engines-wrapper) and publish a new [`@prisma/engines-version`](https://www.npmjs.com/package/@prisma/engines-version) npm package but on the `integration` tag.
+- Which triggers [prisma/prisma](https://github.com/prisma/prisma) to create a `chore(Automated Integration PR): [...]` PR with a branch name also starting with `integration/`
+- Since in prisma/prisma we also trigger the publish pipeline when a branch name starts with `integration/`, this will publish all prisma/prisma monorepo packages to npm on the `integration` tag.
+- Our [ecosystem-tests](https://github.com/prisma/ecosystem-tests/) tests will automatically pick up this new version and run tests, results will show in [GitHub Actions](https://github.com/prisma/ecosystem-tests/actions?query=branch%3Aintegration)
+
+This end to end will take minimum ~1h20 to complete, but is completely automated :robot:
+
+Notes:
+- in prisma/prisma repository, we do not run tests for `integration/` branches, it is much faster and also means that there is no risk of test failing (e.g. flaky tests, snapshots) that would stop the publishing process.
+- in prisma/prisma-engines tests must first pass, before publishing starts. So better keep an eye on them and restart them as needed.
+
 
 ## Security
 

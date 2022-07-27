@@ -16,7 +16,7 @@ impl MigrationPersistence for SqlMigrationConnector {
 
             if schema
                 .table_walkers()
-                .any(|table| table.name() == self.flavour().migrations_table_name())
+                .any(|table| table.name() == crate::MIGRATIONS_TABLE_NAME)
             {
                 return Ok(());
             }

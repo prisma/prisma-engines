@@ -47,7 +47,7 @@ pub struct Enum {
     ///   Value2
     /// }
     /// ```
-    pub documentation: Option<Comment>,
+    pub(crate) documentation: Option<Comment>,
     /// The location of this enum in the text representation.
     pub span: Span,
 }
@@ -59,8 +59,8 @@ impl WithIdentifier for Enum {
 }
 
 impl WithSpan for Enum {
-    fn span(&self) -> &Span {
-        &self.span
+    fn span(&self) -> Span {
+        self.span
     }
 }
 
@@ -71,12 +71,8 @@ impl WithAttributes for Enum {
 }
 
 impl WithDocumentation for Enum {
-    fn documentation(&self) -> &Option<Comment> {
-        &self.documentation
-    }
-
-    fn is_commented_out(&self) -> bool {
-        false
+    fn documentation(&self) -> Option<&str> {
+        self.documentation.as_ref().map(|doc| doc.text.as_str())
     }
 }
 
@@ -86,10 +82,9 @@ pub struct EnumValue {
     /// The name of the enum value as it will be exposed by the api.
     pub name: Identifier,
     pub attributes: Vec<Attribute>,
-    pub documentation: Option<Comment>,
+    pub(crate) documentation: Option<Comment>,
     /// The location of this enum value in the text representation.
     pub span: Span,
-    pub commented_out: bool,
 }
 
 impl WithIdentifier for EnumValue {
@@ -105,7 +100,13 @@ impl WithAttributes for EnumValue {
 }
 
 impl WithSpan for EnumValue {
-    fn span(&self) -> &Span {
-        &self.span
+    fn span(&self) -> Span {
+        self.span
+    }
+}
+
+impl WithDocumentation for EnumValue {
+    fn documentation(&self) -> Option<&str> {
+        self.documentation.as_ref().map(|doc| doc.text.as_str())
     }
 }

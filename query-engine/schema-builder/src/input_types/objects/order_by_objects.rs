@@ -10,6 +10,10 @@ lazy_static! {
         ordering::SORT_ORDER,
         vec![ordering::ASC.to_owned(), ordering::DESC.to_owned()],
     ));
+    static ref NULLS_ORDER_ENUM: Arc<EnumType> = Arc::new(string_enum_type(
+        ordering::NULLS_ORDER,
+        vec![ordering::FIRST.to_owned(), ordering::LAST.to_owned()]
+    ));
 }
 
 #[derive(Debug, Default)]
@@ -144,7 +148,17 @@ fn orderby_field_mapper(field: &ModelField, ctx: &mut BuilderContext, options: &
 
         // Scalar field.
         ModelField::Scalar(sf) => {
-            Some(input_field(sf.name.clone(), InputType::Enum(SORT_ORDER_ENUM.clone()), None).optional())
+            let mut types = vec![InputType::Enum(SORT_ORDER_ENUM.clone())];
+
+            if ctx.has_feature(&PreviewFeature::OrderByNulls)
+                && ctx.capabilities.contains(ConnectorCapability::OrderByNullsFirstLast)
+                && !sf.is_required()
+                && !sf.is_list()
+            {
+                types.push(InputType::object(sort_nulls_object_type(ctx)));
+            }
+
+            Some(input_field(sf.name.clone(), types, None).optional())
         }
 
         // Composite field.
@@ -161,6 +175,23 @@ fn orderby_field_mapper(field: &ModelField, ctx: &mut BuilderContext, options: &
 
         _ => None,
     }
+}
+
+fn sort_nulls_object_type(ctx: &mut BuilderContext) -> InputObjectTypeWeakRef {
+    let ident = Identifier::new("SortOrderInput", PRISMA_NAMESPACE);
+    return_cached_input!(ctx, &ident);
+
+    let input_object = Arc::new(init_input_object_type(ident.clone()));
+    ctx.cache_input_type(ident, input_object.clone());
+
+    let fields = vec![
+        input_field(ordering::SORT, InputType::Enum(SORT_ORDER_ENUM.clone()), None),
+        input_field(ordering::NULLS, InputType::Enum(NULLS_ORDER_ENUM.clone()), None).optional(),
+    ];
+
+    input_object.set_fields(fields);
+
+    Arc::downgrade(&input_object)
 }
 
 fn order_by_field_aggregate(
@@ -285,30 +316,15 @@ fn order_by_object_type_text_search(
         format!("{}OrderByRelevanceFieldEnum", container.name()),
         scalar_fields.iter().map(|sf| sf.name.clone()).collect_vec(),
     )));
-    let mut fields = vec![];
-
-    append_opt(
-        &mut fields,
-        Some(input_field(
-            "fields",
+    let fields = vec![
+        input_field(
+            ordering::FIELDS,
             vec![fields_enum_type.clone(), InputType::list(fields_enum_type)],
             None,
-        )),
-    );
-
-    append_opt(
-        &mut fields,
-        Some(input_field(
-            ordering::SORT,
-            InputType::Enum(SORT_ORDER_ENUM.clone()),
-            None,
-        )),
-    );
-
-    append_opt(
-        &mut fields,
-        Some(input_field(ordering::SEARCH, InputType::string(), None)),
-    );
+        ),
+        input_field(ordering::SORT, InputType::Enum(SORT_ORDER_ENUM.clone()), None),
+        input_field(ordering::SEARCH, InputType::string(), None),
+    ];
 
     input_object.set_fields(fields);
 

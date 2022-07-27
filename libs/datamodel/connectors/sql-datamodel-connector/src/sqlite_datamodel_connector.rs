@@ -18,11 +18,16 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::ImplicitManyToManyRelation,
     ConnectorCapability::DecimalType,
     ConnectorCapability::BackwardCompatibleQueryRaw,
+    ConnectorCapability::OrderByNullsFirstLast,
 ];
 
 pub struct SqliteDatamodelConnector;
 
 impl Connector for SqliteDatamodelConnector {
+    fn provider_name(&self) -> &'static str {
+        "sqlite"
+    }
+
     fn name(&self) -> &str {
         "sqlite"
     }

@@ -1,64 +1,24 @@
-//! This crate is responsible for parsing, rendering and formatting a Prisma Schema.
+//! # PSL — Prisma Schema Language
+//!
+//! This crate is responsible for parsing, validating, formatting and rendering a PSL documents.
+//!
 //! A Prisma Schema consists out of two parts:
 //! 1. The `Datamodel` part refers to the model and enum definitions.
 //! 2. The `Configuration` part refers to the generator and datasource definitions.
-//!
-//! The data structures are organized into 3 layers:
-//! * The AST layer contains the data data structures representing the schema input.
-//! * The model layer contains the data structures that are semantically rich and therefore engines can build upon.
-//! * The JSON layer contains the data structures that represent the contract for the DMMF which is the API for client generators.
-//!
-//! The responsibilities of each top level module is as following:
-//! * `common`: contains constants and generic helpers
-//! * `error`: contains the error and result types
-//! * `ast`: contains the data structures for the AST of a Prisma schema. And the parsing functions to turn an input string into an AST.
-//! * `dml`: contains the models representing the Datamodel part of a Prisma schema
-//! * `configuration`: contains the models representing the Datasources and Generators of a Prisma schema
-//! * `transform`: contains the logic to turn an AST into models and vice versa
-//! * `mcf`: contains the logic to turn generators and datasources into their JSON representation
-//!
-//! The flow between the layers is depicted in the following diagram.
-//!<pre>
-//!                ┌──────────────────┐
-//!                │       json       │
-//!                └────────▲─────────┘
-//!                         │
-//!                         │
-//!      ┌──────────────────┐┌──────────────────┐
-//!      │       dml        ││  configuration   │
-//!      └──────────────────┘└──────────────────┘
-//!                        │  ▲
-//!┌─────────────────────┐ │  │ ┌─────────────────────┐
-//!│transform::dml_to_ast│ │  │ │transform::ast_to_dml│
-//!└─────────────────────┘ │  │ └─────────────────────┘
-//!                        │  │
-//!                        ▼  │
-//!                ┌──────────────────┐
-//!                │       ast        │
-//!                └──────────────────┘
-//!                        │  ▲
-//!                        │  │
-//!                        │  │
-//!                        ▼  │
-//!                 ┌──────────────────┐
-//!                 │  schema string   │
-//!                 └──────────────────┘
-//!</pre>
 //!
 
 #![deny(rust_2018_idioms, unsafe_code)]
 
 pub mod common;
-pub mod dml;
 
 /// `mcf`: Turns a collection of `configuration::Datasource` and `configuration::Generator` into a JSON representation.
 pub mod mcf;
 
 mod configuration;
+mod lift;
 mod reformat;
-mod transform;
-
-use std::sync::Arc;
+mod render;
+mod validate;
 
 pub use crate::{
     configuration::{Configuration, Datasource, Generator, StringFromEnvVar},
@@ -66,19 +26,20 @@ pub use crate::{
 };
 pub use datamodel_connector;
 pub use diagnostics;
-pub use parser_database;
-pub use parser_database::is_reserved_type_name;
-use schema_ast::source_file::SourceFile;
-pub use schema_ast::{self, ast};
+pub use dml;
+pub use parser_database::{self, is_reserved_type_name};
 
+use self::validate::{validate, DatasourceLoader, GeneratorLoader};
 use crate::common::preview_features::PreviewFeature;
 use diagnostics::Diagnostics;
 use enumflags2::BitFlags;
-use parser_database::ParserDatabase;
-use transform::{
-    ast_to_dml::{validate, DatasourceLoader, GeneratorLoader},
-    dml_to_ast::{lower, LowerParams},
-};
+use parser_database::{ast, ParserDatabase, SourceFile};
+use std::sync::Arc;
+
+pub mod builtin_connectors {
+    pub use mongodb_datamodel_connector::*;
+    pub use sql_datamodel_connector::*;
+}
 
 #[derive(Debug)]
 pub struct Validated<T> {
@@ -167,7 +128,7 @@ fn parse_datamodel_internal(
         return Err(out.diagnostics);
     }
 
-    let datamodel = transform::ast_to_dml::LiftAstToDml::new(&out.db, out.connector, out.referential_integrity).lift();
+    let datamodel = lift::LiftAstToDml::new(&out.db, out.connector, out.referential_integrity).lift();
 
     Ok(Validated {
         subject: (
@@ -227,11 +188,9 @@ fn load_sources(
 /// Renders the datamodel _without configuration blocks_.
 pub fn render_datamodel_to_string(datamodel: &dml::Datamodel, configuration: Option<&Configuration>) -> String {
     let datasource = configuration.and_then(|c| c.datasources.first());
-    let lowered = lower(LowerParams { datasource, datamodel });
-    let mut renderer = schema_ast::renderer::Renderer::new(DEFAULT_INDENT_WIDTH);
-    renderer.stream.reserve(&lowered.tops.len() * 20);
-    renderer.render(&lowered);
-    reformat(&renderer.stream, DEFAULT_INDENT_WIDTH).expect("Internal error: failed to reformat introspected schema")
+    let mut out = String::new();
+    render::render_datamodel(render::RenderParams { datasource, datamodel }, &mut out);
+    reformat(&out, DEFAULT_INDENT_WIDTH).expect("Internal error: failed to reformat introspected schema")
 }
 
 /// Renders a datamodel, sources and generators.
@@ -239,15 +198,11 @@ pub fn render_datamodel_and_config_to_string(
     datamodel: &dml::Datamodel,
     config: &configuration::Configuration,
 ) -> String {
-    let lowered = lower(LowerParams {
-        datasource: config.datasources.first(),
-        datamodel,
-    });
-
-    let mut renderer = schema_ast::renderer::Renderer::new(2);
-    transform::dml_to_ast::render_configuration(config, &mut renderer.stream);
-    renderer.render(&lowered);
-    reformat(&renderer.stream, DEFAULT_INDENT_WIDTH).expect("Internal error: failed to reformat introspected schema")
+    let mut out = String::new();
+    let datasource = config.datasources.first();
+    render::render_configuration(config, &mut out);
+    render::render_datamodel(render::RenderParams { datasource, datamodel }, &mut out);
+    reformat(&out, DEFAULT_INDENT_WIDTH).expect("Internal error: failed to reformat introspected schema")
 }
 
 fn preview_features(generators: &[Generator]) -> BitFlags<PreviewFeature> {

@@ -17,7 +17,6 @@
 // ######################################
 schema = {
     SOI
-    ~ NEWLINE*
     ~ (model_declaration | enum_declaration | config_block | type_alias | arbitrary_block | comment_block | empty_lines | CATCH_ALL)*
     ~ EOI
     }
@@ -74,7 +73,7 @@ config_block = {
     ~ (key_value | comment_block | empty_lines | BLOCK_LEVEL_CATCH_ALL)*
     ~ BLOCK_CLOSE
     }
-key_value = { identifier ~ "=" ~ expression ~ NEWLINE }
+key_value = { identifier ~ "=" ~ expression ~ trailing_comment? ~ NEWLINE }
 
 // a block definition without a keyword. Is not valid. Just acts as a catch for the parser to display a nice error.
 arbitrary_block = { identifier ~ BLOCK_OPEN ~ ((!BLOCK_CLOSE ~ ANY) | NEWLINE)* ~ BLOCK_CLOSE }

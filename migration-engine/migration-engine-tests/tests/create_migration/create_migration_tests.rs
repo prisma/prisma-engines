@@ -69,7 +69,7 @@ fn basic_create_migration_works(api: TestApi) {
                     BEGIN TRAN;
 
                     -- CreateTable
-                    CREATE TABLE [basic_create_migration_works].[Cat] (
+                    CREATE TABLE [dbo].[Cat] (
                         [id] INT NOT NULL,
                         [name] NVARCHAR(1000) NOT NULL,
                         CONSTRAINT [Cat_pkey] PRIMARY KEY CLUSTERED ([id])
@@ -137,8 +137,7 @@ fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(a
         .assert_migration_directories_count(2)
         .assert_migration("create-dogs", |migration| {
             let expected_script = if is_cockroach {
-                expect![[
-                        r#"
+                expect![[r#"
                     -- CreateTable
                     CREATE TABLE "Dog" (
                         "id" INT4 NOT NULL,
@@ -146,13 +145,9 @@ fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(a
 
                         CONSTRAINT "Dog_pkey" PRIMARY KEY ("id")
                     );
-                "#
-                ]]
-                }
-                else if is_postgres
-                {
-                    expect![[
-                        r#"
+                "#]]
+            } else if is_postgres {
+                expect![[r#"
                         -- CreateTable
                         CREATE TABLE "Dog" (
                             "id" INTEGER NOT NULL,
@@ -160,11 +155,9 @@ fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(a
 
                             CONSTRAINT "Dog_pkey" PRIMARY KEY ("id")
                         );
-                        "#
-                    ]]
-                } else if is_mysql {
-                    expect![[
-                        r#"
+                        "#]]
+            } else if is_mysql {
+                expect![[r#"
                         -- CreateTable
                         CREATE TABLE `Dog` (
                             `id` INTEGER NOT NULL,
@@ -172,28 +165,23 @@ fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(a
 
                             PRIMARY KEY (`id`)
                         ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-                        "#
-                    ]]
-                }
-                else if is_sqlite {
-                    expect![[
-                        r#"
+                        "#]]
+            } else if is_sqlite {
+                expect![[r#"
                         -- CreateTable
                         CREATE TABLE "Dog" (
                             "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                             "name" TEXT NOT NULL
                         );
-                        "#
-                            ]]
-                } else if is_mssql {
-                    expect![[
-                        r#"
+                        "#]]
+            } else if is_mssql {
+                expect![[r#"
                         BEGIN TRY
 
                         BEGIN TRAN;
 
                         -- CreateTable
-                        CREATE TABLE [creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline].[Dog] (
+                        CREATE TABLE [dbo].[Dog] (
                             [id] INT NOT NULL,
                             [name] NVARCHAR(1000) NOT NULL,
                             CONSTRAINT [Dog_pkey] PRIMARY KEY CLUSTERED ([id])
@@ -211,11 +199,10 @@ fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(a
                         THROW
 
                         END CATCH
-                    "#
-                        ]]
-                } else {
-                    unreachable!()
-                };
+                    "#]]
+            } else {
+                unreachable!()
+            };
 
             migration.expect_contents(expected_script)
         });
@@ -584,14 +571,13 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
         .assert_migration_directories_count(1)
         .assert_migration("setup", |migration| {
             let expected_script = if is_mssql {
-                expect![[
-                     r#"
+                expect![[r#"
                     BEGIN TRY
 
                     BEGIN TRAN;
 
                     -- CreateTable
-                    CREATE TABLE [create_constraint_name_tests_w_implicit_names].[A] (
+                    CREATE TABLE [dbo].[A] (
                         [id] INT NOT NULL,
                         [name] NVARCHAR(1000) NOT NULL,
                         [a] NVARCHAR(1000) NOT NULL,
@@ -602,7 +588,7 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
                     );
 
                     -- CreateTable
-                    CREATE TABLE [create_constraint_name_tests_w_implicit_names].[B] (
+                    CREATE TABLE [dbo].[B] (
                         [a] NVARCHAR(1000) NOT NULL,
                         [b] NVARCHAR(1000) NOT NULL,
                         [aId] INT NOT NULL,
@@ -610,13 +596,13 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
                     );
 
                     -- CreateIndex
-                    CREATE NONCLUSTERED INDEX [A_a_idx] ON [create_constraint_name_tests_w_implicit_names].[A]([a]);
+                    CREATE NONCLUSTERED INDEX [A_a_idx] ON [dbo].[A]([a]);
 
                     -- CreateIndex
-                    CREATE NONCLUSTERED INDEX [B_a_b_idx] ON [create_constraint_name_tests_w_implicit_names].[B]([a], [b]);
+                    CREATE NONCLUSTERED INDEX [B_a_b_idx] ON [dbo].[B]([a], [b]);
 
                     -- AddForeignKey
-                    ALTER TABLE [create_constraint_name_tests_w_implicit_names].[B] ADD CONSTRAINT [B_aId_fkey] FOREIGN KEY ([aId]) REFERENCES [create_constraint_name_tests_w_implicit_names].[A]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
+                    ALTER TABLE [dbo].[B] ADD CONSTRAINT [B_aId_fkey] FOREIGN KEY ([aId]) REFERENCES [dbo].[A]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
 
                     COMMIT TRAN;
 
@@ -630,8 +616,7 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
                     THROW
 
                     END CATCH
-                "#
-                 ]]
+                "#]]
             } else if is_cockroach {
                 expect![[
                      r#"
@@ -818,14 +803,13 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
         .assert_migration_directories_count(1)
         .assert_migration("setup", move |migration| {
             let expected_script = if is_mssql {
-                expect![[
-                     r#"
+                expect![[r#"
                     BEGIN TRY
 
                     BEGIN TRAN;
 
                     -- CreateTable
-                    CREATE TABLE [create_constraint_name_tests_w_explicit_names].[A] (
+                    CREATE TABLE [dbo].[A] (
                         [id] INT NOT NULL,
                         [name] NVARCHAR(1000) NOT NULL,
                         [a] NVARCHAR(1000) NOT NULL,
@@ -837,7 +821,7 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
                     );
 
                     -- CreateTable
-                    CREATE TABLE [create_constraint_name_tests_w_explicit_names].[B] (
+                    CREATE TABLE [dbo].[B] (
                         [a] NVARCHAR(1000) NOT NULL,
                         [b] NVARCHAR(1000) NOT NULL,
                         [aId] INT NOT NULL,
@@ -845,13 +829,13 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
                     );
 
                     -- CreateIndex
-                    CREATE NONCLUSTERED INDEX [SingleIndex] ON [create_constraint_name_tests_w_explicit_names].[A]([a]);
+                    CREATE NONCLUSTERED INDEX [SingleIndex] ON [dbo].[A]([a]);
 
                     -- CreateIndex
-                    CREATE NONCLUSTERED INDEX [CompoundIndex] ON [create_constraint_name_tests_w_explicit_names].[B]([a], [b]);
+                    CREATE NONCLUSTERED INDEX [CompoundIndex] ON [dbo].[B]([a], [b]);
 
                     -- AddForeignKey
-                    ALTER TABLE [create_constraint_name_tests_w_explicit_names].[B] ADD CONSTRAINT [ForeignKey] FOREIGN KEY ([aId]) REFERENCES [create_constraint_name_tests_w_explicit_names].[A]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
+                    ALTER TABLE [dbo].[B] ADD CONSTRAINT [ForeignKey] FOREIGN KEY ([aId]) REFERENCES [dbo].[A]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
 
                     COMMIT TRAN;
 
@@ -865,8 +849,7 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
                     THROW
 
                     END CATCH
-                "#
-                 ]]
+                "#]]
             } else if is_cockroach {
                 expect![[
                      r#"
@@ -1098,25 +1081,25 @@ fn alter_constraint_name(mut api: TestApi) {
                     BEGIN TRAN;
 
                     -- AlterTable
-                    EXEC SP_RENAME N'alter_constraint_name.A_pkey', N'CustomId';
+                    EXEC SP_RENAME N'dbo.A_pkey', N'CustomId';
 
                     -- AlterTable
-                    EXEC SP_RENAME N'alter_constraint_name.B_pkey', N'CustomCompoundId';
+                    EXEC SP_RENAME N'dbo.B_pkey', N'CustomCompoundId';
 
                     -- RenameForeignKey
-                    EXEC sp_rename 'alter_constraint_name.B_aId_fkey', 'CustomFK', 'OBJECT';
+                    EXEC sp_rename 'dbo.B_aId_fkey', 'CustomFK', 'OBJECT';
 
                     -- RenameIndex
-                    EXEC SP_RENAME N'alter_constraint_name.A.A_a_b_key', N'CustomCompoundUnique', N'INDEX';
+                    EXEC SP_RENAME N'dbo.A.A_a_b_key', N'CustomCompoundUnique', N'INDEX';
 
                     -- RenameIndex
-                    EXEC SP_RENAME N'alter_constraint_name.A.A_a_idx', N'CustomIndex', N'INDEX';
+                    EXEC SP_RENAME N'dbo.A.A_a_idx', N'CustomIndex', N'INDEX';
 
                     -- RenameIndex
-                    EXEC SP_RENAME N'alter_constraint_name.A.A_name_key', N'CustomUnique', N'INDEX';
+                    EXEC SP_RENAME N'dbo.A.A_name_key', N'CustomUnique', N'INDEX';
 
                     -- RenameIndex
-                    EXEC SP_RENAME N'alter_constraint_name.B.B_a_b_idx', N'AnotherCustomIndex', N'INDEX';
+                    EXEC SP_RENAME N'dbo.B.B_a_b_idx', N'AnotherCustomIndex', N'INDEX';
 
                     COMMIT TRAN;
 
@@ -1130,7 +1113,7 @@ fn alter_constraint_name(mut api: TestApi) {
                     THROW
 
                     END CATCH
-                 "#]]
+                "#]]
             } else if is_cockroach {
                 expect![[r#"
                     -- AlterTable

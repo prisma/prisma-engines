@@ -1,5 +1,4 @@
-use datamodel_connector::Connector;
-use mongodb_datamodel_connector::MongoDbDatamodelConnector;
+use mongodb_datamodel_connector::MONGODB;
 
 use super::*;
 use crate::{MongoDbSchemaRenderer, TestError, TestResult};
@@ -153,5 +152,5 @@ impl ToString for MongoDbVersion {
 }
 
 fn mongo_capabilities() -> Vec<ConnectorCapability> {
-    MongoDbDatamodelConnector.capabilities().to_owned()
+    MONGODB.capabilities().to_owned()
 }

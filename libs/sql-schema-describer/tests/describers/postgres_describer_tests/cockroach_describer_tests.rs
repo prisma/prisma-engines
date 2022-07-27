@@ -235,62 +235,6 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
             tables: [
                 Table {
                     name: "indexes_test",
-                    indices: [
-                        Index {
-                            name: "my_idx",
-                            columns: [
-                                IndexColumn {
-                                    name: "name",
-                                    sort_order: Some(
-                                        Asc,
-                                    ),
-                                    length: None,
-                                },
-                                IndexColumn {
-                                    name: "age",
-                                    sort_order: Some(
-                                        Asc,
-                                    ),
-                                    length: None,
-                                },
-                            ],
-                            tpe: Unique,
-                        },
-                        Index {
-                            name: "my_idx2",
-                            columns: [
-                                IndexColumn {
-                                    name: "age",
-                                    sort_order: Some(
-                                        Asc,
-                                    ),
-                                    length: None,
-                                },
-                                IndexColumn {
-                                    name: "name",
-                                    sort_order: Some(
-                                        Asc,
-                                    ),
-                                    length: None,
-                                },
-                            ],
-                            tpe: Normal,
-                        },
-                    ],
-                    primary_key: Some(
-                        PrimaryKey {
-                            columns: [
-                                PrimaryKeyColumn {
-                                    name: "id",
-                                    length: None,
-                                    sort_order: None,
-                                },
-                            ],
-                            constraint_name: Some(
-                                "indexes_test_pkey",
-                            ),
-                        },
-                    ),
                 },
             ],
             enums: [],
@@ -358,6 +302,91 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
             ],
             foreign_keys: [],
             foreign_key_columns: [],
+            indexes: [
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "indexes_test_pkey",
+                    tpe: PrimaryKey,
+                },
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "my_idx",
+                    tpe: Unique,
+                },
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "my_idx2",
+                    tpe: Normal,
+                },
+            ],
+            index_columns: [
+                IndexColumn {
+                    index_id: IndexId(
+                        0,
+                    ),
+                    column_id: ColumnId(
+                        0,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        1,
+                    ),
+                    column_id: ColumnId(
+                        1,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        1,
+                    ),
+                    column_id: ColumnId(
+                        2,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        2,
+                    ),
+                    column_id: ColumnId(
+                        2,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        2,
+                    ),
+                    column_id: ColumnId(
+                        1,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+            ],
             views: [],
             procedures: [],
             user_defined_types: [],
@@ -380,11 +409,11 @@ fn escaped_characters_in_string_defaults(api: TestApi) {
     "#;
     api.raw_cmd(init);
     let schema = api.describe();
-    let (table_id, _table) = schema.table_bang("Fruit");
+    let table = schema.table_walker("Fruit").unwrap();
 
     let expect_col = |name: &str, expected: &str| {
-        let col = schema.column_bang(table_id, name);
-        let default = col.default.as_ref().unwrap().as_value().unwrap().as_string().unwrap();
+        let col = table.column(name).unwrap();
+        let default = col.default().unwrap().as_value().unwrap().as_string().unwrap();
         assert_eq!(default, expected);
     };
     expect_col("seasonality", r#""summer""#);
@@ -413,7 +442,7 @@ fn cockroachdb_sequences_must_work(api: TestApi) {
     api.raw_cmd(sql);
 
     let schema = api.describe();
-    let ext: &PostgresSchemaExt = schema.downcast_connector_data().unwrap_or_default();
+    let ext: &PostgresSchemaExt = schema.downcast_connector_data();
     let expected_ext = expect![[r#"
         PostgresSchemaExt {
             opclasses: [],

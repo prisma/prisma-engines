@@ -1,41 +1,31 @@
 use crate::test_api::*;
-use barrel::{types, Migration};
-use indoc::indoc;
 use pretty_assertions::assert_eq;
 use sql_schema_describer::*;
 
 #[test_connector(tags(Sqlite))]
 fn multi_column_foreign_keys_must_work(api: TestApi) {
-    let sql_family = api.sql_family();
+    let sql = r#"
+        CREATE TABLE "City" (
+            id INTEGER PRIMARY KEY,
+            name VARCHAR(255)
+        );
 
-    api.execute_barrel(|migration| {
-        migration.create_table("City", move |t| {
-            t.add_column("id", types::primary());
-            t.add_column("name", types::varchar(255));
-        });
-        migration.create_table("User", move |t| {
-            t.add_column("city", types::integer());
-            t.add_column("city_name", types::varchar(255));
+        CREATE TABLE "User" (
+            city INTEGER,
+            city_name VARCHAR(255),
 
-            t.inject_custom("FOREIGN KEY(city_name, city) REFERENCES \"City\"(name, id)");
-        });
-    });
-
+            FOREIGN KEY (city_name, city) REFERENCES "City"(name, id)
+        );
+    "#;
+    api.raw_cmd(sql);
     let schema = api.describe();
 
     schema.assert_table("User", |t| {
-        let t = t
-            .assert_column("city", |c| c.assert_type_is_int_or_bigint())
+        t.assert_column("city", |c| c.assert_type_is_int_or_bigint())
             .assert_column("city_name", |c| c.assert_type_is_string())
             .assert_foreign_key_on_columns(&["city_name", "city"], |fk| {
                 fk.assert_references("City", &["name", "id"])
-            });
-
-        if sql_family.is_mysql() {
-            t.assert_index_on_columns(&["city_name", "city"], |idx| idx.assert_name("city_name"))
-        } else {
-            t
-        }
+            })
     });
 }
 
@@ -59,36 +49,22 @@ fn views_can_be_described(api: TestApi) {
 
 #[test_connector(tags(Sqlite))]
 fn sqlite_column_types_must_work(api: TestApi) {
-    let mut migration = Migration::new();
-    migration.create_table("User", move |t| {
-        t.inject_custom("int_col int not null");
-        t.add_column("int4_col", types::integer());
-        t.add_column("text_col", types::text());
-        t.add_column("real_col", types::float());
-        t.add_column("primary_col", types::primary());
-        t.inject_custom("decimal_col decimal (5, 3) not null");
-    });
-
-    let full_sql = migration.make::<barrel::backend::Sqlite>();
-    api.raw_cmd(&full_sql);
+    let sql = r#"
+        CREATE TABLE "User" (
+            int_col int not null,
+            int4_col INTEGER NOT NULL,
+            text_col TEXT NOT NULL,
+            real_col REAL NOT NULL,
+            primary_col INTEGER PRIMARY KEY,
+            decimal_col DECIMAL (5, 3) NOT NULL
+        );
+    "#;
+    api.raw_cmd(sql);
     let expectation = expect![[r#"
         SqlSchema {
             tables: [
                 Table {
                     name: "User",
-                    indices: [],
-                    primary_key: Some(
-                        PrimaryKey {
-                            columns: [
-                                PrimaryKeyColumn {
-                                    name: "primary_col",
-                                    length: None,
-                                    sort_order: None,
-                                },
-                            ],
-                            constraint_name: None,
-                        },
-                    ),
                 },
             ],
             enums: [],
@@ -116,7 +92,7 @@ fn sqlite_column_types_must_work(api: TestApi) {
                     Column {
                         name: "int4_col",
                         tpe: ColumnType {
-                            full_data_type: "INTEGER",
+                            full_data_type: "integer",
                             family: Int,
                             arity: Required,
                             native_type: None,
@@ -132,7 +108,7 @@ fn sqlite_column_types_must_work(api: TestApi) {
                     Column {
                         name: "text_col",
                         tpe: ColumnType {
-                            full_data_type: "TEXT",
+                            full_data_type: "text",
                             family: String,
                             arity: Required,
                             native_type: None,
@@ -148,7 +124,7 @@ fn sqlite_column_types_must_work(api: TestApi) {
                     Column {
                         name: "real_col",
                         tpe: ColumnType {
-                            full_data_type: "REAL",
+                            full_data_type: "real",
                             family: Float,
                             arity: Required,
                             native_type: None,
@@ -164,7 +140,7 @@ fn sqlite_column_types_must_work(api: TestApi) {
                     Column {
                         name: "primary_col",
                         tpe: ColumnType {
-                            full_data_type: "INTEGER",
+                            full_data_type: "integer",
                             family: Int,
                             arity: Required,
                             native_type: None,
@@ -192,6 +168,27 @@ fn sqlite_column_types_must_work(api: TestApi) {
             ],
             foreign_keys: [],
             foreign_key_columns: [],
+            indexes: [
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "",
+                    tpe: PrimaryKey,
+                },
+            ],
+            index_columns: [
+                IndexColumn {
+                    index_id: IndexId(
+                        0,
+                    ),
+                    column_id: ColumnId(
+                        4,
+                    ),
+                    sort_order: None,
+                    length: None,
+                },
+            ],
             views: [],
             procedures: [],
             user_defined_types: [],
@@ -237,32 +234,23 @@ fn sqlite_foreign_key_on_delete_must_be_handled(api: TestApi) {
 
 #[test_connector(tags(Sqlite))]
 fn sqlite_text_primary_keys_must_be_inferred_on_table_and_not_as_separate_indexes(api: TestApi) {
-    let mut migration = Migration::new();
-    migration.create_table("User", move |t| {
-        t.add_column("int4_col", types::integer());
-        t.add_column("text_col", types::text());
-        t.add_column("real_col", types::float());
-        t.add_column("primary_col", types::text());
+    let sql = r#"
+        CREATE TABLE "User" (
+            int4_col INTEGER,
+            text_col TEXT,
+            real_col FLOAT,
+            primary_col TEXT,
 
-        // Simulate how we create primary keys in the migrations engine.
-        t.inject_custom("PRIMARY KEY (\"primary_col\")");
-    });
-    let full_sql = migration.make::<barrel::backend::Sqlite>();
-    api.raw_cmd(&full_sql);
+            PRIMARY KEY ("primary_col")
+        );
+    "#;
+    api.raw_cmd(sql);
 
     let result = api.describe();
-
-    let (_, table) = result.table_bang("User");
-
-    assert!(table.indices.is_empty());
-
-    assert_eq!(
-        table.primary_key.as_ref().unwrap(),
-        &PrimaryKey {
-            columns: vec![PrimaryKeyColumn::new("primary_col")],
-            constraint_name: None,
-        }
-    );
+    let table = result.table_walker("User").unwrap();
+    assert!(result.indexes_count() == 1);
+    assert!(table.primary_key_columns_count() == 1);
+    assert!(table.primary_key_columns().unwrap().next().unwrap().name() == "primary_col");
 }
 
 #[test_connector(tags(Sqlite))]
@@ -281,8 +269,6 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
             tables: [
                 Table {
                     name: "string_defaults_test",
-                    indices: [],
-                    primary_key: None,
                 },
             ],
             enums: [],
@@ -294,7 +280,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                     Column {
                         name: "regular",
                         tpe: ColumnType {
-                            full_data_type: "VARCHAR",
+                            full_data_type: "varchar",
                             family: String,
                             arity: Required,
                             native_type: None,
@@ -319,7 +305,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                     Column {
                         name: "escaped",
                         tpe: ColumnType {
-                            full_data_type: "VARCHAR",
+                            full_data_type: "varchar",
                             family: String,
                             arity: Required,
                             native_type: None,
@@ -340,6 +326,8 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
             ],
             foreign_keys: [],
             foreign_key_columns: [],
+            indexes: [],
+            index_columns: [],
             views: [],
             procedures: [],
             user_defined_types: [],
@@ -364,8 +352,6 @@ fn backslashes_in_string_literals(api: TestApi) {
             tables: [
                 Table {
                     name: "test",
-                    indices: [],
-                    primary_key: None,
                 },
             ],
             enums: [],
@@ -377,7 +363,7 @@ fn backslashes_in_string_literals(api: TestApi) {
                     Column {
                         name: "model_name_space",
                         tpe: ColumnType {
-                            full_data_type: "VARCHAR(255)",
+                            full_data_type: "varchar(255)",
                             family: String,
                             arity: Required,
                             native_type: None,
@@ -398,6 +384,8 @@ fn backslashes_in_string_literals(api: TestApi) {
             ],
             foreign_keys: [],
             foreign_key_columns: [],
+            indexes: [],
+            index_columns: [],
             views: [],
             procedures: [],
             user_defined_types: [],
@@ -434,35 +422,9 @@ fn broken_relations_are_filtered_out(api: TestApi) {
             tables: [
                 Table {
                     name: "dog",
-                    indices: [],
-                    primary_key: Some(
-                        PrimaryKey {
-                            columns: [
-                                PrimaryKeyColumn {
-                                    name: "id",
-                                    length: None,
-                                    sort_order: None,
-                                },
-                            ],
-                            constraint_name: None,
-                        },
-                    ),
                 },
                 Table {
                     name: "platypus",
-                    indices: [],
-                    primary_key: Some(
-                        PrimaryKey {
-                            columns: [
-                                PrimaryKeyColumn {
-                                    name: "id",
-                                    length: None,
-                                    sort_order: None,
-                                },
-                            ],
-                            constraint_name: None,
-                        },
-                    ),
                 },
             ],
             enums: [],
@@ -474,7 +436,7 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                     Column {
                         name: "id",
                         tpe: ColumnType {
-                            full_data_type: "INTEGER",
+                            full_data_type: "integer",
                             family: Int,
                             arity: Required,
                             native_type: None,
@@ -490,7 +452,7 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                     Column {
                         name: "bestFriendId",
                         tpe: ColumnType {
-                            full_data_type: "INTEGER",
+                            full_data_type: "integer",
                             family: Int,
                             arity: Nullable,
                             native_type: None,
@@ -506,7 +468,7 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                     Column {
                         name: "realBestFriendId",
                         tpe: ColumnType {
-                            full_data_type: "INTEGER",
+                            full_data_type: "integer",
                             family: Int,
                             arity: Nullable,
                             native_type: None,
@@ -522,7 +484,7 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                     Column {
                         name: "otherBestFriendId",
                         tpe: ColumnType {
-                            full_data_type: "INTEGER",
+                            full_data_type: "integer",
                             family: Int,
                             arity: Nullable,
                             native_type: None,
@@ -538,7 +500,7 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                     Column {
                         name: "id",
                         tpe: ColumnType {
-                            full_data_type: "INTEGER",
+                            full_data_type: "integer",
                             family: Int,
                             arity: Required,
                             native_type: None,
@@ -574,6 +536,44 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                     ),
                 },
             ],
+            indexes: [
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "",
+                    tpe: PrimaryKey,
+                },
+                Index {
+                    table_id: TableId(
+                        1,
+                    ),
+                    index_name: "",
+                    tpe: PrimaryKey,
+                },
+            ],
+            index_columns: [
+                IndexColumn {
+                    index_id: IndexId(
+                        0,
+                    ),
+                    column_id: ColumnId(
+                        0,
+                    ),
+                    sort_order: None,
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        1,
+                    ),
+                    column_id: ColumnId(
+                        4,
+                    ),
+                    sort_order: None,
+                    length: None,
+                },
+            ],
             views: [],
             procedures: [],
             user_defined_types: [],
@@ -599,7 +599,7 @@ fn index_sort_order_is_handled(api: TestApi) {
 
     let schema = api.describe();
     let table = schema.table_walkers().next().unwrap();
-    let index = table.indexes().next().unwrap();
+    let index = table.indexes().nth(1).unwrap();
 
     let columns = index.columns().collect::<Vec<_>>();
 
@@ -610,4 +610,65 @@ fn index_sort_order_is_handled(api: TestApi) {
 
     assert_eq!(Some(SQLSortOrder::Desc), columns[0].sort_order());
     assert_eq!(Some(SQLSortOrder::Asc), columns[1].sort_order());
+}
+
+// See https://www.sqlite.org/lang_createtable.html for the exact logic.
+#[test_connector(tags(Sqlite))]
+fn integer_primary_keys_autoincrement(api: TestApi) {
+    let sql = indoc! {r#"
+        CREATE TABLE "A" (
+            id INT PRIMARY KEY,
+            published BOOLEAN
+        );
+
+        CREATE TABLE "B" (
+            id integer primary key,
+            age INTEGER
+        );
+
+        CREATE TABLE "C" (
+            pk INTEGER PRIMARY KEY,
+            name STRING
+        );
+    "#};
+
+    api.raw_cmd(sql);
+
+    let schema = api.describe();
+    let expected = expect![[r#"
+        [
+            (
+                "A",
+                [
+                    false,
+                ],
+            ),
+            (
+                "B",
+                [
+                    true,
+                ],
+            ),
+            (
+                "C",
+                [
+                    true,
+                ],
+            ),
+        ]
+    "#]];
+    let found = schema
+        .table_walkers()
+        .map(|t| {
+            (
+                t.name(),
+                t.primary_key_columns()
+                    .unwrap()
+                    .map(|c| c.as_column().is_autoincrement())
+                    .collect::<Vec<_>>(),
+            )
+        })
+        .collect::<Vec<_>>();
+
+    expected.assert_debug_eq(&found);
 }

@@ -10,6 +10,8 @@ use tokio::{
     task::JoinHandle,
     time::{self, Duration},
 };
+use tracing::Span;
+use tracing_futures::Instrument;
 use tracing_futures::WithSubscriber;
 
 #[derive(PartialEq)]
@@ -70,6 +72,8 @@ impl ITXServer {
     }
 
     async fn execute_single(&mut self, operation: &Operation, trace_id: Option<String>) -> crate::Result<ResponseData> {
+        let span = info_span!("prisma:itx_query_builder", user_facing = true);
+
         let conn = self.cached_tx.as_open()?;
         execute_single_operation(
             self.query_schema.clone(),
@@ -77,6 +81,7 @@ impl ITXServer {
             operation,
             trace_id,
         )
+        .instrument(span)
         .await
     }
 
@@ -85,6 +90,8 @@ impl ITXServer {
         operations: &[Operation],
         trace_id: Option<String>,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
+        let span = info_span!("prisma:itx_execute", user_facing = true);
+
         let conn = self.cached_tx.as_open()?;
         execute_many_operations(
             self.query_schema.clone(),
@@ -92,6 +99,7 @@ impl ITXServer {
             operations,
             trace_id,
         )
+        .instrument(span)
         .await
     }
 
@@ -188,7 +196,7 @@ impl ITXClient {
         if let Err(err) = self.send.send(req).await {
             debug!("channel send error {err}");
             return Err(TransactionError::Closed {
-                reason: "Cound not perform operation".to_string(),
+                reason: "Could not perform operation".to_string(),
             }
             .into());
         }
@@ -196,7 +204,7 @@ impl ITXClient {
         match receiver.await {
             Ok(resp) => Ok(resp),
             Err(_err) => Err(TransactionError::Closed {
-                reason: "Cound not perform operation".to_string(),
+                reason: "Could not perform operation".to_string(),
             }
             .into()),
         }
@@ -246,8 +254,18 @@ pub fn spawn_itx_actor(
         tx_id: tx_id.clone(),
     };
 
-    let mut server = ITXServer::new(tx_id, CachedTx::Open(value), timeout, rx_from_client, query_schema);
+    let mut server = ITXServer::new(
+        tx_id.clone(),
+        CachedTx::Open(value),
+        timeout,
+        rx_from_client,
+        query_schema,
+    );
     let dispatcher = crate::get_current_dispatcher();
+    let span = Span::current();
+
+    let tx_id_str = tx_id.to_string();
+    span.record("itx_id", &tx_id_str.as_str());
 
     tokio::task::spawn(
         async move {
@@ -279,6 +297,7 @@ pub fn spawn_itx_actor(
 
             trace!("[{}] has stopped with {}", server.id.to_string(), server.cached_tx);
         }
+        .instrument(span)
         .with_subscriber(dispatcher),
     );
 

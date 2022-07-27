@@ -8,8 +8,6 @@ fn nice_error_for_missing_model_keyword() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
-
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating: This block is invalid. It does not start with any known Prisma schema keyword. Valid keywords include 'model', 'enum', 'datasource' and 'generator'.[0m
           [1;94m-->[0m  [4mschema.prisma:1[0m
@@ -21,7 +19,7 @@ fn nice_error_for_missing_model_keyword() {
         [1;94m   | [0m
     "#]];
 
-    expectation.assert_eq(&error)
+    expect_error(dml, &expectation)
 }
 
 #[test]
@@ -36,8 +34,6 @@ fn nice_error_for_missing_model_keyword_2() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
-
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating: This block is invalid. It does not start with any known Prisma schema keyword. Valid keywords include 'model', 'enum', 'datasource' and 'generator'.[0m
           [1;94m-->[0m  [4mschema.prisma:5[0m
@@ -49,7 +45,7 @@ fn nice_error_for_missing_model_keyword_2() {
         [1;94m   | [0m
     "#]];
 
-    expectation.assert_eq(&error)
+    expect_error(dml, &expectation)
 }
 
 #[test]
@@ -61,8 +57,6 @@ fn nice_error_on_incorrect_enum_field() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
-
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating: The character `-` is not allowed in Enum Value names.[0m
           [1;94m-->[0m  [4mschema.prisma:2[0m
@@ -72,7 +66,7 @@ fn nice_error_on_incorrect_enum_field() {
         [1;94m   | [0m
     "#]];
 
-    expectation.assert_eq(&error)
+    expect_error(dml, &expectation)
 }
 
 #[test]
@@ -84,8 +78,6 @@ fn nice_error_missing_type() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
-
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "User": This field declaration is invalid. It is either missing a name or a type.[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
@@ -96,7 +88,7 @@ fn nice_error_missing_type() {
         [1;94m   | [0m
     "#]];
 
-    expectation.assert_eq(&error)
+    expect_error(dml, &expectation)
 }
 
 #[test]
@@ -106,8 +98,6 @@ fn nice_error_missing_attribute_name() {
           id Int @id @
         }
     "#};
-
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating: This line is not a valid field or attribute definition.[0m
@@ -119,7 +109,7 @@ fn nice_error_missing_attribute_name() {
         [1;94m   | [0m
     "#]];
 
-    expectation.assert_eq(&error)
+    expect_error(dml, &expectation)
 }
 
 #[test]
@@ -128,8 +118,6 @@ fn nice_error_missing_braces() {
         model User
           id Int @id
     "#};
-
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
@@ -148,7 +136,7 @@ fn nice_error_missing_braces() {
         [1;94m   | [0m
     "#]];
 
-    expectation.assert_eq(&error)
+    expect_error(dml, &expectation)
 }
 
 #[test]
@@ -159,8 +147,6 @@ fn nice_error_broken_field_type_legacy_list() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
-
     let expectation = expect![[r#"
         [1;91merror[0m: [1mTo specify a list, please use `Type[]` instead of `[Type]`.[0m
           [1;94m-->[0m  [4mschema.prisma:2[0m
@@ -170,7 +156,7 @@ fn nice_error_broken_field_type_legacy_list() {
         [1;94m   | [0m
     "#]];
 
-    expectation.assert_eq(&error)
+    expect_error(dml, &expectation)
 }
 
 #[test]
@@ -181,8 +167,6 @@ fn nice_error_broken_field_type_legacy_colon() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
-
     let expectation = expect![[r#"
         [1;91merror[0m: [1mField declarations don't require a `:`.[0m
           [1;94m-->[0m  [4mschema.prisma:2[0m
@@ -192,7 +176,7 @@ fn nice_error_broken_field_type_legacy_colon() {
         [1;94m   | [0m
     "#]];
 
-    expectation.assert_eq(&error)
+    expect_error(dml, &expectation)
 }
 
 #[test]
@@ -203,8 +187,6 @@ fn nice_error_broken_field_type_legacy_required() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
-
     let expectation = expect![[r#"
         [1;91merror[0m: [1mFields are required by default, `!` is no longer required.[0m
           [1;94m-->[0m  [4mschema.prisma:2[0m
@@ -214,7 +196,7 @@ fn nice_error_broken_field_type_legacy_required() {
         [1;94m   | [0m
     "#]];
 
-    expectation.assert_eq(&error)
+    expect_error(dml, &expectation)
 }
 
 #[test]
@@ -226,8 +208,6 @@ fn nice_error_in_case_of_literal_type_in_env_var() {
         }
     "#};
 
-    let error = datamodel::parse_schema(source).map(drop).unwrap_err();
-
     let expectation = expect![[r#"
         [1;91merror[0m: [1mExpected a String value, but received literal value `DATABASE_URL`.[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
@@ -237,7 +217,7 @@ fn nice_error_in_case_of_literal_type_in_env_var() {
         [1;94m   | [0m
     "#]];
 
-    expectation.assert_eq(&error)
+    expect_error(source, &expectation)
 }
 
 #[test]
@@ -249,8 +229,6 @@ fn nice_error_in_case_of_bool_type_in_env_var() {
         }
     "#};
 
-    let error = datamodel::parse_schema(source).map(drop).unwrap_err();
-
     let expectation = expect![[r#"
         [1;91merror[0m: [1mExpected a String value, but received literal value `true`.[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
@@ -260,7 +238,7 @@ fn nice_error_in_case_of_bool_type_in_env_var() {
         [1;94m   | [0m
     "#]];
 
-    expectation.assert_eq(&error)
+    expect_error(source, &expectation)
 }
 
 #[test]
@@ -272,8 +250,6 @@ fn nice_error_in_case_of_numeric_type_in_env_var() {
         }
     "#};
 
-    let error = datamodel::parse_schema(source).map(drop).unwrap_err();
-
     let expectation = expect![[r#"
         [1;91merror[0m: [1mExpected a String value, but received numeric value `4`.[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
@@ -283,7 +259,7 @@ fn nice_error_in_case_of_numeric_type_in_env_var() {
         [1;94m   | [0m
     "#]];
 
-    expectation.assert_eq(&error)
+    expect_error(source, &expectation)
 }
 
 #[test]
@@ -295,8 +271,6 @@ fn nice_error_in_case_of_array_type_in_env_var() {
         }
     "#};
 
-    let error = datamodel::parse_schema(source).map(drop).unwrap_err();
-
     let expectation = expect![[r#"
         [1;91merror[0m: [1mExpected a String value, but received array value `[DATABASE_URL]`.[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
@@ -306,7 +280,7 @@ fn nice_error_in_case_of_array_type_in_env_var() {
         [1;94m   | [0m
     "#]];
 
-    expectation.assert_eq(&error)
+    expect_error(source, &expectation)
 }
 
 #[test]
@@ -318,8 +292,6 @@ fn optional_list_fields_must_error() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
-
     let expectation = expect![[r#"
         [1;91merror[0m: [1mOptional lists are not supported. Use either `Type[]` or `Type?`.[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
@@ -329,7 +301,7 @@ fn optional_list_fields_must_error() {
         [1;94m   | [0m
     "#]];
 
-    expectation.assert_eq(&error)
+    expect_error(dml, &expectation)
 }
 
 #[test]
@@ -346,8 +318,6 @@ fn invalid_lines_at_the_top_level_must_render_nicely() {
         model Bl
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
-
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
           [1;94m-->[0m  [4mschema.prisma:6[0m
@@ -358,7 +328,7 @@ fn invalid_lines_at_the_top_level_must_render_nicely() {
         [1;94m   | [0m
     "#]];
 
-    expectation.assert_eq(&error)
+    expect_error(dml, &expectation)
 }
 
 #[test]
@@ -371,8 +341,6 @@ fn invalid_lines_in_datasources_must_render_nicely() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
-
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating: This line is not a valid definition within a datasource.[0m
           [1;94m-->[0m  [4mschema.prisma:4[0m
@@ -383,7 +351,7 @@ fn invalid_lines_in_datasources_must_render_nicely() {
         [1;94m   | [0m
     "#]];
 
-    expectation.assert_eq(&error)
+    expect_error(dml, &expectation)
 }
 
 #[test]
@@ -395,8 +363,6 @@ fn invalid_lines_in_generators_must_render_nicely() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
-
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating: This line is not a valid definition within a generator.[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
@@ -407,7 +373,7 @@ fn invalid_lines_in_generators_must_render_nicely() {
         [1;94m   | [0m
     "#]];
 
-    expectation.assert_eq(&error)
+    expect_error(dml, &expectation)
 }
 
 #[test]
@@ -422,8 +388,6 @@ fn invalid_field_line_must_error_nicely() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
-
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating: This line is not a valid field or attribute definition.[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
@@ -434,5 +398,5 @@ fn invalid_field_line_must_error_nicely() {
         [1;94m   | [0m
     "#]];
 
-    expectation.assert_eq(&error)
+    expect_error(dml, &expectation)
 }

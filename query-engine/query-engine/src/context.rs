@@ -23,7 +23,6 @@ impl fmt::Debug for PrismaContext {
 }
 
 pub struct ContextBuilder {
-    legacy: bool,
     enable_raw_queries: bool,
     datamodel: Datamodel,
     config: Configuration,
@@ -31,11 +30,6 @@ pub struct ContextBuilder {
 }
 
 impl ContextBuilder {
-    pub fn legacy(mut self, val: bool) -> Self {
-        self.legacy = val;
-        self
-    }
-
     pub fn enable_raw_queries(mut self, val: bool) -> Self {
         self.enable_raw_queries = val;
         self
@@ -50,7 +44,6 @@ impl ContextBuilder {
         PrismaContext::new(
             self.config,
             self.datamodel,
-            self.legacy,
             self.enable_raw_queries,
             self.metrics.unwrap(),
         )
@@ -63,7 +56,6 @@ impl PrismaContext {
     async fn new(
         config: Configuration,
         dm: Datamodel,
-        _legacy: bool,
         enable_raw_queries: bool,
         metrics: MetricRegistry,
     ) -> PrismaResult<Self> {
@@ -110,7 +102,6 @@ impl PrismaContext {
 
     pub fn builder(config: Configuration, datamodel: Datamodel) -> ContextBuilder {
         ContextBuilder {
-            legacy: false,
             enable_raw_queries: false,
             datamodel,
             config,

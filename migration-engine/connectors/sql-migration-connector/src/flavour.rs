@@ -140,6 +140,12 @@ pub(crate) trait SqlFlavour:
     /// Drop the migrations table
     fn drop_migrations_table(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
 
+    /// Return an empty database schema. This happens in the flavour, because we need
+    /// SqlSchema::connector_data to be set.
+    fn empty_database_schema(&self) -> SqlSchema {
+        SqlSchema::default()
+    }
+
     /// Check a connection to make sure it is usable by the migration engine.
     /// This can include some set up on the database, like ensuring that the
     /// schema we connect to exists.
@@ -173,20 +179,12 @@ pub(crate) trait SqlFlavour:
         shadow_database_url: Option<String>,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>>;
 
-    /// Runs a single SQL script.
-    fn run_query_script<'a>(&'a mut self, sql: &'a str) -> BoxFuture<'a, ConnectorResult<()>>;
-
     /// Receive and validate connector params.
     fn set_params(&mut self, connector_params: ConnectorParams) -> ConnectorResult<()>;
 
-    /// Table to store applied migrations, the name part.
-    fn migrations_table_name(&self) -> &'static str {
-        "_prisma_migrations"
-    }
-
     /// Table to store applied migrations.
     fn migrations_table(&self) -> Table<'static> {
-        self.migrations_table_name().into()
+        crate::MIGRATIONS_TABLE_NAME.into()
     }
 
     fn version(&mut self) -> BoxFuture<'_, ConnectorResult<Option<String>>>;
@@ -203,21 +201,9 @@ fn validate_connection_infos_do_not_match(previous: &str, next: &str) -> Connect
 
 /// Remove all usage of non-enabled preview feature elements from the SqlSchema.
 fn normalize_sql_schema(sql_schema: &mut SqlSchema, preview_features: BitFlags<PreviewFeature>) {
-    use sql_schema_describer::IndexType;
-
-    fn filter_fulltext_capabilities(schema: &mut SqlSchema) {
-        let indices = schema
-            .iter_tables_mut()
-            .flat_map(|(_, t)| t.indices.iter_mut().filter(|i| i.tpe.is_fulltext()));
-
-        for index in indices {
-            index.tpe = IndexType::Normal;
-        }
-    }
-
     // Remove this when the feature is GA
     if !preview_features.contains(PreviewFeature::FullTextIndex) {
-        filter_fulltext_capabilities(sql_schema);
+        sql_schema.make_fulltext_indexes_normal();
     }
 }
 

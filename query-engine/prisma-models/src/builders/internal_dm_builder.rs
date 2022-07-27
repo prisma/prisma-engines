@@ -178,7 +178,7 @@ fn composite_field_builders(datamodel: &Datamodel, composite: &dml::CompositeTyp
                 // No defaults on composite fields of type composite
                 default_value: None,
             })),
-            CompositeTypeFieldType::Scalar(_, _, _) | CompositeTypeFieldType::Enum(_) => {
+            CompositeTypeFieldType::Scalar(_, _) | CompositeTypeFieldType::Enum(_) => {
                 let type_ident = field.type_identifier();
 
                 if type_ident == TypeIdentifier::Unsupported {

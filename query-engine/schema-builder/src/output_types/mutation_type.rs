@@ -6,8 +6,7 @@ use prisma_models::{dml, PrismaValue};
 /// Builds the root `Mutation` type.
 pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRef) {
     let mut fields: Vec<OutputField> = ctx
-        .internal_data_model
-        .models_cloned()
+        .models()
         .into_iter()
         .flat_map(|model| {
             let mut vec = vec![];

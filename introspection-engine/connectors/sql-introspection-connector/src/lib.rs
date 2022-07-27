@@ -36,7 +36,7 @@ pub type SqlIntrospectionResult<T> = core::result::Result<T, SqlError>;
 #[derive(Debug)]
 pub struct SqlIntrospectionConnector {
     connection: Quaint,
-    preview_features: BitFlags<PreviewFeature>,
+    _preview_features: BitFlags<PreviewFeature>,
 }
 
 impl SqlIntrospectionConnector {
@@ -62,7 +62,7 @@ impl SqlIntrospectionConnector {
 
         Ok(SqlIntrospectionConnector {
             connection,
-            preview_features,
+            _preview_features: preview_features,
         })
     }
 
@@ -76,13 +76,7 @@ impl SqlIntrospectionConnector {
         &self,
         provider: Option<&str>,
     ) -> SqlIntrospectionResult<Box<dyn SqlSchemaDescriberBackend + '_>> {
-        load_describer(
-            &self.connection,
-            self.connection.connection_info(),
-            provider,
-            self.preview_features,
-        )
-        .await
+        load_describer(&self.connection, self.connection.connection_info(), provider).await
     }
 
     async fn list_databases_internal(&self) -> SqlIntrospectionResult<Vec<String>> {
@@ -157,7 +151,7 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
         previous_data_model: &Datamodel,
         ctx: IntrospectionContext,
     ) -> ConnectorResult<IntrospectionResult> {
-        let sql_schema = self.catch(self.describe(Some(&ctx.source.active_provider))).await?;
+        let sql_schema = self.catch(self.describe(Some(ctx.source.active_provider))).await?;
 
         let introspection_result = calculate_datamodel::calculate_datamodel(&sql_schema, previous_data_model, ctx)
             .map_err(|sql_introspection_error| {
@@ -174,7 +168,7 @@ trait SqlFamilyTrait {
 
 impl SqlFamilyTrait for IntrospectionContext {
     fn sql_family(&self) -> SqlFamily {
-        match self.source.active_provider.as_str() {
+        match self.source.active_provider {
             "postgresql" => SqlFamily::Postgres,
             "cockroachdb" => SqlFamily::Postgres,
             "sqlite" => SqlFamily::Sqlite,

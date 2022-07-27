@@ -1,13 +1,12 @@
+use super::IndexFieldWalker;
 use crate::{
-    ast,
+    ast::{self, WithName},
     types::{DefaultAttribute, FieldWithArgs, OperatorClassStore, ScalarField, ScalarType, SortOrder},
     walkers::{EnumWalker, ModelWalker, Walker},
     OperatorClass, ParserDatabase, ScalarFieldType,
 };
 use diagnostics::Span;
 use either::Either;
-
-use super::IndexFieldWalker;
 
 /// A scalar field, as part of a model.
 #[derive(Debug, Copy, Clone)]
@@ -84,7 +83,7 @@ impl<'db> ScalarFieldWalker<'db> {
         self.ast_field().arity.is_optional()
     }
 
-    /// Is there an `@updateAt` attribute on the field?
+    /// Is there an `@updatedAt` attribute on the field?
     pub fn is_updated_at(self) -> bool {
         self.attributes().is_updated_at
     }
@@ -383,15 +382,15 @@ impl<'db> ScalarFieldAttributeWalker<'db> {
     /// writing to the database.
     pub fn as_path_to_indexed_field(self) -> Vec<(&'db str, Option<&'db str>)> {
         let path = &self.args().path;
-        let root = self.db.ast[self.model_id][path.root()].name.name.as_str();
+        let root = self.db.ast[self.model_id][path.root()].name();
 
         let mut result = vec![(root, None)];
 
         for (ctid, field_id) in path.path() {
             let ct = &self.db.ast[*ctid];
-            let field = ct[*field_id].name.name.as_str();
+            let field = ct[*field_id].name();
 
-            result.push((field, Some(ct.name.name.as_str())));
+            result.push((field, Some(ct.name())));
         }
 
         result
@@ -408,7 +407,7 @@ impl<'db> ScalarFieldAttributeWalker<'db> {
 
             mapped
                 .and_then(|id| self.db.interner.get(id))
-                .unwrap_or_else(|| self.db.ast[self.model_id][path.root()].name.name.as_str())
+                .unwrap_or_else(|| self.db.ast[self.model_id][path.root()].name())
         };
 
         let mut result = vec![(root, None)];
@@ -419,9 +418,9 @@ impl<'db> ScalarFieldAttributeWalker<'db> {
             let field = &self.db.types.composite_type_fields[&(*ctid, *field_id)]
                 .mapped_name
                 .and_then(|id| self.db.interner.get(id))
-                .unwrap_or_else(|| ct[*field_id].name.name.as_str());
+                .unwrap_or_else(|| ct[*field_id].name());
 
-            result.push((field, Some(ct.name.name.as_str())));
+            result.push((field, Some(ct.name())));
         }
 
         result
@@ -433,7 +432,7 @@ impl<'db> ScalarFieldAttributeWalker<'db> {
     /// @@index(name(sort: Desc))
     ///                    ^^^^
     /// ```
-    pub fn sort_order(&self) -> Option<SortOrder> {
+    pub fn sort_order(self) -> Option<SortOrder> {
         self.args().sort_order
     }
 }

@@ -102,15 +102,6 @@ async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestAp
     "#};
 
     let expectation = expect![[r#"
-        generator client {
-          provider = "prisma-client-js"
-        }
-
-        datasource db {
-          provider = "sqlite"
-          url      = "env(TEST_DATABASE_URL)"
-        }
-
         model User {
           id     Int    @id @default(autoincrement())
           User_A User[] @relation("FollowRelation")
@@ -158,15 +149,6 @@ async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
     "#};
 
     let expectation = expect![[r#"
-        generator client {
-          provider = "prisma-client-js"
-        }
-
-        datasource db {
-          provider = "sqlite"
-          url      = "env(TEST_DATABASE_URL)"
-        }
-
         model Employee {
           id                                            Int        @id @default(autoincrement())
           A                                             Schedule[] @relation("EmployeeToSchedule_eveningEmployeeId")

@@ -12,7 +12,6 @@ use request_handlers::{dmmf, GraphQlHandler};
 use std::{env, sync::Arc};
 
 pub struct ExecuteRequest {
-    legacy: bool,
     query: String,
     datamodel: Datamodel,
     config: Configuration,
@@ -64,7 +63,6 @@ impl CliCommand {
                 CliOpt::ExecuteRequest(input) => Ok(Some(CliCommand::ExecuteRequest(ExecuteRequest {
                     query: input.query.clone(),
                     enable_raw_queries: opts.enable_raw_queries,
-                    legacy: input.legacy,
                     datamodel: opts.datamodel()?,
                     config: opts.configuration(false)?.subject,
                 }))),
@@ -139,7 +137,6 @@ impl CliCommand {
         request.config.validate_that_one_datasource_is_provided()?;
 
         let cx = PrismaContext::builder(request.config, request.datamodel)
-            .legacy(request.legacy)
             .enable_raw_queries(request.enable_raw_queries)
             .build()
             .await?;

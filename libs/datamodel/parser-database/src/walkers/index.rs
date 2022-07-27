@@ -76,7 +76,7 @@ impl<'db> IndexWalker<'db> {
     }
 
     /// The scalar fields covered by the index.
-    pub fn fields(self) -> impl ExactSizeIterator<Item = IndexFieldWalker<'db>> + 'db {
+    pub fn fields(self) -> impl ExactSizeIterator<Item = IndexFieldWalker<'db>> {
         self.index_attribute.fields.iter().map(move |attributes| {
             let path = &attributes.path;
             let field_id = path.field_in_index();
@@ -95,7 +95,7 @@ impl<'db> IndexWalker<'db> {
     }
 
     /// The scalar fields covered by the index, and their arguments.
-    pub fn scalar_field_attributes(self) -> impl ExactSizeIterator<Item = ScalarFieldAttributeWalker<'db>> + 'db {
+    pub fn scalar_field_attributes(self) -> impl ExactSizeIterator<Item = ScalarFieldAttributeWalker<'db>> {
         self.attribute()
             .fields
             .iter()
@@ -112,7 +112,7 @@ impl<'db> IndexWalker<'db> {
     /// and with the same attributes.
     pub fn contains_exactly_the_fields(
         self,
-        fields: impl ExactSizeIterator<Item = ScalarFieldAttributeWalker<'db>> + 'db,
+        fields: impl ExactSizeIterator<Item = ScalarFieldAttributeWalker<'db>>,
     ) -> bool {
         if self.scalar_field_attributes().len() != fields.len() {
             return false;

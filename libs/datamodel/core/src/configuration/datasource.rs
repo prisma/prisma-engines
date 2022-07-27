@@ -10,8 +10,8 @@ pub struct Datasource {
     pub name: String,
     /// The provider string
     pub provider: String,
-    /// the provider that was selected as active from all specified providers
-    pub active_provider: String,
+    /// The provider that was selected as active from all specified providers
+    pub active_provider: &'static str,
     pub url: StringFromEnvVar,
     pub url_span: Span,
     pub documentation: Option<String>,

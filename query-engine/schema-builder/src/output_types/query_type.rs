@@ -4,8 +4,7 @@ use input_types::fields::arguments;
 /// Builds the root `Query` type.
 pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRef) {
     let fields: Vec<_> = ctx
-        .internal_data_model
-        .models_cloned()
+        .models()
         .into_iter()
         .flat_map(|model| {
             let mut vec = vec![

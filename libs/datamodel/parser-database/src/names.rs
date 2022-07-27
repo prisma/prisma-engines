@@ -3,7 +3,7 @@ mod reserved_model_names;
 pub use reserved_model_names::is_reserved_type_name;
 
 use crate::{
-    ast::{self, ConfigBlockProperty, TopId, WithAttributes, WithIdentifier},
+    ast::{self, ConfigBlockProperty, TopId, WithAttributes, WithIdentifier, WithName, WithSpan},
     types::ScalarType,
     Context, DatamodelError, StringId,
 };
@@ -61,19 +61,19 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
                 &mut names.tops
             }
             (ast::TopId::Model(model_id), ast::Top::Model(model)) => {
-                validate_identifier(&model.name, "Model", ctx);
+                validate_identifier(model.identifier(), "Model", ctx);
                 validate_model_name(model, ctx.diagnostics);
                 validate_attribute_identifiers(model, ctx);
 
                 for (field_id, field) in model.iter_fields() {
-                    validate_identifier(&field.name, "Field", ctx);
+                    validate_identifier(field.identifier(), "Field", ctx);
                     validate_attribute_identifiers(field, ctx);
                     let field_name_id = ctx.interner.intern(field.name());
 
                     if names.model_fields.insert((model_id, field_name_id), field_id).is_some() {
                         ctx.push_error(DatamodelError::new_duplicate_field_error(
-                            &model.name.name,
-                            &field.name.name,
+                            model.name(),
+                            field.name(),
                             field.identifier().span,
                         ))
                     }
@@ -82,7 +82,7 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
                 &mut names.tops
             }
             (ast::TopId::CompositeType(ctid), ast::Top::CompositeType(ct)) => {
-                validate_identifier(&ct.name, "Composite type", ctx);
+                validate_identifier(ct.identifier(), "Composite type", ctx);
 
                 for (field_id, field) in ct.iter_fields() {
                     let field_name_id = ctx.interner.intern(field.name());
@@ -93,9 +93,9 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
                         .is_some()
                     {
                         ctx.push_error(DatamodelError::new_composite_type_duplicate_field_error(
-                            &ct.name.name,
-                            &field.name.name,
-                            field.identifier().span,
+                            ct.name(),
+                            field.name(),
+                            field.identifier().span(),
                         ))
                     }
                 }
@@ -168,17 +168,17 @@ fn validate_attribute_identifiers(with_attrs: &dyn WithAttributes, ctx: &mut Con
 fn validate_identifier(ident: &ast::Identifier, schema_item: &str, ctx: &mut Context<'_>) {
     if ident.name.is_empty() {
         ctx.push_error(DatamodelError::new_validation_error(
-            format!("The name of a {} must not be empty.", schema_item),
+            &format!("The name of a {} must not be empty.", schema_item),
             ident.span,
         ))
     } else if ident.name.chars().next().unwrap().is_numeric() {
         ctx.push_error(DatamodelError::new_validation_error(
-            format!("The name of a {} must not start with a number.", schema_item),
+            &format!("The name of a {} must not start with a number.", schema_item),
             ident.span,
         ))
     } else if ident.name.contains('-') {
         ctx.push_error(DatamodelError::new_validation_error(
-            format!("The character `-` is not allowed in {} names.", schema_item),
+            &format!("The character `-` is not allowed in {} names.", schema_item),
             ident.span,
         ))
     }

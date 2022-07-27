@@ -18,7 +18,7 @@ pub struct Field {
     /// name String
     /// ^^^^
     /// ```
-    pub name: Identifier,
+    pub(crate) name: Identifier,
     /// The arity of the field.
     pub arity: FieldArity,
     /// The attributes of this field.
@@ -35,11 +35,9 @@ pub struct Field {
     ///     ^^^^^^^^^^^
     /// name String @id @default("lol")
     /// ```
-    pub documentation: Option<Comment>,
+    pub(crate) documentation: Option<Comment>,
     /// The location of this field in the text representation.
-    pub span: Span,
-    /// The location of this field in the text representation.
-    pub is_commented_out: bool,
+    pub(crate) span: Span,
 }
 
 impl Field {
@@ -76,8 +74,8 @@ impl WithIdentifier for Field {
 }
 
 impl WithSpan for Field {
-    fn span(&self) -> &Span {
-        &self.span
+    fn span(&self) -> Span {
+        self.span
     }
 }
 
@@ -88,12 +86,8 @@ impl WithAttributes for Field {
 }
 
 impl WithDocumentation for Field {
-    fn documentation(&self) -> &Option<Comment> {
-        &self.documentation
-    }
-
-    fn is_commented_out(&self) -> bool {
-        self.is_commented_out
+    fn documentation(&self) -> Option<&str> {
+        self.documentation.as_ref().map(|doc| doc.text.as_str())
     }
 }
 

@@ -6,9 +6,7 @@ members = [
   "introspection-engine/connectors/mongodb-introspection-connector",
   "introspection-engine/core",
   "introspection-engine/introspection-engine-tests",
-  "libs/datamodel/connectors/datamodel-connector",
-  "libs/datamodel/connectors/sql-datamodel-connector",
-  "libs/datamodel/connectors/mongodb-datamodel-connector",
+  "libs/datamodel/connectors/*",
   "migration-engine/cli",
   "migration-engine/connectors/migration-connector",
   "migration-engine/connectors/sql-migration-connector",
@@ -36,7 +34,6 @@ members = [
   "libs/datamodel/schema-ast",
   "libs/json-rpc-stdio",
   "libs/native-types",
-  "libs/prisma-inflector",
   "libs/prisma-value",
   "libs/sql-ddl",
   "libs/sql-schema-describer",
@@ -44,6 +41,7 @@ members = [
   "libs/mongodb-client",
   "libs/test-cli",
   "libs/user-facing-errors",
+  "psl/*",
 ]
 
 [profile.dev]
