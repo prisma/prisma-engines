@@ -63,7 +63,7 @@ fn handle_compound_field(
         }
     }
 
-    Ok(dbg!(Filter::And(filters)))
+    Ok(Filter::And(filters))
 }
 
 fn traverse_composite_filter(
@@ -74,6 +74,7 @@ fn traverse_composite_filter(
 ) -> QueryGraphBuilderResult<Filter> {
     if path.len() == 1 {
         let pv: PrismaValue = input_map.remove(&field.name).unwrap().try_into()?;
+
         return Ok(field.equals(pv));
     }
 
@@ -85,7 +86,11 @@ fn traverse_composite_filter(
     let path = &path[1..];
     let inner = traverse_composite_filter(model, path, field, input_map)?;
 
-    Ok(cf.is(inner))
+    if cf.is_list() {
+        Ok(cf.some(inner))  // When field is in a list
+    } else {
+        Ok(cf.is(inner))    // Just a simple value
+    }
 }
 
 /// Extracts a regular filter potentially matching many records.
