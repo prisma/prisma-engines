@@ -87,9 +87,9 @@ fn traverse_composite_filter(
     let inner = traverse_composite_filter(model, path, field, input_map)?;
 
     if cf.is_list() {
-        Ok(cf.some(inner))  // When field is in a list
+        Ok(cf.some(inner)) // When field is in a list
     } else {
-        Ok(cf.is(inner))    // Just a simple value
+        Ok(cf.is(inner)) // Just a simple value
     }
 }
 
