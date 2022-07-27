@@ -35,23 +35,9 @@ pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderConte
         OutputType::List(ref l) => {
             let mut type_reference = render_output_type(l, ctx);
             type_reference.is_list = true;
-
             type_reference
         }
 
-        // OutputType::Scalar(ScalarType::Enum(et)) => {
-        //     ctx.mark_to_be_rendered(&et.as_ref());
-
-        //     let ident = et.identifier();
-        //     let type_reference = DmmfTypeReference {
-        //         typ: ident.name().to_owned(),
-        //         namespace: Some(ident.namespace().to_owned()),
-        //         location: TypeLocation::Scalar,
-        //         is_list: false,
-        //     };
-
-        //     type_reference
-        // }
         OutputType::Scalar(ref scalar) => {
             let stringified = match scalar {
                 ScalarType::Null => "Null",
@@ -67,7 +53,6 @@ pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderConte
                 ScalarType::JsonList => "Json",
                 ScalarType::Xml => "Xml",
                 ScalarType::Bytes => "Bytes",
-                // ScalarType::Enum(_) => unreachable!(), // Handled separately above.
             };
 
             DmmfTypeReference {
@@ -125,17 +110,6 @@ pub(super) fn render_input_type(input_type: &InputType, ctx: &mut RenderContext)
             type_reference
         }
 
-        // InputType::Scalar(ScalarType::Enum(et)) => {
-        //     ctx.mark_to_be_rendered(&et.as_ref());
-        //     let type_reference = DmmfTypeReference {
-        //         typ: et.name().to_owned(),
-        //         namespace: Some(et.namespace()),
-        //         location: TypeLocation::Scalar,
-        //         is_list: false,
-        //     };
-
-        //     type_reference
-        // }
         InputType::Scalar(ref scalar) => {
             let stringified = match scalar {
                 ScalarType::Null => "Null",
@@ -151,7 +125,6 @@ pub(super) fn render_input_type(input_type: &InputType, ctx: &mut RenderContext)
                 ScalarType::JsonList => "Json",
                 ScalarType::Xml => "Xml",
                 ScalarType::Bytes => "Bytes",
-                // ScalarType::Enum(_) => unreachable!(), // Handled separately above.
             };
 
             DmmfTypeReference {

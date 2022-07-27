@@ -9,7 +9,6 @@ use crate::{
     RelationLinkManifestation, RelationSide, RelationTable, TypeIdentifier,
 };
 use datamodel::dml::{self, CompositeTypeFieldType, Datamodel, Ignorable, WithDatabaseName};
-use itertools::Itertools;
 use once_cell::sync::OnceCell;
 use std::sync::Arc;
 
@@ -64,20 +63,6 @@ impl InternalDataModelBuilder {
 
         internal_data_model.relations.set(relations).unwrap();
         internal_data_model.finalize();
-
-        internal_data_model
-            .composite_types
-            .get()
-            .unwrap()
-            .iter()
-            .for_each(|ct| {
-                println!(
-                    "{}: {}",
-                    ct.name,
-                    ct.fields().iter().map(|f| f.name()).collect_vec().join(", ")
-                )
-            });
-
         internal_data_model
     }
 }
