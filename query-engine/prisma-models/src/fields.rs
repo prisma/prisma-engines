@@ -259,4 +259,11 @@ impl Fields {
             .flat_map(|field| field.scalar_fields().into_iter().map(|f| f.db_name().to_owned()))
             .unique()
     }
+
+    pub fn filter_all<P>(&self, predicate: P) -> Vec<Field>
+    where
+        P: FnMut(&&Field) -> bool,
+    {
+        self.all.iter().filter(predicate).map(Clone::clone).collect()
+    }
 }

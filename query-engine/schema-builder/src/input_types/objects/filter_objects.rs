@@ -10,7 +10,7 @@ pub(crate) fn scalar_filter_object_type(
 ) -> InputObjectTypeWeakRef {
     let aggregate = if include_aggregates { "WithAggregates" } else { "" };
     let ident = Identifier::new(format!("{}ScalarWhere{}Input", model.name, aggregate), PRISMA_NAMESPACE);
-    return_if_cached!(ctx, &ident);
+    return_input_if_cached!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());
@@ -50,7 +50,7 @@ where
 {
     let container = container.into();
     let ident = Identifier::new(format!("{}WhereInput", container.name()), PRISMA_NAMESPACE);
-    return_if_cached!(ctx, &ident);
+    return_input_if_cached!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());
@@ -87,7 +87,7 @@ where
 
 pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> InputObjectTypeWeakRef {
     let ident = Identifier::new(format!("{}WhereUniqueInput", model.name), PRISMA_NAMESPACE);
-    return_if_cached!(ctx, &ident);
+    return_input_if_cached!(ctx, &ident);
 
     let mut x = init_input_object_type(ident.clone());
     x.require_exactly_one_field();
@@ -158,7 +158,7 @@ fn compound_field_unique_object_type(
         PRISMA_NAMESPACE,
     );
 
-    return_if_cached!(ctx, &ident);
+    return_input_if_cached!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());
@@ -212,7 +212,7 @@ fn composite_field_unique_object_type(
         format!("{}CompositeUniqueInput", path.iter().map(capitalize).join("")),
         PRISMA_NAMESPACE,
     );
-    return_if_cached!(ctx, &ident);
+    return_input_if_cached!(ctx, &ident);
 
     let obj = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, obj.clone());
@@ -228,7 +228,7 @@ fn composite_field_unique_object_type(
 /// If the composite is a list, only lists are allowed for comparison, no shorthands are used.
 pub(crate) fn composite_equality_object(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
     let ident = Identifier::new(format!("{}ObjectEqualityInput", cf.typ.name), PRISMA_NAMESPACE);
-    return_if_cached!(ctx, &ident);
+    return_input_if_cached!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());

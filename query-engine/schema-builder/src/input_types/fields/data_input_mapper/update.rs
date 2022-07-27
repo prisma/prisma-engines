@@ -173,7 +173,7 @@ fn update_operations_object_type(
         format!("{}{}FieldUpdateOperationsInput", nullable, prefix),
         PRISMA_NAMESPACE,
     );
-    return_if_cached!(ctx, &ident);
+    return_input_if_cached!(ctx, &ident);
 
     let mut obj = init_input_object_type(ident.clone());
     obj.require_exactly_one_field();
@@ -223,7 +223,7 @@ fn composite_update_envelope_object_type(ctx: &mut BuilderContext, cf: &Composit
     let name = format!("{}{}UpdateEnvelopeInput", cf.typ.name, arity);
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
 
-    return_if_cached!(ctx, &ident);
+    return_input_if_cached!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
     input_object.require_exactly_one_field();
@@ -251,7 +251,7 @@ fn composite_update_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef
     let name = format!("{}UpdateInput", cf.typ.name);
 
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
-    return_if_cached!(ctx, &ident);
+    return_input_if_cached!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
     input_object.set_min_fields(1);
@@ -319,7 +319,7 @@ fn composite_upsert_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef
     let name = format!("{}UpsertInput", cf.typ.name);
 
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
-    return_if_cached!(ctx, &ident);
+    return_input_if_cached!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
     input_object.set_tag(ObjectTag::CompositeEnvelope);
@@ -354,7 +354,7 @@ fn composite_update_many_object_type(ctx: &mut BuilderContext, cf: &CompositeFie
     let name = format!("{}UpdateManyInput", cf.typ.name);
 
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
-    return_if_cached!(ctx, &ident);
+    return_input_if_cached!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
     input_object.set_tag(ObjectTag::CompositeEnvelope);
@@ -380,7 +380,7 @@ fn composite_delete_many_object_type(ctx: &mut BuilderContext, cf: &CompositeFie
     let name = format!("{}DeleteManyInput", cf.typ.name);
 
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
-    return_if_cached!(ctx, &ident);
+    return_input_if_cached!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
     input_object.set_tag(ObjectTag::CompositeEnvelope);

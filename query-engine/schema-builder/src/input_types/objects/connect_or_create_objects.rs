@@ -1,5 +1,6 @@
 use super::*;
 use constants::args;
+use mutations::create_one;
 
 /// Builds "<x>CreateOrConnectNestedInput" input object types.
 pub(crate) fn nested_connect_or_create_input_object(
@@ -22,7 +23,7 @@ pub(crate) fn nested_connect_or_create_input_object(
         PRISMA_NAMESPACE,
     );
 
-    let create_types = create_one_objects::create_one_input_types(ctx, &related_model, Some(parent_field));
+    let create_types = create_one::create_one_input_types(ctx, &related_model, Some(parent_field));
 
     match ctx.get_input_type(&ident) {
         None => {

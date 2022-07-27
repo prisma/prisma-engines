@@ -1,5 +1,6 @@
 use super::objects::*;
 use super::*;
+use crate::mutations::{create_many, create_one};
 use constants::{args, operations};
 use datamodel_connector::ConnectorCapability;
 
@@ -18,8 +19,7 @@ pub(crate) fn filter_input_field(ctx: &mut BuilderContext, field: &ModelField, i
 }
 
 pub(crate) fn nested_create_one_input_field(ctx: &mut BuilderContext, parent_field: &RelationFieldRef) -> InputField {
-    let create_types =
-        create_one_objects::create_one_input_types(ctx, &parent_field.related_model(), Some(parent_field));
+    let create_types = create_one::create_one_input_types(ctx, &parent_field.related_model(), Some(parent_field));
 
     let types: Vec<InputType> = create_types
         .into_iter()
@@ -51,14 +51,13 @@ pub(crate) fn nested_create_many_input_field(
 }
 
 fn nested_create_many_envelope(ctx: &mut BuilderContext, parent_field: &RelationFieldRef) -> InputObjectTypeWeakRef {
-    let create_type =
-        create_many_objects::create_many_object_type(ctx, &parent_field.related_model(), Some(parent_field));
+    let create_type = create_many::create_many_object_type(ctx, &parent_field.related_model(), Some(parent_field));
 
     let nested_ident = &create_type.into_arc().identifier;
     let name = format!("{}Envelope", nested_ident.name());
 
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
-    return_if_cached!(ctx, &ident);
+    return_input_if_cached!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());

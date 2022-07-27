@@ -52,6 +52,10 @@ impl Model {
             .unwrap()
     }
 
+    pub fn supports_create_operation(&self) -> bool {
+        self.supports_create_operation
+    }
+
     pub fn indexes(&self) -> &[Index] {
         self.indexes
             .get()

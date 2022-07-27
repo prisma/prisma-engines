@@ -85,7 +85,7 @@ impl From<&dml::Datamodel> for InternalDataModelBuilder {
 fn model_builders(datamodel: &Datamodel, relation_placeholders: &[RelationPlaceholder]) -> Vec<ModelBuilder> {
     datamodel
         .models()
-        .filter(|model| !model.is_ignored)
+        .filter(|model| !model.is_ignored())
         .filter(|model| model.is_supported())
         .map(|model| ModelBuilder {
             name: model.name.clone(),
