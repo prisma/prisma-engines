@@ -17,6 +17,7 @@ pub struct InputObjectType {
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum ObjectTag {
     CompositeEnvelope,
+    FieldRef,
 }
 
 #[derive(Debug, Default, PartialEq)]

@@ -54,6 +54,11 @@ fn parse_internal_json(
 
                     Ok(vec![filter])
                 }
+                ParsedInputValue::Map(ref map) if matches!(map.tag, Some(schema::ObjectTag::FieldRef)) => {
+                    let filter = field.json_not_equals(as_condition_value(input, field, false)?, json_path);
+
+                    Ok(vec![filter])
+                }
                 _ => {
                     let inner_object: ParsedInputMap = input.try_into()?;
 

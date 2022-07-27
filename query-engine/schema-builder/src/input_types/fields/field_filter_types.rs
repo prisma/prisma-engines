@@ -388,13 +388,9 @@ fn equality_filters(
     nullable: bool,
 ) -> impl Iterator<Item = InputField> {
     std::iter::once(
-        input_field(
-            filters::EQUALS,
-            vec![mapped_type, InputType::object(field_reference_object_type(ctx))],
-            None,
-        )
-        .optional()
-        .nullable_if(nullable),
+        input_field(filters::EQUALS, mapped_type.with_field_ref_input(ctx), None)
+            .optional()
+            .nullable_if(nullable),
     )
 }
 
@@ -404,11 +400,13 @@ fn json_equality_filters(
     nullable: bool,
 ) -> impl Iterator<Item = InputField> {
     let field = if ctx.has_capability(ConnectorCapability::AdvancedJsonNullability) {
-        let enum_type = InputType::enum_type(json_null_filter_enum(ctx));
+        let enum_type = json_null_filter_enum(ctx);
+        let mut field_types = mapped_type.with_field_ref_input(ctx);
+        field_types.push(InputType::Enum(enum_type));
 
-        input_field(filters::EQUALS, vec![enum_type, mapped_type], None).optional()
+        input_field(filters::EQUALS, field_types, None).optional()
     } else {
-        input_field(filters::EQUALS, vec![mapped_type], None)
+        input_field(filters::EQUALS, mapped_type.with_field_ref_input(ctx), None)
             .optional()
             .nullable_if(nullable)
     };
@@ -422,54 +420,43 @@ fn inclusion_filters(
     nullable: bool,
 ) -> impl Iterator<Item = InputField> {
     let typ = InputType::list(mapped_type);
+    let field_types: Vec<InputType> =
+        typ.with_field_ref_input_if(ctx, ctx.has_capability(ConnectorCapability::ScalarLists));
 
     vec![
-        input_field(
-            filters::IN,
-            vec![typ.clone(), InputType::object(field_reference_object_type(ctx))],
-            None,
-        )
-        .optional()
-        .nullable_if(nullable),
-        input_field(
-            filters::NOT_IN,
-            vec![typ, InputType::object(field_reference_object_type(ctx))],
-            None,
-        )
-        .optional()
-        .nullable_if(nullable), // Kept for legacy reasons!
+        input_field(filters::IN, field_types.clone(), None)
+            .optional()
+            .nullable_if(nullable),
+        input_field(filters::NOT_IN, field_types, None)
+            .optional()
+            .nullable_if(nullable), // Kept for legacy reasons!
     ]
     .into_iter()
 }
 
 fn alphanumeric_filters(ctx: &mut BuilderContext, mapped_type: InputType) -> impl Iterator<Item = InputField> {
-    let ref_type = InputType::object(field_reference_object_type(ctx));
+    let field_types = mapped_type.with_field_ref_input(ctx);
 
     vec![
-        input_field(filters::LOWER_THAN, vec![mapped_type.clone(), ref_type.clone()], None).optional(),
-        input_field(
-            filters::LOWER_THAN_OR_EQUAL,
-            vec![mapped_type.clone(), ref_type.clone()],
-            None,
-        )
-        .optional(),
-        input_field(filters::GREATER_THAN, vec![mapped_type.clone(), ref_type.clone()], None).optional(),
-        input_field(filters::GREATER_THAN_OR_EQUAL, vec![mapped_type, ref_type], None).optional(),
+        input_field(filters::LOWER_THAN, field_types.clone(), None).optional(),
+        input_field(filters::LOWER_THAN_OR_EQUAL, field_types.clone(), None).optional(),
+        input_field(filters::GREATER_THAN, field_types.clone(), None).optional(),
+        input_field(filters::GREATER_THAN_OR_EQUAL, field_types, None).optional(),
     ]
     .into_iter()
 }
 
 fn string_filters(ctx: &mut BuilderContext, mapped_type: InputType) -> impl Iterator<Item = InputField> {
-    let ref_type = InputType::object(field_reference_object_type(ctx));
+    let field_types = mapped_type.clone().with_field_ref_input(ctx);
 
     let mut string_filters = vec![
-        input_field(filters::CONTAINS, vec![mapped_type.clone(), ref_type.clone()], None).optional(),
-        input_field(filters::STARTS_WITH, vec![mapped_type.clone(), ref_type.clone()], None).optional(),
-        input_field(filters::ENDS_WITH, vec![mapped_type.clone(), ref_type.clone()], None).optional(),
+        input_field(filters::CONTAINS, field_types.clone(), None).optional(),
+        input_field(filters::STARTS_WITH, field_types.clone(), None).optional(),
+        input_field(filters::ENDS_WITH, field_types, None).optional(),
     ];
 
     if ctx.can_full_text_search() {
-        string_filters.push(input_field(filters::SEARCH, vec![mapped_type, ref_type], None).optional());
+        string_filters.push(input_field(filters::SEARCH, mapped_type, None).optional());
     }
 
     string_filters.into_iter()
@@ -485,26 +472,48 @@ fn json_filters(ctx: &mut BuilderContext) -> impl Iterator<Item = InputField> {
     } else {
         unreachable!()
     };
-    let ref_type = InputType::object(field_reference_object_type(ctx));
 
     vec![
-        input_field(filters::PATH, vec![path_type], None).optional(),
-        input_field(filters::STRING_CONTAINS, InputType::string(), None).optional(),
-        input_field(filters::STRING_STARTS_WITH, InputType::string(), None).optional(),
-        input_field(filters::STRING_ENDS_WITH, InputType::string(), None).optional(),
-        input_field(filters::ARRAY_CONTAINS, vec![InputType::json(), ref_type.clone()], None)
-            .optional()
-            .nullable(),
+        input_field(filters::PATH, path_type.with_field_ref_input(ctx), None).optional(),
         input_field(
-            filters::ARRAY_STARTS_WITH,
-            vec![InputType::json(), ref_type.clone()],
+            filters::STRING_CONTAINS,
+            InputType::string().with_field_ref_input(ctx),
+            None,
+        )
+        .optional(),
+        input_field(
+            filters::STRING_STARTS_WITH,
+            InputType::string().with_field_ref_input(ctx),
+            None,
+        )
+        .optional(),
+        input_field(
+            filters::STRING_ENDS_WITH,
+            InputType::string().with_field_ref_input(ctx),
+            None,
+        )
+        .optional(),
+        input_field(
+            filters::ARRAY_CONTAINS,
+            InputType::json().with_field_ref_input(ctx),
             None,
         )
         .optional()
         .nullable(),
-        input_field(filters::ARRAY_ENDS_WITH, vec![InputType::json(), ref_type], None)
-            .optional()
-            .nullable(),
+        input_field(
+            filters::ARRAY_STARTS_WITH,
+            InputType::json().with_field_ref_input(ctx),
+            None,
+        )
+        .optional()
+        .nullable(),
+        input_field(
+            filters::ARRAY_ENDS_WITH,
+            InputType::json().with_field_ref_input(ctx),
+            None,
+        )
+        .optional()
+        .nullable(),
     ]
     .into_iter()
 }
@@ -591,13 +600,20 @@ fn not_filter_field(
     match typ {
         // Json is not nullable on dbs with `AdvancedJsonNullability`, only by proxy through an enum.
         TypeIdentifier::Json if has_adv_json => {
-            let enum_type = InputType::enum_type(json_null_filter_enum(ctx));
-            input_field(filters::NOT_LOWERCASE, vec![enum_type, mapped_scalar_type], None).optional()
+            let enum_type = json_null_filter_enum(ctx);
+            let mut field_types = mapped_scalar_type.with_field_ref_input(ctx);
+            field_types.push(InputType::Enum(enum_type));
+
+            input_field(filters::NOT_LOWERCASE, field_types, None).optional()
         }
 
-        TypeIdentifier::Json => input_field(filters::NOT_LOWERCASE, vec![mapped_scalar_type], None)
-            .optional()
-            .nullable_if(is_nullable),
+        TypeIdentifier::Json => input_field(
+            filters::NOT_LOWERCASE,
+            mapped_scalar_type.with_field_ref_input(ctx),
+            None,
+        )
+        .optional()
+        .nullable_if(is_nullable),
 
         _ => {
             // Full nested filter. Only available on non-JSON fields.
@@ -622,10 +638,38 @@ fn field_reference_object_type(ctx: &mut BuilderContext) -> InputObjectTypeWeakR
 
     return_cached_input!(ctx, &ident);
 
-    let object = Arc::new(init_input_object_type(ident.clone()));
+    let mut object = init_input_object_type(ident.clone());
+    object.set_tag(ObjectTag::FieldRef);
+
+    let object = Arc::new(object);
     ctx.cache_input_type(ident, object.clone());
 
     object.set_fields(vec![input_field(filters::REF, InputType::string(), None)]);
 
     Arc::downgrade(&object)
+}
+
+trait WithFieldReferenceInputExtension {
+    fn with_field_ref_input(self, ctx: &mut BuilderContext) -> Vec<InputType>;
+    fn with_field_ref_input_if(self, ctx: &mut BuilderContext, cond: bool) -> Vec<InputType>;
+}
+
+impl WithFieldReferenceInputExtension for InputType {
+    fn with_field_ref_input(self, ctx: &mut BuilderContext) -> Vec<InputType> {
+        let mut field_types: Vec<InputType> = vec![self];
+
+        if ctx.has_feature(&PreviewFeature::FieldReference) {
+            field_types.push(InputType::object(field_reference_object_type(ctx)));
+        }
+
+        field_types
+    }
+
+    fn with_field_ref_input_if(self, ctx: &mut BuilderContext, cond: bool) -> Vec<InputType> {
+        if cond {
+            self.with_field_ref_input(ctx)
+        } else {
+            vec![self]
+        }
+    }
 }

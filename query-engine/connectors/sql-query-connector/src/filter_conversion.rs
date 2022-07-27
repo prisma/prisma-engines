@@ -63,7 +63,7 @@ pub trait AliasedCondition {
     ///
     /// Alias should be used only when nesting, making the top level queries
     /// more explicit.
-    fn aliased_cond(self, alias: Option<Alias>) -> ConditionTree<'static>;
+    fn aliased_cond(self, alias: Option<Alias>, reverse: bool) -> ConditionTree<'static>;
 }
 
 trait AliasedSelect {
@@ -77,15 +77,15 @@ trait AliasedSelect {
 
 impl AliasedCondition for Filter {
     /// Conversion from a `Filter` to a query condition tree. Aliased when in a nested `SELECT`.
-    fn aliased_cond(self, alias: Option<Alias>) -> ConditionTree<'static> {
+    fn aliased_cond(self, alias: Option<Alias>, reverse: bool) -> ConditionTree<'static> {
         match self {
             Filter::And(mut filters) => match filters.len() {
                 n if n == 0 => ConditionTree::NoCondition,
-                n if n == 1 => filters.pop().unwrap().aliased_cond(alias),
+                n if n == 1 => filters.pop().unwrap().aliased_cond(alias, reverse),
                 _ => {
                     let exprs = filters
                         .into_iter()
-                        .map(|f| f.aliased_cond(alias))
+                        .map(|f| f.aliased_cond(alias, reverse))
                         .map(Expression::from)
                         .collect();
 
@@ -94,11 +94,11 @@ impl AliasedCondition for Filter {
             },
             Filter::Or(mut filters) => match filters.len() {
                 n if n == 0 => ConditionTree::NegativeCondition,
-                n if n == 1 => filters.pop().unwrap().aliased_cond(alias),
+                n if n == 1 => filters.pop().unwrap().aliased_cond(alias, reverse),
                 _ => {
                     let exprs = filters
                         .into_iter()
-                        .map(|f| f.aliased_cond(alias))
+                        .map(|f| f.aliased_cond(alias, reverse))
                         .map(Expression::from)
                         .collect();
 
@@ -107,20 +107,20 @@ impl AliasedCondition for Filter {
             },
             Filter::Not(mut filters) => match filters.len() {
                 n if n == 0 => ConditionTree::NoCondition,
-                n if n == 1 => filters.pop().unwrap().aliased_cond(alias).not(),
+                n if n == 1 => filters.pop().unwrap().aliased_cond(alias, !reverse).not(),
                 _ => {
                     let exprs = filters
                         .into_iter()
-                        .map(|f| f.aliased_cond(alias).not())
+                        .map(|f| f.aliased_cond(alias, !reverse).not())
                         .map(Expression::from)
                         .collect();
 
                     ConditionTree::And(exprs)
                 }
             },
-            Filter::Scalar(filter) => filter.aliased_cond(alias),
-            Filter::OneRelationIsNull(filter) => filter.aliased_cond(alias),
-            Filter::Relation(filter) => filter.aliased_cond(alias),
+            Filter::Scalar(filter) => filter.aliased_cond(alias, reverse),
+            Filter::OneRelationIsNull(filter) => filter.aliased_cond(alias, reverse),
+            Filter::Relation(filter) => filter.aliased_cond(alias, reverse),
             Filter::BoolFilter(b) => {
                 if b {
                     ConditionTree::NoCondition
@@ -128,8 +128,8 @@ impl AliasedCondition for Filter {
                     ConditionTree::NegativeCondition
                 }
             }
-            Filter::Aggregation(filter) => filter.aliased_cond(alias),
-            Filter::ScalarList(filter) => filter.aliased_cond(alias),
+            Filter::Aggregation(filter) => filter.aliased_cond(alias, reverse),
+            Filter::ScalarList(filter) => filter.aliased_cond(alias, reverse),
             Filter::Empty => ConditionTree::NoCondition,
             Filter::Composite(_) => unimplemented!("SQL connectors do not support composites yet."),
         }
@@ -138,45 +138,45 @@ impl AliasedCondition for Filter {
 
 impl AliasedCondition for ScalarFilter {
     /// Conversion from a `ScalarFilter` to a query condition tree. Aliased when in a nested `SELECT`.
-    fn aliased_cond(self, alias: Option<Alias>) -> ConditionTree<'static> {
+    fn aliased_cond(self, alias: Option<Alias>, reverse: bool) -> ConditionTree<'static> {
         match self.condition {
             ScalarCondition::Search(_, _) | ScalarCondition::NotSearch(_, _) => {
-                scalar_filter_aliased_cond_search(self, alias)
+                let mut projections = match self.condition.clone() {
+                    ScalarCondition::Search(_, proj) => proj,
+                    ScalarCondition::NotSearch(_, proj) => proj,
+                    _ => unreachable!(),
+                };
+
+                projections.push(self.projection);
+
+                let columns: Vec<Column> = projections
+                    .into_iter()
+                    .map(|p| match (p, alias) {
+                        (ScalarProjection::Single(field), None) => field.as_column(),
+                        (ScalarProjection::Single(field), Some(alias)) => {
+                            field.as_column().table(alias.to_string(None))
+                        }
+                        (ScalarProjection::Compound(_), _) => {
+                            unreachable!("Full-text search does not support compound fields")
+                        }
+                    })
+                    .collect();
+
+                let comparable: Expression = text_search(columns.as_slice()).into();
+
+                convert_scalar_filter(comparable, self.condition, reverse, self.mode, &[], false)
             }
-            _ => scalar_filter_aliased_cond(self, alias),
+            _ => scalar_filter_aliased_cond(self, alias, reverse),
         }
     }
 }
 
-fn scalar_filter_aliased_cond_search(sf: ScalarFilter, alias: Option<Alias>) -> ConditionTree<'static> {
-    let mut projections = match sf.condition.clone() {
-        ScalarCondition::Search(_, proj) => proj,
-        ScalarCondition::NotSearch(_, proj) => proj,
-        _ => unreachable!(),
-    };
-
-    projections.push(sf.projection);
-
-    let columns: Vec<Column> = projections
-        .into_iter()
-        .map(|p| match (p, alias) {
-            (ScalarProjection::Single(field), None) => field.as_column(),
-            (ScalarProjection::Single(field), Some(alias)) => field.as_column().table(alias.to_string(None)),
-            (ScalarProjection::Compound(_), _) => unreachable!("Full-text search does not support compound fields"),
-        })
-        .collect();
-
-    let comparable: Expression = text_search(columns.as_slice()).into();
-
-    convert_scalar_filter(comparable, sf.condition, sf.mode, &[], false)
-}
-
-fn scalar_filter_aliased_cond(sf: ScalarFilter, alias: Option<Alias>) -> ConditionTree<'static> {
+fn scalar_filter_aliased_cond(sf: ScalarFilter, alias: Option<Alias>, reverse: bool) -> ConditionTree<'static> {
     match (alias, sf.projection) {
         (Some(alias), ScalarProjection::Single(field)) => {
             let comparable: Expression = field.as_column().table(alias.to_string(None)).into();
 
-            convert_scalar_filter(comparable, sf.condition, sf.mode, &[field], false)
+            convert_scalar_filter(comparable, sf.condition, reverse, sf.mode, &[field], false)
         }
         (Some(alias), ScalarProjection::Compound(fields)) => {
             let columns: Vec<Column<'static>> = fields
@@ -185,23 +185,37 @@ fn scalar_filter_aliased_cond(sf: ScalarFilter, alias: Option<Alias>) -> Conditi
                 .map(|field| field.as_column().table(alias.to_string(None)))
                 .collect();
 
-            convert_scalar_filter(Row::from(columns).into(), sf.condition, sf.mode, &fields, false)
+            convert_scalar_filter(
+                Row::from(columns).into(),
+                sf.condition,
+                reverse,
+                sf.mode,
+                &fields,
+                false,
+            )
         }
         (None, ScalarProjection::Single(field)) => {
             let comparable: Expression = field.as_column().into();
 
-            convert_scalar_filter(comparable, sf.condition, sf.mode, &[field], false)
+            convert_scalar_filter(comparable, sf.condition, reverse, sf.mode, &[field], false)
         }
         (None, ScalarProjection::Compound(fields)) => {
             let columns: Vec<Column<'static>> = fields.clone().into_iter().map(|field| field.as_column()).collect();
 
-            convert_scalar_filter(Row::from(columns).into(), sf.condition, sf.mode, &fields, false)
+            convert_scalar_filter(
+                Row::from(columns).into(),
+                sf.condition,
+                reverse,
+                sf.mode,
+                &fields,
+                false,
+            )
         }
     }
 }
 
 impl AliasedCondition for ScalarListFilter {
-    fn aliased_cond(self, alias: Option<Alias>) -> ConditionTree<'static> {
+    fn aliased_cond(self, alias: Option<Alias>, _reverse: bool) -> ConditionTree<'static> {
         match alias {
             Some(alias) => {
                 let comparable: Expression = self.field.as_column().table(alias.to_string(None)).into();
@@ -250,7 +264,7 @@ fn convert_scalar_list_filter(
 
 impl AliasedCondition for RelationFilter {
     /// Conversion from a `RelationFilter` to a query condition tree. Aliased when in a nested `SELECT`.
-    fn aliased_cond(self, alias: Option<Alias>) -> ConditionTree<'static> {
+    fn aliased_cond(self, alias: Option<Alias>, _reverse: bool) -> ConditionTree<'static> {
         let ids = ModelProjection::from(self.field.model().primary_identifier()).as_columns();
         let columns: Vec<Column<'static>> = match alias {
             Some(alias) => ids.map(|c| c.table(alias.to_string(None))).collect(),
@@ -298,7 +312,7 @@ impl AliasedSelect for RelationFilter {
 
         let nested_conditions = self
             .nested_filter
-            .aliased_cond(Some(alias.flip(AliasMode::Join)))
+            .aliased_cond(Some(alias.flip(AliasMode::Join)), false)
             .invert_if(condition.invert_of_subselect());
 
         let conditions = selected_identifier
@@ -319,7 +333,7 @@ impl AliasedSelect for RelationFilter {
 
 impl AliasedCondition for OneRelationIsNullFilter {
     /// Conversion from a `OneRelationIsNullFilter` to a query condition tree. Aliased when in a nested `SELECT`.
-    fn aliased_cond(self, alias: Option<Alias>) -> ConditionTree<'static> {
+    fn aliased_cond(self, alias: Option<Alias>, _reverse: bool) -> ConditionTree<'static> {
         let alias = alias.map(|a| a.to_string(None));
 
         let condition = if self.field.relation_is_inlined_in_parent() {
@@ -383,18 +397,23 @@ impl AliasedCondition for OneRelationIsNullFilter {
 
 impl AliasedCondition for AggregationFilter {
     /// Conversion from an `AggregationFilter` to a query condition tree. Aliased when in a nested `SELECT`.
-    fn aliased_cond(self, alias: Option<Alias>) -> ConditionTree<'static> {
+    fn aliased_cond(self, alias: Option<Alias>, reverse: bool) -> ConditionTree<'static> {
         match self {
-            AggregationFilter::Count(filter) => aggregate_conditions(*filter, alias, |x| count(x).into()),
-            AggregationFilter::Average(filter) => aggregate_conditions(*filter, alias, |x| avg(x).into()),
-            AggregationFilter::Sum(filter) => aggregate_conditions(*filter, alias, |x| sum(x).into()),
-            AggregationFilter::Min(filter) => aggregate_conditions(*filter, alias, |x| min(x).into()),
-            AggregationFilter::Max(filter) => aggregate_conditions(*filter, alias, |x| max(x).into()),
+            AggregationFilter::Count(filter) => aggregate_conditions(*filter, alias, reverse, |x| count(x).into()),
+            AggregationFilter::Average(filter) => aggregate_conditions(*filter, alias, reverse, |x| avg(x).into()),
+            AggregationFilter::Sum(filter) => aggregate_conditions(*filter, alias, reverse, |x| sum(x).into()),
+            AggregationFilter::Min(filter) => aggregate_conditions(*filter, alias, reverse, |x| min(x).into()),
+            AggregationFilter::Max(filter) => aggregate_conditions(*filter, alias, reverse, |x| max(x).into()),
         }
     }
 }
 
-fn aggregate_conditions<T>(filter: Filter, alias: Option<Alias>, field_transformer: T) -> ConditionTree<'static>
+fn aggregate_conditions<T>(
+    filter: Filter,
+    alias: Option<Alias>,
+    reverse: bool,
+    field_transformer: T,
+) -> ConditionTree<'static>
 where
     T: Fn(Column) -> Expression,
 {
@@ -409,11 +428,11 @@ where
         }
         (Some(alias), ScalarProjection::Single(field)) => {
             let comparable: Expression = field_transformer(field.as_column().table(alias.to_string(None)));
-            convert_scalar_filter(comparable, sf.condition, sf.mode, &[field], true)
+            convert_scalar_filter(comparable, sf.condition, reverse, sf.mode, &[field], true)
         }
         (None, ScalarProjection::Single(field)) => {
             let comparable: Expression = field_transformer(field.as_column());
-            convert_scalar_filter(comparable, sf.condition, sf.mode, &[field], true)
+            convert_scalar_filter(comparable, sf.condition, reverse, sf.mode, &[field], true)
         }
     }
 }
@@ -421,13 +440,14 @@ where
 fn convert_scalar_filter(
     comparable: Expression<'static>,
     cond: ScalarCondition,
+    reverse: bool,
     mode: QueryMode,
     fields: &[ScalarFieldRef],
     is_parent_aggregation: bool,
 ) -> ConditionTree<'static> {
     match cond {
         ScalarCondition::JsonCompare(json_compare) => {
-            convert_json_filter(comparable, json_compare, mode, fields.first().unwrap().to_owned())
+            convert_json_filter(comparable, json_compare, reverse, fields.first().unwrap(), mode)
         }
         _ => match mode {
             QueryMode::Default => default_scalar_filter(comparable, cond, fields),
@@ -439,13 +459,16 @@ fn convert_scalar_filter(
 fn convert_json_filter(
     comparable: Expression<'static>,
     json_condition: JsonCondition,
+    reverse: bool,
+    field: &ScalarFieldRef,
     query_mode: QueryMode,
-    field: ScalarFieldRef,
 ) -> ConditionTree<'static> {
-    let json_filter_path = json_condition.path;
-    let cond = json_condition.condition;
-    let target_type = json_condition.target_type;
-    let (expr_json, expr_string): (Expression, Expression) = if let Some(path) = json_filter_path {
+    let JsonCondition {
+        path,
+        condition,
+        target_type,
+    } = json_condition;
+    let (expr_json, expr_string): (Expression, Expression) = if let Some(path) = path {
         match path {
             JsonFilterPath::String(path) => (
                 json_extract(comparable.clone(), JsonPath::string(path.clone()), false).into(),
@@ -460,87 +483,43 @@ fn convert_json_filter(
         (comparable.clone(), comparable)
     };
 
-    let condition: Expression = match *cond {
-        ScalarCondition::Contains(value) => match target_type.unwrap() {
-            JsonTargetType::String => expr_string
-                .like(format!("{}", (value.into_value()).unwrap()))
-                .and(expr_json.json_type_equals(JsonType::String))
-                .into(),
-            JsonTargetType::Array => expr_json.json_array_contains(convert_value(&field, value)).into(),
-        },
-        ScalarCondition::NotContains(value) => match target_type.unwrap() {
-            JsonTargetType::String => expr_string
-                .not_like(format!("{}", (value.into_value()).unwrap()))
-                .and(expr_json.json_type_equals(JsonType::String))
-                .into(),
-            JsonTargetType::Array => expr_json.json_array_not_contains(convert_value(&field, value)).into(),
-        },
-        ScalarCondition::StartsWith(value) => match target_type.unwrap() {
-            JsonTargetType::String => expr_string
-                .like(format!("%{}", (value.into_value()).unwrap()))
-                .and(expr_json.json_type_equals(JsonType::String))
-                .into(),
-            JsonTargetType::Array => expr_json
-                .clone()
-                .json_array_begins_with(convert_value(&field, value))
-                .and(expr_json.json_type_equals(JsonType::Array))
-                .into(),
-        },
-        ScalarCondition::NotStartsWith(value) => match target_type.unwrap() {
-            JsonTargetType::String => expr_string
-                .not_like(format!("%{}", (value.into_value()).unwrap()))
-                .and(expr_json.json_type_equals(JsonType::String))
-                .into(),
-            JsonTargetType::Array => expr_json
-                .clone()
-                .json_array_not_begins_with(convert_value(&field, value))
-                .and(expr_json.json_type_equals(JsonType::Array))
-                .into(),
-        },
-        ScalarCondition::EndsWith(value) => match target_type.unwrap() {
-            JsonTargetType::String => expr_string
-                .like(format!("{}%", (value.into_value()).unwrap()))
-                .and(expr_json.json_type_equals(JsonType::String))
-                .into(),
-            JsonTargetType::Array => expr_json
-                .clone()
-                .json_array_ends_into(convert_value(&field, value))
-                .and(expr_json.json_type_equals(JsonType::Array))
-                .into(),
-        },
-        ScalarCondition::NotEndsWith(value) => match target_type.unwrap() {
-            JsonTargetType::String => expr_string
-                .not_like(format!("{}%", (value.into_value()).unwrap()))
-                .and(expr_json.json_type_equals(JsonType::String))
-                .into(),
-            JsonTargetType::Array => expr_json
-                .clone()
-                .json_array_not_ends_into(convert_value(&field, value))
-                .and(expr_json.json_type_equals(JsonType::Array))
-                .into(),
-        },
+    let condition: Expression = match *condition {
+        ScalarCondition::Contains(value) => {
+            (expr_json, expr_string).json_contains(field, value, target_type.unwrap(), reverse)
+        }
+        ScalarCondition::StartsWith(value) => {
+            (expr_json, expr_string).json_starts_with(field, value, target_type.unwrap(), reverse)
+        }
+        ScalarCondition::EndsWith(value) => {
+            (expr_json, expr_string).json_ends_with(field, value, target_type.unwrap(), reverse)
+        }
         ScalarCondition::GreaterThan(value) => expr_json
             .clone()
-            .greater_than(convert_value(&field, value.clone()))
+            .greater_than(convert_value(field, value.clone()))
             .and(filter_json_type(expr_json, value))
             .into(),
         ScalarCondition::GreaterThanOrEquals(value) => expr_json
             .clone()
-            .greater_than_or_equals(convert_value(&field, value.clone()))
+            .greater_than_or_equals(convert_value(field, value.clone()))
             .and(filter_json_type(expr_json, value))
             .into(),
         ScalarCondition::LessThan(value) => expr_json
             .clone()
-            .less_than(convert_value(&field, value.clone()))
+            .less_than(convert_value(field, value.clone()))
             .and(filter_json_type(expr_json, value))
             .into(),
         ScalarCondition::LessThanOrEquals(value) => expr_json
             .clone()
-            .less_than_or_equals(convert_value(&field, value.clone()))
+            .less_than_or_equals(convert_value(field, value.clone()))
             .and(filter_json_type(expr_json, value))
             .into(),
-        _ => {
-            return convert_scalar_filter(expr_json, *cond, query_mode, &[field], false);
+        // Those conditions are unreachable because json filters are not accessible via the lowercase `not`.
+        // They can only be inverted via the uppercase `NOT`, which doesn't invert filters but only renders a SQL `NOT`.
+        ScalarCondition::NotContains(_) => unreachable!(),
+        ScalarCondition::NotStartsWith(_) => unreachable!(),
+        ScalarCondition::NotEndsWith(_) => unreachable!(),
+        cond => {
+            return convert_scalar_filter(expr_json, cond, reverse, query_mode, &[field.clone()], false);
         }
     };
 
@@ -594,34 +573,34 @@ fn default_scalar_filter(
             }
         },
         ScalarCondition::StartsWith(value) => match value {
-            ConditionValue::Value(value) => comparable.like(format!("%{}", value)),
-            ConditionValue::FieldRef(field_ref) => comparable.like(quaint::ast::concat::<'_, Expression<'_>>(vec![
-                Value::text("%").raw().into(),
-                field_ref.as_column().into(),
-            ])),
-        },
-        ScalarCondition::NotStartsWith(value) => match value {
-            ConditionValue::Value(value) => comparable.not_like(format!("%{}", value)),
-            ConditionValue::FieldRef(field_ref) => {
-                comparable.not_like(quaint::ast::concat::<'_, Expression<'_>>(vec![
-                    Value::text("%").raw().into(),
-                    field_ref.as_column().into(),
-                ]))
-            }
-        },
-        ScalarCondition::EndsWith(value) => match value {
             ConditionValue::Value(value) => comparable.like(format!("{}%", value)),
             ConditionValue::FieldRef(field_ref) => comparable.like(quaint::ast::concat::<'_, Expression<'_>>(vec![
                 field_ref.as_column().into(),
                 Value::text("%").raw().into(),
             ])),
         },
-        ScalarCondition::NotEndsWith(value) => match value {
+        ScalarCondition::NotStartsWith(value) => match value {
             ConditionValue::Value(value) => comparable.not_like(format!("{}%", value)),
             ConditionValue::FieldRef(field_ref) => {
                 comparable.not_like(quaint::ast::concat::<'_, Expression<'_>>(vec![
                     field_ref.as_column().into(),
                     Value::text("%").raw().into(),
+                ]))
+            }
+        },
+        ScalarCondition::EndsWith(value) => match value {
+            ConditionValue::Value(value) => comparable.like(format!("%{}", value)),
+            ConditionValue::FieldRef(field_ref) => comparable.like(quaint::ast::concat::<'_, Expression<'_>>(vec![
+                Value::text("%").raw().into(),
+                field_ref.as_column().into(),
+            ])),
+        },
+        ScalarCondition::NotEndsWith(value) => match value {
+            ConditionValue::Value(value) => comparable.not_like(format!("%{}", value)),
+            ConditionValue::FieldRef(field_ref) => {
+                comparable.not_like(quaint::ast::concat::<'_, Expression<'_>>(vec![
+                    Value::text("%").raw().into(),
+                    field_ref.as_column().into(),
                 ]))
             }
         },
@@ -898,5 +877,200 @@ fn convert_values<'a>(fields: &[ScalarFieldRef], values: Vec<PrismaValue>) -> Ve
     } else {
         let field = fields.first().unwrap();
         values.into_iter().map(|value| field.value(value)).collect()
+    }
+}
+
+trait JsonFilterExtension {
+    fn json_contains(
+        self,
+        field: &ScalarFieldRef,
+        value: ConditionValue,
+        target_type: JsonTargetType,
+        reverse: bool,
+    ) -> Expression<'static>;
+
+    fn json_starts_with(
+        self,
+        field: &ScalarFieldRef,
+        value: ConditionValue,
+        target_type: JsonTargetType,
+        reverse: bool,
+    ) -> Expression<'static>;
+
+    fn json_ends_with(
+        self,
+        field: &ScalarFieldRef,
+        value: ConditionValue,
+        target_type: JsonTargetType,
+        reverse: bool,
+    ) -> Expression<'static>;
+}
+
+impl JsonFilterExtension for (Expression<'static>, Expression<'static>) {
+    fn json_contains(
+        self,
+        field: &ScalarFieldRef,
+        value: ConditionValue,
+        target_type: JsonTargetType,
+        reverse: bool,
+    ) -> Expression<'static> {
+        let (expr_json, expr_string) = self;
+
+        match (value, target_type) {
+            // string_contains (value)
+            // TODO: .and should take `reverse` into account
+            (ConditionValue::Value(value), JsonTargetType::String) => expr_string
+                .like(format!("%{}%", value))
+                .and(expr_json.json_type_equals(JsonType::String))
+                .into(),
+            // array_contains (value)
+            // TODO: .and should take `reverse` into account
+            (ConditionValue::Value(value), JsonTargetType::Array) => expr_json
+                .clone()
+                .json_array_contains(convert_value(field, value))
+                .and(expr_json.json_type_equals(JsonType::Array))
+                .into(),
+            // string_contains (ref)
+            (ConditionValue::FieldRef(field_ref), JsonTargetType::String) => {
+                let contains = expr_string.like(quaint::ast::concat::<'_, Expression<'_>>(vec![
+                    Value::text("%").raw().into(),
+                    json_unquote(field_ref.as_column()).into(),
+                    Value::text("%").raw().into(),
+                ]));
+
+                if reverse {
+                    contains
+                        .or(expr_json.json_type_not_equals(JsonType::String))
+                        .or(field_ref.as_column().json_type_not_equals(JsonType::String))
+                        .into()
+                } else {
+                    contains
+                        .and(expr_json.json_type_equals(JsonType::String))
+                        .and(field_ref.as_column().json_type_equals(JsonType::String))
+                        .into()
+                }
+            }
+            // array_contains (ref)
+            (ConditionValue::FieldRef(field_ref), JsonTargetType::Array) => {
+                let contains = expr_json.clone().json_array_contains(convert_value(field, &field_ref));
+
+                if reverse {
+                    contains.or(expr_json.json_type_not_equals(JsonType::Array)).into()
+                } else {
+                    contains.and(expr_json.json_type_equals(JsonType::Array)).into()
+                }
+            }
+        }
+    }
+
+    fn json_starts_with(
+        self,
+        field: &ScalarFieldRef,
+        value: ConditionValue,
+        target_type: JsonTargetType,
+        reverse: bool,
+    ) -> Expression<'static> {
+        let (expr_json, expr_string) = self;
+        match (value, target_type) {
+            // string_starts_with (value)
+            // TODO: .and should take `reverse` into account
+            (ConditionValue::Value(value), JsonTargetType::String) => expr_string
+                .like(format!("{}%", value))
+                .and(expr_json.json_type_equals(JsonType::String))
+                .into(),
+            // array_starts_with (value)
+            // TODO: .and should take `reverse` into account
+            (ConditionValue::Value(value), JsonTargetType::Array) => expr_json
+                .clone()
+                .json_array_begins_with(convert_value(field, value))
+                .and(expr_json.json_type_equals(JsonType::Array))
+                .into(),
+            // string_starts_with (ref)
+            (ConditionValue::FieldRef(field_ref), JsonTargetType::String) => {
+                let starts_with = expr_string.like(quaint::ast::concat::<'_, Expression<'_>>(vec![
+                    json_unquote(field_ref.as_column()).into(),
+                    Value::text("%").raw().into(),
+                ]));
+
+                if reverse {
+                    starts_with
+                        .or(expr_json.json_type_not_equals(JsonType::String))
+                        .or(field_ref.as_column().json_type_not_equals(JsonType::String))
+                        .into()
+                } else {
+                    starts_with
+                        .and(expr_json.json_type_equals(JsonType::String))
+                        .and(field_ref.as_column().json_type_equals(JsonType::String))
+                        .into()
+                }
+            }
+            // array_starts_with (ref)
+            (ConditionValue::FieldRef(field_ref), JsonTargetType::Array) => {
+                let starts_with = expr_json
+                    .clone()
+                    .json_array_begins_with(convert_value(field, &field_ref));
+
+                if reverse {
+                    starts_with.or(expr_json.json_type_not_equals(JsonType::Array)).into()
+                } else {
+                    starts_with.and(expr_json.json_type_equals(JsonType::Array)).into()
+                }
+            }
+        }
+    }
+
+    fn json_ends_with(
+        self,
+        field: &ScalarFieldRef,
+        value: ConditionValue,
+        target_type: JsonTargetType,
+        reverse: bool,
+    ) -> Expression<'static> {
+        let (expr_json, expr_string) = self;
+
+        match (value, target_type) {
+            // string_ends_with (value)
+            // TODO: .and should take `reverse` into account
+            (ConditionValue::Value(value), JsonTargetType::String) => expr_string
+                .like(format!("%{}", value))
+                .and(expr_json.json_type_equals(JsonType::String))
+                .into(),
+            // array_ends_with (value)
+            // TODO: .and should take `reverse` into account
+            (ConditionValue::Value(value), JsonTargetType::Array) => expr_json
+                .clone()
+                .json_array_ends_into(convert_value(field, value))
+                .and(expr_json.json_type_equals(JsonType::Array))
+                .into(),
+            // string_ends_with (ref)
+            (ConditionValue::FieldRef(field_ref), JsonTargetType::String) => {
+                let ends_with = expr_string.like(quaint::ast::concat::<'_, Expression<'_>>(vec![
+                    Value::text("%").raw().into(),
+                    json_unquote(field_ref.as_column()).into(),
+                ]));
+
+                if reverse {
+                    ends_with
+                        .or(expr_json.json_type_not_equals(JsonType::String))
+                        .or(field_ref.as_column().json_type_not_equals(JsonType::String))
+                        .into()
+                } else {
+                    ends_with
+                        .and(expr_json.json_type_equals(JsonType::String))
+                        .and(field_ref.as_column().json_type_equals(JsonType::String))
+                        .into()
+                }
+            }
+            // array_ends_with (ref)
+            (ConditionValue::FieldRef(field_ref), JsonTargetType::Array) => {
+                let ends_with = expr_json.clone().json_array_ends_into(convert_value(field, &field_ref));
+
+                if reverse {
+                    ends_with.or(expr_json.json_type_not_equals(JsonType::Array)).into()
+                } else {
+                    ends_with.and(expr_json.json_type_equals(JsonType::Array)).into()
+                }
+            }
+        }
     }
 }
