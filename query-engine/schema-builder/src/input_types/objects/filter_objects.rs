@@ -112,7 +112,7 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
     let compound_unique_fields: Vec<InputField> = model
         .unique_indexes()
         .into_iter()
-        .filter(|index| index.fields.iter().any(|f| f.0.len() > 0))
+        .filter(|index| index.fields.iter().any(|f| !f.0.is_empty()))
         .map(|index| {
             let typ = compound_field_unique_object_type(ctx, model, index.name.as_ref(), index.fields());
             let name = compound_index_field_name(index);
@@ -183,10 +183,10 @@ fn compound_field_unique_object_type(
 }
 
 fn composite_field_unique_input_type(ctx: &mut BuilderContext, path: &[String], field: &ScalarFieldRef) -> InputField {
-    if path.len() == 0 {
+    if path.is_empty() {
         // We build the entire path, return that field
         let name = field.name.clone();
-        let typ = map_scalar_input_type_for_field(ctx, &field);
+        let typ = map_scalar_input_type_for_field(ctx, field);
 
         input_field(name, typ, None)
     } else {

@@ -119,8 +119,7 @@ pub fn compound_index_field_name(index: &Index) -> String {
         let index_fields = index.fields();
         let field_names = index_fields
             .iter()
-            .map(|(path, _)| path)
-            .flatten()
+            .flat_map(|(path, _)| path)
             .map(|fp| fp.as_ref())
             .collect_vec();
 

@@ -30,12 +30,12 @@ impl IndexBuilder {
                 let field = if path.len() == 1 {
                     let name = path.first().unwrap();
                     all_fields
-                        .into_iter()
+                        .iter()
                         .find(|&f| f.name() == name)
-                        .map(|f| f.clone())
+                        .cloned()
                         .and_then(|f| f.into_scalar())
                 } else {
-                    find_scalar_in_composite_fields(path.as_slice(), &all_fields)
+                    find_scalar_in_composite_fields(path.as_slice(), all_fields)
                 }
                 .unwrap_or_else(|| panic!("Unable to resolve field path '{}'", path.join(".")));
 
@@ -52,7 +52,7 @@ fn find_scalar_in_composite_fields(path: &[String], fields: &[Field]) -> Option<
         match (path, field) {
             ([_], Field::Composite(_)) => None,
             ([_], Field::Scalar(field_ref)) => Some(field_ref.clone()),
-            (_, Field::Composite(field_ref)) => find_scalar_in_composite_fields(&path[1..], &field_ref.typ.fields()),
+            (_, Field::Composite(field_ref)) => find_scalar_in_composite_fields(&path[1..], field_ref.typ.fields()),
             (_, _) => None,
         }
     } else {
