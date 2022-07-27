@@ -94,6 +94,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::FullTextSearchWithoutIndex,
     ConnectorCapability::InsensitiveFilters,
     ConnectorCapability::Json,
+    ConnectorCapability::JsonFiltering,
     ConnectorCapability::JsonFilteringArrayPath,
     ConnectorCapability::JsonFilteringAlphanumeric,
     ConnectorCapability::MultiSchema,

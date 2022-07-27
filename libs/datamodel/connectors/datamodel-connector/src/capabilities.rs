@@ -75,7 +75,7 @@ capabilities!(
     WritableAutoincField,
     CreateSkipDuplicates,
     UpdateableId,
-    JsonFiltering,
+    JsonFiltering, // Used as an umbrella for json filtering capabilities, whether it's JsonPath, ArrayPath or Alphanumeric.
     JsonFilteringJsonPath,
     JsonFilteringArrayPath,
     JsonFilteringAlphanumeric,

@@ -80,6 +80,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::Enums,
     ConnectorCapability::InsensitiveFilters,
     ConnectorCapability::Json,
+    ConnectorCapability::JsonFiltering,
     ConnectorCapability::JsonFilteringArrayPath,
     ConnectorCapability::NamedPrimaryKeys,
     ConnectorCapability::NamedForeignKeys,
