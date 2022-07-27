@@ -65,6 +65,7 @@ features!(
     Metrics,
     OrderByNulls,
     MultiSchema,
+    FieldReference
 );
 
 /// Generator preview features
