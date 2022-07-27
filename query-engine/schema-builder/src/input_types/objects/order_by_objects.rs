@@ -179,7 +179,7 @@ fn orderby_field_mapper(field: &ModelField, ctx: &mut BuilderContext, options: &
 
 fn sort_nulls_object_type(ctx: &mut BuilderContext) -> InputObjectTypeWeakRef {
     let ident = Identifier::new("SortOrderInput", PRISMA_NAMESPACE);
-    return_cached_input!(ctx, &ident);
+    return_if_cached!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());
