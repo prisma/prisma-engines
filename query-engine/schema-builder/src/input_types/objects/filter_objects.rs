@@ -113,7 +113,7 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
     let compound_unique_fields: Vec<InputField> = model
         .unique_indexes()
         .into_iter()
-        .filter(|index| index.fields.len() > 1)
+        .filter(|index| index.fields.iter().any(|f| f.0.len() > 0))
         .map(|index| {
             let typ = compound_field_unique_object_type(ctx, model, index.name.as_ref(), index.fields());
             let name = compound_index_field_name(index);
