@@ -161,7 +161,7 @@ fn composite_create_envelope_object_type(ctx: &mut BuilderContext, cf: &Composit
     let name = format!("{}{}CreateEnvelopeInput", cf.typ.name, arity);
 
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
-    return_input_if_cached!(ctx, &ident);
+    return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
     input_object.require_exactly_one_field();
@@ -192,7 +192,7 @@ pub(crate) fn composite_create_object_type(ctx: &mut BuilderContext, cf: &Compos
     let name = format!("{}CreateInput", cf.typ.name);
 
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
-    return_input_if_cached!(ctx, &ident);
+    return_cached_input!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());
