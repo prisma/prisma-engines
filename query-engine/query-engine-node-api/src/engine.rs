@@ -202,7 +202,7 @@ impl QueryEngine {
     /// Connect to the database, allow queries to be run.
     #[napi]
     pub async fn connect(&self, trace: String) -> napi::Result<()> {
-        let span = tracing::info_span!("prisma:disconnect", user_facing = true);
+        let span = tracing::info_span!("prisma:connect", user_facing = true);
         let _ = set_parent_context_from_json_str(&span, trace);
         async_panic_to_js_error(async {
             let mut inner = self.inner.write().await;
