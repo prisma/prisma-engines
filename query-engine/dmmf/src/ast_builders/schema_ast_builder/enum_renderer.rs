@@ -1,7 +1,10 @@
 use super::*;
 
 pub(crate) fn render_enum_types(ctx: &mut RenderContext, enum_types: &[EnumTypeRef]) {
-    enum_types.iter().for_each(|et| DmmfEnumRenderer::new(et).render(ctx))
+    let mut borrows: Vec<_> = enum_types.iter().collect();
+
+    borrows.sort_by(|a, b| a.name().cmp(b.name()));
+    borrows.into_iter().for_each(|et| DmmfEnumRenderer::new(et).render(ctx));
 }
 
 pub struct DmmfEnumRenderer {
