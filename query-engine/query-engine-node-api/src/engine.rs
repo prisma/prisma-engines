@@ -201,7 +201,9 @@ impl QueryEngine {
 
     /// Connect to the database, allow queries to be run.
     #[napi]
-    pub async fn connect(&self) -> napi::Result<()> {
+    pub async fn connect(&self, trace: String) -> napi::Result<()> {
+        let span = tracing::info_span!("prisma:disconnect", user_facing = true);
+        let _ = set_parent_context_from_json_str(&span, trace);
         async_panic_to_js_error(async {
             let mut inner = self.inner.write().await;
             let builder = inner.as_builder()?;
@@ -253,12 +255,15 @@ impl QueryEngine {
 
             Ok(())
         })
+        .instrument(span)
         .await
     }
 
     /// Disconnect and drop the core. Can be reconnected later with `#connect`.
     #[napi]
-    pub async fn disconnect(&self) -> napi::Result<()> {
+    pub async fn disconnect(&self, trace: String) -> napi::Result<()> {
+        let span = tracing::info_span!("prisma:disconnect", user_facing = true);
+        let _ = set_parent_context_from_json_str(&span, trace);
         async_panic_to_js_error(async {
             let mut inner = self.inner.write().await;
             let engine = inner.as_engine()?;
@@ -277,6 +282,7 @@ impl QueryEngine {
 
             Ok(())
         })
+        .instrument(span)
         .await
     }
 
@@ -293,7 +299,7 @@ impl QueryEngine {
 
             async move {
                 let (span, trace_id) = if tx_id.is_none() {
-                    let span = tracing::info_span!("prisma:query_builder", user_facing = true);
+                    let span = tracing::info_span!("prisma:engine", user_facing = true);
                     let trace_id = set_parent_context_from_json_str(&span, trace);
                     (span, trace_id)
                 } else {

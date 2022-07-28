@@ -1,11 +1,18 @@
+use once_cell::sync::Lazy;
 use opentelemetry::sdk::export::trace::SpanData;
 use serde_json::{json, Value};
 use std::borrow::Cow;
+
 use std::{collections::HashMap, time::SystemTime};
 use tracing::{Metadata, Span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 const ACCEPT_ATTRIBUTES: &[&str] = &["db.statement", "itx_id", "db.type"];
+
+pub static SHOW_ALL_TRACES: Lazy<bool> = Lazy::new(|| match std::env::var("PRISMA_SHOW_ALL_TRACES") {
+    Ok(enabled) => enabled.to_lowercase() == "true".to_string(),
+    Err(_) => false,
+});
 
 pub fn spans_to_json(spans: &[SpanData]) -> String {
     let json_spans: Vec<Value> = spans.iter().map(span_to_json).collect();
@@ -63,6 +70,10 @@ pub fn set_parent_context_from_json_str(span: &Span, trace: String) -> Option<St
 pub fn is_user_facing_trace_filter(meta: &Metadata) -> bool {
     if !meta.is_span() {
         return false;
+    }
+
+    if *SHOW_ALL_TRACES {
+        return true;
     }
 
     if meta.fields().iter().any(|f| f.name() == "user_facing") {

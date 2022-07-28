@@ -190,7 +190,7 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
 
     let span = if tx_id.is_none() {
         let cx = get_parent_span_context(&req);
-        let span = info_span!("prisma:query_builder", user_facing = true);
+        let span = info_span!("prisma:engine", user_facing = true);
         span.set_parent(cx);
         span
     } else {
