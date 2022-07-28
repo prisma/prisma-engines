@@ -21,7 +21,7 @@ mongodb-client = { path = "../../libs/mongodb-client/" }
 datamodel = { path = "../../libs/datamodel/core" }
 datamodel-connector = { path = "../../libs/datamodel/connectors/datamodel-connector" }
 futures = "0.3"
-im = "15.0"
+im = "15.1.0"
 indexmap = { version = "1.7", features = ["serde-1"] }
 itertools = "0.10"
 mongodb-connector = { path = "../connectors/mongodb-query-connector", package = "mongodb-query-connector", optional = true }
