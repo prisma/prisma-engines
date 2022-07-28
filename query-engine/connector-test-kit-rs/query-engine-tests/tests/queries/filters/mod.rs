@@ -11,7 +11,6 @@ pub mod filter_unwrap;
 pub mod filters;
 pub mod insensitive_filters;
 pub mod json;
-pub mod json_filter;
 pub mod json_filters;
 pub mod list_filters;
 pub mod many_relation;

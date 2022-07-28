@@ -132,8 +132,20 @@ fn collect_scalar_fields(filter: &Filter) -> Vec<&ScalarFieldRef> {
         Filter::And(inner) => inner.iter().flat_map(collect_scalar_fields).collect(),
         Filter::Or(inner) => inner.iter().flat_map(collect_scalar_fields).collect(),
         Filter::Not(inner) => inner.iter().flat_map(collect_scalar_fields).collect(),
-        Filter::Scalar(sf) => sf.projection.scalar_fields(),
-        Filter::Aggregation(_) => vec![], // Aggregations have no effect here.
+        Filter::Scalar(sf) => sf.scalar_fields(),
+        Filter::Aggregation(af) => collect_aggregate_ref_fields(af.filter()), // Aggregations have no effect here.
+        _ => unreachable!(),
+    }
+}
+
+/// Collects all referenced fields that are used in an aggregate filter
+fn collect_aggregate_ref_fields(filter: &Filter) -> Vec<&ScalarFieldRef> {
+    match filter {
+        Filter::And(inner) => inner.iter().flat_map(collect_aggregate_ref_fields).collect(),
+        Filter::Or(inner) => inner.iter().flat_map(collect_aggregate_ref_fields).collect(),
+        Filter::Not(inner) => inner.iter().flat_map(collect_aggregate_ref_fields).collect(),
+        Filter::Scalar(sf) => sf.as_ref_field().map(|sf| vec![sf]).unwrap_or_default(),
+        Filter::Aggregation(af) => collect_aggregate_ref_fields(af.filter()),
         _ => unreachable!(),
     }
 }

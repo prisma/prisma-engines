@@ -145,8 +145,21 @@ impl ScalarFilter {
         }
     }
 
+    /// Returns the referenced scalar field if there is one.
     pub fn as_ref_field(&self) -> Option<&ScalarFieldRef> {
         self.condition.as_ref_field()
+    }
+
+    /// Returns all the scalar fields related to a scalar filter.
+    /// It also includes the referenced field if there is one.
+    pub fn scalar_fields(&self) -> Vec<&ScalarFieldRef> {
+        let mut fields = self.projection.scalar_fields();
+
+        if let Some(ref_field) = self.as_ref_field() {
+            fields.push(ref_field);
+        }
+
+        fields
     }
 }
 

@@ -258,7 +258,7 @@ fn extract_scalar_filters(field: &ScalarFieldRef, value: ParsedInputValue) -> Qu
                 Some(i) => parse_query_mode(i)?,
                 None => QueryMode::Default,
             };
-            let mut filters: Vec<Filter> = scalar::parse(filter_map, field, false)?;
+            let mut filters: Vec<Filter> = scalar::ScalarFilterParser::new(field, false).parse(filter_map)?;
 
             filters.iter_mut().for_each(|f| f.set_mode(mode.clone()));
             Ok(filters)
