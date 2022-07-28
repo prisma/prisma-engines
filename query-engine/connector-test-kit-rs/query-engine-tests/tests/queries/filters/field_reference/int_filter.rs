@@ -11,17 +11,17 @@ mod int_filter {
         setup::test_data_common_types(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { int: { equals: { ref: "int" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { int: { equals: { _ref: "int" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { int: { equals: { ref: "int2" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { int: { equals: { _ref: "int2" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { AND: { int: { not: { equals: { ref: "int2" } } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { AND: { int: { not: { equals: { _ref: "int2" } } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
@@ -34,81 +34,81 @@ mod int_filter {
 
         // Gt
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { int: { gt: { ref: "int" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { int: { gt: { _ref: "int" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { int2: { gt: { ref: "int" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { int2: { gt: { _ref: "int" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         // Not gt => lte
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { int: { not: { gt: { ref: "int" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { int: { not: { gt: { _ref: "int" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { int: { not: { gt: { ref: "int2" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { int: { not: { gt: { _ref: "int2" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         // Gte
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { int: { gte: { ref: "int" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { int: { gte: { _ref: "int" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { int2: { gte: { ref: "int" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { int2: { gte: { _ref: "int" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         // Not gte => lt
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { int: { not: { gte: { ref: "int" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { int: { not: { gte: { _ref: "int" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { int: { not: { gte: { ref: "int2" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { int: { not: { gte: { _ref: "int2" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         // Lt
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { int: { lt: { ref: "int" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { int: { lt: { _ref: "int" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { int: { lt: { ref: "int2" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { int: { lt: { _ref: "int2" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         // Not lt => gte
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { int: { not: { lt: { ref: "int" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { int: { not: { lt: { _ref: "int" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { int2: { not: { lt: { ref: "int" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { int2: { not: { lt: { _ref: "int" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         // Lte
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { int: { lte: { ref: "int" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { int: { lte: { _ref: "int" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { int: { lte: { ref: "int2" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { int: { lte: { _ref: "int2" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         // Not lte => gt
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { int: { not: { lte: { ref: "int" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { int: { not: { lte: { _ref: "int" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { int2: { not: { lte: { ref: "int" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { int2: { not: { lte: { _ref: "int" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
@@ -120,17 +120,17 @@ mod int_filter {
         setup::test_data_common_mixed_types(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { int: { in: { ref: "int2" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { int: { in: { _ref: "int2" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { int: { notIn: { ref: "int2" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { int: { notIn: { _ref: "int2" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { int: { not: { in: { ref: "int2" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { int: { not: { in: { _ref: "int2" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 

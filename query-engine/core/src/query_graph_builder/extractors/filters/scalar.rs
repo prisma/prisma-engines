@@ -422,7 +422,7 @@ fn as_condition_value(
 ) -> QueryGraphBuilderResult<ConditionValue> {
     match input {
         ParsedInputValue::Map(mut map) => {
-            let ref_field_name = map.remove(filters::REF).unwrap();
+            let ref_field_name = map.remove(filters::UNDERSCORE_REF).unwrap();
             let ref_field_name = PrismaValue::try_from(ref_field_name)?.into_string().unwrap();
             let ref_field = field.container().find_field(&ref_field_name);
 
@@ -465,7 +465,7 @@ fn as_condition_list_value(
 ) -> QueryGraphBuilderResult<ConditionListValue> {
     match input {
         ParsedInputValue::Map(mut map) => {
-            let ref_field_name = map.remove(filters::REF).unwrap();
+            let ref_field_name = map.remove(filters::UNDERSCORE_REF).unwrap();
             let ref_field_name = PrismaValue::try_from(ref_field_name)?.into_string().unwrap();
             let ref_field = field.container.find_field(&ref_field_name);
 

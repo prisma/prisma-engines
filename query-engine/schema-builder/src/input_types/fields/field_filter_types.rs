@@ -644,7 +644,7 @@ fn field_reference_object_type(ctx: &mut BuilderContext) -> InputObjectTypeWeakR
     let object = Arc::new(object);
     ctx.cache_input_type(ident, object.clone());
 
-    object.set_fields(vec![input_field(filters::REF, InputType::string(), None)]);
+    object.set_fields(vec![input_field(filters::UNDERSCORE_REF, InputType::string(), None)]);
 
     Arc::downgrade(&object)
 }

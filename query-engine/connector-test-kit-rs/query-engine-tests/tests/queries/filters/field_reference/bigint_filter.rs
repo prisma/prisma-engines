@@ -11,17 +11,17 @@ mod bigint_filter {
         setup::test_data_common_types(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { equals: { ref: "bInt" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { equals: { _ref: "bInt" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { equals: { ref: "bInt2" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { equals: { _ref: "bInt2" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { AND: { bInt: { not: { equals: { ref: "bInt2" } } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { AND: { bInt: { not: { equals: { _ref: "bInt2" } } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
@@ -34,81 +34,81 @@ mod bigint_filter {
 
         // Gt
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { gt: { ref: "bInt" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { gt: { _ref: "bInt" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bInt2: { gt: { ref: "bInt" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bInt2: { gt: { _ref: "bInt" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         // Not gt => lte
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { not: { gt: { ref: "bInt" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { not: { gt: { _ref: "bInt" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { not: { gt: { ref: "bInt2" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { not: { gt: { _ref: "bInt2" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         // Gte
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { gte: { ref: "bInt" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { gte: { _ref: "bInt" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bInt2: { gte: { ref: "bInt" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bInt2: { gte: { _ref: "bInt" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         // Not gte => lt
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { not: { gte: { ref: "bInt" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { not: { gte: { _ref: "bInt" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { not: { gte: { ref: "bInt2" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { not: { gte: { _ref: "bInt2" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         // Lt
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { lt: { ref: "bInt" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { lt: { _ref: "bInt" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { lt: { ref: "bInt2" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { lt: { _ref: "bInt2" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         // Not lt => gte
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { not: { lt: { ref: "bInt" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { not: { lt: { _ref: "bInt" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bInt2: { not: { lt: { ref: "bInt" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bInt2: { not: { lt: { _ref: "bInt" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         // Lte
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { lte: { ref: "bInt" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { lte: { _ref: "bInt" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { lte: { ref: "bInt2" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { lte: { _ref: "bInt2" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         // Not lte => gt
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { not: { lte: { ref: "bInt" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { not: { lte: { _ref: "bInt" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bInt2: { not: { lte: { ref: "bInt" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bInt2: { not: { lte: { _ref: "bInt" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
@@ -120,17 +120,17 @@ mod bigint_filter {
         setup::test_data_common_mixed_types(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { in: { ref: "bInt2" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { in: { _ref: "bInt2" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { notIn: { ref: "bInt2" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { notIn: { _ref: "bInt2" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { not: { in: { ref: "bInt2" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bInt: { not: { in: { _ref: "bInt2" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 

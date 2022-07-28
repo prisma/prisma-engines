@@ -39,7 +39,7 @@ mod failure {
     async fn unknown_field_name_fails(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
-            r#"{ findManyTestModel(where: { id: { equals: { ref: "unknown" } } }) { id } }"#,
+            r#"{ findManyTestModel(where: { id: { equals: { _ref: "unknown" } } }) { id } }"#,
             2019,
             "The referenced scalar field TestModel.unknown does not exist."
         );
@@ -51,7 +51,7 @@ mod failure {
     async fn relation_field_name_fails(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
-            r#"{ findManyTestModel(where: { id: { equals: { ref: "children" } } }) { id } }"#,
+            r#"{ findManyTestModel(where: { id: { equals: { _ref: "children" } } }) { id } }"#,
             2019,
             "Expected a referenced scalar field TestModel.children but found a relation field."
         );
@@ -63,7 +63,7 @@ mod failure {
     async fn fields_of_different_type_fails(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
-            r#"{ findManyTestModel(where: { id: { equals: { ref: "str" } } }) { id } }"#,
+            r#"{ findManyTestModel(where: { id: { equals: { _ref: "str" } } }) { id } }"#,
             2019,
             "Expected a referenced scalar field of type Int but found TestModel.str of type String."
         );
@@ -75,7 +75,7 @@ mod failure {
     async fn field_of_different_arity_fails(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
-            r#"{ findManyTestModel(where: { str: { equals: { ref: "str_list" } } }) { id } }"#,
+            r#"{ findManyTestModel(where: { str: { equals: { _ref: "str_list" } } }) { id } }"#,
             2019,
             "error_contains"
         );
@@ -87,14 +87,14 @@ mod failure {
     async fn cannot_reference_in_not_in_filter(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
-            r#"{ findManyTestModel(where: { str: { in: { ref: "smth" } } }) { id } }"#,
+            r#"{ findManyTestModel(where: { str: { in: { _ref: "smth" } } }) { id } }"#,
             2009,
             "Query.findManyTestModel.where.TestModelWhereInput.str.StringFilter.in`: Value types mismatch"
         );
 
         assert_error!(
             runner,
-            r#"{ findManyTestModel(where: { str: { notIn: { ref: "smth" } } }) { id } }"#,
+            r#"{ findManyTestModel(where: { str: { notIn: { _ref: "smth" } } }) { id } }"#,
             2009,
             "Query.findManyTestModel.where.TestModelWhereInput.str.StringFilter.notIn`: Value types mismatch"
         );

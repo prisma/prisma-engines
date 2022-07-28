@@ -11,17 +11,17 @@ mod bytes_filter {
         setup::test_data_common_types(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bytes: { equals: { ref: "bytes" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bytes: { equals: { _ref: "bytes" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bytes: { equals: { ref: "bytes2" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bytes: { equals: { _ref: "bytes2" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { AND: { bytes: { not: { equals: { ref: "bytes2" } } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { AND: { bytes: { not: { equals: { _ref: "bytes2" } } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
@@ -33,17 +33,17 @@ mod bytes_filter {
         setup::test_data_common_mixed_types(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bytes: { in: { ref: "bytes2" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bytes: { in: { _ref: "bytes2" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bytes: { notIn: { ref: "bytes2" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bytes: { notIn: { _ref: "bytes2" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bytes: { not: { in: { ref: "bytes2" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bytes: { not: { in: { _ref: "bytes2" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 

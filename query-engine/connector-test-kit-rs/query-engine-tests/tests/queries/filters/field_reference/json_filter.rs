@@ -21,17 +21,17 @@ mod json_filter {
         test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { json: { equals: { ref: "json" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { json: { equals: { _ref: "json" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { json: { equals: { ref: "json2" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { json: { equals: { _ref: "json2" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { json: { not: { ref: "json2" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { json: { not: { _ref: "json2" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2},{"id":3}]}}"###
         );
 
@@ -45,41 +45,41 @@ mod json_filter {
 
         // Gt
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"json: {{ {}, gt: {{ ref: "json" }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"json: {{ {}, gt: {{ _ref: "json" }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"json: {{ {}, gt: {{ ref: "json2" }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"json: {{ {}, gt: {{ _ref: "json2" }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[{"id":3}]}}"###
         );
 
         // Gte
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"json: {{ {}, gte: {{ ref: "json" }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"json: {{ {}, gte: {{ _ref: "json" }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"json: {{ {}, gte: {{ ref: "json2" }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"json: {{ {}, gte: {{ _ref: "json2" }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[{"id":3}]}}"###
         );
 
         // Lt
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"json: {{ {}, lt: {{ ref: "json" }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"json: {{ {}, lt: {{ _ref: "json" }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"json: {{ {}, lt: {{ ref: "json2" }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"json: {{ {}, lt: {{ _ref: "json2" }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         // Lte
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"json: {{ {}, lte: {{ ref: "json" }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"json: {{ {}, lte: {{ _ref: "json" }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"json: {{ {}, lte: {{ ref: "json2" }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"json: {{ {}, lte: {{ _ref: "json2" }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
@@ -92,61 +92,61 @@ mod json_filter {
 
         // contains
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"json: {{ {}, string_contains: {{ ref: "json" }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"json: {{ {}, string_contains: {{ _ref: "json" }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"json: {{ {}, string_contains: {{ ref: "json2" }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"json: {{ {}, string_contains: {{ _ref: "json2" }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3}]}}"###
         );
 
         // not contains
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"NOT: {{ json: {{ {}, string_contains: {{ ref: "json" }} }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"NOT: {{ json: {{ {}, string_contains: {{ _ref: "json" }} }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"NOT: {{ json: {{ {}, string_contains: {{ ref: "json2" }} }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"NOT: {{ json: {{ {}, string_contains: {{ _ref: "json2" }} }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
 
         // startsWith
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"json: {{ {}, string_starts_with: {{ ref: "json" }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"json: {{ {}, string_starts_with: {{ _ref: "json" }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"json: {{ {}, string_starts_with: {{ ref: "json2" }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"json: {{ {}, string_starts_with: {{ _ref: "json2" }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         // not startsWith
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"NOT: {{ json: {{ {}, string_starts_with: {{ ref: "json" }} }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"NOT: {{ json: {{ {}, string_starts_with: {{ _ref: "json" }} }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"NOT: {{ json: {{ {}, string_starts_with: {{ ref: "json2" }} }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"NOT: {{ json: {{ {}, string_starts_with: {{ _ref: "json2" }} }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[{"id":3}]}}"###
         );
 
         // endsWith
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"json: {{ {}, string_ends_with: {{ ref: "json" }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"json: {{ {}, string_ends_with: {{ _ref: "json" }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"json: {{ {}, string_ends_with: {{ ref: "json2" }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"json: {{ {}, string_ends_with: {{ _ref: "json2" }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":3}]}}"###
         );
 
         // not endsWith
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"NOT: {{ json: {{ {}, string_ends_with: {{ ref: "json" }} }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"NOT: {{ json: {{ {}, string_ends_with: {{ _ref: "json" }} }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"NOT: {{ json: {{ {}, string_ends_with: {{ ref: "json2" }} }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"NOT: {{ json: {{ {}, string_ends_with: {{ _ref: "json2" }} }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
@@ -159,61 +159,61 @@ mod json_filter {
 
         // contains
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"json: {{ {}, array_contains: {{ ref: "json" }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"json: {{ {}, array_contains: {{ _ref: "json" }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"json: {{ {}, array_contains: {{ ref: "json2" }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"json: {{ {}, array_contains: {{ _ref: "json2" }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         // not contains
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"NOT: {{ json: {{ {}, array_contains: {{ ref: "json" }} }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"NOT: {{ json: {{ {}, array_contains: {{ _ref: "json" }} }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"NOT: {{ json: {{ {}, array_contains: {{ ref: "json2" }} }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"NOT: {{ json: {{ {}, array_contains: {{ _ref: "json2" }} }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[{"id":3}]}}"###
         );
 
         // startsWith
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"json: {{ {}, array_starts_with: {{ ref: "json" }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"json: {{ {}, array_starts_with: {{ _ref: "json" }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"json: {{ {}, array_starts_with: {{ ref: "json2" }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"json: {{ {}, array_starts_with: {{ _ref: "json2" }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         // not startsWith
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"NOT: {{ json: {{ {}, array_starts_with: {{ ref: "json" }} }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"NOT: {{ json: {{ {}, array_starts_with: {{ _ref: "json" }} }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"NOT: {{ json: {{ {}, array_starts_with: {{ ref: "json2" }} }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"NOT: {{ json: {{ {}, array_starts_with: {{ _ref: "json2" }} }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[{"id":2},{"id":3}]}}"###
         );
 
         // endsWith
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"json: {{ {}, array_ends_with: {{ ref: "json" }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"json: {{ {}, array_ends_with: {{ _ref: "json" }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"json: {{ {}, array_ends_with: {{ ref: "json2" }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"json: {{ {}, array_ends_with: {{ _ref: "json2" }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         // not endsWith
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"NOT: {{ json: {{ {}, array_ends_with: {{ ref: "json" }} }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"NOT: {{ json: {{ {}, array_ends_with: {{ _ref: "json" }} }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, jsonq(format!(r#"NOT: {{ json: {{ {}, array_ends_with: {{ ref: "json2" }} }} }}"#, json_path(&runner)))),
+          run_query!(&runner, jsonq(format!(r#"NOT: {{ json: {{ {}, array_ends_with: {{ _ref: "json2" }} }} }}"#, json_path(&runner)))),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":3}]}}"###
         );
 
