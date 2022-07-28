@@ -286,7 +286,7 @@ impl<'conn> QueryInterpreter<'conn> {
     pub fn log_output(&self) -> String {
         let mut output = String::with_capacity(self.log.len() * 30);
 
-        while let Ok(s) = self.log.pop() {
+        while let Some(s) = self.log.pop() {
             output.push_str(&s);
         }
 
