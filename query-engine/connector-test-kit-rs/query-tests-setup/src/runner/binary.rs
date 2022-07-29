@@ -1,4 +1,4 @@
-use crate::{ConnectorTag, RunnerInterface, TestResult, TxResult};
+use crate::{ConnectorTag, RunnerInterface, TestError, TestResult, TxResult};
 use hyper::{Body, Method, Request, Response};
 use query_core::{MetricRegistry, TxId};
 use query_engine::opt::PrismaOpt;
@@ -87,10 +87,16 @@ impl RunnerInterface for BinaryRunner {
         Ok(PrismaResponse::Multi(batch_response).into())
     }
 
-    async fn start_tx(&self, max_acquisition_millis: u64, valid_for_millis: u64) -> TestResult<TxId> {
+    async fn start_tx(
+        &self,
+        max_acquisition_millis: u64,
+        valid_for_millis: u64,
+        isolation_level: Option<String>,
+    ) -> TestResult<TxId> {
         let body = serde_json::json!({
             "max_wait": max_acquisition_millis,
-            "timeout": valid_for_millis
+            "timeout": valid_for_millis,
+            "isolation_level": isolation_level,
         });
 
         let body_bytes = serde_json::to_vec(&body).unwrap();
@@ -103,9 +109,14 @@ impl RunnerInterface for BinaryRunner {
 
         let resp = routes(self.state.clone(), req).await.unwrap();
         let json_resp = response_to_json(resp).await;
-        let tx_id = json_resp.as_object().unwrap().get("id").unwrap().as_str().unwrap();
+        let json_obj = json_resp.as_object().unwrap();
 
-        Ok(tx_id.into())
+        match json_obj.get("error_code") {
+            Some(_) => Err(TestError::InteractiveTransactionError(
+                serde_json::to_string(json_obj).unwrap(),
+            )),
+            None => Ok(json_obj.get("id").unwrap().as_str().unwrap().into()),
+        }
     }
 
     async fn commit_tx(&self, tx_id: TxId) -> TestResult<TxResult> {

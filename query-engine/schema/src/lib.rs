@@ -27,7 +27,9 @@ pub type QuerySchemaRef = Arc<QuerySchema>;
 pub type OutputTypeRef = Arc<OutputType>;
 pub type OutputFieldRef = Arc<OutputField>;
 pub type InputFieldRef = Arc<InputField>;
+
 pub type EnumTypeRef = Arc<EnumType>;
+pub type EnumTypeWeakRef = Weak<EnumType>;
 
 /// Since we have the invariant that the weak refs that are used throughout the query
 /// schema have to be always valid, we use this simple trait to keep the code clutter low.

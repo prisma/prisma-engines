@@ -190,7 +190,7 @@ impl<'a> IntoRenderer for &'a EnumType {
     }
 
     fn is_already_rendered(&self, ctx: &RenderContext) -> bool {
-        ctx.already_rendered(&self.identifier())
+        ctx.already_rendered(self.identifier())
     }
 }
 

@@ -7,4 +7,7 @@ pub struct TxInput {
 
     /// Time in milliseconds after which the transaction rolls back automatically.
     pub timeout: u64,
+
+    /// Isolation level to use for the transaction.
+    pub isolation_level: Option<String>,
 }

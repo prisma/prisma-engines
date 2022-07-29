@@ -6,7 +6,7 @@ use std::{fmt, sync::Arc};
 
 #[derive(Debug, Clone)]
 pub enum OutputType {
-    Enum(EnumTypeRef),
+    Enum(EnumTypeWeakRef),
     List(OutputTypeRef),
     Object(ObjectTypeWeakRef),
     Scalar(ScalarType),
@@ -43,6 +43,10 @@ impl OutputType {
 
     pub fn boolean() -> OutputType {
         OutputType::Scalar(ScalarType::Boolean)
+    }
+
+    pub fn enum_type(containing: EnumTypeWeakRef) -> OutputType {
+        OutputType::Enum(containing)
     }
 
     pub fn date_time() -> OutputType {

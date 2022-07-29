@@ -9,8 +9,11 @@ use connector_interface::{
 use datamodel::common::preview_features::PreviewFeature;
 use prisma_models::{prelude::*, SelectionResult};
 use prisma_value::PrismaValue;
-use quaint::{connector::TransactionCapable, prelude::ConnectionInfo};
-use std::collections::HashMap;
+use quaint::{
+    connector::{IsolationLevel, TransactionCapable},
+    prelude::ConnectionInfo,
+};
+use std::{collections::HashMap, str::FromStr};
 
 pub struct SqlConnection<C> {
     inner: C,
@@ -40,10 +43,24 @@ impl<C> Connection for SqlConnection<C>
 where
     C: QueryExt + TransactionCapable + Send + Sync + 'static,
 {
-    async fn start_transaction<'a>(&'a mut self) -> connector::Result<Box<dyn Transaction + 'a>> {
-        let fut_tx = self.inner.start_transaction();
+    async fn start_transaction<'a>(
+        &'a mut self,
+        isolation_level: Option<String>,
+    ) -> connector::Result<Box<dyn Transaction + 'a>> {
         let connection_info = &self.connection_info;
         let features = self.features.clone();
+        let isolation_level = match isolation_level {
+            Some(level) => {
+                let transformed = IsolationLevel::from_str(&level)
+                    .map_err(SqlError::from)
+                    .map_err(|err| err.into_connector_error(&connection_info))?;
+
+                Some(transformed)
+            }
+            None => None,
+        };
+
+        let fut_tx = self.inner.start_transaction(isolation_level);
 
         catch(self.connection_info.clone(), async move {
             let tx: quaint::connector::Transaction = fut_tx.await.map_err(SqlError::from)?;

@@ -100,6 +100,11 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::DecimalType,
     ConnectorCapability::ClusteringSetting,
     ConnectorCapability::OrderByNullsFirstLast,
+    ConnectorCapability::SupportsTxIsolationReadUncommitted,
+    ConnectorCapability::SupportsTxIsolationReadCommitted,
+    ConnectorCapability::SupportsTxIsolationRepeatableRead,
+    ConnectorCapability::SupportsTxIsolationSerializable,
+    ConnectorCapability::SupportsTxIsolationSnapshot,
 ];
 
 pub struct MsSqlDatamodelConnector;

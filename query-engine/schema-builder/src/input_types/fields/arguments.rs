@@ -114,7 +114,7 @@ pub(crate) fn relation_selection_arguments(
         args.push(
             input_field(
                 args::DISTINCT,
-                InputType::list(InputType::Enum(model_field_enum(model))),
+                InputType::list(InputType::Enum(model_field_enum(ctx, model))),
                 None,
             )
             .optional(),
@@ -126,8 +126,6 @@ pub(crate) fn relation_selection_arguments(
 
 /// Builds "many composite where" arguments for to-many composite selection sets.
 pub(crate) fn composite_selection_arguments(_ctx: &mut BuilderContext, _cf: &CompositeFieldRef) -> Vec<InputField> {
-    //vec![order_by_argument(ctx, &(&cf.typ).into(), &OrderByOptions::new())]
-
     vec![]
 }
 
@@ -148,7 +146,7 @@ pub(crate) fn order_by_argument(
 }
 
 pub(crate) fn group_by_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<InputField> {
-    let field_enum_type = InputType::Enum(model_field_enum(model));
+    let field_enum_type = InputType::Enum(model_field_enum(ctx, model));
 
     vec![
         where_argument(ctx, model),

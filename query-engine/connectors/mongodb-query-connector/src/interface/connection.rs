@@ -1,5 +1,6 @@
 use super::catch;
 use crate::{
+    error::MongoError,
     root_queries::{aggregate, read, write},
     MongoDbTransaction,
 };
@@ -25,7 +26,15 @@ impl ConnectionLike for MongoDbConnection {}
 impl Connection for MongoDbConnection {
     async fn start_transaction<'a>(
         &'a mut self,
+        isolation_level: Option<String>,
     ) -> connector_interface::Result<Box<dyn connector_interface::Transaction + 'a>> {
+        if isolation_level.is_some() {
+            return Err(MongoError::Unsupported(
+                "Mongo does not support setting transaction isolation levels.".to_owned(),
+            )
+            .into_connector_error());
+        }
+
         let tx = Box::new(MongoDbTransaction::new(self).await?);
 
         Ok(tx as Box<dyn Transaction>)

@@ -1,4 +1,5 @@
 use super::*;
+use crate::enum_types::*;
 use input_types::fields::arguments;
 use prisma_models::{CompositeFieldRef, ScalarFieldRef};
 
@@ -30,7 +31,7 @@ pub(crate) fn map_scalar_output_type(ctx: &mut BuilderContext, typ: &TypeIdentif
         TypeIdentifier::Float => OutputType::float(),
         TypeIdentifier::Decimal => OutputType::decimal(),
         TypeIdentifier::Boolean => OutputType::boolean(),
-        TypeIdentifier::Enum(e) => map_enum_type(ctx, e).into(),
+        TypeIdentifier::Enum(e) => OutputType::enum_type(map_schema_enum_type(ctx, e)),
         TypeIdentifier::Json => OutputType::json(),
         TypeIdentifier::DateTime => OutputType::date_time(),
         TypeIdentifier::UUID => OutputType::uuid(),
@@ -56,15 +57,6 @@ pub(crate) fn map_relation_output_type(ctx: &mut BuilderContext, rf: &RelationFi
     } else {
         related_model_obj
     }
-}
-
-fn map_enum_type(ctx: &mut BuilderContext, enum_name: &str) -> EnumType {
-    let e = ctx
-        .internal_data_model
-        .find_enum(enum_name)
-        .expect("Enum references must always be valid.");
-
-    e.into()
 }
 
 fn map_composite_field_output_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> OutputType {

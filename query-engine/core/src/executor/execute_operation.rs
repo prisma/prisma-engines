@@ -128,7 +128,7 @@ async fn execute_self_contained(
 ) -> crate::Result<ResponseData> {
     let operation_timer = Instant::now();
     let result = if force_transactions || graph.needs_transaction() {
-        let mut tx = conn.start_transaction().await?;
+        let mut tx = conn.start_transaction(None).await?;
         let result = execute_on(tx.as_connection_like(), graph, serializer, trace_id).await;
 
         if result.is_ok() {
