@@ -108,6 +108,16 @@
 <span id="103">103</span>
 <span id="104">104</span>
 <span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ConnectorTag</span>, <span class="ident">RunnerInterface</span>, <span class="ident">TestResult</span>, <span class="ident">TxResult</span>};
 <span class="kw">use</span> <span class="ident">prisma_models::InternalDataModelBuilder</span>;
 <span class="kw">use</span> <span class="ident">query_core</span>::{<span class="ident">executor</span>, <span class="ident">schema::QuerySchemaRef</span>, <span class="ident">schema_builder</span>, <span class="ident">MetricRegistry</span>, <span class="ident">QueryExecutor</span>, <span class="ident">TxId</span>};
@@ -169,10 +179,20 @@
         <span class="prelude-val">Ok</span>(<span class="ident">handler</span>.<span class="ident">handle</span>(<span class="ident">query</span>, <span class="self">self</span>.<span class="ident">current_tx_id</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>).<span class="kw">await</span>.<span class="ident">into</span>())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_tx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">max_acquisition_millis</span>: <span class="ident">u64</span>, <span class="ident">valid_for_millis</span>: <span class="ident">u64</span>) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident">TxId</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_tx</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">max_acquisition_millis</span>: <span class="ident">u64</span>,
+        <span class="ident">valid_for_millis</span>: <span class="ident">u64</span>,
+        <span class="ident">isolation_level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident">TxId</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">executor</span>
-            .<span class="ident">start_tx</span>(<span class="self">self</span>.<span class="ident">query_schema</span>.<span class="ident">clone</span>(), <span class="ident">max_acquisition_millis</span>, <span class="ident">valid_for_millis</span>)
+            .<span class="ident">start_tx</span>(
+                <span class="self">self</span>.<span class="ident">query_schema</span>.<span class="ident">clone</span>(),
+                <span class="ident">max_acquisition_millis</span>,
+                <span class="ident">valid_for_millis</span>,
+                <span class="ident">isolation_level</span>,
+            )
             .<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">id</span>)
     }

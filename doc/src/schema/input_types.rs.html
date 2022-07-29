@@ -443,7 +443,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">InputType</span> {
     <span class="ident">Scalar</span>(<span class="ident">ScalarType</span>),
-    <span class="ident">Enum</span>(<span class="ident">EnumTypeRef</span>),
+    <span class="ident">Enum</span>(<span class="ident">EnumTypeWeakRef</span>),
     <span class="ident">List</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">InputType</span><span class="op">&gt;</span>),
     <span class="ident">Object</span>(<span class="ident">InputObjectTypeWeakRef</span>),
 }
@@ -534,7 +534,7 @@
         <span class="ident">InputType::Scalar</span>(<span class="ident">ScalarType::Null</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enum_type</span>(<span class="ident">containing</span>: <span class="ident">EnumTypeRef</span>) -&gt; <span class="ident">InputType</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enum_type</span>(<span class="ident">containing</span>: <span class="ident">EnumTypeWeakRef</span>) -&gt; <span class="ident">InputType</span> {
         <span class="ident">InputType::Enum</span>(<span class="ident">containing</span>)
     }
 

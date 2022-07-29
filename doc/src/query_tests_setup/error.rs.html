@@ -47,6 +47,9 @@
 <span id="42">42</span>
 <span id="43">43</span>
 <span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::TemplatingError</span>;
 <span class="kw">use</span> <span class="ident">std::env::VarError</span>;
 <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
@@ -68,6 +71,9 @@
 
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Error processing schema template: {0}&quot;</span>)]</span>
     <span class="ident">TemplatingError</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">TemplatingError</span>),
+
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Error during interactive transaction processing: {}&quot;</span>, <span class="ident">_0</span>)]</span>
+    <span class="ident">InteractiveTransactionError</span>(<span class="ident">String</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">TestError</span> {

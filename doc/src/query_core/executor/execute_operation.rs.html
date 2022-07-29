@@ -296,7 +296,7 @@
 ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResponseData</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">operation_timer</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
     <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">force_transactions</span> <span class="op">|</span><span class="op">|</span> <span class="ident">graph</span>.<span class="ident">needs_transaction</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tx</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">start_transaction</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tx</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">start_transaction</span>(<span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">execute_on</span>(<span class="ident">tx</span>.<span class="ident">as_connection_like</span>(), <span class="ident">graph</span>, <span class="ident">serializer</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>;
 
         <span class="kw">if</span> <span class="ident">result</span>.<span class="ident">is_ok</span>() {

@@ -117,6 +117,7 @@
 <span id="112">112</span>
 <span id="113">113</span>
 <span id="114">114</span>
+<span id="115">115</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
     <span class="ident">parser_database::ScalarType</span>, <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">NativeTypeConstructor</span>, <span class="ident">NativeTypeInstance</span>,
     <span class="ident">ReferentialAction</span>, <span class="ident">ReferentialIntegrity</span>,
@@ -138,6 +139,7 @@
     <span class="ident">ConnectorCapability::DecimalType</span>,
     <span class="ident">ConnectorCapability::BackwardCompatibleQueryRaw</span>,
     <span class="ident">ConnectorCapability::OrderByNullsFirstLast</span>,
+    <span class="ident">ConnectorCapability::SupportsTxIsolationSerializable</span>,
 ];
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SqliteDatamodelConnector</span>;

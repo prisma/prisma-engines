@@ -163,6 +163,12 @@
 <span id="158">158</span>
 <span id="159">159</span>
 <span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">str::FromStr</span>};
 
 <span class="doccomment">/// Not all Databases are created equal. Hence connectors for our datasources support different capabilities.</span>
@@ -253,7 +259,13 @@
     <span class="ident">UndefinedType</span>,              <span class="comment">// Connector distinguishes `null` and `undefined`</span>
     <span class="ident">DecimalType</span>,                <span class="comment">// Connector supports Prisma Decimal type.</span>
     <span class="ident">BackwardCompatibleQueryRaw</span>, <span class="comment">// Temporary SQLite specific capability. Should be removed once https://github.com/prisma/prisma/issues/12784 is fixed,</span>
-    <span class="ident">OrderByNullsFirstLast</span>       <span class="comment">// Connector supports ORDER BY NULLS LAST/FIRST</span>
+    <span class="ident">OrderByNullsFirstLast</span>,      <span class="comment">// Connector supports ORDER BY NULLS LAST/FIRST</span>
+    <span class="comment">// Block of isolation levels.</span>
+    <span class="ident">SupportsTxIsolationReadUncommitted</span>,
+    <span class="ident">SupportsTxIsolationReadCommitted</span>,
+    <span class="ident">SupportsTxIsolationRepeatableRead</span>,
+    <span class="ident">SupportsTxIsolationSerializable</span>,
+    <span class="ident">SupportsTxIsolationSnapshot</span>,
 );
 
 <span class="doccomment">/// Contains all capabilities that the connector is able to serve.</span>

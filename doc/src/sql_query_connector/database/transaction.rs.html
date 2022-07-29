@@ -262,10 +262,8 @@
 <span id="257">257</span>
 <span id="258">258</span>
 <span id="259">259</span>
-<span id="260">260</span>
-<span id="261">261</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::SqlError</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">database::operations</span>::<span class="kw-2">*</span>, <span class="ident">sql_info::SqlInfo</span>};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::catch</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">database::operations</span>::<span class="kw-2">*</span>, <span class="ident">sql_info::SqlInfo</span>, <span class="ident">SqlError</span>};
 <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
 <span class="kw">use</span> <span class="ident">connector</span>::{<span class="ident">ConnectionLike</span>, <span class="ident">RelAggregationSelection</span>};
 <span class="kw">use</span> <span class="ident">connector_interface</span>::{
@@ -277,8 +275,6 @@
 <span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
 <span class="kw">use</span> <span class="ident">quaint::prelude::ConnectionInfo</span>;
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
-
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::catch</span>;
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SqlConnectorTransaction</span><span class="op">&lt;</span><span class="lifetime">&#39;tx</span><span class="op">&gt;</span> {
     <span class="ident">inner</span>: <span class="ident">quaint::connector::Transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;tx</span><span class="op">&gt;</span>,

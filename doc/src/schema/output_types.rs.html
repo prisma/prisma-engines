@@ -189,6 +189,10 @@
 <span id="184">184</span>
 <span id="185">185</span>
 <span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">fmt::Debug</span>;
 <span class="kw">use</span> <span class="ident">once_cell::sync::OnceCell</span>;
@@ -197,7 +201,7 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">OutputType</span> {
-    <span class="ident">Enum</span>(<span class="ident">EnumTypeRef</span>),
+    <span class="ident">Enum</span>(<span class="ident">EnumTypeWeakRef</span>),
     <span class="ident">List</span>(<span class="ident">OutputTypeRef</span>),
     <span class="ident">Object</span>(<span class="ident">ObjectTypeWeakRef</span>),
     <span class="ident">Scalar</span>(<span class="ident">ScalarType</span>),
@@ -234,6 +238,10 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">boolean</span>() -&gt; <span class="ident">OutputType</span> {
         <span class="ident">OutputType::Scalar</span>(<span class="ident">ScalarType::Boolean</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enum_type</span>(<span class="ident">containing</span>: <span class="ident">EnumTypeWeakRef</span>) -&gt; <span class="ident">OutputType</span> {
+        <span class="ident">OutputType::Enum</span>(<span class="ident">containing</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">date_time</span>() -&gt; <span class="ident">OutputType</span> {

@@ -101,18 +101,6 @@
 <span id="96">96</span>
 <span id="97">97</span>
 <span id="98">98</span>
-<span id="99">99</span>
-<span id="100">100</span>
-<span id="101">101</span>
-<span id="102">102</span>
-<span id="103">103</span>
-<span id="104">104</span>
-<span id="105">105</span>
-<span id="106">106</span>
-<span id="107">107</span>
-<span id="108">108</span>
-<span id="109">109</span>
-<span id="110">110</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -139,19 +127,14 @@
             }
 
             <span class="ident">InputType::Enum</span>(<span class="ident">et</span>) =&gt; {
-                <span class="comment">// Not sure how this fits together with the enum handling below.</span>
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">et</span>.<span class="ident">into_renderer</span>().<span class="ident">render</span>(<span class="ident">ctx</span>);
-                <span class="ident">et</span>.<span class="ident">name</span>().<span class="ident">to_string</span>()
+                <span class="kw">let</span> <span class="ident">et</span> <span class="op">=</span> <span class="ident">et</span>.<span class="ident">into_arc</span>();
+                <span class="ident">et</span>.<span class="ident">into_renderer</span>().<span class="ident">render</span>(<span class="ident">ctx</span>);
+                <span class="ident">et</span>.<span class="ident">identifier</span>().<span class="ident">name</span>().<span class="ident">to_string</span>()
             }
 
             <span class="ident">InputType::List</span>(<span class="kw-2">ref</span> <span class="ident">l</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">substring</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">render_input_type</span>(<span class="ident">l</span>, <span class="ident">ctx</span>);
                 <span class="macro">format!</span>(<span class="string">&quot;[{}]&quot;</span>, <span class="ident">substring</span>)
-            }
-
-            <span class="ident">InputType::Scalar</span>(<span class="ident">ScalarType::Enum</span>(<span class="ident">et</span>)) =&gt; {
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">et</span>.<span class="ident">into_renderer</span>().<span class="ident">render</span>(<span class="ident">ctx</span>);
-                <span class="ident">et</span>.<span class="ident">name</span>().<span class="ident">to_string</span>()
             }
 
             <span class="ident">InputType::Scalar</span>(<span class="kw-2">ref</span> <span class="ident">scalar</span>) =&gt; {
@@ -168,7 +151,6 @@
                     <span class="ident">ScalarType::JsonList</span> =&gt; <span class="string">&quot;Json&quot;</span>,
                     <span class="ident">ScalarType::Xml</span> =&gt; <span class="string">&quot;Xml&quot;</span>,
                     <span class="ident">ScalarType::Bytes</span> =&gt; <span class="string">&quot;Bytes&quot;</span>,
-                    <span class="ident">ScalarType::Enum</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Encountered enum type during GQL scalar rendering.&quot;</span>), <span class="comment">// Handled separately above.</span>
                     <span class="ident">ScalarType::Null</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Null types should not be picked for GQL rendering.&quot;</span>),
                 };
 
@@ -185,19 +167,14 @@
             }
 
             <span class="ident">OutputType::Enum</span>(<span class="ident">et</span>) =&gt; {
-                <span class="comment">// Not sure how this fits together with the enum handling below.</span>
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">et</span>.<span class="ident">into_renderer</span>().<span class="ident">render</span>(<span class="ident">ctx</span>);
-                <span class="ident">et</span>.<span class="ident">name</span>().<span class="ident">to_string</span>()
+                <span class="kw">let</span> <span class="ident">et</span> <span class="op">=</span> <span class="ident">et</span>.<span class="ident">into_arc</span>();
+                <span class="ident">et</span>.<span class="ident">into_renderer</span>().<span class="ident">render</span>(<span class="ident">ctx</span>);
+                <span class="ident">et</span>.<span class="ident">identifier</span>().<span class="ident">name</span>().<span class="ident">to_string</span>()
             }
 
             <span class="ident">OutputType::List</span>(<span class="ident">l</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">substring</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">render_output_type</span>(<span class="ident">l</span>, <span class="ident">ctx</span>);
                 <span class="macro">format!</span>(<span class="string">&quot;[{}]&quot;</span>, <span class="ident">substring</span>)
-            }
-
-            <span class="ident">OutputType::Scalar</span>(<span class="ident">ScalarType::Enum</span>(<span class="ident">et</span>)) =&gt; {
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">et</span>.<span class="ident">into_renderer</span>().<span class="ident">render</span>(<span class="ident">ctx</span>);
-                <span class="ident">et</span>.<span class="ident">name</span>().<span class="ident">to_string</span>()
             }
 
             <span class="ident">OutputType::Scalar</span>(<span class="kw-2">ref</span> <span class="ident">scalar</span>) =&gt; {
@@ -214,7 +191,6 @@
                     <span class="ident">ScalarType::JsonList</span> =&gt; <span class="string">&quot;Json&quot;</span>,
                     <span class="ident">ScalarType::Xml</span> =&gt; <span class="string">&quot;Xml&quot;</span>,
                     <span class="ident">ScalarType::Bytes</span> =&gt; <span class="string">&quot;Bytes&quot;</span>,
-                    <span class="ident">ScalarType::Enum</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Encountered enum type during GQL scalar rendering.&quot;</span>), <span class="comment">// Handled separately above.</span>
                     <span class="ident">ScalarType::Null</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Null types should not be picked for GQL rendering.&quot;</span>),
                 };
 

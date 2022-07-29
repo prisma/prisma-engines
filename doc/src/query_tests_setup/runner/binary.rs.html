@@ -206,7 +206,18 @@
 <span id="201">201</span>
 <span id="202">202</span>
 <span id="203">203</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ConnectorTag</span>, <span class="ident">RunnerInterface</span>, <span class="ident">TestResult</span>, <span class="ident">TxResult</span>};
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ConnectorTag</span>, <span class="ident">RunnerInterface</span>, <span class="ident">TestError</span>, <span class="ident">TestResult</span>, <span class="ident">TxResult</span>};
 <span class="kw">use</span> <span class="ident">hyper</span>::{<span class="ident">Body</span>, <span class="ident">Method</span>, <span class="ident">Request</span>, <span class="ident">Response</span>};
 <span class="kw">use</span> <span class="ident">query_core</span>::{<span class="ident">MetricRegistry</span>, <span class="ident">TxId</span>};
 <span class="kw">use</span> <span class="ident">query_engine::opt::PrismaOpt</span>;
@@ -295,10 +306,16 @@
         <span class="prelude-val">Ok</span>(<span class="ident">PrismaResponse::Multi</span>(<span class="ident">batch_response</span>).<span class="ident">into</span>())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_tx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">max_acquisition_millis</span>: <span class="ident">u64</span>, <span class="ident">valid_for_millis</span>: <span class="ident">u64</span>) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident">TxId</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_tx</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">max_acquisition_millis</span>: <span class="ident">u64</span>,
+        <span class="ident">valid_for_millis</span>: <span class="ident">u64</span>,
+        <span class="ident">isolation_level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident">TxId</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="macro">serde_json::json!</span>({
             <span class="string">&quot;max_wait&quot;</span>: <span class="ident">max_acquisition_millis</span>,
-            <span class="string">&quot;timeout&quot;</span>: <span class="ident">valid_for_millis</span>
+            <span class="string">&quot;timeout&quot;</span>: <span class="ident">valid_for_millis</span>,
+            <span class="string">&quot;isolation_level&quot;</span>: <span class="ident">isolation_level</span>,
         });
 
         <span class="kw">let</span> <span class="ident">body_bytes</span> <span class="op">=</span> <span class="ident">serde_json::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>).<span class="ident">unwrap</span>();
@@ -311,9 +328,14 @@
 
         <span class="kw">let</span> <span class="ident">resp</span> <span class="op">=</span> <span class="ident">routes</span>(<span class="self">self</span>.<span class="ident">state</span>.<span class="ident">clone</span>(), <span class="ident">req</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">json_resp</span> <span class="op">=</span> <span class="ident">response_to_json</span>(<span class="ident">resp</span>).<span class="kw">await</span>;
-        <span class="kw">let</span> <span class="ident">tx_id</span> <span class="op">=</span> <span class="ident">json_resp</span>.<span class="ident">as_object</span>().<span class="ident">unwrap</span>().<span class="ident">get</span>(<span class="string">&quot;id&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">json_obj</span> <span class="op">=</span> <span class="ident">json_resp</span>.<span class="ident">as_object</span>().<span class="ident">unwrap</span>();
 
-        <span class="prelude-val">Ok</span>(<span class="ident">tx_id</span>.<span class="ident">into</span>())
+        <span class="kw">match</span> <span class="ident">json_obj</span>.<span class="ident">get</span>(<span class="string">&quot;error_code&quot;</span>) {
+            <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">TestError::InteractiveTransactionError</span>(
+                <span class="ident">serde_json::to_string</span>(<span class="ident">json_obj</span>).<span class="ident">unwrap</span>(),
+            )),
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">json_obj</span>.<span class="ident">get</span>(<span class="string">&quot;id&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>().<span class="ident">unwrap</span>().<span class="ident">into</span>()),
+        }
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">commit_tx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tx_id</span>: <span class="ident">TxId</span>) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident">TxResult</span><span class="op">&gt;</span> {

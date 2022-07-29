@@ -421,12 +421,8 @@
 <span id="416">416</span>
 <span id="417">417</span>
 <span id="418">418</span>
-<span id="419">419</span>
-<span id="420">420</span>
-<span id="421">421</span>
-<span id="422">422</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">constants</span>::<span class="kw-2">*</span>, <span class="ident">enum_types</span>::<span class="kw-2">*</span>};
 <span class="kw">use</span> <span class="ident">prisma_models::CompositeFieldRef</span>;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">UpdateDataInputFieldMapper</span> {
@@ -467,12 +463,8 @@
         <span class="kw">let</span> <span class="ident">has_adv_json</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::AdvancedJsonNullability</span>);
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">sf</span>.<span class="ident">type_identifier</span> {
             <span class="ident">TypeIdentifier::Json</span> <span class="kw">if</span> <span class="ident">has_adv_json</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">enum_type</span> <span class="op">=</span> <span class="ident">json_null_input_enum</span>(<span class="op">!</span><span class="ident">sf</span>.<span class="ident">is_required</span>());
-                <span class="kw">let</span> <span class="ident">input_field</span> <span class="op">=</span> <span class="ident">input_field</span>(
-                    <span class="ident">sf</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-                    <span class="macro">vec!</span>[<span class="ident">InputType::Enum</span>(<span class="ident">enum_type</span>), <span class="ident">base_update_type</span>],
-                    <span class="prelude-val">None</span>,
-                );
+                <span class="kw">let</span> <span class="ident">enum_type</span> <span class="op">=</span> <span class="ident">InputType::enum_type</span>(<span class="ident">json_null_input_enum</span>(<span class="ident">ctx</span>, <span class="op">!</span><span class="ident">sf</span>.<span class="ident">is_required</span>()));
+                <span class="kw">let</span> <span class="ident">input_field</span> <span class="op">=</span> <span class="ident">input_field</span>(<span class="ident">sf</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="macro">vec!</span>[<span class="ident">enum_type</span>, <span class="ident">base_update_type</span>], <span class="prelude-val">None</span>);
 
                 <span class="ident">input_field</span>.<span class="ident">optional</span>()
             }

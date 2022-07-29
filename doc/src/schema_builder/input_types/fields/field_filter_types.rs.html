@@ -564,29 +564,8 @@
 <span id="559">559</span>
 <span id="560">560</span>
 <span id="561">561</span>
-<span id="562">562</span>
-<span id="563">563</span>
-<span id="564">564</span>
-<span id="565">565</span>
-<span id="566">566</span>
-<span id="567">567</span>
-<span id="568">568</span>
-<span id="569">569</span>
-<span id="570">570</span>
-<span id="571">571</span>
-<span id="572">572</span>
-<span id="573">573</span>
-<span id="574">574</span>
-<span id="575">575</span>
-<span id="576">576</span>
-<span id="577">577</span>
-<span id="578">578</span>
-<span id="579">579</span>
-<span id="580">580</span>
-<span id="581">581</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::objects</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants::json_null</span>;
 <span class="kw">use</span> <span class="ident">constants</span>::{<span class="ident">aggregations</span>, <span class="ident">filters</span>};
 <span class="kw">use</span> <span class="ident">datamodel_connector::ConnectorCapability</span>;
 <span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">dml::DefaultValue</span>, <span class="ident">CompositeFieldRef</span>, <span class="ident">PrismaValue</span>};
@@ -957,13 +936,14 @@
 }
 
 <span class="kw">fn</span> <span class="ident">json_equality_filters</span>(
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">BuilderContext</span>,
+    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>,
     <span class="ident">mapped_type</span>: <span class="ident">InputType</span>,
     <span class="ident">nullable</span>: <span class="ident">bool</span>,
 ) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">InputField</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::AdvancedJsonNullability</span>) {
-        <span class="kw">let</span> <span class="ident">enum_type</span> <span class="op">=</span> <span class="ident">json_null_filter_enum</span>();
-        <span class="ident">input_field</span>(<span class="ident">filters::EQUALS</span>, <span class="macro">vec!</span>[<span class="ident">InputType::Enum</span>(<span class="ident">enum_type</span>), <span class="ident">mapped_type</span>], <span class="prelude-val">None</span>).<span class="ident">optional</span>()
+        <span class="kw">let</span> <span class="ident">enum_type</span> <span class="op">=</span> <span class="ident">InputType::enum_type</span>(<span class="ident">json_null_filter_enum</span>(<span class="ident">ctx</span>));
+
+        <span class="ident">input_field</span>(<span class="ident">filters::EQUALS</span>, <span class="macro">vec!</span>[<span class="ident">enum_type</span>, <span class="ident">mapped_type</span>], <span class="prelude-val">None</span>).<span class="ident">optional</span>()
     } <span class="kw">else</span> {
         <span class="ident">input_field</span>(<span class="ident">filters::EQUALS</span>, <span class="macro">vec!</span>[<span class="ident">mapped_type</span>], <span class="prelude-val">None</span>)
             .<span class="ident">optional</span>()
@@ -971,17 +951,6 @@
     };
 
     <span class="ident">std::iter::once</span>(<span class="ident">field</span>)
-}
-
-<span class="kw">fn</span> <span class="ident">json_null_filter_enum</span>() -&gt; <span class="ident">EnumTypeRef</span> {
-    <span class="ident">Arc::new</span>(<span class="ident">string_enum_type</span>(
-        <span class="ident">json_null::FILTER_ENUM_NAME</span>,
-        <span class="macro">vec!</span>[
-            <span class="ident">json_null::DB_NULL</span>.<span class="ident">to_owned</span>(),
-            <span class="ident">json_null::JSON_NULL</span>.<span class="ident">to_owned</span>(),
-            <span class="ident">json_null::ANY_NULL</span>.<span class="ident">to_owned</span>(),
-        ],
-    ))
 }
 
 <span class="kw">fn</span> <span class="ident">inclusion_filters</span>(<span class="ident">mapped_type</span>: <span class="ident">InputType</span>, <span class="ident">nullable</span>: <span class="ident">bool</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">InputField</span><span class="op">&gt;</span> {
@@ -1049,14 +1018,11 @@
     .<span class="ident">into_iter</span>()
 }
 
-<span class="kw">fn</span> <span class="ident">query_mode_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">BuilderContext</span>, <span class="ident">nested</span>: <span class="ident">bool</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">InputField</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">query_mode_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">nested</span>: <span class="ident">bool</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">InputField</span><span class="op">&gt;</span> {
     <span class="comment">// Limit query mode field to the topmost filter level.</span>
     <span class="comment">// Only build mode field for connectors with insensitive filter support.</span>
     <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">nested</span> <span class="op">&amp;&amp;</span> <span class="ident">ctx</span>.<span class="ident">capabilities</span>.<span class="ident">contains</span>(<span class="ident">ConnectorCapability::InsensitiveFilters</span>) {
-        <span class="kw">let</span> <span class="ident">enum_type</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">string_enum_type</span>(
-            <span class="string">&quot;QueryMode&quot;</span>,
-            <span class="macro">vec!</span>[<span class="ident">filters::DEFAULT</span>.<span class="ident">to_owned</span>(), <span class="ident">filters::INSENSITIVE</span>.<span class="ident">to_owned</span>()],
-        ));
+        <span class="kw">let</span> <span class="ident">enum_type</span> <span class="op">=</span> <span class="ident">query_mode_enum</span>(<span class="ident">ctx</span>);
 
         <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">input_field</span>(
             <span class="ident">filters::MODE</span>,
@@ -1134,14 +1100,8 @@
     <span class="kw">match</span> <span class="ident">typ</span> {
         <span class="comment">// Json is not nullable on dbs with `AdvancedJsonNullability`, only by proxy through an enum.</span>
         <span class="ident">TypeIdentifier::Json</span> <span class="kw">if</span> <span class="ident">has_adv_json</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">enum_type</span> <span class="op">=</span> <span class="ident">json_null_filter_enum</span>();
-
-            <span class="ident">input_field</span>(
-                <span class="ident">filters::NOT_LOWERCASE</span>,
-                <span class="macro">vec!</span>[<span class="ident">InputType::Enum</span>(<span class="ident">enum_type</span>), <span class="ident">mapped_scalar_type</span>],
-                <span class="prelude-val">None</span>,
-            )
-            .<span class="ident">optional</span>()
+            <span class="kw">let</span> <span class="ident">enum_type</span> <span class="op">=</span> <span class="ident">InputType::enum_type</span>(<span class="ident">json_null_filter_enum</span>(<span class="ident">ctx</span>));
+            <span class="ident">input_field</span>(<span class="ident">filters::NOT_LOWERCASE</span>, <span class="macro">vec!</span>[<span class="ident">enum_type</span>, <span class="ident">mapped_scalar_type</span>], <span class="prelude-val">None</span>).<span class="ident">optional</span>()
         }
 
         <span class="ident">TypeIdentifier::Json</span> =&gt; <span class="ident">input_field</span>(<span class="ident">filters::NOT_LOWERCASE</span>, <span class="macro">vec!</span>[<span class="ident">mapped_scalar_type</span>], <span class="prelude-val">None</span>)

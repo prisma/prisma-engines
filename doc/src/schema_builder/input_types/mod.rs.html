@@ -63,32 +63,11 @@
 <span id="58">58</span>
 <span id="59">59</span>
 <span id="60">60</span>
-<span id="61">61</span>
-<span id="62">62</span>
-<span id="63">63</span>
-<span id="64">64</span>
-<span id="65">65</span>
-<span id="66">66</span>
-<span id="67">67</span>
-<span id="68">68</span>
-<span id="69">69</span>
-<span id="70">70</span>
-<span id="71">71</span>
-<span id="72">72</span>
-<span id="73">73</span>
-<span id="74">74</span>
-<span id="75">75</span>
-<span id="76">76</span>
-<span id="77">77</span>
-<span id="78">78</span>
-<span id="79">79</span>
-<span id="80">80</span>
-<span id="81">81</span>
-<span id="82">82</span>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">fields</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">objects</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::enum_types</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">fields</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">prisma_models::ScalarFieldRef</span>;
 <span class="kw">use</span> <span class="ident">schema</span>::<span class="kw-2">*</span>;
@@ -107,7 +86,7 @@
         <span class="ident">TypeIdentifier::UUID</span> =&gt; <span class="ident">InputType::uuid</span>(),
         <span class="ident">TypeIdentifier::DateTime</span> =&gt; <span class="ident">InputType::date_time</span>(),
         <span class="ident">TypeIdentifier::Json</span> =&gt; <span class="ident">InputType::json</span>(),
-        <span class="ident">TypeIdentifier::Enum</span>(<span class="ident">e</span>) =&gt; <span class="ident">map_enum_input_type</span>(<span class="ident">ctx</span>, <span class="ident">e</span>),
+        <span class="ident">TypeIdentifier::Enum</span>(<span class="ident">e</span>) =&gt; <span class="ident">InputType::enum_type</span>(<span class="ident">map_schema_enum_type</span>(<span class="ident">ctx</span>, <span class="ident">e</span>)),
         <span class="ident">TypeIdentifier::Xml</span> =&gt; <span class="ident">InputType::xml</span>(),
         <span class="ident">TypeIdentifier::Bytes</span> =&gt; <span class="ident">InputType::bytes</span>(),
         <span class="ident">TypeIdentifier::BigInt</span> =&gt; <span class="ident">InputType::bigint</span>(),
@@ -119,17 +98,6 @@
     } <span class="kw">else</span> {
         <span class="ident">typ</span>
     }
-}
-
-<span class="kw">fn</span> <span class="ident">map_enum_input_type</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">enum_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">InputType</span> {
-    <span class="kw">let</span> <span class="ident">e</span> <span class="op">=</span> <span class="ident">ctx</span>
-        .<span class="ident">internal_data_model</span>
-        .<span class="ident">find_enum</span>(<span class="ident">enum_name</span>)
-        .<span class="ident">expect</span>(<span class="string">&quot;Enum references must always be valid.&quot;</span>);
-
-    <span class="kw">let</span> <span class="ident">et</span>: <span class="ident">EnumType</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">into</span>();
-
-    <span class="ident">et</span>.<span class="ident">into</span>()
 }
 
 <span class="doccomment">/// Convenience function to return [object_type, list_object_type]</span>
@@ -154,18 +122,6 @@
         <span class="kw">let</span> <span class="ident">field_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">from_fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">capitalize</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">name</span>)).<span class="ident">collect</span>();
         <span class="ident">field_names</span>.<span class="ident">join</span>(<span class="string">&quot;&quot;</span>)
     })
-}
-
-<span class="kw">fn</span> <span class="ident">model_field_enum</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">EnumTypeRef</span> {
-    <span class="ident">Arc::new</span>(<span class="ident">EnumType::FieldRef</span>(<span class="ident">FieldRefEnumType</span> {
-        <span class="ident">name</span>: <span class="macro">format!</span>(<span class="string">&quot;{}ScalarFieldEnum&quot;</span>, <span class="ident">capitalize</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">name</span>)),
-        <span class="ident">values</span>: <span class="ident">model</span>
-            .<span class="ident">fields</span>()
-            .<span class="ident">scalar</span>()
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> (<span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">field</span>))
-            .<span class="ident">collect</span>(),
-    }))
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="schema_builder" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.1 (e092d0b6b 2022-07-16)" ></div>

@@ -181,6 +181,22 @@
 <span id="176">176</span>
 <span id="177">177</span>
 <span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">binary</span>;
 <span class="kw">mod</span> <span class="ident">direct</span>;
 <span class="kw">mod</span> <span class="ident">node_api</span>;
@@ -207,7 +223,12 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">batch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">queries</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">transaction</span>: <span class="ident">bool</span>) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident">QueryResult</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// start a transaction for a batch run</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_tx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">max_acquisition_millis</span>: <span class="ident">u64</span>, <span class="ident">valid_for_millis</span>: <span class="ident">u64</span>) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident">TxId</span><span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_tx</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">max_acquisition_millis</span>: <span class="ident">u64</span>,
+        <span class="ident">valid_for_millis</span>: <span class="ident">u64</span>,
+        <span class="ident">isolation_level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident">TxId</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// commit transaction</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">commit_tx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tx_id</span>: <span class="ident">TxId</span>) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident">TxResult</span><span class="op">&gt;</span>;
@@ -275,11 +296,22 @@
         <span class="prelude-val">Ok</span>(<span class="ident">response</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_tx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">max_acquisition_millis</span>: <span class="ident">u64</span>, <span class="ident">valid_for_millis</span>: <span class="ident">u64</span>) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident">TxId</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_tx</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">max_acquisition_millis</span>: <span class="ident">u64</span>,
+        <span class="ident">valid_for_millis</span>: <span class="ident">u64</span>,
+        <span class="ident">isolation_level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident">TxId</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Runner::Direct</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">start_tx</span>(<span class="ident">max_acquisition_millis</span>, <span class="ident">valid_for_millis</span>).<span class="kw">await</span>,
+            <span class="ident">Runner::Direct</span>(<span class="ident">r</span>) =&gt; {
+                <span class="ident">r</span>.<span class="ident">start_tx</span>(<span class="ident">max_acquisition_millis</span>, <span class="ident">valid_for_millis</span>, <span class="ident">isolation_level</span>)
+                    .<span class="kw">await</span>
+            }
+            <span class="ident">Runner::Binary</span>(<span class="ident">r</span>) =&gt; {
+                <span class="ident">r</span>.<span class="ident">start_tx</span>(<span class="ident">max_acquisition_millis</span>, <span class="ident">valid_for_millis</span>, <span class="ident">isolation_level</span>)
+                    .<span class="kw">await</span>
+            }
             <span class="ident">Runner::NodeApi</span>(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
-            <span class="ident">Runner::Binary</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">start_tx</span>(<span class="ident">max_acquisition_millis</span>, <span class="ident">valid_for_millis</span>).<span class="kw">await</span>,
         }
     }
 

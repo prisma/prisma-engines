@@ -191,6 +191,33 @@
 <span id="186">186</span>
 <span id="187">187</span>
 <span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Query schema builder. Root for query schema building.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The schema builder creates all builders necessary for the process,</span>
@@ -226,6 +253,7 @@
 <span class="attribute">#[<span class="ident">macro_use</span>]</span>
 <span class="kw">mod</span> <span class="ident">cache</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">constants</span>;
+<span class="kw">mod</span> <span class="ident">enum_types</span>;
 <span class="kw">mod</span> <span class="ident">input_types</span>;
 <span class="kw">mod</span> <span class="ident">mutations</span>;
 <span class="kw">mod</span> <span class="ident">output_types</span>;
@@ -250,6 +278,7 @@
     <span class="ident">preview_features</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
     <span class="ident">nested_create_inputs_queue</span>: <span class="ident">NestedInputsQueue</span>,
     <span class="ident">nested_update_inputs_queue</span>: <span class="ident">NestedInputsQueue</span>,
+    <span class="comment">// enums?</span>
 }
 
 <span class="kw">impl</span> <span class="ident">BuilderContext</span> {
@@ -288,6 +317,11 @@
         <span class="self">self</span>.<span class="ident">cache</span>.<span class="ident">output_types</span>.<span class="ident">get</span>(<span class="ident">ident</span>)
     }
 
+    <span class="doccomment">/// Get an enum type.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_enum_type</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">Identifier</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EnumTypeWeakRef</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">cache</span>.<span class="ident">enum_types</span>.<span class="ident">get</span>(<span class="ident">ident</span>)
+    }
+
     <span class="doccomment">/// Caches an input (object) type.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cache_input_type</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">Identifier</span>, <span class="ident">typ</span>: <span class="ident">InputObjectTypeStrongRef</span>) {
         <span class="self">self</span>.<span class="ident">cache</span>.<span class="ident">input_types</span>.<span class="ident">insert</span>(<span class="ident">ident</span>, <span class="ident">typ</span>);
@@ -296,6 +330,11 @@
     <span class="doccomment">/// Caches an output (object) type.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cache_output_type</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">Identifier</span>, <span class="ident">typ</span>: <span class="ident">ObjectTypeStrongRef</span>) {
         <span class="self">self</span>.<span class="ident">cache</span>.<span class="ident">output_types</span>.<span class="ident">insert</span>(<span class="ident">ident</span>, <span class="ident">typ</span>);
+    }
+
+    <span class="doccomment">/// Caches an enum type.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cache_enum_type</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">Identifier</span>, <span class="ident">e</span>: <span class="ident">EnumTypeRef</span>) {
+        <span class="self">self</span>.<span class="ident">cache</span>.<span class="ident">enum_types</span>.<span class="ident">insert</span>(<span class="ident">ident</span>, <span class="ident">e</span>);
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">can_full_text_search</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
@@ -317,6 +356,7 @@
 <span class="kw">struct</span> <span class="ident">TypeCache</span> {
     <span class="ident">input_types</span>: <span class="ident">TypeRefCache</span><span class="op">&lt;</span><span class="ident">InputObjectType</span><span class="op">&gt;</span>,
     <span class="ident">output_types</span>: <span class="ident">TypeRefCache</span><span class="op">&lt;</span><span class="ident">ObjectType</span><span class="op">&gt;</span>,
+    <span class="ident">enum_types</span>: <span class="ident">TypeRefCache</span><span class="op">&lt;</span><span class="ident">EnumType</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">TypeCache</span> {
@@ -324,6 +364,7 @@
         <span class="self">Self</span> {
             <span class="ident">input_types</span>: <span class="ident">TypeRefCache::new</span>(),
             <span class="ident">output_types</span>: <span class="ident">TypeRefCache::new</span>(),
+            <span class="ident">enum_types</span>: <span class="ident">TypeRefCache::new</span>(),
         }
     }
 
@@ -331,11 +372,18 @@
     <span class="doccomment">/// finalize the query schema building.</span>
     <span class="doccomment">/// Unwraps are safe because the cache is required to be the only strong Arc ref holder,</span>
     <span class="doccomment">/// which makes the Arc counter 1, all other refs contained in the schema are weak refs.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">collect_types</span>(<span class="self">self</span>) -&gt; (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputObjectTypeStrongRef</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ObjectTypeStrongRef</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">collect_types</span>(
+        <span class="self">self</span>,
+    ) -&gt; (
+        <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputObjectTypeStrongRef</span><span class="op">&gt;</span>,
+        <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ObjectTypeStrongRef</span><span class="op">&gt;</span>,
+        <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EnumTypeRef</span><span class="op">&gt;</span>,
+    ) {
         <span class="kw">let</span> <span class="ident">input_objects</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">input_types</span>.<span class="ident">into</span>();
         <span class="kw">let</span> <span class="ident">output_objects</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">output_types</span>.<span class="ident">into</span>();
+        <span class="kw">let</span> <span class="ident">enum_types</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">enum_types</span>.<span class="ident">into</span>();
 
-        (<span class="ident">input_objects</span>, <span class="ident">output_objects</span>)
+        (<span class="ident">input_objects</span>, <span class="ident">output_objects</span>, <span class="ident">enum_types</span>)
     }
 }
 
@@ -357,7 +405,12 @@
 
     <span class="kw">let</span> (<span class="ident">query_type</span>, <span class="ident">query_object_ref</span>) <span class="op">=</span> <span class="ident">output_types::query_type::build</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>);
     <span class="kw">let</span> (<span class="ident">mutation_type</span>, <span class="ident">mutation_object_ref</span>) <span class="op">=</span> <span class="ident">output_types::mutation_type::build</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>);
-    <span class="kw">let</span> (<span class="ident">input_objects</span>, <span class="kw-2">mut</span> <span class="ident">output_objects</span>) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">cache</span>.<span class="ident">collect_types</span>();
+
+    <span class="comment">// Add iTX isolation levels to the schema.</span>
+    <span class="ident">enum_types::itx_isolation_levels</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>);
+
+    <span class="comment">// Finalize the schema.</span>
+    <span class="kw">let</span> (<span class="ident">input_objects</span>, <span class="kw-2">mut</span> <span class="ident">output_objects</span>, <span class="ident">enum_types</span>) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">cache</span>.<span class="ident">collect_types</span>();
 
     <span class="comment">// The mutation and query object types need to be part of the strong refs.</span>
     <span class="ident">output_objects</span>.<span class="ident">push</span>(<span class="ident">query_object_ref</span>);
@@ -371,6 +424,7 @@
         <span class="ident">mutation_type</span>,
         <span class="ident">input_objects</span>,
         <span class="ident">output_objects</span>,
+        <span class="ident">enum_types</span>,
         <span class="ident">ctx</span>.<span class="ident">internal_data_model</span>,
         <span class="ident">ctx</span>.<span class="ident">capabilities</span>.<span class="ident">capabilities</span>,
         <span class="ident">preview_features</span>,

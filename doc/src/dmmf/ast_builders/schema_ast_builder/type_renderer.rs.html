@@ -141,27 +141,6 @@
 <span id="136">136</span>
 <span id="137">137</span>
 <span id="138">138</span>
-<span id="139">139</span>
-<span id="140">140</span>
-<span id="141">141</span>
-<span id="142">142</span>
-<span id="143">143</span>
-<span id="144">144</span>
-<span id="145">145</span>
-<span id="146">146</span>
-<span id="147">147</span>
-<span id="148">148</span>
-<span id="149">149</span>
-<span id="150">150</span>
-<span id="151">151</span>
-<span id="152">152</span>
-<span id="153">153</span>
-<span id="154">154</span>
-<span id="155">155</span>
-<span id="156">156</span>
-<span id="157">157</span>
-<span id="158">158</span>
-<span id="159">159</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">DmmfTypeReference</span>, <span class="ident">RenderContext</span>, <span class="ident">TypeLocation</span>};
 <span class="kw">use</span> <span class="ident">schema</span>::{<span class="ident">InputType</span>, <span class="ident">IntoArc</span>, <span class="ident">OutputType</span>, <span class="ident">ScalarType</span>};
 
@@ -182,10 +161,13 @@
         }
 
         <span class="ident">OutputType::Enum</span>(<span class="ident">et</span>) =&gt; {
+            <span class="kw">let</span> <span class="ident">et</span> <span class="op">=</span> <span class="ident">et</span>.<span class="ident">into_arc</span>();
             <span class="ident">ctx</span>.<span class="ident">mark_to_be_rendered</span>(<span class="kw-2">&amp;</span><span class="ident">et</span>.<span class="ident">as_ref</span>());
+
+            <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">et</span>.<span class="ident">identifier</span>();
             <span class="kw">let</span> <span class="ident">type_reference</span> <span class="op">=</span> <span class="ident">DmmfTypeReference</span> {
-                <span class="ident">typ</span>: <span class="ident">et</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-                <span class="ident">namespace</span>: <span class="prelude-val">Some</span>(<span class="ident">et</span>.<span class="ident">namespace</span>()),
+                <span class="ident">typ</span>: <span class="ident">ident</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
+                <span class="ident">namespace</span>: <span class="prelude-val">Some</span>(<span class="ident">ident</span>.<span class="ident">namespace</span>().<span class="ident">to_owned</span>()),
                 <span class="ident">location</span>: <span class="ident">TypeLocation::EnumTypes</span>,
                 <span class="ident">is_list</span>: <span class="bool-val">false</span>,
             };
@@ -196,19 +178,6 @@
         <span class="ident">OutputType::List</span>(<span class="kw-2">ref</span> <span class="ident">l</span>) =&gt; {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">type_reference</span> <span class="op">=</span> <span class="ident">render_output_type</span>(<span class="ident">l</span>, <span class="ident">ctx</span>);
             <span class="ident">type_reference</span>.<span class="ident">is_list</span> <span class="op">=</span> <span class="bool-val">true</span>;
-
-            <span class="ident">type_reference</span>
-        }
-
-        <span class="ident">OutputType::Scalar</span>(<span class="ident">ScalarType::Enum</span>(<span class="ident">et</span>)) =&gt; {
-            <span class="ident">ctx</span>.<span class="ident">mark_to_be_rendered</span>(<span class="kw-2">&amp;</span><span class="ident">et</span>.<span class="ident">as_ref</span>());
-            <span class="kw">let</span> <span class="ident">type_reference</span> <span class="op">=</span> <span class="ident">DmmfTypeReference</span> {
-                <span class="ident">typ</span>: <span class="ident">et</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-                <span class="ident">namespace</span>: <span class="prelude-val">Some</span>(<span class="ident">et</span>.<span class="ident">namespace</span>()),
-                <span class="ident">location</span>: <span class="ident">TypeLocation::Scalar</span>,
-                <span class="ident">is_list</span>: <span class="bool-val">false</span>,
-            };
-
             <span class="ident">type_reference</span>
         }
 
@@ -227,7 +196,6 @@
                 <span class="ident">ScalarType::JsonList</span> =&gt; <span class="string">&quot;Json&quot;</span>,
                 <span class="ident">ScalarType::Xml</span> =&gt; <span class="string">&quot;Xml&quot;</span>,
                 <span class="ident">ScalarType::Bytes</span> =&gt; <span class="string">&quot;Bytes&quot;</span>,
-                <span class="ident">ScalarType::Enum</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(), <span class="comment">// Handled separately above.</span>
             };
 
             <span class="ident">DmmfTypeReference</span> {
@@ -264,10 +232,13 @@
         }
 
         <span class="ident">InputType::Enum</span>(<span class="ident">et</span>) =&gt; {
+            <span class="kw">let</span> <span class="ident">et</span> <span class="op">=</span> <span class="ident">et</span>.<span class="ident">into_arc</span>();
             <span class="ident">ctx</span>.<span class="ident">mark_to_be_rendered</span>(<span class="kw-2">&amp;</span><span class="ident">et</span>.<span class="ident">as_ref</span>());
+
+            <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">et</span>.<span class="ident">identifier</span>();
             <span class="kw">let</span> <span class="ident">type_reference</span> <span class="op">=</span> <span class="ident">DmmfTypeReference</span> {
-                <span class="ident">typ</span>: <span class="ident">et</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-                <span class="ident">namespace</span>: <span class="prelude-val">Some</span>(<span class="ident">et</span>.<span class="ident">namespace</span>()),
+                <span class="ident">typ</span>: <span class="ident">ident</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
+                <span class="ident">namespace</span>: <span class="prelude-val">Some</span>(<span class="ident">ident</span>.<span class="ident">namespace</span>().<span class="ident">to_owned</span>()),
                 <span class="ident">location</span>: <span class="ident">TypeLocation::EnumTypes</span>,
                 <span class="ident">is_list</span>: <span class="bool-val">false</span>,
             };
@@ -278,18 +249,6 @@
         <span class="ident">InputType::List</span>(<span class="kw-2">ref</span> <span class="ident">l</span>) =&gt; {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">type_reference</span> <span class="op">=</span> <span class="ident">render_input_type</span>(<span class="ident">l</span>, <span class="ident">ctx</span>);
             <span class="ident">type_reference</span>.<span class="ident">is_list</span> <span class="op">=</span> <span class="bool-val">true</span>;
-
-            <span class="ident">type_reference</span>
-        }
-
-        <span class="ident">InputType::Scalar</span>(<span class="ident">ScalarType::Enum</span>(<span class="ident">et</span>)) =&gt; {
-            <span class="ident">ctx</span>.<span class="ident">mark_to_be_rendered</span>(<span class="kw-2">&amp;</span><span class="ident">et</span>.<span class="ident">as_ref</span>());
-            <span class="kw">let</span> <span class="ident">type_reference</span> <span class="op">=</span> <span class="ident">DmmfTypeReference</span> {
-                <span class="ident">typ</span>: <span class="ident">et</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-                <span class="ident">namespace</span>: <span class="prelude-val">Some</span>(<span class="ident">et</span>.<span class="ident">namespace</span>()),
-                <span class="ident">location</span>: <span class="ident">TypeLocation::Scalar</span>,
-                <span class="ident">is_list</span>: <span class="bool-val">false</span>,
-            };
 
             <span class="ident">type_reference</span>
         }
@@ -309,7 +268,6 @@
                 <span class="ident">ScalarType::JsonList</span> =&gt; <span class="string">&quot;Json&quot;</span>,
                 <span class="ident">ScalarType::Xml</span> =&gt; <span class="string">&quot;Xml&quot;</span>,
                 <span class="ident">ScalarType::Bytes</span> =&gt; <span class="string">&quot;Bytes&quot;</span>,
-                <span class="ident">ScalarType::Enum</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(), <span class="comment">// Handled separately above.</span>
             };
 
             <span class="ident">DmmfTypeReference</span> {

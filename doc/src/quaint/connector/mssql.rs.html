@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/df52315/src/connector/mssql.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mssql.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/d0ec0d1/src/connector/mssql.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mssql.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -608,22 +608,10 @@
 <span id="603">603</span>
 <span id="604">604</span>
 <span id="605">605</span>
-<span id="606">606</span>
-<span id="607">607</span>
-<span id="608">608</span>
-<span id="609">609</span>
-<span id="610">610</span>
-<span id="611">611</span>
-<span id="612">612</span>
-<span id="613">613</span>
-<span id="614">614</span>
-<span id="615">615</span>
-<span id="616">616</span>
-<span id="617">617</span>
-<span id="618">618</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">conversion</span>;
 <span class="kw">mod</span> <span class="ident">error</span>;
 
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">IsolationLevel</span>, <span class="ident">TransactionOptions</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>::{<span class="ident">Query</span>, <span class="ident">Value</span>},
     <span class="ident">connector</span>::{<span class="ident">metrics</span>, <span class="ident">queryable</span>::<span class="kw-2">*</span>, <span class="ident">ResultSet</span>, <span class="ident">Transaction</span>},
@@ -644,6 +632,10 @@
 <span class="kw">use</span> <span class="ident">tiberius</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">tokio::net::TcpStream</span>;
 <span class="kw">use</span> <span class="ident">tokio_util::compat</span>::{<span class="ident">Compat</span>, <span class="ident">TokioAsyncWriteCompatExt</span>};
+
+<span class="doccomment">/// The underlying SQL Server driver. Only available with the `expose-drivers` Cargo feature.</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;expose-drivers&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tiberius</span>;
 
 <span class="doccomment">/// Wraps a connection url and exposes the parsing logic used by Quaint,</span>
 <span class="doccomment">/// including default values.</span>
@@ -710,56 +702,22 @@
     <span class="ident">max_idle_connection_lifetime</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="doccomment">/// Controls the locking and row versioning behavior of Transact-SQL statements</span>
-<span class="doccomment">/// issued by a connection to SQL Server. Read more from the [SQL Server</span>
-<span class="doccomment">/// documentation].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [SQL Server documentation]: https://docs.microsoft.com/en-us/sql/t-sql/statements/set-transaction-isolation-level-transact-sql?view=sql-server-ver15</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mssql&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IsolationLevel</span> {
-    <span class="ident">ReadUncommitted</span>,
-    <span class="ident">ReadCommitted</span>,
-    <span class="ident">RepeatableRead</span>,
-    <span class="ident">Snapshot</span>,
-    <span class="ident">Serializable</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">IsolationLevel</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::ReadUncommitted</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;READ UNCOMMITTED&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::ReadCommitted</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;READ COMMITTED&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::RepeatableRead</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;REPEATABLE READ&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::Snapshot</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;SNAPSHOT&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::Serializable</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;SERIALIZABLE&quot;</span>),
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">IsolationLevel</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">Error</span>;
-
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">s</span> {
-            <span class="string">&quot;READ UNCOMMITTED&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::ReadUncommitted</span>),
-            <span class="string">&quot;READ COMMITTED&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::ReadCommitted</span>),
-            <span class="string">&quot;REPEATABLE READ&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::RepeatableRead</span>),
-            <span class="string">&quot;SNAPSHOT&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Snapshot</span>),
-            <span class="string">&quot;SERIALIZABLE&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Serializable</span>),
-            <span class="kw">_</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::database_url_is_invalid</span>(<span class="macro">format!</span>(<span class="string">&quot;Invalid isolation level `{}`&quot;</span>, <span class="ident">s</span>));
-
-                <span class="prelude-val">Err</span>(<span class="ident">Error::builder</span>(<span class="ident">kind</span>).<span class="ident">build</span>())
-            }
-        }
-    }
-}
+<span class="kw">static</span> <span class="ident">SQL_SERVER_DEFAULT_ISOLATION</span>: <span class="ident">IsolationLevel</span> <span class="op">=</span> <span class="ident">IsolationLevel::ReadCommitted</span>;
 
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">TransactionCapable</span> <span class="kw">for</span> <span class="ident">Mssql</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_transaction</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Transaction::new</span>(<span class="self">self</span>, <span class="string">&quot;BEGIN TRAN&quot;</span>).<span class="kw">await</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_transaction</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">isolation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IsolationLevel</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="comment">// Isolation levels in SQL Server are set on the connection and live until they&#39;re changed.</span>
+        <span class="comment">// Always explicitly setting the isolation level each time a tx is started (either to the given value</span>
+        <span class="comment">// or by using the default/connection string value) prevents transactions started on connections from</span>
+        <span class="comment">// the pool to have unexpected isolation levels set.</span>
+        <span class="kw">let</span> <span class="ident">isolation</span> <span class="op">=</span> <span class="ident">isolation</span>
+            .<span class="ident">or</span>(<span class="self">self</span>.<span class="ident">url</span>.<span class="ident">query_params</span>.<span class="ident">transaction_isolation_level</span>)
+            .<span class="ident">or</span>(<span class="prelude-val">Some</span>(<span class="ident">SQL_SERVER_DEFAULT_ISOLATION</span>));
+
+        <span class="kw">let</span> <span class="ident">opts</span> <span class="op">=</span> <span class="ident">TransactionOptions::new</span>(<span class="ident">isolation</span>, <span class="self">self</span>.<span class="ident">requires_isolation_first</span>());
+
+        <span class="ident">Transaction::new</span>(<span class="self">self</span>, <span class="string">&quot;BEGIN TRAN&quot;</span>, <span class="ident">opts</span>).<span class="kw">await</span>
     }
 }
 
@@ -786,7 +744,7 @@
     }
 
     <span class="doccomment">/// The isolation level of a transaction.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transaction_isolation_level</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IsolationLevel</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">transaction_isolation_level</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IsolationLevel</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">query_params</span>.<span class="ident">transaction_isolation_level</span>
     }
 
@@ -985,11 +943,6 @@
         <span class="self">self</span>.<span class="ident">query_raw</span>(<span class="kw-2">&amp;</span><span class="ident">sql</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>[..]).<span class="kw">await</span>
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">q</span>: <span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">sql</span>, <span class="ident">params</span>) <span class="op">=</span> <span class="ident">visitor::Mssql::build</span>(<span class="ident">q</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">execute_raw</span>(<span class="kw-2">&amp;</span><span class="ident">sql</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>[..]).<span class="kw">await</span>
-    }
-
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResultSet</span><span class="op">&gt;</span> {
         <span class="ident">metrics::query</span>(<span class="string">&quot;mssql.query_raw&quot;</span>, <span class="ident">sql</span>, <span class="ident">params</span>, <span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
@@ -1033,6 +986,11 @@
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query_raw_typed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResultSet</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">query_raw</span>(<span class="ident">sql</span>, <span class="ident">params</span>).<span class="kw">await</span>
+    }
+
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">q</span>: <span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> (<span class="ident">sql</span>, <span class="ident">params</span>) <span class="op">=</span> <span class="ident">visitor::Mssql::build</span>(<span class="ident">q</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">execute_raw</span>(<span class="kw-2">&amp;</span><span class="ident">sql</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>[..]).<span class="kw">await</span>
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
@@ -1079,8 +1037,19 @@
         <span class="self">self</span>.<span class="ident">is_healthy</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>)
     }
 
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_tx_isolation_level</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">isolation_level</span>: <span class="ident">IsolationLevel</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;SET TRANSACTION ISOLATION LEVEL {}&quot;</span>, <span class="ident">isolation_level</span>))
+            .<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(())
+    }
+
     <span class="kw">fn</span> <span class="ident">begin_statement</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="string">&quot;BEGIN TRAN&quot;</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">requires_isolation_first</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="bool-val">true</span>
     }
 }
 
@@ -1127,7 +1096,12 @@
         <span class="kw">let</span> <span class="ident">transaction_isolation_level</span> <span class="op">=</span> <span class="ident">props</span>
             .<span class="ident">remove</span>(<span class="string">&quot;isolationlevel&quot;</span>)
             .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">props</span>.<span class="ident">remove</span>(<span class="string">&quot;isolation_level&quot;</span>))
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">level</span><span class="op">|</span> <span class="ident">IsolationLevel::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">level</span>))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">level</span><span class="op">|</span> {
+                <span class="ident">IsolationLevel::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">level</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
+                    <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::database_url_is_invalid</span>(<span class="macro">format!</span>(<span class="string">&quot;Invalid isolation level `{}`&quot;</span>, <span class="ident">level</span>));
+                    <span class="ident">Error::builder</span>(<span class="ident">kind</span>).<span class="ident">build</span>()
+                })
+            })
             .<span class="ident">transpose</span>()<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connect_timeout</span> <span class="op">=</span> <span class="ident">props</span>

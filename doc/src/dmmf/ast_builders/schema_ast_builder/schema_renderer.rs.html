@@ -21,6 +21,8 @@
 <span id="16">16</span>
 <span id="17">17</span>
 <span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DmmfSchemaRenderer</span> {
@@ -29,6 +31,8 @@
 
 <span class="kw">impl</span> <span class="ident">Renderer</span> <span class="kw">for</span> <span class="ident">DmmfSchemaRenderer</span> {
     <span class="kw">fn</span> <span class="ident">render</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">RenderContext</span>) {
+        <span class="comment">// This ensures that all enums are rendered, even if not reached by the output and input types.</span>
+        <span class="ident">render_enum_types</span>(<span class="ident">ctx</span>, <span class="self">self</span>.<span class="ident">query_schema</span>.<span class="ident">enum_types</span>());
         <span class="ident">render_output_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">query_schema</span>.<span class="ident">query</span>, <span class="ident">ctx</span>);
         <span class="ident">render_output_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">query_schema</span>.<span class="ident">mutation</span>, <span class="ident">ctx</span>);
     }

@@ -53,6 +53,8 @@
 <span id="48">48</span>
 <span id="49">49</span>
 <span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">warn</span>(<span class="ident">warnings</span>)]</span>
 
 <span class="kw">mod</span> <span class="ident">enum_type</span>;
@@ -82,7 +84,9 @@
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">OutputTypeRef</span> <span class="op">=</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">OutputType</span><span class="op">&gt;</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">OutputFieldRef</span> <span class="op">=</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">OutputField</span><span class="op">&gt;</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">InputFieldRef</span> <span class="op">=</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span>;
+
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">EnumTypeRef</span> <span class="op">=</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">EnumType</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">EnumTypeWeakRef</span> <span class="op">=</span> <span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">EnumType</span><span class="op">&gt;</span>;
 
 <span class="doccomment">/// Since we have the invariant that the weak refs that are used throughout the query</span>
 <span class="doccomment">/// schema have to be always valid, we use this simple trait to keep the code clutter low.</span>

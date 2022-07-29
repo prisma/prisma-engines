@@ -559,6 +559,10 @@
 <span id="554">554</span>
 <span id="555">555</span>
 <span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">validations</span>;
 
 <span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
@@ -668,6 +672,10 @@
     <span class="ident">ConnectorCapability::ImplicitManyToManyRelation</span>,
     <span class="ident">ConnectorCapability::DecimalType</span>,
     <span class="ident">ConnectorCapability::OrderByNullsFirstLast</span>,
+    <span class="ident">ConnectorCapability::SupportsTxIsolationReadUncommitted</span>,
+    <span class="ident">ConnectorCapability::SupportsTxIsolationReadCommitted</span>,
+    <span class="ident">ConnectorCapability::SupportsTxIsolationRepeatableRead</span>,
+    <span class="ident">ConnectorCapability::SupportsTxIsolationSerializable</span>,
 ];
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PostgresDatamodelConnector</span>;

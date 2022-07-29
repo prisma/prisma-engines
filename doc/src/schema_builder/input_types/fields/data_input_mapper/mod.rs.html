@@ -35,21 +35,6 @@
 <span id="30">30</span>
 <span id="31">31</span>
 <span id="32">32</span>
-<span id="33">33</span>
-<span id="34">34</span>
-<span id="35">35</span>
-<span id="36">36</span>
-<span id="37">37</span>
-<span id="38">38</span>
-<span id="39">39</span>
-<span id="40">40</span>
-<span id="41">41</span>
-<span id="42">42</span>
-<span id="43">43</span>
-<span id="44">44</span>
-<span id="45">45</span>
-<span id="46">46</span>
-<span id="47">47</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">create</span>;
 <span class="kw">mod</span> <span class="ident">update</span>;
 
@@ -57,7 +42,6 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">update</span>::<span class="kw-2">*</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants::json_null</span>;
 <span class="kw">use</span> <span class="ident">prisma_models::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="comment">// Todo: This isn&#39;t final, this is only the first draft to get structure into the</span>
@@ -82,20 +66,6 @@
     <span class="kw">fn</span> <span class="ident">map_relation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>) -&gt; <span class="ident">InputField</span>;
 
     <span class="kw">fn</span> <span class="ident">map_composite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">cf</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>) -&gt; <span class="ident">InputField</span>;
-}
-
-<span class="kw">fn</span> <span class="ident">json_null_input_enum</span>(<span class="ident">nullable</span>: <span class="ident">bool</span>) -&gt; <span class="ident">EnumTypeRef</span> {
-    <span class="kw">if</span> <span class="ident">nullable</span> {
-        <span class="ident">Arc::new</span>(<span class="ident">string_enum_type</span>(
-            <span class="ident">json_null::NULLABLE_INPUT_ENUM_NAME</span>,
-            <span class="macro">vec!</span>[<span class="ident">json_null::DB_NULL</span>.<span class="ident">to_owned</span>(), <span class="ident">json_null::JSON_NULL</span>.<span class="ident">to_owned</span>()],
-        ))
-    } <span class="kw">else</span> {
-        <span class="ident">Arc::new</span>(<span class="ident">string_enum_type</span>(
-            <span class="ident">json_null::INPUT_ENUM_NAME</span>,
-            <span class="macro">vec!</span>[<span class="ident">json_null::JSON_NULL</span>.<span class="ident">to_owned</span>()],
-        ))
-    }
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="schema_builder" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.1 (e092d0b6b 2022-07-16)" ></div>

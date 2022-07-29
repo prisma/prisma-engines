@@ -204,8 +204,18 @@
 <span id="199">199</span>
 <span id="200">200</span>
 <span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::catch</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">error::MongoError</span>,
     <span class="ident">root_queries</span>::{<span class="ident">aggregate</span>, <span class="ident">read</span>, <span class="ident">write</span>},
     <span class="ident">MongoDbTransaction</span>,
 };
@@ -231,7 +241,15 @@
 <span class="kw">impl</span> <span class="ident">Connection</span> <span class="kw">for</span> <span class="ident">MongoDbConnection</span> {
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">isolation_level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">connector_interface::Transaction</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="ident">isolation_level</span>.<span class="ident">is_some</span>() {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">MongoError::Unsupported</span>(
+                <span class="string">&quot;Mongo does not support setting transaction isolation levels.&quot;</span>.<span class="ident">to_owned</span>(),
+            )
+            .<span class="ident">into_connector_error</span>());
+        }
+
         <span class="kw">let</span> <span class="ident">tx</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">MongoDbTransaction::new</span>(<span class="self">self</span>).<span class="kw">await</span><span class="question-mark">?</span>);
 
         <span class="prelude-val">Ok</span>(<span class="ident">tx</span> <span class="kw">as</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Transaction</span><span class="op">&gt;</span>)
