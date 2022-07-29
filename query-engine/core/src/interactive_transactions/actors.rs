@@ -1,5 +1,8 @@
 use super::{CachedTx, TransactionError, TxOpRequest, TxOpRequestMsg, TxOpResponse};
-use crate::{execute_many_operations, execute_single_operation, OpenTx, Operation, ResponseData, TxId};
+use crate::{
+    execute_many_operations, execute_single_operation, set_span_link_from_trace_id, OpenTx, Operation, ResponseData,
+    TxId,
+};
 use schema::QuerySchemaRef;
 use std::{collections::HashMap, sync::Arc};
 use tokio::{
@@ -73,6 +76,7 @@ impl ITXServer {
 
     async fn execute_single(&mut self, operation: &Operation, trace_id: Option<String>) -> crate::Result<ResponseData> {
         let span = info_span!("prisma:itx_query_builder", user_facing = true);
+        set_span_link_from_trace_id(&span, trace_id.clone());
 
         let conn = self.cached_tx.as_open()?;
         execute_single_operation(

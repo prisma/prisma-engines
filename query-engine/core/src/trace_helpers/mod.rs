@@ -1,4 +1,5 @@
 use opentelemetry::sdk::export::trace::SpanData;
+use opentelemetry::trace::TraceContextExt;
 use serde_json::{json, Value};
 use std::borrow::Cow;
 use std::{collections::HashMap, time::SystemTime};
@@ -47,8 +48,22 @@ fn span_to_json(span: &SpanData) -> Value {
         "name": name,
         "start_time": span.start_time.duration_since(SystemTime::UNIX_EPOCH).unwrap().as_millis().to_string(),
         "end_time": span.end_time.duration_since(SystemTime::UNIX_EPOCH).unwrap().as_millis().to_string(),
-        "attributes": attributes
+        "attributes": attributes,
+        "links": create_link_json(span)
     })
+}
+
+fn create_link_json(span: &SpanData) -> Vec<Value> {
+    span.links
+        .iter()
+        .map(|link| {
+            let ctx = link.span_context();
+            json!({
+                "trace_id": ctx.trace_id().to_string(),
+                "span_id": ctx.span_id().to_string(),
+            })
+        })
+        .collect()
 }
 
 // set the parent context and return the traceparent
@@ -58,6 +73,15 @@ pub fn set_parent_context_from_json_str(span: &Span, trace: String) -> Option<St
     let cx = opentelemetry::global::get_text_map_propagator(|propagator| propagator.extract(&trace));
     span.set_parent(cx);
     trace_id
+}
+
+pub fn set_span_link_from_trace_id(span: &Span, trace_id: Option<String>) {
+    if let Some(trace_id) = trace_id {
+        let trace: HashMap<String, String> = HashMap::from([("traceparent".to_string(), trace_id)]);
+        let cx = opentelemetry::global::get_text_map_propagator(|propagator| propagator.extract(&trace));
+        let context_span = cx.span();
+        span.add_link(context_span.span_context().clone());
+    }
 }
 
 pub fn is_user_facing_trace_filter(meta: &Metadata) -> bool {
