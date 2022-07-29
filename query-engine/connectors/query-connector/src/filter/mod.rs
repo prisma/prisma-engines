@@ -193,6 +193,14 @@ impl Filter {
             None
         }
     }
+
+    pub fn into_scalar(self) -> Option<ScalarFilter> {
+        if let Self::Scalar(v) = self {
+            Some(v)
+        } else {
+            None
+        }
+    }
 }
 
 impl From<ScalarFilter> for Filter {

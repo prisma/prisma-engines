@@ -96,7 +96,9 @@ impl IntoUpdateExpression for UpdateMany {
         // A reference to that alias
         let ref_elem_alias = format!("$${}", &elem_alias);
 
-        let (filter_doc, _) = filter::convert_filter(self.filter.clone(), false, format!("${}", &elem_alias))?.render();
+        let (filter_doc, _) = filter::MongoFilterVisitor::new(format!("${}", &elem_alias), false)
+            .visit(self.filter.clone())?
+            .render();
 
         // Builds a `$mergeObjects` operation to perform updates on each element of the to-many embeds.
         // The `FieldPath` used for the `$mergeObjects` is the alias constructed above, since we'll merge against

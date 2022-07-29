@@ -36,6 +36,13 @@ impl ScalarProjection {
             ScalarProjection::Compound(sfs) => sfs.iter().collect(),
         }
     }
+
+    pub fn as_single(&self) -> Option<&ScalarFieldRef> {
+        match self {
+            ScalarProjection::Single(sf) => Some(sf),
+            ScalarProjection::Compound(_) => None,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

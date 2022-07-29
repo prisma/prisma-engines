@@ -30,15 +30,20 @@ mod having_filter {
         )
         .await?;
 
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"query { groupByTestModel(by: [string, string2], having: {
-            string: { equals: { _ref: "string2" } }
-          }) {
-            string
-            string2
-          }
-        }"#),
-          @r###"{"data":{"groupByTestModel":[{"string":"group1","string2":"group1"},{"string":"group2","string2":"group2"}]}}"###
+        match_connector_result!(
+          &runner,
+          r#"query { groupByTestModel(by: [string, string2], having: {
+              string: { equals: { _ref: "string2" } }
+            }) {
+              string
+              string2
+            }
+          }"#,
+          MongoDb(_) => vec![
+            r#"{"data":{"groupByTestModel":[{"string":"group1","string2":"group1"},{"string":"group2","string2":"group2"}]}}"#,
+            r#"{"data":{"groupByTestModel":[{"string":"group2","string2":"group2"},{"string":"group1","string2":"group1"}]}}"#
+          ],
+          _ => vec![r#"{"data":{"groupByTestModel":[{"string":"group1","string2":"group1"},{"string":"group2","string2":"group2"}]}}"#]
         );
 
         insta::assert_snapshot!(
@@ -53,16 +58,21 @@ mod having_filter {
           @r###"{"data":{"groupByTestModel":[{"string":"group1","int":1,"_count":{"string":1}}]}}"###
         );
 
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"query { groupByTestModel(by: [string, int, int2], having: {
-                int: { _max: { equals: { _ref: "int2" } } }
-              }) {
-                string
-                int2
-                _max { int }
-              }
-            }"#),
-          @r###"{"data":{"groupByTestModel":[{"string":"group2","int2":2,"_max":{"int":2}},{"string":"group1","int2":1,"_max":{"int":1}}]}}"###
+        match_connector_result!(
+          &runner,
+          r#"query { groupByTestModel(by: [string, int, int2], having: {
+              int: { _max: { equals: { _ref: "int2" } } }
+            }) {
+              string
+              int2
+              _max { int }
+            }
+          }"#,
+          MongoDb(_) => vec![
+            r#"{"data":{"groupByTestModel":[{"string":"group1","int2":1,"_max":{"int":1}},{"string":"group2","int2":2,"_max":{"int":2}}]}}"#,
+            r#"{"data":{"groupByTestModel":[{"string":"group2","int2":2,"_max":{"int":2}},{"string":"group1","int2":1,"_max":{"int":1}}]}}"#,
+          ],
+          _ => vec![r#"{"data":{"groupByTestModel":[{"string":"group2","int2":2,"_max":{"int":2}},{"string":"group1","int2":1,"_max":{"int":1}}]}}"#]
         );
 
         Ok(())

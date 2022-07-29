@@ -38,7 +38,7 @@ impl ScalarListCondition {
             ScalarListCondition::Contains(v) => v.as_field_ref(),
             ScalarListCondition::ContainsEvery(v) => v.as_field_ref(),
             ScalarListCondition::ContainsSome(v) => v.as_field_ref(),
-            ScalarListCondition::IsEmpty(_) => todo!(),
+            ScalarListCondition::IsEmpty(_) => None,
         }
     }
 }

@@ -8,12 +8,11 @@ use schema_builder::constants::{aggregations, filters, json_null};
 use std::convert::TryInto;
 
 pub struct ScalarFilterParser<'a> {
-    /// The field on which the filters are applied
+    /// The field on which the filters are applied.
     field: &'a ScalarFieldRef,
-    /// Whether it should extract inverted filters
+    /// Whether it should extract inverted filters.
     reverse: bool,
-    /// Whether the parser is going to parse a filter map that relates to a _count filter
-    /// Used to enable referencing fields
+    /// Whether the parser is going to parse a filter map that relates to a _count filter.
     is_count_filter: bool,
 }
 
@@ -423,7 +422,7 @@ impl<'a> ScalarFilterParser<'a> {
                 let expected_type = if self.is_count_filter() {
                     TypeIdentifier::Int
                 } else {
-                    self.field().type_identifier.clone()
+                    field.type_identifier.clone()
                 };
 
                 match ref_field {

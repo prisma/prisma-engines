@@ -1,14 +1,16 @@
 use crate::{
+    filter::FilterPrefix,
     output_meta::{CompositeOutputMeta, OutputMeta, ScalarOutputMeta},
     IntoBson, MongoError,
 };
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{TimeZone, Utc};
-use connector_interface::ConditionValue;
 use itertools::Itertools;
 use mongodb::bson::{oid::ObjectId, spec::BinarySubtype, Binary, Bson, Document, Timestamp};
 use native_types::MongoDbType;
-use prisma_models::{CompositeFieldRef, Field, PrismaValue, ScalarFieldRef, SelectedField, TypeIdentifier};
+use prisma_models::{
+    CompositeFieldRef, Field, PrismaValue, RelationFieldRef, ScalarFieldRef, SelectedField, TypeIdentifier,
+};
 use serde_json::Value;
 use std::{convert::TryFrom, fmt::Display};
 
@@ -81,26 +83,27 @@ fn convert_composite_object(cf: &CompositeFieldRef, pairs: Vec<(String, PrismaVa
     Ok(Bson::Document(doc))
 }
 
-impl IntoBson for (&ScalarFieldRef, ConditionValue) {
+impl IntoBson for (&FilterPrefix, &ScalarFieldRef) {
     fn into_bson(self) -> crate::Result<Bson> {
-        let (sf, value) = self;
+        let (prefix, sf) = self;
 
-        match value {
-            ConditionValue::Value(pv) => (sf, pv).into_bson(),
-            ConditionValue::FieldRef(ref_field) => ref_field.into_bson(),
-        }
+        Ok(Bson::String(prefix.render_with(sf.db_name().to_string())))
     }
 }
 
-impl IntoBson for &ScalarFieldRef {
+impl IntoBson for (&FilterPrefix, &CompositeFieldRef) {
     fn into_bson(self) -> crate::Result<Bson> {
-        Ok(Bson::String(format!("${}", self.db_name())))
+        let (prefix, cf) = self;
+
+        Ok(Bson::String(prefix.render_with(cf.db_name().to_string())))
     }
 }
 
-impl IntoBson for (&ScalarFieldRef, &ScalarFieldRef) {
+impl IntoBson for (&FilterPrefix, &RelationFieldRef) {
     fn into_bson(self) -> crate::Result<Bson> {
-        todo!()
+        let (prefix, rf) = self;
+
+        Ok(Bson::String(prefix.render_with(rf.relation().name.to_owned())))
     }
 }
 

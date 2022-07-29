@@ -107,7 +107,9 @@ impl IntoUpdateOperation for CompositeWriteOperation {
             }
             CompositeWriteOperation::DeleteMany { filter } => {
                 let elem_alias = format!("{}_item", path.identifier());
-                let (filter_doc, _) = filter::convert_filter(filter, true, format!("${}", &elem_alias))?.render();
+                let (filter_doc, _) = filter::MongoFilterVisitor::new(format!("${}", &elem_alias), true)
+                    .visit(filter)?
+                    .render();
 
                 let filter = doc! {
                     "$filter": {
