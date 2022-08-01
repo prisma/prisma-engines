@@ -112,8 +112,8 @@
     <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
     <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">f</span>().<span class="kw">await</span>;
 
-    <span class="macro">histogram!</span>(<span class="string">&quot;query_total_elapsed_time_ms&quot;</span>, <span class="ident">start</span>.<span class="ident">elapsed</span>());
-    <span class="macro">increment_counter!</span>(<span class="string">&quot;query_total_queries&quot;</span>);
+    <span class="macro">histogram!</span>(<span class="string">&quot;prisma_datasource_queries_duration_histogram_ms&quot;</span>, <span class="ident">start</span>.<span class="ident">elapsed</span>());
+    <span class="macro">increment_counter!</span>(<span class="string">&quot;prisma_datasource_queries_total&quot;</span>);
 
     <span class="ident">res</span>
 }

@@ -531,6 +531,56 @@
 <span id="526">526</span>
 <span id="527">527</span>
 <span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Query Engine Metrics</span>
 <span class="doccomment">//! This crate is responsible for capturing and recording metrics in the Query Engine.</span>
 <span class="doccomment">//! Metrics is broken into two parts, `MetricsRecorder` and `MetricsRegistry`, and uses our tracing framework to communicate.</span>
@@ -569,21 +619,27 @@
 <span class="kw">use</span> <span class="ident">serde::Deserialize</span>;
 <span class="kw">use</span> <span class="ident">std::sync::Once</span>;
 
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">PRISMA_CLIENT_QUERIES_TOTAL</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;prisma_client_queries_total&quot;</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">PRISMA_CLIENT_QUERIES_HISTOGRAM_MS</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;prisma_client_queries_duration_histogram_ms&quot;</span>;
+
 <span class="comment">// At the moment the histogram is only used for timings. So the bounds are hard coded here</span>
 <span class="comment">// The buckets are for ms</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">HISTOGRAM_BOUNDS</span>: [<span class="ident">f64</span>; <span class="number">10</span>] <span class="op">=</span> [<span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">5.0</span>, <span class="number">10.0</span>, <span class="number">50.0</span>, <span class="number">100.0</span>, <span class="number">500.0</span>, <span class="number">1000.0</span>, <span class="number">5000.0</span>, <span class="number">50000.0</span>];
 <span class="comment">// We need a list of acceptable metrics we want to expose, we don&#39;t want to accidentally expose metrics</span>
 <span class="comment">// that a different library have or unintended information</span>
 <span class="kw">const</span> <span class="ident">ACCEPT_LIST</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-    <span class="string">&quot;pool_active_connections&quot;</span>,
-    <span class="string">&quot;pool_idle_connections&quot;</span>,
-    <span class="string">&quot;pool_wait_count&quot;</span>,
-    <span class="string">&quot;pool_wait_duration_ms&quot;</span>,
-    <span class="string">&quot;query_total_elapsed_time_ms&quot;</span>,
-    <span class="string">&quot;query_total_queries&quot;</span>,
-    <span class="string">&quot;query_active_transactions&quot;</span>,
-    <span class="string">&quot;query_total_operations&quot;</span>,
-    <span class="string">&quot;query_operation_total_elapsed_time_ms&quot;</span>,
+    <span class="string">&quot;prisma_pool_connections_opened_total&quot;</span>,
+    <span class="string">&quot;prisma_pool_connections_closed_total&quot;</span>,
+    <span class="string">&quot;prisma_pool_connections_open&quot;</span>,
+    <span class="string">&quot;prisma_pool_connections_busy&quot;</span>,
+    <span class="string">&quot;prisma_pool_connections_idle&quot;</span>,
+    <span class="string">&quot;prisma_client_queries_wait&quot;</span>,
+    <span class="string">&quot;prisma_client_queries_wait_histogram_ms&quot;</span>,
+    <span class="string">&quot;prisma_datasource_queries_duration_histogram_ms&quot;</span>,
+    <span class="string">&quot;prisma_datasource_queries_total&quot;</span>,
+    <span class="string">&quot;prisma_client_queries_active&quot;</span>,
+    <span class="ident">PRISMA_CLIENT_QUERIES_HISTOGRAM_MS</span>,
+    <span class="ident">PRISMA_CLIENT_QUERIES_TOTAL</span>,
 ];
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>)]</span>
@@ -603,40 +659,84 @@
 <span class="comment">// a new metric registry for a Query Instance the descriptions</span>
 <span class="comment">// will be in place</span>
 <span class="kw">fn</span> <span class="ident">describe_metrics</span>() {
-    <span class="macro">describe_gauge!</span>(<span class="string">&quot;pool_active_connections&quot;</span>, <span class="string">&quot;The number of active connections in use&quot;</span>);
+    <span class="macro">describe_counter!</span>(
+        <span class="string">&quot;prisma_pool_connections_opened_total&quot;</span>,
+        <span class="string">&quot;Total number of Pool Connections opened&quot;</span>
+    );
+    <span class="macro">describe_counter!</span>(
+        <span class="string">&quot;prisma_pool_connections_closed_total&quot;</span>,
+        <span class="string">&quot;Total number of Pool Connections closed&quot;</span>
+    );
+    <span class="macro">describe_gauge!</span>(
+        <span class="string">&quot;prisma_pool_connections_busy&quot;</span>,
+        <span class="string">&quot;Number of currently busy Pool Connections (executing a datasource query)&quot;</span>
+    );
 
     <span class="macro">describe_gauge!</span>(
-        <span class="string">&quot;pool_idle_connections&quot;</span>,
-        <span class="string">&quot;The number of connections that are not being used&quot;</span>
+        <span class="string">&quot;prisma_pool_connections_idle&quot;</span>,
+        <span class="string">&quot;Number of currently unused Pool Connections (waiting for the next datasource query to run)&quot;</span>
     );
 
-    <span class="macro">describe_gauge!</span>(<span class="string">&quot;pool_wait_count&quot;</span>, <span class="string">&quot;The number of workers waiting for a connection&quot;</span>);
-    <span class="macro">describe_gauge!</span>(<span class="string">&quot;query_active_transactions&quot;</span>, <span class="string">&quot;The number of active transactions&quot;</span>);
+    <span class="macro">describe_gauge!</span>(
+        <span class="string">&quot;prisma_client_queries_wait&quot;</span>,
+        <span class="string">&quot;Number of Prisma Client queries currently waiting for a connection&quot;</span>
+    );
+    <span class="macro">describe_gauge!</span>(
+        <span class="string">&quot;prisma_client_queries_active&quot;</span>,
+        <span class="string">&quot;Number of currently active Prisma Client queries&quot;</span>
+    );
 
-    <span class="macro">gauge!</span>(<span class="string">&quot;pool_active_connections&quot;</span>, <span class="number">0.0</span>);
-    <span class="macro">gauge!</span>(<span class="string">&quot;pool_idle_connections&quot;</span>, <span class="number">0.0</span>);
-    <span class="macro">gauge!</span>(<span class="string">&quot;pool_wait_count&quot;</span>, <span class="number">0.0</span>);
-    <span class="macro">gauge!</span>(<span class="string">&quot;query_active_transactions&quot;</span>, <span class="number">0.0</span>);
+    <span class="macro">gauge!</span>(<span class="string">&quot;prisma_pool_connections_busy&quot;</span>, <span class="number">0.0</span>);
+    <span class="macro">gauge!</span>(<span class="string">&quot;prisma_pool_connections_idle&quot;</span>, <span class="number">0.0</span>);
+    <span class="macro">gauge!</span>(<span class="string">&quot;prisma_client_queries_wait&quot;</span>, <span class="number">0.0</span>);
+    <span class="macro">gauge!</span>(<span class="string">&quot;prisma_client_queries_active&quot;</span>, <span class="number">0.0</span>);
+
+    <span class="macro">describe_gauge!</span>(
+        <span class="string">&quot;prisma_client_queries_active&quot;</span>,
+        <span class="string">&quot;Number of currently active Prisma Client queries&quot;</span>
+    );
+
+    <span class="macro">describe_gauge!</span>(
+        <span class="string">&quot;prisma_pool_connections_busy&quot;</span>,
+        <span class="string">&quot;Number of currently busy Pool Connections (executing a datasource query)&quot;</span>
+    );
+
+    <span class="macro">describe_gauge!</span>(
+        <span class="string">&quot;prisma_pool_connections_idle&quot;</span>,
+        <span class="string">&quot;Number of currently unused Pool Connections (waiting for the next datasource query to run)&quot;</span>
+    );
+
+    <span class="macro">describe_gauge!</span>(
+        <span class="string">&quot;prisma_client_queries_wait&quot;</span>,
+        <span class="string">&quot;Number of Prisma Client queries currently waiting for a connection&quot;</span>
+    );
 
     <span class="macro">describe_histogram!</span>(
-        <span class="string">&quot;pool_wait_duration_ms&quot;</span>,
-        <span class="string">&quot;The wait time for a worker to get a connection.&quot;</span>
+        <span class="string">&quot;prisma_client_queries_wait_histogram_ms&quot;</span>,
+        <span class="string">&quot;Histogram of the wait time of all Prisma Client Queries in ms&quot;</span>
     );
     <span class="macro">describe_histogram!</span>(
-        <span class="string">&quot;query_total_elapsed_time_ms&quot;</span>,
-        <span class="string">&quot;The execution time for all database queries executed.&quot;</span>
+        <span class="string">&quot;prisma_datasource_queries_duration_histogram_ms&quot;</span>,
+        <span class="string">&quot;Histogram of the duration of all executed Datasource Queries in ms&quot;</span>
     );
 
     <span class="macro">describe_histogram!</span>(
-        <span class="string">&quot;query_operation_total_elapsed_time_ms&quot;</span>,
-        <span class="string">&quot;The execution time for all operations.&quot;</span>
+        <span class="ident">PRISMA_CLIENT_QUERIES_HISTOGRAM_MS</span>,
+        <span class="string">&quot;Histogram of the duration of all executed Prisma Client queries in ms&quot;</span>
     );
 
-    <span class="macro">describe_counter!</span>(<span class="string">&quot;query_total_queries&quot;</span>, <span class="string">&quot;The total number of queries executed&quot;</span>);
-    <span class="macro">describe_counter!</span>(<span class="string">&quot;query_total_operations&quot;</span>, <span class="string">&quot;The total number of operations executed&quot;</span>);
+    <span class="macro">describe_counter!</span>(
+        <span class="string">&quot;prisma_datasource_queries_total&quot;</span>,
+        <span class="string">&quot;Total number of Datasource Queries executed&quot;</span>
+    );
 
-    <span class="macro">absolute_counter!</span>(<span class="string">&quot;query_total_queries&quot;</span>, <span class="number">0</span>);
-    <span class="macro">absolute_counter!</span>(<span class="string">&quot;query_total_operations&quot;</span>, <span class="number">0</span>);
+    <span class="macro">describe_counter!</span>(
+        <span class="ident">PRISMA_CLIENT_QUERIES_TOTAL</span>,
+        <span class="string">&quot;Total number of Prisma Client queries executed&quot;</span>
+    );
+
+    <span class="macro">absolute_counter!</span>(<span class="string">&quot;prisma_datasource_queries_total&quot;</span>, <span class="number">0</span>);
+    <span class="macro">absolute_counter!</span>(<span class="ident">PRISMA_CLIENT_QUERIES_TOTAL</span>, <span class="number">0</span>);
 }
 
 <span class="kw">static</span> <span class="ident">METRIC_RECORDER</span>: <span class="ident">Once</span> <span class="op">=</span> <span class="ident">Once::new</span>();

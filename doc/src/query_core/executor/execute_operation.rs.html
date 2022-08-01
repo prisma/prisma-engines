@@ -166,10 +166,16 @@
 <span id="161">161</span>
 <span id="162">162</span>
 <span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::time::Instant</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::pipeline::QueryPipeline</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">IrSerializer</span>, <span class="ident">Operation</span>, <span class="ident">QueryGraph</span>, <span class="ident">QueryGraphBuilder</span>, <span class="ident">QueryInterpreter</span>, <span class="ident">ResponseData</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">IrSerializer</span>, <span class="ident">Operation</span>, <span class="ident">QueryGraph</span>, <span class="ident">QueryGraphBuilder</span>, <span class="ident">QueryInterpreter</span>, <span class="ident">ResponseData</span>,
+    <span class="ident">PRISMA_CLIENT_QUERIES_HISTOGRAM_MS</span>, <span class="ident">PRISMA_CLIENT_QUERIES_TOTAL</span>,
+};
 <span class="kw">use</span> <span class="ident">connector</span>::{<span class="ident">Connection</span>, <span class="ident">ConnectionLike</span>, <span class="ident">Connector</span>};
 <span class="kw">use</span> <span class="ident">futures::future</span>;
 <span class="kw">use</span> <span class="ident">metrics</span>::{<span class="ident">histogram</span>, <span class="ident">increment_counter</span>};
@@ -187,13 +193,13 @@
     <span class="kw">let</span> <span class="ident">interpreter</span> <span class="op">=</span> <span class="ident">QueryInterpreter::new</span>(<span class="ident">conn</span>);
     <span class="kw">let</span> (<span class="ident">query_graph</span>, <span class="ident">serializer</span>) <span class="op">=</span> <span class="ident">QueryGraphBuilder::new</span>(<span class="ident">query_schema</span>.<span class="ident">clone</span>()).<span class="ident">build</span>(<span class="ident">operation</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>;
 
-    <span class="macro">increment_counter!</span>(<span class="string">&quot;query_total_operations&quot;</span>);
+    <span class="macro">increment_counter!</span>(<span class="ident">PRISMA_CLIENT_QUERIES_TOTAL</span>);
 
     <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">QueryPipeline::new</span>(<span class="ident">query_graph</span>, <span class="ident">interpreter</span>, <span class="ident">serializer</span>)
         .<span class="ident">execute</span>(<span class="ident">trace_id</span>)
         .<span class="kw">await</span>;
 
-    <span class="macro">histogram!</span>(<span class="string">&quot;query_operation_total_elapsed_time_ms&quot;</span>, <span class="ident">operation_timer</span>.<span class="ident">elapsed</span>());
+    <span class="macro">histogram!</span>(<span class="ident">PRISMA_CLIENT_QUERIES_HISTOGRAM_MS</span>, <span class="ident">operation_timer</span>.<span class="ident">elapsed</span>());
     <span class="ident">result</span>
 }
 
@@ -211,14 +217,14 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">results</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">queries</span>.<span class="ident">len</span>());
 
     <span class="kw">for</span> (<span class="ident">query_graph</span>, <span class="ident">serializer</span>) <span class="kw">in</span> <span class="ident">queries</span> {
-        <span class="macro">increment_counter!</span>(<span class="string">&quot;query_total_operations&quot;</span>);
+        <span class="macro">increment_counter!</span>(<span class="ident">PRISMA_CLIENT_QUERIES_TOTAL</span>);
         <span class="kw">let</span> <span class="ident">operation_timer</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
         <span class="kw">let</span> <span class="ident">interpreter</span> <span class="op">=</span> <span class="ident">QueryInterpreter::new</span>(<span class="ident">conn</span>);
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">QueryPipeline::new</span>(<span class="ident">query_graph</span>, <span class="ident">interpreter</span>, <span class="ident">serializer</span>)
             .<span class="ident">execute</span>(<span class="ident">trace_id</span>.<span class="ident">clone</span>())
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="macro">histogram!</span>(<span class="string">&quot;query_operation_total_elapsed_time_ms&quot;</span>, <span class="ident">operation_timer</span>.<span class="ident">elapsed</span>());
+        <span class="macro">histogram!</span>(<span class="ident">PRISMA_CLIENT_QUERIES_HISTOGRAM_MS</span>, <span class="ident">operation_timer</span>.<span class="ident">elapsed</span>());
         <span class="ident">results</span>.<span class="ident">push</span>(<span class="prelude-val">Ok</span>(<span class="ident">result</span>));
     }
 
@@ -256,7 +262,7 @@
     <span class="kw">for</span> <span class="ident">op</span> <span class="kw">in</span> <span class="ident">operations</span> {
         <span class="kw">match</span> <span class="ident">QueryGraphBuilder::new</span>(<span class="ident">query_schema</span>.<span class="ident">clone</span>()).<span class="ident">build</span>(<span class="ident">op</span>.<span class="ident">clone</span>()) {
             <span class="prelude-val">Ok</span>((<span class="ident">graph</span>, <span class="ident">serializer</span>)) =&gt; {
-                <span class="macro">increment_counter!</span>(<span class="string">&quot;query_total_operations&quot;</span>);
+                <span class="macro">increment_counter!</span>(<span class="ident">PRISMA_CLIENT_QUERIES_TOTAL</span>);
 
                 <span class="kw">let</span> <span class="ident">connection_name</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">name</span>();
                 <span class="kw">let</span> <span class="ident">conn_span</span> <span class="op">=</span> <span class="macro">info_span!</span>(
@@ -310,7 +316,7 @@
         <span class="ident">execute_on</span>(<span class="ident">conn</span>.<span class="ident">as_connection_like</span>(), <span class="ident">graph</span>, <span class="ident">serializer</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>
     };
 
-    <span class="macro">histogram!</span>(<span class="string">&quot;query_operation_total_elapsed_time_ms&quot;</span>, <span class="ident">operation_timer</span>.<span class="ident">elapsed</span>());
+    <span class="macro">histogram!</span>(<span class="ident">PRISMA_CLIENT_QUERIES_HISTOGRAM_MS</span>, <span class="ident">operation_timer</span>.<span class="ident">elapsed</span>());
     <span class="ident">result</span>
 }
 
@@ -321,7 +327,7 @@
     <span class="ident">serializer</span>: <span class="ident">IrSerializer</span>,
     <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResponseData</span><span class="op">&gt;</span> {
-    <span class="macro">increment_counter!</span>(<span class="string">&quot;query_total_operations&quot;</span>);
+    <span class="macro">increment_counter!</span>(<span class="ident">PRISMA_CLIENT_QUERIES_TOTAL</span>);
     <span class="kw">let</span> <span class="ident">interpreter</span> <span class="op">=</span> <span class="ident">QueryInterpreter::new</span>(<span class="ident">conn</span>);
     <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">QueryPipeline::new</span>(<span class="ident">graph</span>, <span class="ident">interpreter</span>, <span class="ident">serializer</span>)
         .<span class="ident">execute</span>(<span class="ident">trace_id</span>)

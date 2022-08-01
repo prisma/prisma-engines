@@ -315,7 +315,7 @@
             .<span class="kw">await</span>
             .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">MongoError::from</span>(<span class="ident">err</span>).<span class="ident">into_connector_error</span>())<span class="question-mark">?</span>;
 
-        <span class="macro">increment_gauge!</span>(<span class="string">&quot;query_active_transactions&quot;</span>, <span class="number">1.0</span>);
+        <span class="macro">increment_gauge!</span>(<span class="string">&quot;prisma_client_queries_active&quot;</span>, <span class="number">1.0</span>);
 
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">connection</span> })
     }
@@ -324,7 +324,7 @@
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span> <span class="ident">Transaction</span> <span class="kw">for</span> <span class="ident">MongoDbTransaction</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span> {
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">commit</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="macro">decrement_gauge!</span>(<span class="string">&quot;query_active_transactions&quot;</span>, <span class="number">1.0</span>);
+        <span class="macro">decrement_gauge!</span>(<span class="string">&quot;prisma_client_queries_active&quot;</span>, <span class="number">1.0</span>);
         <span class="self">self</span>.<span class="ident">connection</span>
             .<span class="ident">session</span>
             .<span class="ident">commit_transaction</span>()
@@ -335,7 +335,7 @@
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">rollback</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="macro">decrement_gauge!</span>(<span class="string">&quot;query_active_transactions&quot;</span>, <span class="number">1.0</span>);
+        <span class="macro">decrement_gauge!</span>(<span class="string">&quot;prisma_client_queries_active&quot;</span>, <span class="number">1.0</span>);
         <span class="self">self</span>.<span class="ident">connection</span>
             .<span class="ident">session</span>
             .<span class="ident">abort_transaction</span>()

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mobc-711820eed980cd14/4d0d2da/src/metrics_utils.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>metrics_utils.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mobc-711820eed980cd14/d50fd5d/src/metrics_utils.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>metrics_utils.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mobc/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
@@ -31,32 +31,56 @@
 <span id="26">26</span>
 <span id="27">27</span>
 <span id="28">28</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">metrics</span>::{<span class="ident">describe_gauge</span>, <span class="ident">describe_histogram</span>};
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">metrics</span>::{<span class="ident">describe_counter</span>, <span class="ident">describe_gauge</span>, <span class="ident">describe_histogram</span>};
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ACTIVE_CONNECTIONS</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;pool_active_connections&quot;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">IDLE_CONNECTIONS</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;pool_idle_connections&quot;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">WAIT_COUNT</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;pool_wait_count&quot;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">WAIT_DURATION</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;pool_wait_duration_ms&quot;</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">OPENED_TOTAL</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;prisma_pool_connections_opened_total&quot;</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CLOSED_TOTAL</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;prisma_pool_connections_closed_total&quot;</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">OPEN_CONNECTIONS</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;prisma_pool_connections_open&quot;</span>;
+
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ACTIVE_CONNECTIONS</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;prisma_pool_connections_busy&quot;</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">IDLE_CONNECTIONS</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;prisma_pool_connections_idle&quot;</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">WAIT_COUNT</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;prisma_client_queries_wait&quot;</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">WAIT_DURATION</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;prisma_client_queries_wait_histogram_ms&quot;</span>;
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">describe_metrics</span>() {
+    <span class="macro">describe_counter!</span>(<span class="ident">OPENED_TOTAL</span>, <span class="string">&quot;Total number of Pool Connections opened&quot;</span>);
+    <span class="macro">describe_counter!</span>(<span class="ident">CLOSED_TOTAL</span>, <span class="string">&quot;Total number of Pool Connections closed&quot;</span>);
+
+    <span class="macro">describe_gauge!</span>(
+        <span class="ident">OPEN_CONNECTIONS</span>,
+        <span class="string">&quot;Number of currently open Pool Connections&quot;</span>
+    );
+
     <span class="macro">describe_gauge!</span>(
         <span class="ident">ACTIVE_CONNECTIONS</span>,
-        <span class="string">&quot;The number of active connections in use.&quot;</span>
+        <span class="string">&quot;Number of currently busy Pool Connections (executing a datasource query)&quot;</span>
     );
 
     <span class="macro">describe_gauge!</span>(
         <span class="ident">IDLE_CONNECTIONS</span>,
-        <span class="string">&quot;The number of connections that are not being used&quot;</span>
+        <span class="string">&quot;Number of currently unused Pool Connections (waiting for the next datasource query to run)&quot;</span>
     );
 
     <span class="macro">describe_gauge!</span>(
         <span class="ident">WAIT_COUNT</span>,
-        <span class="string">&quot;The number of workers waiting for a connection.&quot;</span>
+        <span class="string">&quot;Number of Prisma Client queries currently waiting for a connection&quot;</span>
     );
 
     <span class="macro">describe_histogram!</span>(
         <span class="ident">WAIT_DURATION</span>,
-        <span class="string">&quot;The wait time for a worker to get a connection.&quot;</span>
+        <span class="string">&quot;Histogram of the wait time of all Prisma Client Queries in ms&quot;</span>
     );
 }
 </code></pre></div>
