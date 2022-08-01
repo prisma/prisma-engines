@@ -283,6 +283,10 @@ impl ConditionListValue {
         }
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
     pub fn as_field_ref(&self) -> Option<&ScalarFieldRef> {
         if let Self::FieldRef(v) = self {
             Some(v)

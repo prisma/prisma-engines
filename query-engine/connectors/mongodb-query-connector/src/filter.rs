@@ -157,10 +157,10 @@ impl MongoFilterVisitor {
 
         let filter_doc = match condition {
             ScalarCondition::Equals(val) => {
-                doc! { "$eq": [&field_name, self.into_bson_coerce_count(field, val)?] }
+                doc! { "$eq": [&field_name, self.as_bson_coerce_count(field, val)?] }
             }
             ScalarCondition::NotEquals(val) => {
-                doc! { "$ne": [&field_name, self.into_bson_coerce_count(field, val)?] }
+                doc! { "$ne": [&field_name, self.as_bson_coerce_count(field, val)?] }
             }
             ScalarCondition::Contains(val) => self.regex_match(&field_name, field, ".*", val, ".*", false)?,
             ScalarCondition::NotContains(val) => {
@@ -175,16 +175,16 @@ impl MongoFilterVisitor {
                 doc! { "$not": self.regex_match(&field_name, field, "", val, "$", false)? }
             }
             ScalarCondition::LessThan(val) => {
-                doc! { "$lt": [&field_name, self.into_bson_coerce_count(field, val)?] }
+                doc! { "$lt": [&field_name, self.as_bson_coerce_count(field, val)?] }
             }
             ScalarCondition::LessThanOrEquals(val) => {
-                doc! { "$lte": [&field_name, self.into_bson_coerce_count(field, val)?] }
+                doc! { "$lte": [&field_name, self.as_bson_coerce_count(field, val)?] }
             }
             ScalarCondition::GreaterThan(val) => {
-                doc! { "$gt": [&field_name, self.into_bson_coerce_count(field, val)?] }
+                doc! { "$gt": [&field_name, self.as_bson_coerce_count(field, val)?] }
             }
             ScalarCondition::GreaterThanOrEquals(val) => {
-                doc! { "$gte": [&field_name, self.into_bson_coerce_count(field, val)?] }
+                doc! { "$gte": [&field_name, self.as_bson_coerce_count(field, val)?] }
             }
             // Todo: The nested list unpack looks like a bug somewhere.
             //       Likely join code mistakenly repacks a list into a list of PrismaValue somewhere in the core.
@@ -199,7 +199,7 @@ impl MongoFilterVisitor {
                                 bson_values.extend(
                                     inner
                                         .into_iter()
-                                        .map(|val| self.into_bson_coerce_count(field, val))
+                                        .map(|val| self.as_bson_coerce_count(field, val))
                                         .collect::<crate::Result<Vec<_>>>()?,
                                 )
                             }
@@ -208,7 +208,7 @@ impl MongoFilterVisitor {
                         doc! { "$in": [&field_name, bson_values] }
                     }
                     _ => {
-                        doc! { "$in": [&field_name, self.into_bson_coerce_count(field, PrismaValue::List(vals))?] }
+                        doc! { "$in": [&field_name, self.as_bson_coerce_count(field, PrismaValue::List(vals))?] }
                     }
                 },
                 ConditionListValue::FieldRef(field_ref) => {
@@ -219,7 +219,7 @@ impl MongoFilterVisitor {
                 ConditionListValue::List(vals) => {
                     let bson_values = vals
                         .into_iter()
-                        .map(|val| self.into_bson_coerce_count(field, val))
+                        .map(|val| self.as_bson_coerce_count(field, val))
                         .collect::<crate::Result<Vec<_>>>()?;
 
                     doc! { "$not": { "$in": [&field_name, bson_values] } }
@@ -497,7 +497,7 @@ impl MongoFilterVisitor {
                     doc! { "$in": [bson, coerce_as_array(&field_name)] }
                 }
 
-                connector_interface::ScalarListCondition::ContainsEvery(vals) if vals.len() == 0 => {
+                connector_interface::ScalarListCondition::ContainsEvery(vals) if vals.is_empty() => {
                     // Empty hasEvery: Return all records.
                     render_stub_condition(true)
                 }
@@ -522,7 +522,7 @@ impl MongoFilterVisitor {
                     )
                 }
 
-                connector_interface::ScalarListCondition::ContainsSome(vals) if vals.len() == 0 => {
+                connector_interface::ScalarListCondition::ContainsSome(vals) if vals.is_empty() => {
                     // Empty hasSome: Return no records.
                     render_stub_condition(false)
                 }
@@ -791,7 +791,7 @@ impl MongoFilterVisitor {
     ///
     /// When converting the value of a `_count` aggregation filter for a field that's _not_ numerical,
     /// we force the `TypeIdentifier` to be `Int` to prevent panics.
-    fn into_bson_coerce_count(&self, sf: &ScalarFieldRef, value: impl Into<ConditionValue>) -> crate::Result<Bson> {
+    fn as_bson_coerce_count(&self, sf: &ScalarFieldRef, value: impl Into<ConditionValue>) -> crate::Result<Bson> {
         match value.into() {
             ConditionValue::Value(value) => {
                 if self.parent_is_count_aggregation() && !sf.is_numeric() {

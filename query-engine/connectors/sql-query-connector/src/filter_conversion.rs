@@ -846,7 +846,7 @@ fn insensitive_scalar_filter(
     ConditionTree::single(condition)
 }
 
-fn lower_if<'a>(expr: Expression<'a>, cond: bool) -> Expression<'a> {
+fn lower_if(expr: Expression<'_>, cond: bool) -> Expression<'_> {
     if cond {
         lower(expr).into()
     } else {
@@ -863,7 +863,7 @@ fn convert_value<'a>(field: &ScalarFieldRef, value: impl Into<ConditionValue>) -
 
 fn convert_first_value<'a>(fields: &[ScalarFieldRef], value: impl Into<ConditionValue>) -> Expression<'a> {
     match value.into() {
-        ConditionValue::Value(pv) => convert_value(fields.first().unwrap(), pv).into(),
+        ConditionValue::Value(pv) => convert_value(fields.first().unwrap(), pv),
         ConditionValue::FieldRef(field_ref) => field_ref.as_column().into(),
     }
 }

@@ -536,7 +536,7 @@ where
                 json_null::JSON_NULL => filter_fn(PrismaValue::Json("null".to_owned()).into(), json_path),
 
                 json_null::ANY_NULL if reverse => Filter::And(vec![
-                    filter_fn(PrismaValue::Json("null".to_owned()).into(), json_path.clone().into()),
+                    filter_fn(PrismaValue::Json("null".to_owned()).into(), json_path.clone()),
                     filter_fn(PrismaValue::Null.into(), json_path),
                 ]),
 

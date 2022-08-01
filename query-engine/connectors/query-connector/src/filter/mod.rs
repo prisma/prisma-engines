@@ -46,11 +46,11 @@ pub enum AggregationFilter {
 impl AggregationFilter {
     pub fn filter(&self) -> &Filter {
         match self {
-            AggregationFilter::Count(f) => &f,
-            AggregationFilter::Average(f) => &f,
-            AggregationFilter::Sum(f) => &f,
-            AggregationFilter::Min(f) => &f,
-            AggregationFilter::Max(f) => &f,
+            AggregationFilter::Count(f) => f,
+            AggregationFilter::Average(f) => f,
+            AggregationFilter::Sum(f) => f,
+            AggregationFilter::Min(f) => f,
+            AggregationFilter::Max(f) => f,
         }
     }
 }
