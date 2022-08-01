@@ -64,6 +64,64 @@ mod insensitive {
         Ok(())
     }
 
+    // FIXME: MongoDB numeric insensitive filters are broken
+    #[connector_test(exclude(MongoDb))]
+    async fn numeric_matchers(runner: Runner) -> TestResult<()> {
+        create_row(&runner, "a").await?;
+        create_row(&runner, "A").await?;
+        create_row(&runner, "b").await?;
+
+        // gt
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { str: { gt: "a", mode: insensitive } }) { str }}"#),
+          @r###"{"data":{"findManyTestModel":[{"str":"b"}]}}"###
+        );
+
+        // not gt => lte
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { str: { not: { gt: "a" }, mode: insensitive  } }) { str }}"#),
+          @r###"{"data":{"findManyTestModel":[{"str":"a"},{"str":"A"}]}}"###
+        );
+
+        // gte
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { str: { gte: "a", mode: insensitive } }) { str }}"#),
+          @r###"{"data":{"findManyTestModel":[{"str":"a"},{"str":"A"},{"str":"b"}]}}"###
+        );
+
+        // not gte => lt
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { str: { not: { gte: "a" }, mode: insensitive  } }) { str }}"#),
+          @r###"{"data":{"findManyTestModel":[]}}"###
+        );
+
+        // lt
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { str: { lt: "a", mode: insensitive } }) { str }}"#),
+          @r###"{"data":{"findManyTestModel":[]}}"###
+        );
+
+        // not lt => gte
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { str: { not: { lt: "a" }, mode: insensitive  } }) { str }}"#),
+          @r###"{"data":{"findManyTestModel":[{"str":"a"},{"str":"A"},{"str":"b"}]}}"###
+        );
+
+        // lte
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { str: { lte: "a", mode: insensitive } }) { str }}"#),
+          @r###"{"data":{"findManyTestModel":[{"str":"a"},{"str":"A"}]}}"###
+        );
+
+        // not lte => gt
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { str: { not: { lte: "a" }, mode: insensitive  } }) { str }}"#),
+          @r###"{"data":{"findManyTestModel":[{"str":"b"}]}}"###
+        );
+
+        Ok(())
+    }
+
     #[connector_test]
     async fn comparator_ops(runner: Runner) -> TestResult<()> {
         // Note: Postgres collations order characters differently than, say, using .sort in most programming languages,

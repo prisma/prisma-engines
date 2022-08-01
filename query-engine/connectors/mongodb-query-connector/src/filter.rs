@@ -38,7 +38,7 @@ pub(crate) struct MongoRelationFilter {
 }
 
 pub(crate) struct MongoFilterVisitor {
-    /// The prefix that's applied to the field name.
+    /// The prefix that's applied to the field name for which we render the filter.
     prefix: FilterPrefix,
     /// An optional custom prefix for referenced fields.
     /// By default, referenced fields will use the same prefix as the field on which a filter is applied.
@@ -252,30 +252,32 @@ impl MongoFilterVisitor {
             ScalarCondition::NotSearch(_, _) => unimplemented!("Full-text search is not supported yet on MongoDB"),
         };
 
-        let cond = if !is_set_cond {
+        let filter_doc = if !is_set_cond {
             exclude_undefineds(&field_name, self.invert_undefined_exclusion(), filter_doc)
         } else {
             filter_doc
         };
 
-        let cond = if let Some(field_ref) = &field_ref {
+        let filter_doc = if let Some(field_ref) = &field_ref {
             exclude_undefineds(
                 self.prefixed_field_ref(field_ref)?,
                 self.invert_undefined_exclusion(),
-                cond,
+                filter_doc,
             )
         } else {
-            cond
+            filter_doc
         };
 
-        Ok(cond)
+        Ok(filter_doc)
     }
 
     /// Insensitive filters are only reachable with TypeIdentifier::String (or UUID, which is string as well for us).
     fn insensitive_scalar_filter(&self, field: &ScalarFieldRef, condition: ScalarCondition) -> crate::Result<Document> {
         let field_name = (self.prefix(), field).into_bson()?;
+        let field_ref = condition.as_ref_field().cloned();
+        let is_set_cond = matches!(&condition, ScalarCondition::IsSet(_));
 
-        match condition {
+        let filter_doc = match condition {
             ScalarCondition::Equals(val) => self.regex_match(&field_name, field, "^", val, "$", true),
             ScalarCondition::NotEquals(val) => {
                 Ok(doc! { "$not": self.regex_match(&field_name, field, "^", val, "$", true)? })
@@ -387,7 +389,25 @@ impl MongoFilterVisitor {
             ScalarCondition::Search(_, _) | ScalarCondition::NotSearch(_, _) => Err(MongoError::Unsupported(
                 "Full-text search is not supported yet on MongoDB".to_string(),
             )),
-        }
+        }?;
+
+        let filter_doc = if !is_set_cond {
+            exclude_undefineds(&field_name, self.invert_undefined_exclusion(), filter_doc)
+        } else {
+            filter_doc
+        };
+
+        let filter_doc = if let Some(field_ref) = &field_ref {
+            exclude_undefineds(
+                self.prefixed_field_ref(field_ref)?,
+                self.invert_undefined_exclusion(),
+                filter_doc,
+            )
+        } else {
+            filter_doc
+        };
+
+        Ok(filter_doc)
     }
 
     /// Filters available on list fields.
@@ -857,6 +877,7 @@ impl MongoFilterVisitor {
     }
 
     /// Returns the prefix for a referenced field.
+    /// If there's no custom `ref_prefix` then use the prefix
     fn ref_prefix(&self) -> &FilterPrefix {
         self.ref_prefix.as_ref().unwrap_or_else(|| self.prefix())
     }
