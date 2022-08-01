@@ -1,6 +1,6 @@
 use crate::{common::preview_features::PreviewFeature, configuration::StringFromEnvVar};
 use enumflags2::BitFlags;
-use serde::{Serialize, Serializer};
+use serde::{ser::SerializeSeq, Serialize, Serializer};
 use std::collections::HashMap;
 
 #[derive(Debug, Serialize, Clone)]
@@ -15,27 +15,20 @@ pub struct Generator {
     pub binary_targets: Vec<StringFromEnvVar>,
 
     #[serde(default, serialize_with = "mcf_preview_features")]
-    pub preview_features: Option<Vec<PreviewFeature>>,
+    pub preview_features: Option<BitFlags<PreviewFeature>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub documentation: Option<String>,
 }
 
-pub fn mcf_preview_features<S>(feat: &Option<Vec<PreviewFeature>>, s: S) -> Result<S::Ok, S::Error>
+pub fn mcf_preview_features<S>(feats: &Option<BitFlags<PreviewFeature>>, s: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {
-    match feat {
-        Some(feats) => feats.serialize(s),
-        None => Vec::<String>::new().serialize(s),
+    let feats = feats.unwrap_or_default();
+    let mut seq = s.serialize_seq(Some(feats.len()))?;
+    for feat in feats.iter() {
+        seq.serialize_element(&feat)?;
     }
-}
-
-impl Generator {
-    pub fn preview_features(&self) -> BitFlags<PreviewFeature> {
-        match self.preview_features {
-            Some(ref preview_features) => preview_features.iter().copied().collect(),
-            None => BitFlags::empty(),
-        }
-    }
+    seq.end()
 }
