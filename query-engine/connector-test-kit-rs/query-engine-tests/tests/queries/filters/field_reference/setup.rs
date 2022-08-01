@@ -242,3 +242,54 @@ pub async fn test_data_list_common(runner: &Runner) -> TestResult<()> {
 
     Ok(())
 }
+
+/// Test model containing a mix of composite object & list.
+pub fn mixed_composite_types() -> String {
+    let schema = indoc! {
+        "model TestModel {
+            #id(id, Int, @id)
+            comp Composite?
+            comp2 Composite?
+            comp_list Composite[]
+            comp_list2 Composite[]
+         }
+
+         type Composite {
+            string  String
+            string2 String
+         }
+        "
+    };
+
+    schema.to_owned()
+}
+
+/// Creates test data used by filter tests using the `composite_types` schema.
+pub async fn test_data_mixed_composite(runner: &Runner) -> TestResult<()> {
+    runner
+        .query(indoc! { r#"
+            mutation { createOneTestModel(data: {
+                id: 1,
+                comp: { string: "a", string2: "a" },
+                comp_list: [{ string: "a", string2: "a" }, { string: "a", string2: "a" }]
+            }) { id }}"# })
+        .await?
+        .assert_success();
+
+    runner
+        .query(indoc! { r#"
+            mutation { createOneTestModel(data: {
+                id: 2,
+                comp: { string: "a", string2: "b" },
+                comp_list: [{ string: "a", string2: "b" }, { string: "c", string2: "d" }]
+            }) { id }}"# })
+        .await?
+        .assert_success();
+
+    runner
+        .query(indoc! { r#"mutation { createOneTestModel(data: { id: 3 }) { id }}"# })
+        .await?
+        .assert_success();
+
+    Ok(())
+}

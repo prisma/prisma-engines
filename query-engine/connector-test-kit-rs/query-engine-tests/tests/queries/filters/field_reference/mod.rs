@@ -4,6 +4,7 @@ pub mod failure;
 
 pub mod bigint_filter;
 pub mod bytes_filter;
+pub mod composite_filter;
 pub mod datetime_filter;
 pub mod decimal_filter;
 pub mod float_filter;

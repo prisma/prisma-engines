@@ -119,18 +119,32 @@ mod failure {
 
     #[connector_test(schema(setup::common_types))]
     async fn count_requires_int_ref_field(runner: Runner) -> TestResult<()> {
-        // assert that referencing a Int field for the count of a string field works
+        // assert that referencing an Int field for the count of a string field works
         run_query!(
             &runner,
             r#"query { groupByTestModel(by: [string, int], having: { string: { _count: { equals: { _ref: "int" } } } }) { string, int }}"#
         );
 
-        // assert that the count of a String field expect a the referenced field to be of type Int
+        // assert that the count of a String field expect the referenced field to be of type Int
         assert_error!(
             runner,
             r#"query { groupByTestModel(by: [string, int], having: { string: { _count: { equals: { _ref: "string" } } } }) { id }}"#,
             2019,
             "Expected a referenced scalar field of type Int but found TestModel.string of type String."
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(setup::mixed_composite_types), capabilities(CompositeTypes))]
+    async fn referencing_composite_field_fails(runner: Runner) -> TestResult<()> {
+        setup::test_data_mixed_composite(&runner).await?;
+
+        assert_error!(
+            runner,
+            r#"query { findManyTestModel(where: { comp: { equals: { _ref: "comp" } } }) { id }}"#,
+            2009,
+            "`Query.findManyTestModel.where.TestModelWhereInput.comp.CompositeNullableCompositeFilter.equals`: Unable to match input value to any allowed input type for the field"
         );
 
         Ok(())
