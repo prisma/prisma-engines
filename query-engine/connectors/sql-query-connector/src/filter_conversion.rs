@@ -241,7 +241,8 @@ fn convert_scalar_list_filter(
         ScalarListCondition::Contains(ConditionValue::FieldRef(field_ref)) => {
             let field_ref_expr: Expression = field_ref.as_column().into();
 
-            field_ref_expr.equals(array_any(comparable))
+            // This code path is only reachable for connectors with `ScalarLists` capability
+            field_ref_expr.equals(any_operator(comparable))
         }
         ScalarListCondition::ContainsEvery(ConditionListValue::List(vals)) => {
             comparable.compare_raw("@>", convert_list_value(field, vals))
@@ -624,7 +625,8 @@ fn default_scalar_filter(
             _ => comparable.in_selection(convert_values(fields, values)),
         },
         ScalarCondition::In(ConditionListValue::FieldRef(field_ref)) => {
-            comparable.equals(array_any(field_ref.as_column()))
+            // This code path is only reachable for connectors with `ScalarLists` capability
+            comparable.equals(any_operator(field_ref.as_column()))
         }
         ScalarCondition::NotIn(ConditionListValue::List(values)) => match values.split_first() {
             Some((PrismaValue::List(_), _)) => {
@@ -640,7 +642,8 @@ fn default_scalar_filter(
             _ => comparable.not_in_selection(convert_values(fields, values)),
         },
         ScalarCondition::NotIn(ConditionListValue::FieldRef(field_ref)) => {
-            comparable.not_equals(array_all(field_ref.as_column()))
+            // This code path is only reachable for connectors with `ScalarLists` capability
+            comparable.not_equals(all_operator(field_ref.as_column()))
         }
         ScalarCondition::Search(value, _) => {
             let query: String = value
@@ -784,7 +787,8 @@ fn insensitive_scalar_filter(
             }
         },
         ScalarCondition::In(ConditionListValue::FieldRef(field_ref)) => {
-            comparable.compare_raw("ILIKE", array_any(field_ref.as_column()))
+            // This code path is only reachable for connectors with `ScalarLists` capability
+            comparable.compare_raw("ILIKE", any_operator(field_ref.as_column()))
         }
         ScalarCondition::NotIn(ConditionListValue::List(values)) => match values.split_first() {
             Some((PrismaValue::List(_), _)) => {
@@ -814,7 +818,8 @@ fn insensitive_scalar_filter(
             }
         },
         ScalarCondition::NotIn(ConditionListValue::FieldRef(field_ref)) => {
-            comparable.compare_raw("NOT ILIKE", array_all(field_ref.as_column()))
+            // This code path is only reachable for connectors with `ScalarLists` capability
+            comparable.compare_raw("NOT ILIKE", all_operator(field_ref.as_column()))
         }
         ScalarCondition::Search(value, _) => {
             let query: String = value
