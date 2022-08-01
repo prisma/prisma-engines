@@ -101,6 +101,10 @@ pub struct PrismaOpt {
     #[structopt(long)]
     pub enable_open_telemetry: bool,
 
+    /// JSON key value for additional headers such as traceparent
+    #[structopt(long, default_value = "{}")]
+    pub additional_headers: String,
+
     /// The url to the OpenTelemetry collector.
     /// Enabling this will send the OpenTelemtry tracing to a collector
     /// and not via our custom stdout tracer
