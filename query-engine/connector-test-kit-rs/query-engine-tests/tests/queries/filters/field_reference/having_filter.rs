@@ -68,11 +68,10 @@ mod having_filter {
               _max { int }
             }
           }"#,
-          MongoDb(_) => vec![
+          _ => vec![
             r#"{"data":{"groupByTestModel":[{"string":"group1","int2":1,"_max":{"int":1}},{"string":"group2","int2":2,"_max":{"int":2}}]}}"#,
-            r#"{"data":{"groupByTestModel":[{"string":"group2","int2":2,"_max":{"int":2}},{"string":"group1","int2":1,"_max":{"int":1}}]}}"#,
-          ],
-          _ => vec![r#"{"data":{"groupByTestModel":[{"string":"group2","int2":2,"_max":{"int":2}},{"string":"group1","int2":1,"_max":{"int":1}}]}}"#]
+            r#"{"data":{"groupByTestModel":[{"string":"group2","int2":2,"_max":{"int":2}},{"string":"group1","int2":1,"_max":{"int":1}}]}}"#
+          ]
         );
 
         Ok(())

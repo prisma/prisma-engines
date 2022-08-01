@@ -28,7 +28,7 @@ mod string_filter {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(capabilities(InsensitiveFilters))]
     async fn basic_where_insensitive(runner: Runner) -> TestResult<()> {
         test_data_insensitive(&runner).await?;
 
@@ -138,7 +138,7 @@ mod string_filter {
     }
 
     // FIXME: MongoDB numeric insensitive filters are broken
-    #[connector_test(exclude(MongoDB))]
+    #[connector_test(exclude(MongoDB), capabilities(InsensitiveFilters))]
     async fn numeric_comparison_filters_insensitive(runner: Runner) -> TestResult<()> {
         test_data_insensitive(&runner).await?;
 
@@ -308,7 +308,7 @@ mod string_filter {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(capabilities(InsensitiveFilters))]
     async fn string_comparison_filters_insensitive(runner: Runner) -> TestResult<()> {
         test_data_insensitive(&runner).await?;
         run_query!(
@@ -413,7 +413,7 @@ mod string_filter {
         Ok(())
     }
 
-    #[connector_test(schema(setup::common_mixed_types), capabilities(ScalarLists))]
+    #[connector_test(schema(setup::common_mixed_types), capabilities(ScalarLists, InsensitiveFilters))]
     async fn inclusion_filter_insensitive(runner: Runner) -> TestResult<()> {
         test_data_mixed_types_insensitive(&runner).await?;
 
