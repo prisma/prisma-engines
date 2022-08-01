@@ -17,7 +17,6 @@ mod ignore_positive;
 mod index_clustering;
 mod index_negative;
 mod index_positive;
-mod map_negative;
 mod map_positive;
 mod postgres_indices;
 mod relations;
