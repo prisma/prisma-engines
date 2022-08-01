@@ -613,7 +613,7 @@ mod many_count_rel {
         schema.to_owned()
     }
 
-    #[connector_test(schema(composite_schema), only(MongoDb))]
+    #[connector_test(schema(composite_schema), capabilities(CompositeTypes))]
     async fn filtered_count_composite(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,

@@ -47,6 +47,15 @@ pub fn compute_aggr_join(
     }
 }
 
+/// Computes a one-to-many join for an aggregation (in aggregation selections, order by...).
+///
+/// Preview of the rendered SQL:
+/// ```sql
+/// LEFT JOIN (
+///     SELECT Child.<fk>, COUNT(*) AS <AGGREGATOR_ALIAS> FROM Child WHERE <filter>
+///     GROUP BY Child.<fk>
+/// ) AS <ORDER_JOIN_PREFIX> ON (<Parent | previous_join_alias>.<fk> = <ORDER_JOIN_PREFIX>.<fk>)
+/// ```
 fn compute_aggr_join_one2m(
     rf: &RelationFieldRef,
     aggregation: AggregationType,
@@ -68,7 +77,7 @@ fn compute_aggr_join_one2m(
         .map(|f| f.aliased_cond(None))
         .unwrap_or(ConditionTree::NoCondition);
 
-    // + SELECT Child.<fk> FROM A
+    // + SELECT Child.<fk> FROM Child WHERE <FILTER>
     let query = Select::from_table(rf.related_model().as_table())
         .columns(select_columns)
         .so_that(conditions);
@@ -78,10 +87,10 @@ fn compute_aggr_join_one2m(
 
     // SELECT Child.<fk>,
     // + COUNT(*) AS <AGGREGATOR_ALIAS>
-    // FROM Child
+    // FROM Child WHERE <FILTER>
     let query = query.value(aggr_expr.alias(aggregator_alias.to_owned()));
 
-    // SELECT Child.<fk>, COUNT(*) AS <AGGREGATOR_ALIAS> FROM Child
+    // SELECT Child.<fk>, COUNT(*) AS <AGGREGATOR_ALIAS> FROM Child WHERE <FILTER>
     // + GROUP BY Child.<fk>
     let query = right_fields.iter().fold(query, |acc, f| acc.group_by(f.as_column()));
 
@@ -99,7 +108,7 @@ fn compute_aggr_join_one2m(
         .collect::<Vec<_>>();
 
     // + LEFT JOIN (
-    //     SELECT Child.<fk>, COUNT(*) AS <AGGREGATOR_ALIAS> FROM Child
+    //     SELECT Child.<fk>, COUNT(*) AS <AGGREGATOR_ALIAS> FROM Child WHERE <FILTER>
     //     GROUP BY Child.<fk>
     // + ) AS <ORDER_JOIN_PREFIX> ON (<Parent | previous_join_alias>.<fk> = <ORDER_JOIN_PREFIX>.<fk>)
     let join = Table::from(query)
@@ -112,6 +121,16 @@ fn compute_aggr_join_one2m(
     }
 }
 
+/// Compoutes a many-to-many join for an aggregation (in aggregation selections, order by...).
+///
+/// Preview of the rendered SQL:
+/// ```sql
+/// LEFT JOIN (
+///   SELECT _ParentToChild.ChildId, COUNT(_ParentToChild.ChildId) AS <AGGREGATOR_ALIAS> FROM Child WHERE <FILTER>
+///   LEFT JOIN _ParentToChild ON (Child.id = _ParentToChild.ChildId)
+///   GROUP BY _ParentToChild.ChildId
+/// ) AS <ORDER_JOIN_PREFIX> ON (<Parent | previous_join_alias>.id = <ORDER_JOIN_PREFIX>.ChildId)
+/// ```
 fn compute_aggr_join_m2m(
     rf: &RelationFieldRef,
     aggregation: AggregationType,
@@ -120,9 +139,9 @@ fn compute_aggr_join_m2m(
     join_alias: &str,
     previous_join: Option<&AliasedJoin>,
 ) -> AliasedJoin {
-    // _ParentToChild m2m join table
+    // m2m join table (_ParentToChild)
     let m2m_table = rf.as_table();
-    // _ParentToChild.Child columns
+    // Child colums on the m2m join table (_ParentToChild.ChildId)
     let m2m_child_columns = rf.related_field().m2m_columns();
     // Child table
     let child_model = rf.related_model();
@@ -135,7 +154,7 @@ fn compute_aggr_join_m2m(
         .map(|f| f.aliased_cond(None))
         .unwrap_or(ConditionTree::NoCondition);
 
-    // + SELECT _ParentToChild.Child FROM Child
+    // + SELECT _ParentToChild.ChildId FROM Child WHERE <FILTER>
     let query = Select::from_table(child_model.as_table())
         .columns(m2m_child_columns.clone())
         .so_that(conditions);
@@ -144,9 +163,9 @@ fn compute_aggr_join_m2m(
         AggregationType::Count => count(m2m_child_columns.clone()),
     };
 
-    // SELECT _ParentToChild.Child,
-    // + COUNT(_ParentToChild.Child) AS <AGGREGATOR_ALIAS>
-    // FROM Child
+    // SELECT _ParentToChild.ChildId,
+    // + COUNT(_ParentToChild.ChildId) AS <AGGREGATOR_ALIAS>
+    // FROM Child WHERE <FILTER>
     let query = query.value(aggr_expr.alias(aggregator_alias.to_owned()));
 
     let left_join_conditions: Vec<Expression> = child_ids
@@ -155,13 +174,13 @@ fn compute_aggr_join_m2m(
         .map(|c| c.equals(rf.m2m_columns()).into())
         .collect();
 
-    // SELECT _ParentToChild.Child, COUNT(_ParenTtoChild.Child) AS <AGGREGATOR_ALIAS> FROM Child
-    // + LEFT JOIN _ParentToChild ON (B.id = _ParenTtoChild.Child)
+    // SELECT _ParentToChild.ChildId, COUNT(_ParentToChild.ChildId) AS <AGGREGATOR_ALIAS> FROM Child WHERE <FILTER>
+    // + LEFT JOIN _ParentToChild ON (Child.id = _ParenTtoChild.ChildId)
     let query = query.left_join(m2m_table.on(ConditionTree::And(left_join_conditions)));
 
-    // SELECT _ParentToChild.Child, COUNT(_ParenttoChild.Child) AS <AGGREGATOR_ALIAS> FROM Child
-    // LEFT JOIN _ParentToChild ON (Child.id = _ParenttoChild.Child)
-    // + GROUP BY _ParentToChild.Child
+    // SELECT _ParentToChild.ChildId, COUNT(_ParentToChild.ChildId) AS <AGGREGATOR_ALIAS> FROM Child WHERE <FILTER>
+    // LEFT JOIN _ParentToChild ON (Child.id = _ParentToChild.ChildId)
+    // + GROUP BY _ParentToChild.ChildId
     let query = rf
         .related_field()
         .m2m_columns()
@@ -183,10 +202,10 @@ fn compute_aggr_join_m2m(
         .collect::<Vec<_>>();
 
     // + LEFT JOIN (
-    //     SELECT _ParentToChild.Child, COUNT(_ParentToChild.Child) AS <AGGREGATOR_ALIAS> FROM Child
-    //     LEFT JOIN _ParentToChild ON (B.id = _ParentToChild.Child)
-    //     GROUP BY _ParentToChild.Child
-    // + ) AS <ORDER_JOIN_PREFIX> ON (<Parent | previous_join_alias>.id = <ORDER_JOIN_PREFIX>.B)
+    //     SELECT _ParentToChild.ChildId, COUNT(_ParentToChild.ChildId) AS <AGGREGATOR_ALIAS> FROM Child WHERE <FILTER>
+    //     LEFT JOIN _ParentToChild ON (Child.id = _ParentToChild.ChildId)
+    //     GROUP BY _ParentToChild.ChildId
+    // + ) AS <ORDER_JOIN_PREFIX> ON (<Parent | previous_join_alias>.id = <ORDER_JOIN_PREFIX>.ChildId)
     let join = Table::from(query)
         .alias(join_alias.to_owned())
         .on(ConditionTree::And(on_conditions));
