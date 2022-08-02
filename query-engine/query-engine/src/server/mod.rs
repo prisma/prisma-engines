@@ -359,7 +359,12 @@ async fn transaction_start_handler(state: State, req: Request<Body>) -> Result<R
     match state
         .cx
         .executor
-        .start_tx(state.cx.query_schema().clone(), input.max_wait, input.timeout)
+        .start_tx(
+            state.cx.query_schema().clone(),
+            input.max_wait,
+            input.timeout,
+            input.isolation_level,
+        )
         .instrument(span)
         .await
     {

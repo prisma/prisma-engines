@@ -1,5 +1,5 @@
-use crate::SqlError;
-use crate::{database::operations::*, sql_info::SqlInfo};
+use super::catch;
+use crate::{database::operations::*, sql_info::SqlInfo, SqlError};
 use async_trait::async_trait;
 use connector::{ConnectionLike, RelAggregationSelection};
 use connector_interface::{
@@ -11,8 +11,6 @@ use prisma_models::{prelude::*, SelectionResult};
 use prisma_value::PrismaValue;
 use quaint::prelude::ConnectionInfo;
 use std::collections::HashMap;
-
-use super::catch;
 
 pub struct SqlConnectorTransaction<'tx> {
     inner: quaint::connector::Transaction<'tx>,

@@ -92,7 +92,7 @@ where
                 "db.type" = connection_name.as_str()
             );
             let mut conn = self.connector.get_connection().instrument(conn_span).await?;
-            let mut tx = conn.start_transaction().await?;
+            let mut tx = conn.start_transaction(None).await?;
 
             let results = execute_many_operations(query_schema, tx.as_connection_like(), &operations, trace_id).await;
 
@@ -130,6 +130,7 @@ where
         query_schema: QuerySchemaRef,
         max_acquisition_millis: u64,
         valid_for_millis: u64,
+        isolation_level: Option<String>,
     ) -> crate::Result<TxId> {
         let id = TxId::default();
         trace!("[{}] Starting...", id);
@@ -147,7 +148,7 @@ where
         .await;
 
         let conn = conn.map_err(|_| TransactionError::AcquisitionTimeout)??;
-        let c_tx = OpenTx::start(conn).await?;
+        let c_tx = OpenTx::start(conn, isolation_level).await?;
 
         self.itx_manager
             .create_tx(

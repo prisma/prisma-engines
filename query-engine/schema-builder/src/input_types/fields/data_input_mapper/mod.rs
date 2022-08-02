@@ -5,7 +5,6 @@ pub(crate) use create::*;
 pub(crate) use update::*;
 
 use super::*;
-use crate::constants::json_null;
 use prisma_models::prelude::*;
 
 // Todo: This isn't final, this is only the first draft to get structure into the
@@ -30,18 +29,4 @@ pub(crate) trait DataInputFieldMapper {
     fn map_relation(&self, ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputField;
 
     fn map_composite(&self, ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputField;
-}
-
-fn json_null_input_enum(nullable: bool) -> EnumTypeRef {
-    if nullable {
-        Arc::new(string_enum_type(
-            json_null::NULLABLE_INPUT_ENUM_NAME,
-            vec![json_null::DB_NULL.to_owned(), json_null::JSON_NULL.to_owned()],
-        ))
-    } else {
-        Arc::new(string_enum_type(
-            json_null::INPUT_ENUM_NAME,
-            vec![json_null::JSON_NULL.to_owned()],
-        ))
-    }
 }

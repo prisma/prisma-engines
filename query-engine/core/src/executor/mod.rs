@@ -62,6 +62,7 @@ pub trait TransactionManager {
         query_schema: QuerySchemaRef,
         max_acquisition_millis: u64,
         valid_for_millis: u64,
+        isolation_level: Option<String>,
     ) -> crate::Result<TxId>;
 
     /// Commits a transaction.

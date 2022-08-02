@@ -36,21 +36,27 @@ pub use registry::MetricRegistry;
 use serde::Deserialize;
 use std::sync::Once;
 
+pub(crate) const PRISMA_CLIENT_QUERIES_TOTAL: &str = "prisma_client_queries_total";
+pub(crate) const PRISMA_CLIENT_QUERIES_HISTOGRAM_MS: &str = "prisma_client_queries_duration_histogram_ms";
+
 // At the moment the histogram is only used for timings. So the bounds are hard coded here
 // The buckets are for ms
 pub(crate) const HISTOGRAM_BOUNDS: [f64; 10] = [0.0, 1.0, 5.0, 10.0, 50.0, 100.0, 500.0, 1000.0, 5000.0, 50000.0];
 // We need a list of acceptable metrics we want to expose, we don't want to accidentally expose metrics
 // that a different library have or unintended information
 const ACCEPT_LIST: &[&str] = &[
-    "pool_active_connections",
-    "pool_idle_connections",
-    "pool_wait_count",
-    "pool_wait_duration_ms",
-    "query_total_elapsed_time_ms",
-    "query_total_queries",
-    "query_active_transactions",
-    "query_total_operations",
-    "query_operation_total_elapsed_time_ms",
+    "prisma_pool_connections_opened_total",
+    "prisma_pool_connections_closed_total",
+    "prisma_pool_connections_open",
+    "prisma_pool_connections_busy",
+    "prisma_pool_connections_idle",
+    "prisma_client_queries_wait",
+    "prisma_client_queries_wait_histogram_ms",
+    "prisma_datasource_queries_duration_histogram_ms",
+    "prisma_datasource_queries_total",
+    "prisma_client_queries_active",
+    PRISMA_CLIENT_QUERIES_HISTOGRAM_MS,
+    PRISMA_CLIENT_QUERIES_TOTAL,
 ];
 
 #[derive(PartialEq, Debug, Deserialize)]
@@ -70,40 +76,84 @@ pub fn setup() {
 // a new metric registry for a Query Instance the descriptions
 // will be in place
 fn describe_metrics() {
-    describe_gauge!("pool_active_connections", "The number of active connections in use");
+    describe_counter!(
+        "prisma_pool_connections_opened_total",
+        "Total number of Pool Connections opened"
+    );
+    describe_counter!(
+        "prisma_pool_connections_closed_total",
+        "Total number of Pool Connections closed"
+    );
+    describe_gauge!(
+        "prisma_pool_connections_busy",
+        "Number of currently busy Pool Connections (executing a datasource query)"
+    );
 
     describe_gauge!(
-        "pool_idle_connections",
-        "The number of connections that are not being used"
+        "prisma_pool_connections_idle",
+        "Number of currently unused Pool Connections (waiting for the next datasource query to run)"
     );
 
-    describe_gauge!("pool_wait_count", "The number of workers waiting for a connection");
-    describe_gauge!("query_active_transactions", "The number of active transactions");
+    describe_gauge!(
+        "prisma_client_queries_wait",
+        "Number of Prisma Client queries currently waiting for a connection"
+    );
+    describe_gauge!(
+        "prisma_client_queries_active",
+        "Number of currently active Prisma Client queries"
+    );
 
-    gauge!("pool_active_connections", 0.0);
-    gauge!("pool_idle_connections", 0.0);
-    gauge!("pool_wait_count", 0.0);
-    gauge!("query_active_transactions", 0.0);
+    gauge!("prisma_pool_connections_busy", 0.0);
+    gauge!("prisma_pool_connections_idle", 0.0);
+    gauge!("prisma_client_queries_wait", 0.0);
+    gauge!("prisma_client_queries_active", 0.0);
+
+    describe_gauge!(
+        "prisma_client_queries_active",
+        "Number of currently active Prisma Client queries"
+    );
+
+    describe_gauge!(
+        "prisma_pool_connections_busy",
+        "Number of currently busy Pool Connections (executing a datasource query)"
+    );
+
+    describe_gauge!(
+        "prisma_pool_connections_idle",
+        "Number of currently unused Pool Connections (waiting for the next datasource query to run)"
+    );
+
+    describe_gauge!(
+        "prisma_client_queries_wait",
+        "Number of Prisma Client queries currently waiting for a connection"
+    );
 
     describe_histogram!(
-        "pool_wait_duration_ms",
-        "The wait time for a worker to get a connection."
+        "prisma_client_queries_wait_histogram_ms",
+        "Histogram of the wait time of all Prisma Client Queries in ms"
     );
     describe_histogram!(
-        "query_total_elapsed_time_ms",
-        "The execution time for all database queries executed."
+        "prisma_datasource_queries_duration_histogram_ms",
+        "Histogram of the duration of all executed Datasource Queries in ms"
     );
 
     describe_histogram!(
-        "query_operation_total_elapsed_time_ms",
-        "The execution time for all operations."
+        PRISMA_CLIENT_QUERIES_HISTOGRAM_MS,
+        "Histogram of the duration of all executed Prisma Client queries in ms"
     );
 
-    describe_counter!("query_total_queries", "The total number of queries executed");
-    describe_counter!("query_total_operations", "The total number of operations executed");
+    describe_counter!(
+        "prisma_datasource_queries_total",
+        "Total number of Datasource Queries executed"
+    );
 
-    absolute_counter!("query_total_queries", 0);
-    absolute_counter!("query_total_operations", 0);
+    describe_counter!(
+        PRISMA_CLIENT_QUERIES_TOTAL,
+        "Total number of Prisma Client queries executed"
+    );
+
+    absolute_counter!("prisma_datasource_queries_total", 0);
+    absolute_counter!(PRISMA_CLIENT_QUERIES_TOTAL, 0);
 }
 
 static METRIC_RECORDER: Once = Once::new();

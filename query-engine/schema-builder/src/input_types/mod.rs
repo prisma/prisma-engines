@@ -2,6 +2,7 @@ pub(crate) mod fields;
 pub(crate) mod objects;
 
 use super::*;
+use crate::enum_types::*;
 use fields::*;
 use itertools::Itertools;
 use prisma_models::ScalarFieldRef;
@@ -21,7 +22,7 @@ fn map_scalar_input_type(ctx: &mut BuilderContext, typ: &TypeIdentifier, list: b
         TypeIdentifier::UUID => InputType::uuid(),
         TypeIdentifier::DateTime => InputType::date_time(),
         TypeIdentifier::Json => InputType::json(),
-        TypeIdentifier::Enum(e) => map_enum_input_type(ctx, e),
+        TypeIdentifier::Enum(e) => InputType::enum_type(map_schema_enum_type(ctx, e)),
         TypeIdentifier::Xml => InputType::xml(),
         TypeIdentifier::Bytes => InputType::bytes(),
         TypeIdentifier::BigInt => InputType::bigint(),
@@ -33,17 +34,6 @@ fn map_scalar_input_type(ctx: &mut BuilderContext, typ: &TypeIdentifier, list: b
     } else {
         typ
     }
-}
-
-fn map_enum_input_type(ctx: &mut BuilderContext, enum_name: &str) -> InputType {
-    let e = ctx
-        .internal_data_model
-        .find_enum(enum_name)
-        .expect("Enum references must always be valid.");
-
-    let et: EnumType = e.into();
-
-    et.into()
 }
 
 /// Convenience function to return [object_type, list_object_type]
@@ -72,16 +62,4 @@ fn compound_object_name(alias: Option<&String>, path_fields: &[(Vec<String>, Sca
 
         field_names.join("")
     })
-}
-
-fn model_field_enum(model: &ModelRef) -> EnumTypeRef {
-    Arc::new(EnumType::FieldRef(FieldRefEnumType {
-        name: format!("{}ScalarFieldEnum", capitalize(&model.name)),
-        values: model
-            .fields()
-            .scalar()
-            .into_iter()
-            .map(|field| (field.name.clone(), field))
-            .collect(),
-    }))
 }

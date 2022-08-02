@@ -16,7 +16,10 @@ pub trait Connector {
 
 #[async_trait]
 pub trait Connection: ConnectionLike {
-    async fn start_transaction<'a>(&'a mut self) -> crate::Result<Box<dyn Transaction + 'a>>;
+    async fn start_transaction<'a>(
+        &'a mut self,
+        isolation_level: Option<String>,
+    ) -> crate::Result<Box<dyn Transaction + 'a>>;
 
     /// Explicit upcast.
     fn as_connection_like(&mut self) -> &mut dyn ConnectionLike;

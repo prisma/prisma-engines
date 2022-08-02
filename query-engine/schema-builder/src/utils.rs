@@ -1,5 +1,4 @@
 use super::*;
-use crate::EnumType;
 use itertools::Itertools;
 use once_cell::sync::OnceCell;
 use prisma_models::pk::PrimaryKey;
@@ -30,17 +29,6 @@ pub fn init_input_object_type(ident: Identifier) -> InputObjectType {
         fields: OnceCell::new(),
         tag: None,
     }
-}
-
-/// Enum type convenience wrapper function.
-pub fn string_enum_type<T>(name: T, values: Vec<String>) -> EnumType
-where
-    T: Into<String>,
-{
-    EnumType::String(StringEnumType {
-        name: name.into(),
-        values,
-    })
 }
 
 /// Field convenience wrapper function.

@@ -33,6 +33,7 @@
 #[macro_use]
 mod cache;
 pub mod constants;
+mod enum_types;
 mod input_types;
 mod mutations;
 mod output_types;
@@ -57,6 +58,7 @@ pub(crate) struct BuilderContext {
     preview_features: Vec<PreviewFeature>,
     nested_create_inputs_queue: NestedInputsQueue,
     nested_update_inputs_queue: NestedInputsQueue,
+    // enums?
 }
 
 impl BuilderContext {
@@ -95,6 +97,11 @@ impl BuilderContext {
         self.cache.output_types.get(ident)
     }
 
+    /// Get an enum type.
+    pub fn get_enum_type(&mut self, ident: &Identifier) -> Option<EnumTypeWeakRef> {
+        self.cache.enum_types.get(ident)
+    }
+
     /// Caches an input (object) type.
     pub fn cache_input_type(&mut self, ident: Identifier, typ: InputObjectTypeStrongRef) {
         self.cache.input_types.insert(ident, typ);
@@ -103,6 +110,11 @@ impl BuilderContext {
     /// Caches an output (object) type.
     pub fn cache_output_type(&mut self, ident: Identifier, typ: ObjectTypeStrongRef) {
         self.cache.output_types.insert(ident, typ);
+    }
+
+    /// Caches an enum type.
+    pub fn cache_enum_type(&mut self, ident: Identifier, e: EnumTypeRef) {
+        self.cache.enum_types.insert(ident, e);
     }
 
     pub fn can_full_text_search(&self) -> bool {
@@ -124,6 +136,7 @@ impl BuilderContext {
 struct TypeCache {
     input_types: TypeRefCache<InputObjectType>,
     output_types: TypeRefCache<ObjectType>,
+    enum_types: TypeRefCache<EnumType>,
 }
 
 impl TypeCache {
@@ -131,6 +144,7 @@ impl TypeCache {
         Self {
             input_types: TypeRefCache::new(),
             output_types: TypeRefCache::new(),
+            enum_types: TypeRefCache::new(),
         }
     }
 
@@ -138,11 +152,18 @@ impl TypeCache {
     /// finalize the query schema building.
     /// Unwraps are safe because the cache is required to be the only strong Arc ref holder,
     /// which makes the Arc counter 1, all other refs contained in the schema are weak refs.
-    pub fn collect_types(self) -> (Vec<InputObjectTypeStrongRef>, Vec<ObjectTypeStrongRef>) {
+    pub fn collect_types(
+        self,
+    ) -> (
+        Vec<InputObjectTypeStrongRef>,
+        Vec<ObjectTypeStrongRef>,
+        Vec<EnumTypeRef>,
+    ) {
         let input_objects = self.input_types.into();
         let output_objects = self.output_types.into();
+        let enum_types = self.enum_types.into();
 
-        (input_objects, output_objects)
+        (input_objects, output_objects, enum_types)
     }
 }
 
@@ -164,7 +185,12 @@ pub fn build(
 
     let (query_type, query_object_ref) = output_types::query_type::build(&mut ctx);
     let (mutation_type, mutation_object_ref) = output_types::mutation_type::build(&mut ctx);
-    let (input_objects, mut output_objects) = ctx.cache.collect_types();
+
+    // Add iTX isolation levels to the schema.
+    enum_types::itx_isolation_levels(&mut ctx);
+
+    // Finalize the schema.
+    let (input_objects, mut output_objects, enum_types) = ctx.cache.collect_types();
 
     // The mutation and query object types need to be part of the strong refs.
     output_objects.push(query_object_ref);
@@ -178,6 +204,7 @@ pub fn build(
         mutation_type,
         input_objects,
         output_objects,
+        enum_types,
         ctx.internal_data_model,
         ctx.capabilities.capabilities,
         preview_features,

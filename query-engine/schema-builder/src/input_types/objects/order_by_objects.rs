@@ -1,20 +1,8 @@
 use super::*;
 use constants::{aggregations, ordering};
 use itertools::Itertools;
-use lazy_static::lazy_static;
 use output_types::aggregation;
 use prisma_models::prelude::ParentContainer;
-
-lazy_static! {
-    static ref SORT_ORDER_ENUM: Arc<EnumType> = Arc::new(string_enum_type(
-        ordering::SORT_ORDER,
-        vec![ordering::ASC.to_owned(), ordering::DESC.to_owned()],
-    ));
-    static ref NULLS_ORDER_ENUM: Arc<EnumType> = Arc::new(string_enum_type(
-        ordering::NULLS_ORDER,
-        vec![ordering::FIRST.to_owned(), ordering::LAST.to_owned()]
-    ));
-}
 
 #[derive(Debug, Default)]
 pub(crate) struct OrderByOptions {
@@ -148,7 +136,7 @@ fn orderby_field_mapper(field: &ModelField, ctx: &mut BuilderContext, options: &
 
         // Scalar field.
         ModelField::Scalar(sf) => {
-            let mut types = vec![InputType::Enum(SORT_ORDER_ENUM.clone())];
+            let mut types = vec![InputType::Enum(sort_order_enum(ctx))];
 
             if ctx.has_feature(&PreviewFeature::OrderByNulls)
                 && ctx.capabilities.contains(ConnectorCapability::OrderByNullsFirstLast)
@@ -185,8 +173,8 @@ fn sort_nulls_object_type(ctx: &mut BuilderContext) -> InputObjectTypeWeakRef {
     ctx.cache_input_type(ident, input_object.clone());
 
     let fields = vec![
-        input_field(ordering::SORT, InputType::Enum(SORT_ORDER_ENUM.clone()), None),
-        input_field(ordering::NULLS, InputType::Enum(NULLS_ORDER_ENUM.clone()), None).optional(),
+        input_field(ordering::SORT, InputType::Enum(sort_order_enum(ctx)), None),
+        input_field(ordering::NULLS, InputType::Enum(nulls_order_enum(ctx)), None).optional(),
     ];
 
     input_object.set_fields(fields);
@@ -236,7 +224,7 @@ fn order_by_object_type_aggregate(
 
     let fields = scalar_fields
         .iter()
-        .map(|sf| input_field(sf.name.clone(), InputType::Enum(SORT_ORDER_ENUM.clone()), None).optional())
+        .map(|sf| input_field(sf.name.clone(), InputType::Enum(sort_order_enum(ctx)), None).optional())
         .collect();
 
     input_object.set_fields(fields);
@@ -266,7 +254,7 @@ fn order_by_to_many_aggregate_object_type(
 
     let fields = vec![input_field(
         aggregations::UNDERSCORE_COUNT,
-        InputType::Enum(SORT_ORDER_ENUM.clone()),
+        InputType::Enum(sort_order_enum(ctx)),
         None,
     )
     .optional()];
@@ -312,17 +300,19 @@ fn order_by_object_type_text_search(
     let input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());
 
-    let fields_enum_type = InputType::enum_type(Arc::new(string_enum_type(
-        format!("{}OrderByRelevanceFieldEnum", container.name()),
+    let fields_enum_type = InputType::enum_type(order_by_relevance_enum(
+        ctx,
+        &container.name(),
         scalar_fields.iter().map(|sf| sf.name.clone()).collect_vec(),
-    )));
+    ));
+
     let fields = vec![
         input_field(
             ordering::FIELDS,
             vec![fields_enum_type.clone(), InputType::list(fields_enum_type)],
             None,
         ),
-        input_field(ordering::SORT, InputType::Enum(SORT_ORDER_ENUM.clone()), None),
+        input_field(ordering::SORT, InputType::Enum(sort_order_enum(ctx)), None),
         input_field(ordering::SEARCH, InputType::string(), None),
     ];
 

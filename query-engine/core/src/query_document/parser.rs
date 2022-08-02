@@ -182,9 +182,9 @@ impl QueryDocumentParser {
                     .map(ParsedInputValue::Single),
 
                 // Enum handling
-                (QueryValue::Enum(_), InputType::Enum(et)) => self.parse_enum(&parent_path, value, et),
-                (QueryValue::String(_), InputType::Enum(et)) => self.parse_enum(&parent_path, value, et),
-                (QueryValue::Boolean(_), InputType::Enum(et)) => self.parse_enum(&parent_path, value, et),
+                (QueryValue::Enum(_), InputType::Enum(et)) => self.parse_enum(&parent_path, value, &et.into_arc()),
+                (QueryValue::String(_), InputType::Enum(et)) => self.parse_enum(&parent_path, value, &et.into_arc()),
+                (QueryValue::Boolean(_), InputType::Enum(et)) => self.parse_enum(&parent_path, value, &et.into_arc()),
 
                 // List handling.
                 (QueryValue::List(values), InputType::List(l)) => self
@@ -404,15 +404,15 @@ impl QueryDocumentParser {
         match typ.borrow() {
             EnumType::Database(db) => match db.map_input_value(&raw) {
                 Some(value) => Ok(ParsedInputValue::Single(value)),
-                None => err(&db.name),
+                None => err(db.identifier().name()),
             },
             EnumType::String(s) => match s.value_for(raw.as_str()) {
                 Some(val) => Ok(ParsedInputValue::Single(PrismaValue::Enum(val.to_owned()))),
-                None => err(&s.name),
+                None => err(s.identifier().name()),
             },
             EnumType::FieldRef(f) => match f.value_for(raw.as_str()) {
                 Some(value) => Ok(ParsedInputValue::ScalarField(value.clone())),
-                None => err(&f.name),
+                None => err(f.identifier().name()),
             },
         }
     }

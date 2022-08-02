@@ -9,7 +9,7 @@ mod interactive_tx {
 
     #[connector_test]
     async fn basic_commit_workflow(mut runner: Runner) -> TestResult<()> {
-        let tx_id = runner.start_tx(5000, 5000).await?;
+        let tx_id = runner.start_tx(5000, 5000, None).await?;
         runner.set_active_tx(tx_id.clone());
 
         insta::assert_snapshot!(
@@ -36,7 +36,7 @@ mod interactive_tx {
 
     #[connector_test]
     async fn basic_rollback_workflow(mut runner: Runner) -> TestResult<()> {
-        let tx_id = runner.start_tx(5000, 5000).await?;
+        let tx_id = runner.start_tx(5000, 5000, None).await?;
         runner.set_active_tx(tx_id.clone());
 
         insta::assert_snapshot!(
@@ -64,7 +64,7 @@ mod interactive_tx {
     #[connector_test]
     async fn tx_expiration_cycle(mut runner: Runner) -> TestResult<()> {
         // Tx expires after one second.
-        let tx_id = runner.start_tx(5000, 1000).await?;
+        let tx_id = runner.start_tx(5000, 1000, None).await?;
         runner.set_active_tx(tx_id.clone());
 
         insta::assert_snapshot!(
@@ -108,7 +108,7 @@ mod interactive_tx {
     #[connector_test]
     async fn no_auto_rollback(mut runner: Runner) -> TestResult<()> {
         // Tx expires after five second.
-        let tx_id = runner.start_tx(5000, 5000).await?;
+        let tx_id = runner.start_tx(5000, 5000, None).await?;
         runner.set_active_tx(tx_id.clone());
 
         // Row is created
@@ -135,7 +135,7 @@ mod interactive_tx {
     #[connector_test(only(Postgres))]
     async fn raw_queries(mut runner: Runner) -> TestResult<()> {
         // Tx expires after five second.
-        let tx_id = runner.start_tx(5000, 5000).await?;
+        let tx_id = runner.start_tx(5000, 5000, None).await?;
         runner.set_active_tx(tx_id.clone());
 
         insta::assert_snapshot!(
@@ -164,7 +164,7 @@ mod interactive_tx {
     #[connector_test]
     async fn batch_queries_success(mut runner: Runner) -> TestResult<()> {
         // Tx expires after five second.
-        let tx_id = runner.start_tx(5000, 5000).await?;
+        let tx_id = runner.start_tx(5000, 5000, None).await?;
         runner.set_active_tx(tx_id.clone());
 
         let queries = vec![
@@ -190,7 +190,7 @@ mod interactive_tx {
     #[connector_test]
     async fn batch_queries_rollback(mut runner: Runner) -> TestResult<()> {
         // Tx expires after five second.
-        let tx_id = runner.start_tx(5000, 5000).await?;
+        let tx_id = runner.start_tx(5000, 5000, None).await?;
         runner.set_active_tx(tx_id.clone());
 
         let queries = vec![
@@ -216,7 +216,7 @@ mod interactive_tx {
     #[connector_test]
     async fn batch_queries_failure(mut runner: Runner) -> TestResult<()> {
         // Tx expires after five second.
-        let tx_id = runner.start_tx(5000, 5000).await?;
+        let tx_id = runner.start_tx(5000, 5000, None).await?;
         runner.set_active_tx(tx_id.clone());
 
         // One dup key, will cause failure of the batch.
@@ -259,7 +259,7 @@ mod interactive_tx {
     #[connector_test]
     async fn tx_expiration_failure_cycle(mut runner: Runner) -> TestResult<()> {
         // Tx expires after one seconds.
-        let tx_id = runner.start_tx(5000, 1000).await?;
+        let tx_id = runner.start_tx(5000, 1000, None).await?;
         runner.set_active_tx(tx_id.clone());
 
         // Row is created
@@ -327,10 +327,10 @@ mod interactive_tx {
     #[connector_test(exclude(Sqlite))]
     async fn multiple_tx(mut runner: Runner) -> TestResult<()> {
         // First transaction.
-        let tx_id_a = runner.start_tx(2000, 2000).await?;
+        let tx_id_a = runner.start_tx(2000, 2000, None).await?;
 
         // Second transaction.
-        let tx_id_b = runner.start_tx(2000, 2000).await?;
+        let tx_id_b = runner.start_tx(2000, 2000, None).await?;
 
         // Execute on first transaction.
         runner.set_active_tx(tx_id_a.clone());
@@ -365,6 +365,89 @@ mod interactive_tx {
         let res = runner.commit_tx(tx_id_a.clone()).await?;
 
         assert!(res.is_ok());
+
+        Ok(())
+    }
+}
+
+#[test_suite(schema(generic))]
+mod itx_isolation {
+    use query_engine_tests::*;
+
+    // All (SQL) connectors support serializable.
+    #[connector_test(exclude(MongoDb))]
+    async fn basic_serializable(mut runner: Runner) -> TestResult<()> {
+        let tx_id = runner.start_tx(5000, 5000, Some("Serializable".to_owned())).await?;
+        runner.set_active_tx(tx_id.clone());
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1 }) { id }}"#),
+          @r###"{"data":{"createOneTestModel":{"id":1}}}"###
+        );
+
+        let res = runner.commit_tx(tx_id).await?;
+        assert!(res.is_ok());
+        runner.clear_active_tx();
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel { id field }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1,"field":null}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(exclude(MongoDb))]
+    async fn casing_doesnt_matter(mut runner: Runner) -> TestResult<()> {
+        let tx_id = runner.start_tx(5000, 5000, Some("sErIaLiZaBlE".to_owned())).await?;
+        runner.set_active_tx(tx_id.clone());
+
+        let res = runner.commit_tx(tx_id).await?;
+        assert!(res.is_ok());
+
+        Ok(())
+    }
+
+    #[connector_test(only(Postgres))]
+    async fn spacing_doesnt_matter(mut runner: Runner) -> TestResult<()> {
+        let tx_id = runner.start_tx(5000, 5000, Some("Repeatable Read".to_owned())).await?;
+        runner.set_active_tx(tx_id.clone());
+
+        let res = runner.commit_tx(tx_id).await?;
+        assert!(res.is_ok());
+
+        let tx_id = runner.start_tx(5000, 5000, Some("RepeatableRead".to_owned())).await?;
+        runner.set_active_tx(tx_id.clone());
+
+        let res = runner.commit_tx(tx_id).await?;
+        assert!(res.is_ok());
+
+        Ok(())
+    }
+
+    #[connector_test(exclude(MongoDb))]
+    async fn invalid_isolation(runner: Runner) -> TestResult<()> {
+        let tx_id = runner.start_tx(5000, 5000, Some("test".to_owned())).await;
+
+        match tx_id {
+            Ok(_) => panic!("Expected invalid isolation level string to throw an error, but it succeeded instead."),
+            Err(err) => assert!(err.to_string().contains("Invalid isolation level `test`")),
+        };
+
+        Ok(())
+    }
+
+    // Mongo doesn't support isolation levels.
+    #[connector_test(only(MongoDb))]
+    async fn mongo_failure(runner: Runner) -> TestResult<()> {
+        let tx_id = runner.start_tx(5000, 5000, Some("Serializable".to_owned())).await;
+
+        match tx_id {
+            Ok(_) => panic!("Expected mongo to throw an unsupported error, but it succeeded instead."),
+            Err(err) => assert!(dbg!(err.to_string()).contains(
+                "Unsupported connector feature: Mongo does not support setting transaction isolation levels"
+            )),
+        };
 
         Ok(())
     }

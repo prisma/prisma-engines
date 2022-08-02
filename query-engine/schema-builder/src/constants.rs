@@ -155,4 +155,12 @@ pub mod output_fields {
     pub const AFFECTED_COUNT: &str = "count";
 }
 
+pub mod itx {
+    pub const READ_UNCOMMITTED: &str = "ReadUncommitted";
+    pub const READ_COMMITTED: &str = "ReadCommitted";
+    pub const REPEATABLE_READ: &str = "RepeatableRead";
+    pub const SERIALIZABLE: &str = "Serializable";
+    pub const SNAPSHOT: &str = "Snapshot";
+}
+
 pub mod deprecation {}
