@@ -223,6 +223,7 @@ fn index_builders(model: &dml::Model) -> Vec<IndexBuilder> {
         .indices
         .iter()
         .filter(|i| model.is_compound_index_supported(i))
+        .filter(|idx| idx.fields.len() > 1 || idx.fields.iter().any(|field| field.path.len() > 1))
         .map(|idx| IndexBuilder {
             name: idx.name.clone(),
             field_paths: idx
