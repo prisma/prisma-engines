@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(capabilities(DecimalType))]
+#[test_suite(schema(schema), capabilities(DecimalType))]
 mod decimal_filter {
     use query_engine_tests::run_query;
 
@@ -16,7 +16,7 @@ mod decimal_filter {
         schema.to_owned()
     }
 
-    #[connector_test(schema(schema))]
+    #[connector_test]
     async fn basic_where(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
 
@@ -38,7 +38,7 @@ mod decimal_filter {
         Ok(())
     }
 
-    #[connector_test(schema(schema))]
+    #[connector_test]
     async fn numeric_comparison_filters(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
 
@@ -137,7 +137,7 @@ mod decimal_filter {
         schema.to_owned()
     }
 
-    #[connector_test(schema(schema_list), capabilities(ScalarLists))]
+    #[connector_test(schema(schema_list), capabilities(DecimalType, ScalarLists))]
     async fn inclusion_filter(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,

@@ -1,7 +1,7 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schemas::json), capabilities(JsonFiltering))]
-mod json_path {
+#[test_suite(schema(schemas::json), capabilities(JsonFiltering), exclude(MySql(5.6)))]
+mod json_filters {
     use indoc::indoc;
     use query_engine_tests::{assert_error, is_one_of, run_query, ConnectorTag, MySqlVersion, Runner};
 
