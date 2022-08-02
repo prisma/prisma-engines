@@ -1,0 +1,26 @@
+datasource mdb {
+  provider = "mongodb"
+  url = env("TESTDBURL")
+}
+
+type C {
+  val String
+}
+
+type A {
+  c C[] @relation("foo")
+}
+
+model B {
+  id Int @id
+  a  A
+}
+
+
+// [1;91merror[0m: [1mError validating: Defining `@relation` attribute for a field in a composite type is not allowed.[0m
+//   [1;94m-->[0m  [4mschema.prisma:11[0m
+// [1;94m   | [0m
+// [1;94m10 | [0mtype A {
+// [1;94m11 | [0m  [1;91mc C[] @relation("foo")[0m
+// [1;94m12 | [0m}
+// [1;94m   | [0m
