@@ -67,6 +67,7 @@ features!(
     ImprovedQueryRaw,
     Metrics,
     OrderByNulls,
+    DenoDeploy,
 );
 
 // Mapping of which active, deprecated and hidden
@@ -82,6 +83,7 @@ pub const GENERATOR: FeatureMap = FeatureMap::new()
         Tracing,
         Metrics,
         OrderByNulls,
+        DenoDeploy,
     ])
     .with_deprecated(&[
         AtomicNumberOperations,
