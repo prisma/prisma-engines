@@ -26,7 +26,7 @@ jobs:
             url: "mongodb://prisma:prisma@localhost:27018/?authSource=admin&retryWrites=true"
     runs-on: buildjet-16vcpu-ubuntu-2004
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Login to Docker Hub
         uses: docker/login-action@v2
@@ -103,7 +103,7 @@ jobs:
 
     runs-on: buildjet-16vcpu-ubuntu-2004
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Login to Docker Hub
         uses: docker/login-action@v2
@@ -211,7 +211,7 @@ jobs:
     name: "Test ${{ matrix.db.name }} on Windows"
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: actions-rs/toolchain@v1
         with:
