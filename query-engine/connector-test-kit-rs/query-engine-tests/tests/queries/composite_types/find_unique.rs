@@ -3,7 +3,7 @@ use query_engine_tests::*;
 #[test_suite(only(MongoDb))]
 mod find_unique {
     use query_engine_tests::assert_query;
-    
+
     fn simple_uniq_idx_with_embedded() -> String {
         indoc! {r#"
         type Location {
