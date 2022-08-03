@@ -75,7 +75,7 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
         Some(ref_override) => {
             let wat = ref_override.to_string();
             quote! { Some(#wat.to_string()) }
-        },
+        }
         None => quote! { None },
     };
 

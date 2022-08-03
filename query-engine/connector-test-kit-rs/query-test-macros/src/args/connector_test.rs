@@ -63,7 +63,7 @@ impl darling::FromMeta for ReferentialIntegrity {
         match value.to_lowercase().as_str() {
             "prisma" => Ok(Self::Prisma),
             "foreignkeys" => Ok(Self::ForeignKeys),
-            _ => Err(darling::Error::custom(format!("Invalid value: {}", value)))
+            _ => Err(darling::Error::custom(format!("Invalid value: {}", value))),
         }
     }
 }
