@@ -43,7 +43,7 @@ pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn Sq
 
 fn push_model_tables(ctx: &mut Context<'_>) {
     for model in ctx.datamodel.db.walk_models() {
-        let table_id = ctx.schema.describer_schema.push_table(model.database_name().to_owned());
+        let table_id = ctx.schema.describer_schema.push_table(Default::default(), model.database_name().to_owned());
         ctx.model_id_to_table_id.insert(model.model_id(), table_id);
 
         for field in model.scalar_fields() {
@@ -197,7 +197,7 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
             format!("{table_name}_B{fk_suffix}")
         };
 
-        let table_id = ctx.schema.describer_schema.push_table(table_name.clone());
+        let table_id = ctx.schema.describer_schema.push_table(Default::default(), table_name.clone());
         let column_a_type = ctx
             .walk(model_a_table_id)
             .primary_key_columns()

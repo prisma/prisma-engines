@@ -51,10 +51,16 @@ pub struct SqlMetadata {
     pub size_in_bytes: usize,
 }
 
-/// The result of describing a database schema.
+/// The result of describing a logical database.
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct SqlSchema {
-    /// The schema's tables.
+    /// The namespaces (schemas) defined on the database. Empty where not relevant.
+    namespaces: Vec<String>,
+
+    #[serde(skip_serializing)] // not relevant, would deserialize back fine
+    _default_namespace: NamespaceId,
+
+    /// The schema's tables, sorted by namespace id, then name.
     tables: Vec<Table>,
     /// The schema's enums.
     pub enums: Vec<Enum>,
@@ -210,9 +216,9 @@ impl SqlSchema {
         });
     }
 
-    pub fn push_table(&mut self, name: String) -> TableId {
+    pub fn push_table(&mut self, namespace: NamespaceId, name: String) -> TableId {
         let id = TableId(self.tables.len() as u32);
-        self.tables.push(Table { name });
+        self.tables.push(Table { name, namespace });
         id
     }
 
@@ -279,9 +285,9 @@ impl SqlSchema {
     }
 }
 
-/// A table found in a schema.
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
-pub struct Table {
+pub(crate) struct Table {
+    namespace: NamespaceId,
     name: String,
 }
 

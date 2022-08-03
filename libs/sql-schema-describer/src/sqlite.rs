@@ -152,7 +152,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for name in names {
             let cloned_name = name.clone();
-            let id = schema.push_table(name);
+            let id = schema.push_table(Default::default(), name);
             map.insert(cloned_name, id);
         }
 

@@ -92,9 +92,12 @@ async fn database_description_for_mysql_8_should_work(api: &TestApi) -> TestResu
 
     let expected = expect![[r#"
         {
+          "namespaces": [],
+          "default_namespace": 0,
           "tables": [
             {
-              "name": "Blog"
+              "name": "Blog",
+              "namespace": 0
             }
           ],
           "enums": [],
@@ -162,8 +165,10 @@ async fn database_description_for_postgres_should_work(api: &TestApi) -> TestRes
 
     let expected = expect![[r#"
         {
+          "namespaces": [],
           "tables": [
             {
+              "namespace": 0,
               "name": "Blog"
             }
           ],
@@ -237,9 +242,12 @@ async fn database_description_for_sqlite_should_work(api: &TestApi) -> TestResul
 
     let expected = expect![[r#"
         {
+          "namespaces": [],
+          "default_namespace": 0,
           "tables": [
             {
-              "name": "Blog"
+              "name": "Blog",
+              "namespace": 0
             }
           ],
           "enums": [],

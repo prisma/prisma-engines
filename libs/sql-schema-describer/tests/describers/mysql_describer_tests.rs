@@ -44,51 +44,53 @@ fn procedures_can_be_described(api: TestApi) {
 
 #[test_connector(tags(Mysql), exclude(Mysql8, Mysql56, Mariadb))]
 fn all_mysql_column_types_must_work(api: TestApi) {
-    let mut migration = Migration::new().schema(api.db_name());
-    migration.create_table("User", move |t| {
-        t.add_column("primary_col", types::primary());
-        t.add_column("int_col", types::custom("int"));
-        t.add_column("smallint_col", types::custom("smallint"));
-        t.add_column("tinyint4_col", types::custom("tinyint(4)"));
-        t.add_column("tinyint1_col", types::custom("tinyint(1)"));
-        t.add_column("mediumint_col", types::custom("mediumint"));
-        t.add_column("bigint_col", types::custom("bigint"));
-        t.add_column("decimal_col", types::custom("decimal"));
-        t.add_column("numeric_col", types::custom("numeric"));
-        t.add_column("float_col", types::custom("float"));
-        t.add_column("double_col", types::custom("double"));
-        t.add_column("date_col", types::custom("date"));
-        t.add_column("time_col", types::custom("time"));
-        t.add_column("datetime_col", types::custom("datetime"));
-        t.add_column("timestamp_col", types::custom("timestamp"));
-        t.add_column("year_col", types::custom("year"));
-        t.add_column("char_col", types::custom("char"));
-        t.add_column("varchar_col", types::custom("varchar(255)"));
-        t.add_column("text_col", types::custom("text"));
-        t.add_column("tinytext_col", types::custom("tinytext"));
-        t.add_column("mediumtext_col", types::custom("mediumtext"));
-        t.add_column("longtext_col", types::custom("longtext"));
-        t.add_column("enum_col", types::custom("enum('a', 'b')"));
-        t.add_column("set_col", types::custom("set('a', 'b')"));
-        t.add_column("binary_col", types::custom("binary"));
-        t.add_column("varbinary_col", types::custom("varbinary(255)"));
-        t.add_column("blob_col", types::custom("blob"));
-        t.add_column("tinyblob_col", types::custom("tinyblob"));
-        t.add_column("mediumblob_col", types::custom("mediumblob"));
-        t.add_column("longblob_col", types::custom("longblob"));
-        t.add_column("geometry_col", types::custom("geometry"));
-        t.add_column("point_col", types::custom("point"));
-        t.add_column("linestring_col", types::custom("linestring"));
-        t.add_column("polygon_col", types::custom("polygon"));
-        t.add_column("multipoint_col", types::custom("multipoint"));
-        t.add_column("multilinestring_col", types::custom("multilinestring"));
-        t.add_column("multipolygon_col", types::custom("multipolygon"));
-        t.add_column("geometrycollection_col", types::custom("geometrycollection"));
-        t.add_column("json_col", types::custom("json"));
-    });
+    let create_table = r#"
+        CREATE TABLE `User` (
+            t.add_column("primary_col", types::primary());
+            int_col int,
+            smallint_col smallint,
+            tinyint4_col tinyint(4),
+            tinyint1_col tinyint(1),
+            mediumint_col mediumint,
+            bigint_col bigint,
+            decimal_col decimal,
+            numeric_col numeric,
+            float_col float,
+            double_col double,
+            date_col date,
+            time_col time,
+            datetime_col datetime,
+            timestamp_col timestamp,
+            year_col year,
+            char_col char,
+            varchar_col varchar(255),
+            text_col text,
+            tinytext_col tinytext,
+            mediumtext_col mediumtext,
+            longtext_col longtext,
+            enum_col enum('a', 'b'),
+            set_col set('a', 'b'),
+            binary_col binary,
+            varbinary_col varbinary(255),
+            blob_col blob,
+            tinyblob_col tinyblob,
+            mediumblob_col mediumblob,
+            longblob_col longblob,
+            geometry_col geometry,
+            point_col point,
+            linestring_col linestring,
+            polygon_col polygon,
+            multipoint_col multipoint,
+            multilinestring_col multilinestring,
+            multipolygon_col multipolygon,
+            geometrycollection_col geometrycollection,
+            json_col json
+        );
 
-    let full_sql = migration.make::<barrel::backend::MySql>();
-    api.raw_cmd(&full_sql);
+    "#;
+
+    api.raw_cmd(create_table);
+
     let expectation = expect![[r#"
         SqlSchema {
             tables: [
@@ -1871,9 +1873,16 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
     api.raw_cmd(&full_sql);
     let expectation = expect![[r#"
         SqlSchema {
+            namespaces: [],
+            default_namespace: NamespaceId(
+                0,
+            ),
             tables: [
                 Table {
                     name: "User",
+                    namespace: NamespaceId(
+                        0,
+                    ),
                 },
             ],
             enums: [
@@ -2859,12 +2868,22 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
 
     let expectation = expect![[r#"
         SqlSchema {
+            namespaces: [],
+            default_namespace: NamespaceId(
+                0,
+            ),
             tables: [
                 Table {
                     name: "Post",
+                    namespace: NamespaceId(
+                        0,
+                    ),
                 },
                 Table {
                     name: "User",
+                    namespace: NamespaceId(
+                        0,
+                    ),
                 },
             ],
             enums: [],
@@ -3045,9 +3064,16 @@ fn introspected_default_strings_should_be_unescaped(api: TestApi) {
     api.raw_cmd(create_table);
     let expectation = expect![[r#"
         SqlSchema {
+            namespaces: [],
+            default_namespace: NamespaceId(
+                0,
+            ),
             tables: [
                 Table {
                     name: "User",
+                    namespace: NamespaceId(
+                        0,
+                    ),
                 },
             ],
             enums: [],
@@ -3109,9 +3135,16 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
 
     let expectation = expect![[r#"
         SqlSchema {
+            namespaces: [],
+            default_namespace: NamespaceId(
+                0,
+            ),
             tables: [
                 Table {
                     name: "string_defaults_test",
+                    namespace: NamespaceId(
+                        0,
+                    ),
                 },
             ],
             enums: [],
@@ -3204,9 +3237,16 @@ fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
 
     let expectation = expect![[r#"
         SqlSchema {
+            namespaces: [],
+            default_namespace: NamespaceId(
+                0,
+            ),
             tables: [
                 Table {
                     name: "test",
+                    namespace: NamespaceId(
+                        0,
+                    ),
                 },
             ],
             enums: [],
@@ -3279,9 +3319,16 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
 
     let expectation = expect![[r#"
         SqlSchema {
+            namespaces: [],
+            default_namespace: NamespaceId(
+                0,
+            ),
             tables: [
                 Table {
                     name: "game",
+                    namespace: NamespaceId(
+                        0,
+                    ),
                 },
             ],
             enums: [

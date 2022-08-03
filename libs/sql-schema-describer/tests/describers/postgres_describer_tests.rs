@@ -75,8 +75,15 @@ fn all_postgres_column_types_must_work(api: TestApi) {
     api.raw_cmd(sql);
     let expectation = expect![[r#"
         SqlSchema {
+            namespaces: [],
+            _default_namespace: NamespaceId(
+                0,
+            ),
             tables: [
                 Table {
+                    namespace: NamespaceId(
+                        0,
+                    ),
                     name: "User",
                 },
             ],
@@ -1252,8 +1259,15 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
     api.raw_cmd(create_table);
     let expectation = expect![[r#"
         SqlSchema {
+            namespaces: [],
+            _default_namespace: NamespaceId(
+                0,
+            ),
             tables: [
                 Table {
+                    namespace: NamespaceId(
+                        0,
+                    ),
                     name: "string_defaults_test",
                 },
             ],
@@ -1413,8 +1427,15 @@ fn seemingly_escaped_backslashes_in_string_literals_must_not_be_unescaped(api: T
     api.raw_cmd(create_table);
     let expectation = expect![[r#"
         SqlSchema {
+            namespaces: [],
+            _default_namespace: NamespaceId(
+                0,
+            ),
             tables: [
                 Table {
+                    namespace: NamespaceId(
+                        0,
+                    ),
                     name: "test",
                 },
             ],

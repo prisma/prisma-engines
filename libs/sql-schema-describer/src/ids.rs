@@ -23,3 +23,7 @@ pub struct IndexColumnId(pub(crate) u32);
 /// The identifier for a ForeignKey in the schema.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct ForeignKeyId(pub(crate) u32);
+
+/// The identifier for a namespace (schema).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default, Serialize, Deserialize)]
+pub struct NamespaceId(pub(crate) u32);
