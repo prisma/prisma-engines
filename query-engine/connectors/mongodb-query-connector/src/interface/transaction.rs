@@ -30,7 +30,7 @@ impl<'conn> MongoDbTransaction<'conn> {
             .await
             .map_err(|err| MongoError::from(err).into_connector_error())?;
 
-        increment_gauge!("query_active_transactions", 1.0);
+        increment_gauge!("prisma_client_queries_active", 1.0);
 
         Ok(Self { connection })
     }
@@ -39,7 +39,7 @@ impl<'conn> MongoDbTransaction<'conn> {
 #[async_trait]
 impl<'conn> Transaction for MongoDbTransaction<'conn> {
     async fn commit(&mut self) -> connector_interface::Result<()> {
-        decrement_gauge!("query_active_transactions", 1.0);
+        decrement_gauge!("prisma_client_queries_active", 1.0);
         self.connection
             .session
             .commit_transaction()
@@ -50,7 +50,7 @@ impl<'conn> Transaction for MongoDbTransaction<'conn> {
     }
 
     async fn rollback(&mut self) -> connector_interface::Result<()> {
-        decrement_gauge!("query_active_transactions", 1.0);
+        decrement_gauge!("prisma_client_queries_active", 1.0);
         self.connection
             .session
             .abort_transaction()

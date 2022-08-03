@@ -163,7 +163,7 @@ impl InputField {
 #[derive(Clone)]
 pub enum InputType {
     Scalar(ScalarType),
-    Enum(EnumTypeRef),
+    Enum(EnumTypeWeakRef),
     List(Box<InputType>),
     Object(InputObjectTypeWeakRef),
 }
@@ -254,7 +254,7 @@ impl InputType {
         InputType::Scalar(ScalarType::Null)
     }
 
-    pub fn enum_type(containing: EnumTypeRef) -> InputType {
+    pub fn enum_type(containing: EnumTypeWeakRef) -> InputType {
         InputType::Enum(containing)
     }
 

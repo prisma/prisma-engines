@@ -346,7 +346,12 @@ impl QueryEngine {
                 let input: TxInput = serde_json::from_str(&input)?;
                 match engine
                     .executor()
-                    .start_tx(engine.query_schema().clone(), input.max_wait, input.timeout)
+                    .start_tx(
+                        engine.query_schema().clone(),
+                        input.max_wait,
+                        input.timeout,
+                        input.isolation_level,
+                    )
                     .instrument(span)
                     .await
                 {

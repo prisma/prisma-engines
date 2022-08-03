@@ -1,0 +1,62 @@
+datasource mdb {
+  provider = "mongodb"
+  url = env("TESTDBURL")
+}
+
+type A {
+    pk String @id
+    field Int @unique
+    content String
+    other Float
+    rank Int
+
+    @@id([pk])
+    @@fulltext([content])
+    @@index([other, field])
+    @@unique([content, rank])
+}
+
+model B {
+    id Int @id @map("_id")
+    a  A
+}
+
+
+// [1;91merror[0m: [1mError validating: Defining `@id` attribute for a field in a composite type is not allowed.[0m
+//   [1;94m-->[0m  [4mschema.prisma:7[0m
+// [1;94m   | [0m
+// [1;94m 6 | [0mtype A {
+// [1;94m 7 | [0m    [1;91mpk String @id[0m
+// [1;94m 8 | [0m    field Int @unique
+// [1;94m   | [0m
+// [1;91merror[0m: [1mError validating: Defining `@unique` attribute for a field in a composite type is not allowed.[0m
+//   [1;94m-->[0m  [4mschema.prisma:8[0m
+// [1;94m   | [0m
+// [1;94m 7 | [0m    pk String @id
+// [1;94m 8 | [0m    [1;91mfield Int @unique[0m
+// [1;94m 9 | [0m    content String
+// [1;94m   | [0m
+// [1;91merror[0m: [1mError validating: A composite type cannot define an id.[0m
+//   [1;94m-->[0m  [4mschema.prisma:13[0m
+// [1;94m   | [0m
+// [1;94m12 | [0m
+// [1;94m13 | [0m    [1;91m@@id([pk])[0m
+// [1;94m   | [0m
+// [1;91merror[0m: [1mError validating: A fulltext index should be defined in the model containing the embed.[0m
+//   [1;94m-->[0m  [4mschema.prisma:14[0m
+// [1;94m   | [0m
+// [1;94m13 | [0m    @@id([pk])
+// [1;94m14 | [0m    [1;91m@@fulltext([content])[0m
+// [1;94m   | [0m
+// [1;91merror[0m: [1mError validating: An index should be defined in the model containing the embed.[0m
+//   [1;94m-->[0m  [4mschema.prisma:15[0m
+// [1;94m   | [0m
+// [1;94m14 | [0m    @@fulltext([content])
+// [1;94m15 | [0m    [1;91m@@index([other, field])[0m
+// [1;94m   | [0m
+// [1;91merror[0m: [1mError validating: A unique constraint should be defined in the model containing the embed.[0m
+//   [1;94m-->[0m  [4mschema.prisma:16[0m
+// [1;94m   | [0m
+// [1;94m15 | [0m    @@index([other, field])
+// [1;94m16 | [0m    [1;91m@@unique([content, rank])[0m
+// [1;94m   | [0m

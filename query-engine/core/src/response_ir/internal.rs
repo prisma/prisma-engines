@@ -497,7 +497,7 @@ fn serialize_composite(cf: &CompositeFieldRef, out_field: &OutputFieldRef, value
 fn serialize_scalar(field: &OutputFieldRef, value: PrismaValue) -> crate::Result<Item> {
     match (&value, field.field_type.as_ref()) {
         (PrismaValue::Null, _) if field.is_nullable => Ok(Item::Value(PrismaValue::Null)),
-        (_, OutputType::Enum(et)) => match et.borrow() {
+        (_, OutputType::Enum(et)) => match *et.into_arc() {
             EnumType::Database(ref db) => convert_enum(value, db),
             _ => unreachable!(),
         },
@@ -513,7 +513,7 @@ fn serialize_scalar(field: &OutputFieldRef, value: PrismaValue) -> crate::Result
             OutputType::Enum(et) => {
                 let items = unwrap_prisma_value(value)
                     .into_iter()
-                    .map(|v| match et.borrow() {
+                    .map(|v| match *et.into_arc() {
                         EnumType::Database(ref dbt) => convert_enum(v, dbt),
                         _ => unreachable!(),
                     })
@@ -582,13 +582,15 @@ fn convert_enum(value: PrismaValue, dbt: &DatabaseEnumType) -> Result<Item, Core
             Some(inum) => Ok(Item::Value(inum)),
             None => Err(CoreError::SerializationError(format!(
                 "Value '{}' not found in enum '{}'",
-                s, dbt.name
+                s,
+                dbt.identifier().name()
             ))),
         },
 
         val => Err(CoreError::SerializationError(format!(
             "Attempted to serialize non-enum-compatible value '{}' for enum '{}'",
-            val, dbt.name
+            val,
+            dbt.identifier().name()
         ))),
     }
 }
