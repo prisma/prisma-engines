@@ -218,7 +218,7 @@ fn invalid_name_for_compound_id_must_error() {
         [1;94m   | [0m
     "#]];
 
-    expect_error(&dml, &expectation)
+    expect_error(dml, &expectation)
 }
 
 #[test]
@@ -343,7 +343,7 @@ fn naming_id_to_a_field_name_should_error() {
         [1;94m   | [0m
     "#]];
 
-    expect_error(&dml, &expectation)
+    expect_error(dml, &expectation)
 }
 
 #[test]

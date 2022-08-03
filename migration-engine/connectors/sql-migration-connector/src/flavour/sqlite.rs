@@ -7,14 +7,13 @@ use migration_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult,
 };
 use sql_schema_describer::SqlSchema;
-use std::{future, path::Path};
+use std::path::Path;
 
 type State = super::State<Params, Connection>;
 
 struct Params {
     connector_params: ConnectorParams,
     file_path: String,
-    attached_name: String,
 }
 
 pub(crate) struct SqliteFlavour {
@@ -47,9 +46,9 @@ impl SqlFlavour for SqliteFlavour {
         migration_name: &'a str,
         script: &'a str,
     ) -> BoxFuture<'a, ConnectorResult<()>> {
-        with_connection(&mut self.state, move |_params, connection| async move {
-            generic_apply_migration_script(migration_name, script, connection).await
-        })
+        ready(with_connection(&mut self.state, move |_params, connection| {
+            generic_apply_migration_script(migration_name, script, connection)
+        }))
     }
 
     fn connection_string(&self) -> Option<&str> {
@@ -102,8 +101,9 @@ impl SqlFlavour for SqliteFlavour {
     }
 
     fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
-        with_connection(&mut self.state, |params, connection| async move {
-            connection.describe_schema(params).await
+        Box::pin(async move {
+            let schema = with_connection(&mut self.state, |_, conn| Ok(Box::pin(conn.describe_schema())))?.await?;
+            Ok(schema)
         })
     }
 
@@ -113,7 +113,7 @@ impl SqlFlavour for SqliteFlavour {
         let ret = std::fs::remove_file(file_path).map_err(|err| {
             ConnectorError::from_msg(format!("Failed to delete SQLite database at `{}`.\n{}", file_path, err))
         });
-        Box::pin(std::future::ready(ret))
+        ready(ret)
     }
 
     fn drop_migrations_table(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
@@ -140,16 +140,96 @@ impl SqlFlavour for SqliteFlavour {
             Err(err) => Err(ConnectorError::from_source(err, "Failed to open SQLite database.")),
         };
 
-        Box::pin(future::ready(result))
+        ready(result)
+    }
+
+    fn load_migrations_table(
+        &mut self,
+    ) -> BoxFuture<
+        '_,
+        ConnectorResult<
+            Result<Vec<migration_connector::MigrationRecord>, migration_connector::PersistenceNotInitializedError>,
+        >,
+    > {
+        const SQL: &str = indoc! {r#"
+            SELECT
+                id,
+                checksum,
+                finished_at,
+                migration_name,
+                logs,
+                rolled_back_at,
+                started_at,
+                applied_steps_count
+            FROM `_prisma_migrations`
+            ORDER BY `started_at` ASC
+        "#};
+        ready(with_connection(&mut self.state, |_, conn| {
+            let rows = match conn.query_raw(SQL, &[]) {
+                Ok(result) => result,
+                Err(err) => {
+                    if let Some(rusqlite::Error::SqliteFailure(
+                        rusqlite::ffi::Error {
+                            extended_code: 1, // table not found
+                            ..
+                        },
+                        _,
+                    )) = err.source_as::<rusqlite::Error>()
+                    {
+                        return Ok(Err(migration_connector::PersistenceNotInitializedError));
+                    } else {
+                        return Err(err);
+                    }
+                }
+            };
+
+            let rows = rows
+                .into_iter()
+                .map(|row| -> ConnectorResult<_> {
+                    Ok(migration_connector::MigrationRecord {
+                        id: row.get("id").and_then(|v| v.to_string()).ok_or_else(|| {
+                            ConnectorError::from_msg("Failed to extract `id` from `_prisma_migrations` row.".into())
+                        })?,
+                        checksum: row.get("checksum").and_then(|v| v.to_string()).ok_or_else(|| {
+                            ConnectorError::from_msg(
+                                "Failed to extract `checksum` from `_prisma_migrations` row.".into(),
+                            )
+                        })?,
+                        finished_at: row.get("finished_at").and_then(|v| v.as_datetime()),
+                        migration_name: row.get("migration_name").and_then(|v| v.to_string()).ok_or_else(|| {
+                            ConnectorError::from_msg(
+                                "Failed to extract `migration_name` from `_prisma_migrations` row.".into(),
+                            )
+                        })?,
+                        logs: None,
+                        rolled_back_at: row.get("rolled_back_at").and_then(|v| v.as_datetime()),
+                        started_at: row.get("started_at").and_then(|v| v.as_datetime()).ok_or_else(|| {
+                            ConnectorError::from_msg(
+                                "Failed to extract `started_at` from `_prisma_migrations` row.".into(),
+                            )
+                        })?,
+                        applied_steps_count: row.get("applied_steps_count").and_then(|v| v.as_integer()).ok_or_else(
+                            || {
+                                ConnectorError::from_msg(
+                                    "Failed to extract `applied_steps_count` from `_prisma_migrations` row.".into(),
+                                )
+                            },
+                        )? as u32,
+                    })
+                })
+                .collect::<Result<Vec<_>, _>>()?;
+
+            tracing::debug!("Found {} migrations in the migrations table.", rows.len());
+
+            Ok(Ok(rows))
+        }))
     }
 
     fn query<'a>(
         &'a mut self,
         query: quaint::ast::Query<'a>,
     ) -> BoxFuture<'a, ConnectorResult<quaint::prelude::ResultSet>> {
-        with_connection(&mut self.state, |params, conn| async {
-            conn.query(query, params).await
-        })
+        ready(with_connection(&mut self.state, |_, conn| conn.query(query)))
     }
 
     fn query_raw<'a>(
@@ -158,42 +238,37 @@ impl SqlFlavour for SqliteFlavour {
         params: &'a [quaint::Value<'a>],
     ) -> BoxFuture<'a, ConnectorResult<quaint::prelude::ResultSet>> {
         tracing::debug!(sql, params = ?params, query_type = "query_raw");
-        with_connection(&mut self.state, |conn_params, conn: &mut Connection| async {
-            conn.query_raw(sql, params, conn_params).await
-        })
+        ready(with_connection(&mut self.state, |_, conn| conn.query_raw(sql, params)))
     }
 
     fn raw_cmd<'a>(&'a mut self, sql: &'a str) -> BoxFuture<'a, ConnectorResult<()>> {
-        with_connection(&mut self.state, |params, conn| async {
-            conn.raw_cmd(sql, params).await
-        })
+        ready(with_connection(&mut self.state, |_, conn| conn.raw_cmd(sql)))
     }
 
     fn reset(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
-        with_connection(&mut self.state, move |params, connection| async move {
+        ready(with_connection(&mut self.state, move |params, connection| {
             let file_path = &params.file_path;
 
-            connection.raw_cmd("PRAGMA main.locking_mode=NORMAL", params).await?;
-            connection.raw_cmd("PRAGMA main.quick_check", params).await?;
+            connection.raw_cmd("PRAGMA main.locking_mode=NORMAL")?;
+            connection.raw_cmd("PRAGMA main.quick_check")?;
 
             tracing::debug!("Truncating {:?}", file_path);
             std::fs::File::create(file_path).expect("failed to truncate sqlite file");
 
-            acquire_lock(connection, params).await?;
+            acquire_lock(connection)?;
 
             Ok(())
-        })
+        }))
     }
 
     fn set_params(&mut self, params: ConnectorParams) -> ConnectorResult<()> {
-        let quaint::connector::SqliteParams { file_path, db_name, .. } =
+        let quaint::connector::SqliteParams { file_path, .. } =
             quaint::connector::SqliteParams::try_from(params.connection_string.as_str())
                 .map_err(ConnectorError::url_parse_error)?;
 
         self.state.set_params(Params {
             connector_params: params,
             file_path,
-            attached_name: db_name,
         });
         Ok(())
     }
@@ -207,16 +282,6 @@ impl SqlFlavour for SqliteFlavour {
         Box::pin(async move {
             tracing::debug!("Applying migrations to temporary in-memory SQLite database.");
             let mut shadow_db_conn = Connection::new_in_memory();
-            let shadow_db_params = Params {
-                connector_params: ConnectorParams {
-                    connection_string: String::new(),
-                    preview_features: Default::default(),
-                    shadow_database_connection_string: None,
-                },
-                file_path: String::new(),
-                attached_name: String::new(),
-            };
-
             for migration in migrations {
                 let script = migration.read_migration_script()?;
 
@@ -225,43 +290,44 @@ impl SqlFlavour for SqliteFlavour {
                     migration.migration_name()
                 );
 
-                shadow_db_conn
-                    .raw_cmd(&script, &shadow_db_params)
-                    .await
-                    .map_err(|connector_error| {
-                        connector_error.into_migration_does_not_apply_cleanly(migration.migration_name().to_owned())
-                    })?;
+                shadow_db_conn.raw_cmd(&script).map_err(|connector_error| {
+                    connector_error.into_migration_does_not_apply_cleanly(migration.migration_name().to_owned())
+                })?;
             }
 
-            let sql_schema = shadow_db_conn.describe_schema(&shadow_db_params).await?;
-
-            Ok(sql_schema)
+            shadow_db_conn.describe_schema().await
         })
     }
 
     fn version(&mut self) -> BoxFuture<'_, ConnectorResult<Option<String>>> {
-        Box::pin(future::ready(Ok(Some(quaint::connector::sqlite_version().to_owned()))))
+        ready(Ok(Some(quaint::connector::sqlite_version().to_owned())))
     }
 }
 
-async fn acquire_lock(connection: &mut Connection, params: &Params) -> ConnectorResult<()> {
-    connection.raw_cmd("PRAGMA main.locking_mode=EXCLUSIVE", params).await
+fn acquire_lock(connection: &mut Connection) -> ConnectorResult<()> {
+    connection.raw_cmd("PRAGMA main.locking_mode=EXCLUSIVE")
 }
 
-fn with_connection<'a, O, F, C>(state: &'a mut State, f: C) -> BoxFuture<'a, ConnectorResult<O>>
+fn with_connection<'a, O, C>(state: &'a mut State, f: C) -> ConnectorResult<O>
 where
-    O: 'a,
-    F: future::Future<Output = ConnectorResult<O>> + Send + 'a,
-    C: (FnOnce(&'a mut Params, &'a mut Connection) -> F) + Send + 'a,
+    O: 'a + Send,
+    C: (FnOnce(&'a mut Params, &'a mut Connection) -> ConnectorResult<O>) + Send + Sync + 'a,
 {
     match state {
         super::State::Initial => panic!("logic error: Initial"),
-        super::State::Connected(p, c) => Box::pin(f(p, c)),
-        state @ super::State::WithParams(_) => Box::pin(async move {
-            state
-                .try_connect(|params| Box::pin(std::future::ready(Connection::new(params))))
-                .await?;
-            with_connection(state, f).await
-        }),
+        super::State::Connected(p, c) => f(p, c),
+        super::State::WithParams(p) => {
+            let conn = Connection::new(p)?;
+            let params = match std::mem::replace(state, super::State::Initial) {
+                super::State::WithParams(p) => p,
+                _ => unreachable!(),
+            };
+            *state = super::State::Connected(params, conn);
+            with_connection(state, f)
+        }
     }
+}
+
+fn ready<O: Send + Sync + 'static>(output: O) -> BoxFuture<'static, O> {
+    Box::pin(std::future::ready(output))
 }

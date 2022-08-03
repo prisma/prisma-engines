@@ -3,7 +3,7 @@ use quaint::prelude::{ConnectionInfo, Queryable, SqlFamily};
 use sql_schema_describer::{postgres::Circumstances, SqlSchemaDescriberBackend};
 
 pub async fn load_describer<'a>(
-    connection: &'a dyn Queryable,
+    connection: &'a quaint::single::Quaint,
     connection_info: &ConnectionInfo,
     provider: Option<&str>,
 ) -> Result<Box<dyn SqlSchemaDescriberBackend + 'a>, crate::SqlError> {
