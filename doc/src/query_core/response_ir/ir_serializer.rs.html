@@ -80,7 +80,7 @@
 
 <span class="kw">impl</span> <span class="ident">IrSerializer</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">result</span>: <span class="ident">ExpressionResult</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResponseData</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">_span</span> <span class="op">=</span> <span class="macro">info_span!</span>(<span class="string">&quot;engine:serialize&quot;</span>);
+        <span class="kw">let</span> <span class="ident">_span</span> <span class="op">=</span> <span class="macro">info_span!</span>(<span class="string">&quot;prisma:engine:serialize&quot;</span>, <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>);
         <span class="kw">match</span> <span class="ident">result</span> {
             <span class="ident">ExpressionResult::Query</span>(<span class="ident">QueryResult::Json</span>(<span class="ident">json</span>)) =&gt; {
                 <span class="prelude-val">Ok</span>(<span class="ident">ResponseData::new</span>(<span class="self">self</span>.<span class="ident">key</span>.<span class="ident">clone</span>(), <span class="ident">Item::Json</span>(<span class="ident">json</span>)))

@@ -450,7 +450,7 @@
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_single</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">operation</span>: <span class="kw-2">&amp;</span><span class="ident">Operation</span>, <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResponseData</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(<span class="string">&quot;prisma:itx_query_builder&quot;</span>, <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>);
+        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(<span class="string">&quot;prisma:engine:itx_query_builder&quot;</span>, <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>);
         <span class="ident">set_span_link_from_trace_id</span>(<span class="kw-2">&amp;</span><span class="ident">span</span>, <span class="ident">trace_id</span>.<span class="ident">clone</span>());
 
         <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cached_tx</span>.<span class="ident">as_open</span>()<span class="question-mark">?</span>;
@@ -469,7 +469,7 @@
         <span class="ident">operations</span>: <span class="kw-2">&amp;</span>[<span class="ident">Operation</span>],
         <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResponseData</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(<span class="string">&quot;prisma:itx_execute&quot;</span>, <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>);
+        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(<span class="string">&quot;prisma:engine:itx_execute&quot;</span>, <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>);
 
         <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cached_tx</span>.<span class="ident">as_open</span>()<span class="question-mark">?</span>;
         <span class="ident">execute_many_operations</span>(

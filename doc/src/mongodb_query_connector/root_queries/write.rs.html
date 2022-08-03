@@ -511,7 +511,7 @@
     <span class="kw">let</span> <span class="ident">coll</span> <span class="op">=</span> <span class="ident">database</span>.<span class="ident">collection</span>::<span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>(<span class="ident">model</span>.<span class="ident">db_name</span>());
 
     <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(
-        <span class="string">&quot;prisma:db_query&quot;</span>,
+        <span class="string">&quot;prisma:engine:db_query&quot;</span>,
         <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>,
         <span class="string">&quot;db.statement&quot;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;db.{}.insertOne(*)&quot;</span>, <span class="ident">coll</span>.<span class="ident">name</span>())
     );
@@ -564,7 +564,7 @@
     <span class="kw">let</span> <span class="ident">coll</span> <span class="op">=</span> <span class="ident">database</span>.<span class="ident">collection</span>::<span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>(<span class="ident">model</span>.<span class="ident">db_name</span>());
 
     <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(
-        <span class="string">&quot;prisma:db_query&quot;</span>,
+        <span class="string">&quot;prisma:engine:db_query&quot;</span>,
         <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>,
         <span class="string">&quot;db.statement&quot;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;db.{}.insertMany(*)&quot;</span>, <span class="ident">coll</span>.<span class="ident">name</span>())
     );
@@ -653,7 +653,7 @@
     }
 
     <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(
-        <span class="string">&quot;prisma:db_query&quot;</span>,
+        <span class="string">&quot;prisma:engine:db_query&quot;</span>,
         <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>,
         <span class="string">&quot;db.statement&quot;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;db.{}.updateMany(*)&quot;</span>, <span class="ident">coll</span>.<span class="ident">name</span>())
     );
@@ -725,7 +725,7 @@
     }
 
     <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(
-        <span class="string">&quot;prisma:db_query&quot;</span>,
+        <span class="string">&quot;prisma:engine:db_query&quot;</span>,
         <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>,
         <span class="string">&quot;db.statement&quot;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;db.{}.deleteMany(*)&quot;</span>, <span class="ident">coll</span>.<span class="ident">name</span>())
     );
@@ -750,7 +750,7 @@
     <span class="kw">let</span> <span class="ident">coll</span> <span class="op">=</span> <span class="ident">database</span>.<span class="ident">collection</span>::<span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>(<span class="ident">model</span>.<span class="ident">db_name</span>());
 
     <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(
-        <span class="string">&quot;prisma:db_query&quot;</span>,
+        <span class="string">&quot;prisma:engine:db_query&quot;</span>,
         <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>,
         <span class="string">&quot;db.statement&quot;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;db.{}.findMany(*)&quot;</span>, <span class="ident">coll</span>.<span class="ident">name</span>())
     );
@@ -899,7 +899,7 @@
 ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">db_statement</span> <span class="op">=</span> <span class="ident">get_raw_db_statement</span>(<span class="kw-2">&amp;</span><span class="ident">query_type</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>, <span class="ident">database</span>);
     <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(
-        <span class="string">&quot;prisma:db_query&quot;</span>,
+        <span class="string">&quot;prisma:engine:db_query&quot;</span>,
         <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>,
         <span class="string">&quot;db.statement&quot;</span> <span class="op">=</span> <span class="op">&amp;&amp;</span><span class="ident">db_statement</span>.<span class="ident">as_str</span>()
     );

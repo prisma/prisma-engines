@@ -120,7 +120,7 @@
 
     <span class="doccomment">/// Maps an operation to a query.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>, <span class="ident">operation</span>: <span class="ident">Operation</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>(<span class="ident">QueryGraph</span>, <span class="ident">IrSerializer</span>)<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">_span</span> <span class="op">=</span> <span class="macro">info_span!</span>(<span class="string">&quot;engine:build_graph&quot;</span>);
+        <span class="kw">let</span> <span class="ident">_span</span> <span class="op">=</span> <span class="macro">info_span!</span>(<span class="string">&quot;prisma:engine:build_graph&quot;</span>);
         <span class="kw">match</span> <span class="ident">operation</span> {
             <span class="ident">Operation::Read</span>(<span class="ident">selection</span>) =&gt; <span class="self">self</span>.<span class="ident">build_internal</span>(<span class="ident">selection</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">query_schema</span>.<span class="ident">query</span>()),
             <span class="ident">Operation::Write</span>(<span class="ident">selection</span>) =&gt; <span class="self">self</span>.<span class="ident">build_internal</span>(<span class="ident">selection</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">query_schema</span>.<span class="ident">mutation</span>()),
