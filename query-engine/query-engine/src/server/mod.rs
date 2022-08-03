@@ -357,7 +357,7 @@ async fn transaction_start_handler(state: State, req: Request<Body>) -> Result<R
     let full_body = hyper::body::to_bytes(body_start).await?;
     let input: TxInput = serde_json::from_slice(full_body.as_ref()).unwrap();
 
-    let span = tracing::info_span!("prisma:itx_runner", user_facing = true, itx_id = field::Empty);
+    let span = tracing::info_span!("prisma:engine:itx_runner", user_facing = true, itx_id = field::Empty);
     span.set_parent(cx);
 
     match state

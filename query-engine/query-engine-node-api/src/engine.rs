@@ -340,7 +340,7 @@ impl QueryEngine {
             let dispatcher = self.logger.dispatcher();
 
             async move {
-                let span = tracing::info_span!("prisma:itx_runner", user_facing = true, itx_id = field::Empty);
+                let span = tracing::info_span!("prisma:engine:itx_runner", user_facing = true, itx_id = field::Empty);
                 set_parent_context_from_json_str(&span, &trace);
 
                 let input: TxInput = serde_json::from_str(&input)?;

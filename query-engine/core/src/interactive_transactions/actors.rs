@@ -72,7 +72,7 @@ impl ITXServer {
     }
 
     async fn execute_single(&mut self, operation: &Operation, trace_id: Option<String>) -> crate::Result<ResponseData> {
-        let span = info_span!("prisma:itx_query_builder", user_facing = true);
+        let span = info_span!("prisma:engine:itx_query_builder", user_facing = true);
 
         let conn = self.cached_tx.as_open()?;
         execute_single_operation(
@@ -90,7 +90,7 @@ impl ITXServer {
         operations: &[Operation],
         trace_id: Option<String>,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
-        let span = info_span!("prisma:itx_execute", user_facing = true);
+        let span = info_span!("prisma:engine:itx_execute", user_facing = true);
 
         let conn = self.cached_tx.as_open()?;
         execute_many_operations(
