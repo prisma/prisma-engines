@@ -3,7 +3,7 @@ use datamodel::common::preview_features::PreviewFeature;
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{header::CONTENT_TYPE, Body, HeaderMap, Method, Request, Response, Server, StatusCode};
 use opentelemetry::{global, propagation::Extractor, Context};
-use query_core::{schema::QuerySchemaRenderer, TxId};
+use query_core::{schema::QuerySchemaRenderer, set_parent_context_from_json_str, TxId};
 use query_core::{MetricFormat, MetricRegistry};
 use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlHandler, TxInput};
 use serde_json::json;
@@ -64,6 +64,9 @@ pub async fn setup(opts: &PrismaOpt, metrics: MetricRegistry) -> PrismaResult<St
     let config = opts.configuration(false)?.subject;
     config.validate_that_one_datasource_is_provided()?;
 
+    let span = tracing::info_span!("prisma:engine:connect", user_facing = true);
+    let _ = set_parent_context_from_json_str(&span, &(opts.tracing_headers));
+
     let enable_itx = config
         .preview_features()
         .contains(PreviewFeature::InteractiveTransactions);
@@ -75,6 +78,7 @@ pub async fn setup(opts: &PrismaOpt, metrics: MetricRegistry) -> PrismaResult<St
         .set_metrics(metrics)
         .enable_raw_queries(opts.enable_raw_queries)
         .build()
+        .instrument(span)
         .await?;
 
     let state = State::new(
@@ -190,7 +194,7 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
 
     let span = if tx_id.is_none() {
         let cx = get_parent_span_context(&req);
-        let span = info_span!("prisma:query_builder", user_facing = true);
+        let span = info_span!("prisma:engine", user_facing = true);
         span.set_parent(cx);
         span
     } else {
@@ -353,7 +357,7 @@ async fn transaction_start_handler(state: State, req: Request<Body>) -> Result<R
     let full_body = hyper::body::to_bytes(body_start).await?;
     let input: TxInput = serde_json::from_slice(full_body.as_ref()).unwrap();
 
-    let span = tracing::info_span!("prisma:itx_runner", user_facing = true, itx_id = field::Empty);
+    let span = tracing::info_span!("prisma:engine:itx_runner", user_facing = true, itx_id = field::Empty);
     span.set_parent(cx);
 
     match state
