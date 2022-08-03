@@ -206,7 +206,7 @@ impl QueryEngine {
 
         async_panic_to_js_error(async {
             let span = tracing::info_span!("prisma:engine:connect", user_facing = true);
-            let _ = set_parent_context_from_json_str(&span, trace);
+            let _ = set_parent_context_from_json_str(&span, &trace);
 
             let mut inner = self.inner.write().await;
             let builder = inner.as_builder()?;
@@ -269,7 +269,7 @@ impl QueryEngine {
 
         async_panic_to_js_error(async {
             let span = tracing::info_span!("prisma:engine:disconnect", user_facing = true);
-            let _ = set_parent_context_from_json_str(&span, trace);
+            let _ = set_parent_context_from_json_str(&span, &trace);
 
             async {
                 let mut inner = self.inner.write().await;
@@ -310,7 +310,7 @@ impl QueryEngine {
             async move {
                 let (span, trace_id) = if tx_id.is_none() {
                     let span = tracing::info_span!("prisma:engine", user_facing = true);
-                    let trace_id = set_parent_context_from_json_str(&span, trace);
+                    let trace_id = set_parent_context_from_json_str(&span, &trace);
                     (span, trace_id)
                 } else {
                     (Span::none(), None)
@@ -341,7 +341,7 @@ impl QueryEngine {
 
             async move {
                 let span = tracing::info_span!("prisma:itx_runner", user_facing = true, itx_id = field::Empty);
-                set_parent_context_from_json_str(&span, trace);
+                set_parent_context_from_json_str(&span, &trace);
 
                 let input: TxInput = serde_json::from_str(&input)?;
                 match engine

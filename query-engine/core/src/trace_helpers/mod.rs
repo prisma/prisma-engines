@@ -59,8 +59,8 @@ fn span_to_json(span: &SpanData) -> Value {
 }
 
 // set the parent context and return the traceparent
-pub fn set_parent_context_from_json_str(span: &Span, trace: String) -> Option<String> {
-    let trace: HashMap<String, String> = serde_json::from_str(&trace).unwrap_or_default();
+pub fn set_parent_context_from_json_str(span: &Span, trace: &str) -> Option<String> {
+    let trace: HashMap<String, String> = serde_json::from_str(trace).unwrap_or_default();
     let trace_id = trace.get("traceparent").map(String::from);
     let cx = opentelemetry::global::get_text_map_propagator(|propagator| propagator.extract(&trace));
     span.set_parent(cx);
