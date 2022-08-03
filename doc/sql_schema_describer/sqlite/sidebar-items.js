@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["SqlSchemaDescriber",""]]});
+initSidebarItems({"struct":[["SqlSchemaDescriber",""]],"trait":[["Connection",""]]});
