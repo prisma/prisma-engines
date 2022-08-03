@@ -55,7 +55,7 @@ pub fn render_test_datamodel(
         "#},
         tag.datamodel_provider(),
         tag.connection_string(test_database, config.is_ci()),
-        referential_integrity_override.unwrap_or(tag.referential_integrity().to_string()),
+        referential_integrity_override.unwrap_or_else(|| tag.referential_integrity().to_string()),
         preview_features
     );
 
