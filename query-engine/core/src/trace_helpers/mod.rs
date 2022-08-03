@@ -42,7 +42,7 @@ fn span_to_json(span: &SpanData) -> Value {
     // Override the name of quaint. It will be confusing for users to see quaint instead of
     // Prisma in the spans.
     let name: Cow<str> = match span.name {
-        Cow::Borrowed("quaint:query") => "prisma:db_query".into(),
+        Cow::Borrowed("quaint:query") => "prisma:engine:db_query".into(),
         _ => span.name.clone(),
     };
 
