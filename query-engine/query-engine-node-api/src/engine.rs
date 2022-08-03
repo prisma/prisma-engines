@@ -202,13 +202,14 @@ impl QueryEngine {
     /// Connect to the database, allow queries to be run.
     #[napi]
     pub async fn connect(&self, trace: String) -> napi::Result<()> {
-        let span = tracing::info_span!("prisma:engine:connect", user_facing = true);
-        let _ = set_parent_context_from_json_str(&span, trace);
+        let dispatcher = self.logger.dispatcher();
+
         async_panic_to_js_error(async {
+            let span = tracing::info_span!("prisma:engine:connect", user_facing = true);
+            let _ = set_parent_context_from_json_str(&span, trace);
+
             let mut inner = self.inner.write().await;
             let builder = inner.as_builder()?;
-
-            let dispatcher = self.logger.dispatcher();
 
             let engine = async move {
                 // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
@@ -248,41 +249,50 @@ impl QueryEngine {
                     metrics: self.logger.metrics(),
                 }) as crate::Result<ConnectedEngine>
             }
-            .with_subscriber(dispatcher)
+            .instrument(span)
             .await?;
 
             *inner = Inner::Connected(engine);
 
             Ok(())
         })
-        .instrument(span)
-        .await
+        .with_subscriber(dispatcher)
+        .await?;
+
+        Ok(())
     }
 
     /// Disconnect and drop the core. Can be reconnected later with `#connect`.
     #[napi]
     pub async fn disconnect(&self, trace: String) -> napi::Result<()> {
-        let span = tracing::info_span!("prisma:engine:disconnect", user_facing = true);
-        let _ = set_parent_context_from_json_str(&span, trace);
+        let dispatcher = self.logger.dispatcher();
+
         async_panic_to_js_error(async {
-            let mut inner = self.inner.write().await;
-            let engine = inner.as_engine()?;
+            let span = tracing::info_span!("prisma:engine:disconnect", user_facing = true);
+            let _ = set_parent_context_from_json_str(&span, trace);
 
-            let config = datamodel::parse_configuration(&engine.datamodel.raw)
-                .map_err(|errors| ApiError::conversion(errors, &engine.datamodel.raw))?;
+            async {
+                let mut inner = self.inner.write().await;
+                let engine = inner.as_engine()?;
 
-            let builder = EngineBuilder {
-                datamodel: engine.datamodel.clone(),
-                config,
-                config_dir: engine.config_dir.clone(),
-                env: engine.env.clone(),
-            };
+                let config = datamodel::parse_configuration(&engine.datamodel.raw)
+                    .map_err(|errors| ApiError::conversion(errors, &engine.datamodel.raw))?;
 
-            *inner = Inner::Builder(builder);
+                let builder = EngineBuilder {
+                    datamodel: engine.datamodel.clone(),
+                    config,
+                    config_dir: engine.config_dir.clone(),
+                    env: engine.env.clone(),
+                };
 
-            Ok(())
+                *inner = Inner::Builder(builder);
+
+                Ok(())
+            }
+            .instrument(span)
+            .await
         })
-        .instrument(span)
+        .with_subscriber(dispatcher)
         .await
     }
 
