@@ -1,0 +1,15 @@
+datasource mdb {
+  provider = "mongodb"
+  url = env("TESTDBURL")
+}
+
+type A {
+  name String @map("alias")
+}
+
+model B {
+  id Int @id @map("_id")
+  a  A
+}
+
+

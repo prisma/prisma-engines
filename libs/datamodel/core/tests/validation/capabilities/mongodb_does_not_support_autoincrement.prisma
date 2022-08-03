@@ -1,0 +1,16 @@
+datasource mydb {
+    provider = "mongodb"
+    url = env("TEST_DB_URL")
+}
+
+model User {
+  id Int @id @default(autoincrement()) @map("_id")
+}
+
+
+// [1;91merror[0m: [1mError parsing attribute "@default": The `autoincrement()` default value is used with a datasource that does not support it.[0m
+//   [1;94m-->[0m  [4mschema.prisma:7[0m
+// [1;94m   | [0m
+// [1;94m 6 | [0mmodel User {
+// [1;94m 7 | [0m  id Int @id [1;91m@default(autoincrement())[0m @map("_id")
+// [1;94m   | [0m

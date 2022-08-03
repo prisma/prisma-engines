@@ -1,5 +1,4 @@
 mod cockroachdb;
-mod mongodb;
 mod mysql;
 mod postgres;
 mod sqlite;
