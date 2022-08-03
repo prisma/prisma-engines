@@ -10,7 +10,7 @@ use tracing_opentelemetry::OpenTelemetrySpanExt;
 const ACCEPT_ATTRIBUTES: &[&str] = &["db.statement", "itx_id", "db.type"];
 
 pub static SHOW_ALL_TRACES: Lazy<bool> = Lazy::new(|| match std::env::var("PRISMA_SHOW_ALL_TRACES") {
-    Ok(enabled) => enabled.to_lowercase() == "true".to_string(),
+    Ok(enabled) => enabled.to_lowercase() == *("true"),
     Err(_) => false,
 });
 
