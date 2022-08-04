@@ -150,7 +150,7 @@ mod failure {
 
     /// Json alphanumeric filters don't allow referencing other columns for now because
     /// we can't make it work both for MySQL and MariaDB without making MariaDB its own connector.
-    #[connector_test(schema(schemas::json), only(MySql))]
+    #[connector_test(schema(schemas::json), only(MySql(5.7, 8, "mariadb")))]
     async fn alphanumeric_json_filter_fails(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
