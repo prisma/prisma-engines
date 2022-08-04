@@ -97,7 +97,7 @@ mod json_filters {
         Ok(())
     }
 
-    #[connector_test(schema(pg_json), capabilities(JsonFilteringArrayPath))]
+    #[connector_test(schema(pg_json), capabilities(JsonFilteringArrayPath), exclude(CockroachDb))]
     async fn extract_array_path_pg_json(runner: Runner) -> TestResult<()> {
         extract_array_path_runner(runner).await?;
 

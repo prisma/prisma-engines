@@ -87,7 +87,7 @@ mod failure {
 
     // Exclude connectors that supports `ScalarLists`
     #[connector_test(schema(schema), exclude(MongoDb, Postgres, CockroachDb))]
-    async fn cannot_reference_in_not_in_filter(runner: Runner) -> TestResult<()> {
+    async fn field_ref_inclusion_filter_fails(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
             r#"{ findManyTestModel(where: { str: { in: { _ref: "smth" } } }) { id } }"#,
@@ -138,13 +138,25 @@ mod failure {
 
     #[connector_test(schema(setup::mixed_composite_types), capabilities(CompositeTypes))]
     async fn referencing_composite_field_fails(runner: Runner) -> TestResult<()> {
-        setup::test_data_mixed_composite(&runner).await?;
-
         assert_error!(
             runner,
             r#"query { findManyTestModel(where: { comp: { equals: { _ref: "comp" } } }) { id }}"#,
             2009,
             "`Query.findManyTestModel.where.TestModelWhereInput.comp.CompositeNullableCompositeFilter.equals`: Unable to match input value to any allowed input type for the field"
+        );
+
+        Ok(())
+    }
+
+    /// Json alphanumeric filters don't allow referencing other columns for now because
+    /// we can't make it work both for MySQL and MariaDB without making MariaDB its own connector.
+    #[connector_test(schema(schemas::json), only(MySql))]
+    async fn alphanumeric_json_filter_fails(runner: Runner) -> TestResult<()> {
+        assert_error!(
+            runner,
+            r#"query { findManyTestModel(where: { json: { gt: { _ref: "json" } } }) { id }}"#,
+            2009,
+            "Failed to validate the query: `Value types mismatch."
         );
 
         Ok(())

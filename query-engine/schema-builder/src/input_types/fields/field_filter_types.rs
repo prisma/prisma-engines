@@ -435,7 +435,12 @@ fn inclusion_filters(
 }
 
 fn alphanumeric_filters(ctx: &mut BuilderContext, mapped_type: InputType) -> impl Iterator<Item = InputField> {
-    let field_types = mapped_type.with_field_ref_input(ctx);
+    // We disable alphanumeric json filters on field reference for MySQL & MariaDB because we can't make it work
+    // for both connectors without making MariaDB its own connector.
+    let field_types = mapped_type.with_field_ref_input_if(
+        ctx,
+        ctx.has_capability(ConnectorCapability::JsonFilteringAlphanumericFieldRef),
+    );
 
     vec![
         input_field(filters::LOWER_THAN, field_types.clone(), None).optional(),

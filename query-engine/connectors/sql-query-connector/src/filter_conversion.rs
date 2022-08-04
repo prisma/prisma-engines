@@ -515,7 +515,7 @@ fn convert_json_filter(
             .and(filter_json_type(expr_json, value))
             .into(),
         // Those conditions are unreachable because json filters are not accessible via the lowercase `not`.
-        // They can only be inverted via the uppercase `NOT`, which doesn't invert filters but only renders a SQL `NOT`.
+        // They can only be inverted via the uppercase `NOT`, which doesn't invert filters but adds a Filter::Not().
         ScalarCondition::NotContains(_) => unreachable!(),
         ScalarCondition::NotStartsWith(_) => unreachable!(),
         ScalarCondition::NotEndsWith(_) => unreachable!(),

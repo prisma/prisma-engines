@@ -38,8 +38,7 @@ mod json_filter {
         Ok(())
     }
 
-    // Then move on with path & string/array contains/startsWith/endsWith
-    #[connector_test(schema(schema), capabilities(JsonFilteringAlphanumeric))]
+    #[connector_test(schema(schema), capabilities(JsonFilteringAlphanumericFieldRef))]
     async fn numeric_comparison_filters(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
 

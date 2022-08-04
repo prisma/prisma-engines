@@ -97,6 +97,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::JsonFiltering,
     ConnectorCapability::JsonFilteringArrayPath,
     ConnectorCapability::JsonFilteringAlphanumeric,
+    ConnectorCapability::JsonFilteringAlphanumericFieldRef,
     ConnectorCapability::MultiSchema,
     ConnectorCapability::NamedForeignKeys,
     ConnectorCapability::NamedPrimaryKeys,
