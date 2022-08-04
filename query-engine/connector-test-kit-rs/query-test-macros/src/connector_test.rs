@@ -71,6 +71,14 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
         })
         .collect();
 
+    let referential_override = match args.referential_integrity {
+        Some(ref_override) => {
+            let wat = ref_override.to_string();
+            quote! { Some(#wat.to_string()) }
+        }
+        None => quote! { None },
+    };
+
     // The actual test is a shell function that gets the name of the original function,
     // which is then calling `{orig_name}_run` in the end (see `runner_fn_ident`).
     let test = quote! {
@@ -87,7 +95,7 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
 
             if ConnectorTag::should_run(&config, &enabled_connectors, &capabilities, #test_name) {
                 let template = #handler();
-                let datamodel = query_tests_setup::render_test_datamodel(config, #test_database, template, #excluded_features);
+                let datamodel = query_tests_setup::render_test_datamodel(config, #test_database, template, #excluded_features, #referential_override);
                 let connector = config.test_connector_tag().unwrap();
                 let metrics = query_tests_setup::setup_metrics();
                 let metrics_for_subscriber = metrics.clone();
