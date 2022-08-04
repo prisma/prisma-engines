@@ -309,7 +309,7 @@ impl QueryEngine {
 
             async move {
                 let span = if tx_id.is_none() {
-                    tracing::info_span!("prisma:engine:query_builder", user_facing = true)
+                    tracing::info_span!("prisma:engine", user_facing = true)
                 } else {
                     Span::none()
                 };
