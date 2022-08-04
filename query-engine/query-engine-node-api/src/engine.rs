@@ -308,13 +308,13 @@ impl QueryEngine {
             let dispatcher = self.logger.dispatcher();
 
             async move {
-                let (span, trace_id) = if tx_id.is_none() {
-                    let span = tracing::info_span!("prisma:engine", user_facing = true);
-                    let trace_id = set_parent_context_from_json_str(&span, &trace);
-                    (span, trace_id)
+                let span = if tx_id.is_none() {
+                    tracing::info_span!("prisma:engine", user_facing = true)
                 } else {
-                    (Span::none(), None)
+                    Span::none()
                 };
+
+                let trace_id = set_parent_context_from_json_str(&span, &trace);
 
                 let handler = GraphQlHandler::new(engine.executor(), engine.query_schema());
                 let response = handler
