@@ -20,7 +20,7 @@ pub async fn get_single_record<'conn>(
     let coll = database.collection(model.db_name());
 
     let span = info_span!(
-        "prisma:engine:db_query",
+        "prisma:db_query",
         user_facing = true,
         "db.statement" = &format_args!("db.{}.findOne(*)", coll.name())
     );
@@ -66,7 +66,7 @@ pub async fn get_many_records<'conn>(
     let coll = database.collection(model.db_name());
 
     let span = info_span!(
-        "prisma:engine:db_query",
+        "prisma:db_query",
         user_facing = true,
         "db.statement" = &format_args!("db.{}.findMany(*)", coll.name())
     );

@@ -225,7 +225,7 @@ impl<'conn> QueryInterpreter<'conn> {
                 match *query {
                     Query::Read(read) => {
                         self.log_line(level, || format!("READ {}", read));
-                        let span = info_span!("prisma:engine:read-execute");
+                        let span = info_span!("engine:read-execute");
                         Ok(read::execute(self.conn, read, None, trace_id)
                             .instrument(span)
                             .await
@@ -234,7 +234,7 @@ impl<'conn> QueryInterpreter<'conn> {
 
                     Query::Write(write) => {
                         self.log_line(level, || format!("WRITE {}", write));
-                        let span = info_span!("prisma:engine:write-execute");
+                        let span = info_span!("engine:write-execute");
                         Ok(write::execute(self.conn, write, trace_id)
                             .instrument(span)
                             .await

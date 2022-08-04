@@ -22,7 +22,7 @@ impl<'conn> QueryPipeline<'conn> {
         let serializer = self.serializer;
         let expr = Expressionista::translate(self.graph)?;
 
-        let span = info_span!("prisma:engine:interpret");
+        let span = info_span!("engine:interpret");
 
         let result = self
             .interpreter

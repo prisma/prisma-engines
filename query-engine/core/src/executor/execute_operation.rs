@@ -70,7 +70,7 @@ pub async fn execute_single_self_contained<C: Connector + Send + Sync>(
     let (query_graph, serializer) = QueryGraphBuilder::new(query_schema).build(operation)?;
     let connection_name = connector.name();
     let conn_span = info_span!(
-        "prisma:engine:connection",
+        "prisma:connection",
         user_facing = true,
         "db.type" = connection_name.as_str()
     );
@@ -95,7 +95,7 @@ pub async fn execute_many_self_contained<C: Connector + Send + Sync>(
 
                 let connection_name = connector.name();
                 let conn_span = info_span!(
-                    "prisma:engine:connection",
+                    "prisma:connection",
                     user_facing = true,
                     "db.type" = connection_name.as_str()
                 );
