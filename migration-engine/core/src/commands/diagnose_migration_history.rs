@@ -84,9 +84,9 @@ pub async fn diagnose_migration_history(
 
     // Check filesystem history against database history.
     for (index, fs_migration) in migrations_from_filesystem.iter().enumerate() {
-        let corresponding_db_migration = migrations_from_database
-            .iter()
-            .find(|db_migration| db_migration.migration_name == fs_migration.migration_name());
+        let corresponding_db_migration = migrations_from_database.iter().find(|db_migration| {
+            db_migration.rolled_back_at.is_none() && db_migration.migration_name == fs_migration.migration_name()
+        });
 
         match corresponding_db_migration {
             Some(db_migration)

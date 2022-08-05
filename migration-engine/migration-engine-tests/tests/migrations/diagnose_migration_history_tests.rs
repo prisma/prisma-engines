@@ -1,5 +1,3 @@
-use std::io::Write;
-
 use migration_core::{
     commands::{DiagnoseMigrationHistoryInput, DiagnoseMigrationHistoryOutput, DriftDiagnostic, HistoryDiagnostic},
     json_rpc::types::CreateMigrationOutput,
@@ -7,6 +5,7 @@ use migration_core::{
 };
 use migration_engine_tests::test_api::*;
 use pretty_assertions::assert_eq;
+use std::io::Write;
 use user_facing_errors::{migration_engine::ShadowDbCreationError, UserFacingError};
 
 #[test_connector]
@@ -494,6 +493,60 @@ fn diagnose_migrations_history_can_detect_edited_migrations(api: TestApi) {
     assert!(history.is_none());
     assert!(failed_migration_names.is_empty());
     assert_eq!(edited_migration_names, &[initial_migration_name]);
+    assert!(has_migrations_table);
+    assert!(error_in_unapplied_migration.is_none());
+}
+
+#[test_connector]
+fn diagnose_migrations_history_does_not_report_rolled_back_migrations_as_edited(api: TestApi) {
+    let directory = api.create_migrations_directory();
+
+    let dm1 = api.datamodel_with_provider(
+        r#"
+        model Cat {
+            id      Int @id
+            name    String
+        }
+    "#,
+    );
+
+    let (initial_migration_output, initial_migration_path) = {
+        let initial_assertions = api
+            .create_migration("initial", &dm1, &directory)
+            .send_sync()
+            // Make the migration fail
+            .modify_migration(|script| script.push_str("MEOWMEOW"));
+
+        let path = initial_assertions.migration_script_path();
+        (initial_assertions.into_output(), path)
+    };
+
+    let initial_migration_name = initial_migration_output.generated_migration_name.unwrap();
+
+    api.apply_migrations(&directory).send_unwrap_err();
+    api.mark_migration_rolled_back(initial_migration_name.as_str()).send();
+
+    let mut file = std::fs::OpenOptions::new()
+        .write(true)
+        .append(true)
+        .open(initial_migration_path)
+        .unwrap();
+    file.write_all(b"/* test */").unwrap();
+
+    let DiagnoseMigrationHistoryOutput {
+        drift,
+        history: _,
+        edited_migration_names,
+        failed_migration_names,
+        has_migrations_table,
+        error_in_unapplied_migration,
+    } = api.diagnose_migration_history(&directory).send_sync().into_output();
+
+    // This should be empty because the migration was rolled back.
+    assert!(edited_migration_names.is_empty());
+
+    assert!(drift.is_none());
+    assert!(failed_migration_names.is_empty());
     assert!(has_migrations_table);
     assert!(error_in_unapplied_migration.is_none());
 }
