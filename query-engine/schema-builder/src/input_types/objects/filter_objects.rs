@@ -148,7 +148,7 @@ fn compound_field_unique_object_type(
         format!(
             "{}{}CompoundUniqueInput",
             model.name,
-            compound_object_name(alias, &index_fields)
+            compound_object_name(alias, index_fields)
         ),
         PRISMA_NAMESPACE,
     );
@@ -159,9 +159,9 @@ fn compound_field_unique_object_type(
     ctx.cache_input_type(ident, input_object.clone());
 
     let fields = index_fields
-        .into_iter()
+        .iter()
         .map(|index_field| match index_field {
-            IndexField::Scalar(sf) => scalar_unique_input_field(ctx, &sf),
+            IndexField::Scalar(sf) => scalar_unique_input_field(ctx, sf),
             IndexField::Composite(cif) => composite_unique_input_field(ctx, cif),
         })
         .collect();
