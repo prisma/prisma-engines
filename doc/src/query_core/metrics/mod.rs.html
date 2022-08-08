@@ -658,7 +658,7 @@
 <span class="comment">// Describe all metric here so that every time for create</span>
 <span class="comment">// a new metric registry for a Query Instance the descriptions</span>
 <span class="comment">// will be in place</span>
-<span class="kw">fn</span> <span class="ident">describe_metrics</span>() {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">describe_metrics</span>() {
     <span class="macro">describe_counter!</span>(
         <span class="string">&quot;prisma_pool_connections_opened_total&quot;</span>,
         <span class="string">&quot;Total number of Pool Connections opened&quot;</span>
