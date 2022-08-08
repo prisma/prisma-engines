@@ -211,34 +211,20 @@ fn scalar_list_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> Inp
     let mut fields: Vec<_> = equality_filters(ctx, mapped_list_type.clone(), !sf.is_required()).collect();
 
     fields.push(
-        input_field(
-            filters::HAS,
-            vec![mapped_nonlist_type, InputType::object(field_reference_object_type(ctx))],
-            None,
-        )
-        .optional()
-        .nullable_if(!sf.is_required()),
+        input_field(filters::HAS, mapped_nonlist_type.with_field_ref_input(ctx), None)
+            .optional()
+            .nullable_if(!sf.is_required()),
     );
 
     fields.push(
         input_field(
             filters::HAS_EVERY,
-            vec![
-                mapped_list_type.clone(),
-                InputType::object(field_reference_object_type(ctx)),
-            ],
+            mapped_list_type.clone().with_field_ref_input(ctx),
             None,
         )
         .optional(),
     );
-    fields.push(
-        input_field(
-            filters::HAS_SOME,
-            vec![mapped_list_type, InputType::object(field_reference_object_type(ctx))],
-            None,
-        )
-        .optional(),
-    );
+    fields.push(input_field(filters::HAS_SOME, mapped_list_type.with_field_ref_input(ctx), None).optional());
     fields.push(input_field(filters::IS_EMPTY, InputType::boolean(), None).optional());
 
     object.set_fields(fields);
