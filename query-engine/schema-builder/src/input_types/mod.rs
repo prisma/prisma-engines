@@ -5,7 +5,7 @@ use super::*;
 use crate::enum_types::*;
 use fields::*;
 use itertools::Itertools;
-use prisma_models::ScalarFieldRef;
+use prisma_models::{IndexField, ScalarFieldRef};
 use schema::*;
 
 fn map_scalar_input_type_for_field(ctx: &mut BuilderContext, field: &ScalarFieldRef) -> InputType {
@@ -53,11 +53,11 @@ fn list_union_type(input_type: InputType, as_list: bool) -> Vec<InputType> {
     }
 }
 
-fn compound_object_name(alias: Option<&String>, path_fields: &[(Vec<String>, ScalarFieldRef)]) -> String {
+fn compound_object_name(alias: Option<&String>, index_fields: &[IndexField]) -> String {
     alias.map(capitalize).unwrap_or_else(|| {
-        let field_names: Vec<String> = path_fields
+        let field_names: Vec<String> = index_fields
             .iter()
-            .map(|(path, _)| path.iter().map(capitalize).join(""))
+            .map(|index_field| index_field.path().iter().map(capitalize).join(""))
             .collect();
 
         field_names.join("")

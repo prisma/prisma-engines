@@ -1,19 +1,21 @@
-use std::sync::Arc;
+use crate::{Field, Index, IndexField, IndexType};
 
-use crate::{Field, Index, IndexType, ScalarFieldRef, ScalarFieldWeak};
+use itertools::Itertools;
+
+type FieldPaths = Vec<Vec<String>>;
 
 #[derive(Debug)]
 pub struct IndexBuilder {
     pub name: Option<String>,
-    pub field_paths: Vec<Vec<String>>,
+    pub field_paths: FieldPaths,
     pub typ: IndexType,
 }
 
 impl IndexBuilder {
     pub fn build(self, all_fields: &[Field]) -> Index {
         let fields = match self.typ {
-            IndexType::Unique => Self::map_fields(self.field_paths, all_fields),
-            IndexType::Normal => Self::map_fields(self.field_paths, all_fields),
+            IndexType::Unique => Self::build_index_fields(self.field_paths, all_fields),
+            IndexType::Normal => Self::build_index_fields(self.field_paths, all_fields),
         };
 
         Index {
@@ -23,39 +25,43 @@ impl IndexBuilder {
         }
     }
 
-    fn map_fields(field_paths: Vec<Vec<String>>, all_fields: &[Field]) -> Vec<(Vec<String>, ScalarFieldWeak)> {
-        field_paths
-            .into_iter()
-            .map(|path| {
-                let field = if path.len() == 1 {
-                    let name = path.first().unwrap();
-                    all_fields
-                        .iter()
-                        .find(|&f| f.name() == name)
-                        .cloned()
-                        .and_then(|f| f.into_scalar())
-                } else {
-                    find_scalar_in_composite_fields(path.as_slice(), all_fields)
-                }
-                .unwrap_or_else(|| panic!("Unable to resolve field path '{}'", path.join(".")));
+    fn build_index_fields(field_paths: FieldPaths, fields: &[Field]) -> Vec<IndexField> {
+        let mut index_fields: Vec<IndexField> = vec![];
 
-                (path, Arc::downgrade(&field))
-            })
-            .collect()
+        for (field_name, grouped_paths) in &field_paths.into_iter().group_by(|path| path.first().cloned().unwrap()) {
+            let grouped_paths = grouped_paths.collect_vec();
+            let field = fields.iter().find(|f| f.name() == field_name);
+
+            match field {
+                Some(Field::Composite(cf)) => {
+                    let walked_paths = walk_composite_paths(grouped_paths);
+                    let nested = Self::build_index_fields(walked_paths, cf.typ.fields());
+
+                    index_fields.push(IndexField::composite(cf.clone(), nested));
+                }
+                Some(Field::Scalar(sf)) => {
+                    index_fields.push(IndexField::scalar(sf.clone()));
+                }
+                _ => panic!(
+                    "Unable to resolve field path '{}'",
+                    grouped_paths.first().unwrap().join(".")
+                ),
+            }
+        }
+
+        index_fields
     }
 }
 
-fn find_scalar_in_composite_fields(path: &[String], fields: &[Field]) -> Option<ScalarFieldRef> {
-    // Recursively go through the embedded fields until finding the scalar
-    let name = path.first();
-    if let Some(field) = fields.iter().find(|f| f.name() == name.unwrap()) {
-        match (path, field) {
-            ([_], Field::Composite(_)) => None,
-            ([_], Field::Scalar(field_ref)) => Some(field_ref.clone()),
-            (_, Field::Composite(field_ref)) => find_scalar_in_composite_fields(&path[1..], field_ref.typ.fields()),
-            (_, _) => None,
-        }
-    } else {
-        None
-    }
+pub fn walk_composite_paths(field_paths: FieldPaths) -> FieldPaths {
+    field_paths
+        .into_iter()
+        .map(|path| {
+            if let Some((_, rest)) = path.split_first() {
+                rest.to_vec()
+            } else {
+                unreachable!()
+            }
+        })
+        .collect_vec()
 }

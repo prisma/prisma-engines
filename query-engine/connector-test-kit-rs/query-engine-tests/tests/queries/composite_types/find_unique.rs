@@ -140,4 +140,60 @@ mod find_unique {
 
         Ok(())
     }
+
+    fn uniq_idx_with_multiple_composite_fields() -> String {
+        indoc! {r#"
+        type Location {
+            street  String
+            zipCode String
+            city    City
+        }
+
+        type City {
+            name String
+        }
+
+        model A {
+            #id(id, Int, @id)
+            name String
+            location Location
+
+            @@unique([name, location.street, location.zipCode, location.city.name])
+        }
+        "#}
+        .to_string()
+    }
+
+    #[connector_test(schema(uniq_idx_with_multiple_composite_fields), only(MongoDb))]
+    async fn multiple_fields_from_composite_type(runner: Runner) -> TestResult<()> {
+        run_query!(
+            runner,
+            indoc! {r#"mutation {
+            createManyA(data: [
+                {id: 1 name: "foo" location: {set: {street: "a", zipCode: "a", city: { name: "paris" }}}},
+                {id: 2 name: "foo" location: {set: {street: "b", zipCode: "b", city: { name: "paris" }}}},
+                {id: 3 name: "bar" location: {set: {street: "c", zipCode: "c", city: { name: "paris" }}}},
+            ]) { count }
+        }"#}
+        );
+
+        assert_query!(
+            runner,
+            r#"query { findUniqueA(where: { 
+                name_location_street_zipCode_city_name: {
+                    name: "foo"
+                    location: {
+                        address: "a"
+                        zipCode: "a",
+                        city: {
+                            name: "paris"
+                        }
+                    }
+                } 
+            }) { id }}"#,
+            r#"{"data":{"findUniqueA":{"id":1}}}"#
+        );
+
+        Ok(())
+    }
 }

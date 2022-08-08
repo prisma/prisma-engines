@@ -142,9 +142,9 @@ impl QueryArguments {
         // Indicates whether or not a combination of contained fields is on the source model (we don't check for relations for now).
         let order_by_contains_unique_index = self.model.unique_indexes().into_iter().any(|index| {
             index
-                .fields()
+                .scalars()
                 .into_iter()
-                .all(|(_, f)| on_model.iter().any(|o| o.field == f))
+                .all(|f| on_model.iter().any(|o| o.field == f))
         });
 
         let source_contains_unique = on_model.iter().any(|o| o.field.unique());

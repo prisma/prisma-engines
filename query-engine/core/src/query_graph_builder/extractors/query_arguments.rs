@@ -294,16 +294,10 @@ fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilde
                 vec![(field, value)]
             }
             Err(_) => match utils::resolve_compound_field(&field_name, &model) {
-                Some(path_fields) => {
+                Some(fields) => {
                     let mut map: ParsedInputMap = map_value.try_into()?;
-                    let mut pairs = vec![];
 
-                    for (path, field) in path_fields {
-                        let value = extract_from_input_map(&path, &mut map);
-                        pairs.extend(vec![(field, value)]);
-                    }
-
-                    pairs
+                    extract_compound_indexes(&fields, &mut map)?
                 }
                 None => {
                     return Err(QueryGraphBuilderError::AssertionError(format!(
@@ -320,16 +314,28 @@ fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilde
     Ok(Some(SelectionResult::new(pairs)))
 }
 
-fn extract_from_input_map(path: &[String], map: &mut ParsedInputMap) -> PrismaValue {
-    let name = path.first().expect("I was expecting a path to unwrap");
-    let mut entry = map.remove(name).unwrap();
+fn extract_compound_indexes(
+    index_fields: &[IndexField],
+    map: &mut ParsedInputMap,
+) -> QueryGraphBuilderResult<Vec<(ScalarFieldRef, PrismaValue)>> {
+    let mut pairs: Vec<(ScalarFieldRef, PrismaValue)> = vec![];
 
-    // Recursively go through the map until finding the single value
-    match entry {
-        ParsedInputValue::Map(ref mut map) => extract_from_input_map(&path[1..], map),
-        ParsedInputValue::Single(value) => value,
-        _ => panic!("Was not expected a non map or single value in this expression"),
+    for index_field in index_fields {
+        match index_field {
+            IndexField::Scalar(sf) => {
+                let pv: PrismaValue = map.remove(&sf.name).unwrap().try_into()?;
+
+                pairs.push((sf.clone(), pv));
+            }
+            IndexField::Composite(cif) => {
+                let mut inner_map: ParsedInputMap = map.remove(&cif.field().name).unwrap().try_into()?;
+
+                pairs.extend(extract_compound_indexes(cif.nested(), &mut inner_map)?);
+            }
+        }
     }
+
+    Ok(pairs)
 }
 
 /// Runs final transformations on the QueryArguments.

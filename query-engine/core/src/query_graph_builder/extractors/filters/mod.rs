@@ -15,7 +15,8 @@ use connector::{
 use filter_fold::*;
 use filter_grouping::*;
 use prisma_models::{
-    prelude::ParentContainer, CompositeFieldRef, Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef,
+    prelude::ParentContainer, CompositeFieldRef, CompositeIndexField, Field, IndexField, ModelRef, PrismaValue,
+    RelationFieldRef, ScalarFieldRef,
 };
 use schema_builder::constants::filters;
 use std::{collections::HashMap, convert::TryInto, str::FromStr};
@@ -38,7 +39,7 @@ pub fn extract_unique_filter(value_map: ParsedInputMap, model: &ModelRef) -> Que
                             field_name, model.name
                         ))
                     })
-                    .and_then(|fields| handle_compound_field(model, fields, value)),
+                    .and_then(|fields| extract_compound_field(&fields, value)),
             }
         })
         .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?;
@@ -46,50 +47,52 @@ pub fn extract_unique_filter(value_map: ParsedInputMap, model: &ModelRef) -> Que
     Ok(Filter::and(filters))
 }
 
-fn handle_compound_field(
-    model: &ModelRef,
-    path_fields: Vec<(Vec<String>, ScalarFieldRef)>,
-    value: ParsedInputValue,
-) -> QueryGraphBuilderResult<Filter> {
+fn extract_compound_field(index_fields: &[IndexField], value: ParsedInputValue) -> QueryGraphBuilderResult<Filter> {
     let mut input_map: ParsedInputMap = value.try_into()?;
-    let mut filters = Vec::with_capacity(path_fields.len());
+    let mut filters = Vec::with_capacity(index_fields.len());
 
-    for (path, field) in path_fields {
-        if path.len() > 1 {
-            filters.push(traverse_composite_filter(model, &path, field, input_map.clone())?);
-        } else {
-            let pv: PrismaValue = input_map.remove(&field.name).unwrap().try_into()?;
-            filters.push(field.equals(pv));
+    dbg!(&index_fields);
+
+    for index_field in index_fields {
+        match index_field {
+            IndexField::Scalar(sf) => {
+                let pv: PrismaValue = input_map.remove(&sf.name).unwrap().try_into()?;
+
+                filters.push(sf.equals(pv));
+            }
+            IndexField::Composite(cif) => {
+                filters.push(extract_composite_compound(cif, &mut input_map)?);
+            }
         }
     }
 
     Ok(Filter::And(filters))
 }
 
-fn traverse_composite_filter(
-    model: &ModelRef,
-    path: &[String],
-    field: ScalarFieldRef,
-    mut input_map: ParsedInputMap,
+fn extract_composite_compound(
+    cif: &CompositeIndexField,
+    input_map: &mut ParsedInputMap,
 ) -> QueryGraphBuilderResult<Filter> {
-    if path.len() == 1 {
-        let pv: PrismaValue = input_map.remove(&field.name).unwrap().try_into()?;
+    let mut inner_map: ParsedInputMap = input_map.remove(&cif.field().name).unwrap().try_into()?;
+    let mut filters: Vec<Filter> = vec![];
 
-        return Ok(field.equals(pv));
+    for index_field in cif.nested() {
+        match index_field {
+            IndexField::Scalar(sf) => {
+                let pv: PrismaValue = inner_map.remove(&sf.name).unwrap().try_into()?;
+
+                filters.push(sf.equals(pv));
+            }
+            IndexField::Composite(nested_cif) => {
+                filters.push(extract_composite_compound(nested_cif, &mut inner_map)?);
+            }
+        }
     }
 
-    let composite_field_name = path.first().unwrap();
-    let cf = model.fields().find_from_composite(composite_field_name)?;
-
-    // NOTE: [geo.location.city] => { geo: { location: { city: "" } }}
-    let input_map = input_map.remove(composite_field_name).unwrap().try_into()?;
-    let path = &path[1..];
-    let inner = traverse_composite_filter(model, path, field, input_map)?;
-
-    if cf.is_list() {
-        Ok(cf.some(inner)) // When field is in a list
+    if cif.field().is_list() {
+        Ok(cif.field().some(Filter::And(filters))) // When field is in a list
     } else {
-        Ok(cf.is(inner)) // Just a simple value
+        Ok(cif.field().is(Filter::And(filters))) // Just a simple value
     }
 }
 
