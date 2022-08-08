@@ -306,8 +306,7 @@ async fn best_effort_reset_impl(flavour: &mut (dyn SqlFlavour + Send + Sync)) ->
     let drop_views = source_schema
         .view_walkers()
         .filter(|view| !flavour.view_should_be_ignored(view.name()))
-        .map(|vw| vw.view_index())
-        .map(DropView::new)
+        .map(|vw| DropView::new(vw.id))
         .map(SqlMigrationStep::DropView);
 
     steps.extend(drop_views);
@@ -318,7 +317,7 @@ async fn best_effort_reset_impl(flavour: &mut (dyn SqlFlavour + Send + Sync)) ->
 
     let drop_udts = source_schema
         .udt_walkers()
-        .map(|udtw| udtw.udt_index())
+        .map(|udtw| udtw.id)
         .map(DropUserDefinedType::new)
         .map(SqlMigrationStep::DropUserDefinedType);
 
