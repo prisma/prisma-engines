@@ -162,8 +162,8 @@ impl ScalarFilter {
     pub fn scalar_fields(&self) -> Vec<&ScalarFieldRef> {
         let mut fields = self.projection.scalar_fields();
 
-        if let Some(ref_field) = self.as_field_ref() {
-            fields.push(ref_field);
+        if let Some(field_ref) = self.as_field_ref() {
+            fields.push(field_ref);
         }
 
         fields

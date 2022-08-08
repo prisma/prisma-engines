@@ -100,8 +100,8 @@ impl<'a> ScalarFilterParser<'a> {
 
                         _ => unreachable!(), // Validation guarantees this.
                     },
-                    ConditionValue::FieldRef(ref_field) if self.reverse() => field.not_in(ref_field),
-                    ConditionValue::FieldRef(ref_field) => field.is_in(ref_field),
+                    ConditionValue::FieldRef(field_ref) if self.reverse() => field.not_in(field_ref),
+                    ConditionValue::FieldRef(field_ref) => field.is_in(field_ref),
                 };
 
                 Ok(vec![filter])
@@ -121,8 +121,8 @@ impl<'a> ScalarFilterParser<'a> {
 
                         _ => unreachable!(), // Validation guarantees this.
                     },
-                    ConditionValue::FieldRef(ref_field) if self.reverse() => field.is_in(ref_field),
-                    ConditionValue::FieldRef(ref_field) => field.not_in(ref_field),
+                    ConditionValue::FieldRef(field_ref) if self.reverse() => field.is_in(field_ref),
+                    ConditionValue::FieldRef(field_ref) => field.not_in(field_ref),
                 };
 
                 Ok(vec![filter])
@@ -415,9 +415,9 @@ impl<'a> ScalarFilterParser<'a> {
 
         match input {
             ParsedInputValue::Map(mut map) => {
-                let ref_field_name = map.remove(filters::UNDERSCORE_REF).unwrap();
-                let ref_field_name = PrismaValue::try_from(ref_field_name)?.into_string().unwrap();
-                let ref_field = field.container().find_field(&ref_field_name);
+                let field_ref_name = map.remove(filters::UNDERSCORE_REF).unwrap();
+                let field_ref_name = PrismaValue::try_from(field_ref_name)?.into_string().unwrap();
+                let field_ref = field.container().find_field(&field_ref_name);
                 // If we're parsing a count filter, force the referenced field to be of TypeIdentifier::Int
                 let expected_type = if self.is_count_filter() {
                     TypeIdentifier::Int
@@ -425,32 +425,32 @@ impl<'a> ScalarFilterParser<'a> {
                     field.type_identifier.clone()
                 };
 
-                match ref_field {
-                    Some(Field::Scalar(ref_field))
-                        if ref_field.is_list() == expect_list_ref && expected_type == ref_field.type_identifier =>
+                match field_ref {
+                    Some(Field::Scalar(field_ref))
+                        if field_ref.is_list() == expect_list_ref && expected_type == field_ref.type_identifier =>
                     {
-                        Ok(ConditionValue::reference(ref_field))
+                        Ok(ConditionValue::reference(field_ref))
                     }
-                    Some(Field::Scalar(ref_field)) => Err(QueryGraphBuilderError::InputError(format!(
+                    Some(Field::Scalar(field_ref)) => Err(QueryGraphBuilderError::InputError(format!(
                         "Expected a referenced scalar field of type {}{} but found {} of type {}{}.",
                         expected_type,
                         if field.is_list() { "[]" } else { "" },
-                        ref_field,
-                        ref_field.type_identifier,
-                        if ref_field.is_list() { "[]" } else { "" },
+                        field_ref,
+                        field_ref.type_identifier,
+                        if field_ref.is_list() { "[]" } else { "" },
                     ))),
-                    Some(Field::Relation(ref_field)) => Err(QueryGraphBuilderError::InputError(format!(
+                    Some(Field::Relation(field_ref)) => Err(QueryGraphBuilderError::InputError(format!(
                         "Expected a referenced scalar field {} but found a relation field.",
-                        ref_field
+                        field_ref
                     ))),
-                    Some(Field::Composite(ref_field)) => Err(QueryGraphBuilderError::InputError(format!(
+                    Some(Field::Composite(field_ref)) => Err(QueryGraphBuilderError::InputError(format!(
                         "Expected a referenced scalar field {} but found a composite field.",
-                        ref_field
+                        field_ref
                     ))),
                     None => Err(QueryGraphBuilderError::InputError(format!(
                         "The referenced scalar field {}.{} does not exist.",
                         field.container.name(),
-                        &ref_field_name
+                        &field_ref_name
                     ))),
                 }
             }
@@ -463,21 +463,23 @@ impl<'a> ScalarFilterParser<'a> {
 
         match input {
             ParsedInputValue::Map(mut map) => {
-                let ref_field_name = map.remove(filters::UNDERSCORE_REF).unwrap();
-                let ref_field_name = PrismaValue::try_from(ref_field_name)?.into_string().unwrap();
-                let ref_field = field.container.find_field(&ref_field_name);
+                let field_ref_name = map.remove(filters::UNDERSCORE_REF).unwrap();
+                let field_ref_name = PrismaValue::try_from(field_ref_name)?.into_string().unwrap();
+                let field_ref = field.container.find_field(&field_ref_name);
 
-                match ref_field {
-                    Some(Field::Scalar(sf)) if sf.is_list() && sf.type_identifier == field.type_identifier => {
-                        Ok(ConditionListValue::reference(sf))
+                match field_ref {
+                    Some(Field::Scalar(field_ref))
+                        if field_ref.is_list() && field_ref.type_identifier == field.type_identifier =>
+                    {
+                        Ok(ConditionListValue::reference(field_ref))
                     }
-                    Some(Field::Scalar(sf)) => Err(QueryGraphBuilderError::InputError(format!(
+                    Some(Field::Scalar(field_ref)) => Err(QueryGraphBuilderError::InputError(format!(
                         "Expected a referenced scalar field of type {}{} but found {} of type {}{}.",
                         field.type_identifier,
                         if field.is_list() { "[]" } else { "" },
-                        sf,
-                        sf.type_identifier,
-                        if sf.is_list() { "[]" } else { "" },
+                        field_ref,
+                        field_ref.type_identifier,
+                        if field_ref.is_list() { "[]" } else { "" },
                     ))),
                     Some(Field::Relation(rf)) => Err(QueryGraphBuilderError::InputError(format!(
                         "Expected a referenced scalar list field {} but found a relation field.",
@@ -490,7 +492,7 @@ impl<'a> ScalarFilterParser<'a> {
                     _ => Err(QueryGraphBuilderError::InputError(format!(
                         "The referenced scalar list field {}.{} does not exist.",
                         field.container.name(),
-                        &ref_field_name
+                        &field_ref_name
                     ))),
                 }
             }
@@ -549,7 +551,7 @@ where
             },
             val => filter_fn(val.into(), json_path),
         },
-        ConditionValue::FieldRef(ref_field) => filter_fn(ref_field.into(), json_path),
+        ConditionValue::FieldRef(field_ref) => filter_fn(field_ref.into(), json_path),
     };
 
     filter
