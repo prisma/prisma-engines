@@ -9,8 +9,26 @@ pub struct Index {
     pub typ: IndexType,
 }
 
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub enum IndexType {
+    Unique,
+    Normal,
+}
+
+#[derive(Debug, Clone)]
+pub enum IndexField {
+    Scalar(ScalarFieldRef),
+    Composite(CompositeIndexField),
+}
+
+#[derive(Debug, Clone)]
+pub struct CompositeIndexField {
+    field: CompositeFieldRef,
+    nested: Vec<IndexField>,
+}
+
 impl Index {
-    pub fn fields(&self) -> &Vec<IndexField> {
+    pub fn fields(&self) -> &[IndexField] {
         &self.fields
     }
 
@@ -23,12 +41,6 @@ impl Index {
             })
             .collect_vec()
     }
-}
-
-#[derive(Debug, Clone)]
-pub enum IndexField {
-    Scalar(ScalarFieldRef),
-    Composite(CompositeIndexField),
 }
 
 impl IndexField {
@@ -50,12 +62,6 @@ impl IndexField {
             IndexField::Composite(cif) => cif.path(),
         }
     }
-}
-
-#[derive(Debug, Clone)]
-pub struct CompositeIndexField {
-    field: CompositeFieldRef,
-    nested: Vec<IndexField>,
 }
 
 impl CompositeIndexField {
@@ -89,10 +95,4 @@ impl CompositeIndexField {
 
         path
     }
-}
-
-#[derive(Debug, Copy, Clone, PartialEq)]
-pub enum IndexType {
-    Unique,
-    Normal,
 }
