@@ -106,7 +106,7 @@ mod failure {
     }
 
     #[connector_test(schema(setup::common_types))]
-    async fn ref_field_in_having_must_be_selected(runner: Runner) -> TestResult<()> {
+    async fn field_ref_in_having_must_be_selected(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
             r#"query { groupByTestModel(by: [int], having: { int: { _count: { equals: { _ref: "int_2" } } } }) { int }}"#,
@@ -118,7 +118,7 @@ mod failure {
     }
 
     #[connector_test(schema(setup::common_types))]
-    async fn count_requires_int_ref_field(runner: Runner) -> TestResult<()> {
+    async fn count_requires_int_field_ref(runner: Runner) -> TestResult<()> {
         // assert that referencing an Int field for the count of a string field works
         run_query!(
             &runner,

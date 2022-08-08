@@ -152,7 +152,7 @@ impl MongoFilterVisitor {
     // Note contains / startsWith / endsWith are only applicable to String types in the schema.
     fn default_scalar_filter(&self, field: &ScalarFieldRef, condition: ScalarCondition) -> crate::Result<Document> {
         let field_name = (self.prefix(), field).into_bson()?;
-        let field_ref = condition.as_ref_field().cloned();
+        let field_ref = condition.as_field_ref().cloned();
         let is_set_cond = matches!(&condition, ScalarCondition::IsSet(_));
 
         let filter_doc = match condition {
@@ -274,7 +274,7 @@ impl MongoFilterVisitor {
     /// Insensitive filters are only reachable with TypeIdentifier::String (or UUID, which is string as well for us).
     fn insensitive_scalar_filter(&self, field: &ScalarFieldRef, condition: ScalarCondition) -> crate::Result<Document> {
         let field_name = (self.prefix(), field).into_bson()?;
-        let field_ref = condition.as_ref_field().cloned();
+        let field_ref = condition.as_field_ref().cloned();
         let is_set_cond = matches!(&condition, ScalarCondition::IsSet(_));
 
         let filter_doc = match condition {

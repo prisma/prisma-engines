@@ -154,7 +154,7 @@ impl ScalarFilter {
 
     /// Returns the referenced scalar field if there is one.
     pub fn as_field_ref(&self) -> Option<&ScalarFieldRef> {
-        self.condition.as_ref_field()
+        self.condition.as_field_ref()
     }
 
     /// Returns all the scalar fields related to a scalar filter.
@@ -351,7 +351,7 @@ impl ScalarCondition {
         }
     }
 
-    pub fn as_ref_field(&self) -> Option<&ScalarFieldRef> {
+    pub fn as_field_ref(&self) -> Option<&ScalarFieldRef> {
         match self {
             ScalarCondition::Equals(v) => v.as_field_ref(),
             ScalarCondition::NotEquals(v) => v.as_field_ref(),
@@ -367,7 +367,7 @@ impl ScalarCondition {
             ScalarCondition::GreaterThanOrEquals(v) => v.as_field_ref(),
             ScalarCondition::In(v) => v.as_field_ref(),
             ScalarCondition::NotIn(v) => v.as_field_ref(),
-            ScalarCondition::JsonCompare(json_cond) => json_cond.condition.as_ref_field(),
+            ScalarCondition::JsonCompare(json_cond) => json_cond.condition.as_field_ref(),
             ScalarCondition::Search(v, _) => v.as_field_ref(),
             ScalarCondition::NotSearch(v, _) => v.as_field_ref(),
             ScalarCondition::IsSet(_) => None,
