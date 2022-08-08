@@ -3,7 +3,7 @@ use datamodel::common::preview_features::PreviewFeature;
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{header::CONTENT_TYPE, Body, HeaderMap, Method, Request, Response, Server, StatusCode};
 use opentelemetry::{global, propagation::Extractor, Context};
-use query_core::{schema::QuerySchemaRenderer, set_parent_context_from_json_str, TxId};
+use query_core::{schema::QuerySchemaRenderer, TxId};
 use query_core::{MetricFormat, MetricRegistry};
 use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlHandler, TxInput};
 use serde_json::json;
@@ -63,6 +63,8 @@ impl Clone for State {
 pub async fn setup(opts: &PrismaOpt, metrics: MetricRegistry) -> PrismaResult<State> {
     let config = opts.configuration(false)?.subject;
     config.validate_that_one_datasource_is_provided()?;
+
+    let span = tracing::info_span!("prisma:engine:connect");
 
     let enable_itx = config
         .preview_features()
