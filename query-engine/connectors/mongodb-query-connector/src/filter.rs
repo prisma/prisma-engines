@@ -414,7 +414,7 @@ impl MongoFilterVisitor {
     fn visit_scalar_list_filter(&self, filter: ScalarListFilter) -> crate::Result<MongoFilter> {
         let field = &filter.field;
         let field_name = (self.prefix(), field).into_bson()?;
-        let field_ref = filter.get_field_ref().cloned();
+        let field_ref = filter.as_field_ref().cloned();
 
         // Of course Mongo needs special filters for the inverted case, everything else would be too easy.
         let filter_doc = if self.invert() {

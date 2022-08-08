@@ -11,4 +11,5 @@ pub mod float_filter;
 pub mod having_filter;
 pub mod int_filter;
 pub mod json_filter;
+pub mod relation_filter;
 pub mod string_filter;

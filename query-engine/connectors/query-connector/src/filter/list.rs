@@ -11,8 +11,8 @@ pub struct ScalarListFilter {
 
 impl ScalarListFilter {
     /// Returns the referenced field of the filter condition if there's one
-    pub fn get_field_ref(&self) -> Option<&ScalarFieldRef> {
-        self.condition.get_field_ref()
+    pub fn as_field_ref(&self) -> Option<&ScalarFieldRef> {
+        self.condition.as_field_ref()
     }
 }
 
@@ -33,7 +33,7 @@ pub enum ScalarListCondition {
 
 impl ScalarListCondition {
     /// Returns the referenced field of the filter condition if there's one
-    pub fn get_field_ref(&self) -> Option<&ScalarFieldRef> {
+    pub fn as_field_ref(&self) -> Option<&ScalarFieldRef> {
         match self {
             ScalarListCondition::Contains(v) => v.as_field_ref(),
             ScalarListCondition::ContainsEvery(v) => v.as_field_ref(),

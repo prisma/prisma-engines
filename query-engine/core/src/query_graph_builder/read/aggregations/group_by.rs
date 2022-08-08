@@ -144,7 +144,7 @@ fn collect_aggregate_ref_fields(filter: &Filter) -> Vec<&ScalarFieldRef> {
         Filter::And(inner) => inner.iter().flat_map(collect_aggregate_ref_fields).collect(),
         Filter::Or(inner) => inner.iter().flat_map(collect_aggregate_ref_fields).collect(),
         Filter::Not(inner) => inner.iter().flat_map(collect_aggregate_ref_fields).collect(),
-        Filter::Scalar(sf) => sf.as_ref_field().map(|sf| vec![sf]).unwrap_or_default(),
+        Filter::Scalar(sf) => sf.as_field_ref().map(|sf| vec![sf]).unwrap_or_default(),
         Filter::Aggregation(af) => collect_aggregate_ref_fields(af.filter()),
         _ => unreachable!(),
     }
