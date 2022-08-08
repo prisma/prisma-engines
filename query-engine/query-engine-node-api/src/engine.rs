@@ -205,7 +205,7 @@ impl QueryEngine {
         let dispatcher = self.logger.dispatcher();
 
         async_panic_to_js_error(async {
-            let span = tracing::info_span!("prisma:engine:connect", user_facing = true);
+            let span = tracing::info_span!("prisma:engine:connect");
             let _ = set_parent_context_from_json_str(&span, &trace);
 
             let mut inner = self.inner.write().await;
@@ -268,7 +268,7 @@ impl QueryEngine {
         let dispatcher = self.logger.dispatcher();
 
         async_panic_to_js_error(async {
-            let span = tracing::info_span!("prisma:engine:disconnect", user_facing = true);
+            let span = tracing::info_span!("prisma:engine:disconnect");
             let _ = set_parent_context_from_json_str(&span, &trace);
 
             async {

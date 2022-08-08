@@ -64,12 +64,6 @@ pub async fn setup(opts: &PrismaOpt, metrics: MetricRegistry) -> PrismaResult<St
     let config = opts.configuration(false)?.subject;
     config.validate_that_one_datasource_is_provided()?;
 
-    let span = tracing::info_span!("prisma:engine:connect", user_facing = true);
-
-    if let Some(tracing_headers) = &opts.tracing_headers {
-        let _ = set_parent_context_from_json_str(&span, tracing_headers);
-    }
-
     let enable_itx = config
         .preview_features()
         .contains(PreviewFeature::InteractiveTransactions);

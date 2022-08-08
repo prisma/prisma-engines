@@ -107,10 +107,6 @@ pub struct PrismaOpt {
     #[structopt(long, default_value)]
     pub open_telemetry_endpoint: String,
 
-    /// JSON object for tracing headers such as the traceparent
-    #[structopt(long)]
-    pub tracing_headers: Option<String>,
-
     #[structopt(subcommand)]
     pub subcommand: Option<Subcommand>,
 }
