@@ -183,7 +183,7 @@ mod find_unique {
                 name_location_street_zipCode_city_name: {
                     name: "foo"
                     location: {
-                        address: "a"
+                        street: "a"
                         zipCode: "a",
                         city: {
                             name: "paris"
