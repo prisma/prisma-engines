@@ -51,8 +51,6 @@ fn extract_compound_field(index_fields: &[IndexField], value: ParsedInputValue) 
     let mut input_map: ParsedInputMap = value.try_into()?;
     let mut filters = Vec::with_capacity(index_fields.len());
 
-    dbg!(&index_fields);
-
     for index_field in index_fields {
         match index_field {
             IndexField::Scalar(sf) => {
