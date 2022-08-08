@@ -334,12 +334,12 @@
         }
         <span class="ident">SqlMigrationStep::RenameIndex</span> { <span class="ident">index</span> } =&gt; <span class="ident">renderer</span>.<span class="ident">render_rename_index</span>(<span class="ident">schemas</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">index</span>)),
         <span class="ident">SqlMigrationStep::DropView</span>(<span class="ident">drop_view</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">view</span> <span class="op">=</span> <span class="ident">schemas</span>.<span class="ident">previous</span>.<span class="ident">view_walker_at</span>(<span class="ident">drop_view</span>.<span class="ident">view_index</span>);
+            <span class="kw">let</span> <span class="ident">view</span> <span class="op">=</span> <span class="ident">schemas</span>.<span class="ident">previous</span>.<span class="ident">walk</span>(<span class="ident">drop_view</span>.<span class="ident">view_id</span>);
 
             <span class="macro">vec!</span>[<span class="ident">renderer</span>.<span class="ident">render_drop_view</span>(<span class="ident">view</span>)]
         }
         <span class="ident">SqlMigrationStep::DropUserDefinedType</span>(<span class="ident">drop_udt</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">udt</span> <span class="op">=</span> <span class="ident">schemas</span>.<span class="ident">previous</span>.<span class="ident">udt_walker_at</span>(<span class="ident">drop_udt</span>.<span class="ident">udt_index</span>);
+            <span class="kw">let</span> <span class="ident">udt</span> <span class="op">=</span> <span class="ident">schemas</span>.<span class="ident">previous</span>.<span class="ident">walk</span>(<span class="ident">drop_udt</span>.<span class="ident">udt_id</span>);
 
             <span class="macro">vec!</span>[<span class="ident">renderer</span>.<span class="ident">render_drop_user_defined_type</span>(<span class="kw-2">&amp;</span><span class="ident">udt</span>)]
         }

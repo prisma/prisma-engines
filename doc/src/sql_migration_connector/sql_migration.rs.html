@@ -613,11 +613,6 @@
 <span id="608">608</span>
 <span id="609">609</span>
 <span id="610">610</span>
-<span id="611">611</span>
-<span id="612">612</span>
-<span id="613">613</span>
-<span id="614">614</span>
-<span id="615">615</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">pair::Pair</span>,
     <span class="ident">sql_renderer::IteratorJoin</span>,
@@ -626,7 +621,7 @@
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
     <span class="ident">walkers</span>::{<span class="ident">ColumnWalker</span>, <span class="ident">TableWalker</span>},
-    <span class="ident">ColumnId</span>, <span class="ident">EnumId</span>, <span class="ident">ForeignKeyId</span>, <span class="ident">IndexId</span>, <span class="ident">SqlSchema</span>, <span class="ident">TableId</span>,
+    <span class="ident">ColumnId</span>, <span class="ident">EnumId</span>, <span class="ident">ForeignKeyId</span>, <span class="ident">IndexId</span>, <span class="ident">SqlSchema</span>, <span class="ident">TableId</span>, <span class="ident">UdtId</span>, <span class="ident">ViewId</span>,
 };
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::BTreeSet</span>, <span class="ident">fmt::Write</span> <span class="kw">as</span> <span class="kw">_</span>};
 
@@ -683,14 +678,14 @@
                 <span class="ident">SqlMigrationStep::DropView</span>(<span class="ident">drop_view</span>) =&gt; {
                     <span class="ident">drift_items</span>.<span class="ident">insert</span>((
                         <span class="ident">DriftType::RemovedView</span>,
-                        <span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">previous</span>.<span class="ident">view_walker_at</span>(<span class="ident">drop_view</span>.<span class="ident">view_index</span>).<span class="ident">name</span>(),
+                        <span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">previous</span>.<span class="ident">walk</span>(<span class="ident">drop_view</span>.<span class="ident">view_id</span>).<span class="ident">name</span>(),
                         <span class="ident">idx</span>,
                     ));
                 }
                 <span class="ident">SqlMigrationStep::DropUserDefinedType</span>(<span class="ident">drop_udt</span>) =&gt; {
                     <span class="ident">drift_items</span>.<span class="ident">insert</span>((
                         <span class="ident">DriftType::RemovedUdt</span>,
-                        <span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">previous</span>.<span class="ident">udt_walker_at</span>(<span class="ident">drop_udt</span>.<span class="ident">udt_index</span>).<span class="ident">name</span>(),
+                        <span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">previous</span>.<span class="ident">walk</span>(<span class="ident">drop_udt</span>.<span class="ident">udt_id</span>).<span class="ident">name</span>(),
                         <span class="ident">idx</span>,
                     ));
                 }
@@ -1131,29 +1126,24 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">DropView</span> {
-    <span class="kw">pub</span> <span class="ident">view_index</span>: <span class="ident">usize</span>,
+    <span class="kw">pub</span> <span class="ident">view_id</span>: <span class="ident">ViewId</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">DropView</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">view_index</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">view_index</span> }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">view_id</span>: <span class="ident">ViewId</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> { <span class="ident">view_id</span> }
     }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">DropUserDefinedType</span> {
-    <span class="kw">pub</span> <span class="ident">udt_index</span>: <span class="ident">usize</span>,
+    <span class="kw">pub</span> <span class="ident">udt_id</span>: <span class="ident">UdtId</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">DropUserDefinedType</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">udt_index</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">udt_index</span> }
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">udt_id</span>: <span class="ident">UdtId</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> { <span class="ident">udt_id</span> }
     }
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">DropColumn</span> {
-    <span class="kw">pub</span> <span class="ident">index</span>: <span class="ident">usize</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>

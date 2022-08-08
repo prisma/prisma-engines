@@ -686,20 +686,6 @@
 <span id="681">681</span>
 <span id="682">682</span>
 <span id="683">683</span>
-<span id="684">684</span>
-<span id="685">685</span>
-<span id="686">686</span>
-<span id="687">687</span>
-<span id="688">688</span>
-<span id="689">689</span>
-<span id="690">690</span>
-<span id="691">691</span>
-<span id="692">692</span>
-<span id="693">693</span>
-<span id="694">694</span>
-<span id="695">695</span>
-<span id="696">696</span>
-<span id="697">697</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Database description. This crate is used heavily in the introspection and migration engines.</span>
 
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>)]</span>
@@ -935,11 +921,11 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">view_walkers</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ViewWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        (<span class="number">0</span>..<span class="self">self</span>.<span class="ident">views</span>.<span class="ident">len</span>()).<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">view_index</span><span class="op">|</span> <span class="ident">ViewWalker::new</span>(<span class="self">self</span>, <span class="ident">view_index</span>))
+        (<span class="number">0</span>..<span class="self">self</span>.<span class="ident">views</span>.<span class="ident">len</span>()).<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">view_index</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">walk</span>(<span class="ident">ViewId</span>(<span class="ident">view_index</span> <span class="kw">as</span> <span class="ident">u32</span>)))
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">udt_walkers</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">UserDefinedTypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        (<span class="number">0</span>..<span class="self">self</span>.<span class="ident">user_defined_types</span>.<span class="ident">len</span>()).<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">udt_index</span><span class="op">|</span> <span class="ident">UserDefinedTypeWalker::new</span>(<span class="self">self</span>, <span class="ident">udt_index</span>))
+        (<span class="number">0</span>..<span class="self">self</span>.<span class="ident">user_defined_types</span>.<span class="ident">len</span>()).<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">udt_index</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">walk</span>(<span class="ident">UdtId</span>(<span class="ident">udt_index</span> <span class="kw">as</span> <span class="ident">u32</span>)))
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enum_walkers</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
@@ -959,20 +945,6 @@
     <span class="doccomment">/// Traverse a schema item by id.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">walk</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">I</span>) -&gt; <span class="ident">Walker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">I</span><span class="op">&gt;</span> {
         <span class="ident">Walker</span> { <span class="ident">id</span>, <span class="ident">schema</span>: <span class="self">self</span> }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">udt_walker_at</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">UserDefinedTypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">UserDefinedTypeWalker</span> {
-            <span class="ident">udt_index</span>: <span class="ident">index</span>,
-            <span class="ident">schema</span>: <span class="self">self</span>,
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">view_walker_at</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">ViewWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">ViewWalker</span> {
-            <span class="ident">view_index</span>: <span class="ident">index</span>,
-            <span class="ident">schema</span>: <span class="self">self</span>,
-        }
     }
 
     <span class="doccomment">/// Traverse all the columns in the schema.</span>

@@ -352,7 +352,6 @@
 <span id="347">347</span>
 <span id="348">348</span>
 <span id="349">349</span>
-<span id="350">350</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The SQL migration connector.</span>
 
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>, <span class="ident">missing_docs</span>)]</span>
@@ -661,8 +660,7 @@
     <span class="kw">let</span> <span class="ident">drop_views</span> <span class="op">=</span> <span class="ident">source_schema</span>
         .<span class="ident">view_walkers</span>()
         .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">view</span><span class="op">|</span> <span class="op">!</span><span class="ident">flavour</span>.<span class="ident">view_should_be_ignored</span>(<span class="ident">view</span>.<span class="ident">name</span>()))
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">vw</span><span class="op">|</span> <span class="ident">vw</span>.<span class="ident">view_index</span>())
-        .<span class="ident">map</span>(<span class="ident">DropView::new</span>)
+        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">vw</span><span class="op">|</span> <span class="ident">DropView::new</span>(<span class="ident">vw</span>.<span class="ident">id</span>))
         .<span class="ident">map</span>(<span class="ident">SqlMigrationStep::DropView</span>);
 
     <span class="ident">steps</span>.<span class="ident">extend</span>(<span class="ident">drop_views</span>);
@@ -673,7 +671,7 @@
 
     <span class="kw">let</span> <span class="ident">drop_udts</span> <span class="op">=</span> <span class="ident">source_schema</span>
         .<span class="ident">udt_walkers</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">udtw</span><span class="op">|</span> <span class="ident">udtw</span>.<span class="ident">udt_index</span>())
+        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">udtw</span><span class="op">|</span> <span class="ident">udtw</span>.<span class="ident">id</span>)
         .<span class="ident">map</span>(<span class="ident">DropUserDefinedType::new</span>)
         .<span class="ident">map</span>(<span class="ident">SqlMigrationStep::DropUserDefinedType</span>);
 
