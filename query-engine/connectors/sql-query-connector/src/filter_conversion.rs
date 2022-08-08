@@ -194,7 +194,7 @@ impl AliasedCondition for ScalarFilter {
 fn scalar_filter_aliased_cond(sf: ScalarFilter, alias: Option<Alias>, reverse: bool) -> ConditionTree<'static> {
     match sf.projection {
         ScalarProjection::Single(field) => {
-            let comparable: Expression = field.aliased_col(alias.clone()).into();
+            let comparable: Expression = field.aliased_col(alias).into();
 
             convert_scalar_filter(comparable, sf.condition, reverse, sf.mode, &[field], alias, false)
         }
@@ -202,7 +202,7 @@ fn scalar_filter_aliased_cond(sf: ScalarFilter, alias: Option<Alias>, reverse: b
             let columns: Vec<Column<'static>> = fields
                 .clone()
                 .into_iter()
-                .map(|field| field.aliased_col(alias.clone()))
+                .map(|field| field.aliased_col(alias))
                 .collect();
 
             convert_scalar_filter(
@@ -416,7 +416,8 @@ where
             unimplemented!("Compound aggregate projections are unsupported.")
         }
         ScalarProjection::Single(field) => {
-            let comparable: Expression = field_transformer(field.aliased_col(alias.clone()));
+            let comparable: Expression = field_transformer(field.aliased_col(alias));
+
             convert_scalar_filter(comparable, sf.condition, reverse, sf.mode, &[field], alias, true)
         }
     }
@@ -857,7 +858,7 @@ fn convert_first_value<'a>(
     alias: Option<Alias>,
 ) -> Expression<'a> {
     match value.into() {
-        ConditionValue::Value(pv) => convert_pv(fields.first().unwrap(), pv).into(),
+        ConditionValue::Value(pv) => convert_pv(fields.first().unwrap(), pv),
         ConditionValue::FieldRef(field_ref) => field_ref.aliased_col(alias).into(),
     }
 }
