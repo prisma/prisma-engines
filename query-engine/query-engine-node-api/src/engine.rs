@@ -140,9 +140,9 @@ impl Inner {
 impl QueryEngine {
     /// Parse a validated datamodel and configuration to allow connecting later on.
     #[napi(constructor)]
-    pub fn new(env: Env, options: JsUnknown, callback: JsFunction) -> napi::Result<Self> {
-        let log_callback = LogCallback::new(env, callback)?;
-        log_callback.unref(&env)?;
+    pub fn new(napi_env: Env, options: JsUnknown, callback: JsFunction) -> napi::Result<Self> {
+        let log_callback = LogCallback::new(napi_env, callback)?;
+        log_callback.unref(&napi_env)?;
 
         let ConstructorOptions {
             datamodel,
@@ -152,7 +152,7 @@ impl QueryEngine {
             env,
             config_dir,
             ignore_env_var_errors,
-        } = env.from_js_value(options)?;
+        } = napi_env.from_js_value(options)?;
 
         let env = stringify_env_values(env)?; // we cannot trust anything JS sends us from process.env
         let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
@@ -192,10 +192,26 @@ impl QueryEngine {
         };
 
         let log_level = log_level.parse::<LevelFilter>().unwrap();
+        let logger = Logger::new(log_queries, log_level, log_callback, enable_metrics, enable_tracing);
+
+        // Describe metrics adds all the descriptions and default values for our metrics
+        // this needs to run once our metrics pipeline has been configured and it needs to
+        // use the correct logging subscriber(our dispatch) so that the metrics recorder recieves
+        // it
+        if enable_metrics {
+            napi_env.execute_tokio_future(
+                async {
+                    query_core::describe_metrics();
+                    Ok(())
+                }
+                .with_subscriber(logger.dispatcher()),
+                |&mut _env, _data| Ok(()),
+            )?;
+        }
 
         Ok(Self {
             inner: RwLock::new(Inner::Builder(builder)),
-            logger: Logger::new(log_queries, log_level, log_callback, enable_metrics, enable_tracing),
+            logger,
         })
     }
 
