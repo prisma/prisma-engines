@@ -210,7 +210,8 @@ mod find_unique {
 
             @@unique([b.foo, b.bar])
         }
-        "#}.to_string()
+        "#}
+        .to_string()
     }
 
     #[connector_test(schema(two_fields_same_composite), only(MongoDb))]
