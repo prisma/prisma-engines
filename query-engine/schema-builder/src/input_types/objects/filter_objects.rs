@@ -1,6 +1,7 @@
 use super::*;
 use constants::filters;
 use prisma_models::{prelude::ParentContainer, CompositeFieldRef};
+use std::collections::HashMap;
 use std::sync::Arc;
 
 pub(crate) fn scalar_filter_object_type(
@@ -137,6 +138,8 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
     fields.extend(compound_unique_fields);
     fields.extend(compound_id_field);
 
+    dbg!(&fields);
+
     input_object.set_fields(fields);
 
     Arc::downgrade(&input_object)
@@ -163,65 +166,72 @@ fn compound_field_unique_object_type(
     let input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());
 
-    let fields = from_fields
+    let mut entries = HashMap::new();
+    from_fields
         .into_iter()
-        .map(|(path, field)| {
-            // it is an embedded field
-            if path.len() > 1 {
-                composite_field_unique_input_type(ctx, &path, &field)
-            } else {
-                let name = field.name.clone();
-                let typ = map_scalar_input_type_for_field(ctx, &field);
+        .for_each(|(path, field)| generate_field_entries(&mut entries, path.as_slice(), field));
 
-                input_field(name, typ, None)
-            }
-        })
-        .collect();
+    let composite_fields = entries
+        .into_iter()
+        .map(|(name, param)| generate_composite_fields(ctx, name, param))
+        .collect_vec();
+    input_object.set_fields(composite_fields);
 
-    input_object.set_fields(fields);
     Arc::downgrade(&input_object)
 }
-
-fn composite_field_unique_input_type(ctx: &mut BuilderContext, path: &[String], field: &ScalarFieldRef) -> InputField {
-    if path.is_empty() {
-        // We build the entire path, return that field
-        let name = field.name.clone();
-        let typ = map_scalar_input_type_for_field(ctx, field);
-
-        input_field(name, typ, None)
-    } else {
-        // Build the composite _inside_ the field
-
-        // @@unique([location.address]) => LocationAddressCompoundUniqueInput { LocationAddressCompositeUniqueInput }
-        // @@unique([name, location.address]) => NameLocationAddressUniqueInput { String, LocationAddressCompositeUniqueInput }
-
-        let composite_name = path.first().unwrap();
-        let path = &path[1..];
-        let object_type = composite_field_unique_object_type(ctx, path, field);
-
-        input_field(composite_name, InputType::object(object_type), None)
-    }
+#[derive(Debug)]
+enum CompositeParameter {
+    Single(ScalarFieldRef),
+    Composite(HashMap<String, CompositeParameter>),
 }
 
-fn composite_field_unique_object_type(
-    ctx: &mut BuilderContext,
-    path: &[String],
-    field: &ScalarFieldRef,
-) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new(
-        format!("{}CompositeUniqueInput", path.iter().map(capitalize).join("")),
-        PRISMA_NAMESPACE,
-    );
-    return_cached_input!(ctx, &ident);
+fn generate_field_entries(entries: &mut HashMap<String, CompositeParameter>, path: &[String], field: ScalarFieldRef) {
+    let key = path.first().unwrap();
 
-    let obj = Arc::new(init_input_object_type(ident.clone()));
-    ctx.cache_input_type(ident, obj.clone());
+    match entries.entry(key.to_string()) {
+        std::collections::hash_map::Entry::Occupied(mut entry) => match entry.get_mut() {
+            CompositeParameter::Single(_) => panic!("Not expecting an already existing leaf"),
+            CompositeParameter::Composite(comp) => {
+                if path.len() == 1 {
+                    entry.insert(CompositeParameter::Single(field));
+                } else {
+                    generate_field_entries(comp, &path[1..], field);
+                }
+            }
+        },
+        std::collections::hash_map::Entry::Vacant(entry) => {
+            if path.len() == 1 {
+                entry.insert(CompositeParameter::Single(field));
+            } else {
+                let mut composite = HashMap::new();
+                generate_field_entries(&mut composite, &path[1..], field);
+                entry.insert(CompositeParameter::Composite(composite));
+            }
+        }
+    };
+}
 
-    let path = &path[1..];
-    let inner_field = composite_field_unique_input_type(ctx, path, field);
-    obj.set_fields(vec![inner_field]);
+fn generate_composite_fields(ctx: &mut BuilderContext, name: String, parameter: CompositeParameter) -> InputField {
+    match parameter {
+        CompositeParameter::Single(field) => {
+            let typ = map_scalar_input_type_for_field(ctx, &field);
+            input_field(name, typ, None)
+        }
+        CompositeParameter::Composite(comp) => {
+            let ident = Identifier::new(format!("{}CompositeUniqueInput", name), PRISMA_NAMESPACE);
 
-    Arc::downgrade(&obj)
+            let obj = Arc::new(init_input_object_type(ident.clone()));
+            ctx.cache_input_type(ident, obj.clone());
+
+            let fields = comp
+                .into_iter()
+                .map(|(key, inner_field)| generate_composite_fields(ctx, key, inner_field))
+                .collect_vec();
+            obj.set_fields(fields);
+
+            input_field(name, InputType::object(Arc::downgrade(&obj)), None)
+        }
+    }
 }
 
 /// Object used for full composite equality, e.g. `{ field: "value", field2: 123 } == { field: "value" }`.
