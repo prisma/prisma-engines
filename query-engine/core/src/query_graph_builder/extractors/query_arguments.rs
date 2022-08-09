@@ -321,7 +321,7 @@ fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilde
 }
 
 fn extract_from_input_map(path: &[String], map: &mut ParsedInputMap) -> PrismaValue {
-    let name = path.first().expect("I was expecting a path to unwrap");
+    let name = path.first().unwrap();
     let mut entry = map.remove(name).unwrap();
 
     // Recursively go through the map until finding the single value
