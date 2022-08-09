@@ -22,7 +22,7 @@ mod find_unique {
         .to_string()
     }
 
-    #[connector_test(schema(simple_uniq_idx_with_embedded))]
+    #[connector_test(schema(simple_uniq_idx_with_embedded), only(MongoDb))]
     async fn simple_embedded_type(runner: Runner) -> TestResult<()> {
         run_query!(
             runner,
