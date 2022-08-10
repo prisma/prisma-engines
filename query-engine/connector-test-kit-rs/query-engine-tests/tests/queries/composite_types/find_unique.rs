@@ -243,4 +243,54 @@ mod find_unique {
 
         Ok(())
     }
+
+    fn hierarchical_composite_schema() -> String {
+        indoc! {r#"
+        type C {
+            foo String
+        }
+
+        type B {
+            c C
+        }
+
+        model A {
+            #id(id, Int, @id)
+            b B
+
+            @@unique([b.c.foo])
+        }
+        "#}.to_string()
+    }
+
+    #[connector_test(schema(hierarchical_composite_schema), only(MongoDb))]
+    async fn embedded_hierarchy_with_composite_uniq_idx(runner: Runner) -> TestResult<()> {
+        run_query!(
+            runner,
+            indoc! {r#"mutation {
+                createManyA(data: [
+                  {id: 1 b: { c: { foo: "a" } } },
+                  {id: 2 b: { c: { foo: "b" } } },
+                ]) { count }
+              }"#}
+        );
+
+        assert_query!(
+            runner,
+            r#"query {
+                findUniqueA(where: {
+                  b_c_foo: {
+                    b: {
+                        c: {
+                            foo: "a"
+                        }
+                    }
+                  }
+                }) { id }
+              }"#,
+            r#"{"data":{"findUniqueA":{"id":1}}}"#
+        );
+
+        Ok(())
+    }
 }
