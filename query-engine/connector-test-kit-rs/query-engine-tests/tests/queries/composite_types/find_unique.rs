@@ -14,7 +14,6 @@ mod find_unique {
             #id(id, Int, @id)
             name String
             location Location
-            location_address String?
 
             @@unique([location.address])
         }
