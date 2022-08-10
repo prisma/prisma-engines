@@ -106,6 +106,18 @@ impl RenderContext {
         self.mark_as_rendered(identifier);
     }
 
+    pub fn add_field_ref_type(&mut self, identifier: Identifier, ref_type: DmmfFieldRefType) {
+        // Field ref types from the namespace
+        match self.schema.field_ref_types.entry(identifier.namespace().to_owned()) {
+            Entry::Occupied(mut v) => v.get_mut().push(ref_type),
+            Entry::Vacant(v) => {
+                v.insert(vec![ref_type]);
+            }
+        };
+
+        self.mark_as_rendered(identifier);
+    }
+
     pub fn add_mapping(&mut self, name: String, operation: Option<&QueryInfo>) {
         if let Some(info) = operation {
             if let Some(ref model) = info.model {

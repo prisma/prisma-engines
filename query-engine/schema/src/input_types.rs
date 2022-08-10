@@ -14,10 +14,11 @@ pub struct InputObjectType {
 
 /// Object tags help differentiating objects during parsing / raw input data processing,
 /// especially if complex object unions are present.
-#[derive(Debug, PartialEq, Copy, Clone)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum ObjectTag {
     CompositeEnvelope,
-    FieldRef,
+    // Holds the type against which a field can be compared
+    FieldRefType(InputType),
 }
 
 #[derive(Debug, Default, PartialEq)]
@@ -265,6 +266,14 @@ impl InputType {
             Self::Enum(_) => false,
             Self::List(inner) => inner.is_empty(),
             Self::Object(weak) => weak.into_arc().is_empty(),
+        }
+    }
+
+    pub fn is_json(&self) -> bool {
+        match self {
+            Self::Scalar(ScalarType::Json) => true,
+            Self::Scalar(ScalarType::JsonList) => true,
+            _ => false,
         }
     }
 }

@@ -8,6 +8,7 @@ pub struct DmmfSchema {
     pub input_object_types: IndexMap<String, Vec<DmmfInputType>>,
     pub output_object_types: IndexMap<String, Vec<DmmfOutputType>>,
     pub enum_types: IndexMap<String, Vec<DmmfEnum>>,
+    pub field_ref_types: IndexMap<String, Vec<DmmfFieldRefType>>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -35,6 +36,14 @@ pub struct DmmfInputType {
 pub struct DmmfInputTypeConstraints {
     pub max_num_fields: Option<usize>,
     pub min_num_fields: Option<usize>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DmmfFieldRefType {
+    pub name: String,
+    pub allow_types: Vec<DmmfTypeReference>,
+    pub fields: Vec<DmmfInputField>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -75,6 +84,7 @@ pub enum TypeLocation {
     InputObjectTypes,
     OutputObjectTypes,
     EnumTypes,
+    FieldRefTypes,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

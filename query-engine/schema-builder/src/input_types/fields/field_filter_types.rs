@@ -373,8 +373,10 @@ fn equality_filters(
     mapped_type: InputType,
     nullable: bool,
 ) -> impl Iterator<Item = InputField> {
+    let types = mapped_type.with_field_ref_input(ctx);
+
     std::iter::once(
-        input_field(filters::EQUALS, mapped_type.with_field_ref_input(ctx), None)
+        input_field(filters::EQUALS, types, None)
             .optional()
             .nullable_if(nullable),
     )
@@ -405,9 +407,13 @@ fn inclusion_filters(
     mapped_type: InputType,
     nullable: bool,
 ) -> impl Iterator<Item = InputField> {
-    let typ = InputType::list(mapped_type);
-    let field_types: Vec<InputType> =
-        typ.with_field_ref_input_if(ctx, ctx.has_capability(ConnectorCapability::ScalarLists));
+    let input_type = InputType::list(mapped_type);
+
+    let field_types: Vec<InputType> = if ctx.has_capability(ConnectorCapability::ScalarLists) {
+        input_type.with_field_ref_input(ctx)
+    } else {
+        vec![input_type]
+    };
 
     vec![
         input_field(filters::IN, field_types.clone(), None)
@@ -421,13 +427,14 @@ fn inclusion_filters(
 }
 
 fn alphanumeric_filters(ctx: &mut BuilderContext, mapped_type: InputType) -> impl Iterator<Item = InputField> {
-    let is_json_type = matches!(&mapped_type, InputType::Scalar(ScalarType::Json));
-    // We disable alphanumeric json filters on field reference for MySQL & MariaDB because we can't make it work
-    // for both connectors without making MariaDB its own connector.
-    let field_types = mapped_type.with_field_ref_input_if(
-        ctx,
-        !is_json_type || ctx.has_capability(ConnectorCapability::JsonFilteringAlphanumericFieldRef),
-    );
+    // We disable referencing fields on alphanumeric json filters for MySQL & MariaDB because we can't make it work
+    // for both database without splitting them into their own connectors.
+    let field_types =
+        if !mapped_type.is_json() || ctx.has_capability(ConnectorCapability::JsonFilteringAlphanumericFieldRef) {
+            mapped_type.with_field_ref_input(ctx)
+        } else {
+            vec![mapped_type]
+        };
 
     vec![
         input_field(filters::LOWER_THAN, field_types.clone(), None).optional(),
@@ -625,13 +632,13 @@ fn not_filter_field(
     }
 }
 
-fn field_reference_object_type(ctx: &mut BuilderContext) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new("FieldRefInput", PRISMA_NAMESPACE);
+fn field_ref_input_object_type(ctx: &mut BuilderContext, allow_type: InputType) -> InputObjectTypeWeakRef {
+    let ident = Identifier::new(field_ref_input_type_name(&allow_type), PRISMA_NAMESPACE);
 
     return_cached_input!(ctx, &ident);
 
     let mut object = init_input_object_type(ident.clone());
-    object.set_tag(ObjectTag::FieldRef);
+    object.set_tag(ObjectTag::FieldRefType(allow_type));
 
     let object = Arc::new(object);
     ctx.cache_input_type(ident, object.clone());
@@ -641,27 +648,38 @@ fn field_reference_object_type(ctx: &mut BuilderContext) -> InputObjectTypeWeakR
     Arc::downgrade(&object)
 }
 
-trait WithFieldReferenceInputExtension {
+trait WithFieldRefInputExt {
     fn with_field_ref_input(self, ctx: &mut BuilderContext) -> Vec<InputType>;
-    fn with_field_ref_input_if(self, ctx: &mut BuilderContext, cond: bool) -> Vec<InputType>;
 }
 
-impl WithFieldReferenceInputExtension for InputType {
+impl WithFieldRefInputExt for InputType {
     fn with_field_ref_input(self, ctx: &mut BuilderContext) -> Vec<InputType> {
-        let mut field_types: Vec<InputType> = vec![self];
+        let mut field_types: Vec<InputType> = vec![self.clone()];
 
         if ctx.has_feature(&PreviewFeature::FieldReference) {
-            field_types.push(InputType::object(field_reference_object_type(ctx)));
+            field_types.push(InputType::object(field_ref_input_object_type(ctx, self)));
         }
 
         field_types
     }
+}
 
-    fn with_field_ref_input_if(self, ctx: &mut BuilderContext, cond: bool) -> Vec<InputType> {
-        if cond {
-            self.with_field_ref_input(ctx)
-        } else {
-            vec![self]
-        }
-    }
+fn field_ref_input_type_name(allow_type: &InputType) -> String {
+    internal_field_ref_input_type_name(allow_type, false)
+}
+
+fn internal_field_ref_input_type_name(allow_type: &InputType, is_list: bool) -> String {
+    let list = if is_list { "List" } else { "" };
+
+    let typ_str = match allow_type {
+        InputType::Scalar(scalar) => match scalar {
+            ScalarType::Null => unreachable!("ScalarType::Null should never reach that code path"),
+            _ => scalar.to_string(),
+        },
+        InputType::Enum(e) => format!("Enum{}", e.into_arc().name()),
+        InputType::List(inner) => return internal_field_ref_input_type_name(inner, true),
+        _ => unreachable!("input ref type only support scalar or enums"),
+    };
+
+    format!("{}{}FieldRefInput", typ_str, list)
 }

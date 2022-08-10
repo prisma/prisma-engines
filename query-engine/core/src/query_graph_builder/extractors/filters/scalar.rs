@@ -212,7 +212,7 @@ impl<'a> ScalarFilterParser<'a> {
 
                         Ok(vec![filter])
                     }
-                    ParsedInputValue::Map(ref map) if matches!(map.tag, Some(schema::ObjectTag::FieldRef)) => {
+                    ParsedInputValue::Map(ref map) if matches!(map.tag, Some(schema::ObjectTag::FieldRefType(_))) => {
                         let filter = field.json_not_equals(self.as_condition_value(input, false)?, json_path);
 
                         Ok(vec![filter])
