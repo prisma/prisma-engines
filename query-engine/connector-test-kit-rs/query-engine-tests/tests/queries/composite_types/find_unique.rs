@@ -14,6 +14,7 @@ mod find_unique {
             #id(id, Int, @id)
             name String
             location Location
+            location_address String?
 
             @@unique([location.address])
         }
@@ -191,6 +192,107 @@ mod find_unique {
                     }
                 } 
             }) { id }}"#,
+            r#"{"data":{"findUniqueA":{"id":1}}}"#
+        );
+
+        Ok(())
+    }
+
+    fn composite_uniq_idx_with_name() -> String {
+        indoc! {r#"
+        type Location {
+            address Int
+        }
+
+        model A {
+            #id(id, Int, @id)
+            name String
+            location Location
+
+            @@unique([name, location.address], name: "name_address")
+        }
+        "#}
+        .to_string()
+    }
+
+    #[connector_test(schema(composite_uniq_idx_with_name), only(MongoDb))]
+    async fn composite_unique_index_with_name(runner: Runner) -> TestResult<()> {
+        run_query!(
+            runner,
+            indoc! {r#"mutation {
+            createManyA(data: [
+                {id: 1 name: "foo" location: {set: {address: "a"}}},
+                {id: 2 name: "foo" location: {set: {address: "b"}}},
+                {id: 3 name: "bar" location: {set: {address: "c"}}},
+            ]) { count }
+        }"#}
+        );
+
+        assert_query!(
+            runner,
+            r#"query { findUniqueA(where: { 
+                name_address: {
+                    name: "foo"
+                    location: {
+                        address: 1
+                    }
+                } 
+            }) { id }}"#,
+            r#"{"data":{"findUniqueA":{"id":1}}}"#
+        );
+
+        Ok(())
+    }
+
+    fn two_composite_uniq_idx() -> String {
+        indoc! {r#"
+        type Location {
+            address String
+        }
+
+        type Person {
+            name String
+            age Int
+        }
+
+        model A {
+            #id(id, Int, @id)
+            person Person
+            location Location
+
+            @@unique([location.address, person.name])
+        }
+        "#}
+        .to_string()
+    }
+
+    #[connector_test(schema(two_composite_uniq_idx), only(MongoDb))]
+    async fn two_composite_unique_idx(runner: Runner) -> TestResult<()> {
+        run_query!(
+            runner,
+            indoc! {r#"mutation {
+                createManyA(data: [
+                  {id: 1 person: {name: "foo", age: 1}, location: {address: "a"}},
+                  {id: 2 person: {name: "bar", age: 2}, location: {address: "a"}},
+                  {id: 3 person: {name: "foo", age: 3}, location: {address: "b"}},
+                ]) { count }
+              }"#}
+        );
+
+        assert_query!(
+            runner,
+            r#"query {
+                findUniqueA(where: {
+                  location_address_person_name: {
+                    location: {
+                      address: "a"
+                    },
+                    person: {
+                        name: "foo",
+                    }
+                  }
+                }) { id }
+              }"#,
             r#"{"data":{"findUniqueA":{"id":1}}}"#
         );
 
