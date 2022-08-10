@@ -471,11 +471,6 @@
 <span id="466">466</span>
 <span id="467">467</span>
 <span id="468">468</span>
-<span id="469">469</span>
-<span id="470">470</span>
-<span id="471">471</span>
-<span id="472">472</span>
-<span id="473">473</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::print_literal</span>)]</span> <span class="comment">// it is just wrong in this case</span>
 
 <span class="kw">mod</span> <span class="ident">diagnose_migration_history</span>;
@@ -782,11 +777,6 @@
             datasource db {{
               provider = &quot;{}&quot;
               url = &quot;{}&quot;
-            }}
-
-            generator js {{
-              provider        = &quot;prisma-client-js&quot;
-              previewFeatures = [&quot;mongodb&quot;]
             }}
         &quot;#</span>,
         <span class="ident">provider</span>, <span class="ident">url</span>
