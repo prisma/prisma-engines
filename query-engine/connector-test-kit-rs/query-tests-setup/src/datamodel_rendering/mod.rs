@@ -35,6 +35,7 @@ pub fn render_test_datamodel(
     test_database: &str,
     template: String,
     excluded_features: &[&str],
+    referential_integrity_override: Option<String>,
 ) -> String {
     let tag = config.test_connector_tag().unwrap();
     let preview_features = render_preview_features(excluded_features);
@@ -54,7 +55,7 @@ pub fn render_test_datamodel(
         "#},
         tag.datamodel_provider(),
         tag.connection_string(test_database, config.is_ci()),
-        tag.referential_integrity(),
+        referential_integrity_override.unwrap_or_else(|| tag.referential_integrity().to_string()),
         preview_features
     );
 

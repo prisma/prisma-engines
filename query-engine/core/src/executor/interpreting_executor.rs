@@ -87,7 +87,7 @@ where
         } else if transactional {
             let connection_name = self.connector.name();
             let conn_span = info_span!(
-                "prisma:connection",
+                "prisma:engine:connection",
                 user_facing = true,
                 "db.type" = connection_name.as_str()
             );
@@ -136,7 +136,7 @@ where
         trace!("[{}] Starting...", id);
         let connection_name = self.connector.name();
         let conn_span = info_span!(
-            "prisma:connection",
+            "prisma:engine:connection",
             user_facing = true,
             "db.type" = connection_name.as_str()
         );

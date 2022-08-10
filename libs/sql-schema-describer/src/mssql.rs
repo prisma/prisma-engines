@@ -186,8 +186,8 @@ impl<'a> SqlSchemaDescriber<'a> {
             SELECT tbl.name AS table_name
             FROM sys.tables tbl
             WHERE SCHEMA_NAME(tbl.schema_id) = @P1
-            AND tbl.is_ms_shipped = 0
-            AND tbl.type = 'U'
+                AND tbl.is_ms_shipped = 0
+                AND tbl.type = 'U'
             ORDER BY tbl.name;
         "#;
 
@@ -387,7 +387,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 ind.is_unique AS is_unique,
                 ind.is_unique_constraint AS is_unique_constraint,
                 ind.is_primary_key AS is_primary_key,
-                ind.type_desc as clustering,
+                ind.type_desc AS clustering,
                 col.name AS column_name,
                 ic.key_ordinal AS seq_in_index,
                 ic.is_descending_key AS is_descending,
@@ -401,6 +401,8 @@ impl<'a> SqlSchemaDescriber<'a> {
             INNER JOIN
                 sys.tables t ON ind.object_id = t.object_id
             WHERE SCHEMA_NAME(t.schema_id) = @P1
+                -- https://docs.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-index-columns-transact-sql?view=sql-server-ver16
+                AND ic.key_ordinal != 0
                 AND t.is_ms_shipped = 0
                 AND ind.filter_definition IS NULL
                 AND ind.name IS NOT NULL
@@ -428,7 +430,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
             let clustered = row.get_expect_string("clustering").starts_with("CLUSTERED");
 
-            let column_name = row.get("column_name").and_then(|x| x.to_string()).unwrap();
+            let column_name = row.get_expect_string("column_name");
             let column_id = if let Some(col) = sql_schema.walk(table_id).column(&column_name) {
                 col.id
             } else {

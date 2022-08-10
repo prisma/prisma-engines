@@ -72,26 +72,42 @@ impl TestApi {
     }
 
     pub(crate) fn describe_with_schema(&self, schema: &str) -> SqlSchema {
-        tok(self.describer(&self.database).describe(schema)).unwrap()
+        tok(self.describe_impl(schema)).unwrap()
     }
 
     pub(crate) fn describe_error(&self) -> DescriberError {
-        tok(self.describer(&self.database).describe(self.schema_name())).unwrap_err()
+        tok(self.describe_impl(self.schema_name())).unwrap_err()
     }
 
-    fn describer<'a>(&self, connection: &'a dyn Queryable) -> Box<dyn SqlSchemaDescriberBackend + 'a> {
+    async fn describe_impl(&self, schema: &str) -> Result<SqlSchema, DescriberError> {
         match self.sql_family() {
-            SqlFamily::Postgres => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(
-                connection,
-                if self.tags.contains(Tags::CockroachDb) {
-                    Circumstances::Cockroach.into()
-                } else {
-                    Default::default()
-                },
-            )),
-            SqlFamily::Sqlite => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(connection)),
-            SqlFamily::Mysql => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(connection)),
-            SqlFamily::Mssql => Box::new(sql_schema_describer::mssql::SqlSchemaDescriber::new(connection)),
+            SqlFamily::Postgres => {
+                sql_schema_describer::postgres::SqlSchemaDescriber::new(
+                    &self.database,
+                    if self.tags.contains(Tags::CockroachDb) {
+                        Circumstances::Cockroach.into()
+                    } else {
+                        Default::default()
+                    },
+                )
+                .describe(schema)
+                .await
+            }
+            SqlFamily::Sqlite => {
+                sql_schema_describer::sqlite::SqlSchemaDescriber::new(&self.database)
+                    .describe_impl()
+                    .await
+            }
+            SqlFamily::Mysql => {
+                sql_schema_describer::mysql::SqlSchemaDescriber::new(&self.database)
+                    .describe(schema)
+                    .await
+            }
+            SqlFamily::Mssql => {
+                sql_schema_describer::mssql::SqlSchemaDescriber::new(&self.database)
+                    .describe(schema)
+                    .await
+            }
         }
     }
 

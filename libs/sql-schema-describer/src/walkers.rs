@@ -52,6 +52,12 @@ pub type IndexWalker<'a> = Walker<'a, IndexId>;
 /// Traverse a specific column inside an index.
 pub type IndexColumnWalker<'a> = Walker<'a, IndexColumnId>;
 
+/// Traverse a user-defined type
+pub type UserDefinedTypeWalker<'a> = Walker<'a, UdtId>;
+
+/// Traverse a view
+pub type ViewWalker<'a> = Walker<'a, ViewId>;
+
 impl<'a> ColumnWalker<'a> {
     /// The nullability and arity of the column.
     pub fn arity(self) -> ColumnArity {
@@ -165,21 +171,7 @@ impl<'a> ColumnWalker<'a> {
     }
 }
 
-/// Traverse a view
-#[derive(Clone, Copy)]
-pub struct ViewWalker<'a> {
-    /// The schema the view is contained in.
-    pub(crate) schema: &'a SqlSchema,
-    /// The index of the view in the schema.
-    pub(crate) view_index: usize,
-}
-
 impl<'a> ViewWalker<'a> {
-    /// Create a ViewWalker from a schema and a reference to one of its views.
-    pub fn new(schema: &'a SqlSchema, view_index: usize) -> Self {
-        Self { schema, view_index }
-    }
-
     /// The name of the view
     pub fn name(self) -> &'a str {
         &self.view().name
@@ -190,29 +182,12 @@ impl<'a> ViewWalker<'a> {
         self.view().definition.as_deref()
     }
 
-    /// The index of the view in the schema.
-    pub fn view_index(self) -> usize {
-        self.view_index
-    }
-
     fn view(self) -> &'a View {
-        &self.schema.views[self.view_index]
+        &self.schema.views[self.id.0 as usize]
     }
-}
-
-/// Traverse a user-defined type
-#[derive(Clone, Copy)]
-pub struct UserDefinedTypeWalker<'a> {
-    pub(crate) schema: &'a SqlSchema,
-    pub(crate) udt_index: usize,
 }
 
 impl<'a> UserDefinedTypeWalker<'a> {
-    /// Create a UserDefinedTypeWalker from a schema and a reference to one of its udts.
-    pub fn new(schema: &'a SqlSchema, udt_index: usize) -> Self {
-        Self { schema, udt_index }
-    }
-
     /// The name of the type
     pub fn name(self) -> &'a str {
         &self.udt().name
@@ -223,13 +198,8 @@ impl<'a> UserDefinedTypeWalker<'a> {
         self.udt().definition.as_deref()
     }
 
-    /// The index of the user-defined type in the schema.
-    pub fn udt_index(self) -> usize {
-        self.udt_index
-    }
-
     fn udt(self) -> &'a UserDefinedType {
-        &self.schema.user_defined_types[self.udt_index]
+        &self.schema.user_defined_types[self.id.0 as usize]
     }
 }
 

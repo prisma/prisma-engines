@@ -686,6 +686,7 @@ dependencies = [
  "chrono",
  "datamodel-connector",
  "diagnostics",
+ "dissimilar",
  "dml",
  "either",
  "enumflags2",

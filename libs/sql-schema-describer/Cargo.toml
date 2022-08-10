@@ -24,6 +24,7 @@ tracing-futures = "0.2"
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint"
 features = [
+    "expose-drivers",
     "chrono",
     "sqlite",
     "postgresql",

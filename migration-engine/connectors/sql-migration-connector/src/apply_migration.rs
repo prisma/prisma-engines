@@ -156,12 +156,12 @@ fn render_raw_sql(
         }
         SqlMigrationStep::RenameIndex { index } => renderer.render_rename_index(schemas.walk(*index)),
         SqlMigrationStep::DropView(drop_view) => {
-            let view = schemas.previous.view_walker_at(drop_view.view_index);
+            let view = schemas.previous.walk(drop_view.view_id);
 
             vec![renderer.render_drop_view(view)]
         }
         SqlMigrationStep::DropUserDefinedType(drop_udt) => {
-            let udt = schemas.previous.udt_walker_at(drop_udt.udt_index);
+            let udt = schemas.previous.walk(drop_udt.udt_id);
 
             vec![renderer.render_drop_user_defined_type(&udt)]
         }

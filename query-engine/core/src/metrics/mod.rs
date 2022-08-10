@@ -75,7 +75,7 @@ pub fn setup() {
 // Describe all metric here so that every time for create
 // a new metric registry for a Query Instance the descriptions
 // will be in place
-fn describe_metrics() {
+pub fn describe_metrics() {
     describe_counter!(
         "prisma_pool_connections_opened_total",
         "Total number of Pool Connections opened"

@@ -233,11 +233,11 @@ impl SqlSchema {
     }
 
     pub fn view_walkers(&self) -> impl Iterator<Item = ViewWalker<'_>> {
-        (0..self.views.len()).map(move |view_index| ViewWalker::new(self, view_index))
+        (0..self.views.len()).map(move |view_index| self.walk(ViewId(view_index as u32)))
     }
 
     pub fn udt_walkers(&self) -> impl Iterator<Item = UserDefinedTypeWalker<'_>> {
-        (0..self.user_defined_types.len()).map(move |udt_index| UserDefinedTypeWalker::new(self, udt_index))
+        (0..self.user_defined_types.len()).map(move |udt_index| self.walk(UdtId(udt_index as u32)))
     }
 
     pub fn enum_walkers(&self) -> impl Iterator<Item = EnumWalker<'_>> {
@@ -257,20 +257,6 @@ impl SqlSchema {
     /// Traverse a schema item by id.
     pub fn walk<I>(&self, id: I) -> Walker<'_, I> {
         Walker { id, schema: self }
-    }
-
-    pub fn udt_walker_at(&self, index: usize) -> UserDefinedTypeWalker<'_> {
-        UserDefinedTypeWalker {
-            udt_index: index,
-            schema: self,
-        }
-    }
-
-    pub fn view_walker_at(&self, index: usize) -> ViewWalker<'_> {
-        ViewWalker {
-            view_index: index,
-            schema: self,
-        }
     }
 
     /// Traverse all the columns in the schema.
