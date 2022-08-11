@@ -1,0 +1,36 @@
+datasource mdb {
+  provider = "mongodb"
+  url = env("TESTDBURL")
+}
+
+type Street {
+  description String
+}
+
+type Address {
+  street Street
+}
+
+type Location {
+  address Address
+  country String
+}
+
+model A {
+  id Int @id @map("_id")
+  name String
+  my_location Location
+  name_my_location_address_street_description String?
+
+  @@unique([name, my_location.address.street.description])
+}
+
+
+
+
+// [1;91merror[0m: [1mError validating model "A": The field `name_my_location_address_street_description` clashes with the `@@unique` name. Please resolve the conflict by providing a custom id name: `@@unique([...], name: "custom_name")`[0m
+//   [1;94m-->[0m  [4mschema.prisma:25[0m
+// [1;94m   | [0m
+// [1;94m24 | [0m
+// [1;94m25 | [0m  [1;91m@@unique([name, my_location.address.street.description])[0m
+// [1;94m   | [0m
