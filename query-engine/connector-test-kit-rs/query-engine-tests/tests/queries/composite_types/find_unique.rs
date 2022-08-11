@@ -200,7 +200,7 @@ mod find_unique {
     fn composite_uniq_idx_with_name() -> String {
         indoc! {r#"
         type Location {
-            address Int
+            address String
         }
 
         model A {
@@ -233,7 +233,7 @@ mod find_unique {
                 name_address: {
                     name: "foo"
                     location: {
-                        address: 1
+                        address: "a"
                     }
                 } 
             }) { id }}"#,
