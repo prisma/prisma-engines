@@ -53,10 +53,6 @@ impl WriteArgsParser {
     }
 }
 
-fn is_composite_envelope(map: &ParsedInputMap) -> bool {
-    matches!(map.tag, Some(ObjectTag::CompositeEnvelope))
-}
-
 fn parse_scalar(sf: &ScalarFieldRef, v: ParsedInputValue) -> Result<WriteOperation, QueryGraphBuilderError> {
     match v {
         ParsedInputValue::Single(PrismaValue::Enum(e)) if sf.type_identifier == TypeIdentifier::Json => {
@@ -121,7 +117,7 @@ fn parse_composite_writes(
         // - Operation envelope with further actions nested.
         // - Single object set shorthand.
         ParsedInputValue::Map(map) => {
-            if is_composite_envelope(&map) {
+            if map.is_composite_envelope() {
                 parse_composite_envelope(cf, map, path)
             } else {
                 let pv: PrismaValue = ParsedInputValue::Map(map).try_into()?;

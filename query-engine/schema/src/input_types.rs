@@ -17,6 +17,7 @@ pub struct InputObjectType {
 #[derive(Debug, PartialEq, Clone)]
 pub enum ObjectTag {
     CompositeEnvelope,
+    RelationEnvelope,
     // Holds the type against which a field can be compared
     FieldRefType(InputType),
 }

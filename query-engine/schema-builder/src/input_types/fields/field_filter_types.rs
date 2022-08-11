@@ -63,15 +63,20 @@ fn to_one_relation_filter_shorthand_types(ctx: &mut BuilderContext, rf: &Relatio
 
 fn to_many_relation_filter_object(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputObjectTypeWeakRef {
     let related_model = rf.related_model();
-    let related_input_type = filter_objects::where_object_type(ctx, &related_model);
     let ident = Identifier::new(
         format!("{}ListRelationFilter", capitalize(&related_model.name)),
         PRISMA_NAMESPACE,
     );
 
     return_cached_input!(ctx, &ident);
-    let object = Arc::new(init_input_object_type(ident.clone()));
+
+    let mut object = init_input_object_type(ident.clone());
+    object.set_tag(ObjectTag::RelationEnvelope);
+
+    let object = Arc::new(object);
     ctx.cache_input_type(ident, object.clone());
+
+    let related_input_type = filter_objects::where_object_type(ctx, &related_model);
 
     let fields = vec![
         input_field(filters::EVERY, InputType::object(related_input_type.clone()), None).optional(),
@@ -92,7 +97,10 @@ fn to_one_relation_filter_object(ctx: &mut BuilderContext, rf: &RelationFieldRef
     );
 
     return_cached_input!(ctx, &ident);
-    let object = Arc::new(init_input_object_type(ident.clone()));
+    let mut object = init_input_object_type(ident.clone());
+    object.set_tag(ObjectTag::RelationEnvelope);
+
+    let object = Arc::new(object);
     ctx.cache_input_type(ident, object.clone());
 
     let fields = vec![

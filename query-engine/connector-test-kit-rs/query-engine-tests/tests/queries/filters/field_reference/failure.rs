@@ -15,6 +15,8 @@ mod failure {
 
             model Child {
               #id(id, Int, @id)
+              str String
+
               testId Int
               test   TestModel @relation(fields: [testId], references: [id])
             }
@@ -30,6 +32,17 @@ mod failure {
             #id(id, Int, @id)
             str      String
             str_list String[]
+
+            children Child[]
+          }
+
+          model Child {
+            #id(id, Int, @id)
+            str String
+            str_list String[]
+
+            testId Int
+            test   TestModel @relation(fields: [testId], references: [id])
           }
           "#
         };
@@ -63,6 +76,7 @@ mod failure {
 
     #[connector_test]
     async fn fields_of_different_type_fails(runner: Runner) -> TestResult<()> {
+        // Simple scalar filter
         assert_error!(
             runner,
             r#"{ findManyTestModel(where: { id: { equals: { _ref: "str" } } }) { id } }"#,
@@ -70,11 +84,20 @@ mod failure {
             "Expected a referenced scalar field of type Int but found TestModel.str of type String."
         );
 
+        // Through a relation filter
+        assert_error!(
+            runner,
+            r#"{ findManyTestModel(where: { children: { some: { id: { equals: { _ref: "str" } } } } }) { id } }"#,
+            2019,
+            "Expected a referenced scalar field of type Int but found Child.str of type String."
+        );
+
         Ok(())
     }
 
     #[connector_test(schema(schema_list), capabilities(ScalarLists))]
     async fn field_of_different_arity_fails(runner: Runner) -> TestResult<()> {
+        // Simple scalar filter
         assert_error!(
             runner,
             r#"{ findManyTestModel(where: { str: { equals: { _ref: "str_list" } } }) { id } }"#,
@@ -82,10 +105,20 @@ mod failure {
             "Expected a referenced scalar field of type String but found TestModel.str_list of type String[]."
         );
 
+        // Through a relation filter
+        assert_error!(
+            runner,
+            r#"{ findManyTestModel(where: { children: { some: { str: { equals: { _ref: "str_list" } } } } }) { id } }"#,
+            2019,
+            "Expected a referenced scalar field of type String but found Child.str_list of type String[]."
+        );
+
         Ok(())
     }
 
     // Exclude connectors that supports `ScalarLists`
+    // Connectors that don't supports ScalarLists cannot reference fields on inclusion filters
+    // since those filters expect scalar lists.
     #[connector_test(schema(schema), exclude(MongoDb, Postgres, CockroachDb))]
     async fn field_ref_inclusion_filter_fails(runner: Runner) -> TestResult<()> {
         assert_error!(
