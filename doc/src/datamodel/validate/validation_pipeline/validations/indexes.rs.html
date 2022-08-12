@@ -810,7 +810,7 @@
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">idx_client_name</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">fields</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>()).<span class="ident">join</span>(<span class="string">&quot;_&quot;</span>);
+    <span class="kw">let</span> <span class="ident">idx_client_name</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">all_field_names</span>().<span class="ident">join</span>(<span class="string">&quot;_&quot;</span>);
 
     <span class="kw">if</span> <span class="ident">index</span>.<span class="ident">model</span>().<span class="ident">scalar_fields</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">idx_client_name</span>) {
         <span class="kw">let</span> <span class="ident">attr_name</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">attribute_name</span>();
