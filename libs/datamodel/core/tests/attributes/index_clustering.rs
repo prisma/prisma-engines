@@ -1,29 +1,6 @@
 use crate::{common::*, with_header, Provider};
 
 #[test]
-fn non_boolean_clustering() {
-    let dml = indoc! {r#"
-        model A {
-          id Int @id(clustered: meow)
-        }
-    "#};
-
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mExpected a boolean value, but received literal value `meow`.[0m
-          [1;94m-->[0m  [4mschema.prisma:12[0m
-        [1;94m   | [0m
-        [1;94m11 | [0mmodel A {
-        [1;94m12 | [0m  id Int @id(clustered: [1;91mmeow[0m)
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error);
-}
-
-#[test]
 fn clustered_index_works_on_sql_server() {
     let dml = indoc! {r#"
         model A {
