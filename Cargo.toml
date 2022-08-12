@@ -20,6 +20,7 @@ members = [
   "query-engine/connectors/mongodb-query-connector",
   "query-engine/core",
   "query-engine/dmmf",
+  "query-engine/metrics",
   "query-engine/query-engine",
   "query-engine/query-engine-node-api",
   "query-engine/connector-test-kit-rs/query-engine-tests",

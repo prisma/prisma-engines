@@ -2263,6 +2263,7 @@ dependencies = [
  "prisma-models",
  "prisma-value",
  "query-connector",
+ "query-engine-metrics",
  "rand 0.7.3",
  "regex",
  "serde",
@@ -3264,6 +3265,7 @@ dependencies = [
  "prisma-models",
  "prisma-value",
  "query-connector",
+ "query-engine-metrics",
  "schema",
  "schema-builder",
  "serde",
@@ -3305,6 +3307,7 @@ dependencies = [
  "quaint",
  "query-connector",
  "query-core",
+ "query-engine-metrics",
  "rand 0.8.5",
  "request-handlers",
  "rustc_version",
@@ -3325,6 +3328,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "query-engine-metrics"
+version = "0.1.0"
+dependencies = [
+ "expect-test",
+ "metrics 0.18.1",
+ "metrics-exporter-prometheus",
+ "metrics-util 0.12.1",
+ "once_cell",
+ "parking_lot 0.12.1",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tracing",
+ "tracing-futures",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "query-engine-node-api"
 version = "0.1.0"
 dependencies = [
@@ -3341,6 +3362,7 @@ dependencies = [
  "prisma-models",
  "query-connector",
  "query-core",
+ "query-engine-metrics",
  "request-handlers",
  "serde",
  "serde_json",
@@ -3367,6 +3389,7 @@ dependencies = [
  "indoc",
  "insta",
  "prisma-value",
+ "query-engine-metrics",
  "query-test-macros",
  "query-tests-setup",
  "serde_json",
@@ -3411,6 +3434,7 @@ dependencies = [
  "qe-setup",
  "query-core",
  "query-engine",
+ "query-engine-metrics",
  "regex",
  "request-handlers",
  "serde",

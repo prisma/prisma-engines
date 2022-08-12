@@ -1,6 +1,7 @@
 use crate::{ConnectorTag, RunnerInterface, TestResult, TxResult};
 use prisma_models::InternalDataModelBuilder;
-use query_core::{executor, schema::QuerySchemaRef, schema_builder, MetricRegistry, QueryExecutor, TxId};
+use query_core::{executor, schema::QuerySchemaRef, schema_builder, QueryExecutor, TxId};
+use query_engine_metrics::MetricRegistry;
 use request_handlers::{GraphQlBody, GraphQlHandler, MultiQuery};
 use std::{env, sync::Arc};
 

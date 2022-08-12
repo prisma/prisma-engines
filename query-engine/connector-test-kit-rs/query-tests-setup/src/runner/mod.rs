@@ -5,7 +5,8 @@ mod node_api;
 pub use binary::*;
 pub use direct::*;
 pub use node_api::*;
-use query_core::{MetricRegistry, TxId};
+use query_core::TxId;
+use query_engine_metrics::MetricRegistry;
 
 use crate::{ConnectorTag, ConnectorVersion, QueryResult, TestError, TestResult};
 use colored::*;

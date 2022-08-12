@@ -1,4 +1,4 @@
-use query_core::MetricRegistry;
+use query_engine_metrics::MetricRegistry;
 use tracing_error::ErrorLayer;
 use tracing_subscriber::{
     filter::Filtered, fmt::format::DefaultFields, layer::Layered, prelude::*, EnvFilter, Registry,

@@ -3,13 +3,13 @@
 #[macro_use]
 extern crate tracing;
 
-use query_core::{metrics, MetricRegistry};
 use query_engine::cli::CliCommand;
 use query_engine::error::PrismaError;
 use query_engine::logger::Logger;
 use query_engine::opt::PrismaOpt;
 use query_engine::server;
 use query_engine::LogFormat;
+use query_engine_metrics::MetricRegistry;
 use std::{error::Error, process};
 use structopt::StructOpt;
 
@@ -38,7 +38,7 @@ async fn main() -> Result<(), AnyError> {
         logger.install().unwrap();
 
         if opts.enable_metrics {
-            metrics::setup();
+            query_engine_metrics::setup();
         }
 
         match CliCommand::from_opt(&opts)? {

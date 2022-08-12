@@ -16,7 +16,7 @@ pub use datamodel_rendering::*;
 pub use error::*;
 pub use logging::*;
 pub use query_core;
-use query_core::MetricRegistry;
+use query_engine_metrics::MetricRegistry;
 pub use query_result::*;
 pub use runner::*;
 pub use schema_gen::*;
@@ -61,7 +61,7 @@ static METRIC_RECORDER: Once = Once::new();
 pub fn setup_metrics() -> MetricRegistry {
     let metrics = MetricRegistry::new();
     METRIC_RECORDER.call_once(|| {
-        query_core::metrics::setup();
+        query_engine_metrics::setup();
     });
     metrics
 }

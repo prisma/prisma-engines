@@ -4,7 +4,7 @@ use hyper::service::{make_service_fn, service_fn};
 use hyper::{header::CONTENT_TYPE, Body, HeaderMap, Method, Request, Response, Server, StatusCode};
 use opentelemetry::{global, propagation::Extractor, Context};
 use query_core::{schema::QuerySchemaRenderer, TxId};
-use query_core::{MetricFormat, MetricRegistry};
+use query_engine_metrics::{MetricFormat, MetricRegistry};
 use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlHandler, TxInput};
 use serde_json::json;
 use std::collections::HashMap;
