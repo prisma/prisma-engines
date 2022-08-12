@@ -36,6 +36,13 @@ impl fmt::Display for Expression {
 }
 
 impl Expression {
+    pub fn as_array(&self) -> Option<(&[Expression], Span)> {
+        match self {
+            Expression::Array(arr, span) => Some((arr, *span)),
+            _=> None
+        }
+    }
+
     pub fn as_string_value(&self) -> Option<(&str, Span)> {
         match self {
             Expression::StringValue(s, span) => Some((s, *span)),
