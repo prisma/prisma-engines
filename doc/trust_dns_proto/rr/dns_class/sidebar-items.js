@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["DNSClass","The DNS Record class"]]});
+window.SIDEBAR_ITEMS = {"enum":[["DNSClass","The DNS Record class"]]};

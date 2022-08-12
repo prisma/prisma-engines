@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["SerializeFieldMap",""]],"trait":[["AsMap",""]]});
+window.SIDEBAR_ITEMS = {"struct":[["SerializeFieldMap",""]],"trait":[["AsMap",""]]};

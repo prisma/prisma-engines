@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Logger","An installer for a global logger."]]});
+window.SIDEBAR_ITEMS = {"struct":[["Logger","An installer for a global logger."]]};

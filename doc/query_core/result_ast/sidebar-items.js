@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["QueryResult",""]],"struct":[["RecordAggregations",""],["RecordSelection",""]]});
+window.SIDEBAR_ITEMS = {"enum":[["QueryResult",""]],"struct":[["RecordAggregations",""],["RecordSelection",""]]};

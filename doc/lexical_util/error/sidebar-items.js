@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["Error","Error code during parsing, indicating failure type."]]});
+window.SIDEBAR_ITEMS = {"enum":[["Error","Error code during parsing, indicating failure type."]]};

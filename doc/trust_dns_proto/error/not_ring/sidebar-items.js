@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Unspecified","The Unspecified error replacement"]]});
+window.SIDEBAR_ITEMS = {"struct":[["Unspecified","The Unspecified error replacement"]]};

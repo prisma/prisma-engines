@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["comu","Trait-level `co`nst/`mu`table tracking."],["fmt","Format forwarding"]]});
+window.SIDEBAR_ITEMS = {"mod":[["comu","Trait-level `co`nst/`mu`table tracking."],["fmt","Format forwarding"]]};

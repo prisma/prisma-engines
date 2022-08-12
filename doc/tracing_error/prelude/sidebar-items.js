@@ -1,1 +1,1 @@
-initSidebarItems({"trait":[["_","A trait for extracting SpanTraces created by `in_current_span()` from `dyn Error` trait objects"]]});
+window.SIDEBAR_ITEMS = {};

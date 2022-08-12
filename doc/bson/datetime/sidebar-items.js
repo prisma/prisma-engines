@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["Error","Errors that can occur during [`DateTime`] construction and generation."]],"struct":[["DateTime","Struct representing a BSON datetime. Note: BSON datetimes have millisecond precision."]],"type":[["Result","Alias for `Result<T, DateTime::Error>`"]]});
+window.SIDEBAR_ITEMS = {"enum":[["Error","Errors that can occur during [`DateTime`] construction and generation."]],"struct":[["DateTime","Struct representing a BSON datetime. Note: BSON datetimes have millisecond precision."]],"type":[["Result","Alias for `Result<T, DateTime::Error>`"]]};

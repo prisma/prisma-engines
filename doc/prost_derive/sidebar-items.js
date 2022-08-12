@@ -1,1 +1,1 @@
-initSidebarItems({"derive":[["Enumeration",""],["Message",""],["Oneof",""]]});
+window.SIDEBAR_ITEMS = {"derive":[["Enumeration",""],["Message",""],["Oneof",""]]};

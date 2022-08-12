@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["Either",""]],"mod":[["_const",""],["bytes",""],["flags",""],["int",""],["seq",""]],"struct":[["Skip",""]]});
+window.SIDEBAR_ITEMS = {"enum":[["Either",""]],"mod":[["_const",""],["bytes",""],["flags",""],["int",""],["seq",""]],"struct":[["Skip",""]]};

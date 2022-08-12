@@ -1,1 +1,1 @@
-initSidebarItems({"attr":[["test_connector",""]]});
+window.SIDEBAR_ITEMS = {"attr":[["test_connector",""]]};

@@ -1,1 +1,1 @@
-initSidebarItems({"attr":[["connector_test",""],["relation_link_test",""],["test_suite",""]]});
+window.SIDEBAR_ITEMS = {"attr":[["connector_test",""],["relation_link_test",""],["test_suite",""]]};

@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["read_system_conf",""]]});
+window.SIDEBAR_ITEMS = {"fn":[["read_system_conf",""]]};

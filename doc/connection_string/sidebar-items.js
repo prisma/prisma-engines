@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["AdoNetString","An ADO.net connection string."],["Error","A connection string error."],["JdbcString","JDBC connection string parser for SqlServer"]]});
+window.SIDEBAR_ITEMS = {"struct":[["AdoNetString","An ADO.net connection string."],["Error","A connection string error."],["JdbcString","JDBC connection string parser for SqlServer"]]};

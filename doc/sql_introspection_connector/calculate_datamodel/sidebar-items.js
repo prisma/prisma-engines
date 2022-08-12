@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["calculate_datamodel","Calculate a data model from a database schema."]]});
+window.SIDEBAR_ITEMS = {"fn":[["calculate_datamodel","Calculate a data model from a database schema."]]};

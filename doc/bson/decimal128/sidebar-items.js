@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Decimal128","Struct representing a BSON Decimal128 type."]]});
+window.SIDEBAR_ITEMS = {"struct":[["Decimal128","Struct representing a BSON Decimal128 type."]]};

@@ -1,1 +1,1 @@
-initSidebarItems({"trait":[["Rpc",""]]});
+window.SIDEBAR_ITEMS = {"trait":[["Rpc",""]]};

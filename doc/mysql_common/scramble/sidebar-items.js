@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["scramble_323",""],["scramble_native","Scramble algorithm used in mysql_native_password."],["scramble_sha256","Scramble algorithm used in cached_sha2_password fast path."]]});
+window.SIDEBAR_ITEMS = {"fn":[["scramble_323",""],["scramble_native","Scramble algorithm used in mysql_native_password."],["scramble_sha256","Scramble algorithm used in cached_sha2_password fast path."]]};

@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["Output","Represents output - failure or success"],["Response","Synchronous response"]],"struct":[["Failure","Unsuccessful response"],["Success","Successful response"]]});
+window.SIDEBAR_ITEMS = {"enum":[["Output","Represents output - failure or success"],["Response","Synchronous response"]],"struct":[["Failure","Unsuccessful response"],["Success","Successful response"]]};

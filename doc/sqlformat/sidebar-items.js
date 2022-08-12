@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["Indent",""],["QueryParams",""]],"fn":[["format","Formats whitespace in a SQL string to make it easier to read. Optionally replaces parameter placeholders with `params`."]],"struct":[["FormatOptions","Options for controlling how the library formats SQL"]]});
+window.SIDEBAR_ITEMS = {"enum":[["Indent",""],["QueryParams",""]],"fn":[["format","Formats whitespace in a SQL string to make it easier to read. Optionally replaces parameter placeholders with `params`."]],"struct":[["FormatOptions","Options for controlling how the library formats SQL"]]};

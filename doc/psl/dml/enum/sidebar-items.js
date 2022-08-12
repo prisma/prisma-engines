@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Enum","Represents an enum in the datamodel."],["EnumValue","Represents a value of an enum"]]});
+window.SIDEBAR_ITEMS = {"struct":[["Enum","Represents an enum in the datamodel."],["EnumValue","Represents a value of an enum"]]};

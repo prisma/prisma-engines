@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Elapsed","The timeout elapsed."]]});
+window.SIDEBAR_ITEMS = {"struct":[["Elapsed","The timeout elapsed."]]};

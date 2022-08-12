@@ -1,1 +1,1 @@
-initSidebarItems({"trait":[["ChunkLength","A trait used to decide the size of an array."]]});
+window.SIDEBAR_ITEMS = {"trait":[["ChunkLength","A trait used to decide the size of an array."]]};

@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["DbConfig","Database Connection Configuration Options See Database Connection Configuration Options for details."]]});
+window.SIDEBAR_ITEMS = {"enum":[["DbConfig","Database Connection Configuration Options See Database Connection Configuration Options for details."]]};

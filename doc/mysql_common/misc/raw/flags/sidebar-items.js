@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["RawFlags","Wrapper for raw flags value."]]});
+window.SIDEBAR_ITEMS = {"struct":[["RawFlags","Wrapper for raw flags value."]]};

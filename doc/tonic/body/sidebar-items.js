@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["empty_body","Create an empty `BoxBody`"]],"type":[["BoxBody","A type erased HTTP body used for tonic services."]]});
+window.SIDEBAR_ITEMS = {"fn":[["empty_body","Create an empty `BoxBody`"]],"type":[["BoxBody","A type erased HTTP body used for tonic services."]]};

@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["None","Error returned if the inner `Service` has not been set."]]});
+window.SIDEBAR_ITEMS = {"struct":[["None","Error returned if the inner `Service` has not been set."]]};

@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["OpCode","Operation code for queries, updates, and responses"]]});
+window.SIDEBAR_ITEMS = {"enum":[["OpCode","Operation code for queries, updates, and responses"]]};

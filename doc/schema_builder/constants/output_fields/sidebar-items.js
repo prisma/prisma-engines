@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["AFFECTED_COUNT",""]]});
+window.SIDEBAR_ITEMS = {"constant":[["AFFECTED_COUNT",""]]};

@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["CoreError",""]],"struct":[["FieldConversionError",""]]});
+window.SIDEBAR_ITEMS = {"enum":[["CoreError",""]],"struct":[["FieldConversionError",""]]};

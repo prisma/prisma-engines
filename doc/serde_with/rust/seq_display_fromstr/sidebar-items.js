@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["deserialize","Deserialize collection T using [FromIterator] and [FromStr] for each element"],["serialize","Serialize collection T using [IntoIterator] and [Display] for each element"]]});
+window.SIDEBAR_ITEMS = {"fn":[["deserialize","Deserialize collection T using [FromIterator] and [FromStr] for each element"],["serialize","Serialize collection T using [IntoIterator] and [Display] for each element"]]};

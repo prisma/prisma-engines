@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["cipher","Low-level TLS message decryption functions."],["msgs","Low-level TLS message parsing and encoding functions."]]});
+window.SIDEBAR_ITEMS = {"mod":[["cipher","Low-level TLS message decryption functions."],["msgs","Low-level TLS message parsing and encoding functions."]]};

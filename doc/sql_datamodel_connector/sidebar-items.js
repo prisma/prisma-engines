@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["COCKROACH",""],["MSSQL",""],["MYSQL",""],["POSTGRES",""],["SQLITE",""]],"mod":[["cockroach_datamodel_connector",""]]});
+window.SIDEBAR_ITEMS = {"constant":[["COCKROACH",""],["MSSQL",""],["MYSQL",""],["POSTGRES",""],["SQLITE",""]],"mod":[["cockroach_datamodel_connector",""]]};

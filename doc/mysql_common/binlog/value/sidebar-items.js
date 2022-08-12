@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["BinlogValue","Value of a binlog event."],["BinlogValueToValueError",""]]});
+window.SIDEBAR_ITEMS = {"enum":[["BinlogValue","Value of a binlog event."],["BinlogValueToValueError",""]]};

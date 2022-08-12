@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["AtomicI64","An integer type which can be safely shared between threads."],["AtomicU64","An integer type which can be safely shared between threads."]]});
+window.SIDEBAR_ITEMS = {"struct":[["AtomicI64","An integer type which can be safely shared between threads."],["AtomicU64","An integer type which can be safely shared between threads."]]};

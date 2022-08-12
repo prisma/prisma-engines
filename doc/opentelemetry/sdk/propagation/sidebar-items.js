@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["BaggagePropagator","Propagates name-value pairs in W3C Baggage format."],["TextMapCompositePropagator","Composite propagator"],["TraceContextPropagator","Propagates `SpanContext`s in W3C TraceContext format."]]});
+window.SIDEBAR_ITEMS = {"struct":[["BaggagePropagator","Propagates name-value pairs in W3C Baggage format."],["TextMapCompositePropagator","Composite propagator"],["TraceContextPropagator","Propagates `SpanContext`s in W3C TraceContext format."]]};

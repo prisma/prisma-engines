@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["DatabaseSchemaInconsistent",""],["IntrospectionFailed",""],["IntrospectionResultEmpty",""]]});
+window.SIDEBAR_ITEMS = {"struct":[["DatabaseSchemaInconsistent",""],["IntrospectionFailed",""],["IntrospectionResultEmpty",""]]};

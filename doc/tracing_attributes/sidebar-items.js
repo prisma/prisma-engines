@@ -1,1 +1,1 @@
-initSidebarItems({"attr":[["instrument","Instruments a function to create and enter a `tracing` span every time the function is called."]]});
+window.SIDEBAR_ITEMS = {"attr":[["instrument","Instruments a function to create and enter a `tracing` span every time the function is called."]]};

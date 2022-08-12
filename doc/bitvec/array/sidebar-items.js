@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["BitArray","An array of individual bits, able to be held by value on the stack."],["IntoIter","A by-value bit-array iterator."]]});
+window.SIDEBAR_ITEMS = {"struct":[["BitArray","An array of individual bits, able to be held by value on the stack."],["IntoIter","A by-value bit-array iterator."]]};

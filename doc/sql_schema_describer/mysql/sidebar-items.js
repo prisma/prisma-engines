@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["SqlSchemaDescriber",""]]});
+window.SIDEBAR_ITEMS = {"struct":[["SqlSchemaDescriber",""]]};

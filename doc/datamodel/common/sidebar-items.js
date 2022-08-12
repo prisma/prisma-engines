@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["preview_features",""]],"struct":[["RelationNames",""]]});
+window.SIDEBAR_ITEMS = {"mod":[["preview_features",""]],"struct":[["RelationNames",""]]};

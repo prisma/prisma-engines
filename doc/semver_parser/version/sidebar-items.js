@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["Identifier",""]],"fn":[["parse",""]],"struct":[["Version",""]]});
+window.SIDEBAR_ITEMS = {"enum":[["Identifier",""]],"fn":[["parse",""]],"struct":[["Version",""]]};

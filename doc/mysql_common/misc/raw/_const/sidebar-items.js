@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Const","Same as `RawConst<T, U>` but holds `U` instead of `T`, i.e. holds the parsed value."],["RawConst","Wrapper for a raw value of a MySql constant, enum variant or flags value."]]});
+window.SIDEBAR_ITEMS = {"struct":[["Const","Same as `RawConst<T, U>` but holds `U` instead of `T`, i.e. holds the parsed value."],["RawConst","Wrapper for a raw value of a MySql constant, enum variant or flags value."]]};

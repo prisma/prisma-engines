@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["BitVec","A contiguous growable array of bits."],["Drain","A draining iterator for `BitVec`."],["IntoIter","An iterator that moves out of a `BitVec`."],["Splice","A splicing iterator for `BitVec`."]]});
+window.SIDEBAR_ITEMS = {"struct":[["BitVec","A contiguous growable array of bits."],["Drain","A draining iterator for `BitVec`."],["IntoIter","An iterator that moves out of a `BitVec`."],["Splice","A splicing iterator for `BitVec`."]]};

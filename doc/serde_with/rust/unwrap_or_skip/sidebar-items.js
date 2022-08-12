@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["deserialize","Deserialize value wrapped in Some(T)"],["serialize","Serialize value if Some(T), unit struct if None"]]});
+window.SIDEBAR_ITEMS = {"fn":[["deserialize","Deserialize value wrapped in Some(T)"],["serialize","Serialize value if Some(T), unit struct if None"]]};

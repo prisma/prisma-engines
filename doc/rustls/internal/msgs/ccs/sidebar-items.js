@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["ChangeCipherSpecPayload",""]]});
+window.SIDEBAR_ITEMS = {"struct":[["ChangeCipherSpecPayload",""]]};

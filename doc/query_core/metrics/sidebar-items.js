@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["MetricFormat",""]],"fn":[["describe_metrics",""],["setup",""]],"struct":[["MetricRegistry",""]]});
+window.SIDEBAR_ITEMS = {"enum":[["MetricFormat",""]],"fn":[["describe_metrics",""],["setup",""]],"struct":[["MetricRegistry",""]]};

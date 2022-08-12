@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["AlertMessagePayload",""]]});
+window.SIDEBAR_ITEMS = {"struct":[["AlertMessagePayload",""]]};

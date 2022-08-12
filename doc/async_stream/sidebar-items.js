@@ -1,1 +1,1 @@
-initSidebarItems({"macro":[["stream","Asynchronous stream"],["try_stream","Asynchronous fallible stream"]]});
+window.SIDEBAR_ITEMS = {"macro":[["stream","Asynchronous stream"],["try_stream","Asynchronous fallible stream"]]};

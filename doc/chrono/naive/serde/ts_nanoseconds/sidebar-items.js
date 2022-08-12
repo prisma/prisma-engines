@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["deserialize","Deserialize a `DateTime` from a nanoseconds timestamp"],["serialize","Serialize a UTC datetime into an integer number of nanoseconds since the epoch"]]});
+window.SIDEBAR_ITEMS = {"fn":[["deserialize","Deserialize a `DateTime` from a nanoseconds timestamp"],["serialize","Serialize a UTC datetime into an integer number of nanoseconds since the epoch"]]};

@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["GENERATOR","Generator preview features"]],"enum":[["PreviewFeature",""]],"struct":[["FeatureMap",""]]});
+window.SIDEBAR_ITEMS = {"constant":[["GENERATOR","Generator preview features"]],"enum":[["PreviewFeature",""]],"struct":[["FeatureMap",""]]};

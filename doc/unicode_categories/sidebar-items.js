@@ -1,1 +1,1 @@
-initSidebarItems({"trait":[["UnicodeCategories",""]]});
+window.SIDEBAR_ITEMS = {"trait":[["UnicodeCategories",""]]};

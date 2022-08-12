@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["ErrorCode","JSONRPC error code"]],"struct":[["Error","Error object as defined in Spec"]]});
+window.SIDEBAR_ITEMS = {"enum":[["ErrorCode","JSONRPC error code"]],"struct":[["Error","Error object as defined in Spec"]]};

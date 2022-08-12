@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["de","Deserializing MongoDB Extended JSON v2"]]});
+window.SIDEBAR_ITEMS = {"mod":[["de","Deserializing MongoDB Extended JSON v2"]]};

@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["DnsRequest","A DNS request object"],["DnsRequestOptions","A set of options for expressing options to how requests should be treated"]]});
+window.SIDEBAR_ITEMS = {"struct":[["DnsRequest","A DNS request object"],["DnsRequestOptions","A set of options for expressing options to how requests should be treated"]]};

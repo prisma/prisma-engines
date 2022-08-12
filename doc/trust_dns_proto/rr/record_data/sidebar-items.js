@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["RData","Record data enum variants"]]});
+window.SIDEBAR_ITEMS = {"enum":[["RData","Record data enum variants"]]};

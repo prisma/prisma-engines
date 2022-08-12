@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["backward",""],["forward",""]]});
+window.SIDEBAR_ITEMS = {"fn":[["backward",""],["forward",""]]};

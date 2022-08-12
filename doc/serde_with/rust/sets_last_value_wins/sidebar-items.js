@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["deserialize","Deserialize a set and keep the last of equal values"],["serialize","Serialize the set with the default serializer"]]});
+window.SIDEBAR_ITEMS = {"fn":[["deserialize","Deserialize a set and keep the last of equal values"],["serialize","Serialize the set with the default serializer"]]};

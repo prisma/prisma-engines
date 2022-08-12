@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["CompositeTypeFieldType",""]],"struct":[["CompositeType",""],["CompositeTypeField",""]]});
+window.SIDEBAR_ITEMS = {"enum":[["CompositeTypeFieldType",""]],"struct":[["CompositeType",""],["CompositeTypeField",""]]};

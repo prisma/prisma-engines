@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["deserialize","Deserialize potentially non-existing optional value"],["serialize","Serialize optional value"]]});
+window.SIDEBAR_ITEMS = {"fn":[["deserialize","Deserialize potentially non-existing optional value"],["serialize","Serialize optional value"]]};

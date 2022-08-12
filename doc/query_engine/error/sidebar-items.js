@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["PrismaError",""]]});
+window.SIDEBAR_ITEMS = {"enum":[["PrismaError",""]]};

@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["InstrumentationLibrary","InstrumentationLibrary contains information about instrumentation library."]]});
+window.SIDEBAR_ITEMS = {"struct":[["InstrumentationLibrary","InstrumentationLibrary contains information about instrumentation library."]]};

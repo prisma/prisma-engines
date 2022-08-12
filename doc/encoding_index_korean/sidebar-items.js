@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["euc_kr","KS X 1001 plus Unified Hangul Code."]]});
+window.SIDEBAR_ITEMS = {"mod":[["euc_kr","KS X 1001 plus Unified Hangul Code."]]};

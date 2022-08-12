@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["BitBox","A frozen heap-allocated buffer of individual bits."],["IntoIter","An iterator that moves out of a `BitVec`."]]});
+window.SIDEBAR_ITEMS = {"struct":[["BitBox","A frozen heap-allocated buffer of individual bits."],["IntoIter","An iterator that moves out of a `BitVec`."]]};

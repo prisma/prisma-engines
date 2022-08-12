@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Failed","An error indicating that the service with a `K`-typed key failed with an error."]]});
+window.SIDEBAR_ITEMS = {"struct":[["Failed","An error indicating that the service with a `K`-typed key failed with an error."]]};

@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["deserialize","Deserializes a bson::Timestamp from a u32."],["serialize","Serializes a bson::Timestamp as a u32. Returns an error if the conversion is lossy (i.e. the Timestamp has a non-zero increment)."]]});
+window.SIDEBAR_ITEMS = {"fn":[["deserialize","Deserializes a bson::Timestamp from a u32."],["serialize","Serializes a bson::Timestamp as a u32. Returns an error if the conversion is lossy (i.e. the Timestamp has a non-zero increment)."]]};

@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["IndexBits",""]],"struct":[["MssqlSchemaExt",""],["SqlSchemaDescriber",""]]});
+window.SIDEBAR_ITEMS = {"enum":[["IndexBits",""]],"struct":[["MssqlSchemaExt",""],["SqlSchemaDescriber",""]]};

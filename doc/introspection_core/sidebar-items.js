@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["Error",""]],"mod":[["rpc",""]]});
+window.SIDEBAR_ITEMS = {"enum":[["Error",""]],"mod":[["rpc",""]]};

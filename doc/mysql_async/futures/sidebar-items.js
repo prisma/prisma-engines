@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["DisconnectPool","Future that disconnects this pool from a server and resolves to `()`."],["GetConn","This future will take connection from a pool and resolve to [`Conn`]."]]});
+window.SIDEBAR_ITEMS = {"struct":[["DisconnectPool","Future that disconnects this pool from a server and resolves to `()`."],["GetConn","This future will take connection from a pool and resolve to [`Conn`]."]]};

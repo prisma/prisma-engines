@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["is_user_facing_trace_filter",""],["set_parent_context_from_json_str",""],["set_span_link_from_trace_id",""],["spans_to_json",""]],"static":[["SHOW_ALL_TRACES",""]]});
+window.SIDEBAR_ITEMS = {"fn":[["is_user_facing_trace_filter",""],["set_parent_context_from_json_str",""],["set_span_link_from_trace_id",""],["spans_to_json",""]],"static":[["SHOW_ALL_TRACES",""]]};

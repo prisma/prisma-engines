@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["default_false",""]],"mod":[["rpc_impl_Rpc",""]],"struct":[["IntrospectionInput",""],["RpcImpl",""]],"type":[["RpcError",""],["RpcFutureResult",""],["RpcResult",""]]});
+window.SIDEBAR_ITEMS = {"fn":[["default_false",""]],"mod":[["rpc_impl_Rpc",""]],"struct":[["IntrospectionInput",""],["RpcImpl",""]],"type":[["RpcError",""],["RpcFutureResult",""],["RpcResult",""]]};

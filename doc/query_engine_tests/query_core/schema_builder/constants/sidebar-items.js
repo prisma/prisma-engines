@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["aggregations",""],["args",""],["deprecation",""],["filters",""],["itx",""],["json_null",""],["operations",""],["ordering",""],["output_fields",""]]});
+window.SIDEBAR_ITEMS = {"mod":[["aggregations",""],["args",""],["deprecation",""],["filters",""],["itx",""],["json_null",""],["operations",""],["ordering",""],["output_fields",""]]};

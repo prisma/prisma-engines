@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Delay","A future representing the notification that an elapsed duration has occurred."]]});
+window.SIDEBAR_ITEMS = {"struct":[["Delay","A future representing the notification that an elapsed duration has occurred."]]};

@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["range",""],["version",""]]});
+window.SIDEBAR_ITEMS = {"mod":[["range",""],["version",""]]};

@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["MONGODB",""]]});
+window.SIDEBAR_ITEMS = {"constant":[["MONGODB",""]]};

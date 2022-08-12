@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["STANDARD","Standard number format."]],"struct":[["Options","Immutable options to customize writing integers."],["OptionsBuilder","Builder for `Options`."]]});
+window.SIDEBAR_ITEMS = {"constant":[["STANDARD","Standard number format."]],"struct":[["Options","Immutable options to customize writing integers."],["OptionsBuilder","Builder for `Options`."]]};

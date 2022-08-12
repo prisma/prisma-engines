@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["CuidError","Errors for the CUID library"]],"fn":[["cuid","Generate a CUID"],["is_cuid","Return whether a string is a legitimate CUID"],["is_slug","Return whether a string is a legitimate CUID slug"],["slug","Generate a CUID slug"]]});
+window.SIDEBAR_ITEMS = {"enum":[["CuidError","Errors for the CUID library"]],"fn":[["cuid","Generate a CUID"],["is_cuid","Return whether a string is a legitimate CUID"],["is_slug","Return whether a string is a legitimate CUID slug"],["slug","Generate a CUID slug"]]};

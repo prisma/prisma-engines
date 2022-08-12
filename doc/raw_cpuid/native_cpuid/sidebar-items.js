@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["cpuid_count",""]]});
+window.SIDEBAR_ITEMS = {"fn":[["cpuid_count",""]]};

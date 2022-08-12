@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["Error","Errors that can occur during [`ObjectId`] construction and generation."]],"struct":[["ObjectId","A wrapper around raw 12-byte ObjectId representations."]],"type":[["Result","Alias for Result<T, oid::Error>."]]});
+window.SIDEBAR_ITEMS = {"enum":[["Error","Errors that can occur during [`ObjectId`] construction and generation."]],"struct":[["ObjectId","A wrapper around raw 12-byte ObjectId representations."]],"type":[["Result","Alias for Result<T, oid::Error>."]]};

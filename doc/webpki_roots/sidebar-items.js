@@ -1,1 +1,1 @@
-initSidebarItems({"static":[["TLS_SERVER_ROOTS",""]]});
+window.SIDEBAR_ITEMS = {"static":[["TLS_SERVER_ROOTS",""]]};
