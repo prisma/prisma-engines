@@ -8,11 +8,12 @@ use crate::{
 use datamodel_connector::ReferentialIntegrity;
 use enumflags2::BitFlags;
 use mongodb_datamodel_connector::*;
-use parser_database::{ast::WithDocumentation, coerce, coerce_opt};
+use parser_database::{ast::WithDocumentation, coerce, coerce_array, coerce_opt};
 use sql_datamodel_connector::*;
 use std::{borrow::Cow, collections::HashMap};
 
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
+const SCHEMAS_KEY: &str = "schemas";
 const SHADOW_DATABASE_URL_KEY: &str = "shadowDatabaseUrl";
 const URL_KEY: &str = "url";
 
@@ -179,14 +180,35 @@ impl DatasourceLoader {
             }
         }
 
+        let (schemas, schemas_span) = args
+            .remove(SCHEMAS_KEY)
+            .and_then(|(_, expr)| coerce_array(expr, &coerce::string_with_span, diagnostics).map(|b| (b, expr.span())))
+            .map(|(mut schemas, span)| {
+                schemas.sort_by(|(a, _), (b, _)| a.cmp(b));
+
+                for pair in schemas.windows(2) {
+                    if pair[0].0 == pair[1].0 {
+                        diagnostics.push_error(DatamodelError::new_static(
+                            "Duplicated schema names are not allowed",
+                            pair[0].1,
+                        ))
+                    }
+                }
+
+                (schemas, Some(span))
+            })
+            .unwrap_or_default();
+
         // we handle these elsewhere
-        let _ = args.remove("previewFeatures");
-        let _ = args.remove("referentialIntegrity");
+        args.remove("previewFeatures");
+        args.remove("referentialIntegrity");
         for (name, (span, _)) in args.into_iter() {
             diagnostics.push_error(DatamodelError::new_property_not_known_error(name, span));
         }
 
         Some(Datasource {
+            schemas: schemas.into_iter().map(|(s, span)| (s.to_owned(), span)).collect(),
+            schemas_span,
             name: source_name.to_string(),
             provider: provider.to_owned(),
             active_provider: active_connector.provider_name(),

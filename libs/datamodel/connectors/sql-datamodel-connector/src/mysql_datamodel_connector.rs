@@ -2,7 +2,7 @@ mod validations;
 
 use datamodel_connector::{
     helper::{args_vec_from_opt, parse_one_opt_u32, parse_one_u32, parse_two_opt_u32},
-    parser_database::walkers::ModelWalker,
+    parser_database::walkers,
     Connector, ConnectorCapability, ConstraintScope, DatamodelError, Diagnostics, NativeTypeConstructor,
     NativeTypeInstance, ReferentialAction, ReferentialIntegrity, ScalarType, Span,
 };
@@ -111,6 +111,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::NamedForeignKeys,
     ConnectorCapability::AdvancedJsonNullability,
     ConnectorCapability::IndexColumnLengthPrefixing,
+    ConnectorCapability::MultiSchema,
     ConnectorCapability::FullTextIndex,
     ConnectorCapability::FullTextSearchWithIndex,
     ConnectorCapability::MultipleFullTextAttributesPerModel,
@@ -268,7 +269,16 @@ impl Connector for MySqlDatamodelConnector {
         }
     }
 
-    fn validate_model(&self, model: ModelWalker<'_>, errors: &mut Diagnostics) {
+    fn validate_enum(&self, r#enum: walkers::EnumWalker<'_>, diagnostics: &mut Diagnostics) {
+        if let Some((_, span)) = r#enum.schema() {
+            diagnostics.push_error(DatamodelError::new_static(
+                "MySQL enums do not belong to a schema.",
+                span,
+            ));
+        }
+    }
+
+    fn validate_model(&self, model: walkers::ModelWalker<'_>, errors: &mut Diagnostics) {
         for index in model.indexes() {
             validations::field_types_can_be_used_in_an_index(self, index, errors);
         }

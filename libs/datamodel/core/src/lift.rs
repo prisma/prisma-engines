@@ -307,6 +307,7 @@ impl<'a> LiftAstToDml<'a> {
         model.documentation = ast_model.documentation().map(String::from);
         model.database_name = walker.mapped_name().map(String::from);
         model.is_ignored = walker.is_ignored();
+        model.schema = walker.schema().map(|(s, _)| s.to_owned());
 
         model.primary_key = walker.primary_key().map(|pk| dml::PrimaryKeyDefinition {
             name: pk.name().map(String::from),
@@ -433,6 +434,7 @@ impl<'a> LiftAstToDml<'a> {
 
         en.documentation = r#enum.ast_enum().documentation().map(String::from);
         en.database_name = r#enum.mapped_name().map(String::from);
+        en.schema = r#enum.schema().map(|(s, _)| s.to_owned());
         en
     }
 

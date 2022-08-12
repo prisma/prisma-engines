@@ -2,6 +2,7 @@ mod default;
 mod id;
 mod map;
 mod native_types;
+mod schema;
 
 use crate::{
     ast::{self, WithName, WithSpan},
@@ -98,6 +99,12 @@ fn resolve_enum_attributes<'db>(enum_id: ast::EnumId, ast_enum: &'db ast::Enum, 
         ctx.validate_visited_arguments();
     }
 
+    // @@schema
+    if ctx.visit_optional_single_attr("schema") {
+        schema::r#enum(&mut enum_attributes, ctx);
+        ctx.validate_visited_arguments();
+    }
+
     ctx.types.enum_attributes.insert(enum_id, enum_attributes);
     ctx.validate_visited_attributes();
 }
@@ -149,6 +156,12 @@ fn resolve_model_attributes<'db>(model_id: ast::ModelId, ast_model: &'db ast::Mo
     // @@map
     if ctx.visit_optional_single_attr("map") {
         map::model(&mut model_attributes, model_id, ctx);
+        ctx.validate_visited_arguments();
+    }
+
+    // @@schema
+    if ctx.visit_optional_single_attr("schema") {
+        schema::model(&mut model_attributes, ctx);
         ctx.validate_visited_arguments();
     }
 

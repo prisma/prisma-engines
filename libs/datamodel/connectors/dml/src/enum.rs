@@ -13,6 +13,8 @@ pub struct Enum {
     pub database_name: Option<String>,
     /// Has to be commented out.
     pub commented_out: bool,
+    /// The contents of the `@@schema("...")` attribute.
+    pub schema: Option<String>,
 }
 
 impl Enum {
@@ -24,6 +26,7 @@ impl Enum {
             documentation: None,
             database_name: None,
             commented_out: false,
+            schema: None,
         }
     }
 

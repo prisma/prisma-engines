@@ -316,4 +316,14 @@ impl<'db> ModelWalker<'db> {
             _ => NewlineType::Unix,
         }
     }
+
+    /// The name of the schema the enum belongs to.
+    ///
+    /// ```ignore
+    /// @@schema("public")
+    ///          ^^^^^^^^
+    /// ```
+    pub fn schema(self) -> Option<(&'db str, ast::Span)> {
+        self.attributes().schema.map(|(id, span)| (&self.db[id], span))
+    }
 }

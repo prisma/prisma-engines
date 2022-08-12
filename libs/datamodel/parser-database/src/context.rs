@@ -296,7 +296,7 @@ impl<'db> Context<'db> {
             let attribute = &self.ast[*attribute_id];
             diagnostics.push_error(DatamodelError::new_attribute_not_known_error(
                 &attribute.name.name,
-                attribute.name.span,
+                attribute.span,
             ))
         }
         self.attributes.attributes.clear();

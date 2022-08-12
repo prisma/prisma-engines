@@ -64,6 +64,7 @@ features!(
     ImprovedQueryRaw,
     Metrics,
     OrderByNulls,
+    MultiSchema,
 );
 
 /// Generator preview features
@@ -102,7 +103,7 @@ pub const GENERATOR: FeatureMap = FeatureMap {
         | ImprovedQueryRaw
         | DataProxy
     }),
-    hidden: BitFlags::EMPTY,
+    hidden: enumflags2::make_bitflags!(PreviewFeature::{MultiSchema}),
 };
 
 #[derive(Debug)]
