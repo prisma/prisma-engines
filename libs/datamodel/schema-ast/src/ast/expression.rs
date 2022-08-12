@@ -39,7 +39,7 @@ impl Expression {
     pub fn as_array(&self) -> Option<(&[Expression], Span)> {
         match self {
             Expression::Array(arr, span) => Some((arr, *span)),
-            _=> None
+            _ => None,
         }
     }
 
