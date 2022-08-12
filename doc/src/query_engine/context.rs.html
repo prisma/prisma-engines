@@ -174,7 +174,7 @@
             <span class="self">self</span>.<span class="ident">config</span>,
             <span class="self">self</span>.<span class="ident">datamodel</span>,
             <span class="self">self</span>.<span class="ident">enable_raw_queries</span>,
-            <span class="self">self</span>.<span class="ident">metrics</span>.<span class="ident">unwrap</span>(),
+            <span class="self">self</span>.<span class="ident">metrics</span>.<span class="ident">unwrap_or_default</span>(),
         )
         .<span class="kw">await</span>
     }
