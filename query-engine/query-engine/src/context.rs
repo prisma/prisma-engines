@@ -45,7 +45,7 @@ impl ContextBuilder {
             self.config,
             self.datamodel,
             self.enable_raw_queries,
-            self.metrics.unwrap(),
+            self.metrics.unwrap_or_default(),
         )
         .await
     }
