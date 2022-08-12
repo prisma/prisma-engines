@@ -1,4 +1,5 @@
 #![deny(unsafe_code, rust_2018_idioms)]
+#![allow(clippy::derive_partial_eq_without_eq)]
 
 //! This crate contains constants and utilities that are useful for writing tests across the
 //! engines.

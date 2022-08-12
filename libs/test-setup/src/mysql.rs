@@ -96,7 +96,7 @@ pub(crate) async fn create_mysql_database<'a>(
         db_name.len()
     );
 
-    let conn = Quaint::new(&mysql_db_url.to_string()).await?;
+    let conn = Quaint::new(mysql_db_url.as_ref()).await?;
 
     let drop = format!(
         r#"

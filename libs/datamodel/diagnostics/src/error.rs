@@ -1,7 +1,7 @@
 use crate::{pretty_print::pretty_print, Span};
 use std::borrow::Cow;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct DatamodelError {
     span: Span,
     message: Cow<'static, str>,

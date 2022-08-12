@@ -13,7 +13,9 @@
     clippy::mem_replace_with_default,
     clippy::clone_on_copy,
     clippy::needless_borrow,
-    clippy::needless_collect
+    clippy::needless_collect,
+    clippy::needless_return,
+    clippy::derive_partial_eq_without_eq
 )]
 #![warn(warnings)] // Todo deny warnings once done
 

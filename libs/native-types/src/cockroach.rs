@@ -1,6 +1,6 @@
 use serde::*;
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum CockroachType {
     Bit(Option<u32>),
     Bool,

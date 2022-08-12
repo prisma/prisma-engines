@@ -1,6 +1,7 @@
 #![deny(warnings)]
 #![allow(rustdoc::broken_intra_doc_links)]
 #![allow(clippy::from_over_into)]
+#![allow(clippy::derive_partial_eq_without_eq)]
 
 mod builders;
 mod composite_type;
