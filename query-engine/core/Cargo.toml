@@ -49,10 +49,5 @@ lazy_static = "1.4"
 schema = { path = "../schema" }
 schema-builder = { path = "../schema-builder" }
 metrics = "0.18"
-metrics-util = "0.12.1"
-metrics-exporter-prometheus = "0.10.0"
 parking_lot = "0.12"
 lru = "0.7.7"
-
-[dev-dependencies]
-expect-test = "1"
