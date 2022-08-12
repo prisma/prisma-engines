@@ -4,7 +4,7 @@ use serde::Serialize;
 use std::convert::TryFrom;
 
 /// Either an env var or a string literal.
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct StringFromEnvVar {
     /// Contains the name of env var if the value was read from one.

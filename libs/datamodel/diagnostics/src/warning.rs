@@ -2,7 +2,7 @@ use crate::Span;
 
 /// A non-fatal warning emitted by the schema parser.
 /// For fancy printing, please use the `pretty_print_error` function.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct DatamodelWarning {
     message: String,
     span: Span,

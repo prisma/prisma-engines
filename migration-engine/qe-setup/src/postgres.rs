@@ -18,7 +18,7 @@ pub(crate) async fn postgres_setup(url: String, prisma_schema: &str) -> Connecto
         // Now create the schema
         url.set_path(&format!("/{}", db_name));
 
-        let conn = Quaint::new(&url.to_string()).await.unwrap();
+        let conn = Quaint::new(url.as_ref()).await.unwrap();
 
         let drop_and_recreate_schema = format!(
             "DROP SCHEMA IF EXISTS \"{schema}\" CASCADE;\nCREATE SCHEMA \"{schema}\";",
@@ -48,7 +48,7 @@ pub(crate) async fn postgres_teardown(url: &str) -> ConnectorResult<()> {
 
 async fn create_postgres_admin_conn(mut url: Url) -> ConnectorResult<Quaint> {
     url.set_path("/postgres");
-    Ok(Quaint::new(&url.to_string()).await.unwrap())
+    Ok(Quaint::new(url.as_ref()).await.unwrap())
 }
 
 fn strip_schema_param_from_url(url: &mut Url) {

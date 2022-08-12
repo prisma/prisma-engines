@@ -53,7 +53,7 @@ fn shadow_db_url_can_be_configured_on_postgres(api: TestApi) {
         let mut shadow_db_url = url.clone();
         shadow_db_url.set_path("testshadowdb0001");
 
-        let shadow_db_connection = tok(Quaint::new(&shadow_db_url.to_string())).unwrap();
+        let shadow_db_connection = tok(Quaint::new(shadow_db_url.as_ref())).unwrap();
 
         tok(shadow_db_connection.raw_cmd(
             "CREATE SCHEMA \"prisma-tests\"; GRANT USAGE, CREATE ON SCHEMA \"prisma-tests\" TO shadowdbconfigtestuser",

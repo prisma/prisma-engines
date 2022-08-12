@@ -1,4 +1,5 @@
 #![warn(warnings)]
+#![allow(clippy::derive_partial_eq_without_eq)]
 
 mod enum_type;
 mod input_types;

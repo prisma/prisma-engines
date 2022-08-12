@@ -32,7 +32,7 @@ pub struct DatabaseMetadata {
     pub size_in_bytes: usize,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub enum Version {
     NonPrisma,
     Prisma1,

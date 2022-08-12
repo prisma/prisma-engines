@@ -1,5 +1,8 @@
 //! This library aims to provide an exhaustive definition of all available native types for the databases Prisma supports.
 //! There's one enum definition per database which lists all available types for the respective database.
+
+#![allow(clippy::derive_partial_eq_without_eq)]
+
 mod cockroach;
 mod mongodb;
 mod mssql;

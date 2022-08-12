@@ -4,7 +4,7 @@ use serde::*;
 use serde_json::Value;
 
 /// The MySQL native type enum.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 #[allow(missing_docs)]
 pub enum MySqlType {
     Int,

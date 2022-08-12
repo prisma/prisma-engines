@@ -7,7 +7,7 @@ pub(crate) async fn mysql_reset(url: &str) -> ConnectorResult<()> {
     let db_name = url.path().trim_start_matches('/').to_owned();
     url.set_path("/mysql");
 
-    let conn = Quaint::new(&url.to_string()).await.unwrap();
+    let conn = Quaint::new(url.as_ref()).await.unwrap();
 
     let query = format!("DROP DATABASE IF EXISTS `{}`", db_name);
     conn.raw_cmd(&query).await.unwrap();

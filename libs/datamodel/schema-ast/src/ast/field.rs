@@ -92,7 +92,7 @@ impl WithDocumentation for Field {
 }
 
 /// An arity of a data model field.
-#[derive(Copy, Debug, Clone, PartialEq)]
+#[derive(Copy, Debug, Clone)]
 pub enum FieldArity {
     /// The field either must be in an insert statement, or the field must have
     /// a default value for the insert to succeed.

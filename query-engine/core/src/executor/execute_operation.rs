@@ -158,9 +158,7 @@ async fn execute_on(
 ) -> crate::Result<ResponseData> {
     increment_counter!(PRISMA_CLIENT_QUERIES_TOTAL);
     let interpreter = QueryInterpreter::new(conn);
-    let result = QueryPipeline::new(graph, interpreter, serializer)
+    QueryPipeline::new(graph, interpreter, serializer)
         .execute(trace_id)
-        .await;
-
-    result
+        .await
 }

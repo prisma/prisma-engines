@@ -1,4 +1,5 @@
 #![deny(unsafe_code, rust_2018_idioms, missing_docs)]
+#![allow(clippy::derive_partial_eq_without_eq)]
 
 //! See the docs on [ParserDatabase](./struct.ParserDatabase.html).
 //!
