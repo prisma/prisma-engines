@@ -1,0 +1,24 @@
+datasource test {
+    provider = "sqlserver"
+    url = env("TEST_DATABASE_URL")
+}
+
+model A {
+  id Int @id
+  a Int
+
+  @@unique([a], clustered: true)
+}
+
+// [1;91merror[0m: [1mError parsing attribute "@id": A model can only hold one clustered index or id.[0m
+//   [1;94m-->[0m  [4mschema.prisma:7[0m
+// [1;94m   | [0m
+// [1;94m 6 | [0mmodel A {
+// [1;94m 7 | [0m  id Int [1;91m@id[0m
+// [1;94m   | [0m
+// [1;91merror[0m: [1mError parsing attribute "@@unique": A model can only hold one clustered index or key.[0m
+//   [1;94m-->[0m  [4mschema.prisma:10[0m
+// [1;94m   | [0m
+// [1;94m 9 | [0m
+// [1;94m10 | [0m  [1;91m@@unique([a], clustered: true)[0m
+// [1;94m   | [0m
