@@ -4,8 +4,9 @@ use super::pipeline::QueryPipeline;
 use crate::{IrSerializer, Operation, QueryGraph, QueryGraphBuilder, QueryInterpreter, ResponseData};
 use connector::{Connection, ConnectionLike, Connector};
 use futures::future;
-use metrics::{histogram, increment_counter};
-use query_engine_metrics::{PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, PRISMA_CLIENT_QUERIES_TOTAL};
+use query_engine_metrics::{
+    histogram, increment_counter, metrics, PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, PRISMA_CLIENT_QUERIES_TOTAL,
+};
 use schema::QuerySchemaRef;
 use tracing::Instrument;
 use tracing_futures::WithSubscriber;

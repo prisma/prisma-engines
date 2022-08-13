@@ -30,11 +30,16 @@ mod formatters;
 mod recorder;
 mod registry;
 
-use metrics::{absolute_counter, describe_counter, describe_gauge, describe_histogram, gauge};
 use recorder::*;
 pub use registry::MetricRegistry;
 use serde::Deserialize;
 use std::sync::Once;
+
+pub extern crate metrics;
+pub use metrics::{
+    absolute_counter, decrement_gauge, describe_counter, describe_gauge, describe_histogram, gauge, histogram,
+    increment_counter, increment_gauge,
+};
 
 pub const PRISMA_CLIENT_QUERIES_TOTAL: &str = "prisma_client_queries_total";
 pub const PRISMA_CLIENT_QUERIES_HISTOGRAM_MS: &str = "prisma_client_queries_duration_histogram_ms";
@@ -69,7 +74,7 @@ const ACCEPT_LIST: &[&str] = &[
     PRISMA_CLIENT_QUERIES_ACTIVE,
 ];
 
-#[derive(PartialEq, Debug, Deserialize)]
+#[derive(PartialEq, Eq, Debug, Deserialize)]
 pub enum MetricFormat {
     #[serde(alias = "json")]
     Json,

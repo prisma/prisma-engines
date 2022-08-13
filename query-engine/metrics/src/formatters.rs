@@ -82,7 +82,7 @@ pub(crate) fn metrics_to_prometheus(snapshot: Snapshot) -> String {
         let labels = create_label_string(&counter.labels);
 
         if let MetricValue::Counter(value) = counter.value {
-            write_metric_line::<&str, u64>(&mut output, &counter.key.as_str(), None, &labels, None, value);
+            write_metric_line::<&str, u64>(&mut output, counter.key.as_str(), None, &labels, None, value);
         }
         output.push('\n');
     }
@@ -95,7 +95,7 @@ pub(crate) fn metrics_to_prometheus(snapshot: Snapshot) -> String {
         let labels = create_label_string(&gauge.labels);
 
         if let MetricValue::Gauge(value) = gauge.value {
-            write_metric_line::<&str, f64>(&mut output, &gauge.key.as_str(), None, &labels, None, value);
+            write_metric_line::<&str, f64>(&mut output, gauge.key.as_str(), None, &labels, None, value);
         }
         output.push('\n');
     }

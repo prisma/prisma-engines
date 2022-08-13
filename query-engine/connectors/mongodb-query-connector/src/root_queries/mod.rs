@@ -10,11 +10,13 @@ use crate::{
     error::DecorateErrorWithFieldInformationExtension, output_meta::OutputMetaMapping, value::value_from_bson,
 };
 use futures::Future;
-use metrics::{histogram, increment_counter};
 use mongodb::bson::Bson;
 use mongodb::bson::Document;
 use prisma_models::*;
-use query_engine_metrics::{PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS, PRISMA_DATASOURCE_QUERIES_TOTAL};
+use query_engine_metrics::{
+    histogram, increment_counter, metrics, PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS,
+    PRISMA_DATASOURCE_QUERIES_TOTAL,
+};
 use std::time::Instant;
 
 /// Transforms a document to a `Record`, fields ordered as defined in `fields`.

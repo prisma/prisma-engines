@@ -4,10 +4,9 @@ use crate::{
     root_queries::{aggregate, read, write},
 };
 use connector_interface::{ConnectionLike, ReadOperations, RelAggregationSelection, Transaction, WriteOperations};
-use metrics::{decrement_gauge, increment_gauge};
 use mongodb::options::{Acknowledgment, ReadConcern, TransactionOptions, WriteConcern};
 use prisma_models::SelectionResult;
-use query_engine_metrics::PRISMA_CLIENT_QUERIES_ACTIVE;
+use query_engine_metrics::{decrement_gauge, increment_gauge, metrics, PRISMA_CLIENT_QUERIES_ACTIVE};
 use std::collections::HashMap;
 
 pub struct MongoDbTransaction<'conn> {

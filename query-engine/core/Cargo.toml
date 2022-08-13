@@ -48,6 +48,5 @@ pin-utils = "0.1"
 lazy_static = "1.4"
 schema = { path = "../schema" }
 schema-builder = { path = "../schema-builder" }
-metrics = "0.18"
 parking_lot = "0.12"
 lru = "0.7.7"
