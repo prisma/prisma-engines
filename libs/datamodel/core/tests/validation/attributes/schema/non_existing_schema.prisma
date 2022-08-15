@@ -22,9 +22,17 @@ enum Language {
   @@schema("nonpublic")
 }
 
-// [1;91merror[0m: [1mThis schema is not defined in the datasource. Read more on `@@schema` at https://pris.ly/multi-schema[0m
+
+
+// [1;91merror[0m: [1mThis schema is not defined in the datasource. Read more on `@@schema` at https://pris.ly/d/multi-schema[0m
 //   [1;94m-->[0m  [4mschema.prisma:15[0m
 // [1;94m   | [0m
 // [1;94m14 | [0m
 // [1;94m15 | [0m  @@schema([1;91m"nonpublic"[0m)
+// [1;94m   | [0m
+// [1;91merror[0m: [1mThis schema is not defined in the datasource. Read more on `@@schema` at https://pris.ly/d/multi-schema[0m
+//   [1;94m-->[0m  [4mschema.prisma:22[0m
+// [1;94m   | [0m
+// [1;94m21 | [0m
+// [1;94m22 | [0m  @@schema([1;91m"nonpublic"[0m)
 // [1;94m   | [0m

@@ -13,3 +13,5 @@ model Test {
   id Int @id
   @@schema("public")
 }
+
+

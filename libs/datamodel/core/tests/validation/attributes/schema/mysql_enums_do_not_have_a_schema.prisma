@@ -17,6 +17,8 @@ enum MyEnum {
     @@schema("users")
 }
 
+
+
 // [1;91merror[0m: [1mMySQL enums do not belong to a schema.[0m
 //   [1;94m-->[0m  [4mschema.prisma:17[0m
 // [1;94m   | [0m

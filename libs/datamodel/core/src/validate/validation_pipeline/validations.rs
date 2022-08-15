@@ -3,6 +3,7 @@ mod composite_types;
 mod constraint_namespace;
 mod database_name;
 mod default_value;
+mod enums;
 mod fields;
 mod indexes;
 mod models;
@@ -161,6 +162,25 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
         for model in ctx.db.walk_models() {
             models::schema_exists(model, ctx);
             models::schema_capability(model, ctx);
+        }
+
+        for r#enum in ctx.db.walk_enums() {
+            enums::schema_exists(r#enum, ctx);
+            enums::schema_capability(r#enum, ctx);
+        }
+
+        if !ctx
+            .connector
+            .has_capability(datamodel_connector::ConnectorCapability::MultiSchema)
+        {
+            if let Some(ds) = ctx.datasource {
+                if let Some(span) = ds.schemas_span {
+                    ctx.push_error(DatamodelError::new_static(
+                        "The `schemas` property is not supported on the current connector.",
+                        span,
+                    ))
+                }
+            }
         }
     }
 

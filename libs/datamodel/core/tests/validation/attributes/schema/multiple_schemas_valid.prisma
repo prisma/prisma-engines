@@ -41,3 +41,5 @@ model Test5 {
   id Int @id
   @@schema("security")
 }
+
+
