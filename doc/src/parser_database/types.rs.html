@@ -1335,7 +1335,11 @@
 <span id="1329">1329</span>
 <span id="1330">1330</span>
 <span id="1331">1331</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">context::Context</span>, <span class="ident">interner::StringId</span>, <span class="ident">walkers::IndexFieldWalker</span>, <span class="ident">DatamodelError</span>};
+<span id="1332">1332</span>
+<span id="1333">1333</span>
+</pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">index_fields</span>;
+
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">context::Context</span>, <span class="ident">interner::StringId</span>, <span class="ident">walkers::IndexFieldWalker</span>, <span class="ident">DatamodelError</span>};
 <span class="kw">use</span> <span class="ident">either::Either</span>;
 <span class="kw">use</span> <span class="ident">enumflags2::bitflags</span>;
 <span class="kw">use</span> <span class="ident">schema_ast::ast</span>::{<span class="self">self</span>, <span class="ident">WithName</span>};

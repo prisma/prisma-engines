@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":[["boolean",""],["constant",""],["float",""],["function",""],["integer",""],["string",""]]};

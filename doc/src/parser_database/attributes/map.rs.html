@@ -140,8 +140,13 @@
 <span id="134">134</span>
 <span id="135">135</span>
 <span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">WithName</span>, <span class="ident">WithSpan</span>},
+    <span class="ident">coerce</span>,
     <span class="ident">context::Context</span>,
     <span class="ident">types</span>::{<span class="ident">CompositeTypeField</span>, <span class="ident">ModelAttributes</span>, <span class="ident">ScalarField</span>},
     <span class="ident">DatamodelError</span>, <span class="ident">StringId</span>,
@@ -268,10 +273,13 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">visit_map_attribute</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">StringId</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">ctx</span>.<span class="ident">visit_default_arg</span>(<span class="string">&quot;name&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">as_str</span>()) {
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(<span class="ident">name</span>)) =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">ctx</span>.<span class="ident">interner</span>.<span class="ident">intern</span>(<span class="ident">name</span>)),
+    <span class="kw">match</span> <span class="ident">ctx</span>
+        .<span class="ident">visit_default_arg</span>(<span class="string">&quot;name&quot;</span>)
+        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">coerce::string</span>(<span class="ident">value</span>, <span class="ident">ctx</span>.<span class="ident">diagnostics</span>))
+    {
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">name</span>)) =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">ctx</span>.<span class="ident">interner</span>.<span class="ident">intern</span>(<span class="ident">name</span>)),
         <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">err</span>), <span class="comment">// not flattened for error handing legacy reasons</span>
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) =&gt; <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">err</span>),
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; (),
     };
 
     <span class="prelude-val">None</span>

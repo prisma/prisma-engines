@@ -162,35 +162,6 @@
 <span id="156">156</span>
 <span id="157">157</span>
 <span id="158">158</span>
-<span id="159">159</span>
-<span id="160">160</span>
-<span id="161">161</span>
-<span id="162">162</span>
-<span id="163">163</span>
-<span id="164">164</span>
-<span id="165">165</span>
-<span id="166">166</span>
-<span id="167">167</span>
-<span id="168">168</span>
-<span id="169">169</span>
-<span id="170">170</span>
-<span id="171">171</span>
-<span id="172">172</span>
-<span id="173">173</span>
-<span id="174">174</span>
-<span id="175">175</span>
-<span id="176">176</span>
-<span id="177">177</span>
-<span id="178">178</span>
-<span id="179">179</span>
-<span id="180">180</span>
-<span id="181">181</span>
-<span id="182">182</span>
-<span id="183">183</span>
-<span id="184">184</span>
-<span id="185">185</span>
-<span id="186">186</span>
-<span id="187">187</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast::WithSpan</span>,
     <span class="ident">common::preview_features</span>::{<span class="ident">FeatureMap</span>, <span class="ident">PreviewFeature</span>, <span class="ident">GENERATOR</span>},
@@ -201,9 +172,9 @@
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 <span class="kw">use</span> <span class="ident">parser_database</span>::{
     <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">WithDocumentation</span>},
-    <span class="ident">ValueListValidator</span>, <span class="ident">ValueValidator</span>,
+    <span class="ident">coerce</span>, <span class="ident">coerce_array</span>,
 };
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">convert::TryFrom</span>};
+<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">const</span> <span class="ident">PROVIDER_KEY</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;provider&quot;</span>;
 <span class="kw">const</span> <span class="ident">OUTPUT_KEY</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;output&quot;</span>;
@@ -240,28 +211,22 @@
         <span class="kw">let</span> <span class="ident">args</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ast_generator</span>
             .<span class="ident">properties</span>
             .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> (<span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>(), <span class="ident">ValueValidator::new</span>(<span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">value</span>)))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> (<span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>(), <span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">value</span>))
             .<span class="ident">collect</span>();
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">expr</span>) <span class="op">=</span> <span class="ident">args</span>.<span class="ident">get</span>(<span class="ident">ENGINE_TYPE_KEY</span>) {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">expr</span>.<span class="ident">value</span>.<span class="ident">is_string</span>() {
+            <span class="kw">if</span> <span class="op">!</span><span class="ident">expr</span>.<span class="ident">is_string</span>() {
                 <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_type_mismatch_error</span>(
                     <span class="string">&quot;String&quot;</span>,
-                    <span class="ident">expr</span>.<span class="ident">value</span>.<span class="ident">describe_value_type</span>(),
-                    <span class="kw-2">&amp;</span><span class="ident">expr</span>.<span class="ident">value</span>.<span class="ident">to_string</span>(),
+                    <span class="ident">expr</span>.<span class="ident">describe_value_type</span>(),
+                    <span class="kw-2">&amp;</span><span class="ident">expr</span>.<span class="ident">to_string</span>(),
                     <span class="ident">expr</span>.<span class="ident">span</span>(),
                 ))
             }
         }
 
         <span class="kw">let</span> <span class="ident">provider</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">args</span>.<span class="ident">get</span>(<span class="ident">PROVIDER_KEY</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; <span class="kw">match</span> <span class="ident">StringFromEnvVar::try_from</span>(<span class="ident">val</span>.<span class="ident">value</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>,
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
-                    <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">err</span>);
-                    <span class="kw">return</span> <span class="prelude-val">None</span>;
-                }
-            },
+            <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; <span class="ident">StringFromEnvVar::coerce</span>(<span class="ident">val</span>, <span class="ident">diagnostics</span>)<span class="question-mark">?</span>,
             <span class="prelude-val">None</span> =&gt; {
                 <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_generator_argument_not_found_error</span>(
                     <span class="ident">PROVIDER_KEY</span>,
@@ -272,46 +237,23 @@
             }
         };
 
-        <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">args</span>.<span class="ident">get</span>(<span class="ident">OUTPUT_KEY</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">StringFromEnvVar::try_from</span>(<span class="ident">v</span>.<span class="ident">value</span>)) {
-            <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">val</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">val</span>),
-            <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) =&gt; {
-                <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">err</span>);
-                <span class="prelude-val">None</span>
-            }
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
-        };
+        <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">args</span>
+            .<span class="ident">get</span>(<span class="ident">OUTPUT_KEY</span>)
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">StringFromEnvVar::coerce</span>(<span class="ident">v</span>, <span class="ident">diagnostics</span>));
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">properties</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
 
-        <span class="kw">let</span> <span class="ident">binary_targets</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">args</span>.<span class="ident">get</span>(<span class="ident">BINARY_TARGETS_KEY</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">value_validator</span><span class="op">|</span> {
-            <span class="ident">value_validator</span>
-                .<span class="ident">as_array</span>()
-                .<span class="ident">iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">StringFromEnvVar::try_from</span>(<span class="ident">v</span>.<span class="ident">value</span>))
-                .<span class="ident">collect</span>()
-        }) {
-            <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">val</span>)) =&gt; <span class="ident">val</span>,
-            <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) =&gt; {
-                <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">err</span>);
-                <span class="ident">Vec::new</span>()
-            }
-            <span class="prelude-val">None</span> =&gt; <span class="ident">Vec::new</span>(),
-        };
+        <span class="kw">let</span> <span class="ident">binary_targets</span> <span class="op">=</span> <span class="ident">args</span>
+            .<span class="ident">get</span>(<span class="ident">BINARY_TARGETS_KEY</span>)
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">coerce_array</span>(<span class="ident">arg</span>, <span class="kw-2">&amp;</span><span class="ident">StringFromEnvVar::coerce</span>, <span class="ident">diagnostics</span>))
+            .<span class="ident">unwrap_or_default</span>();
 
         <span class="comment">// for compatibility reasons we still accept the old experimental key</span>
-        <span class="kw">let</span> <span class="ident">preview_features_arg</span> <span class="op">=</span> <span class="ident">args</span>
+        <span class="kw">let</span> <span class="ident">preview_features</span> <span class="op">=</span> <span class="ident">args</span>
             .<span class="ident">get</span>(<span class="ident">PREVIEW_FEATURES_KEY</span>)
             .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">args</span>.<span class="ident">get</span>(<span class="ident">EXPERIMENTAL_FEATURES_KEY</span>))
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> (<span class="ident">v</span>.<span class="ident">as_array</span>().<span class="ident">to_str_vec</span>(), <span class="ident">v</span>.<span class="ident">span</span>()));
-
-        <span class="kw">let</span> <span class="ident">preview_features</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">preview_features_arg</span> {
-            <span class="prelude-val">Some</span>((<span class="prelude-val">Ok</span>(<span class="ident">arr</span>), <span class="ident">span</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">parse_and_validate_preview_features</span>(<span class="ident">arr</span>, <span class="kw-2">&amp;</span><span class="ident">GENERATOR</span>, <span class="ident">span</span>, <span class="ident">diagnostics</span>)),
-            <span class="prelude-val">Some</span>((<span class="prelude-val">Err</span>(<span class="ident">err</span>), <span class="kw">_</span>)) =&gt; {
-                <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">err</span>);
-                <span class="prelude-val">None</span>
-            }
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
-        };
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">coerce_array</span>(<span class="ident">v</span>, <span class="kw-2">&amp;</span><span class="ident">coerce::string</span>, <span class="ident">diagnostics</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">arr</span><span class="op">|</span> (<span class="ident">arr</span>, <span class="ident">v</span>.<span class="ident">span</span>())))
+            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">arr</span>, <span class="ident">span</span>)<span class="op">|</span> <span class="ident">parse_and_validate_preview_features</span>(<span class="ident">arr</span>, <span class="kw-2">&amp;</span><span class="ident">GENERATOR</span>, <span class="ident">span</span>, <span class="ident">diagnostics</span>));
 
         <span class="kw">for</span> <span class="ident">prop</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">ast_generator</span>.<span class="ident">properties</span> {
             <span class="kw">let</span> <span class="ident">is_first_class_prop</span> <span class="op">=</span> <span class="ident">FIRST_CLASS_PROPERTIES</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">k</span> <span class="op">==</span> <span class="ident">prop</span>.<span class="ident">name</span>.<span class="ident">name</span>);
@@ -343,7 +285,7 @@
 }
 
 <span class="kw">fn</span> <span class="ident">parse_and_validate_preview_features</span>(
-    <span class="ident">preview_features</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="ident">preview_features</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
     <span class="ident">feature_map</span>: <span class="kw-2">&amp;</span><span class="ident">FeatureMap</span>,
     <span class="ident">span</span>: <span class="ident">ast::Span</span>,
     <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
@@ -351,16 +293,16 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">features</span> <span class="op">=</span> <span class="ident">BitFlags::empty</span>();
 
     <span class="kw">for</span> <span class="ident">feature_str</span> <span class="kw">in</span> <span class="ident">preview_features</span> {
-        <span class="kw">let</span> <span class="ident">feature_opt</span> <span class="op">=</span> <span class="ident">PreviewFeature::parse_opt</span>(<span class="kw-2">&amp;</span><span class="ident">feature_str</span>);
+        <span class="kw">let</span> <span class="ident">feature_opt</span> <span class="op">=</span> <span class="ident">PreviewFeature::parse_opt</span>(<span class="ident">feature_str</span>);
         <span class="kw">match</span> <span class="ident">feature_opt</span> {
             <span class="prelude-val">Some</span>(<span class="ident">feature</span>) <span class="kw">if</span> <span class="ident">feature_map</span>.<span class="ident">is_deprecated</span>(<span class="ident">feature</span>) =&gt; {
                 <span class="ident">features</span> <span class="op">|</span><span class="op">=</span> <span class="ident">feature</span>;
-                <span class="ident">diagnostics</span>.<span class="ident">push_warning</span>(<span class="ident">DatamodelWarning::new_feature_deprecated</span>(<span class="kw-2">&amp;</span><span class="ident">feature_str</span>, <span class="ident">span</span>));
+                <span class="ident">diagnostics</span>.<span class="ident">push_warning</span>(<span class="ident">DatamodelWarning::new_feature_deprecated</span>(<span class="ident">feature_str</span>, <span class="ident">span</span>));
             }
 
             <span class="prelude-val">Some</span>(<span class="ident">feature</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">feature_map</span>.<span class="ident">is_valid</span>(<span class="ident">feature</span>) =&gt; {
                 <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_preview_feature_not_known_error</span>(
-                    <span class="kw-2">&amp;</span><span class="ident">feature_str</span>,
+                    <span class="ident">feature_str</span>,
                     <span class="ident">feature_map</span>.<span class="ident">active_features</span>().<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">pf</span><span class="op">|</span> <span class="ident">pf</span>.<span class="ident">to_string</span>()).<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>),
                     <span class="ident">span</span>,
                 ))
@@ -369,7 +311,7 @@
             <span class="prelude-val">Some</span>(<span class="ident">feature</span>) =&gt; <span class="ident">features</span> <span class="op">|</span><span class="op">=</span> <span class="ident">feature</span>,
 
             <span class="prelude-val">None</span> =&gt; <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_preview_feature_not_known_error</span>(
-                <span class="kw-2">&amp;</span><span class="ident">feature_str</span>,
+                <span class="ident">feature_str</span>,
                 <span class="ident">feature_map</span>.<span class="ident">active_features</span>().<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">pf</span><span class="op">|</span> <span class="ident">pf</span>.<span class="ident">to_string</span>()).<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>),
                 <span class="ident">span</span>,
             )),
