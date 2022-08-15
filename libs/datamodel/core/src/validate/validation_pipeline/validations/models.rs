@@ -277,7 +277,7 @@ pub(super) fn schema_exists(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
         _ => return,
     };
     ctx.push_error(DatamodelError::new_static(
-        "This schema is not defined in the datasource. Read more on `@@schema` at https://pris.ly/multi-schema",
+        "This schema is not defined in the datasource. Read more on `@@schema` at https://pris.ly/d/multi-schema",
         span,
     ))
 }
@@ -292,7 +292,7 @@ pub(super) fn schema_capability(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
         return;
     };
     ctx.push_error(DatamodelError::new_static(
-        "@@schema is not defined on the current datasource provider",
+        "@@schema is not supported on the current datasource provider",
         span,
     ))
 }
