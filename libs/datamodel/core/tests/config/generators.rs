@@ -364,7 +364,7 @@ fn env_in_preview_features_must_be_rejected() {
     "#};
 
     let expect_1 = expect![[r#"
-        [1;91merror[0m: [1mExpected a String value, but received functional value `env("MY_PREVIEW_FEATURE")`.[0m
+        [1;91merror[0m: [1mExpected a string value, but received functional value `env("MY_PREVIEW_FEATURE")`.[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  provider = "prisma-client-js"
@@ -373,7 +373,7 @@ fn env_in_preview_features_must_be_rejected() {
     "#]];
 
     let expect_2 = expect![[r#"
-        [1;91merror[0m: [1mExpected a String value, but received functional value `env("MY_PREVIEW_FEATURE")`.[0m
+        [1;91merror[0m: [1mExpected a string value, but received functional value `env("MY_PREVIEW_FEATURE")`.[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  provider = "prisma-client-js"

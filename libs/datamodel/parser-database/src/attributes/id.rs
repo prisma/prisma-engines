@@ -2,6 +2,7 @@ use super::{FieldResolutionError, FieldResolvingSetup};
 use crate::{
     ast::{self, WithName, WithSpan},
     attributes::resolve_field_array_with_args,
+    coerce,
     context::Context,
     types::{FieldWithArgs, IdAttribute, IndexFieldPath, ModelAttributes, SortOrder},
     DatamodelError, StringId,
@@ -18,7 +19,7 @@ pub(super) fn model(model_data: &mut ModelAttributes, model_id: ast::ModelId, ct
 
     let resolving = FieldResolvingSetup::OnlyTopLevel;
 
-    let resolved_fields = match resolve_field_array_with_args(&fields, attr.span, model_id, resolving, ctx) {
+    let resolved_fields = match resolve_field_array_with_args(fields, attr.span, model_id, resolving, ctx) {
         Ok(fields) => fields,
         Err(FieldResolutionError::AlreadyDealtWith) => return,
         Err(FieldResolutionError::ProblematicFields {
@@ -154,27 +155,22 @@ pub(super) fn field<'db>(
         None => {
             let mapped_name = primary_key_mapped_name(ctx);
 
-            let length = match ctx.visit_optional_arg("length").map(|length| length.as_int()) {
-                Some(Ok(length)) => Some(length as u32),
-                Some(Err(err)) => {
-                    ctx.push_error(err);
-                    None
-                }
-                None => None,
-            };
+            let length = ctx
+                .visit_optional_arg("length")
+                .and_then(|length| coerce::integer(length, ctx.diagnostics))
+                .map(|len| len as u32);
 
-            let sort_order = match ctx.visit_optional_arg("sort").map(|sort| sort.as_constant_literal()) {
-                Some(Ok("Desc")) => Some(SortOrder::Desc),
-                Some(Ok("Asc")) => Some(SortOrder::Asc),
-                Some(Ok(other)) => {
+            let sort_order = match ctx
+                .visit_optional_arg("sort")
+                .and_then(|sort| coerce::constant(sort, ctx.diagnostics))
+            {
+                Some("Desc") => Some(SortOrder::Desc),
+                Some("Asc") => Some(SortOrder::Asc),
+                Some(other) => {
                     ctx.push_attribute_validation_error(&format!(
                         "The `sort` argument can only be `Asc` or `Desc` you provided: {}.",
                         other
                     ));
-                    None
-                }
-                Some(Err(err)) => {
-                    ctx.push_error(err);
                     None
                 }
                 None => None,
@@ -230,16 +226,15 @@ pub(super) fn validate_id_field_arities(
 }
 
 fn primary_key_mapped_name(ctx: &mut Context<'_>) -> Option<StringId> {
-    let mapped_name = match ctx.visit_optional_arg("map").map(|name| name.as_str()) {
-        Some(Ok("")) => {
+    let mapped_name = match ctx
+        .visit_optional_arg("map")
+        .and_then(|name| coerce::string(name, ctx.diagnostics))
+    {
+        Some("") => {
             ctx.push_attribute_validation_error("The `map` argument cannot be an empty string.");
             None
         }
-        Some(Ok(name)) => Some(ctx.interner.intern(name)),
-        Some(Err(err)) => {
-            ctx.push_error(err);
-            None
-        }
+        Some(name) => Some(ctx.interner.intern(name)),
         None => None,
     };
 

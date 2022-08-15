@@ -1,5 +1,6 @@
 use crate::{
     ast::{self, WithName},
+    coerce,
     context::Context,
     types::{CompositeTypeField, DefaultAttribute, ScalarField, ScalarFieldType, ScalarType},
     DatamodelError, StringId,
@@ -34,7 +35,7 @@ pub(super) fn visit_model_field_default(
     };
 
     // @default(dbgenerated(...)) is always valid.
-    match value.value {
+    match value {
         ast::Expression::Function(name, funcargs, _span) if name == FN_DBGENERATED => {
             validate_dbgenerated_args(&funcargs.arguments, accept, ctx);
             return;
@@ -48,14 +49,14 @@ pub(super) fn visit_model_field_default(
         }
         ScalarFieldType::Enum(enum_id) => {
             if ast_field.arity.is_list() {
-                validate_enum_list_default(value.value, enum_id, accept, ctx);
+                validate_enum_list_default(value, enum_id, accept, ctx);
             } else {
-                validate_enum_default(value.value, enum_id, accept, ctx);
+                validate_enum_default(value, enum_id, accept, ctx);
             }
         }
         ScalarFieldType::BuiltInScalar(scalar_type) => validate_model_builtin_scalar_type_default(
             scalar_type,
-            value.value,
+            value,
             mapped_name,
             accept,
             (model_id, field_id),
@@ -101,7 +102,7 @@ pub(super) fn visit_composite_field_default(
     };
 
     // @default(dbgenerated(...)) is never valid on a composite type's fields.
-    match value.value {
+    match value {
         ast::Expression::Function(name, ..) if name == FN_DBGENERATED => {
             ctx.push_attribute_validation_error("Fields of composite types cannot have `dbgenerated()` as default.");
             return;
@@ -117,13 +118,13 @@ pub(super) fn visit_composite_field_default(
         }
         ScalarFieldType::Enum(enum_id) => {
             if ast_field.arity.is_list() {
-                validate_enum_list_default(value.value, enum_id, accept, ctx);
+                validate_enum_list_default(value, enum_id, accept, ctx);
             } else {
-                validate_enum_default(value.value, enum_id, accept, ctx);
+                validate_enum_default(value, enum_id, accept, ctx);
             }
         }
         ScalarFieldType::BuiltInScalar(scalar_type) => {
-            validate_composite_builtin_scalar_type_default(scalar_type, value.value, accept, ast_field.arity, ctx)
+            validate_composite_builtin_scalar_type_default(scalar_type, value, accept, ast_field.arity, ctx)
         }
         ScalarFieldType::Unsupported(_) => {
             ctx.push_attribute_validation_error("Composite field of type `Unsupported` cannot have default values.")
@@ -267,16 +268,15 @@ fn validate_composite_builtin_scalar_type_default(
 }
 
 fn default_attribute_mapped_name(ctx: &mut Context<'_>) -> Option<StringId> {
-    match ctx.visit_optional_arg("map").map(|name| name.as_str()) {
-        Some(Ok("")) => {
+    match ctx
+        .visit_optional_arg("map")
+        .and_then(|name| coerce::string(name, ctx.diagnostics))
+    {
+        Some("") => {
             ctx.push_attribute_validation_error("The `map` argument cannot be an empty string.");
             None
         }
-        Some(Ok(name)) => Some(ctx.interner.intern(name)),
-        Some(Err(err)) => {
-            ctx.push_error(err);
-            None
-        }
+        Some(name) => Some(ctx.interner.intern(name)),
         None => None,
     }
 }

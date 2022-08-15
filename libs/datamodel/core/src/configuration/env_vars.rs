@@ -1,7 +1,6 @@
-use crate::parser_database::{ast, ValueValidator};
-use diagnostics::DatamodelError;
+use crate::parser_database::{ast, coerce};
+use diagnostics::{DatamodelError, Diagnostics};
 use serde::Serialize;
-use std::convert::TryFrom;
 
 /// Either an env var or a string literal.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
@@ -14,6 +13,31 @@ pub struct StringFromEnvVar {
 }
 
 impl StringFromEnvVar {
+    pub(crate) fn coerce(expr: &ast::Expression, diagnostics: &mut Diagnostics) -> Option<Self> {
+        match expr {
+            ast::Expression::Function(name, _, _) if name == "env" => {
+                let mut errs = Diagnostics::new();
+                match EnvFunction::from_ast(expr, &mut errs) {
+                    Some(env_function) => Some(StringFromEnvVar::new_from_env_var(env_function.var_name().to_owned())),
+                    None => {
+                        diagnostics.push_error(errs.errors()[0].clone());
+                        None
+                    }
+                }
+            }
+            ast::Expression::StringValue(value, _) => Some(StringFromEnvVar::new_literal(value.clone())),
+            _ => {
+                diagnostics.push_error(DatamodelError::new_type_mismatch_error(
+                    "String",
+                    expr.describe_value_type(),
+                    &expr.to_string(),
+                    expr.span(),
+                ));
+                None
+            }
+        }
+    }
+
     pub fn new_from_env_var(env_var_name: String) -> StringFromEnvVar {
         StringFromEnvVar {
             from_env_var: Some(env_var_name),
@@ -39,59 +63,42 @@ impl StringFromEnvVar {
     }
 }
 
-impl TryFrom<&ast::Expression> for StringFromEnvVar {
-    type Error = DatamodelError;
-
-    fn try_from(expr: &ast::Expression) -> Result<StringFromEnvVar, Self::Error> {
-        match expr {
-            ast::Expression::Function(name, _, _) if name == "env" => {
-                let env_function = EnvFunction::from_ast(expr)?;
-                Ok(StringFromEnvVar::new_from_env_var(env_function.var_name().to_owned()))
-            }
-            ast::Expression::StringValue(value, _) => Ok(StringFromEnvVar::new_literal(value.clone())),
-            _ => Err(DatamodelError::new_type_mismatch_error(
-                "String",
-                expr.describe_value_type(),
-                &expr.to_string(),
-                expr.span(),
-            )),
-        }
-    }
-}
-
 struct EnvFunction {
     var_name: String,
 }
 
 impl EnvFunction {
-    fn from_ast(expr: &ast::Expression) -> Result<EnvFunction, DatamodelError> {
+    fn from_ast(expr: &ast::Expression, diagnostics: &mut Diagnostics) -> Option<EnvFunction> {
         let args = if let ast::Expression::Function(name, args, _) = &expr {
             if name == "env" {
                 args
             } else {
-                return Err(DatamodelError::new_functional_evaluation_error(
+                diagnostics.push_error(DatamodelError::new_functional_evaluation_error(
                     "Expected this to be an env function.",
                     expr.span(),
                 ));
+                return None;
             }
         } else {
-            return Err(DatamodelError::new_functional_evaluation_error(
+            diagnostics.push_error(DatamodelError::new_functional_evaluation_error(
                 "This is not a function expression but expected it to be one.",
                 expr.span(),
             ));
+            return None;
         };
 
         if args.arguments.len() != 1 {
-            return Err(DatamodelError::new_functional_evaluation_error(
+            diagnostics.push_error(DatamodelError::new_functional_evaluation_error(
                 "Exactly one string parameter must be passed to the env function.",
                 expr.span(),
             ));
+            return None;
         }
 
         let var_wrapped = &args.arguments[0];
-        let var_name = ValueValidator::new(&var_wrapped.value).as_str()?.to_owned();
+        let var_name = coerce::string(&var_wrapped.value, diagnostics)?.to_owned();
 
-        Ok(Self { var_name })
+        Some(Self { var_name })
     }
 
     fn var_name(&self) -> &str {

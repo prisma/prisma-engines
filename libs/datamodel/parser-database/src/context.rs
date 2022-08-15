@@ -3,7 +3,7 @@ mod attributes;
 use self::attributes::AttributesValidationState;
 use crate::{
     ast, interner::StringInterner, names::Names, relations::Relations, types::Types, DatamodelError, Diagnostics,
-    StringId, ValueValidator,
+    StringId,
 };
 use schema_ast::ast::{Expression, WithName};
 use std::collections::{HashMap, HashSet};
@@ -230,7 +230,7 @@ impl<'db> Context<'db> {
     pub(crate) fn visit_default_arg_with_idx(
         &mut self,
         name: &'static str,
-    ) -> Result<(usize, ValueValidator<'db>), DatamodelError> {
+    ) -> Result<(usize, &'db ast::Expression), DatamodelError> {
         let name_s = self.interner.intern(name);
         match (
             self.attributes.args.remove(&Some(name_s)),
@@ -238,7 +238,7 @@ impl<'db> Context<'db> {
         ) {
             (Some(arg_idx), None) | (None, Some(arg_idx)) => {
                 let arg = self.arg_at(arg_idx);
-                Ok((arg_idx, ValueValidator::new(&arg.value)))
+                Ok((arg_idx, &arg.value))
             }
             (Some(arg_idx), Some(_)) => {
                 let arg = self.arg_at(arg_idx);
@@ -255,17 +255,15 @@ impl<'db> Context<'db> {
     /// first unnamed argument.
     ///
     /// Use this to implement unnamed argument behavior.
-    pub(crate) fn visit_default_arg(&mut self, name: &'static str) -> Result<ValueValidator<'db>, DatamodelError> {
+    pub(crate) fn visit_default_arg(&mut self, name: &'static str) -> Result<&'db ast::Expression, DatamodelError> {
         Ok(self.visit_default_arg_with_idx(name)?.1)
     }
 
     /// Visit an optional argument in the current attribute.
-    pub(crate) fn visit_optional_arg(&mut self, name: &'static str) -> Option<ValueValidator<'db>> {
+    pub(crate) fn visit_optional_arg(&mut self, name: &'static str) -> Option<&'db ast::Expression> {
         let arg_name = self.interner.intern(name);
         let idx = self.attributes.args.remove(&Some(arg_name))?;
-        Some(ValueValidator::new(
-            &self.current_attribute().arguments.arguments[idx].value,
-        ))
+        Some(&self.current_attribute().arguments.arguments[idx].value)
     }
 
     /// This must be called at the end of arguments validation. It will report errors for each argument that was not used by the validators. The Drop impl will helpfully panic
