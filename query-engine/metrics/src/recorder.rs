@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use metrics::KeyName;
 use metrics::{Counter, CounterFn, Gauge, GaugeFn, Histogram, HistogramFn, Key, Recorder, Unit};
+use tracing::trace;
 
 use super::common::KeyLabels;
 use super::{METRIC_COUNTER, METRIC_DESCRIPTION, METRIC_GAUGE, METRIC_HISTOGRAM, METRIC_TARGET};

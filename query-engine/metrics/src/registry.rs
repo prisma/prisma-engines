@@ -83,7 +83,7 @@ impl MetricRegistry {
             //TODO: Sanitize string
             descriptions
                 .entry(metric.name.name().to_string())
-                .or_insert(description.to_string());
+                .or_insert_with(|| description.to_string());
         }
     }
 

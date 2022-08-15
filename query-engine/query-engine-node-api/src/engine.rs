@@ -5,8 +5,9 @@ use prisma_models::InternalDataModelBuilder;
 use query_core::{
     executor,
     schema::{QuerySchema, QuerySchemaRenderer},
-    schema_builder, set_parent_context_from_json_str, MetricFormat, MetricRegistry, QueryExecutor, TxId,
+    schema_builder, set_parent_context_from_json_str, QueryExecutor, TxId,
 };
+use query_engine_metrics::{MetricFormat, MetricRegistry};
 use request_handlers::{GraphQLSchemaRenderer, GraphQlHandler, TxInput};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -201,7 +202,7 @@ impl QueryEngine {
         if enable_metrics {
             napi_env.execute_tokio_future(
                 async {
-                    query_core::describe_metrics();
+                    query_engine_metrics::describe_metrics();
                     Ok(())
                 }
                 .with_subscriber(logger.dispatcher()),

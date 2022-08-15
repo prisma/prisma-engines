@@ -4,9 +4,9 @@ use crate::{
     root_queries::{aggregate, read, write},
 };
 use connector_interface::{ConnectionLike, ReadOperations, RelAggregationSelection, Transaction, WriteOperations};
-use metrics::{decrement_gauge, increment_gauge};
 use mongodb::options::{Acknowledgment, ReadConcern, TransactionOptions, WriteConcern};
 use prisma_models::SelectionResult;
+use query_engine_metrics::{decrement_gauge, increment_gauge, metrics, PRISMA_CLIENT_QUERIES_ACTIVE};
 use std::collections::HashMap;
 
 pub struct MongoDbTransaction<'conn> {
@@ -30,7 +30,7 @@ impl<'conn> MongoDbTransaction<'conn> {
             .await
             .map_err(|err| MongoError::from(err).into_connector_error())?;
 
-        increment_gauge!("prisma_client_queries_active", 1.0);
+        increment_gauge!(PRISMA_CLIENT_QUERIES_ACTIVE, 1.0);
 
         Ok(Self { connection })
     }
@@ -39,7 +39,7 @@ impl<'conn> MongoDbTransaction<'conn> {
 #[async_trait]
 impl<'conn> Transaction for MongoDbTransaction<'conn> {
     async fn commit(&mut self) -> connector_interface::Result<()> {
-        decrement_gauge!("prisma_client_queries_active", 1.0);
+        decrement_gauge!(PRISMA_CLIENT_QUERIES_ACTIVE, 1.0);
         self.connection
             .session
             .commit_transaction()
@@ -50,7 +50,7 @@ impl<'conn> Transaction for MongoDbTransaction<'conn> {
     }
 
     async fn rollback(&mut self) -> connector_interface::Result<()> {
-        decrement_gauge!("prisma_client_queries_active", 1.0);
+        decrement_gauge!(PRISMA_CLIENT_QUERIES_ACTIVE, 1.0);
         self.connection
             .session
             .abort_transaction()

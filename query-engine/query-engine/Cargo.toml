@@ -41,6 +41,7 @@ tracing-subscriber = { version = "0.3", features = ["json", "env-filter"] }
 tracing-futures = "0.2"
 opentelemetry = { version = "0.17.0", features = ["rt-tokio"] }
 opentelemetry-otlp = { version = "0.10", features = ["tls", "tls-roots"] }
+query-engine-metrics = {path = "../metrics"}
 
 rand = "0.8"
 tonic = { version = "0.4", default-features = false }
