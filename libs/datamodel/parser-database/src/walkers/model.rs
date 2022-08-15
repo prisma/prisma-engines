@@ -317,7 +317,7 @@ impl<'db> ModelWalker<'db> {
         }
     }
 
-    /// The name of the schema the enum belongs to.
+    /// The name of the schema the model belongs to.
     ///
     /// ```ignore
     /// @@schema("public")

@@ -23,13 +23,14 @@ enum toggle {
 }
 
 
-// [1;91merror[0m: [1mAttribute "@schema" is defined twice.[0m
+
+// [1;91merror[0m: [1mAttribute "@schema" can only be defined once.[0m
 //   [1;94m-->[0m  [4mschema.prisma:21[0m
 // [1;94m   | [0m
 // [1;94m20 | [0m
 // [1;94m21 | [0m  [1;91m@@schema("public")[0m
 // [1;94m   | [0m
-// [1;91merror[0m: [1mAttribute "@schema" is defined twice.[0m
+// [1;91merror[0m: [1mAttribute "@schema" can only be defined once.[0m
 //   [1;94m-->[0m  [4mschema.prisma:22[0m
 // [1;94m   | [0m
 // [1;94m21 | [0m  @@schema("public")
