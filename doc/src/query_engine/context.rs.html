@@ -127,10 +127,12 @@
 <span id="121">121</span>
 <span id="122">122</span>
 <span id="123">123</span>
+<span id="124">124</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">PrismaError</span>, <span class="ident">PrismaResult</span>};
 <span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">dml::Datamodel</span>, <span class="ident">Configuration</span>};
 <span class="kw">use</span> <span class="ident">prisma_models::InternalDataModelBuilder</span>;
-<span class="kw">use</span> <span class="ident">query_core</span>::{<span class="ident">executor</span>, <span class="ident">schema::QuerySchemaRef</span>, <span class="ident">schema_builder</span>, <span class="ident">MetricRegistry</span>, <span class="ident">QueryExecutor</span>};
+<span class="kw">use</span> <span class="ident">query_core</span>::{<span class="ident">executor</span>, <span class="ident">schema::QuerySchemaRef</span>, <span class="ident">schema_builder</span>, <span class="ident">QueryExecutor</span>};
+<span class="kw">use</span> <span class="ident">query_engine_metrics::MetricRegistry</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">env</span>, <span class="ident">fmt</span>, <span class="ident">sync::Arc</span>};
 
 <span class="doccomment">/// Prisma request context containing all immutable state of the process.</span>

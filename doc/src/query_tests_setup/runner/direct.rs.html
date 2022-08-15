@@ -119,9 +119,11 @@
 <span id="113">113</span>
 <span id="114">114</span>
 <span id="115">115</span>
+<span id="116">116</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ConnectorTag</span>, <span class="ident">RunnerInterface</span>, <span class="ident">TestResult</span>, <span class="ident">TxResult</span>};
 <span class="kw">use</span> <span class="ident">prisma_models::InternalDataModelBuilder</span>;
-<span class="kw">use</span> <span class="ident">query_core</span>::{<span class="ident">executor</span>, <span class="ident">schema::QuerySchemaRef</span>, <span class="ident">schema_builder</span>, <span class="ident">MetricRegistry</span>, <span class="ident">QueryExecutor</span>, <span class="ident">TxId</span>};
+<span class="kw">use</span> <span class="ident">query_core</span>::{<span class="ident">executor</span>, <span class="ident">schema::QuerySchemaRef</span>, <span class="ident">schema_builder</span>, <span class="ident">QueryExecutor</span>, <span class="ident">TxId</span>};
+<span class="kw">use</span> <span class="ident">query_engine_metrics::MetricRegistry</span>;
 <span class="kw">use</span> <span class="ident">request_handlers</span>::{<span class="ident">GraphQlBody</span>, <span class="ident">GraphQlHandler</span>, <span class="ident">MultiQuery</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">env</span>, <span class="ident">sync::Arc</span>};
 

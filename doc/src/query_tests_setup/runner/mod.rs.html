@@ -198,6 +198,7 @@
 <span id="192">192</span>
 <span id="193">193</span>
 <span id="194">194</span>
+<span id="195">195</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">binary</span>;
 <span class="kw">mod</span> <span class="ident">direct</span>;
 <span class="kw">mod</span> <span class="ident">node_api</span>;
@@ -205,7 +206,8 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">binary</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">direct</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">node_api</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">query_core</span>::{<span class="ident">MetricRegistry</span>, <span class="ident">TxId</span>};
+<span class="kw">use</span> <span class="ident">query_core::TxId</span>;
+<span class="kw">use</span> <span class="ident">query_engine_metrics::MetricRegistry</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ConnectorTag</span>, <span class="ident">ConnectorVersion</span>, <span class="ident">QueryResult</span>, <span class="ident">TestError</span>, <span class="ident">TestResult</span>};
 <span class="kw">use</span> <span class="ident">colored</span>::<span class="kw-2">*</span>;

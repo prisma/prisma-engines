@@ -161,7 +161,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">logging</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">query_core</span>;
-<span class="kw">use</span> <span class="ident">query_core::MetricRegistry</span>;
+<span class="kw">use</span> <span class="ident">query_engine_metrics::MetricRegistry</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">query_result</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">runner</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">schema_gen</span>::<span class="kw-2">*</span>;
@@ -206,7 +206,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">setup_metrics</span>() -&gt; <span class="ident">MetricRegistry</span> {
     <span class="kw">let</span> <span class="ident">metrics</span> <span class="op">=</span> <span class="ident">MetricRegistry::new</span>();
     <span class="ident">METRIC_RECORDER</span>.<span class="ident">call_once</span>(<span class="op">|</span><span class="op">|</span> {
-        <span class="ident">query_core::metrics::setup</span>();
+        <span class="ident">query_engine_metrics::setup</span>();
     });
     <span class="ident">metrics</span>
 }

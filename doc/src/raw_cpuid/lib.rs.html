@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/raw-cpuid-10.3.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../raw_cpuid/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/raw-cpuid-10.4.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../raw_cpuid/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../raw_cpuid/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
@@ -5368,6 +5368,47 @@
 <span id="5362">5362</span>
 <span id="5363">5363</span>
 <span id="5364">5364</span>
+<span id="5365">5365</span>
+<span id="5366">5366</span>
+<span id="5367">5367</span>
+<span id="5368">5368</span>
+<span id="5369">5369</span>
+<span id="5370">5370</span>
+<span id="5371">5371</span>
+<span id="5372">5372</span>
+<span id="5373">5373</span>
+<span id="5374">5374</span>
+<span id="5375">5375</span>
+<span id="5376">5376</span>
+<span id="5377">5377</span>
+<span id="5378">5378</span>
+<span id="5379">5379</span>
+<span id="5380">5380</span>
+<span id="5381">5381</span>
+<span id="5382">5382</span>
+<span id="5383">5383</span>
+<span id="5384">5384</span>
+<span id="5385">5385</span>
+<span id="5386">5386</span>
+<span id="5387">5387</span>
+<span id="5388">5388</span>
+<span id="5389">5389</span>
+<span id="5390">5390</span>
+<span id="5391">5391</span>
+<span id="5392">5392</span>
+<span id="5393">5393</span>
+<span id="5394">5394</span>
+<span id="5395">5395</span>
+<span id="5396">5396</span>
+<span id="5397">5397</span>
+<span id="5398">5398</span>
+<span id="5399">5399</span>
+<span id="5400">5400</span>
+<span id="5401">5401</span>
+<span id="5402">5402</span>
+<span id="5403">5403</span>
+<span id="5404">5404</span>
+<span id="5405">5405</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A library to parse the x86 CPUID instruction, written in rust with no</span>
 <span class="doccomment">//! external dependencies. The implementation closely resembles the Intel CPUID</span>
 <span class="doccomment">//! manual description. The library works with no_std.</span>
@@ -5679,6 +5720,7 @@
 <span class="kw">const</span> <span class="ident">EAX_FREQUENCY_INFO</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x16</span>;
 <span class="kw">const</span> <span class="ident">EAX_SOC_VENDOR_INFO</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x17</span>;
 <span class="kw">const</span> <span class="ident">EAX_DETERMINISTIC_ADDRESS_TRANSLATION_INFO</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x18</span>;
+<span class="kw">const</span> <span class="ident">EAX_EXTENDED_TOPOLOGY_INFO_V2</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x1F</span>;
 
 <span class="doccomment">/// Hypervisor leaf</span>
 <span class="kw">const</span> <span class="ident">EAX_HYPERVISOR_INFO</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x4000_0000</span>;
@@ -5922,6 +5964,9 @@
 
     <span class="doccomment">/// Information about topology (LEAF=0x0B).</span>
     <span class="doccomment">///</span>
+    <span class="doccomment">/// Intel SDM suggests software should check support for leaf 0x1F ([`get_extended_topology_info_v2()`]), and</span>
+    <span class="doccomment">/// if supported, enumerate that leaf instead.</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ✅ AMD ✅ Intel</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_extended_topology_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ExtendedTopologyIter</span><span class="op">&gt;</span> {
@@ -5929,6 +5974,23 @@
             <span class="prelude-val">Some</span>(<span class="ident">ExtendedTopologyIter</span> {
                 <span class="ident">read</span>: <span class="self">self</span>.<span class="ident">read</span>,
                 <span class="ident">level</span>: <span class="number">0</span>,
+                <span class="ident">is_v2</span>: <span class="bool-val">false</span>,
+            })
+        } <span class="kw">else</span> {
+            <span class="prelude-val">None</span>
+        }
+    }
+
+    <span class="doccomment">/// Extended information about topology (LEAF=0x1F).</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Platforms</span>
+    <span class="doccomment">/// ❌ AMD ✅ Intel</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_extended_topology_info_v2</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ExtendedTopologyIter</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">leaf_is_supported</span>(<span class="ident">EAX_EXTENDED_TOPOLOGY_INFO_V2</span>) {
+            <span class="prelude-val">Some</span>(<span class="ident">ExtendedTopologyIter</span> {
+                <span class="ident">read</span>: <span class="self">self</span>.<span class="ident">read</span>,
+                <span class="ident">level</span>: <span class="number">0</span>,
+                <span class="ident">is_v2</span>: <span class="bool-val">true</span>,
             })
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
@@ -9091,6 +9153,7 @@
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">serde</span>(<span class="ident">skip</span>))]</span>
     <span class="ident">read</span>: <span class="ident">CpuIdReader</span>,
     <span class="ident">level</span>: <span class="ident">u32</span>,
+    <span class="ident">is_v2</span>: <span class="ident">bool</span>,
 }
 
 <span class="doccomment">/// Gives information about the current level in the topology.</span>
@@ -9135,6 +9198,9 @@
             <span class="number">0</span> =&gt; <span class="ident">TopologyType::Invalid</span>,
             <span class="number">1</span> =&gt; <span class="ident">TopologyType::SMT</span>,
             <span class="number">2</span> =&gt; <span class="ident">TopologyType::Core</span>,
+            <span class="number">3</span> =&gt; <span class="ident">TopologyType::Module</span>,
+            <span class="number">4</span> =&gt; <span class="ident">TopologyType::Tile</span>,
+            <span class="number">5</span> =&gt; <span class="ident">TopologyType::Die</span>,
             <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         }
     }
@@ -9159,6 +9225,9 @@
     <span class="doccomment">/// Hyper-thread (Simultaneous multithreading)</span>
     <span class="ident">SMT</span> <span class="op">=</span> <span class="number">1</span>,
     <span class="ident">Core</span> <span class="op">=</span> <span class="number">2</span>,
+    <span class="ident">Module</span> <span class="op">=</span> <span class="number">3</span>,
+    <span class="ident">Tile</span> <span class="op">=</span> <span class="number">4</span>,
+    <span class="ident">Die</span> <span class="op">=</span> <span class="number">5</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">TopologyType</span> {
@@ -9167,6 +9236,9 @@
             <span class="ident">TopologyType::Invalid</span> =&gt; <span class="string">&quot;Invalid&quot;</span>,
             <span class="ident">TopologyType::SMT</span> =&gt; <span class="string">&quot;SMT&quot;</span>,
             <span class="ident">TopologyType::Core</span> =&gt; <span class="string">&quot;Core&quot;</span>,
+            <span class="ident">TopologyType::Module</span> =&gt; <span class="string">&quot;Module&quot;</span>,
+            <span class="ident">TopologyType::Tile</span> =&gt; <span class="string">&quot;Tile&quot;</span>,
+            <span class="ident">TopologyType::Die</span> =&gt; <span class="string">&quot;Die&quot;</span>,
         };
 
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">data</span>)
@@ -9177,7 +9249,11 @@
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">ExtendedTopologyLevel</span>;
 
     <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ExtendedTopologyLevel</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">read</span>.<span class="ident">cpuid2</span>(<span class="ident">EAX_EXTENDED_TOPOLOGY_INFO</span>, <span class="self">self</span>.<span class="ident">level</span>);
+        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_v2</span> {
+            <span class="self">self</span>.<span class="ident">read</span>.<span class="ident">cpuid2</span>(<span class="ident">EAX_EXTENDED_TOPOLOGY_INFO_V2</span>, <span class="self">self</span>.<span class="ident">level</span>)
+        } <span class="kw">else</span> {
+            <span class="self">self</span>.<span class="ident">read</span>.<span class="ident">cpuid2</span>(<span class="ident">EAX_EXTENDED_TOPOLOGY_INFO</span>, <span class="self">self</span>.<span class="ident">level</span>)
+        };
         <span class="self">self</span>.<span class="ident">level</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
 
         <span class="kw">let</span> <span class="ident">et</span> <span class="op">=</span> <span class="ident">ExtendedTopologyLevel</span> {
@@ -10439,6 +10515,8 @@
             <span class="number">0b00010</span> =&gt; <span class="ident">DatType::InstructionTLB</span>,
             <span class="number">0b00011</span> =&gt; <span class="ident">DatType::UnifiedTLB</span>,
             <span class="number">0b00000</span> =&gt; <span class="ident">DatType::Null</span>, <span class="comment">// should never be returned as this indicates invalid struct!</span>
+            <span class="number">0b00100</span> =&gt; <span class="ident">DatType::LoadOnly</span>,
+            <span class="number">0b00101</span> =&gt; <span class="ident">DatType::StoreOnly</span>,
             <span class="kw">_</span> =&gt; <span class="ident">DatType::Unknown</span>,
         }
     }
@@ -10481,6 +10559,8 @@
     <span class="doccomment">/// Please see the Intel® 64 and IA-32 Architectures Optimization Reference Manual</span>
     <span class="doccomment">/// for details of a particular product.</span>
     <span class="ident">UnifiedTLB</span> <span class="op">=</span> <span class="number">0b00011</span>,
+    <span class="ident">LoadOnly</span> <span class="op">=</span> <span class="number">0b0100</span>,
+    <span class="ident">StoreOnly</span> <span class="op">=</span> <span class="number">0b0101</span>,
     <span class="ident">Unknown</span>,
 }
 
@@ -10491,6 +10571,8 @@
             <span class="ident">DatType::DataTLB</span> =&gt; <span class="string">&quot;Data TLB&quot;</span>,
             <span class="ident">DatType::InstructionTLB</span> =&gt; <span class="string">&quot;Instruction TLB&quot;</span>,
             <span class="ident">DatType::UnifiedTLB</span> =&gt; <span class="string">&quot;Unified TLB&quot;</span>,
+            <span class="ident">DatType::LoadOnly</span> =&gt; <span class="string">&quot;Load Only&quot;</span>,
+            <span class="ident">DatType::StoreOnly</span> =&gt; <span class="string">&quot;Store Only&quot;</span>,
             <span class="ident">DatType::Unknown</span> =&gt; <span class="string">&quot;Unknown&quot;</span>,
         };
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">t</span>)

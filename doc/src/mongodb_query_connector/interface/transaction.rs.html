@@ -290,9 +290,9 @@
     <span class="ident">root_queries</span>::{<span class="ident">aggregate</span>, <span class="ident">read</span>, <span class="ident">write</span>},
 };
 <span class="kw">use</span> <span class="ident">connector_interface</span>::{<span class="ident">ConnectionLike</span>, <span class="ident">ReadOperations</span>, <span class="ident">RelAggregationSelection</span>, <span class="ident">Transaction</span>, <span class="ident">WriteOperations</span>};
-<span class="kw">use</span> <span class="ident">metrics</span>::{<span class="ident">decrement_gauge</span>, <span class="ident">increment_gauge</span>};
 <span class="kw">use</span> <span class="ident">mongodb::options</span>::{<span class="ident">Acknowledgment</span>, <span class="ident">ReadConcern</span>, <span class="ident">TransactionOptions</span>, <span class="ident">WriteConcern</span>};
 <span class="kw">use</span> <span class="ident">prisma_models::SelectionResult</span>;
+<span class="kw">use</span> <span class="ident">query_engine_metrics</span>::{<span class="ident">decrement_gauge</span>, <span class="ident">increment_gauge</span>, <span class="ident">metrics</span>, <span class="ident">PRISMA_CLIENT_QUERIES_ACTIVE</span>};
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MongoDbTransaction</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span> {
@@ -316,7 +316,7 @@
             .<span class="kw">await</span>
             .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">MongoError::from</span>(<span class="ident">err</span>).<span class="ident">into_connector_error</span>())<span class="question-mark">?</span>;
 
-        <span class="macro">increment_gauge!</span>(<span class="string">&quot;prisma_client_queries_active&quot;</span>, <span class="number">1.0</span>);
+        <span class="macro">increment_gauge!</span>(<span class="ident">PRISMA_CLIENT_QUERIES_ACTIVE</span>, <span class="number">1.0</span>);
 
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">connection</span> })
     }
@@ -325,7 +325,7 @@
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span> <span class="ident">Transaction</span> <span class="kw">for</span> <span class="ident">MongoDbTransaction</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span> {
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">commit</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="macro">decrement_gauge!</span>(<span class="string">&quot;prisma_client_queries_active&quot;</span>, <span class="number">1.0</span>);
+        <span class="macro">decrement_gauge!</span>(<span class="ident">PRISMA_CLIENT_QUERIES_ACTIVE</span>, <span class="number">1.0</span>);
         <span class="self">self</span>.<span class="ident">connection</span>
             .<span class="ident">session</span>
             .<span class="ident">commit_transaction</span>()
@@ -336,7 +336,7 @@
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">rollback</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="macro">decrement_gauge!</span>(<span class="string">&quot;prisma_client_queries_active&quot;</span>, <span class="number">1.0</span>);
+        <span class="macro">decrement_gauge!</span>(<span class="ident">PRISMA_CLIENT_QUERIES_ACTIVE</span>, <span class="number">1.0</span>);
         <span class="self">self</span>.<span class="ident">connection</span>
             .<span class="ident">session</span>
             .<span class="ident">abort_transaction</span>()

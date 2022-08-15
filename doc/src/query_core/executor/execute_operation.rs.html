@@ -167,17 +167,15 @@
 <span id="161">161</span>
 <span id="162">162</span>
 <span id="163">163</span>
-<span id="164">164</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::time::Instant</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::pipeline::QueryPipeline</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">IrSerializer</span>, <span class="ident">Operation</span>, <span class="ident">QueryGraph</span>, <span class="ident">QueryGraphBuilder</span>, <span class="ident">QueryInterpreter</span>, <span class="ident">ResponseData</span>,
-    <span class="ident">PRISMA_CLIENT_QUERIES_HISTOGRAM_MS</span>, <span class="ident">PRISMA_CLIENT_QUERIES_TOTAL</span>,
-};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">IrSerializer</span>, <span class="ident">Operation</span>, <span class="ident">QueryGraph</span>, <span class="ident">QueryGraphBuilder</span>, <span class="ident">QueryInterpreter</span>, <span class="ident">ResponseData</span>};
 <span class="kw">use</span> <span class="ident">connector</span>::{<span class="ident">Connection</span>, <span class="ident">ConnectionLike</span>, <span class="ident">Connector</span>};
 <span class="kw">use</span> <span class="ident">futures::future</span>;
-<span class="kw">use</span> <span class="ident">metrics</span>::{<span class="ident">histogram</span>, <span class="ident">increment_counter</span>};
+<span class="kw">use</span> <span class="ident">query_engine_metrics</span>::{
+    <span class="ident">histogram</span>, <span class="ident">increment_counter</span>, <span class="ident">metrics</span>, <span class="ident">PRISMA_CLIENT_QUERIES_HISTOGRAM_MS</span>, <span class="ident">PRISMA_CLIENT_QUERIES_TOTAL</span>,
+};
 <span class="kw">use</span> <span class="ident">schema::QuerySchemaRef</span>;
 <span class="kw">use</span> <span class="ident">tracing::Instrument</span>;
 <span class="kw">use</span> <span class="ident">tracing_futures::WithSubscriber</span>;

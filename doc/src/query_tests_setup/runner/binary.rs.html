@@ -218,11 +218,13 @@
 <span id="212">212</span>
 <span id="213">213</span>
 <span id="214">214</span>
+<span id="215">215</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ConnectorTag</span>, <span class="ident">RunnerInterface</span>, <span class="ident">TestError</span>, <span class="ident">TestResult</span>, <span class="ident">TxResult</span>};
 <span class="kw">use</span> <span class="ident">hyper</span>::{<span class="ident">Body</span>, <span class="ident">Method</span>, <span class="ident">Request</span>, <span class="ident">Response</span>};
-<span class="kw">use</span> <span class="ident">query_core</span>::{<span class="ident">MetricRegistry</span>, <span class="ident">TxId</span>};
+<span class="kw">use</span> <span class="ident">query_core::TxId</span>;
 <span class="kw">use</span> <span class="ident">query_engine::opt::PrismaOpt</span>;
 <span class="kw">use</span> <span class="ident">query_engine::server</span>::{<span class="ident">routes</span>, <span class="ident">setup</span>, <span class="ident">State</span>};
+<span class="kw">use</span> <span class="ident">query_engine_metrics::MetricRegistry</span>;
 <span class="kw">use</span> <span class="ident">request_handlers</span>::{<span class="ident">GQLBatchResponse</span>, <span class="ident">GQLError</span>, <span class="ident">GQLResponse</span>, <span class="ident">GraphQlBody</span>, <span class="ident">MultiQuery</span>, <span class="ident">PrismaResponse</span>};
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BinaryRunner</span> {

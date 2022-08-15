@@ -152,6 +152,7 @@
 <span id="146">146</span>
 <span id="147">147</span>
 <span id="148">148</span>
+<span id="149">149</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">opentelemetry</span>::{
     <span class="ident">global</span>,
     <span class="ident">sdk</span>::{
@@ -162,7 +163,8 @@
     <span class="ident">KeyValue</span>,
 };
 <span class="kw">use</span> <span class="ident">opentelemetry_otlp::WithExportConfig</span>;
-<span class="kw">use</span> <span class="ident">query_core</span>::{<span class="ident">is_user_facing_trace_filter</span>, <span class="ident">MetricRegistry</span>};
+<span class="kw">use</span> <span class="ident">query_core::is_user_facing_trace_filter</span>;
+<span class="kw">use</span> <span class="ident">query_engine_metrics::MetricRegistry</span>;
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">dispatcher::SetGlobalDefaultError</span>, <span class="ident">subscriber</span>};
 <span class="kw">use</span> <span class="ident">tracing_subscriber</span>::{<span class="ident">filter::filter_fn</span>, <span class="ident">layer::SubscriberExt</span>, <span class="ident">EnvFilter</span>, <span class="ident">Layer</span>};
 

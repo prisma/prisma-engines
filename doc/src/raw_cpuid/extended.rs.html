@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/raw-cpuid-10.3.0/src/extended.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>extended.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../raw_cpuid/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/raw-cpuid-10.4.0/src/extended.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>extended.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../raw_cpuid/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../raw_cpuid/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
@@ -1550,6 +1550,45 @@
 <span id="1544">1544</span>
 <span id="1545">1545</span>
 <span id="1546">1546</span>
+<span id="1547">1547</span>
+<span id="1548">1548</span>
+<span id="1549">1549</span>
+<span id="1550">1550</span>
+<span id="1551">1551</span>
+<span id="1552">1552</span>
+<span id="1553">1553</span>
+<span id="1554">1554</span>
+<span id="1555">1555</span>
+<span id="1556">1556</span>
+<span id="1557">1557</span>
+<span id="1558">1558</span>
+<span id="1559">1559</span>
+<span id="1560">1560</span>
+<span id="1561">1561</span>
+<span id="1562">1562</span>
+<span id="1563">1563</span>
+<span id="1564">1564</span>
+<span id="1565">1565</span>
+<span id="1566">1566</span>
+<span id="1567">1567</span>
+<span id="1568">1568</span>
+<span id="1569">1569</span>
+<span id="1570">1570</span>
+<span id="1571">1571</span>
+<span id="1572">1572</span>
+<span id="1573">1573</span>
+<span id="1574">1574</span>
+<span id="1575">1575</span>
+<span id="1576">1576</span>
+<span id="1577">1577</span>
+<span id="1578">1578</span>
+<span id="1579">1579</span>
+<span id="1580">1580</span>
+<span id="1581">1581</span>
+<span id="1582">1582</span>
+<span id="1583">1583</span>
+<span id="1584">1584</span>
+<span id="1585">1585</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Data-structures / interpretation for extended leafs (&gt;= 0x8000_0000)</span>
 <span class="kw">use</span> <span class="ident">core::fmt</span>::{<span class="self">self</span>, <span class="ident">Debug</span>, <span class="ident">Display</span>, <span class="ident">Formatter</span>};
 <span class="kw">use</span> <span class="ident">core::mem::size_of</span>;
@@ -2360,6 +2399,7 @@
             <span class="number">0x4</span> =&gt; <span class="ident">Associativity::NWay</span>(<span class="number">4</span>),
             <span class="number">0x5</span> =&gt; <span class="ident">Associativity::NWay</span>(<span class="number">6</span>), <span class="comment">// Reserved on Intel</span>
             <span class="number">0x6</span> =&gt; <span class="ident">Associativity::NWay</span>(<span class="number">8</span>),
+            <span class="comment">// 0x7 =&gt; SDM states: &quot;See CPUID leaf 04H, sub-leaf 2&quot;</span>
             <span class="number">0x8</span> =&gt; <span class="ident">Associativity::NWay</span>(<span class="number">16</span>),
             <span class="number">0x9</span> =&gt; <span class="ident">Associativity::Unknown</span>, <span class="comment">// Intel: Reserved, AMD: Value for all fields should be determined from Fn8000_001D</span>
             <span class="number">0xa</span> =&gt; <span class="ident">Associativity::NWay</span>(<span class="number">32</span>),
@@ -2596,7 +2636,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Platforms</span>
 <span class="doccomment">/// ✅ AMD 🟡 Intel</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ProcessorCapacityAndFeatureInfo</span> {
     <span class="ident">eax</span>: <span class="ident">u32</span>,
@@ -2792,6 +2832,44 @@
     <span class="doccomment">/// ✅ AMD ❌ Intel (reserved=0)</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_rdpru_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
         <span class="ident">get_bits</span>(<span class="self">self</span>.<span class="ident">edx</span>, <span class="number">16</span>, <span class="number">31</span>) <span class="kw">as</span> <span class="ident">u16</span>
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">ProcessorCapacityAndFeatureInfo</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;ProcessorCapacityAndFeatureInfo&quot;</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;physical_address_bits&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">physical_address_bits</span>())
+            .<span class="ident">field</span>(<span class="string">&quot;linear_address_bits&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">linear_address_bits</span>())
+            .<span class="ident">field</span>(
+                <span class="string">&quot;guest_physical_address_bits&quot;</span>,
+                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guest_physical_address_bits</span>(),
+            )
+            .<span class="ident">field</span>(<span class="string">&quot;has_cl_zero&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">has_cl_zero</span>())
+            .<span class="ident">field</span>(<span class="string">&quot;has_inst_ret_cntr_msr&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">has_inst_ret_cntr_msr</span>())
+            .<span class="ident">field</span>(
+                <span class="string">&quot;has_restore_fp_error_ptrs&quot;</span>,
+                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">has_restore_fp_error_ptrs</span>(),
+            )
+            .<span class="ident">field</span>(<span class="string">&quot;has_invlpgb&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">has_invlpgb</span>())
+            .<span class="ident">field</span>(<span class="string">&quot;has_rdpru&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">has_rdpru</span>())
+            .<span class="ident">field</span>(<span class="string">&quot;has_mcommit&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">has_mcommit</span>())
+            .<span class="ident">field</span>(<span class="string">&quot;has_wbnoinvd&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">has_wbnoinvd</span>())
+            .<span class="ident">field</span>(<span class="string">&quot;has_int_wbinvd&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">has_int_wbinvd</span>())
+            .<span class="ident">field</span>(
+                <span class="string">&quot;has_unsupported_efer_lmsle&quot;</span>,
+                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">has_unsupported_efer_lmsle</span>(),
+            )
+            .<span class="ident">field</span>(<span class="string">&quot;has_invlpgb_nested&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">has_invlpgb_nested</span>())
+            .<span class="ident">field</span>(<span class="string">&quot;perf_tsc_size&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">perf_tsc_size</span>())
+            .<span class="ident">field</span>(<span class="string">&quot;apic_id_size&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">apic_id_size</span>())
+            .<span class="ident">field</span>(
+                <span class="string">&quot;maximum_logical_processors&quot;</span>,
+                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">maximum_logical_processors</span>(),
+            )
+            .<span class="ident">field</span>(<span class="string">&quot;num_phys_threads&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">num_phys_threads</span>())
+            .<span class="ident">field</span>(<span class="string">&quot;invlpgb_max_pages&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">invlpgb_max_pages</span>())
+            .<span class="ident">field</span>(<span class="string">&quot;max_rdpru_id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">max_rdpru_id</span>())
+            .<span class="ident">finish</span>()
     }
 }
 
