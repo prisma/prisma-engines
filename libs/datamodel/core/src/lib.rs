@@ -199,7 +199,7 @@ pub fn render_datamodel_and_config_to_string(
 }
 
 fn preview_features(generators: &[Generator]) -> BitFlags<PreviewFeature> {
-    generators.iter().map(|gen| gen.preview_features()).collect()
+    generators.iter().filter_map(|gen| gen.preview_features).collect()
 }
 
 const DEFAULT_INDENT_WIDTH: usize = 2;

@@ -1,16 +1,14 @@
+use enumflags2::BitFlags;
 use serde::{Serialize, Serializer};
 use std::fmt;
-use PreviewFeature::*;
 
 macro_rules! features {
     ($( $variant:ident $(,)? ),*) => {
         #[enumflags2::bitflags]
         #[repr(u32)]
-        #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+        #[derive(Debug, Copy, Clone, PartialEq, Eq)]
         pub enum PreviewFeature {
-            $(
-                $variant,
-            )*
+            $( $variant,)*
         }
 
         impl PreviewFeature {
@@ -25,11 +23,10 @@ macro_rules! features {
 
         impl fmt::Display for PreviewFeature {
             fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                match self {
-                    $(
-                        Self::$variant => write!(f, "{}", decapitalize(stringify!($variant))),
-                    )*
-                }
+                let variant = match self { $( Self::$variant => stringify!($variant),)* };
+                let mut first_char = variant.chars().next().unwrap();
+                first_char.make_ascii_lowercase();
+                f.write_fmt(format_args!("{first_char}{rest}", rest = &variant[1..]))
             }
         }
     };
@@ -69,97 +66,72 @@ features!(
     OrderByNulls,
 );
 
-// Mapping of which active, deprecated and hidden
-// features are valid in which place in the datamodel.
-
 /// Generator preview features
-pub const GENERATOR: FeatureMap = FeatureMap::new()
-    .with_active(&[
-        ReferentialIntegrity,
-        InteractiveTransactions,
-        FullTextSearch,
-        FullTextIndex,
-        Tracing,
-        Metrics,
-        OrderByNulls,
-    ])
-    .with_deprecated(&[
-        AtomicNumberOperations,
-        AggregateApi,
-        Cockroachdb,
-        ExtendedIndexes,
-        FilterJson,
-        Middlewares,
-        NamedConstraints,
-        NativeTypes,
-        Distinct,
-        ConnectOrCreate,
-        TransactionApi,
-        UncheckedScalarInputs,
-        GroupBy,
-        CreateMany,
-        MicrosoftSqlServer,
-        SelectRelationCount,
-        MongoDb,
-        OrderByAggregateGroup,
-        OrderByRelation,
-        ReferentialActions,
-        NApi,
-        ImprovedQueryRaw,
-        DataProxy,
-    ]);
+pub const GENERATOR: FeatureMap = FeatureMap {
+    active: enumflags2::make_bitflags!(PreviewFeature::{
+         ReferentialIntegrity
+         | InteractiveTransactions
+         | FullTextSearch
+         | FullTextIndex
+         | Tracing
+         | Metrics
+         | OrderByNulls
+    }),
+    deprecated: enumflags2::make_bitflags!(PreviewFeature::{
+        AtomicNumberOperations
+        | AggregateApi
+        | Cockroachdb
+        | ExtendedIndexes
+        | FilterJson
+        | Middlewares
+        | NamedConstraints
+        | NativeTypes
+        | Distinct
+        | ConnectOrCreate
+        | TransactionApi
+        | UncheckedScalarInputs
+        | GroupBy
+        | CreateMany
+        | MicrosoftSqlServer
+        | SelectRelationCount
+        | MongoDb
+        | OrderByAggregateGroup
+        | OrderByRelation
+        | ReferentialActions
+        | NApi
+        | ImprovedQueryRaw
+        | DataProxy
+    }),
+    hidden: BitFlags::EMPTY,
+};
 
 #[derive(Debug)]
 pub struct FeatureMap {
     /// Valid, visible features.
-    active: &'static [PreviewFeature],
+    active: BitFlags<PreviewFeature>,
 
     /// Deprecated features.
-    deprecated: &'static [PreviewFeature],
+    deprecated: BitFlags<PreviewFeature>,
 
     /// Hidden preview features are valid features, but are not propagated into the tooling
     /// (as autocomplete or similar) or into error messages (eg. showing a list of valid features).
-    hidden: &'static [PreviewFeature],
+    hidden: BitFlags<PreviewFeature>,
 }
 
 impl FeatureMap {
-    const fn new() -> Self {
-        FeatureMap {
-            active: &[],
-            deprecated: &[],
-            hidden: &[],
-        }
-    }
-
-    pub fn active_features(&self) -> &[PreviewFeature] {
+    pub const fn active_features(&self) -> BitFlags<PreviewFeature> {
         self.active
     }
 
-    pub fn hidden_features(&self) -> &[PreviewFeature] {
+    pub const fn hidden_features(&self) -> BitFlags<PreviewFeature> {
         self.hidden
     }
 
-    const fn with_active(mut self, active: &'static [PreviewFeature]) -> Self {
-        self.active = active;
-        self
+    pub(crate) fn is_valid(&self, flag: PreviewFeature) -> bool {
+        (self.active | self.hidden).contains(flag)
     }
 
-    #[allow(dead_code)]
-    const fn with_hidden(mut self, hidden: &'static [PreviewFeature]) -> Self {
-        self.hidden = hidden;
-        self
-    }
-
-    const fn with_deprecated(mut self, deprecated: &'static [PreviewFeature]) -> Self {
-        self.deprecated = deprecated;
-        self
-    }
-
-    pub fn is_valid(&self, flag: &PreviewFeature) -> bool {
-        self.active.contains(flag) || self.hidden.contains(flag)
-    }
-
-    pub fn is_deprecated(&self, flag: &PreviewFeature) -> bool {
+    pub(crate) fn is_deprecated(&self, flag: PreviewFeature) -> bool {
         self.deprecated.contains(flag)
     }
 }
@@ -171,11 +143,4 @@ impl Serialize for PreviewFeature {
     {
         serializer.serialize_str(&self.to_string())
     }
-}
-
-/// Lowercases first character.
-/// Assumes 1-byte characters!
-fn decapitalize(s: &str) -> String {
-    let first_char = s.chars().next().unwrap();
-    format!("{}{}", first_char.to_lowercase(), &s[1..])
 }

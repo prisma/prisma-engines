@@ -4,6 +4,7 @@ use crate::{
     configuration::{Generator, StringFromEnvVar},
     diagnostics::*,
 };
+use enumflags2::BitFlags;
 use itertools::Itertools;
 use parser_database::{
     ast::{self, WithDocumentation},
@@ -111,11 +112,7 @@ impl GeneratorLoader {
             .map(|v| (v.as_array().to_str_vec(), v.span()));
 
         let preview_features = match preview_features_arg {
-            Some((Ok(arr), span)) => {
-                let features = parse_and_validate_preview_features(arr, &GENERATOR, span, diagnostics);
-
-                Some(features)
-            }
+            Some((Ok(arr), span)) => Some(parse_and_validate_preview_features(arr, &GENERATOR, span, diagnostics)),
             Some((Err(err), _)) => {
                 diagnostics.push_error(err);
                 None
@@ -157,30 +154,30 @@ fn parse_and_validate_preview_features(
     feature_map: &FeatureMap,
     span: ast::Span,
     diagnostics: &mut Diagnostics,
-) -> Vec<PreviewFeature> {
-    let mut features = vec![];
+) -> BitFlags<PreviewFeature> {
+    let mut features = BitFlags::empty();
 
     for feature_str in preview_features {
         let feature_opt = PreviewFeature::parse_opt(&feature_str);
         match feature_opt {
-            Some(feature) if feature_map.is_deprecated(&feature) => {
-                features.push(feature);
+            Some(feature) if feature_map.is_deprecated(feature) => {
+                features |= feature;
                 diagnostics.push_warning(DatamodelWarning::new_feature_deprecated(&feature_str, span));
             }
 
-            Some(feature) if !feature_map.is_valid(&feature) => {
+            Some(feature) if !feature_map.is_valid(feature) => {
                 diagnostics.push_error(DatamodelError::new_preview_feature_not_known_error(
                     &feature_str,
-                    feature_map.active_features().iter().map(ToString::to_string).join(", "),
+                    feature_map.active_features().iter().map(|pf| pf.to_string()).join(", "),
                     span,
                 ))
             }
 
-            Some(feature) => features.push(feature),
+            Some(feature) => features |= feature,
 
             None => diagnostics.push_error(DatamodelError::new_preview_feature_not_known_error(
                 &feature_str,
-                feature_map.active_features().iter().map(ToString::to_string).join(", "),
+                feature_map.active_features().iter().map(|pf| pf.to_string()).join(", "),
                 span,
             )),
         }
