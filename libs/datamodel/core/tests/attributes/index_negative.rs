@@ -76,6 +76,12 @@ fn stringified_field_names_in_index_return_nice_error() {
         [1;94m 5 | [0m
         [1;94m 6 | [0m  @@index([[1;91m"firstName"[0m, "lastName"])
         [1;94m   | [0m
+        [1;91merror[0m: [1mExpected a constant literal value, but received string value `"lastName"`.[0m
+          [1;94m-->[0m  [4mschema.prisma:6[0m
+        [1;94m   | [0m
+        [1;94m 5 | [0m
+        [1;94m 6 | [0m  @@index(["firstName", [1;91m"lastName"[0m])
+        [1;94m   | [0m
     "#]];
 
     expectation.assert_eq(&error)

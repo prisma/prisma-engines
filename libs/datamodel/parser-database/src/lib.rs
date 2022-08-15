@@ -29,18 +29,18 @@
 pub mod walkers;
 
 mod attributes;
+mod coerce_expression;
 mod context;
 mod interner;
 mod names;
 mod relations;
 mod types;
-mod value_validator;
 
+pub use coerce_expression::{coerce, coerce_array, coerce_opt};
 pub use names::is_reserved_type_name;
 pub use relations::ReferentialAction;
 pub use schema_ast::{ast, SourceFile};
 pub use types::{IndexAlgorithm, IndexFieldPath, IndexType, OperatorClass, ScalarFieldType, ScalarType, SortOrder};
-pub use value_validator::{ValueListValidator, ValueValidator};
 
 use self::{context::Context, interner::StringId, relations::Relations, types::Types};
 use diagnostics::{DatamodelError, Diagnostics};

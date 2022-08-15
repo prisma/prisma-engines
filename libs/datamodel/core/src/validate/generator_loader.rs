@@ -8,9 +8,9 @@ use enumflags2::BitFlags;
 use itertools::Itertools;
 use parser_database::{
     ast::{self, WithDocumentation},
-    ValueListValidator, ValueValidator,
+    coerce, coerce_array,
 };
-use std::{collections::HashMap, convert::TryFrom};
+use std::collections::HashMap;
 
 const PROVIDER_KEY: &str = "provider";
 const OUTPUT_KEY: &str = "output";
@@ -47,28 +47,22 @@ impl GeneratorLoader {
         let args: HashMap<_, _> = ast_generator
             .properties
             .iter()
-            .map(|arg| (arg.name.name.as_str(), ValueValidator::new(&arg.value)))
+            .map(|arg| (arg.name.name.as_str(), &arg.value))
             .collect();
 
         if let Some(expr) = args.get(ENGINE_TYPE_KEY) {
-            if !expr.value.is_string() {
+            if !expr.is_string() {
                 diagnostics.push_error(DatamodelError::new_type_mismatch_error(
                     "String",
-                    expr.value.describe_value_type(),
-                    &expr.value.to_string(),
+                    expr.describe_value_type(),
+                    &expr.to_string(),
                     expr.span(),
                 ))
             }
         }
 
         let provider = match args.get(PROVIDER_KEY) {
-            Some(val) => match StringFromEnvVar::try_from(val.value) {
-                Ok(val) => val,
-                Err(err) => {
-                    diagnostics.push_error(err);
-                    return None;
-                }
-            },
+            Some(val) => StringFromEnvVar::coerce(val, diagnostics)?,
             None => {
                 diagnostics.push_error(DatamodelError::new_generator_argument_not_found_error(
                     PROVIDER_KEY,
@@ -79,46 +73,23 @@ impl GeneratorLoader {
             }
         };
 
-        let output = match args.get(OUTPUT_KEY).map(|v| StringFromEnvVar::try_from(v.value)) {
-            Some(Ok(val)) => Some(val),
-            Some(Err(err)) => {
-                diagnostics.push_error(err);
-                None
-            }
-            None => None,
-        };
+        let output = args
+            .get(OUTPUT_KEY)
+            .and_then(|v| StringFromEnvVar::coerce(v, diagnostics));
 
         let mut properties: HashMap<String, String> = HashMap::new();
 
-        let binary_targets = match args.get(BINARY_TARGETS_KEY).map(|value_validator| {
-            value_validator
-                .as_array()
-                .iter()
-                .map(|v| StringFromEnvVar::try_from(v.value))
-                .collect()
-        }) {
-            Some(Ok(val)) => val,
-            Some(Err(err)) => {
-                diagnostics.push_error(err);
-                Vec::new()
-            }
-            None => Vec::new(),
-        };
+        let binary_targets = args
+            .get(BINARY_TARGETS_KEY)
+            .and_then(|arg| coerce_array(arg, &StringFromEnvVar::coerce, diagnostics))
+            .unwrap_or_default();
 
         // for compatibility reasons we still accept the old experimental key
-        let preview_features_arg = args
+        let preview_features = args
             .get(PREVIEW_FEATURES_KEY)
             .or_else(|| args.get(EXPERIMENTAL_FEATURES_KEY))
-            .map(|v| (v.as_array().to_str_vec(), v.span()));
-
-        let preview_features = match preview_features_arg {
-            Some((Ok(arr), span)) => Some(parse_and_validate_preview_features(arr, &GENERATOR, span, diagnostics)),
-            Some((Err(err), _)) => {
-                diagnostics.push_error(err);
-                None
-            }
-            None => None,
-        };
+            .and_then(|v| coerce_array(v, &coerce::string, diagnostics).map(|arr| (arr, v.span())))
+            .map(|(arr, span)| parse_and_validate_preview_features(arr, &GENERATOR, span, diagnostics));
 
         for prop in &ast_generator.properties {
             let is_first_class_prop = FIRST_CLASS_PROPERTIES.iter().any(|k| *k == prop.name.name);
@@ -150,7 +121,7 @@ impl GeneratorLoader {
 }
 
 fn parse_and_validate_preview_features(
-    preview_features: Vec<String>,
+    preview_features: Vec<&str>,
     feature_map: &FeatureMap,
     span: ast::Span,
     diagnostics: &mut Diagnostics,
@@ -158,16 +129,16 @@ fn parse_and_validate_preview_features(
     let mut features = BitFlags::empty();
 
     for feature_str in preview_features {
-        let feature_opt = PreviewFeature::parse_opt(&feature_str);
+        let feature_opt = PreviewFeature::parse_opt(feature_str);
         match feature_opt {
             Some(feature) if feature_map.is_deprecated(feature) => {
                 features |= feature;
-                diagnostics.push_warning(DatamodelWarning::new_feature_deprecated(&feature_str, span));
+                diagnostics.push_warning(DatamodelWarning::new_feature_deprecated(feature_str, span));
             }
 
             Some(feature) if !feature_map.is_valid(feature) => {
                 diagnostics.push_error(DatamodelError::new_preview_feature_not_known_error(
-                    &feature_str,
+                    feature_str,
                     feature_map.active_features().iter().map(|pf| pf.to_string()).join(", "),
                     span,
                 ))
@@ -176,7 +147,7 @@ fn parse_and_validate_preview_features(
             Some(feature) => features |= feature,
 
             None => diagnostics.push_error(DatamodelError::new_preview_feature_not_known_error(
-                &feature_str,
+                feature_str,
                 feature_map.active_features().iter().map(|pf| pf.to_string()).join(", "),
                 span,
             )),

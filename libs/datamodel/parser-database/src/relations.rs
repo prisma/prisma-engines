@@ -1,6 +1,7 @@
 use crate::{
     ast::{self, WithName},
     interner::StringId,
+    DatamodelError, Diagnostics,
     {context::Context, types::RelationField},
 };
 use enumflags2::bitflags;
@@ -458,6 +459,28 @@ impl ReferentialAction {
             ReferentialAction::SetNull => "Set the referencing fields to NULL when the referenced record is deleted.",
             ReferentialAction::SetDefault => {
                 "Set the referencing field's value to the default when the referenced record is deleted."
+            }
+        }
+    }
+
+    pub(crate) fn try_from_expression(
+        expr: &ast::Expression,
+        diagnostics: &mut Diagnostics,
+    ) -> Option<ReferentialAction> {
+        match crate::coerce::constant(expr, diagnostics)? {
+            "Cascade" => Some(ReferentialAction::Cascade),
+            "Restrict" => Some(ReferentialAction::Restrict),
+            "NoAction" => Some(ReferentialAction::NoAction),
+            "SetNull" => Some(ReferentialAction::SetNull),
+            "SetDefault" => Some(ReferentialAction::SetDefault),
+            s => {
+                let message = format!("Invalid referential action: `{}`", s);
+                diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+                    &message,
+                    "@relation",
+                    expr.span(),
+                ));
+                None
             }
         }
     }

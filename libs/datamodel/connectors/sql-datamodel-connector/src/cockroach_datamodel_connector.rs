@@ -5,8 +5,9 @@ use datamodel_connector::{
     parser_database::{
         self,
         ast::{self, SchemaPosition},
+        coerce,
         walkers::ModelWalker,
-        IndexAlgorithm, ParserDatabase, ValueValidator,
+        IndexAlgorithm, ParserDatabase,
     },
     Connector, ConnectorCapability, ConstraintScope, DatamodelError, Diagnostics, NativeTypeConstructor,
     NativeTypeInstance, ReferentialAction, ReferentialIntegrity, ScalarType, Span,
@@ -381,38 +382,16 @@ impl SequenceFunction {
         let mut this = SequenceFunction::default();
 
         for arg in &args.arguments {
-            let span = arg.span;
-            match (
-                arg.name.as_ref().map(|arg| arg.name.as_str()),
-                ValueValidator::new(&arg.value),
-            ) {
-                (Some("virtual"), expr) => match expr.as_bool() {
-                    Ok(b) => this.r#virtual = Some(b),
-                    Err(err) => diagnostics.push_error(err),
-                },
-                (Some("cache"), expr) => match expr.as_int() {
-                    Ok(i) => this.cache = Some(i),
-                    Err(err) => diagnostics.push_error(err),
-                },
-                (Some("increment"), expr) => match expr.as_int() {
-                    Ok(i) => this.increment = Some(i),
-                    Err(err) => diagnostics.push_error(err),
-                },
-                (Some("minValue"), expr) => match expr.as_int() {
-                    Ok(i) => this.min_value = Some(i),
-                    Err(err) => diagnostics.push_error(err),
-                },
-                (Some("maxValue"), expr) => match expr.as_int() {
-                    Ok(i) => this.max_value = Some(i),
-                    Err(err) => diagnostics.push_error(err),
-                },
-                (Some("start"), expr) => match expr.as_int() {
-                    Ok(i) => this.start = Some(i),
-                    Err(err) => diagnostics.push_error(err),
-                },
-                (Some(_), _) | (None, _) => diagnostics.push_error(DatamodelError::new_static(
+            match arg.name.as_ref().map(|arg| arg.name.as_str()) {
+                Some("virtual") => this.r#virtual = coerce::boolean(&arg.value, diagnostics),
+                Some("cache") => this.cache = coerce::integer(&arg.value, diagnostics),
+                Some("increment") => this.increment = coerce::integer(&arg.value, diagnostics),
+                Some("minValue") => this.min_value = coerce::integer(&arg.value, diagnostics),
+                Some("maxValue") => this.max_value = coerce::integer(&arg.value, diagnostics),
+                Some("start") => this.start = coerce::integer(&arg.value, diagnostics),
+                Some(_) | None => diagnostics.push_error(DatamodelError::new_static(
                     "Unexpected argument in `sequence()` function call",
-                    span,
+                    arg.span,
                 )),
             }
         }

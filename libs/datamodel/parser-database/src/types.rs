@@ -1,3 +1,5 @@
+pub(crate) mod index_fields;
+
 use crate::{context::Context, interner::StringId, walkers::IndexFieldWalker, DatamodelError};
 use either::Either;
 use enumflags2::bitflags;

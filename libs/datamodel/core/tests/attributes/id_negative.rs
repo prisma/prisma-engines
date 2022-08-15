@@ -164,6 +164,12 @@ fn stringified_field_names_in_id_return_nice_error() {
         [1;94m 4 | [0m
         [1;94m 5 | [0m  @@id([[1;91m"firstName"[0m, "lastName"])
         [1;94m   | [0m
+        [1;91merror[0m: [1mExpected a constant literal value, but received string value `"lastName"`.[0m
+          [1;94m-->[0m  [4mschema.prisma:5[0m
+        [1;94m   | [0m
+        [1;94m 4 | [0m
+        [1;94m 5 | [0m  @@id(["firstName", [1;91m"lastName"[0m])
+        [1;94m   | [0m
     "#]];
 
     expect_error(dml, &expectation)
