@@ -38,13 +38,13 @@ lazy_static! {
 }
 
 /// Setup of everything as defined in the passed datamodel.
-pub async fn setup_project(datamodel: &str) -> TestResult<()> {
-    Ok(qe_setup::setup(datamodel).await?)
+pub async fn setup_project(datamodel: &str, db_schemas: &[&str]) -> TestResult<()> {
+    Ok(qe_setup::setup(datamodel, db_schemas).await?)
 }
 
 /// Teardown of a test setup.
-pub async fn teardown_project(datamodel: &str) -> TestResult<()> {
-    Ok(qe_setup::teardown(datamodel).await?)
+pub async fn teardown_project(datamodel: &str, db_schemas: &[&str]) -> TestResult<()> {
+    Ok(qe_setup::teardown(datamodel, db_schemas).await?)
 }
 
 /// Helper method to allow a sync shell function to run the async test blocks.
@@ -109,7 +109,7 @@ pub fn run_relation_link_test<F>(
     let dm_with_params_json: DatamodelWithParams = dm_with_params.parse().unwrap();
 
     if ConnectorTag::should_run(config, &enabled_connectors, capabilities, test_name) {
-        let datamodel = render_test_datamodel(config, test_database, template, &[], None);
+        let datamodel = render_test_datamodel(config, test_database, template, &[], None, Default::default());
         let connector = config.test_connector_tag().unwrap();
         let requires_teardown = connector.requires_teardown();
         let metrics = setup_metrics();
@@ -118,7 +118,7 @@ pub fn run_relation_link_test<F>(
         run_with_tokio(
             async move {
                 tracing::debug!("Used datamodel:\n {}", datamodel.clone().yellow());
-                setup_project(&datamodel).await.unwrap();
+                setup_project(&datamodel, Default::default()).await.unwrap();
 
                 let runner = Runner::load(config.runner(), datamodel.clone(), connector, metrics)
                     .await
@@ -127,7 +127,7 @@ pub fn run_relation_link_test<F>(
                 test_fn.call(&runner, &dm_with_params_json).await.unwrap();
 
                 if requires_teardown {
-                    teardown_project(&datamodel).await.unwrap();
+                    teardown_project(&datamodel, Default::default()).await.unwrap();
                 }
             }
             .with_subscriber(test_tracing_subscriber(

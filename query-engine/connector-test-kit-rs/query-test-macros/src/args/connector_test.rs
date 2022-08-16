@@ -30,6 +30,9 @@ pub struct ConnectorTestArgs {
 
     #[darling(default)]
     pub referential_integrity: Option<ReferentialIntegrity>,
+
+    #[darling(default)]
+    pub db_schemas: DbSchemas,
 }
 
 impl ConnectorTestArgs {
@@ -147,27 +150,44 @@ impl ExcludeConnectorTags {
     }
 }
 
+#[derive(Debug, Default)]
+pub struct DbSchemas {
+    db_schemas: Vec<String>,
+}
+
+impl DbSchemas {
+    pub fn schemas(&self) -> &[String] {
+        self.db_schemas.as_ref()
+    }
+}
+
+impl darling::FromMeta for DbSchemas {
+    fn from_list(items: &[syn::NestedMeta]) -> Result<Self, darling::Error> {
+        let db_schemas = strings_to_list("DbSchemas", items)?;
+        Ok(DbSchemas { db_schemas })
+    }
+}
+
 impl darling::FromMeta for ExcludeFeatures {
     fn from_list(items: &[syn::NestedMeta]) -> Result<Self, darling::Error> {
-        let features = items
-            .iter()
-            .map(|i| match i {
-                syn::NestedMeta::Meta(m) => Err(darling::Error::unexpected_type(
-                    "Preview features can only be string literals.",
-                )
-                .with_span(&m.span())),
-                syn::NestedMeta::Lit(l) => match l {
-                    syn::Lit::Str(s) => Ok(s.value()),
-                    _ => Err(
-                        darling::Error::unexpected_type("Preview features can only be string literals.")
-                            .with_span(&l.span()),
-                    ),
-                },
-            })
-            .collect::<Result<Vec<_>, _>>()?;
+        let features = strings_to_list("Preview Features", items)?;
 
         Ok(ExcludeFeatures { features })
     }
+}
+
+fn strings_to_list(name: &str, items: &[syn::NestedMeta]) -> Result<Vec<String>, darling::Error> {
+    let error = format!("{} can only be string literals.", name);
+    items
+        .iter()
+        .map(|i| match i {
+            syn::NestedMeta::Meta(m) => Err(darling::Error::unexpected_type(error.as_str()).with_span(&m.span())),
+            syn::NestedMeta::Lit(l) => match l {
+                syn::Lit::Str(s) => Ok(s.value()),
+                _ => Err(darling::Error::unexpected_type(&error).with_span(&l.span())),
+            },
+        })
+        .collect::<Result<Vec<_>, _>>()
 }
 
 impl darling::FromMeta for OnlyConnectorTags {
