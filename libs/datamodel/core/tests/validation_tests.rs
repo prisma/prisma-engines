@@ -53,7 +53,6 @@ fn run_validation_test(test_file_path: &str) {
             .map(|idx| &source_file.as_str()[..idx])
             .unwrap_or(source_file.as_str());
         file.write_all(schema.as_bytes()).unwrap();
-        file.write_all(b"\n").unwrap();
 
         for line in errors.lines() {
             writeln!(file, "// {line}").unwrap();

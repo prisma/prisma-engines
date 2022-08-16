@@ -136,7 +136,7 @@ fn do_not_render_id_default_clustering() {
     "#]];
 
     let schema = with_header(input, Provider::SqlServer, &[]);
-    let dml = datamodel::parse_datamodel(&schema).unwrap().subject;
+    let dml = parse(&schema);
     let rendered = datamodel::render_datamodel_to_string(&dml, None);
 
     expected.assert_eq(&rendered);

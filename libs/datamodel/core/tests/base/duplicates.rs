@@ -275,7 +275,7 @@ fn do_not_fail_on_duplicate_field_with_map_if_the_maps_differ() {
         }
     "#};
 
-    assert!(datamodel::parse_datamodel(dml).is_ok())
+    assert_valid(dml);
 }
 
 #[test]
