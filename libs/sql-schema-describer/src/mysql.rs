@@ -279,7 +279,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for name in names {
             let cloned_name = name.clone();
-            let id = sql_schema.push_table(name);
+            let id = sql_schema.push_table(name, Default::default());
             map.insert(cloned_name, id);
         }
 
@@ -634,6 +634,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         let enm = match &family {
             ColumnTypeFamily::Enum(name) => Some(Enum {
+                namespace_id: Default::default(),
                 name: name.clone(),
                 values: Self::extract_enum_values(&full_data_type),
             }),

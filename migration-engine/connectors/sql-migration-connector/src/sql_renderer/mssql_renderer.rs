@@ -16,29 +16,11 @@ use sql_schema_describer::{
     },
     ColumnTypeFamily, DefaultKind, DefaultValue, IndexType, SqlSchema,
 };
-use std::{
-    borrow::Cow,
-    fmt::{Display, Write},
-};
-
-#[derive(Debug)]
-struct QuotedWithSchema<'a> {
-    schema_name: &'a str,
-    name: &'a str,
-}
-
-impl<'a> Display for QuotedWithSchema<'a> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "[{}].[{}]", self.schema_name, self.name)
-    }
-}
+use std::{borrow::Cow, fmt::Write};
 
 impl MssqlFlavour {
-    fn quote_with_schema<'a>(&'a self, name: &'a str) -> QuotedWithSchema<'a> {
-        QuotedWithSchema {
-            schema_name: self.schema_name(),
-            name,
-        }
+    fn quote_with_schema<'a>(&'a self, name: &'a str) -> TableName<&'a str> {
+        TableName(Some(Quoted::mssql_ident(self.schema_name())), Quoted::mssql_ident(name))
     }
 
     fn render_column(&self, column: ColumnWalker<'_>) -> String {
@@ -160,7 +142,11 @@ impl SqlRenderer for MssqlFlavour {
         }
     }
 
-    fn render_create_table_as(&self, table: TableWalker<'_>, table_name: &str) -> String {
+    fn render_create_table(&self, table: TableWalker<'_>) -> String {
+        self.render_create_table_as(table, self.quote_with_schema(table.name()))
+    }
+
+    fn render_create_table_as(&self, table: TableWalker<'_>, table_name: TableName<&str>) -> String {
         let columns: String = table.columns().map(|column| self.render_column(column)).join(",\n    ");
         let mssql_schema_ext: &MssqlSchemaExt = table.schema.downcast_connector_data();
 
@@ -232,10 +218,6 @@ impl SqlRenderer for MssqlFlavour {
             CREATE TABLE {table_name} (
                 {columns}{primary_key}{constraints}
             )"#,
-            table_name = self.quote_with_schema(table_name),
-            columns = columns,
-            primary_key = primary_key,
-            constraints = constraints,
         )
     }
 
@@ -316,7 +298,9 @@ impl SqlRenderer for MssqlFlavour {
             "#, table = tables.previous.name(), schema = self.schema_name()});
 
             // Create the new table.
-            result.push(self.render_create_table_as(tables.next, &temporary_table_name));
+            result.push(
+                self.render_create_table_as(tables.next, TableName(None, Quoted::mssql_ident(&temporary_table_name))),
+            );
 
             // We cannot insert into autoincrement columns by default. If we
             // have `IDENTITY` in any of the columns, we'll allow inserting

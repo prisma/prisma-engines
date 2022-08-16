@@ -60,6 +60,7 @@ impl SqlMigration {
             let idx = idx as u32;
             match step {
                 SqlMigrationStep::AlterSequence(_, _) => (),
+                SqlMigrationStep::CreateSchema(_) => (), // todo
                 SqlMigrationStep::DropView(drop_view) => {
                     drift_items.insert((
                         DriftType::RemovedView,
@@ -201,6 +202,7 @@ impl SqlMigration {
                     out.push_str(self.schemas().next.walk(*enum_id).name());
                     out.push('\n');
                 }
+                SqlMigrationStep::CreateSchema(_) => {} // todo
                 SqlMigrationStep::AlterEnum(alter_enum) => {
                     for added in &alter_enum.created_variants {
                         out.push_str("  [+] Added variant `");
@@ -405,6 +407,7 @@ fn render_column_changes(columns: Pair<ColumnWalker<'_>>, changes: &ColumnChange
 // you would intuitively expect.
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) enum SqlMigrationStep {
+    CreateSchema(sql_schema_describer::NamespaceId),
     AlterSequence(Pair<u32>, SequenceChanges),
     DropView(DropView),
     DropUserDefinedType(DropUserDefinedType),
@@ -468,6 +471,7 @@ impl SqlMigrationStep {
             SqlMigrationStep::AlterTable(_) => "AlterTable",
             SqlMigrationStep::CreateEnum(_) => "CreateEnum",
             SqlMigrationStep::CreateIndex { .. } => "CreateIndex",
+            SqlMigrationStep::CreateSchema { .. } => "CreateSchema",
             SqlMigrationStep::CreateTable { .. } => "CreateTable",
             SqlMigrationStep::DropEnum(_) => "DropEnum",
             SqlMigrationStep::DropForeignKey { .. } => "DropForeignKey",

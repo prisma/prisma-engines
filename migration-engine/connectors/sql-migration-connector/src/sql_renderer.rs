@@ -16,12 +16,13 @@ mod sqlite_renderer;
 
 pub(crate) use common::IteratorJoin;
 
+use self::common::{Quoted, TableName};
 use crate::{
     pair::Pair,
     sql_migration::{AlterEnum, AlterTable, RedefineTable, SequenceChanges},
 };
-use common::Quoted;
 use sql_schema_describer::{
+    self as sql,
     walkers::{EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker, UserDefinedTypeWalker, ViewWalker},
     SqlSchema,
 };
@@ -57,12 +58,10 @@ pub(crate) trait SqlRenderer {
     fn render_create_index(&self, index: IndexWalker<'_>) -> String;
 
     /// Render a table creation step.
-    fn render_create_table(&self, table: TableWalker<'_>) -> String {
-        self.render_create_table_as(table, table.name())
-    }
+    fn render_create_table(&self, table: TableWalker<'_>) -> String;
 
     /// Render a table creation with the provided table name.
-    fn render_create_table_as(&self, table: TableWalker<'_>, table_name: &str) -> String;
+    fn render_create_table_as(&self, table: TableWalker<'_>, table_name: TableName<&str>) -> String;
 
     fn render_drop_and_recreate_index(&self, _indexes: Pair<IndexWalker<'_>>) -> Vec<String> {
         unreachable!("unreachable render_drop_and_recreate_index")
@@ -106,4 +105,8 @@ pub(crate) trait SqlRenderer {
 
     /// Render a `RenameForeignKey` step.
     fn render_rename_foreign_key(&self, fks: Pair<ForeignKeyWalker<'_>>) -> String;
+
+    fn render_create_namespace(&self, _namespace: sql::NamespaceWalker<'_>) -> String {
+        unreachable!()
+    }
 }

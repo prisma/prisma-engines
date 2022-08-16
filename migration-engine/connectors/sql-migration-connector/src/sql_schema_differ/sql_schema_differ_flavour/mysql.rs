@@ -40,14 +40,14 @@ impl SqlSchemaDifferFlavour for MysqlFlavour {
             differ.next.column_type_family_as_enum(),
         ) {
             (Some(previous_enum), Some(next_enum)) => {
-                if previous_enum.values == next_enum.values {
+                if previous_enum.values() == next_enum.values() {
                     return None;
                 }
 
                 return if previous_enum
-                    .values
+                    .values()
                     .iter()
-                    .all(|previous_value| next_enum.values.iter().any(|next_value| previous_value == next_value))
+                    .all(|previous_value| next_enum.values().iter().any(|next_value| previous_value == next_value))
                 {
                     Some(ColumnTypeChange::SafeCast)
                 } else {

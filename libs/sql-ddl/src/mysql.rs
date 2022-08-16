@@ -225,9 +225,8 @@ impl Display for CreateIndex<'_> {
     }
 }
 
-#[derive(Debug, Default)]
 pub struct CreateTable<'a> {
-    pub table_name: Cow<'a, str>,
+    pub table_name: &'a dyn Display,
     pub columns: Vec<Column<'a>>,
     pub indexes: Vec<IndexClause<'a>>,
     pub primary_key: Vec<IndexColumn<'a>>,
@@ -238,7 +237,7 @@ pub struct CreateTable<'a> {
 impl Display for CreateTable<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str("CREATE TABLE ")?;
-        Display::fmt(&Ident(self.table_name.as_ref()), f)?;
+        Display::fmt(self.table_name, f)?;
 
         f.write_str(" (\n")?;
 
@@ -400,7 +399,7 @@ mod tests {
     #[test]
     fn full_create_table() {
         let stmt = CreateTable {
-            table_name: "Cat".into(),
+            table_name: &Ident("Cat"),
             columns: vec![
                 Column {
                     column_type: "INTEGER".into(),
@@ -424,7 +423,7 @@ mod tests {
             indexes: vec![],
             default_character_set: Some("utf8mb4".into()),
             collate: Some("utf8mb4_unicode_ci".into()),
-            ..Default::default()
+            primary_key: Vec::new(),
         };
 
         let expected = indoc!(

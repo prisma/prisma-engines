@@ -1,4 +1,4 @@
-// This is _not_ be valid: once @@schema is specified once, it has to be
+// This is _not_ valid: once @@schema is specified once, it has to be
 // specified for every model and enum.
 
 datasource testds {
