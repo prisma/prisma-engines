@@ -26,6 +26,8 @@ pub struct Model {
     pub is_commented_out: bool,
     /// Indicates if this model has to be ignored by the Client.
     pub is_ignored: bool,
+    /// The contents of the `@@schema("...")` attribute.
+    pub schema: Option<String>,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -335,6 +337,7 @@ impl Model {
             is_generated: false,
             is_commented_out: false,
             is_ignored: false,
+            schema: None,
         }
     }
 

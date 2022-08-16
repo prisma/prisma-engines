@@ -224,6 +224,11 @@ pub(crate) struct ModelAttributes {
     pub(super) ast_indexes: Vec<(ast::AttributeId, IndexAttribute)>,
     /// @@map
     pub(crate) mapped_name: Option<StringId>,
+    /// ```ignore
+    /// @@schema("public")
+    ///          ^^^^^^^^
+    /// ```
+    pub(crate) schema: Option<(StringId, ast::Span)>,
 }
 
 /// A type of index as defined by the `type: ...` argument on an index attribute.
@@ -520,6 +525,11 @@ pub(super) struct EnumAttributes {
     pub(super) mapped_name: Option<StringId>,
     /// @map on enum values.
     pub(super) mapped_values: HashMap<u32, StringId>,
+    /// ```ignore
+    /// @@schema("public")
+    ///          ^^^^^^^^
+    /// ```
+    pub(crate) schema: Option<(StringId, ast::Span)>,
 }
 
 fn visit_model<'db>(model_id: ast::ModelId, ast_model: &'db ast::Model, ctx: &mut Context<'db>) {

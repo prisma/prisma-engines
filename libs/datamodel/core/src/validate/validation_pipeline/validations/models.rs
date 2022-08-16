@@ -270,3 +270,29 @@ pub(super) fn id_client_name_does_not_clash_with_field(model: ModelWalker<'_>, c
         ));
     }
 }
+
+pub(super) fn schema_exists(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
+    let (_schema, span) = match (model.schema(), ctx.datasource) {
+        (Some((schema_name, span)), Some(ds)) if !ds.has_schema(schema_name) => (schema_name, span),
+        _ => return,
+    };
+    ctx.push_error(DatamodelError::new_static(
+        "This schema is not defined in the datasource. Read more on `@@schema` at https://pris.ly/d/multi-schema",
+        span,
+    ))
+}
+
+pub(super) fn schema_capability(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
+    if ctx.connector.has_capability(ConnectorCapability::MultiSchema) {
+        return;
+    }
+    let span = if let Some((_, span)) = model.schema() {
+        span
+    } else {
+        return;
+    };
+    ctx.push_error(DatamodelError::new_static(
+        "@@schema is not supported on the current datasource provider",
+        span,
+    ))
+}

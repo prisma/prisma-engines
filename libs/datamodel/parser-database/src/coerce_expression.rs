@@ -22,6 +22,7 @@ impl_coercions! {
     'a;
     constant : "constant" => &'a str;
     string : "string" => &'a str;
+    string_with_span : "string" => (&'a str, ast::Span);
     boolean : "boolean" => bool;
     integer : "numeric" => i64;
     float : "float" => f64;
@@ -40,6 +41,10 @@ pub mod coerce_opt {
 
     pub fn string<'a>(expr: &'a ast::Expression) -> Option<&'a str> {
         expr.as_string_value().map(|(s, _)| s)
+    }
+
+    pub fn string_with_span<'a>(expr: &'a ast::Expression) -> Option<(&'a str, ast::Span)> {
+        expr.as_string_value()
     }
 
     pub fn boolean<'a>(expr: &'a ast::Expression) -> Option<bool> {

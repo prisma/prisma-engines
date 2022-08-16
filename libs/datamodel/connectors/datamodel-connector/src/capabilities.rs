@@ -44,7 +44,6 @@ capabilities!(
     // General capabilities, not specific to any part of Prisma.
     ScalarLists,
     Enums,
-    EnumArrayPush,
     Json,
     JsonLists,
     AutoIncrement,
@@ -53,6 +52,7 @@ capabilities!(
     DefaultValueAuto,
     TwoWayEmbeddedManyToManyRelation,
     ImplicitManyToManyRelation,
+    MultiSchema,
     //Start of ME/IE only capabilities
     AutoIncrementAllowedOnNonId,
     AutoIncrementMultipleAllowed,
@@ -68,6 +68,7 @@ capabilities!(
     MultipleFullTextAttributesPerModel,
     ClusteringSetting,
     // Start of query-engine-only Capabilities
+    EnumArrayPush,
     InsensitiveFilters,
     CreateMany,
     CreateManyWriteableAutoIncId,

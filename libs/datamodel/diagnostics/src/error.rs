@@ -72,7 +72,7 @@ impl DatamodelError {
     }
 
     pub fn new_duplicate_attribute_error(attribute_name: &str, span: Span) -> DatamodelError {
-        let msg = format!("Attribute \"@{attribute_name}\" is defined twice.");
+        let msg = format!("Attribute \"@{attribute_name}\" can only be defined once.");
         Self::new(msg, span)
     }
 

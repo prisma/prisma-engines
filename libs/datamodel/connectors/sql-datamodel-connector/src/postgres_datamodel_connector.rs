@@ -96,6 +96,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::Json,
     ConnectorCapability::JsonFilteringArrayPath,
     ConnectorCapability::JsonFilteringAlphanumeric,
+    ConnectorCapability::MultiSchema,
     ConnectorCapability::NamedForeignKeys,
     ConnectorCapability::NamedPrimaryKeys,
     ConnectorCapability::SqlQueryRaw,

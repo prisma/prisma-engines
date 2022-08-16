@@ -21,6 +21,9 @@ pub struct Datasource {
     pub shadow_database_url: Option<(StringFromEnvVar, Span)>,
     /// In which layer referential actions are handled.
     pub referential_integrity: Option<ReferentialIntegrity>,
+    /// _Sorted_ vec of schemas defined in the schemas property.
+    pub(crate) schemas: Vec<(String, Span)>,
+    pub(crate) schemas_span: Option<Span>,
 }
 
 impl std::fmt::Debug for Datasource {
@@ -32,13 +35,18 @@ impl std::fmt::Debug for Datasource {
             .field("url", &"<url>")
             .field("documentation", &self.documentation)
             .field("active_connector", &&"...")
-            .field("shadow_database_url", &self.shadow_database_url)
+            .field("shadow_database_url", &"<shadow_database_url>")
             .field("referential_integrity", &self.referential_integrity)
+            .field("schemas", &self.schemas)
             .finish()
     }
 }
 
 impl Datasource {
+    pub(crate) fn has_schema(&self, name: &str) -> bool {
+        self.schemas.binary_search_by_key(&name, |(s, _)| s).is_ok()
+    }
+
     pub fn capabilities(&self) -> ConnectorCapabilities {
         let capabilities = self.active_connector.capabilities().to_owned();
 

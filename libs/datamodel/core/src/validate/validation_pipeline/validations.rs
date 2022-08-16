@@ -3,6 +3,7 @@ mod composite_types;
 mod constraint_namespace;
 mod database_name;
 mod default_value;
+mod enums;
 mod fields;
 mod indexes;
 mod models;
@@ -123,6 +124,63 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
                 ),
                 r#enum.span,
             ));
+        }
+    } else {
+        for r#enum in db.walk_enums() {
+            ctx.connector.validate_enum(r#enum, ctx.diagnostics);
+        }
+    }
+
+    if !ctx.preview_features.contains(crate::PreviewFeature::MultiSchema) {
+        for model in ctx.db.walk_models() {
+            if let Some((_, span)) = model.schema() {
+                ctx.push_error(DatamodelError::new_static(
+                    "@@schema is only available with the `multiSchema` preview feature.",
+                    span,
+                ))
+            }
+        }
+
+        for enm in ctx.db.walk_enums() {
+            if let Some((_, span)) = enm.schema() {
+                ctx.push_error(DatamodelError::new_static(
+                    "@@schema is only available with the `multiSchema` preview feature.",
+                    span,
+                ))
+            }
+        }
+
+        if let Some(ds) = ctx.datasource {
+            if let Some(span) = ds.schemas_span {
+                ctx.push_error(DatamodelError::new_static(
+                    "The `schemas` property is only availably with the `multiSchema` preview feature.",
+                    span,
+                ))
+            }
+        }
+    } else {
+        for model in ctx.db.walk_models() {
+            models::schema_exists(model, ctx);
+            models::schema_capability(model, ctx);
+        }
+
+        for r#enum in ctx.db.walk_enums() {
+            enums::schema_exists(r#enum, ctx);
+            enums::schema_capability(r#enum, ctx);
+        }
+
+        if !ctx
+            .connector
+            .has_capability(datamodel_connector::ConnectorCapability::MultiSchema)
+        {
+            if let Some(ds) = ctx.datasource {
+                if let Some(span) = ds.schemas_span {
+                    ctx.push_error(DatamodelError::new_static(
+                        "The `schemas` property is not supported on the current connector.",
+                        span,
+                    ))
+                }
+            }
         }
     }
 
