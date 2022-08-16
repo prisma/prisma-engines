@@ -1337,6 +1337,16 @@
 <span id="1331">1331</span>
 <span id="1332">1332</span>
 <span id="1333">1333</span>
+<span id="1334">1334</span>
+<span id="1335">1335</span>
+<span id="1336">1336</span>
+<span id="1337">1337</span>
+<span id="1338">1338</span>
+<span id="1339">1339</span>
+<span id="1340">1340</span>
+<span id="1341">1341</span>
+<span id="1342">1342</span>
+<span id="1343">1343</span>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">index_fields</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">context::Context</span>, <span class="ident">interner::StringId</span>, <span class="ident">walkers::IndexFieldWalker</span>, <span class="ident">DatamodelError</span>};
@@ -1563,6 +1573,11 @@
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">ast_indexes</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">ast::AttributeId</span>, <span class="ident">IndexAttribute</span>)<span class="op">&gt;</span>,
     <span class="doccomment">/// @@map</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">mapped_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">StringId</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// ```ignore</span>
+    <span class="doccomment">/// @@schema(&quot;public&quot;)</span>
+    <span class="doccomment">///          ^^^^^^^^</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">StringId</span>, <span class="ident">ast::Span</span>)<span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// A type of index as defined by the `type: ...` argument on an index attribute.</span>
@@ -1859,6 +1874,11 @@
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">mapped_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">StringId</span><span class="op">&gt;</span>,
     <span class="doccomment">/// @map on enum values.</span>
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">mapped_values</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">StringId</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// ```ignore</span>
+    <span class="doccomment">/// @@schema(&quot;public&quot;)</span>
+    <span class="doccomment">///          ^^^^^^^^</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">StringId</span>, <span class="ident">ast::Span</span>)<span class="op">&gt;</span>,
 }
 
 <span class="kw">fn</span> <span class="ident">visit_model</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>(<span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>, <span class="ident">ast_model</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Model</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>) {

@@ -107,6 +107,11 @@
 <span id="101">101</span>
 <span id="102">102</span>
 <span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast</span>, <span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>};
 
 <span class="macro">macro_rules!</span> <span class="ident">impl_coercions</span> {
@@ -131,6 +136,7 @@
     <span class="lifetime">&#39;a</span>;
     <span class="ident">constant</span> : <span class="string">&quot;constant&quot;</span> =&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>;
     <span class="ident">string</span> : <span class="string">&quot;string&quot;</span> =&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>;
+    <span class="ident">string_with_span</span> : <span class="string">&quot;string&quot;</span> =&gt; (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">ast::Span</span>);
     <span class="ident">boolean</span> : <span class="string">&quot;boolean&quot;</span> =&gt; <span class="ident">bool</span>;
     <span class="ident">integer</span> : <span class="string">&quot;numeric&quot;</span> =&gt; <span class="ident">i64</span>;
     <span class="ident">float</span> : <span class="string">&quot;float&quot;</span> =&gt; <span class="ident">f64</span>;
@@ -149,6 +155,10 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">string</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ast::Expression</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="ident">expr</span>.<span class="ident">as_string_value</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">s</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">s</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">string_with_span</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ast::Expression</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">ast::Span</span>)<span class="op">&gt;</span> {
+        <span class="ident">expr</span>.<span class="ident">as_string_value</span>()
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">boolean</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ast::Expression</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {

@@ -276,6 +276,32 @@
 <span id="270">270</span>
 <span id="271">271</span>
 <span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::database_name::validate_db_name</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">common::preview_features::PreviewFeature</span>, <span class="ident">diagnostics::DatamodelError</span>, <span class="ident">parser_database::ast::WithSpan</span>,
@@ -547,6 +573,32 @@
             <span class="ident">id</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>,
         ));
     }
+}
+
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">schema_exists</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+    <span class="kw">let</span> (<span class="ident">_schema</span>, <span class="ident">span</span>) <span class="op">=</span> <span class="kw">match</span> (<span class="ident">model</span>.<span class="ident">schema</span>(), <span class="ident">ctx</span>.<span class="ident">datasource</span>) {
+        (<span class="prelude-val">Some</span>((<span class="ident">schema_name</span>, <span class="ident">span</span>)), <span class="prelude-val">Some</span>(<span class="ident">ds</span>)) <span class="kw">if</span> <span class="op">!</span><span class="ident">ds</span>.<span class="ident">has_schema</span>(<span class="ident">schema_name</span>) =&gt; (<span class="ident">schema_name</span>, <span class="ident">span</span>),
+        <span class="kw">_</span> =&gt; <span class="kw">return</span>,
+    };
+    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_static</span>(
+        <span class="string">&quot;This schema is not defined in the datasource. Read more on `@@schema` at https://pris.ly/d/multi-schema&quot;</span>,
+        <span class="ident">span</span>,
+    ))
+}
+
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">schema_capability</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::MultiSchema</span>) {
+        <span class="kw">return</span>;
+    }
+    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">span</span>)) <span class="op">=</span> <span class="ident">model</span>.<span class="ident">schema</span>() {
+        <span class="ident">span</span>
+    } <span class="kw">else</span> {
+        <span class="kw">return</span>;
+    };
+    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_static</span>(
+        <span class="string">&quot;@@schema is not supported on the current datasource provider&quot;</span>,
+        <span class="ident">span</span>,
+    ))
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="datamodel" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0 (4b91a6ea7 2022-08-08)" ></div>

@@ -320,6 +320,7 @@
 <span id="314">314</span>
 <span id="315">315</span>
 <span id="316">316</span>
+<span id="317">317</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::derive_partial_eq_without_eq</span>)]</span>
 
@@ -427,6 +428,7 @@
     ) {
     }
 
+    <span class="kw">fn</span> <span class="ident">validate_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_enum</span>: <span class="ident">parser_database::walkers::EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) {}
     <span class="kw">fn</span> <span class="ident">validate_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_model</span>: <span class="ident">parser_database::walkers::ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) {}
 
     <span class="kw">fn</span> <span class="ident">validate_scalar_field_unknown_default_functions</span>(

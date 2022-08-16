@@ -138,6 +138,9 @@
 <span id="132">132</span>
 <span id="133">133</span>
 <span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::traits</span>::{<span class="ident">WithDatabaseName</span>, <span class="ident">WithName</span>};
 
 <span class="doccomment">/// Represents an enum in the datamodel.</span>
@@ -153,6 +156,8 @@
     <span class="kw">pub</span> <span class="ident">database_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Has to be commented out.</span>
     <span class="kw">pub</span> <span class="ident">commented_out</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// The contents of the `@@schema(&quot;...&quot;)` attribute.</span>
+    <span class="kw">pub</span> <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Enum</span> {
@@ -164,6 +169,7 @@
             <span class="ident">documentation</span>: <span class="prelude-val">None</span>,
             <span class="ident">database_name</span>: <span class="prelude-val">None</span>,
             <span class="ident">commented_out</span>: <span class="bool-val">false</span>,
+            <span class="ident">schema</span>: <span class="prelude-val">None</span>,
         }
     }
 

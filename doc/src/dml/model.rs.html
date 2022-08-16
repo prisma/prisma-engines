@@ -661,6 +661,9 @@
 <span id="655">655</span>
 <span id="656">656</span>
 <span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::default_value::DefaultKind</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::field</span>::{<span class="ident">Field</span>, <span class="ident">FieldType</span>, <span class="ident">RelationField</span>, <span class="ident">ScalarField</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::scalars::ScalarType</span>;
@@ -689,6 +692,8 @@
     <span class="kw">pub</span> <span class="ident">is_commented_out</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// Indicates if this model has to be ignored by the Client.</span>
     <span class="kw">pub</span> <span class="ident">is_ignored</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// The contents of the `@@schema(&quot;...&quot;)` attribute.</span>
+    <span class="kw">pub</span> <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
@@ -998,6 +1003,7 @@
             <span class="ident">is_generated</span>: <span class="bool-val">false</span>,
             <span class="ident">is_commented_out</span>: <span class="bool-val">false</span>,
             <span class="ident">is_ignored</span>: <span class="bool-val">false</span>,
+            <span class="ident">schema</span>: <span class="prelude-val">None</span>,
         }
     }
 

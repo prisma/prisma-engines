@@ -752,7 +752,7 @@
             <span class="kw">let</span> <span class="ident">attribute</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ast</span>[<span class="kw-2">*</span><span class="ident">attribute_id</span>];
             <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_not_known_error</span>(
                 <span class="kw-2">&amp;</span><span class="ident">attribute</span>.<span class="ident">name</span>.<span class="ident">name</span>,
-                <span class="ident">attribute</span>.<span class="ident">name</span>.<span class="ident">span</span>,
+                <span class="ident">attribute</span>.<span class="ident">span</span>,
             ))
         }
         <span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">attributes</span>.<span class="ident">clear</span>();

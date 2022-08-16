@@ -150,6 +150,7 @@
 <span id="144">144</span>
 <span id="145">145</span>
 <span id="146">146</span>
+<span id="147">147</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -216,6 +217,7 @@
     <span class="ident">ImprovedQueryRaw</span>,
     <span class="ident">Metrics</span>,
     <span class="ident">OrderByNulls</span>,
+    <span class="ident">MultiSchema</span>,
 );
 
 <span class="doccomment">/// Generator preview features</span>
@@ -254,7 +256,7 @@
         <span class="op">|</span> <span class="ident">ImprovedQueryRaw</span>
         <span class="op">|</span> <span class="ident">DataProxy</span>
     }),
-    <span class="ident">hidden</span>: <span class="ident">BitFlags::EMPTY</span>,
+    <span class="ident">hidden</span>: <span class="macro">enumflags2::make_bitflags!</span>(<span class="ident">PreviewFeature</span>::{<span class="ident">MultiSchema</span>}),
 };
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>

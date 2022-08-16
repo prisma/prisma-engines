@@ -1085,10 +1085,24 @@
 <span id="1079">1079</span>
 <span id="1080">1080</span>
 <span id="1081">1081</span>
+<span id="1082">1082</span>
+<span id="1083">1083</span>
+<span id="1084">1084</span>
+<span id="1085">1085</span>
+<span id="1086">1086</span>
+<span id="1087">1087</span>
+<span id="1088">1088</span>
+<span id="1089">1089</span>
+<span id="1090">1090</span>
+<span id="1091">1091</span>
+<span id="1092">1092</span>
+<span id="1093">1093</span>
+<span id="1094">1094</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">default</span>;
 <span class="kw">mod</span> <span class="ident">id</span>;
 <span class="kw">mod</span> <span class="ident">map</span>;
 <span class="kw">mod</span> <span class="ident">native_types</span>;
+<span class="kw">mod</span> <span class="ident">schema</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">WithName</span>, <span class="ident">WithSpan</span>},
@@ -1185,6 +1199,12 @@
         <span class="ident">ctx</span>.<span class="ident">validate_visited_arguments</span>();
     }
 
+    <span class="comment">// @@schema</span>
+    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_single_attr</span>(<span class="string">&quot;schema&quot;</span>) {
+        <span class="ident">schema</span>::<span class="ident">r#enum</span>(<span class="kw-2">&amp;mut</span> <span class="ident">enum_attributes</span>, <span class="ident">ctx</span>);
+        <span class="ident">ctx</span>.<span class="ident">validate_visited_arguments</span>();
+    }
+
     <span class="ident">ctx</span>.<span class="ident">types</span>.<span class="ident">enum_attributes</span>.<span class="ident">insert</span>(<span class="ident">enum_id</span>, <span class="ident">enum_attributes</span>);
     <span class="ident">ctx</span>.<span class="ident">validate_visited_attributes</span>();
 }
@@ -1236,6 +1256,12 @@
     <span class="comment">// @@map</span>
     <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_single_attr</span>(<span class="string">&quot;map&quot;</span>) {
         <span class="ident">map::model</span>(<span class="kw-2">&amp;mut</span> <span class="ident">model_attributes</span>, <span class="ident">model_id</span>, <span class="ident">ctx</span>);
+        <span class="ident">ctx</span>.<span class="ident">validate_visited_arguments</span>();
+    }
+
+    <span class="comment">// @@schema</span>
+    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_single_attr</span>(<span class="string">&quot;schema&quot;</span>) {
+        <span class="ident">schema::model</span>(<span class="kw-2">&amp;mut</span> <span class="ident">model_attributes</span>, <span class="ident">ctx</span>);
         <span class="ident">ctx</span>.<span class="ident">validate_visited_arguments</span>();
     }
 

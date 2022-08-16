@@ -170,6 +170,7 @@
 <span id="164">164</span>
 <span id="165">165</span>
 <span id="166">166</span>
+<span id="167">167</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">str::FromStr</span>};
 
 <span class="doccomment">/// Not all Databases are created equal. Hence connectors for our datasources support different capabilities.</span>
@@ -216,7 +217,6 @@
     <span class="comment">// General capabilities, not specific to any part of Prisma.</span>
     <span class="ident">ScalarLists</span>,
     <span class="ident">Enums</span>,
-    <span class="ident">EnumArrayPush</span>,
     <span class="ident">Json</span>,
     <span class="ident">JsonLists</span>,
     <span class="ident">AutoIncrement</span>,
@@ -225,6 +225,7 @@
     <span class="ident">DefaultValueAuto</span>,
     <span class="ident">TwoWayEmbeddedManyToManyRelation</span>,
     <span class="ident">ImplicitManyToManyRelation</span>,
+    <span class="ident">MultiSchema</span>,
     <span class="comment">//Start of ME/IE only capabilities</span>
     <span class="ident">AutoIncrementAllowedOnNonId</span>,
     <span class="ident">AutoIncrementMultipleAllowed</span>,
@@ -240,6 +241,7 @@
     <span class="ident">MultipleFullTextAttributesPerModel</span>,
     <span class="ident">ClusteringSetting</span>,
     <span class="comment">// Start of query-engine-only Capabilities</span>
+    <span class="ident">EnumArrayPush</span>,
     <span class="ident">InsensitiveFilters</span>,
     <span class="ident">CreateMany</span>,
     <span class="ident">CreateManyWriteableAutoIncId</span>,

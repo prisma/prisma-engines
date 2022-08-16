@@ -697,6 +697,8 @@
 <span id="691">691</span>
 <span id="692">692</span>
 <span id="693">693</span>
+<span id="694">694</span>
+<span id="695">695</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parser_database</span>::{
     <span class="self">self</span> <span class="kw">as</span> <span class="ident">db</span>,
     <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">WithDocumentation</span>, <span class="ident">WithName</span>, <span class="ident">WithSpan</span>},
@@ -1006,6 +1008,7 @@
         <span class="ident">model</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">ast_model</span>.<span class="ident">documentation</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
         <span class="ident">model</span>.<span class="ident">database_name</span> <span class="op">=</span> <span class="ident">walker</span>.<span class="ident">mapped_name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
         <span class="ident">model</span>.<span class="ident">is_ignored</span> <span class="op">=</span> <span class="ident">walker</span>.<span class="ident">is_ignored</span>();
+        <span class="ident">model</span>.<span class="ident">schema</span> <span class="op">=</span> <span class="ident">walker</span>.<span class="ident">schema</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">s</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">s</span>.<span class="ident">to_owned</span>());
 
         <span class="ident">model</span>.<span class="ident">primary_key</span> <span class="op">=</span> <span class="ident">walker</span>.<span class="ident">primary_key</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">dml::PrimaryKeyDefinition</span> {
             <span class="ident">name</span>: <span class="ident">pk</span>.<span class="ident">name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>),
@@ -1132,6 +1135,7 @@
 
         <span class="ident">en</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">r#enum</span>.<span class="ident">ast_enum</span>().<span class="ident">documentation</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
         <span class="ident">en</span>.<span class="ident">database_name</span> <span class="op">=</span> <span class="ident">r#enum</span>.<span class="ident">mapped_name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
+        <span class="ident">en</span>.<span class="ident">schema</span> <span class="op">=</span> <span class="ident">r#enum</span>.<span class="ident">schema</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">s</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">s</span>.<span class="ident">to_owned</span>());
         <span class="ident">en</span>
     }
 
