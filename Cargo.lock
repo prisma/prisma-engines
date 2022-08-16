@@ -1994,6 +1994,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "enumflags2",
+ "introspection-connector",
  "psl",
  "sha2 0.9.9",
  "tracing",
@@ -2227,6 +2228,7 @@ dependencies = [
  "migration-connector",
  "mongodb",
  "mongodb-client",
+ "mongodb-introspection-connector",
  "mongodb-schema-describer",
  "once_cell",
  "psl",
@@ -4186,6 +4188,7 @@ dependencies = [
  "regex",
  "serde_json",
  "sql-ddl",
+ "sql-introspection-connector",
  "sql-schema-describer",
  "tokio",
  "tracing",
