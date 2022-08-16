@@ -1,4 +1,5 @@
-use expect_test::expect;
+use crate::common::*;
+use datamodel::*;
 
 #[test]
 fn enum_rendering_works() {
@@ -20,7 +21,7 @@ fn enum_rendering_works() {
         }
     "#]];
 
-    let dml = datamodel::parse_datamodel(dm).unwrap().subject;
-    let rendered = datamodel::render_datamodel_to_string(&dml, None);
+    let dml = parse(dm);
+    let rendered = render_datamodel_to_string(&dml, None);
     expected.assert_eq(&rendered)
 }

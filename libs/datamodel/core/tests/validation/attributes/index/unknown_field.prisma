@@ -1,0 +1,13 @@
+model User {
+  id Int @id
+
+  @@index([foo,bar])
+}
+
+
+// [1;91merror[0m: [1mError validating model "User": The index definition refers to the unknown fields: foo, bar.[0m
+//   [1;94m-->[0m  [4mschema.prisma:4[0m
+// [1;94m   | [0m
+// [1;94m 3 | [0m
+// [1;94m 4 | [0m  [1;91m@@index([foo,bar])[0m
+// [1;94m   | [0m

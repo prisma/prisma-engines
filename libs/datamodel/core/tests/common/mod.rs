@@ -1,4 +1,4 @@
-pub use datamodel::{dml, dml::*};
+pub use datamodel::{dml, dml::*, parse_datamodel, parse_schema};
 pub use expect_test::expect;
 pub use indoc::{formatdoc, indoc};
 
@@ -414,7 +414,7 @@ impl WarningAsserts for Vec<DatamodelWarning> {
 }
 
 pub(crate) fn parse(datamodel_string: &str) -> Datamodel {
-    match datamodel::parse_datamodel(datamodel_string) {
+    match parse_datamodel(datamodel_string) {
         Ok(s) => s.subject,
         Err(errs) => {
             panic!(
@@ -439,7 +439,7 @@ pub(crate) fn parse_configuration(datamodel_string: &str) -> Configuration {
 
 #[track_caller]
 pub(crate) fn expect_error(schema: &str, expectation: &expect_test::Expect) {
-    match datamodel::parse_schema(schema) {
+    match parse_schema(schema) {
         Ok(_) => panic!("Expected a validation error, but the schema is valid."),
         Err(err) => expectation.assert_eq(&err),
     }
