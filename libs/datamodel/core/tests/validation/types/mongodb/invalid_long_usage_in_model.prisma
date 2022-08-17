@@ -1,0 +1,43 @@
+datasource test {
+  provider = "mongodb"
+  url = env("TEST_DATABASE_URL")
+}
+model A {
+  id Int      @id          @map("_id")
+  b  Float    @test.Long
+  d  Boolean  @test.Long
+  e  String   @test.Long
+  f  DateTime @test.Long
+  g  Bytes    @test.Long
+}
+
+// [1;91merror[0m: [1mNative type Long is not compatible with declared field type Float, expected field type Int or BigInt.[0m
+//   [1;94m-->[0m  [4mschema.prisma:7[0m
+// [1;94m   | [0m
+// [1;94m 6 | [0m  id Int      @id          @map("_id")
+// [1;94m 7 | [0m  b  Float    [1;91m@test.Long[0m
+// [1;94m   | [0m
+// [1;91merror[0m: [1mNative type Long is not compatible with declared field type Boolean, expected field type Int or BigInt.[0m
+//   [1;94m-->[0m  [4mschema.prisma:8[0m
+// [1;94m   | [0m
+// [1;94m 7 | [0m  b  Float    @test.Long
+// [1;94m 8 | [0m  d  Boolean  [1;91m@test.Long[0m
+// [1;94m   | [0m
+// [1;91merror[0m: [1mNative type Long is not compatible with declared field type String, expected field type Int or BigInt.[0m
+//   [1;94m-->[0m  [4mschema.prisma:9[0m
+// [1;94m   | [0m
+// [1;94m 8 | [0m  d  Boolean  @test.Long
+// [1;94m 9 | [0m  e  String   [1;91m@test.Long[0m
+// [1;94m   | [0m
+// [1;91merror[0m: [1mNative type Long is not compatible with declared field type DateTime, expected field type Int or BigInt.[0m
+//   [1;94m-->[0m  [4mschema.prisma:10[0m
+// [1;94m   | [0m
+// [1;94m 9 | [0m  e  String   @test.Long
+// [1;94m10 | [0m  f  DateTime [1;91m@test.Long[0m
+// [1;94m   | [0m
+// [1;91merror[0m: [1mNative type Long is not compatible with declared field type Bytes, expected field type Int or BigInt.[0m
+//   [1;94m-->[0m  [4mschema.prisma:11[0m
+// [1;94m   | [0m
+// [1;94m10 | [0m  f  DateTime @test.Long
+// [1;94m11 | [0m  g  Bytes    [1;91m@test.Long[0m
+// [1;94m   | [0m

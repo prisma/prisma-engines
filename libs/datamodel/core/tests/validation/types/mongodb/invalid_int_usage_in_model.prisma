@@ -1,0 +1,50 @@
+datasource test {
+  provider = "mongodb"
+  url = env("TEST_DATABASE_URL")
+}
+
+model A {
+  id Int      @id          @map("_id")
+  a  BigInt   @test.Int
+  b  Float    @test.Int
+  d  Boolean  @test.Int
+  e  String   @test.Int
+  f  DateTime @test.Int
+  g  Bytes    @test.Int
+}
+// [1;91merror[0m: [1mNative type Int is not compatible with declared field type BigInt, expected field type Int.[0m
+//   [1;94m-->[0m  [4mschema.prisma:8[0m
+// [1;94m   | [0m
+// [1;94m 7 | [0m  id Int      @id          @map("_id")
+// [1;94m 8 | [0m  a  BigInt   [1;91m@test.Int[0m
+// [1;94m   | [0m
+// [1;91merror[0m: [1mNative type Int is not compatible with declared field type Float, expected field type Int.[0m
+//   [1;94m-->[0m  [4mschema.prisma:9[0m
+// [1;94m   | [0m
+// [1;94m 8 | [0m  a  BigInt   @test.Int
+// [1;94m 9 | [0m  b  Float    [1;91m@test.Int[0m
+// [1;94m   | [0m
+// [1;91merror[0m: [1mNative type Int is not compatible with declared field type Boolean, expected field type Int.[0m
+//   [1;94m-->[0m  [4mschema.prisma:10[0m
+// [1;94m   | [0m
+// [1;94m 9 | [0m  b  Float    @test.Int
+// [1;94m10 | [0m  d  Boolean  [1;91m@test.Int[0m
+// [1;94m   | [0m
+// [1;91merror[0m: [1mNative type Int is not compatible with declared field type String, expected field type Int.[0m
+//   [1;94m-->[0m  [4mschema.prisma:11[0m
+// [1;94m   | [0m
+// [1;94m10 | [0m  d  Boolean  @test.Int
+// [1;94m11 | [0m  e  String   [1;91m@test.Int[0m
+// [1;94m   | [0m
+// [1;91merror[0m: [1mNative type Int is not compatible with declared field type DateTime, expected field type Int.[0m
+//   [1;94m-->[0m  [4mschema.prisma:12[0m
+// [1;94m   | [0m
+// [1;94m11 | [0m  e  String   @test.Int
+// [1;94m12 | [0m  f  DateTime [1;91m@test.Int[0m
+// [1;94m   | [0m
+// [1;91merror[0m: [1mNative type Int is not compatible with declared field type Bytes, expected field type Int.[0m
+//   [1;94m-->[0m  [4mschema.prisma:13[0m
+// [1;94m   | [0m
+// [1;94m12 | [0m  f  DateTime @test.Int
+// [1;94m13 | [0m  g  Bytes    [1;91m@test.Int[0m
+// [1;94m   | [0m
