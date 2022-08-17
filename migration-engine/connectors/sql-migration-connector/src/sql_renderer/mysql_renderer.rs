@@ -220,9 +220,9 @@ impl SqlRenderer for MysqlFlavour {
         .to_string()
     }
 
-    fn render_create_table_as(&self, table: TableWalker<'_>, table_name: &str) -> String {
+    fn render_create_table_as(&self, table: TableWalker<'_>, table_name: TableName<&str>) -> String {
         ddl::CreateTable {
-            table_name: table_name.into(),
+            table_name: &table_name,
             columns: table.columns().map(|col| self.render_column(col)).collect(),
             indexes: table
                 .indexes()
@@ -328,7 +328,7 @@ impl SqlRenderer for MysqlFlavour {
     }
 
     fn render_create_table(&self, table: TableWalker<'_>) -> String {
-        self.render_create_table_as(table, table.name())
+        self.render_create_table_as(table, TableName(None, Quoted::mysql_ident(table.name())))
     }
 
     fn render_drop_view(&self, view: ViewWalker<'_>) -> String {

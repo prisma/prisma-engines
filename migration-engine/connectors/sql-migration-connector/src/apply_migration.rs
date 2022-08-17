@@ -129,6 +129,9 @@ fn render_raw_sql(
         SqlMigrationStep::AlterEnum(alter_enum) => renderer.render_alter_enum(alter_enum, schemas),
         SqlMigrationStep::RedefineTables(redefine_tables) => renderer.render_redefine_tables(redefine_tables, schemas),
         SqlMigrationStep::CreateEnum(enum_id) => renderer.render_create_enum(schemas.next.walk(*enum_id)),
+        SqlMigrationStep::CreateSchema(namespace_id) => {
+            vec![renderer.render_create_namespace(schemas.next.walk(*namespace_id))]
+        }
         SqlMigrationStep::DropEnum(enum_id) => renderer.render_drop_enum(schemas.previous.walk(*enum_id)),
         SqlMigrationStep::CreateTable { table_id } => {
             let table = schemas.next.walk(*table_id);

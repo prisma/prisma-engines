@@ -129,8 +129,12 @@ fn all_mssql_column_types_must_work(api: TestApi) {
     api.raw_cmd(&full_sql);
     let expectation = expect![[r#"
         SqlSchema {
+            namespaces: [],
             tables: [
                 Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "User",
                 },
             ],

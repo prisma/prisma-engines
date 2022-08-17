@@ -24,6 +24,7 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlDatabaseSchema>, flavour: &dyn S
     let db = DifferDatabase::new(schemas, flavour);
     let mut steps: Vec<SqlMigrationStep> = Vec::new();
 
+    push_created_schema_steps(&mut steps, &db);
     push_created_table_steps(&mut steps, &db);
     push_dropped_table_steps(&mut steps, &db);
     push_dropped_index_steps(&mut steps, &db);
@@ -37,6 +38,12 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlDatabaseSchema>, flavour: &dyn S
     steps.sort();
 
     steps
+}
+
+fn push_created_schema_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDatabase<'_>) {
+    for schema in db.schemas().next.describer_schema.walk_namespaces() {
+        steps.push(SqlMigrationStep::CreateSchema(schema.id))
+    }
 }
 
 fn push_created_table_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDatabase<'_>) {

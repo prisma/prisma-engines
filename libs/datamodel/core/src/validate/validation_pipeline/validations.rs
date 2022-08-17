@@ -160,13 +160,11 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
         }
     } else {
         for model in ctx.db.walk_models() {
-            models::schema_exists(model, ctx);
-            models::schema_capability(model, ctx);
+            models::schema_attribute(model, ctx);
         }
 
         for r#enum in ctx.db.walk_enums() {
-            enums::schema_exists(r#enum, ctx);
-            enums::schema_capability(r#enum, ctx);
+            enums::schema_attribute(r#enum, ctx);
         }
 
         if !ctx

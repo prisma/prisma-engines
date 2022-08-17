@@ -55,6 +55,8 @@ pub struct SqlMetadata {
 /// The result of describing a database schema.
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct SqlSchema {
+    /// Namespaces (schemas)
+    namespaces: Vec<String>,
     /// The schema's tables.
     tables: Vec<Table>,
     /// The schema's enums.
@@ -211,9 +213,15 @@ impl SqlSchema {
         });
     }
 
-    pub fn push_table(&mut self, name: String) -> TableId {
+    pub fn push_namespace(&mut self, name: String) -> NamespaceId {
+        let id = NamespaceId(self.namespaces.len() as u32);
+        self.namespaces.push(name);
+        id
+    }
+
+    pub fn push_table(&mut self, name: String, namespace_id: NamespaceId) -> TableId {
         let id = TableId(self.tables.len() as u32);
-        self.tables.push(Table { name });
+        self.tables.push(Table { namespace_id, name });
         id
     }
 
@@ -264,11 +272,17 @@ impl SqlSchema {
     pub fn walk_columns(&self) -> impl Iterator<Item = ColumnWalker<'_>> {
         (0..self.columns.len()).map(|idx| self.walk(ColumnId(idx as u32)))
     }
+
+    /// Traverse all namespaces in the catalog.
+    pub fn walk_namespaces(&self) -> impl ExactSizeIterator<Item = NamespaceWalker<'_>> {
+        (0..self.namespaces.len()).map(|idx| self.walk(NamespaceId(idx as u32)))
+    }
 }
 
 /// A table found in a schema.
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct Table {
+    namespace_id: NamespaceId,
     name: String,
 }
 
@@ -535,6 +549,8 @@ struct ForeignKeyColumn {
 /// A SQL enum.
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct Enum {
+    /// The namespace the enum type belongs to, if applicable.
+    pub namespace_id: NamespaceId,
     /// Enum name.
     pub name: String,
     /// Possible enum values.

@@ -2,7 +2,7 @@ pub(crate) mod index_fields;
 
 use crate::{context::Context, interner::StringId, walkers::IndexFieldWalker, DatamodelError};
 use either::Either;
-use enumflags2::bitflags;
+use enumflags2::{bitflags, BitFlags};
 use schema_ast::ast::{self, WithName};
 use std::{
     collections::{BTreeMap, HashMap},
@@ -23,6 +23,7 @@ pub(super) fn resolve_types(ctx: &mut Context<'_>) {
 
 #[derive(Debug, Default)]
 pub(super) struct Types {
+    pub(super) flags: BitFlags<SchemaFlags>,
     pub(super) composite_type_fields: BTreeMap<(ast::CompositeTypeId, ast::FieldId), CompositeTypeField>,
     pub(super) scalar_fields: BTreeMap<(ast::ModelId, ast::FieldId), ScalarField>,
     /// This contains only the relation fields actually present in the schema
@@ -57,6 +58,15 @@ impl Types {
     ) -> Option<RelationField> {
         self.relation_fields.remove(&(model_id, field_id))
     }
+}
+
+/// Global properties of a PSL document.
+#[derive(Debug, Clone, Copy)]
+#[bitflags]
+#[repr(u8)]
+pub enum SchemaFlags {
+    /// Is there at least one `@@schema` in the schema?
+    UsesSchemaAttribute = 0b1,
 }
 
 #[derive(Debug, Clone)]

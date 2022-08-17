@@ -52,6 +52,9 @@ pub type IndexWalker<'a> = Walker<'a, IndexId>;
 /// Traverse a specific column inside an index.
 pub type IndexColumnWalker<'a> = Walker<'a, IndexColumnId>;
 
+/// Traverse a namespace
+pub type NamespaceWalker<'a> = Walker<'a, NamespaceId>;
+
 /// Traverse a user-defined type
 pub type UserDefinedTypeWalker<'a> = Walker<'a, UdtId>;
 
@@ -70,7 +73,7 @@ impl<'a> ColumnWalker<'a> {
 
     /// Returns whether the column has the enum default value of the given enum type.
     pub fn column_has_enum_default_value(self, enum_name: &str, value: &str) -> bool {
-        self.column_type_family_as_enum().map(|enm| enm.name.as_str()) == Some(enum_name)
+        self.column_type_family_as_enum().map(|enm| enm.name()) == Some(enum_name)
             && self
                 .default()
                 .and_then(|default| default.as_value())
@@ -81,7 +84,7 @@ impl<'a> ColumnWalker<'a> {
     /// Returns whether the type of the column matches the provided enum name.
     pub fn column_type_is_enum(self, enum_name: &str) -> bool {
         self.column_type_family_as_enum()
-            .map(|enm| enm.name == enum_name)
+            .map(|enm| enm.name() == enum_name)
             .unwrap_or(false)
     }
 
@@ -91,12 +94,17 @@ impl<'a> ColumnWalker<'a> {
     }
 
     /// Extract an `Enum` column type family, or `None` if the family is something else.
-    pub fn column_type_family_as_enum(self) -> Option<&'a Enum> {
+    pub fn column_type_family_as_enum(self) -> Option<EnumWalker<'a>> {
         self.column_type_family().as_enum().map(|enum_name| {
-            self.schema
-                .get_enum(enum_name)
+            let idx = self
+                .schema
+                .enums
+                .iter()
+                .position(|enm| enm.name == enum_name)
                 .ok_or_else(|| panic!("Cannot find enum referenced in ColumnTypeFamily (`{}`)", enum_name))
-                .unwrap()
+                .unwrap();
+
+            self.walk(EnumId(idx as u32))
         })
     }
 
@@ -269,6 +277,19 @@ impl<'a> TableWalker<'a> {
         })
     }
 
+    /// The namespace the table belongs to, if defined.
+    pub fn namespace(self) -> Option<&'a str> {
+        self.schema
+            .namespaces
+            .get(self.table().namespace_id.0 as usize)
+            .map(|s| s.as_str())
+    }
+
+    /// The namespace the table belongs to.
+    pub fn namespace_id(self) -> NamespaceId {
+        self.table().namespace_id
+    }
+
     /// Traverse to the primary key of the table.
     pub fn primary_key(self) -> Option<IndexWalker<'a>> {
         self.indexes().find(|idx| idx.is_primary_key())
@@ -436,6 +457,14 @@ impl<'a> EnumWalker<'a> {
         &self.schema.enums[self.id.0 as usize]
     }
 
+    /// The namespace the enum belongs to, if defined.
+    pub fn namespace(self) -> Option<&'a str> {
+        self.schema
+            .namespaces
+            .get(self.get().namespace_id.0 as usize)
+            .map(|s| s.as_str())
+    }
+
     /// The name of the enum. This is a made up name on MySQL.
     pub fn name(self) -> &'a str {
         &self.get().name
@@ -444,6 +473,13 @@ impl<'a> EnumWalker<'a> {
     /// The values of the enum
     pub fn values(self) -> &'a [String] {
         &self.get().values
+    }
+}
+
+impl<'a> NamespaceWalker<'a> {
+    /// The namespace name.
+    pub fn name(self) -> &'a str {
+        &self.schema.namespaces[self.id.0 as usize]
     }
 }
 

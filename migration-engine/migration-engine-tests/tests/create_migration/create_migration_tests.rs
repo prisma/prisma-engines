@@ -764,11 +764,11 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
         });
 }
 
-#[test_connector]
+#[test_connector(exclude(Sqlite))]
 fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
-    let dm = api.datamodel_with_provider(&format!(
-        r#"
-         model A {{
+    let dm = api.datamodel_with_provider(
+        &r#"
+         model A {
            id   Int    @id
            name String @unique(map: "SingleUnique")
            a    String
@@ -777,25 +777,23 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
            @@unique([a, b], name: "compound", map:"NamedCompoundUnique")
            @@unique([a, b], map:"UnNamedCompoundUnique")
            @@index([a], map: "SingleIndex")
-         }}
+         }
          
-         model B {{
+         model B {
            a   String
            b   String
            aId Int
-           A   A      @relation("AtoB", fields: [aId], references: [id]{})
+           A   A      @relation("AtoB", fields: [aId], references: [id], map: "ForeignKey")
            @@index([a,b], map: "CompoundIndex")
            @@id([a, b])
-         }}
+         }
      "#,
-        if api.is_sqlite() { "" } else { r#", map: "ForeignKey""# }
-    ));
+    );
 
     let dir = api.create_migrations_directory();
 
     let is_mssql = api.is_mssql();
     let is_mysql = api.is_mysql();
-    let is_sqlite = api.is_sqlite();
     let is_postgres = api.is_postgres();
     let is_cockroach = api.is_cockroach();
     api.create_migration("setup", &dm, &dir)
@@ -963,43 +961,7 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
                  ALTER TABLE `B` ADD CONSTRAINT `ForeignKey` FOREIGN KEY (`aId`) REFERENCES `A`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
                  "#
                      ]]
-            }else if is_sqlite {
-                expect![[r#"
-                 -- CreateTable
-                 CREATE TABLE "A" (
-                     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-                     "name" TEXT NOT NULL,
-                     "a" TEXT NOT NULL,
-                     "b" TEXT NOT NULL
-                 );
-                 
-                 -- CreateTable
-                 CREATE TABLE "B" (
-                     "a" TEXT NOT NULL,
-                     "b" TEXT NOT NULL,
-                     "aId" INTEGER NOT NULL,
-                 
-                     PRIMARY KEY ("a", "b"),
-                     CONSTRAINT "B_aId_fkey" FOREIGN KEY ("aId") REFERENCES "A" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
-                 );
-                 
-                 -- CreateIndex
-                 CREATE UNIQUE INDEX "SingleUnique" ON "A"("name");
-                 
-                 -- CreateIndex
-                 CREATE INDEX "SingleIndex" ON "A"("a");
-                 
-                 -- CreateIndex
-                 CREATE UNIQUE INDEX "NamedCompoundUnique" ON "A"("a", "b");
-                 
-                 -- CreateIndex
-                 CREATE UNIQUE INDEX "UnNamedCompoundUnique" ON "A"("a", "b");
-                 
-                 -- CreateIndex
-                 CREATE INDEX "CompoundIndex" ON "B"("a", "b");
-                 "#
-                     ]]
-             } else {
+            } else {
                  unreachable!();
             };
 

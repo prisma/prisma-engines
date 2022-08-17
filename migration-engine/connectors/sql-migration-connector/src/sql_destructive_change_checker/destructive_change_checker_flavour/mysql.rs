@@ -147,11 +147,11 @@ fn is_safe_enum_change(columns: &Pair<ColumnWalker<'_>>, plan: &mut DestructiveC
         columns.next.column_type_family_as_enum(),
     ) {
         let removed_values: Vec<String> = previous_enum
-            .values
+            .values()
             .iter()
             .filter(|previous_value| {
                 !next_enum
-                    .values
+                    .values()
                     .iter()
                     .any(|next_value| previous_value.as_str() == next_value.as_str())
             })
@@ -161,7 +161,7 @@ fn is_safe_enum_change(columns: &Pair<ColumnWalker<'_>>, plan: &mut DestructiveC
         if !removed_values.is_empty() {
             plan.push_warning(
                 SqlMigrationWarningCheck::EnumValueRemoval {
-                    enm: next_enum.name.clone(),
+                    enm: next_enum.name().to_owned(),
                     values: removed_values,
                 },
                 step_index,

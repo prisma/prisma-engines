@@ -91,13 +91,20 @@ fn all_mysql_column_types_must_work(api: TestApi) {
     api.raw_cmd(&full_sql);
     let expectation = expect![[r#"
         SqlSchema {
+            namespaces: [],
             tables: [
                 Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "User",
                 },
             ],
             enums: [
                 Enum {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "User_enum_col",
                     values: [
                         "a",
@@ -981,13 +988,20 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
     api.raw_cmd(&full_sql);
     let expectation = expect![[r#"
         SqlSchema {
+            namespaces: [],
             tables: [
                 Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "User",
                 },
             ],
             enums: [
                 Enum {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "User_enum_col",
                     values: [
                         "a",
@@ -1871,13 +1885,20 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
     api.raw_cmd(&full_sql);
     let expectation = expect![[r#"
         SqlSchema {
+            namespaces: [],
             tables: [
                 Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "User",
                 },
             ],
             enums: [
                 Enum {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "User_enum_col",
                     values: [
                         "a",
@@ -2859,11 +2880,18 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
 
     let expectation = expect![[r#"
         SqlSchema {
+            namespaces: [],
             tables: [
                 Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "Post",
                 },
                 Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "User",
                 },
             ],
@@ -3045,8 +3073,12 @@ fn introspected_default_strings_should_be_unescaped(api: TestApi) {
     api.raw_cmd(create_table);
     let expectation = expect![[r#"
         SqlSchema {
+            namespaces: [],
             tables: [
                 Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "User",
                 },
             ],
@@ -3109,8 +3141,12 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
 
     let expectation = expect![[r#"
         SqlSchema {
+            namespaces: [],
             tables: [
                 Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "string_defaults_test",
                 },
             ],
@@ -3204,8 +3240,12 @@ fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
 
     let expectation = expect![[r#"
         SqlSchema {
+            namespaces: [],
             tables: [
                 Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "test",
                 },
             ],
@@ -3279,13 +3319,20 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
 
     let expectation = expect![[r#"
         SqlSchema {
+            namespaces: [],
             tables: [
                 Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "game",
                 },
             ],
             enums: [
                 Enum {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "game_enum_col",
                     values: [
                         "x-small",

@@ -22,7 +22,7 @@ pub struct Datasource {
     /// In which layer referential actions are handled.
     pub referential_integrity: Option<ReferentialIntegrity>,
     /// _Sorted_ vec of schemas defined in the schemas property.
-    pub(crate) schemas: Vec<(String, Span)>,
+    pub schemas: Vec<(String, Span)>,
     pub(crate) schemas_span: Option<Span>,
 }
 
