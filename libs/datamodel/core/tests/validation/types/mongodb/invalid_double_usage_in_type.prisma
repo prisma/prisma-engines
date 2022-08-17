@@ -1,0 +1,54 @@
+datasource test {
+  provider = "mongodb"
+  url = env("TEST_DATABASE_URL")
+}
+type B {
+  a  Int      @test.Double
+  b  BigInt   @test.Double
+  d  Boolean  @test.Double
+  e  String   @test.Double
+  f  DateTime @test.Double
+  g  Bytes    @test.Double
+}
+
+model A {
+  id Int @id          @map("_id")
+  b  B
+}
+
+// [1;91merror[0m: [1mNative type Double is not compatible with declared field type Int, expected field type Float.[0m
+//   [1;94m-->[0m  [4mschema.prisma:6[0m
+// [1;94m   | [0m
+// [1;94m 5 | [0mtype B {
+// [1;94m 6 | [0m  a  Int      [1;91m@test.Double[0m
+// [1;94m   | [0m
+// [1;91merror[0m: [1mNative type Double is not compatible with declared field type BigInt, expected field type Float.[0m
+//   [1;94m-->[0m  [4mschema.prisma:7[0m
+// [1;94m   | [0m
+// [1;94m 6 | [0m  a  Int      @test.Double
+// [1;94m 7 | [0m  b  BigInt   [1;91m@test.Double[0m
+// [1;94m   | [0m
+// [1;91merror[0m: [1mNative type Double is not compatible with declared field type Boolean, expected field type Float.[0m
+//   [1;94m-->[0m  [4mschema.prisma:8[0m
+// [1;94m   | [0m
+// [1;94m 7 | [0m  b  BigInt   @test.Double
+// [1;94m 8 | [0m  d  Boolean  [1;91m@test.Double[0m
+// [1;94m   | [0m
+// [1;91merror[0m: [1mNative type Double is not compatible with declared field type String, expected field type Float.[0m
+//   [1;94m-->[0m  [4mschema.prisma:9[0m
+// [1;94m   | [0m
+// [1;94m 8 | [0m  d  Boolean  @test.Double
+// [1;94m 9 | [0m  e  String   [1;91m@test.Double[0m
+// [1;94m   | [0m
+// [1;91merror[0m: [1mNative type Double is not compatible with declared field type DateTime, expected field type Float.[0m
+//   [1;94m-->[0m  [4mschema.prisma:10[0m
+// [1;94m   | [0m
+// [1;94m 9 | [0m  e  String   @test.Double
+// [1;94m10 | [0m  f  DateTime [1;91m@test.Double[0m
+// [1;94m   | [0m
+// [1;91merror[0m: [1mNative type Double is not compatible with declared field type Bytes, expected field type Float.[0m
+//   [1;94m-->[0m  [4mschema.prisma:11[0m
+// [1;94m   | [0m
+// [1;94m10 | [0m  f  DateTime @test.Double
+// [1;94m11 | [0m  g  Bytes    [1;91m@test.Double[0m
+// [1;94m   | [0m
