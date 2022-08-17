@@ -78,6 +78,7 @@ pub const GENERATOR: FeatureMap = FeatureMap {
          | Tracing
          | Metrics
          | OrderByNulls
+         | FieldReference
     }),
     deprecated: enumflags2::make_bitflags!(PreviewFeature::{
         AtomicNumberOperations
