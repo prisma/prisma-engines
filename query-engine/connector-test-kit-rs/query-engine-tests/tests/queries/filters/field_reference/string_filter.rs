@@ -435,6 +435,65 @@ mod string_filter {
         Ok(())
     }
 
+    #[connector_test(schema(setup::common_list_types), capabilities(ScalarLists))]
+    async fn scalar_list_filters_sensitive(runner: Runner) -> TestResult<()> {
+        setup::test_data_list_common(&runner).await?;
+
+        // has
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { string_list: { has: { _ref: "string" } } }) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        // not has
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { string_list: { has: { _ref: "string" } } } }) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
+        // hasSome
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { string_list: { hasSome: { _ref: "string_list" } } }) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { string_list: { hasSome: { _ref: "string_list2" } } }) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
+
+        // not hasSome
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { string_list: { hasSome: { _ref: "string_list" } } } }) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[]}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { string_list: { hasSome: { _ref: "string_list2" } } } }) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[]}}"###
+        );
+
+        // hasEvery
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { string_list: { hasEvery: { _ref: "string_list" } } }) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { string_list: { hasEvery: { _ref: "string_list2" } } }) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        // not hasEvery
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { string_list: { hasEvery: { _ref: "string_list" } } } }) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[]}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { string_list: { hasEvery: { _ref: "string_list2" } } } }) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
+        Ok(())
+    }
+
     pub async fn test_data_insensitive(runner: &Runner) -> TestResult<()> {
         runner
             .query(indoc! { r#"

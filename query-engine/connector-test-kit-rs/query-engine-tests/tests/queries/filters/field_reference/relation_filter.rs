@@ -183,17 +183,17 @@ mod relation_filter {
 
     fn many_to_many_schema() -> String {
         let schema = indoc! {
-            r#"model TestModel {
-          #id(id, Int, @id)
-          #m2m(children, Child[], id, Int)
-        }
-        model Child {
-          #id(id, Int, @id)
-          string1 String
-          string2 String
-          #m2m(tests, TestModel[], id, Int)
-        }
-        "#
+          r#"model TestModel {
+            #id(id, Int, @id)
+            #m2m(children, Child[], id, Int)
+          }
+          model Child {
+            #id(id, Int, @id)
+            string1 String
+            string2 String
+            #m2m(tests, TestModel[], id, Int)
+          }
+          "#
         };
 
         schema.to_owned()
@@ -215,6 +215,86 @@ mod relation_filter {
 
         insta::assert_snapshot!(
           run_query!(runner, r#"{ findManyTestModel(where: { children: { every: { string1: { equals: { _ref: "string2" } } } } }) { id } }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        Ok(())
+    }
+
+    fn complex_rel() -> String {
+        let schema = indoc! {
+            r#"model TestModel {
+              #id(id, Int, @id)
+              toMany OneToMany[]
+            }
+            model OneToMany {
+              #id(id, Int, @id)
+
+              testId Int?
+              test TestModel? @relation(fields:[testId], references: [id])
+
+              toOneId Int? @unique
+              toOne ToOne? @relation(fields: [toOneId], references: [id])
+            }
+            
+            model ToOne {
+              #id(id, Int, @id)
+
+              string1 String
+              string2 String
+
+              toMany OneToMany?
+            }
+            "#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(complex_rel))]
+    async fn complex_relation_traversal(runner: Runner) -> TestResult<()> {
+        create_row(
+            &runner,
+            r#"{
+              id: 1,
+              toMany: {
+                create: [
+                  {
+                    id: 1,
+                    toOne: {
+                      create: {
+                        id: 1,
+                        string1: "abc",
+                        string2: "abc"
+                      }
+                    }
+                  },
+                  {
+                    id: 2,
+                    toOne: {
+                      create: {
+                        id: 2,
+                        string1: "abc",
+                        string2: "bcd"
+                      }
+                    }
+                  },
+                ]
+              }
+            }"#,
+        )
+        .await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findManyTestModel(where: {
+            toMany: {
+              some: {
+                toOne: {
+                  string1: { equals: { _ref: "string2" } }
+                }
+              }
+            }
+          }) { id } }"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 

@@ -169,20 +169,36 @@ pub fn common_list_types() -> String {
     let schema = indoc! {
         "model TestModel {
         #id(id, Int, @id)
-        string  String[]
-        string2 String[]
-        int     Int[]
-        int2    Int[]
-        bInt    BigInt[]
-        bInt2   BigInt[]
-        float   Float[]
-        float2  Float[]
-        bytes   Bytes[]
-        bytes2  Bytes[]
-        bool    Boolean[]
-        bool2   Boolean[]
-        dt      DateTime[]
-        dt2     DateTime[]
+
+        string       String?
+        string_list  String[]
+        string_list2 String[]
+
+        int       Int?
+        int_list  Int[]
+        int_list2 Int[]
+
+        bInt       BigInt?
+        bInt_list  BigInt[]
+        bInt_list2 BigInt[]
+
+        
+        float       Float?
+        float_list  Float[]
+        float_list2 Float[]
+
+        bytes       Bytes?
+        bytes_list  Bytes[]
+        bytes_list2 Bytes[]
+
+
+        bool       Boolean?
+        bool_list  Boolean[]
+        bool_list2 Boolean[]
+
+        dt       DateTime?
+        dt_list  DateTime[]
+        dt_list2 DateTime[]
     }"
     };
 
@@ -195,20 +211,37 @@ pub async fn test_data_list_common(runner: &Runner) -> TestResult<()> {
         .query(indoc! { r#"
         mutation { createOneTestModel(data: {
             id: 1,
-            string: ["a", "b"],
-            string2: ["a", "b"],
-            int: [1, 2],
-            int2: [1, 2],
-            bInt: [1, 2],
-            bInt2: [2, 3],
-            float: [1.5, 2.4],
-            float2: [1.5, 2.4],
-            bytes: ["AQID", "AQIDBA=="],
-            bytes2: ["AQID", "AQIDBA=="],
-            bool: [false, true],
-            bool2: [false, true],
-            dt: ["1900-10-10T01:10:10.001Z", "1901-10-10T01:10:10.001Z"],
-            dt2: ["1900-10-10T01:10:10.001Z", "1901-10-10T01:10:10.001Z"],
+            string: "a",
+            string_list: ["a", "b"],
+            string_list2: ["a", "b"],
+
+            int: 1,
+            int_list: [1, 2],
+            int_list2: [1, 2],
+
+            bInt: 1,
+            bInt_list: [1, 2],
+            bInt_list2: [1, 2],
+
+            float: 1.5,
+            float_list: [1.5, 2.4],
+            float_list2: [1.5, 2.4],
+
+            bytes: "AQID",
+            bytes_list: ["AQID", "AQIDBA=="],
+            bytes_list2: ["AQID", "AQIDBA=="],
+
+            bool: true,
+            bool_list: [false, true],
+            bool_list2: [false, true],
+
+            dt: "1900-10-10T01:10:10.001Z",
+            dt_list: ["1900-10-10T01:10:10.001Z", "1901-10-10T01:10:10.001Z"],
+            dt_list2: ["1900-10-10T01:10:10.001Z", "1901-10-10T01:10:10.001Z"],
+
+            json: "{\"a\":1}",
+            json_list: ["{\"a\":1}", "{\"a\":1}"],
+            json_list2: ["{\"a\":1}", "{\"a\":1}"],
         }) { id }}"# })
         .await?
         .assert_success();
@@ -217,20 +250,38 @@ pub async fn test_data_list_common(runner: &Runner) -> TestResult<()> {
         .query(indoc! { r#"
         mutation { createOneTestModel(data: {
             id: 2,
-            string: ["a", "b"],
-            string2: ["b", "c"],
-            int: [1, 2],
-            int2: [2, 3],
-            bInt: [1, 2],
-            bInt2: [2, 3],
-            float: [1.5, 2.4],
-            float2: [2.4, 3.7],
-            bytes: ["AQID", "AQIDBA=="],
-            bytes2: ["AQIDBA==", "AQIDBAU="],
-            bool: [false, true],
-            bool2: [true, true],
-            dt: ["1900-10-10T01:10:10.001Z", "1901-10-10T01:10:10.001Z"],
-            dt2: ["1901-10-10T01:10:10.001Z", "1901-11-10T01:10:10.001Z"],
+
+            string: "d",
+            string_list: ["a", "b"],
+            string_list2: ["b", "c"],
+
+            int: 4,
+            int_list: [1, 2],
+            int_list2: [2, 3],
+
+            bInt: 4,
+            bInt_list: [1, 2],
+            bInt_list2: [2, 3],
+
+            float: 1.2,
+            float_list: [1.5, 2.4],
+            float_list2: [2.4, 3.7],
+
+            bytes: "AQIE",
+            bytes_list: ["AQID", "AQIDBA=="],
+            bytes_list2: ["AQIDBA==", "AQIDBAU="],
+
+            bool: false,
+            bool_list: [false, true],
+            bool_list2: [true, true],
+
+            dt: "1990-10-10T01:10:10.001Z"
+            dt_list: ["1900-10-10T01:10:10.001Z", "1901-10-10T01:10:10.001Z"],
+            dt_list2: ["1901-10-10T01:10:10.001Z", "1901-11-10T01:10:10.001Z"],
+
+            json: "{\"a\":4}",
+            json_list: ["{\"a\":1}", "{\"a\":2}"],
+            json_list2: ["{\"a\":2}", "{\"a\":3}"],
         }) { id }}"# })
         .await?
         .assert_success();

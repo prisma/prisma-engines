@@ -136,4 +136,63 @@ mod int_filter {
 
         Ok(())
     }
+
+    #[connector_test(schema(setup::common_list_types), capabilities(ScalarLists))]
+    async fn scalar_list_filters(runner: Runner) -> TestResult<()> {
+        setup::test_data_list_common(&runner).await?;
+
+        // has
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { int_list: { has: { _ref: "int" } } }) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        // not has
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { int_list: { has: { _ref: "int" } } } }) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
+        // hasSome
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { int_list: { hasSome: { _ref: "int_list" } } }) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { int_list: { hasSome: { _ref: "int_list2" } } }) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
+
+        // not hasSome
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { int_list: { hasSome: { _ref: "int_list" } } } }) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[]}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { int_list: { hasSome: { _ref: "int_list2" } } } }) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[]}}"###
+        );
+
+        // hasEvery
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { int_list: { hasEvery: { _ref: "int_list" } } }) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { int_list: { hasEvery: { _ref: "int_list2" } } }) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        // not hasEvery
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { int_list: { hasEvery: { _ref: "int_list" } } } }) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[]}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { int_list: { hasEvery: { _ref: "int_list2" } } } }) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
+        Ok(())
+    }
 }

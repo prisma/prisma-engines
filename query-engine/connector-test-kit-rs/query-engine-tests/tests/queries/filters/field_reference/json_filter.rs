@@ -219,6 +219,78 @@ mod json_filter {
         Ok(())
     }
 
+    fn schema_list() -> String {
+        let schema = indoc! {
+            r#"model TestModel {
+              #id(id, Int, @id)
+              json       Json?
+              json_list  Json[]
+              json_list2 Json[]
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(schema_list), capabilities(JsonFiltering, ScalarLists))]
+    async fn scalar_list_filters(runner: Runner) -> TestResult<()> {
+        test_data_list(&runner).await?;
+
+        // has
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { json_list: { has: { _ref: "json" } } }) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        // not has
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { json_list: { has: { _ref: "json" } } } }) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
+        // hasSome
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { json_list: { hasSome: { _ref: "json_list" } } }) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { json_list: { hasSome: { _ref: "json_list2" } } }) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
+
+        // not hasSome
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { json_list: { hasSome: { _ref: "json_list" } } } }) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[]}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { json_list: { hasSome: { _ref: "json_list2" } } } }) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[]}}"###
+        );
+
+        // hasEvery
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { json_list: { hasEvery: { _ref: "json_list" } } }) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { json_list: { hasEvery: { _ref: "json_list2" } } }) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        // not hasEvery
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { json_list: { hasEvery: { _ref: "json_list" } } } }) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[]}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { json_list: { hasEvery: { _ref: "json_list2" } } } }) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
+        Ok(())
+    }
+
     pub async fn test_data(runner: &Runner) -> TestResult<()> {
         run_query!(
             runner,
@@ -332,6 +404,36 @@ mod json_filter {
         );
 
         run_query!(runner, r#"mutation { createOneTestModel(data: { id: 5 }) { id }}"#);
+
+        Ok(())
+    }
+
+    pub async fn test_data_list(runner: &Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"
+              mutation { createOneTestModel(data: {
+                  id: 1,
+                  json: "{\"a\":1}",
+                  json_list: ["{\"a\":1}", "{\"a\":1}"],
+                  json_list2: ["{\"a\":1}", "{\"a\":1}"],
+              }) { id }}
+            "#
+        );
+
+        run_query!(
+            &runner,
+            r#"
+              mutation { createOneTestModel(data: {
+                  id: 2,
+                  json: "{\"a\":4}",
+                  json_list: ["{\"a\":1}", "{\"a\":2}"],
+                  json_list2: ["{\"a\":2}", "{\"a\":3}"],
+              }) { id }}
+            "#
+        );
+
+        run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 3 }) { id }}"#);
 
         Ok(())
     }
