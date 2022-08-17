@@ -328,11 +328,11 @@
         <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">column_type_family_as_enum</span>(),
     ) {
         <span class="kw">let</span> <span class="ident">removed_values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">previous_enum</span>
-            .<span class="ident">values</span>
+            .<span class="ident">values</span>()
             .<span class="ident">iter</span>()
             .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">previous_value</span><span class="op">|</span> {
                 <span class="op">!</span><span class="ident">next_enum</span>
-                    .<span class="ident">values</span>
+                    .<span class="ident">values</span>()
                     .<span class="ident">iter</span>()
                     .<span class="ident">any</span>(<span class="op">|</span><span class="ident">next_value</span><span class="op">|</span> <span class="ident">previous_value</span>.<span class="ident">as_str</span>() <span class="op">==</span> <span class="ident">next_value</span>.<span class="ident">as_str</span>())
             })
@@ -342,7 +342,7 @@
         <span class="kw">if</span> <span class="op">!</span><span class="ident">removed_values</span>.<span class="ident">is_empty</span>() {
             <span class="ident">plan</span>.<span class="ident">push_warning</span>(
                 <span class="ident">SqlMigrationWarningCheck::EnumValueRemoval</span> {
-                    <span class="ident">enm</span>: <span class="ident">next_enum</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
+                    <span class="ident">enm</span>: <span class="ident">next_enum</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
                     <span class="ident">values</span>: <span class="ident">removed_values</span>,
                 },
                 <span class="ident">step_index</span>,

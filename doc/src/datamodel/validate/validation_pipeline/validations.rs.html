@@ -239,8 +239,6 @@
 <span id="233">233</span>
 <span id="234">234</span>
 <span id="235">235</span>
-<span id="236">236</span>
-<span id="237">237</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">autoincrement</span>;
 <span class="kw">mod</span> <span class="ident">composite_types</span>;
 <span class="kw">mod</span> <span class="ident">constraint_namespace</span>;
@@ -403,13 +401,11 @@
         }
     } <span class="kw">else</span> {
         <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">walk_models</span>() {
-            <span class="ident">models::schema_exists</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
-            <span class="ident">models::schema_capability</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
+            <span class="ident">models::schema_attribute</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
         }
 
         <span class="kw">for</span> <span class="ident">r#enum</span> <span class="kw">in</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">walk_enums</span>() {
-            <span class="ident">enums::schema_exists</span>(<span class="ident">r#enum</span>, <span class="ident">ctx</span>);
-            <span class="ident">enums::schema_capability</span>(<span class="ident">r#enum</span>, <span class="ident">ctx</span>);
+            <span class="ident">enums::schema_attribute</span>(<span class="ident">r#enum</span>, <span class="ident">ctx</span>);
         }
 
         <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>

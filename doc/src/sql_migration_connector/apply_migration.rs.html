@@ -177,6 +177,9 @@
 <span id="171">171</span>
 <span id="172">172</span>
 <span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">pair::Pair</span>,
     <span class="ident">sql_migration</span>::{<span class="ident">SqlMigration</span>, <span class="ident">SqlMigrationStep</span>},
@@ -308,6 +311,9 @@
         <span class="ident">SqlMigrationStep::AlterEnum</span>(<span class="ident">alter_enum</span>) =&gt; <span class="ident">renderer</span>.<span class="ident">render_alter_enum</span>(<span class="ident">alter_enum</span>, <span class="ident">schemas</span>),
         <span class="ident">SqlMigrationStep::RedefineTables</span>(<span class="ident">redefine_tables</span>) =&gt; <span class="ident">renderer</span>.<span class="ident">render_redefine_tables</span>(<span class="ident">redefine_tables</span>, <span class="ident">schemas</span>),
         <span class="ident">SqlMigrationStep::CreateEnum</span>(<span class="ident">enum_id</span>) =&gt; <span class="ident">renderer</span>.<span class="ident">render_create_enum</span>(<span class="ident">schemas</span>.<span class="ident">next</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">enum_id</span>)),
+        <span class="ident">SqlMigrationStep::CreateSchema</span>(<span class="ident">namespace_id</span>) =&gt; {
+            <span class="macro">vec!</span>[<span class="ident">renderer</span>.<span class="ident">render_create_namespace</span>(<span class="ident">schemas</span>.<span class="ident">next</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">namespace_id</span>))]
+        }
         <span class="ident">SqlMigrationStep::DropEnum</span>(<span class="ident">enum_id</span>) =&gt; <span class="ident">renderer</span>.<span class="ident">render_drop_enum</span>(<span class="ident">schemas</span>.<span class="ident">previous</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">enum_id</span>)),
         <span class="ident">SqlMigrationStep::CreateTable</span> { <span class="ident">table_id</span> } =&gt; {
             <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">schemas</span>.<span class="ident">next</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">table_id</span>);

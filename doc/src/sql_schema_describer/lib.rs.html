@@ -688,6 +688,22 @@
 <span id="682">682</span>
 <span id="683">683</span>
 <span id="684">684</span>
+<span id="685">685</span>
+<span id="686">686</span>
+<span id="687">687</span>
+<span id="688">688</span>
+<span id="689">689</span>
+<span id="690">690</span>
+<span id="691">691</span>
+<span id="692">692</span>
+<span id="693">693</span>
+<span id="694">694</span>
+<span id="695">695</span>
+<span id="696">696</span>
+<span id="697">697</span>
+<span id="698">698</span>
+<span id="699">699</span>
+<span id="700">700</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Database description. This crate is used heavily in the introspection and migration engines.</span>
 
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>)]</span>
@@ -745,6 +761,8 @@
 <span class="doccomment">/// The result of describing a database schema.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SqlSchema</span> {
+    <span class="doccomment">/// Namespaces (schemas)</span>
+    <span class="ident">namespaces</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The schema&#39;s tables.</span>
     <span class="ident">tables</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Table</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The schema&#39;s enums.</span>
@@ -901,9 +919,15 @@
         });
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_table</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">String</span>) -&gt; <span class="ident">TableId</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_namespace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">String</span>) -&gt; <span class="ident">NamespaceId</span> {
+        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">NamespaceId</span>(<span class="self">self</span>.<span class="ident">namespaces</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>);
+        <span class="self">self</span>.<span class="ident">namespaces</span>.<span class="ident">push</span>(<span class="ident">name</span>);
+        <span class="ident">id</span>
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_table</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">String</span>, <span class="ident">namespace_id</span>: <span class="ident">NamespaceId</span>) -&gt; <span class="ident">TableId</span> {
         <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">TableId</span>(<span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>);
-        <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">push</span>(<span class="ident">Table</span> { <span class="ident">name</span> });
+        <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">push</span>(<span class="ident">Table</span> { <span class="ident">namespace_id</span>, <span class="ident">name</span> });
         <span class="ident">id</span>
     }
 
@@ -954,11 +978,17 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">walk_columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         (<span class="number">0</span>..<span class="self">self</span>.<span class="ident">columns</span>.<span class="ident">len</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">walk</span>(<span class="ident">ColumnId</span>(<span class="ident">idx</span> <span class="kw">as</span> <span class="ident">u32</span>)))
     }
+
+    <span class="doccomment">/// Traverse all namespaces in the catalog.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">walk_namespaces</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">NamespaceWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        (<span class="number">0</span>..<span class="self">self</span>.<span class="ident">namespaces</span>.<span class="ident">len</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">walk</span>(<span class="ident">NamespaceId</span>(<span class="ident">idx</span> <span class="kw">as</span> <span class="ident">u32</span>)))
+    }
 }
 
 <span class="doccomment">/// A table found in a schema.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Table</span> {
+    <span class="ident">namespace_id</span>: <span class="ident">NamespaceId</span>,
     <span class="ident">name</span>: <span class="ident">String</span>,
 }
 
@@ -1225,6 +1255,8 @@
 <span class="doccomment">/// A SQL enum.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Enum</span> {
+    <span class="doccomment">/// The namespace the enum type belongs to, if applicable.</span>
+    <span class="kw">pub</span> <span class="ident">namespace_id</span>: <span class="ident">NamespaceId</span>,
     <span class="doccomment">/// Enum name.</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="doccomment">/// Possible enum values.</span>

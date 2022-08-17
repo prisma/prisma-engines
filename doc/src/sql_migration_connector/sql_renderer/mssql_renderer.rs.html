@@ -529,22 +529,6 @@
 <span id="523">523</span>
 <span id="524">524</span>
 <span id="525">525</span>
-<span id="526">526</span>
-<span id="527">527</span>
-<span id="528">528</span>
-<span id="529">529</span>
-<span id="530">530</span>
-<span id="531">531</span>
-<span id="532">532</span>
-<span id="533">533</span>
-<span id="534">534</span>
-<span id="535">535</span>
-<span id="536">536</span>
-<span id="537">537</span>
-<span id="538">538</span>
-<span id="539">539</span>
-<span id="540">540</span>
-<span id="541">541</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">alter_table</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">common</span>::<span class="kw-2">*</span>, <span class="ident">IteratorJoin</span>, <span class="ident">Quoted</span>, <span class="ident">SqlRenderer</span>};
@@ -563,29 +547,11 @@
     },
     <span class="ident">ColumnTypeFamily</span>, <span class="ident">DefaultKind</span>, <span class="ident">DefaultValue</span>, <span class="ident">IndexType</span>, <span class="ident">SqlSchema</span>,
 };
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">borrow::Cow</span>,
-    <span class="ident">fmt</span>::{<span class="ident">Display</span>, <span class="ident">Write</span>},
-};
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">QuotedWithSchema</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">schema_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">QuotedWithSchema</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;[{}].[{}]&quot;</span>, <span class="self">self</span>.<span class="ident">schema_name</span>, <span class="self">self</span>.<span class="ident">name</span>)
-    }
-}
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">fmt::Write</span>};
 
 <span class="kw">impl</span> <span class="ident">MssqlFlavour</span> {
-    <span class="kw">fn</span> <span class="ident">quote_with_schema</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">QuotedWithSchema</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">QuotedWithSchema</span> {
-            <span class="ident">schema_name</span>: <span class="self">self</span>.<span class="ident">schema_name</span>(),
-            <span class="ident">name</span>,
-        }
+    <span class="kw">fn</span> <span class="ident">quote_with_schema</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">TableName</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="ident">TableName</span>(<span class="prelude-val">Some</span>(<span class="ident">Quoted::mssql_ident</span>(<span class="self">self</span>.<span class="ident">schema_name</span>())), <span class="ident">Quoted::mssql_ident</span>(<span class="ident">name</span>))
     }
 
     <span class="kw">fn</span> <span class="ident">render_column</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">column</span>: <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
@@ -707,7 +673,11 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">render_create_table_as</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table</span>: <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">render_create_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table</span>: <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+        <span class="self">self</span>.<span class="ident">render_create_table_as</span>(<span class="ident">table</span>, <span class="self">self</span>.<span class="ident">quote_with_schema</span>(<span class="ident">table</span>.<span class="ident">name</span>()))
+    }
+
+    <span class="kw">fn</span> <span class="ident">render_create_table_as</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table</span>: <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">table_name</span>: <span class="ident">TableName</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="ident">columns</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">column</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">render_column</span>(<span class="ident">column</span>)).<span class="ident">join</span>(<span class="string">&quot;,\n    &quot;</span>);
         <span class="kw">let</span> <span class="ident">mssql_schema_ext</span>: <span class="kw-2">&amp;</span><span class="ident">MssqlSchemaExt</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
 
@@ -779,10 +749,6 @@
             CREATE TABLE {table_name} (
                 {columns}{primary_key}{constraints}
             )&quot;#</span>,
-            <span class="ident">table_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">quote_with_schema</span>(<span class="ident">table_name</span>),
-            <span class="ident">columns</span> <span class="op">=</span> <span class="ident">columns</span>,
-            <span class="ident">primary_key</span> <span class="op">=</span> <span class="ident">primary_key</span>,
-            <span class="ident">constraints</span> <span class="op">=</span> <span class="ident">constraints</span>,
         )
     }
 
@@ -863,7 +829,9 @@
             &quot;#</span>, <span class="ident">table</span> <span class="op">=</span> <span class="ident">tables</span>.<span class="ident">previous</span>.<span class="ident">name</span>(), <span class="ident">schema</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schema_name</span>()});
 
             <span class="comment">// Create the new table.</span>
-            <span class="ident">result</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">render_create_table_as</span>(<span class="ident">tables</span>.<span class="ident">next</span>, <span class="kw-2">&amp;</span><span class="ident">temporary_table_name</span>));
+            <span class="ident">result</span>.<span class="ident">push</span>(
+                <span class="self">self</span>.<span class="ident">render_create_table_as</span>(<span class="ident">tables</span>.<span class="ident">next</span>, <span class="ident">TableName</span>(<span class="prelude-val">None</span>, <span class="ident">Quoted::mssql_ident</span>(<span class="kw-2">&amp;</span><span class="ident">temporary_table_name</span>))),
+            );
 
             <span class="comment">// We cannot insert into autoincrement columns by default. If we</span>
             <span class="comment">// have `IDENTITY` in any of the columns, we&#39;ll allow inserting</span>

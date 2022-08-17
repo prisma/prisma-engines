@@ -46,13 +46,16 @@
 <span id="40">40</span>
 <span id="41">41</span>
 <span id="42">42</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SqlSchemaCalculatorFlavour</span>;
+<span id="43">43</span>
+<span id="44">44</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident"><span class="kw">super</span>::Context</span>, <span class="ident">SqlSchemaCalculatorFlavour</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::flavour::MysqlFlavour</span>;
-<span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">parser_database::walkers</span>::<span class="kw-2">*</span>, <span class="ident">ValidatedSchema</span>};
+<span class="kw">use</span> <span class="ident">datamodel::parser_database::walkers</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span> <span class="kw">as</span> <span class="ident">sql</span>;
 
 <span class="kw">impl</span> <span class="ident">SqlSchemaCalculatorFlavour</span> <span class="kw">for</span> <span class="ident">MysqlFlavour</span> {
-    <span class="kw">fn</span> <span class="ident">calculate_enums</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">ValidatedSchema</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">sql::Enum</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">calculate_enums</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">sql::Enum</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">datamodel</span>;
         <span class="comment">// This is a lower bound for the size of the generated enums (we assume</span>
         <span class="comment">// each enum is used at least once).</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">enums</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
@@ -65,6 +68,7 @@
 
         <span class="kw">for</span> (<span class="ident">field</span>, <span class="ident">enum_tpe</span>) <span class="kw">in</span> <span class="ident">enum_fields</span> {
             <span class="kw">let</span> <span class="ident">sql_enum</span> <span class="op">=</span> <span class="ident">sql::Enum</span> {
+                <span class="ident">namespace_id</span>: <span class="ident">Default::default</span>(),
                 <span class="ident">name</span>: <span class="macro">format!</span>(
                     <span class="string">&quot;{model_name}_{field_name}&quot;</span>,
                     <span class="ident">model_name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">database_name</span>(),

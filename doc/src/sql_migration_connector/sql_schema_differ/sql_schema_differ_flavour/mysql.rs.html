@@ -1415,14 +1415,14 @@
             <span class="ident">differ</span>.<span class="ident">next</span>.<span class="ident">column_type_family_as_enum</span>(),
         ) {
             (<span class="prelude-val">Some</span>(<span class="ident">previous_enum</span>), <span class="prelude-val">Some</span>(<span class="ident">next_enum</span>)) =&gt; {
-                <span class="kw">if</span> <span class="ident">previous_enum</span>.<span class="ident">values</span> <span class="op">==</span> <span class="ident">next_enum</span>.<span class="ident">values</span> {
+                <span class="kw">if</span> <span class="ident">previous_enum</span>.<span class="ident">values</span>() <span class="op">==</span> <span class="ident">next_enum</span>.<span class="ident">values</span>() {
                     <span class="kw">return</span> <span class="prelude-val">None</span>;
                 }
 
                 <span class="kw">return</span> <span class="kw">if</span> <span class="ident">previous_enum</span>
-                    .<span class="ident">values</span>
+                    .<span class="ident">values</span>()
                     .<span class="ident">iter</span>()
-                    .<span class="ident">all</span>(<span class="op">|</span><span class="ident">previous_value</span><span class="op">|</span> <span class="ident">next_enum</span>.<span class="ident">values</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">next_value</span><span class="op">|</span> <span class="ident">previous_value</span> <span class="op">==</span> <span class="ident">next_value</span>))
+                    .<span class="ident">all</span>(<span class="op">|</span><span class="ident">previous_value</span><span class="op">|</span> <span class="ident">next_enum</span>.<span class="ident">values</span>().<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">next_value</span><span class="op">|</span> <span class="ident">previous_value</span> <span class="op">==</span> <span class="ident">next_value</span>))
                 {
                     <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::SafeCast</span>)
                 } <span class="kw">else</span> {

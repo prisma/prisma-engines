@@ -802,6 +802,7 @@
 <span id="796">796</span>
 <span id="797">797</span>
 <span id="798">798</span>
+<span id="799">799</span>
 </pre><pre class="rust"><code><span class="doccomment">//! MySQL schema description.</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">getters::Getter</span>, <span class="ident">parsers::Parser</span>, <span class="kw-2">*</span>};
@@ -1083,7 +1084,7 @@
 
         <span class="kw">for</span> <span class="ident">name</span> <span class="kw">in</span> <span class="ident">names</span> {
             <span class="kw">let</span> <span class="ident">cloned_name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">clone</span>();
-            <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">sql_schema</span>.<span class="ident">push_table</span>(<span class="ident">name</span>);
+            <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">sql_schema</span>.<span class="ident">push_table</span>(<span class="ident">name</span>, <span class="ident">Default::default</span>());
             <span class="ident">map</span>.<span class="ident">insert</span>(<span class="ident">cloned_name</span>, <span class="ident">id</span>);
         }
 
@@ -1438,6 +1439,7 @@
 
         <span class="kw">let</span> <span class="ident">enm</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">family</span> {
             <span class="ident">ColumnTypeFamily::Enum</span>(<span class="ident">name</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">Enum</span> {
+                <span class="ident">namespace_id</span>: <span class="ident">Default::default</span>(),
                 <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">clone</span>(),
                 <span class="ident">values</span>: <span class="ident"><span class="self">Self</span>::extract_enum_values</span>(<span class="kw-2">&amp;</span><span class="ident">full_data_type</span>),
             }),

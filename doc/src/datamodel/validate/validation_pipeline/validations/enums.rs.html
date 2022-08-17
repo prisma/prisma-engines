@@ -29,40 +29,30 @@
 <span id="23">23</span>
 <span id="24">24</span>
 <span id="25">25</span>
-<span id="26">26</span>
-<span id="27">27</span>
-<span id="28">28</span>
-<span id="29">29</span>
-<span id="30">30</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">datamodel_connector::ConnectorCapability</span>, <span class="ident">diagnostics::DatamodelError</span>, <span class="ident">parser_database::walkers::EnumWalker</span>,
+    <span class="ident">datamodel_connector::ConnectorCapability</span>,
+    <span class="ident">diagnostics::DatamodelError</span>,
+    <span class="ident">parser_database</span>::{<span class="self">self</span>, <span class="ident">walkers::EnumWalker</span>},
     <span class="ident">validate::validation_pipeline::context::Context</span>,
 };
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">schema_exists</span>(<span class="ident">enm</span>: <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> (<span class="ident">_schema</span>, <span class="ident">span</span>) <span class="op">=</span> <span class="kw">match</span> (<span class="ident">enm</span>.<span class="ident">schema</span>(), <span class="ident">ctx</span>.<span class="ident">datasource</span>) {
-        (<span class="prelude-val">Some</span>((<span class="ident">schema_name</span>, <span class="ident">span</span>)), <span class="prelude-val">Some</span>(<span class="ident">ds</span>)) <span class="kw">if</span> <span class="op">!</span><span class="ident">ds</span>.<span class="ident">has_schema</span>(<span class="ident">schema_name</span>) =&gt; (<span class="ident">schema_name</span>, <span class="ident">span</span>),
-        <span class="kw">_</span> =&gt; <span class="kw">return</span>,
-    };
-    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_static</span>(
-        <span class="string">&quot;This schema is not defined in the datasource. Read more on `@@schema` at https://pris.ly/d/multi-schema&quot;</span>,
-        <span class="ident">span</span>,
-    ))
-}
-
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">schema_capability</span>(<span class="ident">enm</span>: <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::MultiSchema</span>) {
-        <span class="kw">return</span>;
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">schema_attribute</span>(<span class="ident">enm</span>: <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+    <span class="kw">match</span> (<span class="ident">enm</span>.<span class="ident">schema</span>(), <span class="ident">ctx</span>.<span class="ident">datasource</span>) {
+        (<span class="prelude-val">Some</span>((<span class="ident">schema_name</span>, <span class="ident">span</span>)), <span class="prelude-val">Some</span>(<span class="ident">ds</span>)) <span class="kw">if</span> <span class="op">!</span><span class="ident">ds</span>.<span class="ident">has_schema</span>(<span class="ident">schema_name</span>) =&gt; {
+            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_static</span>(
+                <span class="string">&quot;This schema is not defined in the datasource. Read more on `@@schema` at https://pris.ly/d/multi-schema&quot;</span>,
+                <span class="ident">span</span>,
+            ))
+        },
+        (<span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">span</span>)), <span class="kw">_</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::MultiSchema</span>) =&gt; {
+            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_static</span>(
+                <span class="string">&quot;@@schema is not supported on the current datasource provider&quot;</span>,
+                <span class="ident">span</span>,
+            ))
+        }
+        (<span class="prelude-val">None</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">schema_flags</span>().<span class="ident">contains</span>(<span class="ident">parser_database::SchemaFlags::UsesSchemaAttribute</span>) <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">is_provider</span>(<span class="string">&quot;mysql&quot;</span>) =&gt; <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_static</span>(<span class="string">&quot;This enum is missing an `@@schema` attribute.&quot;</span>, <span class="ident">enm</span>.<span class="ident">ast_enum</span>().<span class="ident">span</span>)),
+        <span class="kw">_</span> =&gt; (),
     }
-    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">span</span>)) <span class="op">=</span> <span class="ident">enm</span>.<span class="ident">schema</span>() {
-        <span class="ident">span</span>
-    } <span class="kw">else</span> {
-        <span class="kw">return</span>;
-    };
-    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_static</span>(
-        <span class="string">&quot;@@schema is not supported on the current datasource provider&quot;</span>,
-        <span class="ident">span</span>,
-    ))
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="datamodel" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0 (4b91a6ea7 2022-08-08)" ></div>

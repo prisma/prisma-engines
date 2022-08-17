@@ -25,6 +25,7 @@
 <span id="19">19</span>
 <span id="20">20</span>
 <span id="21">21</span>
+<span id="22">22</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast</span>, <span class="ident">coerce</span>, <span class="ident">context</span>::<span class="kw-2">*</span>, <span class="ident">types</span>::<span class="kw-2">*</span>, <span class="ident">StringId</span>};
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">model</span>(<span class="ident">model_attributes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ModelAttributes</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
@@ -44,6 +45,7 @@
         }
     };
     <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">coerce::string</span>(<span class="ident">arg</span>, <span class="ident">ctx</span>.<span class="ident">diagnostics</span>)<span class="question-mark">?</span>;
+    <span class="ident">ctx</span>.<span class="ident">types</span>.<span class="ident">flags</span> <span class="op">|</span><span class="op">=</span> <span class="ident"><span class="kw">crate</span>::types::SchemaFlags::UsesSchemaAttribute</span>;
     <span class="prelude-val">Some</span>((<span class="ident">ctx</span>.<span class="ident">interner</span>.<span class="ident">intern</span>(<span class="ident">name</span>), <span class="ident">arg</span>.<span class="ident">span</span>()))
 }
 </code></pre></div>
