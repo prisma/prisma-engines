@@ -416,144 +416,78 @@ impl MongoFilterVisitor {
         let field_name = (self.prefix(), field).into_bson()?;
         let field_ref = filter.as_field_ref().cloned();
 
-        // Of course Mongo needs special filters for the inverted case, everything else would be too easy.
+        let filter_doc = match filter.condition {
+            connector_interface::ScalarListCondition::Contains(val) => {
+                let bson = match val {
+                    ConditionValue::Value(value) => (field, value).into_bson()?,
+                    ConditionValue::FieldRef(field_ref) => self.prefixed_field_ref(&field_ref)?,
+                };
+
+                doc! { "$in": [bson, coerce_as_array(&field_name)] }
+            }
+
+            connector_interface::ScalarListCondition::ContainsEvery(vals) if vals.is_empty() => {
+                // Empty hasEvery: Return all records.
+                render_stub_condition(true)
+            }
+            connector_interface::ScalarListCondition::ContainsEvery(ConditionListValue::List(vals)) => {
+                let ins = vals
+                    .into_iter()
+                    .map(|val| {
+                        (field, val)
+                            .into_bson()
+                            .map(|bson_val| doc! { "$in": [bson_val, coerce_as_array(&field_name)] })
+                    })
+                    .collect::<crate::Result<Vec<_>>>()?;
+
+                doc! { "$and": ins }
+            }
+            connector_interface::ScalarListCondition::ContainsEvery(ConditionListValue::FieldRef(field_ref)) => {
+                render_every(
+                    &field_name,
+                    "elem",
+                    doc! { "$in": ["$$elem", coerce_as_array((self.prefix(), &field_ref).into_bson()?)] },
+                    true,
+                )
+            }
+
+            connector_interface::ScalarListCondition::ContainsSome(vals) if vals.is_empty() => {
+                // Empty hasSome: Return no records.
+                render_stub_condition(false)
+            }
+            connector_interface::ScalarListCondition::ContainsSome(ConditionListValue::List(vals)) => {
+                let ins = vals
+                    .into_iter()
+                    .map(|val| {
+                        (field, val)
+                            .into_bson()
+                            .map(|bson_val| doc! { "$in": [bson_val, coerce_as_array(&field_name)] })
+                    })
+                    .collect::<crate::Result<Vec<_>>>()?;
+
+                doc! { "$or": ins }
+            }
+            connector_interface::ScalarListCondition::ContainsSome(ConditionListValue::FieldRef(field_ref)) => {
+                render_some(
+                    &field_name,
+                    "elem",
+                    doc! { "$in": ["$$elem", coerce_as_array((self.prefix(), &field_ref).into_bson()?)] },
+                    true,
+                )
+            }
+
+            connector_interface::ScalarListCondition::IsEmpty(true) => {
+                doc! { "$eq": [render_size(&field_name, true), 0] }
+            }
+            connector_interface::ScalarListCondition::IsEmpty(false) => {
+                doc! { "$gt": [render_size(&field_name, true), 0] }
+            }
+        };
+
         let filter_doc = if self.invert() {
-            match filter.condition {
-                // "Contains element" -> "Does not contain element"
-                connector_interface::ScalarListCondition::Contains(val) => {
-                    let bson = match val {
-                        ConditionValue::Value(value) => (field, value).into_bson()?,
-                        ConditionValue::FieldRef(field_ref) => self.prefixed_field_ref(&field_ref)?,
-                    };
-
-                    doc! { "$not": { "$in": [bson, coerce_as_array(&field_name)] } }
-                }
-
-                // "Contains all elements" -> "Does not contain any of the elements"
-                connector_interface::ScalarListCondition::ContainsEvery(ConditionListValue::List(vals)) => {
-                    let ins = vals
-                        .into_iter()
-                        .map(|val| {
-                            (field, val)
-                                .into_bson()
-                                .map(|bson_val| doc! { "$not": { "$in": [bson_val, coerce_as_array(&field_name)] } })
-                        })
-                        .collect::<crate::Result<Vec<_>>>()?;
-
-                    doc! {
-                        "$and": ins
-                    }
-                }
-                connector_interface::ScalarListCondition::ContainsEvery(ConditionListValue::FieldRef(field_ref)) => {
-                    render_none(
-                        &field_name,
-                        "elem",
-                        doc! { "$in": ["$$elem", coerce_as_array((self.prefix(), &field_ref).into_bson()?)] },
-                        true,
-                    )
-                }
-
-                // "Contains some of the elements" -> "Contains none of the elements"
-                connector_interface::ScalarListCondition::ContainsSome(ConditionListValue::List(vals)) => {
-                    let ins = vals
-                        .into_iter()
-                        .map(|val| {
-                            (field, val)
-                                .into_bson()
-                                .map(|bson_val| doc! { "$not": { "$in": [bson_val, coerce_as_array(&field_name)] } })
-                        })
-                        .collect::<crate::Result<Vec<_>>>()?;
-
-                    doc! {
-                        "$and": ins
-                    }
-                }
-                connector_interface::ScalarListCondition::ContainsSome(ConditionListValue::FieldRef(field_ref)) => {
-                    render_none(
-                        &field_name,
-                        "elem",
-                        doc! { "$in": ["$$elem", coerce_as_array((self.prefix(), &field_ref).into_bson()?)] },
-                        true,
-                    )
-                }
-
-                // Empty -> not empty and vice versa
-                connector_interface::ScalarListCondition::IsEmpty(should_be_empty) => {
-                    if should_be_empty && !self.invert() {
-                        doc! { "$eq": [render_size(&field_name, true), 0] }
-                    } else {
-                        doc! { "$gt": [render_size(&field_name, true), 0] }
-                    }
-                }
-            }
+            doc! { "$not": filter_doc }
         } else {
-            match filter.condition {
-                connector_interface::ScalarListCondition::Contains(val) => {
-                    let bson = match val {
-                        ConditionValue::Value(value) => (field, value).into_bson()?,
-                        ConditionValue::FieldRef(field_ref) => self.prefixed_field_ref(&field_ref)?,
-                    };
-
-                    doc! { "$in": [bson, coerce_as_array(&field_name)] }
-                }
-
-                connector_interface::ScalarListCondition::ContainsEvery(vals) if vals.is_empty() => {
-                    // Empty hasEvery: Return all records.
-                    render_stub_condition(true)
-                }
-                connector_interface::ScalarListCondition::ContainsEvery(ConditionListValue::List(vals)) => {
-                    let ins = vals
-                        .into_iter()
-                        .map(|val| {
-                            (field, val)
-                                .into_bson()
-                                .map(|bson_val| doc! { "$in": [bson_val, coerce_as_array(&field_name)] })
-                        })
-                        .collect::<crate::Result<Vec<_>>>()?;
-
-                    doc! { "$and": ins }
-                }
-                connector_interface::ScalarListCondition::ContainsEvery(ConditionListValue::FieldRef(field_ref)) => {
-                    render_every(
-                        &field_name,
-                        "elem",
-                        doc! { "$in": ["$$elem", coerce_as_array((self.prefix(), &field_ref).into_bson()?)] },
-                        true,
-                    )
-                }
-
-                connector_interface::ScalarListCondition::ContainsSome(vals) if vals.is_empty() => {
-                    // Empty hasSome: Return no records.
-                    render_stub_condition(false)
-                }
-                connector_interface::ScalarListCondition::ContainsSome(ConditionListValue::List(vals)) => {
-                    let ins = vals
-                        .into_iter()
-                        .map(|val| {
-                            (field, val)
-                                .into_bson()
-                                .map(|bson_val| doc! { "$in": [bson_val, coerce_as_array(&field_name)] })
-                        })
-                        .collect::<crate::Result<Vec<_>>>()?;
-
-                    doc! { "$or": ins }
-                }
-                connector_interface::ScalarListCondition::ContainsSome(ConditionListValue::FieldRef(field_ref)) => {
-                    render_some(
-                        &field_name,
-                        "elem",
-                        doc! { "$in": ["$$elem", coerce_as_array((self.prefix(), &field_ref).into_bson()?)] },
-                        true,
-                    )
-                }
-
-                connector_interface::ScalarListCondition::IsEmpty(true) => {
-                    doc! { "$eq": [render_size(&field_name, true), 0] }
-                }
-                connector_interface::ScalarListCondition::IsEmpty(false) => {
-                    doc! { "$gt": [render_size(&field_name, true), 0] }
-                }
-            }
+            filter_doc
         };
 
         let filter_doc = exclude_undefineds(&field_name, self.invert_undefined_exclusion(), filter_doc);
@@ -1034,7 +968,7 @@ fn render_every(input: impl Into<Bson>, alias: impl Into<Bson>, cond: impl Into<
             }
           }
         },
-        render_size(input, true)
+        render_size(input, false)
       ]
     }
 }
