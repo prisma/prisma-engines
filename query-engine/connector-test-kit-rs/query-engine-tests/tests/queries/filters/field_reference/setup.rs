@@ -238,10 +238,6 @@ pub async fn test_data_list_common(runner: &Runner) -> TestResult<()> {
             dt: "1900-10-10T01:10:10.001Z",
             dt_list: ["1900-10-10T01:10:10.001Z", "1901-10-10T01:10:10.001Z"],
             dt_list2: ["1900-10-10T01:10:10.001Z", "1901-10-10T01:10:10.001Z"],
-
-            json: "{\"a\":1}",
-            json_list: ["{\"a\":1}", "{\"a\":1}"],
-            json_list2: ["{\"a\":1}", "{\"a\":1}"],
         }) { id }}"# })
         .await?
         .assert_success();
@@ -278,10 +274,6 @@ pub async fn test_data_list_common(runner: &Runner) -> TestResult<()> {
             dt: "1990-10-10T01:10:10.001Z"
             dt_list: ["1900-10-10T01:10:10.001Z", "1901-10-10T01:10:10.001Z"],
             dt_list2: ["1901-10-10T01:10:10.001Z", "1901-11-10T01:10:10.001Z"],
-
-            json: "{\"a\":4}",
-            json_list: ["{\"a\":1}", "{\"a\":2}"],
-            json_list2: ["{\"a\":2}", "{\"a\":3}"],
         }) { id }}"# })
         .await?
         .assert_success();

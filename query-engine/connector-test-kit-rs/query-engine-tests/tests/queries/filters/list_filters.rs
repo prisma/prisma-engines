@@ -731,13 +731,13 @@ mod decimal_lists {
         // equals decimal
         insta::assert_snapshot!(
           list_query(&runner, "decimal", "equals", r#"["11.11", "22.22", "33.33"]"#).await?,
-          @r###""###
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         // NOT equals decimal
         insta::assert_snapshot!(
           not_list_query(&runner, "decimal", "equals", r#"["11.11", "22.22", "33.33"]"#).await?,
-          @r###""###
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         Ok(())
@@ -750,13 +750,13 @@ mod decimal_lists {
         // has
         insta::assert_snapshot!(
           list_query(&runner, "decimal", "has", "33.33").await?,
-          @r###""###
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         // NOT has
         insta::assert_snapshot!(
           not_list_query(&runner, "decimal", "has", "33.33").await?,
-          @r###""###
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         Ok(())
@@ -769,13 +769,13 @@ mod decimal_lists {
         // hasSome decimal
         insta::assert_snapshot!(
           list_query(&runner, "decimal", "hasSome", r#"[55.55, 33.33]"#).await?,
-          @r###""###
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         // NOT hasSome decimal
         insta::assert_snapshot!(
           not_list_query(&runner, "decimal", "hasSome", r#"[55.55, 33.33]"#).await?,
-          @r###""###
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         Ok(())
@@ -788,21 +788,21 @@ mod decimal_lists {
         // hasEvery decimal
         insta::assert_snapshot!(
           list_query(&runner, "decimal", "hasEvery", r#"[55.55, 33.33]"#).await?,
-          @r###""###
+          @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
           list_query(&runner, "decimal", "hasEvery", r#"[33.33]"#).await?,
-          @r###""###
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         // NOT hasEvery decimal
         insta::assert_snapshot!(
           not_list_query(&runner, "decimal", "hasEvery", r#"[55.55, 33.33]"#).await?,
-          @r###""###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         insta::assert_snapshot!(
           not_list_query(&runner, "decimal", "hasEvery", r#"[33.33]"#).await?,
-          @r###""###
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         Ok(())
@@ -815,21 +815,21 @@ mod decimal_lists {
         // isEmpty decimal
         insta::assert_snapshot!(
           list_query(&runner, "decimal", "isEmpty", "true").await?,
-          @r###""###
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
         insta::assert_snapshot!(
           list_query(&runner, "decimal", "isEmpty", "false").await?,
-          @r###""###
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         // NOT isEmpty decimal
         insta::assert_snapshot!(
           not_list_query(&runner, "decimal", "isEmpty", "true").await?,
-          @r###""###
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
         insta::assert_snapshot!(
           not_list_query(&runner, "decimal", "isEmpty", "false").await?,
-          @r###""###
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         Ok(())
@@ -848,7 +848,7 @@ mod decimal_lists {
         // NOT hasEvery decimal
         insta::assert_snapshot!(
           run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { decimal: { hasEvery: [] }}}) { id }}"#),
-          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+          @r###"{"data":{"findManyTestModel":[]}}"###
         );
 
         Ok(())
