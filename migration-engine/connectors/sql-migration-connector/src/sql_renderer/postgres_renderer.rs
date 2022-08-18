@@ -289,7 +289,10 @@ impl SqlRenderer for PostgresFlavour {
         ddl::CreateIndex {
             index_name: index.name().into(),
             is_unique: index.is_unique(),
-            table_reference: index.table().name().into(),
+            table_reference: &TableName(
+                index.table().namespace().map(Quoted::postgres_ident),
+                Quoted::postgres_ident(index.table().name()),
+            ),
             using: Some(match pg_ext.index_algorithm(index.id) {
                 SqlIndexAlgorithm::BTree => ddl::IndexAlgorithm::BTree,
                 SqlIndexAlgorithm::Hash => ddl::IndexAlgorithm::Hash,

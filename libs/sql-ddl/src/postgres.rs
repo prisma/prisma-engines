@@ -337,7 +337,7 @@ pub enum IndexAlgorithm {
 pub struct CreateIndex<'a> {
     pub index_name: PostgresIdentifier<'a>,
     pub is_unique: bool,
-    pub table_reference: PostgresIdentifier<'a>,
+    pub table_reference: &'a dyn Display,
     pub columns: Vec<IndexColumn<'a>>,
     pub using: Option<IndexAlgorithm>,
 }
@@ -422,7 +422,7 @@ mod tests {
         let create_index = CreateIndex {
             is_unique: true,
             index_name: "meow_idx".into(),
-            table_reference: "Cat".into(),
+            table_reference: &PostgresIdentifier::Simple(Cow::Borrowed("Cat")),
             columns,
             using: None,
         };
@@ -440,7 +440,7 @@ mod tests {
         let create_index = CreateIndex {
             is_unique: false,
             index_name: "meow_idx".into(),
-            table_reference: "Cat".into(),
+            table_reference: &PostgresIdentifier::Simple(Cow::Borrowed("Cat")),
             columns,
             using: Some(IndexAlgorithm::Hash),
         };
@@ -469,7 +469,7 @@ mod tests {
         let create_index = CreateIndex {
             is_unique: true,
             index_name: "meow_idx".into(),
-            table_reference: "Cat".into(),
+            table_reference: &PostgresIdentifier::Simple("Cat".into()),
             columns,
             using: None,
         };

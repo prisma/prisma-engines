@@ -14,7 +14,9 @@ generator js {
 
 model Test {
   id Int @id
+  name String
   @@schema("users")
+  @@unique([name])
 }
 
 model Test2 {
@@ -63,6 +65,7 @@ model Test5 {
 // -- CreateTable
 // CREATE TABLE "users"."Test" (
 //     "id" INTEGER NOT NULL,
+//     "name" TEXT NOT NULL,
 // 
 //     CONSTRAINT "Test_pkey" PRIMARY KEY ("id")
 // );
@@ -95,6 +98,9 @@ model Test5 {
 // 
 //     CONSTRAINT "Test5_pkey" PRIMARY KEY ("id")
 // );
+// 
+// -- CreateIndex
+// CREATE UNIQUE INDEX "Test_name_key" ON "users"."Test"("name");
 // 
 // -- AddForeignKey
 // ALTER TABLE "public"."Test4" ADD CONSTRAINT "Test4_id_fkey" FOREIGN KEY ("id") REFERENCES "security"."Test5"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
