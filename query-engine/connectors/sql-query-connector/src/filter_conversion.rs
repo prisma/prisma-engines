@@ -456,19 +456,16 @@ fn convert_json_filter(
         condition,
         target_type,
     } = json_condition;
-    let (expr_json, expr_string): (Expression, Expression) = if let Some(path) = path {
-        match path {
-            JsonFilterPath::String(path) => (
-                json_extract(comparable.clone(), JsonPath::string(path.clone()), false).into(),
-                json_extract(comparable, JsonPath::string(path), true).into(),
-            ),
-            JsonFilterPath::Array(path) => (
-                json_extract(comparable.clone(), JsonPath::array(path.clone()), false).into(),
-                json_extract(comparable, JsonPath::array(path), true).into(),
-            ),
-        }
-    } else {
-        (comparable.clone(), comparable)
+    let (expr_json, expr_string): (Expression, Expression) = match path {
+        Some(JsonFilterPath::String(path)) => (
+            json_extract(comparable.clone(), JsonPath::string(path.clone()), false).into(),
+            json_extract(comparable, JsonPath::string(path), true).into(),
+        ),
+        Some(JsonFilterPath::Array(path)) => (
+            json_extract(comparable.clone(), JsonPath::array(path.clone()), false).into(),
+            json_extract(comparable, JsonPath::array(path), true).into(),
+        ),
+        _ => (comparable.clone(), comparable),
     };
 
     let condition: Expression = match *condition {
@@ -481,26 +478,32 @@ fn convert_json_filter(
         ScalarCondition::EndsWith(value) => {
             (expr_json, expr_string).json_ends_with(field, value, target_type.unwrap(), reverse, alias)
         }
-        ScalarCondition::GreaterThan(value) => expr_json
-            .clone()
-            .greater_than(convert_value(field, value.clone(), alias))
-            .and(filter_json_type(expr_json, value, alias))
-            .into(),
-        ScalarCondition::GreaterThanOrEquals(value) => expr_json
-            .clone()
-            .greater_than_or_equals(convert_value(field, value.clone(), alias))
-            .and(filter_json_type(expr_json, value, alias))
-            .into(),
-        ScalarCondition::LessThan(value) => expr_json
-            .clone()
-            .less_than(convert_value(field, value.clone(), alias))
-            .and(filter_json_type(expr_json, value, alias))
-            .into(),
-        ScalarCondition::LessThanOrEquals(value) => expr_json
-            .clone()
-            .less_than_or_equals(convert_value(field, value.clone(), alias))
-            .and(filter_json_type(expr_json, value, alias))
-            .into(),
+        ScalarCondition::GreaterThan(value) => {
+            let gt = expr_json
+                .clone()
+                .greater_than(convert_value(field, value.clone(), alias));
+
+            with_json_type_filter(gt, expr_json, value, alias, reverse)
+        }
+        ScalarCondition::GreaterThanOrEquals(value) => {
+            let gte = expr_json
+                .clone()
+                .greater_than_or_equals(convert_value(field, value.clone(), alias));
+
+            with_json_type_filter(gte, expr_json, value, alias, reverse)
+        }
+        ScalarCondition::LessThan(value) => {
+            let lt = expr_json.clone().less_than(convert_value(field, value.clone(), alias));
+
+            with_json_type_filter(lt, expr_json, value, alias, reverse)
+        }
+        ScalarCondition::LessThanOrEquals(value) => {
+            let lte = expr_json
+                .clone()
+                .less_than_or_equals(convert_value(field, value.clone(), alias));
+
+            with_json_type_filter(lte, expr_json, value, alias, reverse)
+        }
         // Those conditions are unreachable because json filters are not accessible via the lowercase `not`.
         // They can only be inverted via the uppercase `NOT`, which doesn't invert filters but adds a Filter::Not().
         ScalarCondition::NotContains(_) => unreachable!(),
@@ -514,21 +517,38 @@ fn convert_json_filter(
     ConditionTree::single(condition)
 }
 
-fn filter_json_type(comparable: Expression<'static>, value: ConditionValue, alias: Option<Alias>) -> Compare {
+fn with_json_type_filter(
+    comparable: Compare<'static>,
+    expr_json: Expression<'static>,
+    value: ConditionValue,
+    alias: Option<Alias>,
+    reverse: bool,
+) -> Expression<'static> {
     match value {
         ConditionValue::Value(pv) => match pv {
             PrismaValue::Json(json) => {
                 let json: serde_json::Value = serde_json::from_str(json.as_str()).unwrap();
 
                 match json {
-                    serde_json::Value::String(_) => comparable.json_type_equals(JsonType::String),
-                    serde_json::Value::Number(_) => comparable.json_type_equals(JsonType::Number),
+                    serde_json::Value::String(_) if reverse => {
+                        comparable.or(expr_json.json_type_not_equals(JsonType::String)).into()
+                    }
+                    serde_json::Value::String(_) => comparable.and(expr_json.json_type_equals(JsonType::String)).into(),
+                    serde_json::Value::Number(_) if reverse => {
+                        comparable.or(expr_json.json_type_not_equals(JsonType::Number)).into()
+                    }
+                    serde_json::Value::Number(_) => comparable.and(expr_json.json_type_equals(JsonType::Number)).into(),
                     v => panic!("JSON target types only accept strings or numbers, found: {}", v),
                 }
             }
             _ => unreachable!(),
         },
-        ConditionValue::FieldRef(field_ref) => comparable.json_type_equals(field_ref.aliased_col(alias)),
+        ConditionValue::FieldRef(field_ref) if reverse => comparable
+            .or(expr_json.json_type_not_equals(field_ref.aliased_col(alias)))
+            .into(),
+        ConditionValue::FieldRef(field_ref) => comparable
+            .and(expr_json.json_type_equals(field_ref.aliased_col(alias)))
+            .into(),
     }
 }
 
@@ -926,18 +946,25 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
 
         match (value, target_type) {
             // string_contains (value)
-            // TODO: .and should take `reverse` into account
-            (ConditionValue::Value(value), JsonTargetType::String) => expr_string
-                .like(format!("%{}%", value))
-                .and(expr_json.json_type_equals(JsonType::String))
-                .into(),
+            (ConditionValue::Value(value), JsonTargetType::String) => {
+                let contains = expr_string.like(format!("%{}%", value));
+
+                if reverse {
+                    contains.or(expr_json.json_type_not_equals(JsonType::String)).into()
+                } else {
+                    contains.and(expr_json.json_type_equals(JsonType::String)).into()
+                }
+            }
             // array_contains (value)
-            // TODO: .and should take `reverse` into account
-            (ConditionValue::Value(value), JsonTargetType::Array) => expr_json
-                .clone()
-                .json_array_contains(convert_pv(field, value))
-                .and(expr_json.json_type_equals(JsonType::Array))
-                .into(),
+            (ConditionValue::Value(value), JsonTargetType::Array) => {
+                let contains = expr_json.clone().json_array_contains(convert_pv(field, value));
+
+                if reverse {
+                    contains.or(expr_json.json_type_not_equals(JsonType::Array)).into()
+                } else {
+                    contains.and(expr_json.json_type_equals(JsonType::Array)).into()
+                }
+            }
             // string_contains (ref)
             (ConditionValue::FieldRef(field_ref), JsonTargetType::String) => {
                 let contains = expr_string.like(quaint::ast::concat::<'_, Expression<'_>>(vec![
@@ -982,18 +1009,25 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
         let (expr_json, expr_string) = self;
         match (value, target_type) {
             // string_starts_with (value)
-            // TODO: .and should take `reverse` into account
-            (ConditionValue::Value(value), JsonTargetType::String) => expr_string
-                .like(format!("{}%", value))
-                .and(expr_json.json_type_equals(JsonType::String))
-                .into(),
+            (ConditionValue::Value(value), JsonTargetType::String) => {
+                let starts_with = expr_string.like(format!("{}%", value));
+
+                if reverse {
+                    starts_with.or(expr_json.json_type_not_equals(JsonType::String)).into()
+                } else {
+                    starts_with.and(expr_json.json_type_equals(JsonType::String)).into()
+                }
+            }
             // array_starts_with (value)
-            // TODO: .and should take `reverse` into account
-            (ConditionValue::Value(value), JsonTargetType::Array) => expr_json
-                .clone()
-                .json_array_begins_with(convert_pv(field, value))
-                .and(expr_json.json_type_equals(JsonType::Array))
-                .into(),
+            (ConditionValue::Value(value), JsonTargetType::Array) => {
+                let starts_with = expr_json.clone().json_array_begins_with(convert_pv(field, value));
+
+                if reverse {
+                    starts_with.or(expr_json.json_type_not_equals(JsonType::Array)).into()
+                } else {
+                    starts_with.and(expr_json.json_type_equals(JsonType::Array)).into()
+                }
+            }
             // string_starts_with (ref)
             (ConditionValue::FieldRef(field_ref), JsonTargetType::String) => {
                 let starts_with = expr_string.like(quaint::ast::concat::<'_, Expression<'_>>(vec![
@@ -1038,18 +1072,25 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
 
         match (value, target_type) {
             // string_ends_with (value)
-            // TODO: .and should take `reverse` into account
-            (ConditionValue::Value(value), JsonTargetType::String) => expr_string
-                .like(format!("%{}", value))
-                .and(expr_json.json_type_equals(JsonType::String))
-                .into(),
+            (ConditionValue::Value(value), JsonTargetType::String) => {
+                let ends_with = expr_string.like(format!("%{}", value));
+
+                if reverse {
+                    ends_with.or(expr_json.json_type_not_equals(JsonType::String)).into()
+                } else {
+                    ends_with.and(expr_json.json_type_equals(JsonType::String)).into()
+                }
+            }
             // array_ends_with (value)
-            // TODO: .and should take `reverse` into account
-            (ConditionValue::Value(value), JsonTargetType::Array) => expr_json
-                .clone()
-                .json_array_ends_into(convert_pv(field, value))
-                .and(expr_json.json_type_equals(JsonType::Array))
-                .into(),
+            (ConditionValue::Value(value), JsonTargetType::Array) => {
+                let ends_with = expr_json.clone().json_array_ends_into(convert_pv(field, value));
+
+                if reverse {
+                    ends_with.or(expr_json.json_type_not_equals(JsonType::Array)).into()
+                } else {
+                    ends_with.and(expr_json.json_type_equals(JsonType::Array)).into()
+                }
+            }
             // string_ends_with (ref)
             (ConditionValue::FieldRef(field_ref), JsonTargetType::String) => {
                 let ends_with = expr_string.like(quaint::ast::concat::<'_, Expression<'_>>(vec![
