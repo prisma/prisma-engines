@@ -529,6 +529,13 @@
 <span id="523">523</span>
 <span id="524">524</span>
 <span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">alter_table</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">common</span>::<span class="kw-2">*</span>, <span class="ident">IteratorJoin</span>, <span class="ident">Quoted</span>, <span class="ident">SqlRenderer</span>};
@@ -540,22 +547,25 @@
 <span class="kw">use</span> <span class="ident">datamodel::dml::PrismaValue</span>;
 <span class="kw">use</span> <span class="ident">indoc</span>::{<span class="ident">formatdoc</span>, <span class="ident">indoc</span>};
 <span class="kw">use</span> <span class="ident">native_types</span>::{<span class="ident">MsSqlType</span>, <span class="ident">MsSqlTypeParameter</span>};
-<span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
-    <span class="ident">mssql::MssqlSchemaExt</span>,
-    <span class="ident">walkers</span>::{
-        <span class="ident">ColumnWalker</span>, <span class="ident">EnumWalker</span>, <span class="ident">ForeignKeyWalker</span>, <span class="ident">IndexWalker</span>, <span class="ident">TableWalker</span>, <span class="ident">UserDefinedTypeWalker</span>, <span class="ident">ViewWalker</span>,
-    },
-    <span class="ident">ColumnTypeFamily</span>, <span class="ident">DefaultKind</span>, <span class="ident">DefaultValue</span>, <span class="ident">IndexType</span>, <span class="ident">SqlSchema</span>,
-};
+<span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">sql</span>, <span class="ident">mssql::MssqlSchemaExt</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">fmt::Write</span>};
 
 <span class="kw">impl</span> <span class="ident">MssqlFlavour</span> {
+    <span class="kw">fn</span> <span class="ident">table_name</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">table</span>: <span class="ident">sql::TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">TableName</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="ident">TableName</span>(
+            <span class="prelude-val">Some</span>(<span class="ident">Quoted::mssql_ident</span>(
+                <span class="ident">table</span>.<span class="ident">namespace</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">schema_name</span>()),
+            )),
+            <span class="ident">Quoted::mssql_ident</span>(<span class="ident">table</span>.<span class="ident">name</span>()),
+        )
+    }
+
     <span class="kw">fn</span> <span class="ident">quote_with_schema</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">TableName</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="ident">TableName</span>(<span class="prelude-val">Some</span>(<span class="ident">Quoted::mssql_ident</span>(<span class="self">self</span>.<span class="ident">schema_name</span>())), <span class="ident">Quoted::mssql_ident</span>(<span class="ident">name</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">render_column</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">column</span>: <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">column_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">quote</span>(<span class="ident">column</span>.<span class="ident">name</span>());
+    <span class="kw">fn</span> <span class="ident">render_column</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">column</span>: <span class="ident">sql::ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+        <span class="kw">let</span> <span class="ident">column_name</span> <span class="op">=</span> <span class="ident">Quoted::mssql_ident</span>(<span class="ident">column</span>.<span class="ident">name</span>());
 
         <span class="kw">let</span> <span class="ident">r#type</span> <span class="op">=</span> <span class="ident">render_column_type</span>(<span class="ident">column</span>);
         <span class="kw">let</span> <span class="ident">nullability</span> <span class="op">=</span> <span class="ident">render_nullability</span>(<span class="ident">column</span>);
@@ -575,7 +585,7 @@
 
                     <span class="ident">Cow::Owned</span>(<span class="macro">format!</span>(
                         <span class="string">&quot; CONSTRAINT {} DEFAULT {}&quot;</span>,
-                        <span class="self">self</span>.<span class="ident">quote</span>(<span class="kw-2">&amp;</span><span class="ident">constraint_name</span>),
+                        <span class="ident">Quoted::mssql_ident</span>(<span class="kw-2">&amp;</span><span class="ident">constraint_name</span>),
                         <span class="ident">render_default</span>(<span class="ident">default</span>)
                     ))
                 })
@@ -585,7 +595,7 @@
         <span class="macro">format!</span>(<span class="string">&quot;{} {}{}{}&quot;</span>, <span class="ident">column_name</span>, <span class="ident">r#type</span>, <span class="ident">nullability</span>, <span class="ident">default</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">render_references</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">foreign_key</span>: <span class="ident">ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">render_references</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">foreign_key</span>: <span class="ident">sql::ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="ident">cols</span> <span class="op">=</span> <span class="ident">foreign_key</span>
             .<span class="ident">referenced_columns</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">Quoted::mssql_ident</span>(<span class="ident">c</span>.<span class="ident">name</span>()))
@@ -593,7 +603,7 @@
 
         <span class="macro">format!</span>(
             <span class="string">&quot; REFERENCES {}({}) ON DELETE {} ON UPDATE {}&quot;</span>,
-            <span class="self">self</span>.<span class="ident">quote_with_schema</span>(<span class="ident">foreign_key</span>.<span class="ident">referenced_table</span>().<span class="ident">name</span>()),
+            <span class="self">self</span>.<span class="ident">table_name</span>(<span class="ident">foreign_key</span>.<span class="ident">referenced_table</span>()),
             <span class="ident">cols</span>,
             <span class="ident">render_referential_action</span>(<span class="ident">foreign_key</span>.<span class="ident">on_delete_action</span>()),
             <span class="ident">render_referential_action</span>(<span class="ident">foreign_key</span>.<span class="ident">on_update_action</span>()),
@@ -606,17 +616,17 @@
         <span class="ident">Quoted::mssql_ident</span>(<span class="ident">name</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">render_alter_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">alter_table</span>: <span class="kw-2">&amp;</span><span class="ident">AlterTable</span>, <span class="ident">schemas</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">render_alter_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">alter_table</span>: <span class="kw-2">&amp;</span><span class="ident">AlterTable</span>, <span class="ident">schemas</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">sql::SqlSchema</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">AlterTable</span> { <span class="ident">table_ids</span>, <span class="ident">changes</span> } <span class="op">=</span> <span class="ident">alter_table</span>;
         <span class="kw">let</span> <span class="ident">tables</span> <span class="op">=</span> <span class="ident">schemas</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">table_ids</span>);
         <span class="ident">alter_table::create_statements</span>(<span class="self">self</span>, <span class="ident">tables</span>, <span class="ident">changes</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">render_alter_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">AlterEnum</span>, <span class="kw">_</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">render_alter_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">AlterEnum</span>, <span class="kw">_</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">sql::SqlSchema</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="macro">unreachable!</span>(<span class="string">&quot;render_alter_enum on Microsoft SQL Server&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">render_rename_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">indexes</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">render_rename_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">indexes</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">sql::IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">index_with_table</span> <span class="op">=</span> <span class="macro">format!</span>(
             <span class="string">&quot;{}.{}.{}&quot;</span>,
             <span class="self">self</span>.<span class="ident">schema_name</span>(),
@@ -631,14 +641,14 @@
         )]
     }
 
-    <span class="kw">fn</span> <span class="ident">render_create_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">render_create_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">sql::EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="macro">unreachable!</span>(<span class="string">&quot;render_create_enum on Microsoft SQL Server&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">render_create_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">render_create_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">sql::IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="ident">mssql_schema_ext</span>: <span class="kw-2">&amp;</span><span class="ident">MssqlSchemaExt</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
-        <span class="kw">let</span> <span class="ident">index_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">quote</span>(<span class="ident">index</span>.<span class="ident">name</span>());
-        <span class="kw">let</span> <span class="ident">table_reference</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">quote_with_schema</span>(<span class="ident">index</span>.<span class="ident">table</span>().<span class="ident">name</span>()).<span class="ident">to_string</span>();
+        <span class="kw">let</span> <span class="ident">index_name</span> <span class="op">=</span> <span class="ident">Quoted::mssql_ident</span>(<span class="ident">index</span>.<span class="ident">name</span>());
+        <span class="kw">let</span> <span class="ident">table_reference</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">table_name</span>(<span class="ident">index</span>.<span class="ident">table</span>());
 
         <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">Quoted::mssql_ident</span>(<span class="ident">c</span>.<span class="ident">as_column</span>().<span class="ident">name</span>()).<span class="ident">to_string</span>();
@@ -660,24 +670,23 @@
         <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>);
 
         <span class="kw">match</span> <span class="ident">index</span>.<span class="ident">index_type</span>() {
-            <span class="ident">IndexType::Unique</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">constraint_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">quote</span>(<span class="ident">index</span>.<span class="ident">name</span>());
+            <span class="ident">sql::IndexType::Unique</span> =&gt; {
+                <span class="kw">let</span> <span class="ident">constraint_name</span> <span class="op">=</span> <span class="ident">Quoted::mssql_ident</span>(<span class="ident">index</span>.<span class="ident">name</span>());
 
                 <span class="macro">format!</span>(<span class="string">&quot;ALTER TABLE {table_reference} ADD CONSTRAINT {constraint_name} UNIQUE {clustering}({columns})&quot;</span>)
             }
-            <span class="ident">IndexType::Normal</span> =&gt; {
+            <span class="ident">sql::IndexType::Normal</span> =&gt; {
                 <span class="macro">format!</span>(<span class="string">&quot;CREATE {clustering}INDEX {index_name} ON {table_reference}({columns})&quot;</span>,)
             }
-            <span class="ident">IndexType::Fulltext</span> =&gt; <span class="macro">todo!</span>(<span class="string">&quot;SQL Server full-text indices...&quot;</span>),
-            <span class="ident">IndexType::PrimaryKey</span> =&gt; <span class="macro">unreachable!</span>(),
+            <span class="ident">sql::IndexType::Fulltext</span> <span class="op">|</span> <span class="ident">sql::IndexType::PrimaryKey</span> =&gt; <span class="macro">unreachable!</span>(),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">render_create_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table</span>: <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="self">self</span>.<span class="ident">render_create_table_as</span>(<span class="ident">table</span>, <span class="self">self</span>.<span class="ident">quote_with_schema</span>(<span class="ident">table</span>.<span class="ident">name</span>()))
+    <span class="kw">fn</span> <span class="ident">render_create_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table</span>: <span class="ident">sql::TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+        <span class="self">self</span>.<span class="ident">render_create_table_as</span>(<span class="ident">table</span>, <span class="self">self</span>.<span class="ident">table_name</span>(<span class="ident">table</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">render_create_table_as</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table</span>: <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">table_name</span>: <span class="ident">TableName</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">render_create_table_as</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table</span>: <span class="ident">sql::TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">table_name</span>: <span class="ident">TableName</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="ident">columns</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">column</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">render_column</span>(<span class="ident">column</span>)).<span class="ident">join</span>(<span class="string">&quot;,\n    &quot;</span>);
         <span class="kw">let</span> <span class="ident">mssql_schema_ext</span>: <span class="kw-2">&amp;</span><span class="ident">MssqlSchemaExt</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
 
@@ -716,7 +725,7 @@
                 .<span class="ident">iter</span>()
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
                     <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> {
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">quote</span>(<span class="ident">col</span>.<span class="ident">as_column</span>().<span class="ident">name</span>()));
+                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">Quoted::mssql_ident</span>(<span class="ident">col</span>.<span class="ident">as_column</span>().<span class="ident">name</span>()));
 
                         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">sort_order</span>) <span class="op">=</span> <span class="ident">col</span>.<span class="ident">sort_order</span>() {
                             <span class="ident">rendered</span>.<span class="ident">push</span>(<span class="string">&#39; &#39;</span>);
@@ -726,7 +735,7 @@
                         <span class="ident">rendered</span>
                     });
 
-                    <span class="kw">let</span> <span class="ident">constraint_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">quote</span>(<span class="ident">index</span>.<span class="ident">name</span>());
+                    <span class="kw">let</span> <span class="ident">constraint_name</span> <span class="op">=</span> <span class="ident">Quoted::mssql_ident</span>(<span class="ident">index</span>.<span class="ident">name</span>());
                     <span class="kw">let</span> <span class="ident">column_names</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>);
 
                     <span class="kw">let</span> <span class="ident">clustering</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">mssql_schema_ext</span>.<span class="ident">index_is_clustered</span>(<span class="ident">index</span>.<span class="ident">id</span>) {
@@ -752,37 +761,37 @@
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">render_drop_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">render_drop_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">sql::EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="macro">unreachable!</span>(<span class="string">&quot;render_drop_enum on MSSQL&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">render_drop_foreign_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">foreign_key</span>: <span class="ident">ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">render_drop_foreign_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">foreign_key</span>: <span class="ident">sql::ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">format!</span>(
             <span class="string">&quot;ALTER TABLE {table} DROP CONSTRAINT {constraint_name}&quot;</span>,
-            <span class="ident">table</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">quote_with_schema</span>(<span class="ident">foreign_key</span>.<span class="ident">table</span>().<span class="ident">name</span>()),
+            <span class="ident">table</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">table_name</span>(<span class="ident">foreign_key</span>.<span class="ident">table</span>()),
             <span class="ident">constraint_name</span> <span class="op">=</span> <span class="ident">Quoted::mssql_ident</span>(<span class="ident">foreign_key</span>.<span class="ident">constraint_name</span>().<span class="ident">unwrap</span>()),
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">render_drop_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">render_drop_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">sql::IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="ident">MssqlSchemaExt</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
 
         <span class="kw">if</span> <span class="ident">ext</span>.<span class="ident">index_is_a_constraint</span>(<span class="ident">index</span>.<span class="ident">id</span>) {
             <span class="macro">format!</span>(
                 <span class="string">&quot;ALTER TABLE {} DROP CONSTRAINT {}&quot;</span>,
-                <span class="self">self</span>.<span class="ident">quote_with_schema</span>(<span class="ident">index</span>.<span class="ident">table</span>().<span class="ident">name</span>()),
-                <span class="self">self</span>.<span class="ident">quote</span>(<span class="ident">index</span>.<span class="ident">name</span>()),
+                <span class="self">self</span>.<span class="ident">table_name</span>(<span class="ident">index</span>.<span class="ident">table</span>()),
+                <span class="ident">Quoted::mssql_ident</span>(<span class="ident">index</span>.<span class="ident">name</span>()),
             )
         } <span class="kw">else</span> {
             <span class="macro">format!</span>(
                 <span class="string">&quot;DROP INDEX {} ON {}&quot;</span>,
-                <span class="self">self</span>.<span class="ident">quote</span>(<span class="ident">index</span>.<span class="ident">name</span>()),
-                <span class="self">self</span>.<span class="ident">quote_with_schema</span>(<span class="ident">index</span>.<span class="ident">table</span>().<span class="ident">name</span>())
+                <span class="ident">Quoted::mssql_ident</span>(<span class="ident">index</span>.<span class="ident">name</span>()),
+                <span class="self">self</span>.<span class="ident">table_name</span>(<span class="ident">index</span>.<span class="ident">table</span>())
             )
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">render_redefine_tables</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tables</span>: <span class="kw-2">&amp;</span>[<span class="ident">RedefineTable</span>], <span class="ident">schemas</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">render_redefine_tables</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tables</span>: <span class="kw-2">&amp;</span>[<span class="ident">RedefineTable</span>], <span class="ident">schemas</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">sql::SqlSchema</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="comment">// All needs to be inside a transaction.</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="string">&quot;BEGIN TRANSACTION&quot;</span>.<span class="ident">to_string</span>()];
 
@@ -802,7 +811,7 @@
                 .<span class="ident">column_pairs</span>
                 .<span class="ident">iter</span>()
                 .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">column_indexes</span>, <span class="kw">_</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">schemas</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">column_indexes</span>).<span class="ident">next</span>.<span class="ident">name</span>())
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">quote</span>(<span class="ident">c</span>).<span class="ident">to_string</span>())
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">Quoted::mssql_ident</span>(<span class="ident">c</span>).<span class="ident">to_string</span>())
                 .<span class="ident">collect</span>();
 
             <span class="comment">// Drop the indexes on the table.</span>
@@ -829,9 +838,7 @@
             &quot;#</span>, <span class="ident">table</span> <span class="op">=</span> <span class="ident">tables</span>.<span class="ident">previous</span>.<span class="ident">name</span>(), <span class="ident">schema</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schema_name</span>()});
 
             <span class="comment">// Create the new table.</span>
-            <span class="ident">result</span>.<span class="ident">push</span>(
-                <span class="self">self</span>.<span class="ident">render_create_table_as</span>(<span class="ident">tables</span>.<span class="ident">next</span>, <span class="ident">TableName</span>(<span class="prelude-val">None</span>, <span class="ident">Quoted::mssql_ident</span>(<span class="kw-2">&amp;</span><span class="ident">temporary_table_name</span>))),
-            );
+            <span class="ident">result</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">render_create_table_as</span>(<span class="ident">tables</span>.<span class="ident">next</span>, <span class="self">self</span>.<span class="ident">quote_with_schema</span>(<span class="kw-2">&amp;</span><span class="ident">temporary_table_name</span>)));
 
             <span class="comment">// We cannot insert into autoincrement columns by default. If we</span>
             <span class="comment">// have `IDENTITY` in any of the columns, we&#39;ll allow inserting</span>
@@ -887,18 +894,18 @@
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">render_add_foreign_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">foreign_key</span>: <span class="ident">ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">render_add_foreign_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">foreign_key</span>: <span class="ident">sql::ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">add_constraint</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="number">120</span>);
 
         <span class="macro">write!</span>(
             <span class="ident">add_constraint</span>,
             <span class="string">&quot;ALTER TABLE {table} ADD &quot;</span>,
-            <span class="ident">table</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">quote_with_schema</span>(<span class="ident">foreign_key</span>.<span class="ident">table</span>().<span class="ident">name</span>())
+            <span class="ident">table</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">table_name</span>(<span class="ident">foreign_key</span>.<span class="ident">table</span>())
         )
         .<span class="ident">unwrap</span>();
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">constraint_name</span>) <span class="op">=</span> <span class="ident">foreign_key</span>.<span class="ident">constraint_name</span>() {
-            <span class="macro">write!</span>(<span class="ident">add_constraint</span>, <span class="string">&quot;CONSTRAINT {} &quot;</span>, <span class="self">self</span>.<span class="ident">quote</span>(<span class="ident">constraint_name</span>)).<span class="ident">unwrap</span>();
+            <span class="macro">write!</span>(<span class="ident">add_constraint</span>, <span class="string">&quot;CONSTRAINT {} &quot;</span>, <span class="ident">Quoted::mssql_ident</span>(<span class="ident">constraint_name</span>)).<span class="ident">unwrap</span>();
         } <span class="kw">else</span> {
             <span class="macro">write!</span>(
                 <span class="ident">add_constraint</span>,
@@ -928,11 +935,11 @@
         <span class="macro">vec!</span>[<span class="macro">format!</span>(<span class="string">&quot;DROP TABLE {}&quot;</span>, <span class="self">self</span>.<span class="ident">quote_with_schema</span>(<span class="ident">table_name</span>))]
     }
 
-    <span class="kw">fn</span> <span class="ident">render_drop_view</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">view</span>: <span class="ident">ViewWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">render_drop_view</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">view</span>: <span class="ident">sql::ViewWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">format!</span>(<span class="string">&quot;DROP VIEW {}&quot;</span>, <span class="self">self</span>.<span class="ident">quote_with_schema</span>(<span class="ident">view</span>.<span class="ident">name</span>()))
     }
 
-    <span class="kw">fn</span> <span class="ident">render_drop_user_defined_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">udt</span>: <span class="kw-2">&amp;</span><span class="ident">UserDefinedTypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">render_drop_user_defined_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">udt</span>: <span class="kw-2">&amp;</span><span class="ident">sql::UserDefinedTypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">format!</span>(<span class="string">&quot;DROP TYPE {}&quot;</span>, <span class="self">self</span>.<span class="ident">quote_with_schema</span>(<span class="ident">udt</span>.<span class="ident">name</span>()))
     }
 
@@ -965,7 +972,14 @@
         <span class="prelude-val">Some</span>(<span class="ident">sql</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">render_rename_foreign_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fks</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">render_create_namespace</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">namespace</span>: <span class="ident">sql_schema_describer::NamespaceWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+        <span class="macro">format!</span>(
+            <span class="string">&quot;EXEC sp_executesql N&#39;CREATE SCHEMA {};&#39;;&quot;</span>,
+            <span class="ident">Quoted::mssql_ident</span>(<span class="ident">namespace</span>.<span class="ident">name</span>())
+        )
+    }
+
+    <span class="kw">fn</span> <span class="ident">render_rename_foreign_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fks</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">sql::ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">format!</span>(
             <span class="string">r#&quot;EXEC sp_rename &#39;{schema}.{previous}&#39;, &#39;{next}&#39;, &#39;OBJECT&#39;&quot;#</span>,
             <span class="ident">schema</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schema_name</span>(),
@@ -975,7 +989,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">render_column_type</span>(<span class="ident">column</span>: <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">render_column_type</span>(<span class="ident">column</span>: <span class="ident">sql::ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">format_u32_arg</span>(<span class="ident">arg</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">match</span> <span class="ident">arg</span> {
             <span class="prelude-val">None</span> =&gt; <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>(),
@@ -990,7 +1004,7 @@
         }
     }
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ColumnTypeFamily::Unsupported</span>(<span class="ident">description</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">column</span>.<span class="ident">column_type</span>().<span class="ident">family</span> {
+    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">sql::ColumnTypeFamily::Unsupported</span>(<span class="ident">description</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">column</span>.<span class="ident">column_type</span>().<span class="ident">family</span> {
         <span class="kw">return</span> <span class="ident">description</span>.<span class="ident">to_string</span>().<span class="ident">into</span>();
     }
 
@@ -1035,23 +1049,23 @@
     <span class="ident">s</span>.<span class="ident">replace</span>(<span class="string">&#39;\&#39;&#39;</span>, <span class="string">r#&quot;&#39;&#39;&quot;#</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">render_default</span>(<span class="ident">default</span>: <span class="kw-2">&amp;</span><span class="ident">DefaultValue</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">render_default</span>(<span class="ident">default</span>: <span class="kw-2">&amp;</span><span class="ident">sql::DefaultValue</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">default</span>.<span class="ident">kind</span>() {
-        <span class="ident">DefaultKind::DbGenerated</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">as_str</span>().<span class="ident">into</span>(),
-        <span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::String</span>(<span class="ident">val</span>)) <span class="op">|</span> <span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::Enum</span>(<span class="ident">val</span>)) =&gt; {
+        <span class="ident">sql::DefaultKind::DbGenerated</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">as_str</span>().<span class="ident">into</span>(),
+        <span class="ident">sql::DefaultKind::Value</span>(<span class="ident">PrismaValue::String</span>(<span class="ident">val</span>)) <span class="op">|</span> <span class="ident">sql::DefaultKind::Value</span>(<span class="ident">PrismaValue::Enum</span>(<span class="ident">val</span>)) =&gt; {
             <span class="ident">Quoted::mssql_string</span>(<span class="ident">escape_string_literal</span>(<span class="ident">val</span>)).<span class="ident">to_string</span>().<span class="ident">into</span>()
         }
-        <span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::Bytes</span>(<span class="ident">b</span>)) =&gt; {
+        <span class="ident">sql::DefaultKind::Value</span>(<span class="ident">PrismaValue::Bytes</span>(<span class="ident">b</span>)) =&gt; {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">b</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span> <span class="op">+</span> <span class="number">2</span>);
             <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;0x&quot;</span>);
             <span class="ident">format_hex</span>(<span class="ident">b</span>, <span class="kw-2">&amp;mut</span> <span class="ident">out</span>);
             <span class="ident">out</span>.<span class="ident">into</span>()
         }
-        <span class="ident">DefaultKind::Now</span> =&gt; <span class="string">&quot;CURRENT_TIMESTAMP&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::DateTime</span>(<span class="ident">val</span>)) =&gt; <span class="ident">Quoted::mssql_string</span>(<span class="ident">val</span>).<span class="ident">to_string</span>().<span class="ident">into</span>(),
-        <span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::Boolean</span>(<span class="ident">val</span>)) =&gt; <span class="ident">Cow::from</span>(<span class="kw">if</span> <span class="kw-2">*</span><span class="ident">val</span> { <span class="string">&quot;1&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;0&quot;</span> }),
-        <span class="ident">DefaultKind::Value</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">to_string</span>().<span class="ident">into</span>(),
-        <span class="ident">DefaultKind::Sequence</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">DefaultKind::UniqueRowid</span> =&gt; <span class="macro">unreachable!</span>(),
+        <span class="ident">sql::DefaultKind::Now</span> =&gt; <span class="string">&quot;CURRENT_TIMESTAMP&quot;</span>.<span class="ident">into</span>(),
+        <span class="ident">sql::DefaultKind::Value</span>(<span class="ident">PrismaValue::DateTime</span>(<span class="ident">val</span>)) =&gt; <span class="ident">Quoted::mssql_string</span>(<span class="ident">val</span>).<span class="ident">to_string</span>().<span class="ident">into</span>(),
+        <span class="ident">sql::DefaultKind::Value</span>(<span class="ident">PrismaValue::Boolean</span>(<span class="ident">val</span>)) =&gt; <span class="ident">Cow::from</span>(<span class="kw">if</span> <span class="kw-2">*</span><span class="ident">val</span> { <span class="string">&quot;1&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;0&quot;</span> }),
+        <span class="ident">sql::DefaultKind::Value</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">to_string</span>().<span class="ident">into</span>(),
+        <span class="ident">sql::DefaultKind::Sequence</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">sql::DefaultKind::UniqueRowid</span> =&gt; <span class="macro">unreachable!</span>(),
     }
 }
 </code></pre></div>
