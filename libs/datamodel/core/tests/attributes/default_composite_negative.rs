@@ -80,7 +80,7 @@ fn must_error_if_default_value_type_mismatch() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": Expected a String value, but found `3`.[0m
@@ -107,7 +107,7 @@ fn datetime_defaults_must_be_valid_rfc3339() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": Parse error: "Hugo" is not a valid rfc3339 datetime string. (input contains invalid characters)[0m
@@ -129,7 +129,7 @@ fn must_error_if_unknown_function_is_used() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mUnknown function in @default(): `unknown_function` is not known. You can read about the available functions here: https://pris.ly/d/attribute-functions[0m
@@ -151,7 +151,7 @@ fn must_error_if_now_function_is_used_for_fields_that_are_not_datetime() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The function `now()` cannot be used on fields of type `String`.[0m
@@ -173,7 +173,7 @@ fn must_error_if_autoincrement_function_is_used() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The function `autoincrement()` is not supported on composite fields.[0m
@@ -199,7 +199,7 @@ fn must_error_if_default_value_for_enum_is_not_a_value() {
       }
   "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The defined default value `B` is not a valid value of the enum specified for the field.[0m
@@ -225,7 +225,7 @@ fn must_error_if_default_value_for_enum_is_not_valid() {
       }
   "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": Expected an enum value, but found `cuid()`.[0m
@@ -252,7 +252,7 @@ fn must_error_if_scalar_default_on_unsupported() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": Composite field of type `Unsupported` cannot have default values.[0m
@@ -274,7 +274,7 @@ fn named_default_values_are_not_allowed() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The `map` argument is not allowed on a composite type field.[0m
@@ -305,7 +305,7 @@ fn default_on_composite_type_field_errors() {
         }
     "#};
 
-    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(schema);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating field `address` in composite type `Address`: Defaults on fields of type composite are not supported. Please remove the `@default` attribute.[0m
@@ -327,7 +327,7 @@ fn must_error_on_dbgenerated_default() {
         }
     "#;
 
-    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(schema);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": Fields of composite types cannot have `dbgenerated()` as default.[0m
@@ -354,7 +354,7 @@ fn json_defaults_must_be_valid_json() {
         }
     "#;
 
-    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(schema);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": Parse error: "not json" is not a valid JSON string. (expected ident at line 1 column 2)[0m
@@ -381,7 +381,7 @@ fn bytes_defaults_must_be_base64() {
         }
     "#;
 
-    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(schema);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": Parse error: "not base64" is not a valid base64 string. (Could not convert from `base64 encoded bytes` to `PrismaValue::Bytes`)[0m
@@ -408,7 +408,7 @@ fn int_defaults_must_not_contain_decimal_point() {
         }
     "#;
 
-    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(schema);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": Parse error: "3.14" is not a valid integer. (invalid digit found in string)[0m
@@ -435,7 +435,7 @@ fn bigint_defaults_must_not_contain_decimal_point() {
         }
     "#;
 
-    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(schema);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": Parse error: "3.14" is not a valid integer. (invalid digit found in string)[0m
@@ -457,7 +457,7 @@ fn boolean_defaults_must_be_true_or_false() {
         }
     "#;
 
-    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(schema);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": A boolean literal must be `true` or `false`.[0m

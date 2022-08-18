@@ -131,7 +131,7 @@ fn datasource_should_not_allow_arbitrary_parameters() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(schema).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(schema));
 }
 
 #[test]
@@ -158,7 +158,7 @@ fn unescaped_windows_paths_give_a_good_error() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(schema).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(schema));
 }
 
 #[test]

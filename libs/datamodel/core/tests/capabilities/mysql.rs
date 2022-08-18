@@ -1,5 +1,4 @@
 use crate::common::*;
-use indoc::indoc;
 
 #[test]
 fn enum_support() {
@@ -37,7 +36,7 @@ fn scalar_list_support() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mField "val" in model "Todo" can't be a list. The current connector does not support lists of primitive types.[0m
@@ -153,7 +152,7 @@ fn mysql_does_not_support_composite_types() {
         }
     "#;
 
-    let err = datamodel::parse_schema(schema).unwrap_err();
+    let err = parse_unwrap_err(schema);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating: Composite types are not supported on MySQL.[0m

@@ -11,7 +11,7 @@ fn sqlite_disallows_compound_unique_length_prefix() {
     "#};
 
     let dml = with_header(dml, Provider::Sqlite, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@unique": The length argument is not supported in an index definition with the current connector[0m
@@ -37,7 +37,7 @@ fn sqlite_disallows_index_length_prefix() {
     "#};
 
     let dml = with_header(dml, Provider::Sqlite, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The length argument is not supported in an index definition with the current connector[0m
@@ -61,7 +61,7 @@ fn mongodb_disallows_unique_length_prefix() {
     "#};
 
     let dml = with_header(dml, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@unique": The length argument is not supported in an index definition with the current connector[0m
@@ -87,7 +87,7 @@ fn mongodb_disallows_compound_unique_length_prefix() {
     "#};
 
     let dml = with_header(dml, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@unique": The length argument is not supported in an index definition with the current connector[0m
@@ -113,7 +113,7 @@ fn mongodb_disallows_index_length_prefix() {
     "#};
 
     let dml = with_header(dml, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The length argument is not supported in an index definition with the current connector[0m
@@ -139,7 +139,7 @@ fn length_argument_does_not_work_with_decimal() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The length argument is only allowed with field types `String` or `Bytes`.[0m
@@ -165,7 +165,7 @@ fn length_argument_does_not_work_with_json() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The length argument is only allowed with field types `String` or `Bytes`.[0m
@@ -191,7 +191,7 @@ fn length_argument_does_not_work_with_datetime() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The length argument is only allowed with field types `String` or `Bytes`.[0m
@@ -217,7 +217,7 @@ fn length_argument_does_not_work_with_boolean() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The length argument is only allowed with field types `String` or `Bytes`.[0m
@@ -243,7 +243,7 @@ fn length_argument_does_not_work_with_float() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The length argument is only allowed with field types `String` or `Bytes`.[0m
@@ -269,7 +269,7 @@ fn length_argument_does_not_work_with_bigint() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The length argument is only allowed with field types `String` or `Bytes`.[0m
@@ -295,7 +295,7 @@ fn length_argument_does_not_work_with_int() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The length argument is only allowed with field types `String` or `Bytes`.[0m
@@ -321,7 +321,7 @@ fn hash_index_doesnt_allow_sorting() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": Hash type does not support sort option.[0m
@@ -347,7 +347,7 @@ fn hash_index_doesnt_work_on_sqlserver() {
     "#};
 
     let schema = with_header(dml, Provider::SqlServer, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given index type is not supported with the current connector[0m
@@ -374,7 +374,7 @@ fn fulltext_index_no_preview_feature() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@fulltext": You must enable `fullTextIndex` preview feature to be able to define a @@fulltext index.[0m
@@ -400,7 +400,7 @@ fn hash_index_doesnt_work_on_mysql() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given index type is not supported with the current connector[0m
@@ -427,7 +427,7 @@ fn fulltext_index_length_attribute() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &["fullTextIndex"]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@fulltext": The length argument is not supported in a @@fulltext attribute.[0m
@@ -453,7 +453,7 @@ fn hash_index_doesnt_work_on_sqlite() {
     "#};
 
     let schema = with_header(dml, Provider::Sqlite, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given index type is not supported with the current connector[0m
@@ -480,7 +480,7 @@ fn fulltext_index_sort_attribute() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &["fullTextIndex"]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@fulltext": The sort argument is not supported in a @@fulltext attribute in the current connector.[0m
@@ -506,7 +506,7 @@ fn hash_index_doesnt_work_on_mongo() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given index type is not supported with the current connector[0m
@@ -533,7 +533,7 @@ fn fulltext_index_postgres() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &["fullTextIndex"]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@fulltext": Defining fulltext indexes is not supported with the current connector.[0m
@@ -560,7 +560,7 @@ fn fulltext_index_sql_server() {
     "#};
 
     let schema = with_header(dml, Provider::SqlServer, &["fullTextIndex"]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@fulltext": Defining fulltext indexes is not supported with the current connector.[0m
@@ -587,7 +587,7 @@ fn fulltext_index_sqlite() {
     "#};
 
     let schema = with_header(dml, Provider::Sqlite, &["fullTextIndex"]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@fulltext": Defining fulltext indexes is not supported with the current connector.[0m
@@ -617,7 +617,7 @@ fn only_one_fulltext_index_allowed_per_model_in_mongo() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &["fullTextIndex"]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@fulltext": The current connector only allows one fulltext attribute per model[0m
@@ -652,7 +652,7 @@ fn fulltext_index_fields_must_follow_each_other_in_mongo() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &["fullTextIndex"]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@fulltext": All index fields must be listed adjacently in the fields argument.[0m
@@ -711,7 +711,7 @@ fn index_without_fields_must_error() {
         [1;94m   | [0m
     "#]];
 
-    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(schema);
     expected.assert_eq(&error);
 }
 
@@ -728,7 +728,7 @@ fn duplicate_indices_on_the_same_fields_are_not_allowed_on_mongodb() {
     "#};
 
     let dml = with_header(dml, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": Index already exists in the model.[0m
@@ -762,7 +762,7 @@ fn duplicate_uniques_on_the_same_fields_are_not_allowed_on_mongodb() {
     "#};
 
     let dml = with_header(dml, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@unique": Index already exists in the model.[0m
@@ -795,7 +795,7 @@ fn duplicate_indices_on_the_same_fields_different_sort_same_name_are_not_allowed
     "#};
 
     let dml = with_header(dml, Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given constraint name `A_data_idx` has to be unique in the following namespace: on model `A` for indexes and unique constraints. Please provide a different name using the `map` argument.[0m

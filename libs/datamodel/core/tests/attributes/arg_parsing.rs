@@ -18,7 +18,7 @@ fn fail_on_duplicate_attribute() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -39,7 +39,7 @@ fn fail_on_duplicate_unnamed_attribute() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -60,5 +60,5 @@ fn fail_on_extra_argument() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }

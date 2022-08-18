@@ -74,7 +74,7 @@ fn must_error_for_invalid_model_names() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "PrismaClient": The model name `PrismaClient` is invalid. It is a reserved name. Please change it. Read more at https://pris.ly/d/naming-models[0m
@@ -98,7 +98,7 @@ fn must_error_for_invalid_enum_names() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r##"
         [1;91merror[0m: [1mError validating enum `PrismaClient`: The enum name `PrismaClient` is invalid. It is a reserved name. Please change it. Read more at https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-schema/data-model#naming-enums[0m
@@ -124,7 +124,7 @@ fn must_return_good_error_messages_for_numbers_in_enums() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating: The name of a Enum Value must not start with a number.[0m
@@ -146,7 +146,7 @@ fn must_return_good_error_message_for_empty_enum() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating: An enum must have at least one value.[0m
@@ -170,7 +170,7 @@ fn must_return_good_error_message_for_enum_with_all_variants_commented_out() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating: An enum must have at least one value.[0m
@@ -196,7 +196,7 @@ fn invalid_line_must_not_break() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
@@ -222,7 +222,7 @@ fn type_aliases_must_error() {
       }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating: Invalid type definition. Please check the documentation in https://pris.ly/d/composite-types[0m

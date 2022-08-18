@@ -413,6 +413,10 @@ impl WarningAsserts for Vec<DatamodelWarning> {
     }
 }
 
+pub(crate) fn parse_unwrap_err(schema: &str) -> String {
+    parse_schema(schema).unwrap_err()
+}
+
 pub(crate) fn parse(datamodel_string: &str) -> Datamodel {
     match parse_datamodel(datamodel_string) {
         Ok(s) => s.subject,
