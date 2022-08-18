@@ -524,6 +524,15 @@
 <span id="518">518</span>
 <span id="519">519</span>
 <span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::group_by_builder</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::root_queries::metrics</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -950,12 +959,21 @@
     ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">for</span> <span class="ident">aggr</span> <span class="kw">in</span> <span class="ident">aggregation_selections</span> {
             <span class="kw">let</span> <span class="ident">join</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">aggr</span> {
-                <span class="ident">RelAggregationSelection::Count</span>(<span class="ident">rf</span>) =&gt; <span class="ident">JoinStage</span> {
-                    <span class="ident">source</span>: <span class="ident">rf</span>.<span class="ident">clone</span>(),
-                    <span class="ident">alias</span>: <span class="prelude-val">Some</span>(<span class="ident">aggr</span>.<span class="ident">db_alias</span>()),
-                    <span class="ident">nested</span>: <span class="macro">vec!</span>[],
-                },
+                <span class="ident">RelAggregationSelection::Count</span>(<span class="ident">rf</span>, <span class="ident">filter</span>) =&gt; {
+                    <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">filter</span>
+                        .<span class="ident">as_ref</span>()
+                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">convert_filter</span>(<span class="ident">f</span>.<span class="ident">clone</span>(), <span class="bool-val">false</span>, <span class="ident">FilterPrefix::default</span>()))
+                        .<span class="ident">transpose</span>()<span class="question-mark">?</span>;
+
+                    <span class="ident">JoinStage</span> {
+                        <span class="ident">source</span>: <span class="ident">rf</span>.<span class="ident">clone</span>(),
+                        <span class="ident">alias</span>: <span class="prelude-val">Some</span>(<span class="ident">aggr</span>.<span class="ident">db_alias</span>()),
+                        <span class="ident">nested</span>: <span class="macro">vec!</span>[],
+                        <span class="ident">filter</span>,
+                    }
+                }
             };
+
             <span class="kw">let</span> <span class="ident">projection</span> <span class="op">=</span> <span class="macro">doc!</span> {
               <span class="ident">aggr</span>.<span class="ident">db_alias</span>(): { <span class="string">&quot;$size&quot;</span>: <span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="ident">aggr</span>.<span class="ident">db_alias</span>()) }
             };

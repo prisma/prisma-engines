@@ -172,7 +172,26 @@
 <span id="166">166</span>
 <span id="167">167</span>
 <span id="168">168</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">mongodb::bson</span>::{<span class="ident">doc</span>, <span class="ident">Document</span>};
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::filter::MongoFilter</span>;
+<span class="kw">use</span> <span class="ident">mongodb::bson</span>::{<span class="ident">doc</span>, <span class="ident">Document</span>};
 <span class="kw">use</span> <span class="ident">prisma_models::RelationFieldRef</span>;
 
 <span class="doccomment">/// A join stage describes a tree of joins and nested joins to be performed on a collection.</span>
@@ -196,6 +215,9 @@
 
     <span class="doccomment">/// Nested joins</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">nested</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">JoinStage</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// Filter on the join itself, used for aggregations on relations.</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">filter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MongoFilter</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">JoinStage</span> {
@@ -204,6 +226,7 @@
             <span class="ident">source</span>,
             <span class="ident">alias</span>: <span class="prelude-val">None</span>,
             <span class="ident">nested</span>: <span class="macro">vec!</span>[],
+            <span class="ident">filter</span>: <span class="prelude-val">None</span>,
         }
     }
 
@@ -229,9 +252,16 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns: `(Join document, Unwind document)`</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) -&gt; (<span class="ident">Document</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>) {
+        <span class="kw">let</span> (<span class="ident">filter_doc</span>, <span class="ident">filter_joins</span>) <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">filter</span>
+            .<span class="ident">map</span>(<span class="ident">MongoFilter::render</span>)
+            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">doc</span>, <span class="ident">joins</span>)<span class="op">|</span> (<span class="prelude-val">Some</span>(<span class="ident">doc</span>), <span class="ident">joins</span>))
+            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> (<span class="prelude-val">None</span>, <span class="macro">vec!</span>[]));
+
         <span class="kw">let</span> <span class="ident">nested_stages</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">nested</span>
             .<span class="ident">into_iter</span>()
+            .<span class="ident">chain</span>(<span class="ident">filter_joins</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">nested_stage</span><span class="op">|</span> {
                 <span class="kw">let</span> (<span class="ident">join</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">nested_stage</span>.<span class="ident">build</span>();
 
@@ -304,7 +334,13 @@
 
         <span class="comment">// We can now express the match from the operators</span>
         <span class="ident">pipeline</span>.<span class="ident">push</span>(<span class="macro">doc!</span> { <span class="string">&quot;$match&quot;</span>: { <span class="string">&quot;$expr&quot;</span>: { <span class="string">&quot;$and&quot;</span>: <span class="ident">ops</span> } }});
+
         <span class="ident">pipeline</span>.<span class="ident">extend</span>(<span class="ident">nested_stages</span>);
+
+        <span class="comment">// Add inner join filters if there are any (used for relational aggregations)</span>
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">doc</span>) <span class="op">=</span> <span class="ident">filter_doc</span> {
+            <span class="ident">pipeline</span>.<span class="ident">push</span>(<span class="macro">doc!</span> { <span class="string">&quot;$match&quot;</span>: { <span class="string">&quot;$expr&quot;</span>: <span class="ident">doc</span> } });
+        }
 
         <span class="comment">// If the field is a to-one, add an unwind stage.</span>
         <span class="kw">let</span> <span class="ident">unwind_stage</span> <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">from_field</span>.<span class="ident">is_list</span>() {

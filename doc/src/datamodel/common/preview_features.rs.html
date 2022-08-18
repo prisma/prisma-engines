@@ -151,6 +151,8 @@
 <span id="145">145</span>
 <span id="146">146</span>
 <span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -218,6 +220,7 @@
     <span class="ident">Metrics</span>,
     <span class="ident">OrderByNulls</span>,
     <span class="ident">MultiSchema</span>,
+    <span class="ident">FilteredRelationCount</span>,
 );
 
 <span class="doccomment">/// Generator preview features</span>
@@ -230,6 +233,7 @@
          <span class="op">|</span> <span class="ident">Tracing</span>
          <span class="op">|</span> <span class="ident">Metrics</span>
          <span class="op">|</span> <span class="ident">OrderByNulls</span>
+         <span class="op">|</span> <span class="ident">FilteredRelationCount</span>
     }),
     <span class="ident">deprecated</span>: <span class="macro">enumflags2::make_bitflags!</span>(<span class="ident">PreviewFeature</span>::{
         <span class="ident">AtomicNumberOperations</span>

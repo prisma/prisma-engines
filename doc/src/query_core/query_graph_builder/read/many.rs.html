@@ -44,7 +44,7 @@
     <span class="kw">let</span> <span class="ident">alias</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">alias</span>;
     <span class="kw">let</span> <span class="ident">nested_fields</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">nested_fields</span>.<span class="ident">unwrap</span>().<span class="ident">fields</span>;
     <span class="kw">let</span> (<span class="ident">aggr_fields_pairs</span>, <span class="ident">nested_fields</span>) <span class="op">=</span> <span class="ident">extractors::extract_nested_rel_aggr_selections</span>(<span class="ident">nested_fields</span>);
-    <span class="kw">let</span> <span class="ident">aggr_selections</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">utils::collect_relation_aggr_selections</span>(<span class="kw-2">&amp;</span><span class="ident">aggr_fields_pairs</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>);
+    <span class="kw">let</span> <span class="ident">aggregation_selections</span> <span class="op">=</span> <span class="ident">utils::collect_relation_aggr_selections</span>(<span class="ident">aggr_fields_pairs</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">selection_order</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">utils::collect_selection_order</span>(<span class="kw-2">&amp;</span><span class="ident">nested_fields</span>);
     <span class="kw">let</span> <span class="ident">selected_fields</span> <span class="op">=</span> <span class="ident">utils::collect_selected_fields</span>(<span class="kw-2">&amp;</span><span class="ident">nested_fields</span>, <span class="ident">args</span>.<span class="ident">distinct</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">model</span>);
     <span class="kw">let</span> <span class="ident">nested</span> <span class="op">=</span> <span class="ident">utils::collect_nested_queries</span>(<span class="ident">nested_fields</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>)<span class="question-mark">?</span>;
@@ -61,7 +61,7 @@
         <span class="ident">selected_fields</span>,
         <span class="ident">nested</span>,
         <span class="ident">selection_order</span>,
-        <span class="ident">aggregation_selections</span>: <span class="ident">aggr_selections</span>,
+        <span class="ident">aggregation_selections</span>,
     }))
 }
 </code></pre></div>

@@ -41,6 +41,7 @@
 <span id="35">35</span>
 <span id="36">36</span>
 <span id="37">37</span>
+<span id="38">38</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::join_utils</span>::{<span class="ident">compute_aggr_join</span>, <span class="ident">AggregationType</span>, <span class="ident">AliasedJoin</span>};
 <span class="kw">use</span> <span class="ident">connector_interface::RelAggregationSelection</span>;
 <span class="kw">use</span> <span class="ident">quaint::prelude</span>::<span class="kw-2">*</span>;
@@ -59,12 +60,13 @@
 
     <span class="kw">for</span> (<span class="ident">index</span>, <span class="ident">selection</span>) <span class="kw">in</span> <span class="ident">aggr_selections</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
         <span class="kw">match</span> <span class="ident">selection</span> {
-            <span class="ident">RelAggregationSelection::Count</span>(<span class="ident">rf</span>) =&gt; {
+            <span class="ident">RelAggregationSelection::Count</span>(<span class="ident">rf</span>, <span class="ident">filter</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">join_alias</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;aggr_selection_{}&quot;</span>, <span class="ident">index</span>);
                 <span class="kw">let</span> <span class="ident">aggregator_alias</span> <span class="op">=</span> <span class="ident">selection</span>.<span class="ident">db_alias</span>();
                 <span class="kw">let</span> <span class="ident">join</span> <span class="op">=</span> <span class="ident">compute_aggr_join</span>(
                     <span class="ident">rf</span>,
                     <span class="ident">AggregationType::Count</span>,
+                    <span class="ident">filter</span>.<span class="ident">clone</span>(),
                     <span class="ident">aggregator_alias</span>.<span class="ident">as_str</span>(),
                     <span class="ident">join_alias</span>.<span class="ident">as_str</span>(),
                     <span class="prelude-val">None</span>,
