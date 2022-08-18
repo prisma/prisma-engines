@@ -424,12 +424,21 @@ impl MongoReadQueryBuilder {
     ) -> crate::Result<Self> {
         for aggr in aggregation_selections {
             let join = match aggr {
-                RelAggregationSelection::Count(rf) => JoinStage {
-                    source: rf.clone(),
-                    alias: Some(aggr.db_alias()),
-                    nested: vec![],
-                },
+                RelAggregationSelection::Count(rf, filter) => {
+                    let filter = filter
+                        .as_ref()
+                        .map(|f| convert_filter(f.clone(), false, FilterPrefix::default()))
+                        .transpose()?;
+
+                    JoinStage {
+                        source: rf.clone(),
+                        alias: Some(aggr.db_alias()),
+                        nested: vec![],
+                        filter,
+                    }
+                }
             };
+
             let projection = doc! {
               aggr.db_alias(): { "$size": format!("${}", aggr.db_alias()) }
             };

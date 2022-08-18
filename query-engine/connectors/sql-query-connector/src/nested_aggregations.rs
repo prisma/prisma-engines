@@ -16,12 +16,13 @@ pub fn build(aggr_selections: &[RelAggregationSelection]) -> RelAggregationJoins
 
     for (index, selection) in aggr_selections.iter().enumerate() {
         match selection {
-            RelAggregationSelection::Count(rf) => {
+            RelAggregationSelection::Count(rf, filter) => {
                 let join_alias = format!("aggr_selection_{}", index);
                 let aggregator_alias = selection.db_alias();
                 let join = compute_aggr_join(
                     rf,
                     AggregationType::Count,
+                    filter.clone(),
                     aggregator_alias.as_str(),
                     join_alias.as_str(),
                     None,

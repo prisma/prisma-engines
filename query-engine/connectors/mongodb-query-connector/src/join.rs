@@ -1,3 +1,4 @@
+use crate::filter::MongoFilter;
 use mongodb::bson::{doc, Document};
 use prisma_models::RelationFieldRef;
 
@@ -22,6 +23,9 @@ pub(crate) struct JoinStage {
 
     /// Nested joins
     pub(crate) nested: Vec<JoinStage>,
+
+    /// Filter on the join itself, used for aggregations on relations.
+    pub(crate) filter: Option<MongoFilter>,
 }
 
 impl JoinStage {
@@ -30,6 +34,7 @@ impl JoinStage {
             source,
             alias: None,
             nested: vec![],
+            filter: None,
         }
     }
 
@@ -55,9 +60,16 @@ impl JoinStage {
     ///
     /// Returns: `(Join document, Unwind document)`
     pub(crate) fn build(self) -> (Document, Option<Document>) {
+        let (filter_doc, filter_joins) = self
+            .filter
+            .map(MongoFilter::render)
+            .map(|(doc, joins)| (Some(doc), joins))
+            .unwrap_or_else(|| (None, vec![]));
+
         let nested_stages: Vec<Document> = self
             .nested
             .into_iter()
+            .chain(filter_joins)
             .map(|nested_stage| {
                 let (join, _) = nested_stage.build();
 
@@ -130,7 +142,13 @@ impl JoinStage {
 
         // We can now express the match from the operators
         pipeline.push(doc! { "$match": { "$expr": { "$and": ops } }});
+
         pipeline.extend(nested_stages);
+
+        // Add inner join filters if there are any (used for relational aggregations)
+        if let Some(doc) = filter_doc {
+            pipeline.push(doc! { "$match": { "$expr": doc } });
+        }
 
         // If the field is a to-one, add an unwind stage.
         let unwind_stage = if !from_field.is_list() {

@@ -65,6 +65,7 @@ features!(
     Metrics,
     OrderByNulls,
     MultiSchema,
+    FilteredRelationCount,
 );
 
 /// Generator preview features
@@ -77,6 +78,7 @@ pub const GENERATOR: FeatureMap = FeatureMap {
          | Tracing
          | Metrics
          | OrderByNulls
+         | FilteredRelationCount
     }),
     deprecated: enumflags2::make_bitflags!(PreviewFeature::{
         AtomicNumberOperations

@@ -116,7 +116,15 @@ where
 
     let fields: Vec<OutputField> = fields
         .iter()
-        .map(|rf| field(rf.name.clone(), vec![], type_mapper(ctx, rf), None))
+        .map(|rf| {
+            let mut args = vec![];
+
+            if ctx.has_feature(&PreviewFeature::FilteredRelationCount) {
+                args.push(arguments::where_argument(ctx, &rf.related_model()))
+            }
+
+            field(rf.name.clone(), args, type_mapper(ctx, rf), None)
+        })
         .collect();
 
     let object = object_mapper(object_type(ident.clone(), fields, None));

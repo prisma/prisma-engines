@@ -506,6 +506,144 @@ mod many_count_rel {
         Ok(())
     }
 
+    #[connector_test]
+    async fn filtered_count_one2m_m2m(runner: Runner) -> TestResult<()> {
+        // 1 comment / 2 categories
+        create_row(
+            &runner,
+            r#"{
+              id: 1,
+              title: "a",
+              comments: { create: [{id: 1}] },
+              categories: { create: [{id: 1}, {id: 2}] },
+            }"#,
+        )
+        .await?;
+        // 3 comment / 4 categories
+        create_row(
+            &runner,
+            r#"{
+              id: 2,
+              title: "b",
+              comments: { create: [{id: 2}, {id: 3}, {id: 4}] },
+              categories: { create: [{id: 3}, {id: 4}, {id: 5}, {id: 6}] }
+            }"#,
+        )
+        .await?;
+
+        // scalar filter
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findManyPost(orderBy: { id: asc }) {
+              _count {
+                comments(where: { id: { in: [1, 2, 3] } })
+                categories(where: { id: { in: [2, 3, 4] } })
+              }
+            }
+          }"#),
+          @r###"{"data":{"findManyPost":[{"_count":{"comments":1,"categories":1}},{"_count":{"comments":2,"categories":2}}]}}"###
+        );
+
+        // filter through relation
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findManyPost(orderBy: { id: asc }) {
+              _count {
+                comments(
+                  where: { post: { is: { categories: { some: { id: { in: [2, 3, 4] } } } } } }
+                )
+                categories(where: { posts: { some: { title: "a" } } })
+              }
+            }
+          }
+          "#),
+          @r###"{"data":{"findManyPost":[{"_count":{"comments":1,"categories":2}},{"_count":{"comments":3,"categories":0}}]}}"###
+        );
+
+        // filter to-one with orderBy aggregation
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findManyPost(orderBy: { comments: { _count: asc } }) {
+              _count {
+                comments(where: { post: { is: { title: "a" } } })
+              }
+            }
+          }"#),
+          @r###"{"data":{"findManyPost":[{"_count":{"comments":1}},{"_count":{"comments":0}}]}}"###
+        );
+
+        // filter with top-level stable cursor
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findManyPost(cursor: { id: 2 }, take: 2, orderBy: { comments: { _count: asc } }) {
+              _count {
+                comments(
+                  where: { post: { is: { categories: { some: { id: { in: [2, 3, 4] } } } } } }
+                )
+                categories(where: { posts: { some: { title: "a" } } })
+              }
+            }
+          }"#),
+          @r###"{"data":{"findManyPost":[{"_count":{"comments":3,"categories":0}}]}}"###
+        );
+
+        Ok(())
+    }
+
+    fn composite_schema() -> String {
+        let schema = indoc! {
+            r#"model TestModel {
+              #id(id, Int, @id)
+              children Child[]
+            }
+
+            model Child {
+              #id(id, Int, @id)
+              testId Int?
+              test TestModel? @relation(fields:[testId], references: [id])
+              composite Composite?
+            }
+            
+            type Composite {
+              name String
+            }
+            "#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(composite_schema), capabilities(CompositeTypes))]
+    async fn filtered_count_composite(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation { createOneTestModel(data: {
+                id: 1,
+                children: {
+                  create: [{ id: 1, composite: { name: "A" } }, { id: 2, composite: { name: "B" } }]
+                }
+              }) { id } }
+            "#
+        );
+        run_query!(
+            &runner,
+            r#"mutation { createOneTestModel(data: {
+                id: 2,
+                children: {
+                  create: [{ id: 3, composite: { name: "C" } }]
+                }
+              }) { id } }
+            "#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findManyTestModel { _count { children(where: { composite: { is: { name: { in: ["A", "C"] } } } }) } } }"#),
+          @r###"{"data":{"findManyTestModel":[{"_count":{"children":1}},{"_count":{"children":1}}]}}"###
+        );
+
+        Ok(())
+    }
+
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
             .query(format!("mutation {{ createOnePost(data: {}) {{ id }} }}", data))
