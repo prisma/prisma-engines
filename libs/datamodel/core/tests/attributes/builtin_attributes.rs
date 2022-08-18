@@ -50,5 +50,5 @@ fn duplicate_attributes_should_error() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }

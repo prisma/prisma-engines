@@ -78,7 +78,7 @@ fn non_unique_relation_criteria_support() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": The argument `references` must refer to a unique criteria in the related model. Consider adding an `@unique` attribute to the field `name` in the model `User`.[0m
@@ -151,7 +151,7 @@ fn does_not_support_composite_types() {
         }
     "#;
 
-    let err = datamodel::parse_schema(schema).unwrap_err();
+    let err = parse_unwrap_err(schema);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating: Composite types are not supported on CockroachDB.[0m

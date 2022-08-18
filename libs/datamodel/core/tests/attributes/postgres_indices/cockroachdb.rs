@@ -123,7 +123,7 @@ fn jsonb_column_must_be_the_last_in_index() {
     "#};
 
     let schema = with_header(dml, Provider::Cockroach, &["cockroachDb"]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": A `Json` column is only allowed as the last column of an inverted index.[0m
@@ -149,7 +149,7 @@ fn custom_ops_not_supported() {
     "#};
 
     let schema = with_header(dml, Provider::Cockroach, &["cockroachDb"]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": Custom operator classes are not supported with the current connector.[0m
@@ -175,7 +175,7 @@ fn raw_ops_not_supported() {
     "#};
 
     let schema = with_header(dml, Provider::Cockroach, &["cockroachDb"]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": Custom operator classes are not supported with the current connector.[0m
@@ -201,7 +201,7 @@ fn wrong_field_type() {
     "#};
 
     let schema = with_header(dml, Provider::Cockroach, &["cockroachDb"]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The Gin index type does not support the type of the field `a`.[0m

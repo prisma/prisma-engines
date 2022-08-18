@@ -7,7 +7,7 @@ fn disallow_ignore_missing_from_model_without_fields() {
     }
     "#;
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "ModelNoFields": Each model must have at least one unique criteria that has only required fields. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the model.[0m
@@ -30,7 +30,7 @@ fn disallow_ignore_missing_from_model_without_id() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "ModelNoId": Each model must have at least one unique criteria that has only required fields. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the model.[0m
@@ -54,7 +54,7 @@ fn disallow_ignore_missing_from_model_with_optional_id() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@id": Fields that are marked as id must be required.[0m
@@ -76,7 +76,7 @@ fn disallow_ignore_missing_from_model_with_unsupported_id() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "ModelUnsupportedId": Each model must have at least one unique criteria that has only required fields. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the model. The following unique criterias were not considered as they contain fields that are not required:
@@ -104,7 +104,7 @@ fn disallow_ignore_missing_from_model_with_compound_unsupported_id() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "ModelCompoundUnsupportedId": Each model must have at least one unique criteria that has only required fields. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the model. The following unique criterias were not considered as they contain fields that are not required:
@@ -141,7 +141,7 @@ fn disallow_ignore_on_models_with_relations_pointing_to_them() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@ignore": The relation field `rel_d` on Model `ModelValidC` must specify the `@ignore` attribute, because the model ModelValidD it is pointing to is marked ignored.[0m
@@ -173,7 +173,7 @@ fn disallow_ignore_on_models_with_back_relations_pointing_to_them() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@ignore": The relation field `rel_a` on Model `ModelValidB` must specify the `@ignore` attribute, because the model ModelValidA it is pointing to is marked ignored.[0m
@@ -197,7 +197,7 @@ fn disallow_ignore_on_unsupported() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@ignore": Fields of type `Unsupported` cannot take an `@ignore` attribute. They are already treated as ignored by the client due to their type.[0m
@@ -222,7 +222,7 @@ fn disallow_ignore_on_ignored_model() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@ignore": Fields on an already ignored Model do not need an `@ignore` annotation.[0m

@@ -381,8 +381,8 @@ fn env_in_preview_features_must_be_rejected() {
         [1;94m   | [0m
     "#]];
 
-    expect_1.assert_eq(&datamodel::parse_schema(schema_1).map(drop).unwrap_err());
-    expect_2.assert_eq(&datamodel::parse_schema(schema_2).map(drop).unwrap_err());
+    expect_1.assert_eq(&parse_unwrap_err(schema_1));
+    expect_2.assert_eq(&parse_unwrap_err(schema_2));
 }
 
 #[test]

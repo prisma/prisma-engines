@@ -1,6 +1,4 @@
 use crate::{common::*, with_header};
-use expect_test::expect;
-use indoc::indoc;
 
 #[test]
 fn composite_types_are_parsed_without_error() {
@@ -215,7 +213,7 @@ fn block_level_map_not_allowed() {
     "#};
 
     let dml = with_header(schema, crate::Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating: The name of a composite type is not persisted in the database, therefore it does not need a mapped database name.[0m

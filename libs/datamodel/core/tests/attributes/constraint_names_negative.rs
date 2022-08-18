@@ -30,7 +30,7 @@ fn empty_index_names_are_rejected() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@index": The `name` argument cannot be an empty string.[0m
@@ -56,7 +56,7 @@ fn empty_unique_index_names_are_rejected() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@unique": The `name` argument cannot be an empty string.[0m
@@ -86,7 +86,7 @@ fn having_both_the_map_and_name_argument_must_be_rejected() {
         &[],
     );
 
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@index": The `@@index` attribute accepts the `name` argument as an alias for the `map` argument for legacy reasons. It does not accept both though. Please use the `map` argument to specify the database name of the index.[0m
@@ -114,7 +114,7 @@ fn index_and_primary_cannot_have_same_name_on_sqlserver() {
         }}
     "#, datasource = SQL_SERVER};
 
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@id": The given constraint name `MyName` has to be unique in the following namespace: on model `User` for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
@@ -148,7 +148,7 @@ fn index_and_unique_cannot_have_same_name_on_sqlserver() {
         }}
     "#, datasource = SQL_SERVER};
 
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given constraint name `MyName` has to be unique in the following namespace: on model `User` for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
@@ -187,7 +187,7 @@ fn multiple_indexes_with_same_name_are_not_supported_by_postgres() {
         }}
     "#, datasource = POSTGRES};
 
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given constraint name `MyIndexName` has to be unique in the following namespace: global for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
@@ -227,7 +227,7 @@ fn unique_indexes_with_same_name_are_not_supported_by_postgres() {
         }}
     "#, datasource = POSTGRES};
 
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given constraint name `MyIndexName` has to be unique in the following namespace: global for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
@@ -264,7 +264,7 @@ fn foreign_keys_and_primary_keys_with_same_name_on_same_table_are_not_supported_
         }}
     "#, datasource = POSTGRES};
 
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@id": The given constraint name `foo` has to be unique in the following namespace: on model `A` for primary key, indexes, unique constraints and foreign keys. Please provide a different name using the `map` argument.[0m
@@ -311,7 +311,7 @@ fn truncated_constraint_names_are_checked_for_uniqueness_on_postgres() {
         }}
     "#, datasource = POSTGRES};
 
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": The given constraint name `LinkingTableForUserAndPostWithObnoxiouslyLongNameButNotToo_fkey` has to be unique in the following namespace: on model `LinkingTableForUserAndPostWithObnoxiouslyLongNameButNotTooLongBUTLONGER` for primary key, indexes, unique constraints and foreign keys. Please provide a different name using the `map` argument.[0m
@@ -358,7 +358,7 @@ fn foreign_keys_and_indexes_have_to_be_globally_unique_within_their_namespaces_o
         }}
     "#, datasource = MYSQL};
 
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": The given constraint name `test` has to be unique in the following namespace: global for foreign keys. Please provide a different name using the `map` argument.[0m
@@ -400,7 +400,7 @@ fn multiple_indexes_with_same_name_are_not_supported_by_sqlite() {
         }}
     "#, datasource = SQLITE};
 
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given constraint name `MyIndexName` has to be unique in the following namespace: global for indexes and unique constraints. Please provide a different name using the `map` argument.[0m

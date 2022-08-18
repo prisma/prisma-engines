@@ -1,34 +1,6 @@
 use crate::{common::*, with_header, Provider};
 
 #[test]
-fn on_mysql() {
-    let dml = indoc! {r#"
-        datasource db {
-          provider = "mysql"
-          url      = env("DATABASE_URL")
-        }
-
-        model A {
-          id Int  @id
-          a  Int
-
-          @@index([a(ops: raw("whatever_ops"))], type: Brin)
-        }
-    "#};
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@@index": The given index type is not supported with the current connector[0m
-          [1;94m-->[0m  [4mschema.prisma:10[0m
-        [1;94m   | [0m
-        [1;94m 9 | [0m
-        [1;94m10 | [0m  @@index([a(ops: raw("whatever_ops"))], [1;91mtype: Brin[0m)
-        [1;94m   | [0m
-    "#]];
-
-    expect_error(dml, &expectation);
-}
-
-#[test]
 fn with_raw_unsupported() {
     let dml = indoc! {r#"
         model A {
@@ -140,58 +112,6 @@ fn bit_minmax_opclass() {
     });
 }
 
-#[test]
-fn bit_minmax_no_native_type() {
-    let dml = indoc! {r#"
-        model A {
-          id Int    @id
-          a  String
-
-          @@index([a(ops: BitMinMaxOps)], type: Brin)
-        }
-    "#};
-
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `BitMinMaxOps` expects the field `a` to define a valid native type.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
-        [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: BitMinMaxOps)], type: Brin)[0m
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error)
-}
-
-#[test]
-fn bit_minmax_wrong_native_type() {
-    let dml = indoc! {r#"
-        model A {
-          id Int    @id
-          a  String @test.VarBit
-
-          @@index([a(ops: BitMinMaxOps)], type: Brin)
-        }
-    "#};
-
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `BitMinMaxOps` does not support native type `VarBit` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
-        [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: BitMinMaxOps)], type: Brin)[0m
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error)
-}
-
 // VarBit
 
 #[test]
@@ -247,58 +167,6 @@ fn varbit_minmax_opclass() {
         algorithm: Some(IndexAlgorithm::Brin),
         clustered: None,
     });
-}
-
-#[test]
-fn varbit_minmax_no_native_type() {
-    let dml = indoc! {r#"
-        model A {
-          id Int    @id
-          a  String
-
-          @@index([a(ops: VarBitMinMaxOps)], type: Brin)
-        }
-    "#};
-
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `VarBitMinMaxOps` expects the field `a` to define a valid native type.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
-        [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: VarBitMinMaxOps)], type: Brin)[0m
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error)
-}
-
-#[test]
-fn varbit_minmax_wrong_native_type() {
-    let dml = indoc! {r#"
-        model A {
-          id Int    @id
-          a  String @test.Bit
-
-          @@index([a(ops: VarBitMinMaxOps)], type: Brin)
-        }
-    "#};
-
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `VarBitMinMaxOps` does not support native type `Bit` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
-        [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: VarBitMinMaxOps)], type: Brin)[0m
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error)
 }
 
 // date
@@ -359,32 +227,6 @@ fn date_minmax_opclass() {
 }
 
 #[test]
-fn date_minmax_wrong_native_type() {
-    let dml = indoc! {r#"
-        model A {
-          id Int      @id
-          a  DateTime @test.Time
-
-          @@index([a(ops: DateMinMaxOps)], type: Brin)
-        }
-    "#};
-
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `DateMinMaxOps` does not support native type `Time` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
-        [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: DateMinMaxOps)], type: Brin)[0m
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error)
-}
-
-#[test]
 fn date_minmaxmulti_opclass() {
     let dml = indoc! {r#"
         model A {
@@ -413,32 +255,6 @@ fn date_minmaxmulti_opclass() {
 }
 
 #[test]
-fn date_minmaxmulti_wrong_native_type() {
-    let dml = indoc! {r#"
-        model A {
-          id Int      @id
-          a  DateTime @test.Time
-
-          @@index([a(ops: DateMinMaxMultiOps)], type: Brin)
-        }
-    "#};
-
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `DateMinMaxMultiOps` does not support native type `Time` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
-        [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: DateMinMaxMultiOps)], type: Brin)[0m
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error)
-}
-
-#[test]
 fn date_bloom_opclass() {
     let dml = indoc! {r#"
         model A {
@@ -464,32 +280,6 @@ fn date_bloom_opclass() {
         algorithm: Some(IndexAlgorithm::Brin),
         clustered: None,
     });
-}
-
-#[test]
-fn date_bloom_wrong_native_type() {
-    let dml = indoc! {r#"
-        model A {
-          id Int      @id
-          a  DateTime @test.Time
-
-          @@index([a(ops: DateBloomOps)], type: Brin)
-        }
-    "#};
-
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `DateBloomOps` does not support native type `Time` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
-        [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: DateBloomOps)], type: Brin)[0m
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error)
 }
 
 // real
@@ -561,7 +351,7 @@ fn real_minmax_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Float4MinMaxOps` does not support native type `DoublePrecision` of field `a`.[0m
@@ -615,7 +405,7 @@ fn real_minmaxmulti_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Float4MinMaxMultiOps` does not support native type `DoublePrecision` of field `a`.[0m
@@ -669,7 +459,7 @@ fn real_bloom_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Float4BloomOps` does not support native type `DoublePrecision` of field `a`.[0m
@@ -863,7 +653,7 @@ fn double_minmax_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Float8MinMaxOps` does not support native type `Real` of field `a`.[0m
@@ -917,7 +707,7 @@ fn double_minmaxmulti_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Float8MinMaxMultiOps` does not support native type `Real` of field `a`.[0m
@@ -971,7 +761,7 @@ fn double_bloom_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Float8BloomOps` does not support native type `Real` of field `a`.[0m
@@ -1054,7 +844,7 @@ fn inet_minmax_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `InetMinMaxOps` does not support native type `VarChar` of field `a`.[0m
@@ -1080,7 +870,7 @@ fn inet_minmax_no_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `InetMinMaxOps` expects the field `a` to define a valid native type.[0m
@@ -1134,7 +924,7 @@ fn inet_minmaxmulti_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `InetMinMaxMultiOps` does not support native type `VarChar` of field `a`.[0m
@@ -1160,7 +950,7 @@ fn inet_minmaxmulti_no_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `InetMinMaxMultiOps` expects the field `a` to define a valid native type.[0m
@@ -1214,7 +1004,7 @@ fn inet_bloom_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `InetBloomOps` does not support native type `VarChar` of field `a`.[0m
@@ -1240,7 +1030,7 @@ fn inet_bloom_no_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `InetBloomOps` expects the field `a` to define a valid native type.[0m
@@ -1294,7 +1084,7 @@ fn inet_inclusion_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `InetInclusionOps` does not support native type `VarChar` of field `a`.[0m
@@ -1320,7 +1110,7 @@ fn inet_inclusion_no_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `InetInclusionOps` expects the field `a` to define a valid native type.[0m
@@ -1403,7 +1193,7 @@ fn int2_minmax_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Int2MinMaxOps` does not support native type `Integer` of field `a`.[0m
@@ -1429,7 +1219,7 @@ fn int2_minmax_no_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Int2MinMaxOps` expects the field `a` to define a valid native type.[0m
@@ -1483,7 +1273,7 @@ fn int2_minmaxmulti_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Int2MinMaxMultiOps` does not support native type `Integer` of field `a`.[0m
@@ -1509,7 +1299,7 @@ fn int2_minmaxmulti_no_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Int2MinMaxMultiOps` expects the field `a` to define a valid native type.[0m
@@ -1563,7 +1353,7 @@ fn int2_bloom_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Int2BloomOps` does not support native type `Integer` of field `a`.[0m
@@ -1589,7 +1379,7 @@ fn int2_bloom_no_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Int2BloomOps` expects the field `a` to define a valid native type.[0m
@@ -1699,7 +1489,7 @@ fn int4_minmax_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Int4MinMaxOps` does not support native type `SmallInt` of field `a`.[0m
@@ -1781,7 +1571,7 @@ fn int4_minmaxmulti_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Int4MinMaxMultiOps` does not support native type `SmallInt` of field `a`.[0m
@@ -1863,7 +1653,7 @@ fn int4_bloom_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Int4BloomOps` does not support native type `SmallInt` of field `a`.[0m
@@ -2225,7 +2015,7 @@ fn decimal_minmax_wrong_prisma_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `NumericMinMaxOps` points to the field `a` that is not of Decimal type.[0m
@@ -2279,7 +2069,7 @@ fn decimal_minmaxmulti_wrong_prisma_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `NumericMinMaxMultiOps` points to the field `a` that is not of Decimal type.[0m
@@ -2333,7 +2123,7 @@ fn decimal_bloom_wrong_prisma_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `NumericBloomOps` points to the field `a` that is not of Decimal type.[0m
@@ -2500,7 +2290,7 @@ fn oid_minmax_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `OidMinMaxOps` does not support native type `SmallInt` of field `a`.[0m
@@ -2554,7 +2344,7 @@ fn oid_minmaxmulti_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `OidMinMaxMultiOps` does not support native type `SmallInt` of field `a`.[0m
@@ -2608,7 +2398,7 @@ fn oid_bloom_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `OidBloomOps` does not support native type `SmallInt` of field `a`.[0m
@@ -2691,7 +2481,7 @@ fn char_minmax_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `BpcharMinMaxOps` does not support native type `Text` of field `a`.[0m
@@ -2745,7 +2535,7 @@ fn char_bloom_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `BpcharBloomOps` does not support native type `Text` of field `a`.[0m
@@ -2910,7 +2700,7 @@ fn text_minmax_wrong_prisma_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TextMinMaxOps` points to the field `a` that is not of String type.[0m
@@ -2964,7 +2754,7 @@ fn text_bloom_wrong_prisma_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TextBloomOps` points to the field `a` that is not of String type.[0m
@@ -3270,7 +3060,7 @@ fn timestamp_minmax_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TimestampMinMaxOps` does not support native type `Time` of field `a`.[0m
@@ -3324,7 +3114,7 @@ fn timestamp_minmaxmulti_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TimestampMinMaxMultiOps` does not support native type `Time` of field `a`.[0m
@@ -3378,7 +3168,7 @@ fn timestamp_bloom_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TimestampBloomOps` does not support native type `Time` of field `a`.[0m
@@ -3461,7 +3251,7 @@ fn timestamptz_minmax_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TimestampTzMinMaxOps` does not support native type `Timestamp` of field `a`.[0m
@@ -3515,7 +3305,7 @@ fn timestamptz_minmaxmulti_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TimestampTzMinMaxMultiOps` does not support native type `Timestamp` of field `a`.[0m
@@ -3569,7 +3359,7 @@ fn timestamptz_bloom_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TimestampTzBloomOps` does not support native type `Timestamp` of field `a`.[0m
@@ -3652,7 +3442,7 @@ fn time_minmax_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TimeMinMaxOps` does not support native type `Timestamp` of field `a`.[0m
@@ -3706,7 +3496,7 @@ fn time_minmaxmulti_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TimeMinMaxMultiOps` does not support native type `Timestamp` of field `a`.[0m
@@ -3760,7 +3550,7 @@ fn time_bloom_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TimeBloomOps` does not support native type `Timestamp` of field `a`.[0m
@@ -3843,7 +3633,7 @@ fn timetz_minmax_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TimeTzMinMaxOps` does not support native type `Timestamp` of field `a`.[0m
@@ -3897,7 +3687,7 @@ fn timetz_minmaxmulti_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TimeTzMinMaxMultiOps` does not support native type `Timestamp` of field `a`.[0m
@@ -3951,7 +3741,7 @@ fn timetz_bloom_wrong_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TimeTzBloomOps` does not support native type `Timestamp` of field `a`.[0m
@@ -4023,32 +3813,6 @@ fn uuid_minmax_opclass() {
 }
 
 #[test]
-fn uuid_minmax_wrong_native_type() {
-    let dml = indoc! {r#"
-        model A {
-          id Int    @id
-          a  String @test.Text
-
-          @@index([a(ops: UuidMinMaxOps)], type: Brin)
-        }
-    "#};
-
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `UuidMinMaxOps` does not support native type `Text` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
-        [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: UuidMinMaxOps)], type: Brin)[0m
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error)
-}
-
-#[test]
 fn uuid_minmaxmulti_opclass() {
     let dml = indoc! {r#"
         model A {
@@ -4077,32 +3841,6 @@ fn uuid_minmaxmulti_opclass() {
 }
 
 #[test]
-fn uuid_minmaxmulti_wrong_native_type() {
-    let dml = indoc! {r#"
-        model A {
-          id Int    @id
-          a  String @test.Text
-
-          @@index([a(ops: UuidMinMaxMultiOps)], type: Brin)
-        }
-    "#};
-
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `BitMinMaxOps` does not support native type `Text` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
-        [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: UuidMinMaxMultiOps)], type: Brin)[0m
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error)
-}
-
-#[test]
 fn uuid_bloom_opclass() {
     let dml = indoc! {r#"
         model A {
@@ -4128,30 +3866,4 @@ fn uuid_bloom_opclass() {
         algorithm: Some(IndexAlgorithm::Brin),
         clustered: None,
     });
-}
-
-#[test]
-fn uuid_bloom_wrong_native_type() {
-    let dml = indoc! {r#"
-        model A {
-          id Int    @id
-          a  String @test.Text
-
-          @@index([a(ops: UuidBloomOps)], type: Brin)
-        }
-    "#};
-
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `UuidBloomOps` does not support native type `Text` of field `a`.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
-        [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: UuidBloomOps)], type: Brin)[0m
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error)
 }

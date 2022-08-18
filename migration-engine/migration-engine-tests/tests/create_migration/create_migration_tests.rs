@@ -767,7 +767,7 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
 #[test_connector(exclude(Sqlite))]
 fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
     let dm = api.datamodel_with_provider(
-        &r#"
+        r#"
          model A {
            id   Int    @id
            name String @unique(map: "SingleUnique")

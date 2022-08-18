@@ -43,7 +43,7 @@ fn hash_index_disallows_ops() {
     "#};
 
     let dml = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Int4MinMaxOps` is not supported with the `Hash` index type.[0m
@@ -69,7 +69,7 @@ fn btree_index_disallows_ops() {
     "#};
 
     let dml = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `Int4MinMaxOps` is not supported with the `BTree` index type.[0m
@@ -133,7 +133,7 @@ fn disallows_unique_length_prefix() {
     "#};
 
     let dml = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@unique": The length argument is not supported in an index definition with the current connector[0m
@@ -158,7 +158,7 @@ fn disallows_compound_unique_length_prefix() {
     "#};
 
     let dml = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@unique": The length argument is not supported in an index definition with the current connector[0m
@@ -184,7 +184,7 @@ fn disallows_index_length_prefix() {
     "#};
 
     let dml = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The length argument is not supported in an index definition with the current connector[0m
@@ -211,7 +211,7 @@ fn operator_classes_not_allowed_with_unique() {
     "#};
 
     let dml = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@unique": Operator classes can only be defined to fields in an @@index attribute.[0m
