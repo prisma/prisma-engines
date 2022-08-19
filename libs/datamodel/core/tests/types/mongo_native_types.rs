@@ -11,7 +11,7 @@ fn valid_json_usage_in_model() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let (_, datamodel) = datamodel::parse_schema(&schema).unwrap();
+    let datamodel = parse(&schema);
 
     let model = datamodel.assert_has_model("A");
 
@@ -31,7 +31,7 @@ fn valid_object_id_usage_in_model() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let (_, datamodel) = datamodel::parse_schema(&schema).unwrap();
+    let datamodel = parse(&schema);
 
     let model = datamodel.assert_has_model("A");
 
@@ -55,7 +55,7 @@ fn valid_long_usage_in_model() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let (_, datamodel) = datamodel::parse_schema(&schema).unwrap();
+    let datamodel = parse(&schema);
 
     let model = datamodel.assert_has_model("A");
 

@@ -281,7 +281,7 @@ fn mysql_allows_compound_unique_length_prefix() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
+    assert_valid(&schema);
 }
 
 #[test]
@@ -296,7 +296,7 @@ fn mysql_allows_index_length_prefix() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
+    assert_valid(&schema);
 }
 
 #[test]
@@ -311,7 +311,7 @@ fn mysql_allows_index_length_prefix_on_unsupported_field() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
+    assert_valid(&schema);
 }
 
 #[test]
@@ -323,7 +323,7 @@ fn mysql_allows_unique_sort_order() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
+    assert_valid(&schema);
 }
 
 #[test]
@@ -335,7 +335,7 @@ fn sqlite_allows_unique_sort_order() {
     "#};
 
     let schema = with_header(dml, Provider::Sqlite, &[]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
+    assert_valid(&schema);
 }
 
 #[test]
@@ -347,7 +347,7 @@ fn sqlserver_allows_unique_sort_order() {
     "#};
 
     let schema = with_header(dml, Provider::SqlServer, &[]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
+    assert_valid(&schema);
 }
 
 #[test]
@@ -361,7 +361,7 @@ fn mysql_allows_compound_unique_sort_order() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
+    assert_valid(&schema);
 }
 
 #[test]
@@ -375,7 +375,7 @@ fn sqlite_allows_compound_unique_sort_order() {
     "#};
 
     let schema = with_header(dml, Provider::Sqlite, &[]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
+    assert_valid(&schema);
 }
 
 #[test]
@@ -389,7 +389,7 @@ fn sqlserver_allows_compound_unique_sort_order() {
     "#};
 
     let schema = with_header(dml, Provider::SqlServer, &[]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
+    assert_valid(&schema);
 }
 
 #[test]
@@ -404,7 +404,7 @@ fn mysql_allows_index_sort_order() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
+    assert_valid(&schema);
 }
 
 #[test]
@@ -419,7 +419,7 @@ fn sqlserver_allows_index_sort_order() {
     "#};
 
     let schema = with_header(dml, Provider::SqlServer, &[]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
+    assert_valid(&schema);
 }
 
 #[test]

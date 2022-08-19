@@ -1,6 +1,5 @@
 use crate::common::*;
-use datamodel::StringFromEnvVar;
-use datamodel_connector::ReferentialIntegrity;
+use datamodel::{datamodel_connector::ReferentialIntegrity, StringFromEnvVar};
 use pretty_assertions::assert_eq;
 
 #[test]
@@ -17,7 +16,7 @@ fn must_error_if_multiple_datasources_are_defined() {
         }
     "#};
 
-    let error = super::parse_config(dml).map(drop).unwrap_err();
+    let error = parse_config(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating datasource `db1`: You defined more than one datasource. This is not allowed yet because support for multiple databases has not been implemented yet.[0m
@@ -52,7 +51,7 @@ fn must_forbid_env_functions_in_provider_field() {
         }
     "#};
 
-    let error = super::parse_config(dml).map(drop).unwrap_err();
+    let error = parse_config(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mA datasource must not use the env() function in the provider argument.[0m
@@ -78,7 +77,7 @@ fn must_forbid_env_functions_in_provider_field_even_if_missing() {
         }
     "#};
 
-    let error = super::parse_config(dml).map(drop).unwrap_err();
+    let error = parse_config(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mA datasource must not use the env() function in the provider argument.[0m
@@ -104,7 +103,7 @@ fn must_error_for_empty_urls() {
         }
     "#};
 
-    let config = super::parse_config(dml).unwrap();
+    let config = parse_config(dml).unwrap();
 
     let error = config.subject.datasources[0]
         .load_url(load_env_var)
@@ -132,7 +131,7 @@ fn must_error_for_empty_provider_arrays() {
         }
     "#};
 
-    let error = super::parse_config(dml).map(drop).unwrap_err();
+    let error = parse_config(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating datasource `myds`: The provider argument in a datasource must be a string literal[0m
@@ -157,7 +156,7 @@ fn must_error_for_empty_urls_derived_load_env_vars() {
         }
     "#};
 
-    let config = super::parse_config(dml).unwrap();
+    let config = parse_config(dml).unwrap();
 
     let error = config.subject.datasources[0]
         .load_url(load_env_var)
@@ -185,7 +184,7 @@ fn must_error_if_prisma_protocol_is_used_for_mysql() {
         }
     "#};
 
-    let config = super::parse_config(dml).unwrap();
+    let config = parse_config(dml).unwrap();
 
     let error = config.subject.datasources[0]
         .load_url(load_env_var)
@@ -218,7 +217,7 @@ fn must_error_if_wrong_protocol_is_used_for_mysql() {
         }
     "#};
 
-    let config = super::parse_config(dml).unwrap();
+    let config = parse_config(dml).unwrap();
 
     let error = config.subject.datasources[0]
         .load_url(load_env_var)
@@ -247,7 +246,7 @@ fn must_error_if_wrong_protocol_is_used_for_mysql_shadow_database_url() {
         }
     "#};
 
-    let config = super::parse_config(dml).unwrap();
+    let config = parse_config(dml).unwrap();
 
     let error = config.subject.datasources[0]
         .load_shadow_database_url()
@@ -278,8 +277,8 @@ fn must_not_error_for_empty_shadow_database_urls_derived_load_env_vars() {
         }
     "#};
 
-    let config = datamodel::parse_configuration(schema).unwrap();
-    let shadow_database_url = config.subject.datasources[0].load_shadow_database_url().unwrap();
+    let config = parse_configuration(schema);
+    let shadow_database_url = config.datasources[0].load_shadow_database_url().unwrap();
 
     assert!(shadow_database_url.is_none());
 }
@@ -294,8 +293,8 @@ fn must_not_error_for_shadow_database_urls_derived_from_missing_env_vars() {
         }
     "#};
 
-    let config = datamodel::parse_configuration(schema).unwrap();
-    let shadow_database_url = config.subject.datasources[0].load_shadow_database_url().unwrap();
+    let config = parse_configuration(schema);
+    let shadow_database_url = config.datasources[0].load_shadow_database_url().unwrap();
 
     assert!(shadow_database_url.is_none());
 }
@@ -309,7 +308,7 @@ fn must_error_if_wrong_protocol_is_used_for_postgresql() {
         }
     "#};
 
-    let config = super::parse_config(dml).unwrap();
+    let config = parse_config(dml).unwrap();
 
     let error = config.subject.datasources[0]
         .load_url(load_env_var)
@@ -338,7 +337,7 @@ fn must_error_if_wrong_protocol_is_used_for_postgresql_shadow_database_url() {
         }
     "#};
 
-    let config = super::parse_config(dml).unwrap();
+    let config = parse_config(dml).unwrap();
 
     let error = config.subject.datasources[0]
         .load_shadow_database_url()
@@ -366,7 +365,7 @@ fn must_error_if_wrong_protocol_is_used_for_sqlite() {
         }
     "#};
 
-    let config = super::parse_config(dml).unwrap();
+    let config = parse_config(dml).unwrap();
 
     let error = config.subject.datasources[0]
         .load_url(load_env_var)
@@ -423,7 +422,7 @@ fn must_error_if_env_var_is_missing() {
         }
     "#};
 
-    let config = super::parse_config(dml).unwrap();
+    let config = parse_config(dml).unwrap();
 
     let error = config.subject.datasources[0]
         .load_url(load_env_var)
@@ -526,7 +525,7 @@ fn fail_to_load_sources_for_invalid_source() {
         }
     "#};
 
-    let error = super::parse_config(dml).map(drop).unwrap_err();
+    let error = parse_config(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mDatasource provider not known: "AStrangeHalfMongoDatabase".[0m
@@ -550,7 +549,7 @@ fn fail_when_preview_features_are_declared() {
         }
     "#};
 
-    let error = super::parse_config(dml).map(drop).unwrap_err();
+    let error = parse_config(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mPreview features are only supported in the generator block. Please move this field to the generator block.[0m
@@ -601,7 +600,7 @@ fn referential_integrity_without_preview_feature_errors() {
         }
     "#};
 
-    let error = super::parse_config(schema).map(drop).unwrap_err();
+    let error = parse_config(schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating datasource `ps`: 
