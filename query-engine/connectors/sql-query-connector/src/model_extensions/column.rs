@@ -81,20 +81,22 @@ impl AsColumns for RelationField {
             model.db_name().to_string()
         };
 
-        let inner: Vec<_> = self
-            .scalar_fields()
-            .iter()
-            .map(|f| {
-                let parts = (
-                    (internal_data_model.db_name.clone(), table_name.clone()),
-                    f.db_name().to_owned(),
-                );
+        // let inner: Vec<_> = self.scalar_fields().as_columns();
 
-                Column::from(parts)
-            })
-            .collect();
+        //THIS SHOULD BREAK OUT TESTS!!!!
+        self.scalar_fields().as_columns()
+        //     // .iter()
+        //     // .map(|f| {
+        //     //     let parts = (
+        //     //         (internal_data_model.db_name.clone(), table_name.clone()),
+        //     //         f.db_name().to_owned(),
+        //     //     );
 
-        ColumnIterator::from(inner)
+        //     //     Column::from(parts)
+        //     // })
+        //     .collect();
+
+        // ColumnIterator::from(inner)
     }
 }
 
