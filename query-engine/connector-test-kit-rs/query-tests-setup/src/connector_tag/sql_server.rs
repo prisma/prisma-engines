@@ -17,13 +17,19 @@ impl ConnectorTagInterface for SqlServerConnectorTag {
         Box::new(SqlDatamodelRenderer::new())
     }
 
-    fn connection_string(&self, database: &str, is_ci: bool, _is_multi_schema: bool) -> String {
-        match self.version {
-            Some(SqlServerVersion::V2017) if is_ci => format!("sqlserver://test-db-sqlserver-2017:1433;database=master;schema={};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED", database),
-            Some(SqlServerVersion::V2017) => format!("sqlserver://127.0.0.1:1434;database=master;schema={};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED", database),
+    fn connection_string(&self, database: &str, is_ci: bool, is_multi_schema: bool) -> String {
+        let database = if is_multi_schema {
+            format!("database={};schema=dbo", database)
+        } else {
+            format!("database=master;schema={}", database)
+        };
 
-            Some(SqlServerVersion::V2019) if is_ci => format!("sqlserver://test-db-sqlserver-2019:1433;database=master;schema={};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED", database),
-            Some(SqlServerVersion::V2019) => format!("sqlserver://127.0.0.1:1433;database=master;schema={};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED", database),
+        match self.version {
+            Some(SqlServerVersion::V2017) if is_ci => format!("sqlserver://test-db-sqlserver-2017:1433;{};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED", database),
+            Some(SqlServerVersion::V2017) => format!("sqlserver://127.0.0.1:1434;{};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED", database),
+
+            Some(SqlServerVersion::V2019) if is_ci => format!("sqlserver://test-db-sqlserver-2019:1433;{};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED", database),
+            Some(SqlServerVersion::V2019) => format!("sqlserver://127.0.0.1:1433;{};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED", database),
 
             None => unreachable!("A versioned connector must have a concrete version to run."),
         }

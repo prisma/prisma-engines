@@ -49,8 +49,6 @@ pub fn render_test_datamodel(
         String::default()
     };
 
-    println!("BOOM {:?} {}", db_schemas, schema_def);
-
     let datasource_with_generator = format!(
         indoc! {r#"
             datasource test {{

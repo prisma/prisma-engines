@@ -44,7 +44,7 @@ pub async fn setup(prisma_schema: &str, db_schemas: &[&str]) -> ConnectorResult<
         provider if [POSTGRES.provider_name(), COCKROACH.provider_name()].contains(provider) => {
             postgres_setup(url, prisma_schema, db_schemas).await?
         }
-        provider if MSSQL.is_provider(provider) => mssql_setup(url, prisma_schema).await?,
+        provider if MSSQL.is_provider(provider) => mssql_setup(url, prisma_schema, db_schemas).await?,
         provider if MYSQL.is_provider(provider) => {
             mysql_reset(&url).await?;
             diff_and_apply(prisma_schema).await;
@@ -81,14 +81,9 @@ pub async fn teardown(prisma_schema: &str, db_schemas: &[&str]) -> ConnectorResu
             postgres_teardown(&url, db_schemas).await?;
         }
 
-        provider
-            if [
-                SQLITE.provider_name(),
-                MSSQL.provider_name(),
-                MYSQL.provider_name(),
-                MONGODB.provider_name(),
-            ]
-            .contains(provider) => {}
+        provider if MSSQL.is_provider(provider) => mssql_teardown(url, db_schemas).await?,
+
+        provider if [SQLITE.provider_name(), MYSQL.provider_name(), MONGODB.provider_name()].contains(provider) => {}
 
         x => unimplemented!("Connector {} is not supported yet", x),
     };

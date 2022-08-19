@@ -1,6 +1,5 @@
 use query_engine_tests::test_suite;
-
-#[test_suite(capabilities(MultiSchema))]
+#[test_suite(capabilities(MultiSchema), exclude(Mysql))]
 mod multi_schema {
     use query_engine_tests::*;
 
@@ -143,7 +142,6 @@ mod multi_schema {
         );
 
         // DELETE
-
         assert_query!(
             runner,
             r#"mutation { deleteManyTestModel(where: {field: "two"}) { count } }"#,
@@ -162,7 +160,6 @@ mod multi_schema {
     pub fn multi_schema_relations() -> String {
         let schema = indoc! {
             r#"
-
             model ChildModel {
                 #id(id, Int, @id)
                 field String?
@@ -321,6 +318,129 @@ mod multi_schema {
             runner,
             "query{ findManyChildModel(where: {id: {gt: 0}}) { id, parent { id } } }",
             r#"{"data":{"findManyChildModel":[{"id":1,"parent":{"id":1}},{"id":2,"parent":{"id":1}}]}}"#
+        );
+
+        Ok(())
+    }
+
+    pub fn multi_schema_many_to_many_relations() -> String {
+        let schema = indoc! {
+            r#"
+            model Post {
+                #id(id, Int, @id)
+                title  String
+                categories CategoriesOnPosts[]
+                @@schema("schema1")
+              }
+              
+              model Category {
+                #id(id, Int, @id)
+                name  String
+                posts CategoriesOnPosts[]
+                @@schema("schema2")
+              }
+              
+              model CategoriesOnPosts {
+                post       Post     @relation(fields: [postId], references: [id])
+                postId     Int 
+                category   Category @relation(fields: [categoryId], references: [id])
+                categoryId Int 
+                tmp Int?
+                @@schema("schema3")
+              
+                @@id([postId, categoryId])
+              }
+            "#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(
+        schema(multi_schema_many_to_many_relations),
+        db_schemas("schema1", "schema2", "schema3")
+    )]
+    async fn create_and_get_many_to_many_relations(runner: Runner) -> TestResult<()> {
+        runner
+            .query(
+                r#"
+                mutation {
+                    createManyPost(data: [
+                        { id: 1, title: "p1" },
+                        { id: 2, title: "p2" }
+                    ]) {
+                      count
+                    }
+                }"#,
+            )
+            .await?
+            .assert_success();
+
+        runner
+            .query(
+                r#"
+                mutation {
+                    createManyCategory(data: [
+                        { id: 1, name: "c1" },
+                        { id: 2, name: "c2" },
+                        { id: 3, name: "c3" }
+                    ]) {
+                      count
+                    }
+                }"#,
+            )
+            .await?
+            .assert_success();
+
+        runner
+            .query(
+                r#"
+                mutation {
+                    createManyCategoriesOnPosts(data: [
+                        { postId: 1, categoryId: 1 },
+                        { postId: 1, categoryId: 2 },
+                        { postId: 1, categoryId: 3 },
+                        { postId: 2, categoryId: 2 },
+                        { postId: 2, categoryId: 3 },
+                    ]) {
+                      count
+                    }
+                }"#,
+            )
+            .await?
+            .assert_success();
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"
+                query {
+                    findManyCategoriesOnPosts(where: {postId: {gt: 0}}) {
+                      category {
+                        name
+                      },
+                      post {
+                        title
+                      }
+                    }
+                  }
+                "#),
+          @r###"{"data":{"findManyCategoriesOnPosts":[{"category":{"name":"c1"},"post":{"title":"p1"}},{"category":{"name":"c2"},"post":{"title":"p1"}},{"category":{"name":"c3"},"post":{"title":"p1"}},{"category":{"name":"c2"},"post":{"title":"p2"}},{"category":{"name":"c3"},"post":{"title":"p2"}}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"
+            query {
+                findManyPost(where: {id: 1}) {
+                  id,
+                  title,
+                  categories {
+                    category {
+                      name,
+                      id
+                    }
+                  }
+                }
+              }"#),
+          @r###"{"data":{"findManyPost":[{"id":1,"title":"p1","categories":[{"category":{"name":"c1","id":1}},{"category":{"name":"c2","id":2}},{"category":{"name":"c3","id":3}}]}]}}"###
         );
 
         Ok(())
