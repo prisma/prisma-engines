@@ -1,6 +1,6 @@
 mod cycle_detection;
 
-use crate::{common::*, config::parse_config};
+use crate::common::*;
 use datamodel::dml::ReferentialAction::{self, *};
 use datamodel_connector::ReferentialIntegrity;
 

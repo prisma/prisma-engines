@@ -92,7 +92,7 @@ fn unique_sort_order() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
+    assert_valid(&schema)
 }
 
 #[test]
@@ -106,7 +106,7 @@ fn compound_unique_sort_order() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
+    assert_valid(&schema)
 }
 
 #[test]
@@ -121,7 +121,7 @@ fn index_sort_order() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    assert!(datamodel::parse_schema(&schema).is_ok());
+    assert_valid(&schema)
 }
 
 #[test]

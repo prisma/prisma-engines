@@ -2,7 +2,7 @@ pub use datamodel::{dml, dml::*, parse_datamodel, parse_schema};
 pub use expect_test::expect;
 pub use indoc::{formatdoc, indoc};
 
-use datamodel::{diagnostics::*, Configuration, StringFromEnvVar};
+use datamodel::{diagnostics::*, Configuration, StringFromEnvVar, ValidatedConfiguration};
 use pretty_assertions::assert_eq;
 
 pub(crate) fn reformat(input: &str) -> String {
@@ -427,6 +427,10 @@ pub(crate) fn parse(datamodel_string: &str) -> Datamodel {
             )
         }
     }
+}
+
+pub(crate) fn parse_config(schema: &str) -> Result<ValidatedConfiguration, String> {
+    datamodel::parse_configuration(schema).map_err(|err| err.to_pretty_string("schema.prisma", schema))
 }
 
 pub(crate) fn parse_configuration(datamodel_string: &str) -> Configuration {
