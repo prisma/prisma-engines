@@ -464,6 +464,48 @@ mod update {
     }
 
     #[connector_test]
+    async fn update_push_with_dollar_string(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        // Test push with array & object syntax
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+            updateOneTestModel(
+              where: { id: 1 }
+              data: {
+                to_many_as: { push: [{ a_1: "$new_item" }] }
+              }
+            ) {
+              to_many_as {
+                a_1
+              }
+            }
+          }
+          "#),
+          @r###"{"data":{"updateOneTestModel":{"to_many_as":[{"a_1":"a1"},{"a_1":"$new_item"}]}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+            updateOneTestModel(
+              where: { id: 1 }
+              data: {
+                to_many_as: { push: { a_1: "$new_item_2" } }
+              }
+            ) {
+              to_many_as {
+                a_1
+              }
+            }
+          }
+          "#),
+          @r###"{"data":{"updateOneTestModel":{"to_many_as":[{"a_1":"a1"},{"a_1":"$new_item"},{"a_1":"$new_item_2"}]}}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
     async fn update_push_explicit_with_default(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -670,8 +712,6 @@ mod update {
 
     #[connector_test]
     async fn fails_upsert_on_list_field(runner: Runner) -> TestResult<()> {
-        create_test_data(&runner).await?;
-
         // No upsert on list fields
         assert_error!(
             runner,
