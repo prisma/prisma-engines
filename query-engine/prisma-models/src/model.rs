@@ -31,7 +31,6 @@ impl Model {
     pub fn db_name_with_schema(&self) -> (String, String) {
         let schema_prefix = self
             .schema_name()
-            .clone()
             .unwrap_or_else(|| self.internal_data_model().db_name.clone());
 
         let model_db_name = self.db_name().to_string();

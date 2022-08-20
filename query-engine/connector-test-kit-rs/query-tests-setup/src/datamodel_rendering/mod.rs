@@ -41,7 +41,7 @@ pub fn render_test_datamodel(
     let tag = config.test_connector_tag().unwrap();
     let preview_features = render_preview_features(excluded_features);
 
-    let is_multi_schema = db_schemas.len() > 0;
+    let is_multi_schema = !db_schemas.is_empty();
 
     let schema_def = if is_multi_schema {
         format!("schemas = {:?}", db_schemas)

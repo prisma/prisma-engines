@@ -1,6 +1,6 @@
 use crate::model_extensions::ScalarFieldExt;
 use itertools::Itertools;
-use prisma_models::{Field, ModelProjection, RelationField, RelationLinkManifestation, ScalarField, TypeIdentifier};
+use prisma_models::{Field, ModelProjection, RelationField, ScalarField};
 use quaint::ast::{Column, Row};
 use std::convert::AsRef;
 

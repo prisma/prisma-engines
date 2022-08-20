@@ -11,7 +11,7 @@ pub(crate) async fn mssql_setup(url: String, prisma_schema: &str, db_schemas: &[
     let db_name = params.remove("database").unwrap_or_else(|| String::from("master"));
     let conn = Quaint::new(&conn.to_string()).await.unwrap();
 
-    if db_schemas.len() > 0 {
+    if !db_schemas.is_empty() {
         let sql = format!(
             r#"
             DROP DATABASE IF EXISTS [{db_name}];

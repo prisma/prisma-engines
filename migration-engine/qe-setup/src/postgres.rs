@@ -8,7 +8,7 @@ pub(crate) async fn postgres_setup(url: String, prisma_schema: &str, db_schemas:
     let quaint_url = quaint::connector::PostgresUrl::new(url.clone()).unwrap();
     let (db_name, schema) = (quaint_url.dbname(), quaint_url.schema());
 
-    if db_schemas.len() > 0 {
+    if !db_schemas.is_empty() {
         strip_schema_param_from_url(&mut url);
         let conn = create_postgres_admin_conn(url.clone()).await?;
 
@@ -44,7 +44,7 @@ pub(crate) async fn postgres_setup(url: String, prisma_schema: &str, db_schemas:
 
 pub(crate) async fn postgres_teardown(url: &str, db_schemas: &[&str]) -> ConnectorResult<()> {
     // only teardown if we doing multischema
-    if db_schemas.len() > 0 {
+    if !db_schemas.is_empty() {
         let mut url = Url::parse(url).map_err(ConnectorError::url_parse_error)?;
         strip_schema_param_from_url(&mut url);
 
