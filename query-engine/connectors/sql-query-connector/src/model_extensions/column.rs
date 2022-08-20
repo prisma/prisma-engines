@@ -67,36 +67,7 @@ impl AsColumns for Field {
 
 impl AsColumns for RelationField {
     fn as_columns(&self) -> ColumnIterator {
-        let model = self.model();
-        let internal_data_model = model.internal_data_model();
-
-        let relation = self.relation();
-        let table_name = if relation.is_many_to_many() {
-            if let RelationLinkManifestation::RelationTable(ref rt) = relation.manifestation {
-                rt.table.clone()
-            } else {
-                unreachable!()
-            }
-        } else {
-            model.db_name().to_string()
-        };
-
-        // let inner: Vec<_> = self.scalar_fields().as_columns();
-
-        //THIS SHOULD BREAK OUT TESTS!!!!
         self.scalar_fields().as_columns()
-        //     // .iter()
-        //     // .map(|f| {
-        //     //     let parts = (
-        //     //         (internal_data_model.db_name.clone(), table_name.clone()),
-        //     //         f.db_name().to_owned(),
-        //     //     );
-
-        //     //     Column::from(parts)
-        //     // })
-        //     .collect();
-
-        // ColumnIterator::from(inner)
     }
 }
 

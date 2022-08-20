@@ -445,4 +445,74 @@ mod multi_schema {
 
         Ok(())
     }
+
+    fn test_filter_in_schema() -> String {
+        let schema = indoc! {r#"
+            model Foo {
+                #id(id, String, @id)
+                version String
+                name	  String
+                bar		  Bar?
+                @@schema("schema2")
+                @@unique([id, version])
+            }
+
+            model Bar {
+                #id(id, String, @id)
+                name		String
+                fooId		String
+                version     String
+                foo			Foo	@relation(fields: [fooId, version], references: [id, version])
+                @@schema("schema1")
+                @@unique([fooId, version])
+            }
+        "#};
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(test_filter_in_schema), db_schemas("schema1", "schema2"))]
+    async fn test_filter_in(runner: Runner) -> TestResult<()> {
+        runner
+            .query(
+                r#"
+                mutation {
+                    createOneFoo(data: {
+                        id: "1"
+                        version: "a"
+                        name: "first foo"
+                        bar: {
+                            create: {
+                                id: "1"
+                                name: "first bar"
+                            }
+                        }
+                    }) { id }
+                }"#,
+            )
+            .await?
+            .assert_success();
+
+        runner
+            .query(
+                r#"
+                mutation {
+                    createOneFoo(data: {
+                        id: "2"
+                        version: "a"
+                        name: "second foo"
+                    }) { id }
+                }"#,
+            )
+            .await?
+            .assert_success();
+
+        assert_query!(
+            runner,
+            "query { findManyFoo(where: { bar: { is: null } }) { id } }",
+            r#"{"data":{"findManyFoo":[{"id":"2"}]}}"#
+        );
+
+        Ok(())
+    }
 }
