@@ -11,16 +11,7 @@ pub(crate) async fn mssql_setup(url: String, prisma_schema: &str, db_schemas: &[
     let db_name = params.remove("database").unwrap_or_else(|| String::from("master"));
     let conn = Quaint::new(&conn.to_string()).await.unwrap();
 
-    println!("DB NAME: {}", db_name);
-    let api = migration_core::migration_api(Some(prisma_schema.to_owned()), None)?;
-    api.reset().await.ok();
-
     if db_schemas.len() > 0 {
-        conn.raw_cmd(&format!(
-            "USE [master]; ALTER DATABASE [{db_name}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;"
-        ))
-        .await
-        .unwrap();
         let sql = format!(
             r#"
             DROP DATABASE IF EXISTS [{db_name}];
@@ -30,6 +21,8 @@ pub(crate) async fn mssql_setup(url: String, prisma_schema: &str, db_schemas: &[
         conn.raw_cmd(&sql).await.unwrap();
         conn.raw_cmd(&format!("USE [{db_name}];")).await.unwrap();
     } else {
+        let api = migration_core::migration_api(Some(prisma_schema.to_owned()), None)?;
+        api.reset().await.ok();
         // Without these, our poor connection gets deadlocks if other schemas
         // are modified while we introspect.
         let allow_snapshot_isolation = format!(
@@ -52,33 +45,5 @@ pub(crate) async fn mssql_setup(url: String, prisma_schema: &str, db_schemas: &[
 
     // 2. create the database schema for given Prisma schema
     crate::diff_and_apply(prisma_schema).await;
-    Ok(())
-}
-
-// This teardown is needed for running the same multischema tests over and over locally
-pub(crate) async fn mssql_teardown(url: String, db_schemas: &[&str]) -> ConnectorResult<()> {
-    let mut conn = JdbcString::from_str(&format!("jdbc:{}", url))
-        .map_err(|e| ConnectorError::from_source(e, "JDBC string parse error"))?;
-    let params = conn.properties_mut();
-
-    let db_name = params.remove("database").unwrap_or_else(|| String::from("master"));
-    let conn = Quaint::new(&conn.to_string()).await.unwrap();
-
-    println!("DB NAME: {}", db_name);
-
-    if db_schemas.len() > 0 {
-        conn.raw_cmd(&format!(
-            "USE [master]; ALTER DATABASE [{db_name}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;"
-        ))
-        .await
-        .unwrap();
-        let sql = format!(
-            r#"
-            DROP DATABASE IF EXISTS [{db_name}];
-            "#
-        );
-        conn.raw_cmd(&sql).await.unwrap();
-    }
-
     Ok(())
 }

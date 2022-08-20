@@ -81,9 +81,14 @@ pub async fn teardown(prisma_schema: &str, db_schemas: &[&str]) -> ConnectorResu
             postgres_teardown(&url, db_schemas).await?;
         }
 
-        provider if MSSQL.is_provider(provider) => mssql_teardown(url, db_schemas).await?,
-
-        provider if [SQLITE.provider_name(), MYSQL.provider_name(), MONGODB.provider_name()].contains(provider) => {}
+        provider
+            if [
+                SQLITE.provider_name(),
+                MSSQL.provider_name(),
+                MYSQL.provider_name(),
+                MONGODB.provider_name(),
+            ]
+            .contains(provider) => {}
 
         x => unimplemented!("Connector {} is not supported yet", x),
     };
