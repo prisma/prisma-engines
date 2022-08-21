@@ -479,6 +479,6 @@ these discussions to help push design work forward.
 
 Our stance so far has been "never use IF NOT EXISTS, we should always know if
 something exists or not in diffing". We have a first exception in a work in
-progress proposal proposal, motivated by not wanting to make the feature a
+progress proposal, motivated by not wanting to make the feature a
 breaking change, but the general rule is that we want diffing to be as precise
 as possible, so generated migrations should not rely on IF NOT EXISTS.
