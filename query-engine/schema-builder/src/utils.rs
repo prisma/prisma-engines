@@ -1,4 +1,5 @@
 use super::*;
+use itertools::Itertools;
 use once_cell::sync::OnceCell;
 use prisma_models::pk::PrimaryKey;
 use prisma_models::{dml, ModelRef};
@@ -104,7 +105,10 @@ pub fn append_opt<T>(vec: &mut Vec<T>, opt: Option<T>) {
 pub fn compound_index_field_name(index: &Index) -> String {
     index.name.clone().unwrap_or_else(|| {
         let index_fields = index.fields();
-        let field_names: Vec<&str> = index_fields.iter().map(|sf| sf.name.as_ref()).collect();
+        let field_names = index_fields
+            .iter()
+            .flat_map(|index_field| index_field.path())
+            .collect_vec();
 
         field_names.join("_")
     })
