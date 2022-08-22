@@ -391,7 +391,7 @@
         <span class="comment">// Indicates whether or not a combination of contained fields is on the source model (we don&#39;t check for relations for now).</span>
         <span class="kw">let</span> <span class="ident">order_by_contains_unique_index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">model</span>.<span class="ident">unique_indexes</span>().<span class="ident">into_iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
             <span class="ident">index</span>
-                .<span class="ident">fields</span>()
+                .<span class="ident">scalars</span>()
                 .<span class="ident">into_iter</span>()
                 .<span class="ident">all</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">on_model</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="ident">o</span>.<span class="ident">field</span> <span class="op">==</span> <span class="ident">f</span>))
         });

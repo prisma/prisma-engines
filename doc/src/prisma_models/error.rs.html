@@ -50,6 +50,13 @@
 <span id="44">44</span>
 <span id="45">45</span>
 <span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">prisma_value::ConversionFailure</span>;
 <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
 
@@ -70,6 +77,13 @@
 
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;ScalarField `{}` on {} `{}` not found&quot;</span>, <span class="ident">name</span>, <span class="ident">container_type</span>, <span class="ident">container_name</span>)]</span>
     <span class="ident">ScalarFieldNotFound</span> {
+        <span class="ident">name</span>: <span class="ident">String</span>,
+        <span class="ident">container_name</span>: <span class="ident">String</span>,
+        <span class="ident">container_type</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
+    },
+
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;CompositeField `{}` on {} `{}` not found&quot;</span>, <span class="ident">name</span>, <span class="ident">container_type</span>, <span class="ident">container_name</span>)]</span>
+    <span class="ident">CompositeFieldNotFound</span> {
         <span class="ident">name</span>: <span class="ident">String</span>,
         <span class="ident">container_name</span>: <span class="ident">String</span>,
         <span class="ident">container_type</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
