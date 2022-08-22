@@ -89,4 +89,33 @@ mod find_unique {
 
         Ok(())
     }
+
+    fn uniq_idx_with_name() -> String {
+        let schema = indoc! {
+            r#"model User {
+                #id(id, Int, @id)
+                first_name String
+                last_name  String
+                email      String    @unique
+                birthday   DateTime?
+    
+                @@unique([first_name, last_name], name: "full_name")
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(uniq_idx_with_name))]
+    async fn find_unique_index_with_name(runner: Runner) -> TestResult<()> {
+        test_user(&runner).await?;
+
+        assert_query!(
+            &runner,
+            r#"query { findUniqueUser(where: { full_name: { first_name: "Elongated", last_name: "Muskrat" } }) { id } }"#,
+            r#"{"data":{"findUniqueUser":{"id":1}}}"#
+        );
+
+        Ok(())
+    }
 }

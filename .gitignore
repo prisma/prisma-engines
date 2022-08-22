@@ -35,6 +35,7 @@ buildkite-script-*
 # Dev setup
 datamodel_v2.prisma
 dev_datamodel.prisma
+schema.prisma
 target/
 .tmp/
 
