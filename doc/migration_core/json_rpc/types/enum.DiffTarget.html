@@ -7,15 +7,17 @@
                         </div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
     <h1 class="fqn"><span class="in-band">Enum <a href="../../index.html">migration_core</a>::<wbr><a href="../index.html">json_rpc</a>::<wbr><a href="index.html">types</a>::<wbr><a class="enum" href="#">DiffTarget</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../../../src/migration_core/home/runner/work/prisma-engines/prisma-engines/target/debug/build/migration-core-fd8080a03d4a40d1/out/methods.rs.html#685-718">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><div class="docblock item-decl"><pre class="rust enum"><code>pub enum DiffTarget {
     Migrations(<a class="struct" href="struct.PathContainer.html" title="struct migration_core::json_rpc::types::PathContainer">PathContainer</a>),
+    Empty,
     Url(<a class="struct" href="struct.UrlContainer.html" title="struct migration_core::json_rpc::types::UrlContainer">UrlContainer</a>),
     SchemaDatamodel(<a class="struct" href="struct.SchemaContainer.html" title="struct migration_core::json_rpc::types::SchemaContainer">SchemaContainer</a>),
-    Empty,
     SchemaDatasource(<a class="struct" href="struct.SchemaContainer.html" title="struct migration_core::json_rpc::types::SchemaContainer">SchemaContainer</a>),
 }</code></pre></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>A supported source for a database schema to diff in the <code>diff</code> command.</p>
 </div></details><h2 id="variants" class="variants small-section-header">Variants<a href="#variants" class="anchor"></a></h2><h3 id="variant.Migrations" class="variant small-section-header"><a href="#variant.Migrations" class="anchor field"></a><code>Migrations(<a class="struct" href="struct.PathContainer.html" title="struct migration_core::json_rpc::types::PathContainer">PathContainer</a>)</code></h3><div class="docblock"><p>The path to a migrations directory of the shape expected by Prisma Migrate. The
 migrations will be applied to a <strong>shadow database</strong>, and the resulting schema
 considered for diffing.</p>
 <p>JSON name: migrations</p>
+</div><h3 id="variant.Empty" class="variant small-section-header"><a href="#variant.Empty" class="anchor field"></a><code>Empty</code></h3><div class="docblock"><p>An empty schema.</p>
+<p>JSON name: empty</p>
 </div><h3 id="variant.Url" class="variant small-section-header"><a href="#variant.Url" class="anchor field"></a><code>Url(<a class="struct" href="struct.UrlContainer.html" title="struct migration_core::json_rpc::types::UrlContainer">UrlContainer</a>)</code></h3><div class="docblock"><p>The url to a live database. Its schema will be considered.</p>
 <p>This will cause the migration engine to connect to the database and read from
 it. It will not write.</p>
@@ -23,8 +25,6 @@ it. It will not write.</p>
 </div><h3 id="variant.SchemaDatamodel" class="variant small-section-header"><a href="#variant.SchemaDatamodel" class="anchor field"></a><code>SchemaDatamodel(<a class="struct" href="struct.SchemaContainer.html" title="struct migration_core::json_rpc::types::SchemaContainer">SchemaContainer</a>)</code></h3><div class="docblock"><p>The path to a Prisma schema. The contents of the schema itself will be
 considered. This source does not need any database connection.</p>
 <p>JSON name: schemaDatamodel</p>
-</div><h3 id="variant.Empty" class="variant small-section-header"><a href="#variant.Empty" class="anchor field"></a><code>Empty</code></h3><div class="docblock"><p>An empty schema.</p>
-<p>JSON name: empty</p>
 </div><h3 id="variant.SchemaDatasource" class="variant small-section-header"><a href="#variant.SchemaDatasource" class="anchor field"></a><code>SchemaDatasource(<a class="struct" href="struct.SchemaContainer.html" title="struct migration_core::json_rpc::types::SchemaContainer">SchemaContainer</a>)</code></h3><div class="docblock"><p>The path to a Prisma schema. The <em>datasource url</em> will be considered, and the
 live database it points to introspected for its schema.</p>
 <p>JSON name: schemaDatasource</p>
