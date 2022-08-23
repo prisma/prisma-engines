@@ -530,7 +530,7 @@ impl ModelAssertions for Model {
             .iter()
             .find(|index| {
                 let has_right_type = index.typ == tpe;
-                let field_names: Vec<String> = index.fields().iter().map(|f| f.name.clone()).collect();
+                let field_names: Vec<String> = index.scalars().iter().map(|sf| sf.name.clone()).collect();
                 let expected_field_names: Vec<String> = fields.iter().map(|f| f.to_string()).collect();
                 let is_for_right_fields = field_names == expected_field_names;
 

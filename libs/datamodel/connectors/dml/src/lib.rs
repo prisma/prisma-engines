@@ -1,6 +1,8 @@
 //! This module contains the models representing the Datamodel part of a Prisma schema.
 //! It contains the main data structures that the engines can build upon.
 
+#![allow(clippy::derive_partial_eq_without_eq)]
+
 mod datamodel;
 
 pub mod composite_type;

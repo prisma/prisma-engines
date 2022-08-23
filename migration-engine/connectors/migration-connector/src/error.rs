@@ -166,6 +166,12 @@ impl ConnectorError {
         ConnectorError::user_facing(SchemaParserError { full_error })
     }
 
+    /// Try to downcast the source to a specific type.
+    pub fn source_as<T: StdError + 'static>(&self) -> Option<&T> {
+        let source = self.0.source.as_ref()?;
+        source.downcast_ref()
+    }
+
     /// Render to a user_facing_error::Error
     pub fn to_user_facing(&self) -> user_facing_errors::Error {
         match &self.0.user_facing_error {

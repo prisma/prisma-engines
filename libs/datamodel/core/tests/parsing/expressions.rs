@@ -1,7 +1,4 @@
-use expect_test::expect;
-use indoc::indoc;
-
-use crate::{with_header, Provider};
+use crate::common::*;
 
 #[test]
 fn trailing_commas_in_function_arguments_list() {
@@ -21,7 +18,7 @@ fn trailing_commas_in_function_arguments_list() {
         [1;94m   | [0m
     "#]];
 
-    expected.assert_eq(&datamodel::parse_schema(input).map(drop).unwrap_err());
+    expect_error(input, &expected);
 }
 
 #[test]
@@ -42,7 +39,7 @@ fn empty_arguments_in_function_arguments_list() {
         [1;94m   | [0m
     "#]];
 
-    expected.assert_eq(&datamodel::parse_schema(input).map(drop).unwrap_err());
+    expect_error(input, &expected);
 }
 
 #[test]
@@ -65,7 +62,7 @@ fn empty_arguments_in_index_fields() {
         [1;94m   | [0m
     "#]];
 
-    let input = with_header(input, Provider::Postgres, &[]);
+    let input = crate::with_header(input, crate::Provider::Postgres, &[]);
 
-    expected.assert_eq(&datamodel::parse_schema(&input).map(drop).unwrap_err());
+    expect_error(&input, &expected);
 }

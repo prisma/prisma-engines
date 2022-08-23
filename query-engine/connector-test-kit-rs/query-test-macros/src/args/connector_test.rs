@@ -27,6 +27,9 @@ pub struct ConnectorTestArgs {
 
     #[darling(default)]
     pub capabilities: RunOnlyForCapabilities,
+
+    #[darling(default)]
+    pub referential_integrity: Option<ReferentialIntegrity>,
 }
 
 impl ConnectorTestArgs {
@@ -45,6 +48,32 @@ impl ConnectorTestArgs {
     /// Returns all the connectors that the test is valid for.
     pub fn connectors_to_test(&self) -> Vec<ConnectorTag> {
         connectors_to_test(&self.only, &self.exclude)
+    }
+}
+
+#[allow(dead_code)]
+#[derive(Debug)]
+pub enum ReferentialIntegrity {
+    ForeignKeys,
+    Prisma,
+}
+
+impl darling::FromMeta for ReferentialIntegrity {
+    fn from_string(value: &str) -> darling::Result<Self> {
+        match value.to_lowercase().as_str() {
+            "prisma" => Ok(Self::Prisma),
+            "foreignkeys" => Ok(Self::ForeignKeys),
+            _ => Err(darling::Error::custom(format!("Invalid value: {}", value))),
+        }
+    }
+}
+
+impl ToString for ReferentialIntegrity {
+    fn to_string(&self) -> String {
+        match self {
+            ReferentialIntegrity::Prisma => "prisma".to_string(),
+            ReferentialIntegrity::ForeignKeys => "foreignKeys".to_string(),
+        }
     }
 }
 

@@ -1,7 +1,6 @@
 mod cockroach_describer_tests;
 
 use crate::test_api::*;
-use barrel::{types, Migration};
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
 use sql_schema_describer::{postgres::PostgresSchemaExt, *};
@@ -26,59 +25,62 @@ fn views_can_be_described(api: TestApi) {
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn all_postgres_column_types_must_work(api: TestApi) {
-    let mut migration = Migration::new().schema(api.schema_name());
-    migration.create_table("User", move |t| {
-        t.add_column("array_bin_col", types::array(&types::binary()));
-        t.add_column("array_bool_col", types::array(&types::boolean()));
-        t.add_column("array_date_col", types::array(&types::date()));
-        t.add_column("array_double_col", types::array(&types::double()));
-        t.add_column("array_float_col", types::array(&types::float()));
-        t.add_column("array_int_col", types::array(&types::integer()));
-        t.add_column("array_text_col", types::array(&types::text()));
-        t.add_column("array_varchar_col", types::array(&types::varchar(255)));
-        t.add_column("bigint_col", types::custom("BIGINT"));
-        t.add_column("bigserial_col", types::custom("BIGSERIAL"));
-        t.add_column("bit_col", types::custom("BIT"));
-        t.add_column("bit_varying_col", types::custom("BIT VARYING(1)"));
-        t.add_column("binary_col", types::binary());
-        t.add_column("boolean_col", types::boolean());
-        t.add_column("box_col", types::custom("BOX"));
-        t.add_column("char_col", types::custom("CHARACTER(1)"));
-        t.add_column("circle_col", types::custom("CIRCLE"));
-        t.add_column("date_time_col", types::date());
-        t.add_column("double_col", types::double());
-        t.add_column("float_col", types::float());
-        t.add_column("int_col", types::integer());
-        t.add_column("line_col", types::custom("LINE"));
-        t.add_column("lseg_col", types::custom("LSEG"));
-        t.add_column("numeric_col", types::custom("NUMERIC"));
-        t.add_column("path_col", types::custom("PATH"));
-        t.add_column("pg_lsn_col", types::custom("PG_LSN"));
-        t.add_column("polygon_col", types::custom("POLYGON"));
-        t.add_column("smallint_col", types::custom("SMALLINT"));
-        t.add_column("smallserial_col", types::custom("SMALLSERIAL"));
-        t.add_column("serial_col", types::custom("SERIAL"));
-        t.add_column("primary_col", types::primary());
-        t.add_column("string1_col", types::text());
-        t.add_column("string2_col", types::varchar(1));
-        t.add_column("time_col", types::custom("TIME"));
-        t.add_column("timetz_col", types::custom("TIMETZ"));
-        t.add_column("timestamp_col", types::custom("TIMESTAMP"));
-        t.add_column("timestamptz_col", types::custom("TIMESTAMPTZ"));
-        t.add_column("tsquery_col", types::custom("TSQUERY"));
-        t.add_column("tsvector_col", types::custom("TSVECTOR"));
-        t.add_column("txid_col", types::custom("TXID_SNAPSHOT"));
-        t.add_column("json_col", types::json());
-        t.add_column("jsonb_col", types::custom("JSONB"));
-        t.add_column("uuid_col", types::uuid());
-    });
-
-    let full_sql = migration.make::<barrel::backend::Pg>();
-    api.raw_cmd(&full_sql);
+    let sql = r#"
+        CREATE TABLE "User" (
+            array_bin_col BYTEA[],
+            array_bool_col BOOLEAN[],
+            array_date_col DATE[],
+            array_double_col DOUBLE PRECISION[],
+            array_float_col FLOAT[],
+            array_int_col INTEGER[],
+            array_text_col TEXT[],
+            array_varchar_col VARCHAR(255)[],
+            bigint_col BIGINT,
+            bigserial_col BIGSERIAL,
+            bit_col BIT,
+            bit_varying_col BIT VARYING(1),
+            binary_col BYTEA,
+            boolean_col BOOLEAN,
+            box_col BOX,
+            char_col CHARACTER(1),
+            circle_col CIRCLE,
+            date_time_col DATE,
+            double_col DOUBLE PRECISION,
+            float_col FLOAT,
+            int_col INTEGER,
+            line_col LINE,
+            lseg_col LSEG,
+            numeric_col NUMERIC,
+            path_col PATH,
+            pg_lsn_col PG_LSN,
+            polygon_col POLYGON,
+            smallint_col SMALLINT,
+            smallserial_col SMALLSERIAL,
+            serial_col SERIAL,
+            primary_col SERIAL PRIMARY KEY,
+            string1_col TEXT,
+            string2_col VARCHAR(1),
+            time_col TIME,
+            timetz_col TIMETZ,
+            timestamp_col TIMESTAMP,
+            timestamptz_col TIMESTAMPTZ,
+            tsquery_col TSQUERY,
+            tsvector_col TSVECTOR,
+            txid_col TXID_SNAPSHOT,
+            json_col JSON,
+            jsonb_col JSONB,
+            uuid_col UUID
+        );
+    "#;
+    api.raw_cmd(sql);
     let expectation = expect![[r#"
         SqlSchema {
+            namespaces: [],
             tables: [
                 Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "User",
                 },
             ],
@@ -255,7 +257,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "int8",
                             family: BigInt,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 String(
                                     "BigInt",
@@ -302,7 +304,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "bit",
                             family: String,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 Object({
                                     "Bit": Number(
@@ -324,7 +326,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "varbit",
                             family: String,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 Object({
                                     "VarBit": Number(
@@ -346,7 +348,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "bytea",
                             family: Binary,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 String(
                                     "ByteA",
@@ -366,7 +368,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "bool",
                             family: Boolean,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 String(
                                     "Boolean",
@@ -388,7 +390,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Unsupported(
                                 "box",
                             ),
-                            arity: Required,
+                            arity: Nullable,
                             native_type: None,
                         },
                         default: None,
@@ -404,7 +406,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "bpchar",
                             family: String,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 Object({
                                     "Char": Number(
@@ -428,7 +430,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Unsupported(
                                 "circle",
                             ),
-                            arity: Required,
+                            arity: Nullable,
                             native_type: None,
                         },
                         default: None,
@@ -444,7 +446,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "date",
                             family: DateTime,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 String(
                                     "Date",
@@ -464,7 +466,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "float8",
                             family: Float,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 String(
                                     "DoublePrecision",
@@ -484,7 +486,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "float8",
                             family: Float,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 String(
                                     "DoublePrecision",
@@ -504,7 +506,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "int4",
                             family: Int,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 String(
                                     "Integer",
@@ -526,7 +528,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Unsupported(
                                 "line",
                             ),
-                            arity: Required,
+                            arity: Nullable,
                             native_type: None,
                         },
                         default: None,
@@ -544,7 +546,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Unsupported(
                                 "lseg",
                             ),
-                            arity: Required,
+                            arity: Nullable,
                             native_type: None,
                         },
                         default: None,
@@ -560,7 +562,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "numeric",
                             family: Decimal,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 Object({
                                     "Decimal": Null,
@@ -582,7 +584,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Unsupported(
                                 "path",
                             ),
-                            arity: Required,
+                            arity: Nullable,
                             native_type: None,
                         },
                         default: None,
@@ -600,7 +602,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Unsupported(
                                 "pg_lsn",
                             ),
-                            arity: Required,
+                            arity: Nullable,
                             native_type: None,
                         },
                         default: None,
@@ -618,7 +620,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Unsupported(
                                 "polygon",
                             ),
-                            arity: Required,
+                            arity: Nullable,
                             native_type: None,
                         },
                         default: None,
@@ -634,7 +636,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "int2",
                             family: Int,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 String(
                                     "SmallInt",
@@ -735,7 +737,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "text",
                             family: String,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 String(
                                     "Text",
@@ -755,7 +757,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "varchar",
                             family: String,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 Object({
                                     "VarChar": Number(
@@ -777,7 +779,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "time",
                             family: DateTime,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 Object({
                                     "Time": Number(
@@ -799,7 +801,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "timetz",
                             family: DateTime,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 Object({
                                     "Timetz": Number(
@@ -821,7 +823,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "timestamp",
                             family: DateTime,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 Object({
                                     "Timestamp": Number(
@@ -843,7 +845,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "timestamptz",
                             family: DateTime,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 Object({
                                     "Timestamptz": Number(
@@ -867,7 +869,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Unsupported(
                                 "tsquery",
                             ),
-                            arity: Required,
+                            arity: Nullable,
                             native_type: None,
                         },
                         default: None,
@@ -885,7 +887,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Unsupported(
                                 "tsvector",
                             ),
-                            arity: Required,
+                            arity: Nullable,
                             native_type: None,
                         },
                         default: None,
@@ -903,7 +905,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Unsupported(
                                 "txid_snapshot",
                             ),
-                            arity: Required,
+                            arity: Nullable,
                             native_type: None,
                         },
                         default: None,
@@ -919,7 +921,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "json",
                             family: Json,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 String(
                                     "Json",
@@ -939,7 +941,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "jsonb",
                             family: Json,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 String(
                                     "JsonB",
@@ -959,7 +961,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "uuid",
                             family: Uuid,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 String(
                                     "Uuid",
@@ -981,13 +983,6 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                     index_name: "User_pkey",
                     tpe: PrimaryKey,
                 },
-                Index {
-                    table_id: TableId(
-                        0,
-                    ),
-                    index_name: "User_uuid_col_key",
-                    tpe: Unique,
-                },
             ],
             index_columns: [
                 IndexColumn {
@@ -996,18 +991,6 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                     ),
                     column_id: ColumnId(
                         30,
-                    ),
-                    sort_order: Some(
-                        Asc,
-                    ),
-                    length: None,
-                },
-                IndexColumn {
-                    index_id: IndexId(
-                        1,
-                    ),
-                    column_id: ColumnId(
-                        42,
                     ),
                     sort_order: Some(
                         Asc,
@@ -1036,12 +1019,6 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                 (
                     IndexId(
                         0,
-                    ),
-                    BTree,
-                ),
-                (
-                    IndexId(
-                        1,
                     ),
                     BTree,
                 ),
@@ -1279,8 +1256,12 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
     api.raw_cmd(create_table);
     let expectation = expect![[r#"
         SqlSchema {
+            namespaces: [],
             tables: [
                 Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "string_defaults_test",
                 },
             ],
@@ -1440,8 +1421,12 @@ fn seemingly_escaped_backslashes_in_string_literals_must_not_be_unescaped(api: T
     api.raw_cmd(create_table);
     let expectation = expect![[r#"
         SqlSchema {
+            namespaces: [],
             tables: [
                 Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "test",
                 },
             ],

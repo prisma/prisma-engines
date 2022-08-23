@@ -102,7 +102,7 @@ services:
       - databases
 
   postgres15:
-    image: postgres:15beta2
+    image: postgres:15beta3
     restart: always
     command: postgres -c 'max_connections=1000'
     environment:
@@ -118,6 +118,7 @@ services:
     image: mysql:5.6.50
     command: mysqld
     restart: always
+    platform: linux/x86_64
     environment:
       MYSQL_USER: root
       MYSQL_ROOT_PASSWORD: prisma
@@ -132,6 +133,7 @@ services:
     image: mysql:5.7.32
     command: mysqld
     restart: always
+    platform: linux/x86_64
     environment:
       MYSQL_USER: root
       MYSQL_ROOT_PASSWORD: prisma
@@ -146,6 +148,7 @@ services:
     image: mysql:8.0.28
     command: mysqld
     restart: always
+    platform: linux/x86_64
     environment:
       MYSQL_ROOT_PASSWORD: prisma
       MYSQL_DATABASE: prisma

@@ -20,6 +20,18 @@ pub struct IndexId(pub(crate) u32);
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct IndexColumnId(pub(crate) u32);
 
-/// The identifier for a ForeignKey in the schema.
+/// The identifier for a foreign key in the schema.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct ForeignKeyId(pub(crate) u32);
+
+/// The identifier for a namespace in the schema.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize, Default)]
+pub struct NamespaceId(pub(crate) u32);
+
+/// The identifier for a user defined type in the database.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct UdtId(pub(crate) u32);
+
+/// The identifier for a view in the database.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct ViewId(pub(crate) u32);

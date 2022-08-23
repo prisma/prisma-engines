@@ -395,7 +395,7 @@ pub(super) fn unique_client_name_does_not_clash_with_field(index: IndexWalker<'_
         return;
     }
 
-    let idx_client_name = index.fields().map(|f| f.name()).join("_");
+    let idx_client_name = index.all_field_names().join("_");
 
     if index.model().scalar_fields().any(|f| f.name() == idx_client_name) {
         let attr_name = index.attribute_name();

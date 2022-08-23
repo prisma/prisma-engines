@@ -75,6 +75,35 @@ impl<'db> IndexWalker<'db> {
         self.index_attribute
     }
 
+    fn fields_array(self) -> &'db [ast::Expression] {
+        self.ast_attribute()
+            .arguments
+            .arguments
+            .iter()
+            .find(|arg| match &arg.name {
+                Some(ident) if ident.name.is_empty() || ident.name == "fields" => true,
+                None => true,
+                Some(_) => false,
+            })
+            .and_then(|arg| arg.value.as_array())
+            .unwrap()
+            .0
+    }
+
+    /// Iterate over all the names in all the paths in the fields argument.
+    ///
+    /// For example, `@@index([a, b.c.d])` would return an iterator over "a", "b", "c", "d".
+    pub fn all_field_names(self) -> impl Iterator<Item = &'db str> {
+        self.fields_array()
+            .iter()
+            .map(|path| match path {
+                ast::Expression::ConstantValue(name, _) => name,
+                ast::Expression::Function(name, _, _) => name,
+                _ => unreachable!(),
+            })
+            .flat_map(|name| name.split('.'))
+    }
+
     /// The scalar fields covered by the index.
     pub fn fields(self) -> impl ExactSizeIterator<Item = IndexFieldWalker<'db>> {
         self.index_attribute.fields.iter().map(move |attributes| {

@@ -2,19 +2,20 @@ mod default;
 mod id;
 mod map;
 mod native_types;
-
-use std::borrow::Cow;
+mod schema;
 
 use crate::{
     ast::{self, WithName, WithSpan},
+    coerce, coerce_array,
     context::Context,
     types::{
         EnumAttributes, FieldWithArgs, IndexAlgorithm, IndexAttribute, IndexFieldPath, IndexType, ModelAttributes,
         OperatorClassStore, RelationField, ScalarField, ScalarFieldType, SortOrder,
     },
-    DatamodelError, StringId, ValueValidator,
+    DatamodelError, StringId,
 };
 use diagnostics::Span;
+use std::borrow::Cow;
 
 pub(super) fn resolve_attributes(ctx: &mut Context<'_>) {
     for top in ctx.ast.iter_tops() {
@@ -98,6 +99,12 @@ fn resolve_enum_attributes<'db>(enum_id: ast::EnumId, ast_enum: &'db ast::Enum, 
         ctx.validate_visited_arguments();
     }
 
+    // @@schema
+    if ctx.visit_optional_single_attr("schema") {
+        schema::r#enum(&mut enum_attributes, ctx);
+        ctx.validate_visited_arguments();
+    }
+
     ctx.types.enum_attributes.insert(enum_id, enum_attributes);
     ctx.validate_visited_attributes();
 }
@@ -149,6 +156,12 @@ fn resolve_model_attributes<'db>(model_id: ast::ModelId, ast_model: &'db ast::Mo
     // @@map
     if ctx.visit_optional_single_attr("map") {
         map::model(&mut model_attributes, model_id, ctx);
+        ctx.validate_visited_arguments();
+    }
+
+    // @@schema
+    if ctx.visit_optional_single_attr("schema") {
+        schema::model(&mut model_attributes, ctx);
         ctx.validate_visited_arguments();
     }
 
@@ -262,40 +275,34 @@ fn visit_scalar_field_attributes<'db>(
 }
 
 fn visit_field_unique(field_id: ast::FieldId, model_attributes: &mut ModelAttributes, ctx: &mut Context<'_>) {
-    let mapped_name = match ctx.visit_optional_arg("map").map(|name| name.as_str()) {
-        Some(Ok("")) => {
+    let mapped_name = match ctx
+        .visit_optional_arg("map")
+        .and_then(|arg| coerce::string(arg, ctx.diagnostics))
+    {
+        Some("") => {
             ctx.push_attribute_validation_error("The `map` argument cannot be an empty string.");
             None
         }
-        Some(Ok(name)) => Some(ctx.interner.intern(name)),
-        Some(Err(err)) => {
-            ctx.push_error(err);
-            None
-        }
+        Some(name) => Some(ctx.interner.intern(name)),
         None => None,
     };
 
-    let length = match ctx.visit_optional_arg("length").map(|length| length.as_int()) {
-        Some(Ok(length)) => Some(length as u32),
-        Some(Err(err)) => {
-            ctx.push_error(err);
-            None
-        }
-        None => None,
-    };
+    let length = ctx
+        .visit_optional_arg("length")
+        .and_then(|length| coerce::integer(length, ctx.diagnostics))
+        .map(|len| len as u32);
 
-    let sort_order = match ctx.visit_optional_arg("sort").map(|sort| sort.as_constant_literal()) {
-        Some(Ok("Desc")) => Some(SortOrder::Desc),
-        Some(Ok("Asc")) => Some(SortOrder::Asc),
-        Some(Ok(other)) => {
+    let sort_order = match ctx
+        .visit_optional_arg("sort")
+        .and_then(|sort| coerce::constant(sort, ctx.diagnostics))
+    {
+        Some("Desc") => Some(SortOrder::Desc),
+        Some("Asc") => Some(SortOrder::Asc),
+        Some(other) => {
             ctx.push_attribute_validation_error(&format!(
                 "The `sort` argument can only be `Asc` or `Desc` you provided: {}.",
                 other
             ));
-            None
-        }
-        Some(Err(err)) => {
-            ctx.push_error(err);
             None
         }
         None => None,
@@ -436,16 +443,15 @@ fn model_fulltext(data: &mut ModelAttributes, model_id: ast::ModelId, ctx: &mut 
         ctx,
     );
 
-    let mapped_name = match ctx.visit_optional_arg("map").map(|name| name.as_str()) {
-        Some(Ok("")) => {
+    let mapped_name = match ctx
+        .visit_optional_arg("map")
+        .and_then(|name| coerce::string(name, ctx.diagnostics))
+    {
+        Some("") => {
             ctx.push_attribute_validation_error("The `map` argument cannot be an empty string.");
             None
         }
-        Some(Ok(name)) => Some(ctx.interner.intern(name)),
-        Some(Err(err)) => {
-            ctx.push_error(err);
-            None
-        }
+        Some(name) => Some(ctx.interner.intern(name)),
         None => None,
     };
 
@@ -470,16 +476,15 @@ fn model_index(data: &mut ModelAttributes, model_id: ast::ModelId, ctx: &mut Con
 
     let name = get_name_argument(ctx);
 
-    let mapped_name = match ctx.visit_optional_arg("map").map(|name| name.as_str()) {
-        Some(Ok("")) => {
+    let mapped_name = match ctx
+        .visit_optional_arg("map")
+        .and_then(|name| coerce::string(name, ctx.diagnostics))
+    {
+        Some("") => {
             ctx.push_attribute_validation_error("The `map` argument cannot be an empty string.");
             None
         }
-        Some(Ok(name)) => Some(ctx.interner.intern(name)),
-        Some(Err(err)) => {
-            ctx.push_error(err);
-            None
-        }
+        Some(name) => Some(ctx.interner.intern(name)),
         None => None,
     };
 
@@ -506,19 +511,18 @@ fn model_index(data: &mut ModelAttributes, model_id: ast::ModelId, ctx: &mut Con
         (None, None) => None,
     };
 
-    let algo = match ctx.visit_optional_arg("type").map(|sort| sort.as_constant_literal()) {
-        Some(Ok("BTree")) => Some(IndexAlgorithm::BTree),
-        Some(Ok("Hash")) => Some(IndexAlgorithm::Hash),
-        Some(Ok("Gist")) => Some(IndexAlgorithm::Gist),
-        Some(Ok("Gin")) => Some(IndexAlgorithm::Gin),
-        Some(Ok("SpGist")) => Some(IndexAlgorithm::SpGist),
-        Some(Ok("Brin")) => Some(IndexAlgorithm::Brin),
-        Some(Ok(other)) => {
+    let algo = match ctx
+        .visit_optional_arg("type")
+        .and_then(|sort| coerce::constant(sort, ctx.diagnostics))
+    {
+        Some("BTree") => Some(IndexAlgorithm::BTree),
+        Some("Hash") => Some(IndexAlgorithm::Hash),
+        Some("Gist") => Some(IndexAlgorithm::Gist),
+        Some("Gin") => Some(IndexAlgorithm::Gin),
+        Some("SpGist") => Some(IndexAlgorithm::SpGist),
+        Some("Brin") => Some(IndexAlgorithm::Brin),
+        Some(other) => {
             ctx.push_attribute_validation_error(&format!("Unknown index type: {}.", other));
-            None
-        }
-        Some(Err(err)) => {
-            ctx.push_error(err);
             None
         }
         None => None,
@@ -560,16 +564,15 @@ fn model_unique(data: &mut ModelAttributes, model_id: ast::ModelId, ctx: &mut Co
         // We are fine with that since this is not automatically breaking but
         // rather prompts a migration upon the first run on migrate. The client
         // is unaffected by this.
-        let mapped_name = match ctx.visit_optional_arg("map").map(|name| name.as_str()) {
-            Some(Ok("")) => {
+        let mapped_name = match ctx
+            .visit_optional_arg("map")
+            .and_then(|name| coerce::string(name, ctx.diagnostics))
+        {
+            Some("") => {
                 ctx.push_attribute_validation_error("The `map` argument cannot be an empty string.");
                 None
             }
-            Some(Ok(name)) => Some(ctx.interner.intern(name)),
-            Some(Err(err)) => {
-                ctx.push_error(err);
-                None
-            }
+            Some(name) => Some(ctx.interner.intern(name)),
             None => None,
         };
 
@@ -601,7 +604,7 @@ fn common_index_validations(
         }
     };
 
-    match resolve_field_array_with_args(&fields, current_attribute.span, model_id, resolving, ctx) {
+    match resolve_field_array_with_args(fields, current_attribute.span, model_id, resolving, ctx) {
         Ok(fields) => {
             index_data.fields = fields;
         }
@@ -676,7 +679,7 @@ fn visit_relation(model_id: ast::ModelId, relation_field: &mut RelationField, ct
     relation_field.relation_attribute = Some(ctx.current_attribute_id());
 
     if let Some(fields) = ctx.visit_optional_arg("fields") {
-        let fields = match resolve_field_array_without_args(&fields, attr.span, model_id, ctx) {
+        let fields = match resolve_field_array_without_args(fields, attr.span, model_id, ctx) {
             Ok(fields) => fields,
             Err(FieldResolutionError::AlreadyDealtWith) => Vec::new(),
             Err(FieldResolutionError::ProblematicFields {
@@ -716,7 +719,7 @@ fn visit_relation(model_id: ast::ModelId, relation_field: &mut RelationField, ct
 
     if let Some(references) = ctx.visit_optional_arg("references") {
         let references = match resolve_field_array_without_args(
-            &references,
+            references,
             attr.span,
             relation_field.referenced_model,
             ctx,
@@ -760,46 +763,42 @@ fn visit_relation(model_id: ast::ModelId, relation_field: &mut RelationField, ct
     }
 
     // Validate the `name` argument if present.
-    match ctx.visit_default_arg("name").map(|arg| arg.as_str()).ok() {
-        Some(Ok("")) => ctx.push_attribute_validation_error("A relation cannot have an empty name."),
-        Some(Ok(name)) => {
+    match ctx
+        .visit_default_arg("name")
+        .ok()
+        .and_then(|arg| coerce::string(arg, ctx.diagnostics))
+    {
+        Some("") => ctx.push_attribute_validation_error("A relation cannot have an empty name."),
+        Some(name) => {
             let interned_name = ctx.interner.intern(name);
             relation_field.name = Some(interned_name);
         }
-        Some(Err(err)) => ctx.push_error(err),
         None => (),
     }
 
     // Validate referential actions.
     if let Some(on_delete) = ctx.visit_optional_arg("onDelete") {
-        match on_delete.as_referential_action() {
-            Ok(action) => {
-                relation_field.on_delete = Some((action, on_delete.span()));
-            }
-            Err(err) => ctx.push_error(err),
+        if let Some(action) = crate::ReferentialAction::try_from_expression(on_delete, ctx.diagnostics) {
+            relation_field.on_delete = Some((action, on_delete.span()));
         }
     }
 
     if let Some(on_update) = ctx.visit_optional_arg("onUpdate") {
-        match on_update.as_referential_action() {
-            Ok(action) => {
-                relation_field.on_update = Some((action, on_update.span()));
-            }
-            Err(err) => ctx.push_error(err),
+        if let Some(action) = crate::ReferentialAction::try_from_expression(on_update, ctx.diagnostics) {
+            relation_field.on_update = Some((action, on_update.span()));
         }
     }
 
     let fk_name = {
-        let mapped_name = match ctx.visit_optional_arg("map").map(|name| name.as_str()) {
-            Some(Ok("")) => {
+        let mapped_name = match ctx
+            .visit_optional_arg("map")
+            .and_then(|name| coerce::string(name, ctx.diagnostics))
+        {
+            Some("") => {
                 ctx.push_attribute_validation_error("The `map` argument cannot be an empty string.");
                 None
             }
-            Some(Ok(name)) => Some(ctx.interner.intern(name)),
-            Some(Err(err)) => {
-                ctx.push_error(err);
-                None
-            }
+            Some(name) => Some(ctx.interner.intern(name)),
             None => None,
         };
 
@@ -824,15 +823,14 @@ enum FieldResolutionError<'ast> {
 /// resolves  the constant as field names on the model. The error variant
 /// contains the fields that are not in the model.
 fn resolve_field_array_without_args<'db>(
-    values: &ValueValidator<'db>,
+    values: &'db ast::Expression,
     attribute_span: ast::Span,
     model_id: ast::ModelId,
     ctx: &mut Context<'db>,
 ) -> Result<Vec<ast::FieldId>, FieldResolutionError<'db>> {
-    let constant_array = match values.as_constant_array() {
-        Ok(values) => values,
-        Err(err) => {
-            ctx.push_error(err);
+    let constant_array = match coerce_array(values, &coerce::constant, ctx.diagnostics) {
+        Some(values) => values,
+        None => {
             return Err(FieldResolutionError::AlreadyDealtWith);
         }
     };
@@ -904,18 +902,15 @@ impl FieldResolvingSetup {
 /// then resolves  the constant literal as field names on the model. The error variant
 /// contains the fields that are not in the model.
 fn resolve_field_array_with_args<'db>(
-    values: &ValueValidator<'db>,
+    values: &'db ast::Expression,
     attribute_span: ast::Span,
     model_id: ast::ModelId,
     resolving: FieldResolvingSetup,
     ctx: &mut Context<'db>,
 ) -> Result<Vec<FieldWithArgs>, FieldResolutionError<'db>> {
-    let constant_array = match values.as_field_array_with_args() {
-        Ok(values) => values,
-        Err(err) => {
-            ctx.push_error(err);
-            return Err(FieldResolutionError::AlreadyDealtWith);
-        }
+    let constant_array = match crate::types::index_fields::coerce_field_array_with_args(values, ctx.diagnostics) {
+        Some(values) => values,
+        None => return Err(FieldResolutionError::AlreadyDealtWith),
     };
 
     let mut field_ids = Vec::with_capacity(constant_array.len());
@@ -1047,24 +1042,25 @@ fn resolve_field_array_with_args<'db>(
     }
 }
 
-fn convert_op_class(raw: crate::value_validator::OperatorClass<'_>, ctx: &mut Context<'_>) -> OperatorClassStore {
+fn convert_op_class(raw: crate::types::index_fields::OperatorClass<'_>, ctx: &mut Context<'_>) -> OperatorClassStore {
     match raw {
-        crate::value_validator::OperatorClass::Constant(class) => OperatorClassStore::from(class),
-        crate::value_validator::OperatorClass::Raw(s) => OperatorClassStore::raw(ctx.interner.intern(s)),
+        crate::types::index_fields::OperatorClass::Constant(class) => OperatorClassStore::from(class),
+        crate::types::index_fields::OperatorClass::Raw(s) => OperatorClassStore::raw(ctx.interner.intern(s)),
     }
 }
 
 fn get_name_argument(ctx: &mut Context<'_>) -> Option<StringId> {
-    match ctx.visit_optional_arg("name").map(|name| name.as_str()) {
-        Some(Ok("")) => {
+    match ctx
+        .visit_optional_arg("name")
+        .and_then(|name| coerce::string(name, ctx.diagnostics))
+    {
+        Some("") => {
             ctx.push_attribute_validation_error("The `name` argument cannot be an empty string.");
+            None
         }
-        Some(Err(err)) => ctx.push_error(err),
-        Some(Ok(name)) => return Some(ctx.interner.intern(name)),
-        None => (),
+        Some(name) => Some(ctx.interner.intern(name)),
+        None => None,
     }
-
-    None
 }
 
 fn validate_client_name(span: Span, object_name: &str, name: StringId, attribute: &'static str, ctx: &mut Context<'_>) {
@@ -1093,12 +1089,6 @@ fn validate_client_name(span: Span, object_name: &str, name: StringId, attribute
 }
 
 fn validate_clustering_setting(ctx: &mut Context<'_>) -> Option<bool> {
-    match ctx.visit_optional_arg("clustered").map(|sort| sort.as_bool()) {
-        Some(Ok(val)) => Some(val),
-        Some(Err(err)) => {
-            ctx.push_error(err);
-            None
-        }
-        None => None,
-    }
+    ctx.visit_optional_arg("clustered")
+        .and_then(|sort| coerce::boolean(sort, ctx.diagnostics))
 }

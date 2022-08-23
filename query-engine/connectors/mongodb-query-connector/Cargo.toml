@@ -20,8 +20,7 @@ tracing = "0.1"
 tracing-futures = "0.2"
 uuid = "0.8"
 indexmap = "1.7"
-metrics = "0.18"
-metrics-util = "0.12.1"
+query-engine-metrics = {path = "../../metrics"}
 
 [dependencies.prisma-models]
 path = "../../prisma-models"

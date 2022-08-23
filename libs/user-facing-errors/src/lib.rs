@@ -1,4 +1,6 @@
-#![deny(warnings, rust_2018_idioms)]
+#![deny(unsafe_code, warnings, rust_2018_idioms)]
+#![allow(clippy::derive_partial_eq_without_eq)]
+
 mod panic_hook;
 
 pub mod common;

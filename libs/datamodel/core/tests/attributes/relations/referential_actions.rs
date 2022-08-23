@@ -1,6 +1,6 @@
 mod cycle_detection;
 
-use crate::{common::*, config::parse_config};
+use crate::common::*;
 use datamodel::dml::ReferentialAction::{self, *};
 use datamodel_connector::ReferentialIntegrity;
 
@@ -309,7 +309,7 @@ fn invalid_on_delete_action() {
         [1;94m   | [0m
     "#]];
 
-    expected.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expected.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -336,7 +336,7 @@ fn invalid_on_update_action() {
         [1;94m   | [0m
     "#]];
 
-    expected.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expected.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -374,7 +374,7 @@ fn restrict_should_not_work_on_sql_server() {
         [1;94m   | [0m
     "#]];
 
-    expected.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expected.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -414,7 +414,7 @@ fn actions_should_be_defined_only_from_one_side() {
         [1;94m   | [0m
     "#]];
 
-    expected.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expected.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -454,7 +454,7 @@ fn set_default_action_should_not_work_on_prisma_level_referential_integrity() {
         [1;94m   | [0m
     "#]];
 
-    expected.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expected.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -487,7 +487,7 @@ fn on_delete_cannot_be_defined_on_the_wrong_side_1_n() {
         [1;94m   | [0m
     "#]];
 
-    expected.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expected.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -520,7 +520,7 @@ fn on_update_cannot_be_defined_on_the_wrong_side_1_n() {
         [1;94m   | [0m
     "#]];
 
-    expected.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expected.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -549,7 +549,7 @@ fn on_delete_cannot_be_defined_on_the_wrong_side_1_1() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -578,5 +578,5 @@ fn on_update_cannot_be_defined_on_the_wrong_side_1_1() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }

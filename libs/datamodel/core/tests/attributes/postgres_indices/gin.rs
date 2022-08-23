@@ -1,32 +1,6 @@
 use crate::{common::*, with_header, Provider};
 
 #[test]
-fn on_mysql() {
-    let dml = indoc! {r#"
-        model A {
-          id Int  @id
-          a  Json
-
-          @@index([a(ops: JsonbOps)], type: Gin)
-        }
-    "#};
-
-    let schema = with_header(dml, Provider::Mysql, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@@index": The given index type is not supported with the current connector[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
-        [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  @@index([a(ops: JsonbOps)], [1;91mtype: Gin[0m)
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error)
-}
-
-#[test]
 fn with_raw_unsupported() {
     let dml = indoc! {r#"
         model A {
@@ -205,7 +179,7 @@ fn jsonb_ops_with_wrong_prisma_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `JsonbOps` points to the field `a` that is not of Json type.[0m
@@ -231,7 +205,7 @@ fn jsonb_ops_invalid_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `JsonbOps` does not support native type `Json` of field `a`.[0m
@@ -257,7 +231,7 @@ fn jsonb_ops_invalid_index_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `JsonbOps` is not supported with the `Gist` index type.[0m
@@ -341,7 +315,7 @@ fn jsonb_path_ops_invalid_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `JsonbPathOps` does not support native type `Json` of field `a`.[0m
@@ -367,7 +341,7 @@ fn jsonb_path_ops_with_wrong_prisma_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `JsonbPathOps` points to the field `a` that is not of Json type.[0m
@@ -393,7 +367,7 @@ fn jsonb_path_ops_invalid_index_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `JsonbPathOps` is not supported with the `Gist` index type.[0m
@@ -476,7 +450,7 @@ fn non_array_field_array_ops() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `ArrayOps` expects the type of field `a` to be an array.[0m
@@ -484,32 +458,6 @@ fn non_array_field_array_ops() {
         [1;94m   | [0m
         [1;94m14 | [0m
         [1;94m15 | [0m  [1;91m@@index([a(ops: ArrayOps)], type: Gin)[0m
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error)
-}
-
-#[test]
-fn array_ops_invalid_index_type() {
-    let dml = indoc! {r#"
-        model A {
-          id Int   @id
-          a  Int[]
-
-          @@index([a(ops: ArrayOps)], type: Gist)
-        }
-    "#};
-
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `ArrayOps` is not supported with the `Gist` index type.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
-        [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  [1;91m@@index([a(ops: ArrayOps)], type: Gist)[0m
         [1;94m   | [0m
     "#]];
 

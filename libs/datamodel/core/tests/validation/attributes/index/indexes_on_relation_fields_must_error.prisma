@@ -1,0 +1,20 @@
+model User {
+  id               Int @id
+  identificationId Int
+
+  identification   Identification @relation(fields: [identificationId], references:[id])
+
+  @@index([identification])
+}
+
+model Identification {
+  id Int @id
+}
+
+
+// [1;91merror[0m: [1mError validating model "User": The index definition refers to the relation fields identification. Index definitions must reference only scalar fields. Did you mean `@@index([identificationId])`?[0m
+//   [1;94m-->[0m  [4mschema.prisma:7[0m
+// [1;94m   | [0m
+// [1;94m 6 | [0m
+// [1;94m 7 | [0m  [1;91m@@index([identification])[0m
+// [1;94m   | [0m

@@ -1,3 +1,5 @@
+#![allow(clippy::derive_partial_eq_without_eq)]
+
 mod config;
 mod connector_tag;
 mod datamodel_rendering;
@@ -14,7 +16,7 @@ pub use datamodel_rendering::*;
 pub use error::*;
 pub use logging::*;
 pub use query_core;
-use query_core::MetricRegistry;
+use query_engine_metrics::MetricRegistry;
 pub use query_result::*;
 pub use runner::*;
 pub use schema_gen::*;
@@ -59,7 +61,7 @@ static METRIC_RECORDER: Once = Once::new();
 pub fn setup_metrics() -> MetricRegistry {
     let metrics = MetricRegistry::new();
     METRIC_RECORDER.call_once(|| {
-        query_core::metrics::setup();
+        query_engine_metrics::setup();
     });
     metrics
 }
@@ -107,7 +109,7 @@ pub fn run_relation_link_test<F>(
     let dm_with_params_json: DatamodelWithParams = dm_with_params.parse().unwrap();
 
     if ConnectorTag::should_run(config, &enabled_connectors, capabilities, test_name) {
-        let datamodel = render_test_datamodel(config, test_database, template, &[]);
+        let datamodel = render_test_datamodel(config, test_database, template, &[], None);
         let connector = config.test_connector_tag().unwrap();
         let requires_teardown = connector.requires_teardown();
         let metrics = setup_metrics();

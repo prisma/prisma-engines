@@ -289,9 +289,16 @@ fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilde
 
     for (field_name, map_value) in input_map {
         let additional_pairs = match model.fields().find_from_scalar(&field_name) {
-            Ok(field) => extract_cursor_field(field, map_value)?,
+            Ok(field) => {
+                let value = map_value.try_into()?;
+                vec![(field, value)]
+            }
             Err(_) => match utils::resolve_compound_field(&field_name, &model) {
-                Some(fields) => extract_compound_cursor_field(fields, map_value)?,
+                Some(fields) => {
+                    let mut map: ParsedInputMap = map_value.try_into()?;
+
+                    extract_compound_indexes(&fields, &mut map)?
+                }
                 None => {
                     return Err(QueryGraphBuilderError::AssertionError(format!(
                         "Unable to resolve field {} to a field or a set of fields on model {}",
@@ -307,24 +314,25 @@ fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilde
     Ok(Some(SelectionResult::new(pairs)))
 }
 
-fn extract_cursor_field(
-    field: ScalarFieldRef,
-    input_value: ParsedInputValue,
+fn extract_compound_indexes(
+    index_fields: &[IndexField],
+    map: &mut ParsedInputMap,
 ) -> QueryGraphBuilderResult<Vec<(ScalarFieldRef, PrismaValue)>> {
-    let value = input_value.try_into()?;
-    Ok(vec![(field, value)])
-}
+    let mut pairs: Vec<(ScalarFieldRef, PrismaValue)> = vec![];
 
-fn extract_compound_cursor_field(
-    fields: Vec<ScalarFieldRef>,
-    input_value: ParsedInputValue,
-) -> QueryGraphBuilderResult<Vec<(ScalarFieldRef, PrismaValue)>> {
-    let mut map: ParsedInputMap = input_value.try_into()?;
-    let mut pairs = vec![];
+    for index_field in index_fields {
+        match index_field {
+            IndexField::Scalar(sf) => {
+                let pv: PrismaValue = map.remove(&sf.name).unwrap().try_into()?;
 
-    for field in fields {
-        let value = map.remove(&field.name).unwrap();
-        pairs.extend(extract_cursor_field(field, value)?);
+                pairs.push((sf.clone(), pv));
+            }
+            IndexField::Composite(cif) => {
+                let mut inner_map: ParsedInputMap = map.remove(&cif.field().name).unwrap().try_into()?;
+
+                pairs.extend(extract_compound_indexes(cif.nested(), &mut inner_map)?);
+            }
+        }
     }
 
     Ok(pairs)

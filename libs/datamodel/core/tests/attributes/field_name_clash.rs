@@ -1,6 +1,4 @@
-use crate::{with_header, Provider};
-use expect_test::expect;
-use indoc::indoc;
+use crate::{common::*, with_header, Provider};
 
 #[test]
 fn naming_a_scalar_field_same_as_generated_id_name_should_error() {
@@ -18,7 +16,7 @@ fn naming_a_scalar_field_same_as_generated_id_name_should_error() {
         &[],
     );
 
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "User": The field `a_b` clashes with the `@@id` attribute's name. Please resolve the conflict by providing a custom id name: `@@id([...], name: "custom_name")`[0m
@@ -48,7 +46,7 @@ fn naming_a_field_same_as_generated_uniq_name_should_error() {
         &[],
     );
 
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "User": The field `a_b` clashes with the `@@unique` name. Please resolve the conflict by providing a custom id name: `@@unique([...], name: "custom_name")`[0m
@@ -78,7 +76,7 @@ fn naming_a_field_same_as_explicit_uniq_name_should_error() {
         &[],
     );
 
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "User": The custom name `moo` specified for the `@@unique` attribute is already used as a name for a field. Please choose a different name.[0m
@@ -114,7 +112,7 @@ fn naming_a_field_same_as_explicit_id_name_should_error() {
         &[],
     );
 
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "User": The custom name `moo` specified for the `@@id` attribute is already used as a name for a field. Please choose a different name.[0m

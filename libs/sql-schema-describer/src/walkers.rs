@@ -52,6 +52,15 @@ pub type IndexWalker<'a> = Walker<'a, IndexId>;
 /// Traverse a specific column inside an index.
 pub type IndexColumnWalker<'a> = Walker<'a, IndexColumnId>;
 
+/// Traverse a namespace
+pub type NamespaceWalker<'a> = Walker<'a, NamespaceId>;
+
+/// Traverse a user-defined type
+pub type UserDefinedTypeWalker<'a> = Walker<'a, UdtId>;
+
+/// Traverse a view
+pub type ViewWalker<'a> = Walker<'a, ViewId>;
+
 impl<'a> ColumnWalker<'a> {
     /// The nullability and arity of the column.
     pub fn arity(self) -> ColumnArity {
@@ -64,7 +73,7 @@ impl<'a> ColumnWalker<'a> {
 
     /// Returns whether the column has the enum default value of the given enum type.
     pub fn column_has_enum_default_value(self, enum_name: &str, value: &str) -> bool {
-        self.column_type_family_as_enum().map(|enm| enm.name.as_str()) == Some(enum_name)
+        self.column_type_family_as_enum().map(|enm| enm.name()) == Some(enum_name)
             && self
                 .default()
                 .and_then(|default| default.as_value())
@@ -75,7 +84,7 @@ impl<'a> ColumnWalker<'a> {
     /// Returns whether the type of the column matches the provided enum name.
     pub fn column_type_is_enum(self, enum_name: &str) -> bool {
         self.column_type_family_as_enum()
-            .map(|enm| enm.name == enum_name)
+            .map(|enm| enm.name() == enum_name)
             .unwrap_or(false)
     }
 
@@ -85,12 +94,17 @@ impl<'a> ColumnWalker<'a> {
     }
 
     /// Extract an `Enum` column type family, or `None` if the family is something else.
-    pub fn column_type_family_as_enum(self) -> Option<&'a Enum> {
+    pub fn column_type_family_as_enum(self) -> Option<EnumWalker<'a>> {
         self.column_type_family().as_enum().map(|enum_name| {
-            self.schema
-                .get_enum(enum_name)
+            let idx = self
+                .schema
+                .enums
+                .iter()
+                .position(|enm| enm.name == enum_name)
                 .ok_or_else(|| panic!("Cannot find enum referenced in ColumnTypeFamily (`{}`)", enum_name))
-                .unwrap()
+                .unwrap();
+
+            self.walk(EnumId(idx as u32))
         })
     }
 
@@ -165,21 +179,7 @@ impl<'a> ColumnWalker<'a> {
     }
 }
 
-/// Traverse a view
-#[derive(Clone, Copy)]
-pub struct ViewWalker<'a> {
-    /// The schema the view is contained in.
-    pub(crate) schema: &'a SqlSchema,
-    /// The index of the view in the schema.
-    pub(crate) view_index: usize,
-}
-
 impl<'a> ViewWalker<'a> {
-    /// Create a ViewWalker from a schema and a reference to one of its views.
-    pub fn new(schema: &'a SqlSchema, view_index: usize) -> Self {
-        Self { schema, view_index }
-    }
-
     /// The name of the view
     pub fn name(self) -> &'a str {
         &self.view().name
@@ -190,29 +190,12 @@ impl<'a> ViewWalker<'a> {
         self.view().definition.as_deref()
     }
 
-    /// The index of the view in the schema.
-    pub fn view_index(self) -> usize {
-        self.view_index
-    }
-
     fn view(self) -> &'a View {
-        &self.schema.views[self.view_index]
+        &self.schema.views[self.id.0 as usize]
     }
-}
-
-/// Traverse a user-defined type
-#[derive(Clone, Copy)]
-pub struct UserDefinedTypeWalker<'a> {
-    pub(crate) schema: &'a SqlSchema,
-    pub(crate) udt_index: usize,
 }
 
 impl<'a> UserDefinedTypeWalker<'a> {
-    /// Create a UserDefinedTypeWalker from a schema and a reference to one of its udts.
-    pub fn new(schema: &'a SqlSchema, udt_index: usize) -> Self {
-        Self { schema, udt_index }
-    }
-
     /// The name of the type
     pub fn name(self) -> &'a str {
         &self.udt().name
@@ -223,13 +206,8 @@ impl<'a> UserDefinedTypeWalker<'a> {
         self.udt().definition.as_deref()
     }
 
-    /// The index of the user-defined type in the schema.
-    pub fn udt_index(self) -> usize {
-        self.udt_index
-    }
-
     fn udt(self) -> &'a UserDefinedType {
-        &self.schema.user_defined_types[self.udt_index]
+        &self.schema.user_defined_types[self.id.0 as usize]
     }
 }
 
@@ -297,6 +275,19 @@ impl<'a> TableWalker<'a> {
             let cols = fk.columns();
             cols.len() == 1 && cols[0].constrained_column == column
         })
+    }
+
+    /// The namespace the table belongs to, if defined.
+    pub fn namespace(self) -> Option<&'a str> {
+        self.schema
+            .namespaces
+            .get(self.table().namespace_id.0 as usize)
+            .map(|s| s.as_str())
+    }
+
+    /// The namespace the table belongs to.
+    pub fn namespace_id(self) -> NamespaceId {
+        self.table().namespace_id
     }
 
     /// Traverse to the primary key of the table.
@@ -466,6 +457,14 @@ impl<'a> EnumWalker<'a> {
         &self.schema.enums[self.id.0 as usize]
     }
 
+    /// The namespace the enum belongs to, if defined.
+    pub fn namespace(self) -> Option<&'a str> {
+        self.schema
+            .namespaces
+            .get(self.get().namespace_id.0 as usize)
+            .map(|s| s.as_str())
+    }
+
     /// The name of the enum. This is a made up name on MySQL.
     pub fn name(self) -> &'a str {
         &self.get().name
@@ -474,6 +473,13 @@ impl<'a> EnumWalker<'a> {
     /// The values of the enum
     pub fn values(self) -> &'a [String] {
         &self.get().values
+    }
+}
+
+impl<'a> NamespaceWalker<'a> {
+    /// The namespace name.
+    pub fn name(self) -> &'a str {
+        &self.schema.namespaces[self.id.0 as usize]
     }
 }
 

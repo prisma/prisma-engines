@@ -1,5 +1,6 @@
 use crate::{
     ast::{self, WithName, WithSpan},
+    coerce,
     context::Context,
     types::{CompositeTypeField, ModelAttributes, ScalarField},
     DatamodelError, StringId,
@@ -126,10 +127,13 @@ pub(super) fn composite_type_field(
 }
 
 pub(super) fn visit_map_attribute(ctx: &mut Context<'_>) -> Option<StringId> {
-    match ctx.visit_default_arg("name").map(|value| value.as_str()) {
-        Ok(Ok(name)) => return Some(ctx.interner.intern(name)),
+    match ctx
+        .visit_default_arg("name")
+        .map(|value| coerce::string(value, ctx.diagnostics))
+    {
+        Ok(Some(name)) => return Some(ctx.interner.intern(name)),
         Err(err) => ctx.push_error(err), // not flattened for error handing legacy reasons
-        Ok(Err(err)) => ctx.push_error(err),
+        Ok(None) => (),
     };
 
     None

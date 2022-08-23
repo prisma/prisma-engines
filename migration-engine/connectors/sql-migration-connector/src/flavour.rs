@@ -20,6 +20,7 @@ use datamodel::{common::preview_features::PreviewFeature, ValidatedSchema};
 use enumflags2::BitFlags;
 use migration_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult,
+    MigrationRecord, PersistenceNotInitializedError,
 };
 use quaint::prelude::{ConnectionInfo, Table};
 use sql_schema_describer::SqlSchema;
@@ -100,7 +101,13 @@ where
 }
 
 pub(crate) trait SqlFlavour:
-    DestructiveChangeCheckerFlavour + SqlRenderer + SqlSchemaDifferFlavour + SqlSchemaCalculatorFlavour + Debug
+    DestructiveChangeCheckerFlavour
+    + SqlRenderer
+    + SqlSchemaDifferFlavour
+    + SqlSchemaCalculatorFlavour
+    + Send
+    + Sync
+    + Debug
 {
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
 
@@ -150,6 +157,75 @@ pub(crate) trait SqlFlavour:
     /// This can include some set up on the database, like ensuring that the
     /// schema we connect to exists.
     fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
+
+    fn load_migrations_table(
+        &mut self,
+    ) -> BoxFuture<'_, ConnectorResult<Result<Vec<MigrationRecord>, PersistenceNotInitializedError>>> {
+        use quaint::prelude::*;
+        Box::pin(async move {
+            let select = Select::from_table(self.migrations_table())
+                .column("id")
+                .column("checksum")
+                .column("finished_at")
+                .column("migration_name")
+                .column("logs")
+                .column("rolled_back_at")
+                .column("started_at")
+                .column("applied_steps_count")
+                .order_by("started_at".ascend());
+
+            let rows = match self.query(select.into()).await {
+                Ok(result) => result,
+                Err(err)
+                    if err.is_user_facing_error::<user_facing_errors::query_engine::TableDoesNotExist>()
+                        || err.is_user_facing_error::<user_facing_errors::common::InvalidModel>() =>
+                {
+                    return Ok(Err(PersistenceNotInitializedError))
+                }
+                err @ Err(_) => err?,
+            };
+
+            let rows = rows
+                .into_iter()
+                .map(|row| -> ConnectorResult<_> {
+                    Ok(MigrationRecord {
+                        id: row.get("id").and_then(|v| v.to_string()).ok_or_else(|| {
+                            ConnectorError::from_msg("Failed to extract `id` from `_prisma_migrations` row.".into())
+                        })?,
+                        checksum: row.get("checksum").and_then(|v| v.to_string()).ok_or_else(|| {
+                            ConnectorError::from_msg(
+                                "Failed to extract `checksum` from `_prisma_migrations` row.".into(),
+                            )
+                        })?,
+                        finished_at: row.get("finished_at").and_then(|v| v.as_datetime()),
+                        migration_name: row.get("migration_name").and_then(|v| v.to_string()).ok_or_else(|| {
+                            ConnectorError::from_msg(
+                                "Failed to extract `migration_name` from `_prisma_migrations` row.".into(),
+                            )
+                        })?,
+                        logs: None,
+                        rolled_back_at: row.get("rolled_back_at").and_then(|v| v.as_datetime()),
+                        started_at: row.get("started_at").and_then(|v| v.as_datetime()).ok_or_else(|| {
+                            ConnectorError::from_msg(
+                                "Failed to extract `started_at` from `_prisma_migrations` row.".into(),
+                            )
+                        })?,
+                        applied_steps_count: row.get("applied_steps_count").and_then(|v| v.as_integer()).ok_or_else(
+                            || {
+                                ConnectorError::from_msg(
+                                    "Failed to extract `applied_steps_count` from `_prisma_migrations` row.".into(),
+                                )
+                            },
+                        )? as u32,
+                    })
+                })
+                .collect::<Result<Vec<_>, _>>()?;
+
+            tracing::debug!("Found {} migrations in the migrations table.", rows.len());
+
+            Ok(Ok(rows))
+        })
+    }
 
     fn query<'a>(
         &'a mut self,

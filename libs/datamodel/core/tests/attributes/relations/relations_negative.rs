@@ -25,7 +25,7 @@ fn fail_if_ambiguous_relation_fields_do_not_specify_a_name() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -59,7 +59,7 @@ fn fail_if_naming_relation_fields_the_same_as_the_explicit_names() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -90,7 +90,7 @@ fn must_error_when_non_existing_fields_are_used() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -117,7 +117,7 @@ fn should_fail_on_ambiguous_relations_with_automatic_names_1() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -180,7 +180,7 @@ fn should_fail_on_colliding_implicit_self_relations() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -209,7 +209,7 @@ fn should_fail_on_ambiguous_relations_with_automatic_names_2() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -236,7 +236,7 @@ fn should_fail_on_ambiguous_relations_with_manual_names_1() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -265,7 +265,7 @@ fn should_fail_on_ambiguous_relations_with_manual_names_2() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -289,7 +289,7 @@ fn should_fail_on_ambiguous_self_relation() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -312,7 +312,7 @@ fn should_fail_on_ambiguous_self_relation_with_two_fields() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -336,7 +336,7 @@ fn should_fail_on_ambiguous_named_self_relation() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -378,7 +378,7 @@ fn should_fail_on_conflicting_back_relation_field_name() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -429,7 +429,7 @@ fn should_fail_when_relation_attribute_is_missing_for_one_to_one_relations() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -472,7 +472,7 @@ fn should_fail_on_conflicting_generated_back_relation_fields() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 //reformat implicit relations test files
@@ -502,7 +502,7 @@ fn must_generate_forward_relation_fields_for_named_relation_fields() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 // todo this is also accepted and adds a postId scalar field under the hood on PostableEntity
@@ -531,7 +531,7 @@ fn issue4850() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 //todo I think this should be fine and just add the @relation and relationname to the backrelation field
@@ -597,7 +597,7 @@ fn issue5216() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 //todo this is also accepted but will under the hood point the createdBy relationfield to the same userId scalar
@@ -636,7 +636,7 @@ fn issue5069() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -670,7 +670,7 @@ fn must_add_referenced_fields_on_both_sides_for_one_to_many_relations() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 
     // prove that lexicographic order does not have an influence.
     let dml = indoc! {r#"
@@ -702,7 +702,7 @@ fn must_add_referenced_fields_on_both_sides_for_one_to_many_relations() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -746,7 +746,7 @@ fn should_fail_on_missing_embed_ids_on_self_relations() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -777,7 +777,7 @@ fn mapping_foreign_keys_with_a_name_that_is_too_long_should_error() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(&dml));
 }
 
 #[test]
@@ -809,7 +809,7 @@ fn mapping_foreign_keys_on_sqlite_should_error() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -839,7 +839,7 @@ fn relation_field_in_composite_type_errors() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(schema).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(schema));
 }
 
 #[test]
@@ -875,7 +875,7 @@ fn relation_attribute_on_a_composite_field_errors() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(schema).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(schema));
 }
 
 #[test]
@@ -911,7 +911,7 @@ fn a_typoed_relation_should_fail_gracefully() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -947,7 +947,7 @@ fn cannot_use_references_with_many_to_many_relations() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -975,7 +975,7 @@ fn should_fail_if_not_using_unique_constraint_with_singular_one_to_one() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -1007,7 +1007,7 @@ fn should_fail_if_not_using_unique_constraint_with_compound_one_to_one() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -1040,7 +1040,7 @@ fn should_fail_if_not_using_unique_constraint_with_single_one_to_many() {
 
     let dml = with_header(dml, Provider::Mysql, &[]);
 
-    expect.assert_eq(&datamodel::parse_schema(&dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(&dml));
 }
 
 #[test]

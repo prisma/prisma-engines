@@ -1,4 +1,5 @@
 #![deny(unsafe_code, rust_2018_idioms, missing_docs)]
+#![allow(clippy::derive_partial_eq_without_eq)]
 
 //! See the docs on [ParserDatabase](./struct.ParserDatabase.html).
 //!
@@ -28,18 +29,20 @@
 pub mod walkers;
 
 mod attributes;
+mod coerce_expression;
 mod context;
 mod interner;
 mod names;
 mod relations;
 mod types;
-mod value_validator;
 
+pub use coerce_expression::{coerce, coerce_array, coerce_opt};
 pub use names::is_reserved_type_name;
 pub use relations::ReferentialAction;
 pub use schema_ast::{ast, SourceFile};
-pub use types::{IndexAlgorithm, IndexFieldPath, IndexType, OperatorClass, ScalarFieldType, ScalarType, SortOrder};
-pub use value_validator::{ValueListValidator, ValueValidator};
+pub use types::{
+    IndexAlgorithm, IndexFieldPath, IndexType, OperatorClass, ScalarFieldType, ScalarType, SchemaFlags, SortOrder,
+};
 
 use self::{context::Context, interner::StringId, relations::Relations, types::Types};
 use diagnostics::{DatamodelError, Diagnostics};
@@ -145,6 +148,11 @@ impl ParserDatabase {
     /// The source file contents.
     pub fn source(&self) -> &str {
         self.file.as_str()
+    }
+
+    /// Global properties of the schema.
+    pub fn schema_flags(&self) -> enumflags2::BitFlags<types::SchemaFlags> {
+        self.types.flags
     }
 }
 

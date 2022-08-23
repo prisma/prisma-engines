@@ -287,7 +287,7 @@ fn datamodel_parser_errors_must_return_a_known_error(api: TestApi) {
     assert_eq!(error, expected_error);
 }
 
-#[test_connector(exclude(CockroachDb))]
+#[test_connector(exclude(CockroachDb, Sqlite))]
 fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: TestApi) {
     let dm = r#"
         model Fruit {

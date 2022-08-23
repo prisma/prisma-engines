@@ -20,7 +20,7 @@ impl QueryGraphBuilder {
 
     /// Maps an operation to a query.
     pub fn build(self, operation: Operation) -> QueryGraphBuilderResult<(QueryGraph, IrSerializer)> {
-        let _span = info_span!("engine:build_graph");
+        let _span = info_span!("prisma:engine:build_graph");
         match operation {
             Operation::Read(selection) => self.build_internal(selection, &self.query_schema.query()),
             Operation::Write(selection) => self.build_internal(selection, &self.query_schema.mutation()),

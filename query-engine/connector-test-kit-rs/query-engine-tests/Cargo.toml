@@ -19,6 +19,7 @@ base64 = "0.13"
 uuid = "0.8"
 tokio = "1.8"
 prisma-value = { path = "../../../libs/prisma-value" }
+query-engine-metrics = { path = "../../metrics"}
 
 [dev-dependencies]
 insta = "1.7.1"

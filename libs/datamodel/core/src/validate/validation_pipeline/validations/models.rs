@@ -270,3 +270,29 @@ pub(super) fn id_client_name_does_not_clash_with_field(model: ModelWalker<'_>, c
         ));
     }
 }
+
+pub(super) fn schema_attribute(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
+    match (model.schema(), ctx.datasource) {
+        (Some((_, span)), _) if !ctx.connector.has_capability(ConnectorCapability::MultiSchema) => ctx.push_error(
+            DatamodelError::new_static("@@schema is not supported on the current datasource provider", span),
+        ),
+        (Some((schema_name, span)), Some(ds)) if !ds.has_schema(schema_name) => {
+    ctx.push_error(DatamodelError::new_static(
+        "This schema is not defined in the datasource. Read more on `@@schema` at https://pris.ly/d/multi-schema",
+        span,
+    ))
+        },
+        (None, _)
+            if ctx
+                .db
+                .schema_flags()
+                .contains(parser_database::SchemaFlags::UsesSchemaAttribute) =>
+        {
+            ctx.push_error(DatamodelError::new_static(
+                "This model is missing an `@@schema` attribute.",
+                model.ast_model().span(),
+            ))
+        }
+        _ => (),
+    }
+}

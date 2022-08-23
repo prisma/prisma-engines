@@ -1,0 +1,20 @@
+datasource test {
+  provider = "postgresql"
+  url = env("TEST_DATABASE_URL")
+}
+
+model A {
+  id Int    @id
+  a  String @test.Inet
+  b  String @test.Inet
+
+  @@index([a, b], type: SpGist)
+}
+
+
+// [1;91merror[0m: [1mError parsing attribute "@@index": SpGist does not support multi-column indices.[0m
+//   [1;94m-->[0m  [4mschema.prisma:11[0m
+// [1;94m   | [0m
+// [1;94m10 | [0m
+// [1;94m11 | [0m  [1;91m@@index([a, b], type: SpGist)[0m
+// [1;94m   | [0m

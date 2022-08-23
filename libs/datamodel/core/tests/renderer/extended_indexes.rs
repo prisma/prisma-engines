@@ -1,5 +1,4 @@
-use crate::{with_header, Provider};
-use expect_test::expect;
+use crate::{common::*, with_header, Provider};
 
 #[test]
 fn expanded_index_capability_rendering_works() {
@@ -34,7 +33,7 @@ fn expanded_index_capability_rendering_works() {
      }
     "#]];
 
-    let dml = datamodel::parse_datamodel(dm).unwrap().subject;
+    let dml = parse(dm);
     let configuration = datamodel::parse_configuration(dm).unwrap().subject;
     let rendered = datamodel::render_datamodel_to_string(&dml, Some(&configuration));
     expected.assert_eq(&rendered)
@@ -72,7 +71,7 @@ fn expanded_id_capability_rendering_works_for_mysql() {
       }
     "#]];
 
-    let dml = datamodel::parse_datamodel(&dm).unwrap().subject;
+    let dml = parse(&dm);
     let configuration = datamodel::parse_configuration(&dm).unwrap().subject;
     let rendered = datamodel::render_datamodel_to_string(&dml, Some(&configuration));
     expected.assert_eq(&rendered)
@@ -110,8 +109,8 @@ fn expanded_id_capability_rendering_works_for_sqlserver() {
       }
     "#]];
 
-    let dml = datamodel::parse_datamodel(&dm).unwrap().subject;
-    let configuration = datamodel::parse_configuration(&dm).unwrap().subject;
+    let dml = parse(&dm);
+    let configuration = parse_configuration(&dm);
     let rendered = datamodel::render_datamodel_to_string(&dml, Some(&configuration));
     expected.assert_eq(&rendered)
 }

@@ -305,11 +305,6 @@ fn minimal_schema_from_url(url: &str) -> anyhow::Result<String> {
               provider = "{}"
               url = "{}"
             }}
-
-            generator js {{
-              provider        = "prisma-client-js"
-              previewFeatures = ["mongodb"]
-            }}
         "#,
         provider, url
     );

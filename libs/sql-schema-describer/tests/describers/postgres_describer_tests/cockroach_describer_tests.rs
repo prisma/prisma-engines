@@ -232,8 +232,12 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
     api.raw_cmd(&schema);
     let expectation = expect![[r#"
         SqlSchema {
+            namespaces: [],
             tables: [
                 Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "indexes_test",
                 },
             ],

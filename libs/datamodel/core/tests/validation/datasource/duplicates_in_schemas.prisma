@@ -1,0 +1,18 @@
+datasource testds {
+    provider = "postgresql"
+    url = env("TEST_DATABASE_URL")
+    schemas = ["one", "two", "two", "three", "three"]
+}
+
+// [1;91merror[0m: [1mDuplicated schema names are not allowed[0m
+//   [1;94m-->[0m  [4mschema.prisma:4[0m
+// [1;94m   | [0m
+// [1;94m 3 | [0m    url = env("TEST_DATABASE_URL")
+// [1;94m 4 | [0m    schemas = ["one", "two", "two", [1;91m"three"[0m, "three"]
+// [1;94m   | [0m
+// [1;91merror[0m: [1mDuplicated schema names are not allowed[0m
+//   [1;94m-->[0m  [4mschema.prisma:4[0m
+// [1;94m   | [0m
+// [1;94m 3 | [0m    url = env("TEST_DATABASE_URL")
+// [1;94m 4 | [0m    schemas = ["one", [1;91m"two"[0m, "two", "three", "three"]
+// [1;94m   | [0m

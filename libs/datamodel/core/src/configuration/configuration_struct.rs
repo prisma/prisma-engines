@@ -37,9 +37,9 @@ impl Configuration {
     }
 
     pub fn preview_features(&self) -> BitFlags<PreviewFeature> {
-        self.generators
-            .iter()
-            .fold(BitFlags::empty(), |acc, generator| acc | generator.preview_features())
+        self.generators.iter().fold(BitFlags::empty(), |acc, generator| {
+            acc | generator.preview_features.unwrap_or_default()
+        })
     }
 
     pub fn resolve_datasource_urls_from_env<F>(

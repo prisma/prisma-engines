@@ -10,7 +10,7 @@ fn not_allowed_with_unique() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mNo such argument.[0m
@@ -37,7 +37,7 @@ fn not_allowed_with_compound_unique() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mNo such argument.[0m
@@ -63,7 +63,7 @@ fn on_mysql() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given index type is not supported with the current connector[0m
@@ -172,7 +172,7 @@ fn wrong_ops_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `InetOps` does not support native type `VarChar` of field `a`.[0m
@@ -198,7 +198,7 @@ fn wrong_ops_index_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `InetOps` is not supported with the `Hash` index type.[0m
@@ -224,7 +224,7 @@ fn wrong_ops_no_native_type() {
     "#};
 
     let schema = with_header(dml, Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `InetOps` expects the field `a` to define a valid native type.[0m

@@ -12,7 +12,7 @@ pub fn find_related(
     let alias = field.alias;
     let sub_selections = field.nested_fields.unwrap().fields;
     let (aggr_fields_pairs, sub_selections) = extractors::extract_nested_rel_aggr_selections(sub_selections);
-    let aggr_selections: Vec<_> = utils::collect_relation_aggr_selections(&aggr_fields_pairs, &model);
+    let aggregation_selections = utils::collect_relation_aggr_selections(aggr_fields_pairs, &model)?;
     let selection_order: Vec<String> = utils::collect_selection_order(&sub_selections);
     let selected_fields = utils::collect_selected_fields(&sub_selections, args.distinct.clone(), &model);
     let nested = utils::collect_nested_queries(sub_selections, &model)?;
@@ -29,7 +29,7 @@ pub fn find_related(
         selected_fields,
         nested,
         selection_order,
-        aggregation_selections: aggr_selections,
+        aggregation_selections,
         parent_results: None,
     }))
 }

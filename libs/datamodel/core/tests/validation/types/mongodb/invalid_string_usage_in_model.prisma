@@ -1,0 +1,44 @@
+datasource test {
+  provider = "mongodb"
+  url = env("TEST_DATABASE_URL")
+}
+
+model A {
+  id Int      @id          @map("_id")
+  a  Int      @test.String
+  b  Float    @test.String
+  c  Bytes    @test.String
+  d  Boolean  @test.String
+  e  DateTime @test.String
+}
+
+// [1;91merror[0m: [1mNative type String is not compatible with declared field type Int, expected field type String.[0m
+//   [1;94m-->[0m  [4mschema.prisma:8[0m
+// [1;94m   | [0m
+// [1;94m 7 | [0m  id Int      @id          @map("_id")
+// [1;94m 8 | [0m  a  Int      [1;91m@test.String[0m
+// [1;94m   | [0m
+// [1;91merror[0m: [1mNative type String is not compatible with declared field type Float, expected field type String.[0m
+//   [1;94m-->[0m  [4mschema.prisma:9[0m
+// [1;94m   | [0m
+// [1;94m 8 | [0m  a  Int      @test.String
+// [1;94m 9 | [0m  b  Float    [1;91m@test.String[0m
+// [1;94m   | [0m
+// [1;91merror[0m: [1mNative type String is not compatible with declared field type Bytes, expected field type String.[0m
+//   [1;94m-->[0m  [4mschema.prisma:10[0m
+// [1;94m   | [0m
+// [1;94m 9 | [0m  b  Float    @test.String
+// [1;94m10 | [0m  c  Bytes    [1;91m@test.String[0m
+// [1;94m   | [0m
+// [1;91merror[0m: [1mNative type String is not compatible with declared field type Boolean, expected field type String.[0m
+//   [1;94m-->[0m  [4mschema.prisma:11[0m
+// [1;94m   | [0m
+// [1;94m10 | [0m  c  Bytes    @test.String
+// [1;94m11 | [0m  d  Boolean  [1;91m@test.String[0m
+// [1;94m   | [0m
+// [1;91merror[0m: [1mNative type String is not compatible with declared field type DateTime, expected field type String.[0m
+//   [1;94m-->[0m  [4mschema.prisma:12[0m
+// [1;94m   | [0m
+// [1;94m11 | [0m  d  Boolean  @test.String
+// [1;94m12 | [0m  e  DateTime [1;91m@test.String[0m
+// [1;94m   | [0m

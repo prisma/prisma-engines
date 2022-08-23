@@ -30,7 +30,7 @@ pub async fn create_record<'conn>(
     let coll = database.collection::<Document>(model.db_name());
 
     let span = info_span!(
-        "prisma:db_query",
+        "prisma:engine:db_query",
         user_facing = true,
         "db.statement" = &format_args!("db.{}.insertOne(*)", coll.name())
     );
@@ -83,7 +83,7 @@ pub async fn create_records<'conn>(
     let coll = database.collection::<Document>(model.db_name());
 
     let span = info_span!(
-        "prisma:db_query",
+        "prisma:engine:db_query",
         user_facing = true,
         "db.statement" = &format_args!("db.{}.insertMany(*)", coll.name())
     );
@@ -172,7 +172,7 @@ pub async fn update_records<'conn>(
     }
 
     let span = info_span!(
-        "prisma:db_query",
+        "prisma:engine:db_query",
         user_facing = true,
         "db.statement" = &format_args!("db.{}.updateMany(*)", coll.name())
     );
@@ -244,7 +244,7 @@ pub async fn delete_records<'conn>(
     }
 
     let span = info_span!(
-        "prisma:db_query",
+        "prisma:engine:db_query",
         user_facing = true,
         "db.statement" = &format_args!("db.{}.deleteMany(*)", coll.name())
     );
@@ -269,7 +269,7 @@ async fn find_ids(
     let coll = database.collection::<Document>(model.db_name());
 
     let span = info_span!(
-        "prisma:db_query",
+        "prisma:engine:db_query",
         user_facing = true,
         "db.statement" = &format_args!("db.{}.findMany(*)", coll.name())
     );
@@ -418,7 +418,7 @@ pub async fn query_raw<'conn>(
 ) -> crate::Result<serde_json::Value> {
     let db_statement = get_raw_db_statement(&query_type, &model, database);
     let span = info_span!(
-        "prisma:db_query",
+        "prisma:engine:db_query",
         user_facing = true,
         "db.statement" = &&db_statement.as_str()
     );

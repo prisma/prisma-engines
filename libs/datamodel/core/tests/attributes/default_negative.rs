@@ -13,7 +13,7 @@ fn must_error_if_default_value_for_relation_field() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": Cannot set a default value on a relation field.[0m
@@ -112,7 +112,7 @@ fn must_error_if_default_value_type_mismatch() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": Expected a String value, but found `3`.[0m
@@ -135,7 +135,7 @@ fn datetime_defaults_must_be_valid_rfc3339() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": Parse error: "Hugo" is not a valid rfc3339 datetime string. (input contains invalid characters)[0m
@@ -158,7 +158,7 @@ fn must_error_if_unknown_function_is_used() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mUnknown function in @default(): `unknown_function` is not known. You can read about the available functions here: https://pris.ly/d/attribute-functions[0m
@@ -181,7 +181,7 @@ fn must_error_if_now_function_is_used_for_fields_that_are_not_datetime() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The function `now()` cannot be used on fields of type `String`.[0m
@@ -204,7 +204,7 @@ fn must_error_if_autoincrement_function_is_used_for_fields_that_are_not_int() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The function `autoincrement()` cannot be used on fields of type `String`.[0m
@@ -231,7 +231,7 @@ fn must_error_if_default_value_for_enum_is_not_valid() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The defined default value `B` is not a valid value of the enum specified for the field.[0m
@@ -286,7 +286,7 @@ fn must_error_if_using_non_id_auto_increment_on_sqlite() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The `autoincrement()` default value is used on a non-id field even though the datasource does not support this.[0m
@@ -316,7 +316,7 @@ fn must_error_if_using_multiple_auto_increment_on_mysql() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The `autoincrement()` default value is used multiple times on this model even though the underlying datasource only supports one instance per table.[0m
@@ -348,7 +348,7 @@ fn must_error_if_using_non_indexed_auto_increment_on_mysql() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The `autoincrement()` default value is used on a non-indexed field even though the datasource does not support this.[0m
@@ -381,7 +381,7 @@ fn must_error_on_arguments_in_autoincrement() {
         [1;94m   | [0m
     "#]];
 
-    expected.assert_eq(&datamodel::parse_schema(input).map(drop).unwrap_err());
+    expected.assert_eq(&parse_unwrap_err(input));
 }
 
 #[test]
@@ -398,7 +398,7 @@ fn must_error_if_scalar_default_on_unsupported() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": Only @default(dbgenerated("...")) can be used for Unsupported types.[0m
@@ -421,7 +421,7 @@ fn must_error_if_non_string_expression_in_function_default() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The `autoincrement` function does not take any argument. Consider changing this default to `autoincrement()`.[0m
@@ -444,7 +444,7 @@ fn must_error_if_non_string_expression_in_function_default_2() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": `dbgenerated()` takes a single String argument[0m
@@ -467,7 +467,7 @@ fn must_error_on_empty_string_in_dbgenerated() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": dbgenerated() takes either no argument, or a single nonempty string argument.[0m
@@ -498,7 +498,7 @@ fn dbgenerated_default_errors_must_not_cascade_into_other_errors() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": dbgenerated() takes either no argument, or a single nonempty string argument.[0m
@@ -530,7 +530,7 @@ fn named_default_constraints_should_not_work_on_non_sql_server() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": You defined a database name for the default value of a field on the model. This is not supported by the provider.[0m
@@ -561,7 +561,7 @@ fn named_default_constraints_are_not_allowed_on_identity() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": Naming an autoincrement default value is not allowed.[0m
@@ -598,7 +598,7 @@ fn named_default_constraints_cannot_have_duplicate_names() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The given constraint name `reserved` has to be unique in the following namespace: global for primary keys, foreign keys and default constraints. Please provide a different name using the `map` argument.[0m
@@ -640,7 +640,7 @@ fn named_default_constraints_cannot_clash_with_pk_names() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The given constraint name `reserved` has to be unique in the following namespace: global for primary keys, foreign keys and default constraints. Please provide a different name using the `map` argument.[0m
@@ -681,7 +681,7 @@ fn named_default_constraints_cannot_clash_with_fk_names() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The given constraint name `reserved` has to be unique in the following namespace: global for primary keys, foreign keys and default constraints. Please provide a different name using the `map` argument.[0m
@@ -714,7 +714,7 @@ fn default_on_composite_type_field_errors() {
         }
     "#};
 
-    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(schema);
 
     // Error could be better since PG don't support composites yet at all.
     let expected = expect![[r#"
@@ -743,7 +743,7 @@ fn must_error_on_auto_default_on_non_native_type_on_mongodb() {
         }
     "#;
 
-    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(schema);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating field `nickname` in model `User`: MongoDB `@default(auto())` fields must have `ObjectId` native type.[0m
@@ -779,7 +779,7 @@ fn must_error_on_auto_default_on_non_object_id_on_mongodb() {
         }
     "#;
 
-    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(schema);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating field `id` in model `User`: MongoDB `@default(auto())` fields must have `ObjectId` native type.[0m
@@ -812,7 +812,7 @@ fn must_error_on_auto_default_on_mongodb_composite() {
         }
     "#;
 
-    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(schema);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The function `auto()` is not supported on composite fields.[0m
@@ -839,7 +839,7 @@ fn must_error_on_dbgenerated_default_on_mongodb() {
         }
     "#;
 
-    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(schema);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating field `id` in model `User`: The `dbgenerated()` function is not allowed with MongoDB. Please use `auto()` instead.[0m
@@ -867,7 +867,7 @@ fn must_error_with_auto_params_on_mongodb() {
         }
     "#;
 
-    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(schema);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": `auto()` takes no arguments[0m
@@ -894,7 +894,7 @@ fn must_error_if_using_auto_with_postgres() {
         }
     "#;
 
-    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(schema);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The current connector does not support the `auto()` function.[0m
@@ -921,7 +921,7 @@ fn must_error_if_using_auto_with_mysql() {
         }
     "#;
 
-    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(schema);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The current connector does not support the `auto()` function.[0m
@@ -948,7 +948,7 @@ fn must_error_if_using_auto_with_sql_server() {
         }
     "#;
 
-    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(schema);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The current connector does not support the `auto()` function.[0m
@@ -975,7 +975,7 @@ fn must_error_if_using_auto_with_sqlite() {
         }
     "#;
 
-    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(schema);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The current connector does not support the `auto()` function.[0m
@@ -1003,7 +1003,7 @@ fn must_error_on_auto_default_on_non_id_on_mongodb() {
         }
     "#;
 
-    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(schema);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating field `nickname` in model `User`: MongoDB `@default(auto())` fields must have the `@id` attribute.[0m
@@ -1027,7 +1027,7 @@ fn json_defaults_must_be_valid_json() {
         }
     "#;
 
-    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(schema);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": Parse error: "not json" is not a valid JSON string. (expected ident at line 1 column 2)[0m
@@ -1050,7 +1050,7 @@ fn bytes_defaults_must_be_base64() {
         }
     "#;
 
-    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(schema);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": Parse error: "not base64" is not a valid base64 string. (Could not convert from `base64 encoded bytes` to `PrismaValue::Bytes`)[0m
@@ -1073,7 +1073,7 @@ fn int_defaults_must_not_contain_decimal_point() {
         }
     "#;
 
-    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(schema);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": Parse error: "3.14" is not a valid integer. (invalid digit found in string)[0m
@@ -1096,7 +1096,7 @@ fn bigint_defaults_must_not_contain_decimal_point() {
         }
     "#;
 
-    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+    let error = parse_unwrap_err(schema);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": Parse error: "3.14" is not a valid integer. (invalid digit found in string)[0m

@@ -1,8 +1,8 @@
-pub use datamodel::{dml, dml::*};
+pub use datamodel::{dml, dml::*, parse_datamodel, parse_schema};
 pub use expect_test::expect;
 pub use indoc::{formatdoc, indoc};
 
-use datamodel::{diagnostics::*, Configuration, StringFromEnvVar};
+use datamodel::{diagnostics::*, Configuration, StringFromEnvVar, ValidatedConfiguration};
 use pretty_assertions::assert_eq;
 
 pub(crate) fn reformat(input: &str) -> String {
@@ -413,8 +413,12 @@ impl WarningAsserts for Vec<DatamodelWarning> {
     }
 }
 
+pub(crate) fn parse_unwrap_err(schema: &str) -> String {
+    parse_schema(schema).unwrap_err()
+}
+
 pub(crate) fn parse(datamodel_string: &str) -> Datamodel {
-    match datamodel::parse_datamodel(datamodel_string) {
+    match parse_datamodel(datamodel_string) {
         Ok(s) => s.subject,
         Err(errs) => {
             panic!(
@@ -423,6 +427,10 @@ pub(crate) fn parse(datamodel_string: &str) -> Datamodel {
             )
         }
     }
+}
+
+pub(crate) fn parse_config(schema: &str) -> Result<ValidatedConfiguration, String> {
+    datamodel::parse_configuration(schema).map_err(|err| err.to_pretty_string("schema.prisma", schema))
 }
 
 pub(crate) fn parse_configuration(datamodel_string: &str) -> Configuration {
@@ -439,7 +447,7 @@ pub(crate) fn parse_configuration(datamodel_string: &str) -> Configuration {
 
 #[track_caller]
 pub(crate) fn expect_error(schema: &str, expectation: &expect_test::Expect) {
-    match datamodel::parse_schema(schema) {
+    match parse_schema(schema) {
         Ok(_) => panic!("Expected a validation error, but the schema is valid."),
         Err(err) => expectation.assert_eq(&err),
     }

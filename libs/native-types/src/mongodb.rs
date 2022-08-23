@@ -4,7 +4,7 @@ use serde_json::Value;
 /// MongoDB native types.
 /// Ignores deprecated and unsupported types for now.
 /// Taken from: <https://docs.mongodb.com/manual/reference/bson-types/>
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum MongoDbType {
     String,
     Double,

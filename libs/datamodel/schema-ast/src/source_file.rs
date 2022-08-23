@@ -22,7 +22,7 @@ impl SourceFile {
     pub fn as_str(&self) -> &str {
         match self.contents {
             Contents::Static(s) => s,
-            Contents::Allocated(ref s) => &*s,
+            Contents::Allocated(ref s) => &**s,
         }
     }
 }

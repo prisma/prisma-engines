@@ -84,12 +84,18 @@ impl SqlRenderer for PostgresFlavour {
 
     fn render_add_foreign_key(&self, foreign_key: ForeignKeyWalker<'_>) -> String {
         ddl::AlterTable {
-            table_name: ddl::PostgresIdentifier::Simple(foreign_key.table().name().into()),
+            table_name: &TableName(
+                foreign_key.table().namespace().map(Quoted::postgres_ident),
+                Quoted::postgres_ident(foreign_key.table().name()),
+            ),
             clauses: vec![ddl::AlterTableClause::AddForeignKey(ddl::ForeignKey {
                 constrained_columns: foreign_key.constrained_columns().map(|c| c.name().into()).collect(),
                 referenced_columns: foreign_key.referenced_columns().map(|c| c.name().into()).collect(),
                 constraint_name: foreign_key.constraint_name().map(From::from),
-                referenced_table: foreign_key.referenced_table().name().into(),
+                referenced_table: &TableName(
+                    foreign_key.referenced_table().namespace().map(Quoted::postgres_ident),
+                    Quoted::postgres_ident(foreign_key.referenced_table().name()),
+                ),
                 on_delete: Some(match foreign_key.on_delete_action() {
                     ForeignKeyAction::Cascade => ddl::ForeignKeyAction::Cascade,
                     ForeignKeyAction::NoAction => ddl::ForeignKeyAction::NoAction,
@@ -259,10 +265,20 @@ impl SqlRenderer for PostgresFlavour {
     fn render_create_enum(&self, enm: EnumWalker<'_>) -> Vec<String> {
         render_step(&mut |step| {
             step.render_statement(&mut |stmt| {
-                stmt.push_display(&ddl::CreateEnum {
-                    enum_name: enm.name().into(),
-                    variants: enm.values().iter().map(|s| Cow::Borrowed(s.as_str())).collect(),
-                })
+                stmt.push_str("CREATE TYPE ");
+                stmt.push_display(&TableName(
+                    enm.namespace().map(Quoted::postgres_ident),
+                    Quoted::postgres_ident(enm.name()),
+                ));
+                stmt.push_str(" AS ENUM (");
+                let mut values = enm.values().iter().peekable();
+                while let Some(value) = values.next() {
+                    stmt.push_display(&Quoted::postgres_string(value));
+                    if values.peek().is_some() {
+                        stmt.push_str(", ");
+                    }
+                }
+                stmt.push_str(")");
             })
         })
     }
@@ -273,7 +289,10 @@ impl SqlRenderer for PostgresFlavour {
         ddl::CreateIndex {
             index_name: index.name().into(),
             is_unique: index.is_unique(),
-            table_reference: index.table().name().into(),
+            table_reference: &TableName(
+                index.table().namespace().map(Quoted::postgres_ident),
+                Quoted::postgres_ident(index.table().name()),
+            ),
             using: Some(match pg_ext.index_algorithm(index.id) {
                 SqlIndexAlgorithm::BTree => ddl::IndexAlgorithm::BTree,
                 SqlIndexAlgorithm::Hash => ddl::IndexAlgorithm::Hash,
@@ -298,7 +317,21 @@ impl SqlRenderer for PostgresFlavour {
         .to_string()
     }
 
-    fn render_create_table_as(&self, table: TableWalker<'_>, table_name: &str) -> String {
+    fn render_create_namespace(&self, ns: sql_schema_describer::NamespaceWalker<'_>) -> String {
+        format!("CREATE SCHEMA IF NOT EXISTS {}", Quoted::postgres_ident(ns.name()))
+    }
+
+    fn render_create_table(&self, table: TableWalker<'_>) -> String {
+        self.render_create_table_as(
+            table,
+            TableName(
+                table.namespace().map(Quoted::postgres_ident),
+                Quoted::postgres_ident(table.name()),
+            ),
+        )
+    }
+
+    fn render_create_table_as(&self, table: TableWalker<'_>, table_name: TableName<&str>) -> String {
         let columns: String = table.columns().map(|column| self.render_column(column)).join(",\n");
 
         let pk = if let Some(pk) = table.primary_key() {
@@ -314,12 +347,7 @@ impl SqlRenderer for PostgresFlavour {
             String::new()
         };
 
-        format!(
-            "CREATE TABLE {table_name} (\n{columns}{primary_key}\n)",
-            table_name = self.quote(table_name),
-            columns = columns,
-            primary_key = pk,
-        )
+        format!("CREATE TABLE {table_name} (\n{columns}{pk}\n)")
     }
 
     fn render_drop_enum(&self, dropped_enum: EnumWalker<'_>) -> Vec<String> {
@@ -371,7 +399,10 @@ impl SqlRenderer for PostgresFlavour {
         for redefine_table in tables {
             let tables = schemas.walk(redefine_table.table_ids);
             let temporary_table_name = format!("_prisma_new_{}", &tables.next.name());
-            result.push(self.render_create_table_as(tables.next, &temporary_table_name));
+            result.push(self.render_create_table_as(
+                tables.next,
+                TableName(None, Quoted::postgres_ident(&temporary_table_name)),
+            ));
 
             let columns: Vec<_> = redefine_table
                 .column_pairs
@@ -416,11 +447,11 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_rename_table(&self, name: &str, new_name: &str) -> String {
-        ddl::AlterTable {
-            table_name: name.into(),
-            clauses: vec![ddl::AlterTableClause::RenameTo(new_name.into())],
-        }
-        .to_string()
+        format!(
+            "ALTER TABLE {} RENAME TO {}",
+            Quoted::postgres_ident(name),
+            Quoted::postgres_ident(new_name)
+        )
     }
 
     fn render_drop_user_defined_type(&self, _: &UserDefinedTypeWalker<'_>) -> String {
@@ -439,8 +470,13 @@ impl SqlRenderer for PostgresFlavour {
 
 fn render_column_type(col: ColumnWalker<'_>, flavour: &PostgresFlavour) -> Cow<'static, str> {
     let t = col.column_type();
-    if let ColumnTypeFamily::Enum(name) = &t.family {
-        return format!("\"{}\"{}", name, if t.arity.is_list() { "[]" } else { "" }).into();
+    if let Some(enm) = col.column_type_family_as_enum() {
+        let name = TableName(
+            enm.namespace().map(Quoted::postgres_ident),
+            Quoted::postgres_ident(enm.name()),
+        );
+        let arity = if t.arity.is_list() { "[]" } else { "" };
+        return format!("{name}{arity}").into();
     }
 
     if let ColumnTypeFamily::Unsupported(description) = &t.family {

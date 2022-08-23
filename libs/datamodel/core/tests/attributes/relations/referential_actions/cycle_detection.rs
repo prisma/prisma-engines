@@ -27,7 +27,7 @@ fn cascading_on_delete_self_relations() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -77,7 +77,7 @@ fn cascading_cycles_cannot_loop_infinitely() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -138,7 +138,7 @@ fn emulated_cascading_on_delete_self_relations() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -168,7 +168,7 @@ fn cascading_on_update_self_relations() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -204,7 +204,7 @@ fn emulated_cascading_on_update_self_relations() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -234,7 +234,7 @@ fn null_setting_on_delete_self_relations() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -270,7 +270,7 @@ fn emulated_null_setting_on_delete_self_relations() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -300,7 +300,7 @@ fn null_setting_on_update_self_relations() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -336,7 +336,7 @@ fn emulated_null_setting_on_update_self_relations() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -366,7 +366,7 @@ fn default_setting_on_delete_self_relations() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -408,7 +408,7 @@ fn emulated_default_setting_on_delete_self_relations() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -438,7 +438,7 @@ fn default_setting_on_update_self_relations() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -480,7 +480,7 @@ fn emulated_default_setting_on_update_self_relations() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -524,7 +524,7 @@ fn cascading_cyclic_one_hop_relations() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -574,7 +574,7 @@ fn emulated_cascading_cyclic_one_hop_relations() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -632,7 +632,7 @@ fn cascading_cyclic_hop_over_table_relations() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -691,7 +691,7 @@ fn multiple_cascading_simple() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -793,7 +793,7 @@ fn multiple_cascading_complex() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dml));
 }
 
 #[test]
@@ -874,7 +874,7 @@ fn cycle_detection_prints_the_right_path() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&datamodel::parse_schema(dm).map(drop).unwrap_err());
+    expect.assert_eq(&parse_unwrap_err(dm));
 }
 
 #[test]

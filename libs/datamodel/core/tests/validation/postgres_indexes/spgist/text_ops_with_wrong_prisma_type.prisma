@@ -1,0 +1,18 @@
+datasource test {
+  provider = "postgresql"
+  url = env("TEST_DATABASE_URL")
+}
+
+model A {
+  id Int  @id
+  a  Int
+
+  @@index([a(ops: TextOps)], type: SpGist)
+}
+
+// [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TextOps` points to the field `a` that is not of String type.[0m
+//   [1;94m-->[0m  [4mschema.prisma:10[0m
+// [1;94m   | [0m
+// [1;94m 9 | [0m
+// [1;94m10 | [0m  [1;91m@@index([a(ops: TextOps)], type: SpGist)[0m
+// [1;94m   | [0m

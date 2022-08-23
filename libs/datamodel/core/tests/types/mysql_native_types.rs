@@ -705,7 +705,7 @@ fn text_should_not_fail_on_length_prefixed_index() {
         }
     "#};
 
-    assert!(datamodel::parse_schema(dml).is_ok());
+    assert_valid(dml)
 }
 
 #[test]
@@ -722,7 +722,7 @@ fn text_should_not_fail_on_length_prefixed_unique() {
         }
     "#};
 
-    assert!(datamodel::parse_schema(dml).is_ok());
+    assert_valid(dml)
 }
 
 #[test]
@@ -738,7 +738,7 @@ fn text_should_not_fail_on_length_prefixed_pk() {
         }
     "#};
 
-    assert!(datamodel::parse_schema(dml).is_ok());
+    assert_valid(dml)
 }
 
 #[test]
@@ -757,7 +757,7 @@ fn bytes_should_not_fail_on_length_prefixed_index() {
         }
     "#};
 
-    assert!(datamodel::parse_schema(dml).is_ok());
+    assert_valid(dml)
 }
 
 #[test]
@@ -774,7 +774,7 @@ fn bytes_should_not_fail_on_length_prefixed_unique() {
         }
     "#};
 
-    assert!(datamodel::parse_schema(dml).is_ok());
+    assert_valid(dml)
 }
 
 #[test]
@@ -790,7 +790,7 @@ fn bytes_should_not_fail_on_length_prefixed_pk() {
         }
     "#};
 
-    assert!(datamodel::parse_schema(dml).is_ok());
+    assert_valid(dml)
 }
 
 #[test]

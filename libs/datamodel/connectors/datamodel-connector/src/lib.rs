@@ -1,4 +1,5 @@
 #![deny(rust_2018_idioms, unsafe_code)]
+#![allow(clippy::derive_partial_eq_without_eq)]
 
 //! The interface implemented by connectors for Prisma schema validation and interpretation.
 
@@ -104,6 +105,7 @@ pub trait Connector: Send + Sync {
     ) {
     }
 
+    fn validate_enum(&self, _enum: parser_database::walkers::EnumWalker<'_>, _: &mut Diagnostics) {}
     fn validate_model(&self, _model: parser_database::walkers::ModelWalker<'_>, _: &mut Diagnostics) {}
 
     fn validate_scalar_field_unknown_default_functions(

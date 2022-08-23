@@ -13,7 +13,9 @@
     clippy::mem_replace_with_default,
     clippy::clone_on_copy,
     clippy::needless_borrow,
-    clippy::needless_collect
+    clippy::needless_collect,
+    clippy::needless_return,
+    clippy::derive_partial_eq_without_eq
 )]
 #![warn(warnings)] // Todo deny warnings once done
 
@@ -24,7 +26,6 @@ pub mod error;
 pub mod executor;
 pub mod interactive_transactions;
 pub mod interpreter;
-pub mod metrics;
 pub mod query_ast;
 pub mod query_document;
 pub mod query_graph;
@@ -33,7 +34,6 @@ pub mod response_ir;
 pub mod result_ast;
 pub mod trace_helpers;
 
-pub use crate::metrics::*;
 pub use error::*;
 pub use executor::*;
 pub use interactive_transactions::*;

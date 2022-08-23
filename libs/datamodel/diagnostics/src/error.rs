@@ -1,7 +1,7 @@
 use crate::{pretty_print::pretty_print, Span};
 use std::borrow::Cow;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct DatamodelError {
     span: Span,
     message: Cow<'static, str>,
@@ -72,7 +72,7 @@ impl DatamodelError {
     }
 
     pub fn new_duplicate_attribute_error(attribute_name: &str, span: Span) -> DatamodelError {
-        let msg = format!("Attribute \"@{attribute_name}\" is defined twice.");
+        let msg = format!("Attribute \"@{attribute_name}\" can only be defined once.");
         Self::new(msg, span)
     }
 

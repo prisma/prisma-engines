@@ -1,17 +1,10 @@
-//! # PSL — Prisma Schema Language
-//!
-//! This crate is responsible for parsing, validating, formatting and rendering a PSL documents.
-//!
-//! A Prisma Schema consists out of two parts:
-//! 1. The `Datamodel` part refers to the model and enum definitions.
-//! 2. The `Configuration` part refers to the generator and datasource definitions.
-//!
-
+#![doc = include_str!("../README.md")]
 #![deny(rust_2018_idioms, unsafe_code)]
 
 pub mod common;
 
-/// `mcf`: Turns a collection of `configuration::Datasource` and `configuration::Generator` into a JSON representation.
+/// `mcf`: Turns a collection of `configuration::Datasource` and `configuration::Generator` into a
+/// JSON representation. This is the `get_config()` representation.
 pub mod mcf;
 
 mod configuration;
@@ -206,7 +199,7 @@ pub fn render_datamodel_and_config_to_string(
 }
 
 fn preview_features(generators: &[Generator]) -> BitFlags<PreviewFeature> {
-    generators.iter().map(|gen| gen.preview_features()).collect()
+    generators.iter().filter_map(|gen| gen.preview_features).collect()
 }
 
 const DEFAULT_INDENT_WIDTH: usize = 2;

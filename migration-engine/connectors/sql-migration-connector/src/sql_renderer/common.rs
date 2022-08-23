@@ -3,6 +3,22 @@ use std::fmt::{Display, Write as _};
 
 pub(super) const SQL_INDENTATION: &str = "    ";
 
+/// A table name with an optional schema prefix.
+pub(crate) struct TableName<T>(pub(crate) Option<Quoted<T>>, pub(crate) Quoted<T>);
+
+impl<T> Display for TableName<T>
+where
+    T: Display,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if let Some(schema) = &self.0 {
+            Display::fmt(&schema, f)?;
+            f.write_str(".")?;
+        }
+        Display::fmt(&self.1, f)
+    }
+}
+
 #[derive(Debug)]
 pub(crate) enum Quoted<T> {
     Double(T),

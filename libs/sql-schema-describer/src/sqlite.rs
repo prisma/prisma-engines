@@ -8,13 +8,54 @@ use crate::{
 use indexmap::IndexMap;
 use quaint::{
     ast::Value,
-    prelude::{Queryable, ResultRow},
+    connector::{GetRow, ToColumnNames},
+    prelude::ResultRow,
 };
 use std::{any::type_name, borrow::Cow, collections::BTreeMap, convert::TryInto, fmt::Debug, path::Path};
 use tracing::trace;
 
+#[async_trait::async_trait]
+pub trait Connection {
+    async fn query_raw<'a>(
+        &'a self,
+        sql: &'a str,
+        params: &'a [quaint::prelude::Value<'a>],
+    ) -> quaint::Result<quaint::prelude::ResultSet>;
+}
+
+#[async_trait::async_trait]
+impl Connection for std::sync::Mutex<quaint::connector::rusqlite::Connection> {
+    async fn query_raw<'a>(
+        &'a self,
+        sql: &'a str,
+        params: &'a [quaint::prelude::Value<'a>],
+    ) -> quaint::Result<quaint::prelude::ResultSet> {
+        let conn = self.lock().unwrap();
+        let mut stmt = conn.prepare_cached(sql)?;
+        let mut rows = stmt.query(quaint::connector::rusqlite::params_from_iter(params.iter()))?;
+        let column_names = rows.to_column_names();
+        let mut converted_rows = Vec::new();
+        while let Some(row) = rows.next()? {
+            converted_rows.push(row.get_result_row().unwrap());
+        }
+
+        Ok(quaint::prelude::ResultSet::new(column_names, converted_rows))
+    }
+}
+
+#[async_trait::async_trait]
+impl Connection for quaint::single::Quaint {
+    async fn query_raw<'a>(
+        &'a self,
+        sql: &'a str,
+        params: &'a [quaint::prelude::Value<'a>],
+    ) -> quaint::Result<quaint::prelude::ResultSet> {
+        quaint::prelude::Queryable::query_raw(self, sql, params).await
+    }
+}
+
 pub struct SqlSchemaDescriber<'a> {
-    conn: &'a dyn Queryable,
+    conn: &'a (dyn Connection + Send + Sync),
 }
 
 impl Debug for SqlSchemaDescriber<'_> {
@@ -41,6 +82,23 @@ impl SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
     }
 
     async fn describe(&self, _schema: &str) -> DescriberResult<SqlSchema> {
+        self.describe_impl().await
+    }
+
+    async fn version(&self, _schema: &str) -> DescriberResult<Option<String>> {
+        Ok(Some(quaint::connector::sqlite_version().to_owned()))
+    }
+}
+
+impl Parser for SqlSchemaDescriber<'_> {}
+
+impl<'a> SqlSchemaDescriber<'a> {
+    /// Constructor.
+    pub fn new(conn: &'a (dyn Connection + Send + Sync)) -> SqlSchemaDescriber<'a> {
+        SqlSchemaDescriber { conn }
+    }
+
+    pub async fn describe_impl(&self) -> DescriberResult<SqlSchema> {
         let mut schema = SqlSchema::default();
         let table_ids = self.get_table_names(&mut schema).await?;
 
@@ -56,19 +114,6 @@ impl SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
         schema.views = self.get_views().await?;
 
         Ok(schema)
-    }
-
-    async fn version(&self, _schema: &str) -> DescriberResult<Option<String>> {
-        Ok(self.conn.version().await?)
-    }
-}
-
-impl Parser for SqlSchemaDescriber<'_> {}
-
-impl<'a> SqlSchemaDescriber<'a> {
-    /// Constructor.
-    pub fn new(conn: &'a dyn Queryable) -> SqlSchemaDescriber<'a> {
-        SqlSchemaDescriber { conn }
     }
 
     async fn get_databases(&self) -> DescriberResult<Vec<String>> {
@@ -107,7 +152,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for name in names {
             let cloned_name = name.clone();
-            let id = schema.push_table(name);
+            let id = schema.push_table(name, Default::default());
             map.insert(cloned_name, id);
         }
 
@@ -274,7 +319,7 @@ async fn push_columns(
     table_name: &str,
     table_id: TableId,
     schema: &mut SqlSchema,
-    conn: &dyn Queryable,
+    conn: &(dyn Connection + Send + Sync),
 ) -> DescriberResult<()> {
     let sql = format!(r#"PRAGMA table_info ("{}")"#, table_name);
     let result_set = conn.query_raw(&sql, &[]).await?;
@@ -392,7 +437,7 @@ async fn push_indexes(
     table: &str,
     table_id: TableId,
     schema: &mut SqlSchema,
-    conn: &dyn Queryable,
+    conn: &(dyn Connection + Send + Sync),
 ) -> DescriberResult<()> {
     let sql = format!(r#"PRAGMA index_list("{}");"#, table);
     let result_set = conn.query_raw(&sql, &[]).await?;
@@ -413,7 +458,7 @@ async fn push_indexes(
         let mut columns = Vec::new();
 
         let sql = format!(r#"PRAGMA index_info("{}");"#, index_name);
-        let result_set = conn.query_raw(&sql, &[]).await.expect("querying for index info");
+        let result_set = conn.query_raw(&sql, &[]).await?;
         trace!("Got index description results: {:?}", result_set);
 
         for row in result_set.into_iter() {
@@ -431,7 +476,7 @@ async fn push_indexes(
         }
 
         let sql = format!(r#"PRAGMA index_xinfo("{}");"#, index_name);
-        let result_set = conn.query_raw(&sql, &[]).await.expect("querying for index info");
+        let result_set = conn.query_raw(&sql, &[]).await?;
         trace!("Got index description results: {:?}", result_set);
 
         for row in result_set.into_iter() {

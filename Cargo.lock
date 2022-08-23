@@ -686,6 +686,7 @@ dependencies = [
  "chrono",
  "datamodel-connector",
  "diagnostics",
+ "dissimilar",
  "dml",
  "either",
  "enumflags2",
@@ -2254,14 +2255,13 @@ dependencies = [
  "futures",
  "indexmap",
  "itertools",
- "metrics 0.18.1",
- "metrics-util 0.12.1",
  "mongodb",
  "mongodb-client",
  "native-types",
  "prisma-models",
  "prisma-value",
  "query-connector",
+ "query-engine-metrics",
  "rand 0.7.3",
  "regex",
  "serde",
@@ -3158,7 +3158,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#ba10e120ac2572026035731b34c593cd0ff89676"
+source = "git+https://github.com/prisma/quaint#fb4fe90682b4fecb485fd0d6975dd15a3bc9616b"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
@@ -3243,16 +3243,12 @@ dependencies = [
  "cuid",
  "datamodel",
  "datamodel-connector",
- "expect-test",
  "futures",
  "im",
  "indexmap",
  "itertools",
  "lazy_static",
  "lru",
- "metrics 0.18.1",
- "metrics-exporter-prometheus",
- "metrics-util 0.12.1",
  "mongodb-client",
  "mongodb-query-connector",
  "once_cell",
@@ -3263,6 +3259,7 @@ dependencies = [
  "prisma-models",
  "prisma-value",
  "query-connector",
+ "query-engine-metrics",
  "schema",
  "schema-builder",
  "serde",
@@ -3304,6 +3301,7 @@ dependencies = [
  "quaint",
  "query-connector",
  "query-core",
+ "query-engine-metrics",
  "rand 0.8.5",
  "request-handlers",
  "rustc_version",
@@ -3324,6 +3322,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "query-engine-metrics"
+version = "0.1.0"
+dependencies = [
+ "expect-test",
+ "metrics 0.18.1",
+ "metrics-exporter-prometheus",
+ "metrics-util 0.12.1",
+ "once_cell",
+ "parking_lot 0.12.1",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tracing",
+ "tracing-futures",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "query-engine-node-api"
 version = "0.1.0"
 dependencies = [
@@ -3340,6 +3356,7 @@ dependencies = [
  "prisma-models",
  "query-connector",
  "query-core",
+ "query-engine-metrics",
  "request-handlers",
  "serde",
  "serde_json",
@@ -3366,6 +3383,7 @@ dependencies = [
  "indoc",
  "insta",
  "prisma-value",
+ "query-engine-metrics",
  "query-test-macros",
  "query-tests-setup",
  "serde_json",
@@ -3410,6 +3428,7 @@ dependencies = [
  "qe-setup",
  "query-core",
  "query-engine",
+ "query-engine-metrics",
  "regex",
  "request-handlers",
  "serde",
@@ -3537,9 +3556,9 @@ dependencies = [
 
 [[package]]
 name = "raw-cpuid"
-version = "10.3.0"
+version = "10.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "738bc47119e3eeccc7e94c4a506901aea5e7b4944ecd0829cbebf4af04ceda12"
+checksum = "2c49596760fce12ca21550ac21dc5a9617b2ea4b6e0aa7d8dab8ff2824fc2bba"
 dependencies = [
  "bitflags",
 ]

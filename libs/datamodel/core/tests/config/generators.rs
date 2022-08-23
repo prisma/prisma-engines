@@ -259,7 +259,7 @@ fn nice_error_for_unknown_generator_preview_feature() {
         .unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mThe preview feature "foo" is not known. Expected one of: referentialIntegrity, interactiveTransactions, fullTextSearch, fullTextIndex, tracing, metrics, orderByNulls, denoDeploy[0m
+        [1;91merror[0m: [1mThe preview feature "foo" is not known. Expected one of: referentialIntegrity, interactiveTransactions, fullTextSearch, fullTextIndex, tracing, metrics, orderByNulls, filteredRelationCount, denoDeploy[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  provider = "prisma-client-js"
@@ -364,7 +364,7 @@ fn env_in_preview_features_must_be_rejected() {
     "#};
 
     let expect_1 = expect![[r#"
-        [1;91merror[0m: [1mExpected a String value, but received functional value `env("MY_PREVIEW_FEATURE")`.[0m
+        [1;91merror[0m: [1mExpected a string value, but received functional value `env("MY_PREVIEW_FEATURE")`.[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  provider = "prisma-client-js"
@@ -373,7 +373,7 @@ fn env_in_preview_features_must_be_rejected() {
     "#]];
 
     let expect_2 = expect![[r#"
-        [1;91merror[0m: [1mExpected a String value, but received functional value `env("MY_PREVIEW_FEATURE")`.[0m
+        [1;91merror[0m: [1mExpected a string value, but received functional value `env("MY_PREVIEW_FEATURE")`.[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  provider = "prisma-client-js"
@@ -381,8 +381,8 @@ fn env_in_preview_features_must_be_rejected() {
         [1;94m   | [0m
     "#]];
 
-    expect_1.assert_eq(&datamodel::parse_schema(schema_1).map(drop).unwrap_err());
-    expect_2.assert_eq(&datamodel::parse_schema(schema_2).map(drop).unwrap_err());
+    expect_1.assert_eq(&parse_unwrap_err(schema_1));
+    expect_2.assert_eq(&parse_unwrap_err(schema_2));
 }
 
 #[test]

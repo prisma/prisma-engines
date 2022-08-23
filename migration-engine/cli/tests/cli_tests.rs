@@ -65,7 +65,7 @@ fn test_connecting_with_a_non_working_mysql_connection_string(api: TestApi) {
 
     non_existing_url.set_path("this_does_not_exist");
 
-    let output = api.run(&["--datasource", &non_existing_url.to_string(), "can-connect-to-database"]);
+    let output = api.run(&["--datasource", non_existing_url.as_ref(), "can-connect-to-database"]);
     assert_eq!(output.status.code(), Some(1));
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(stderr.contains(r#""error_code":"P1003""#), "{}", stderr);
@@ -107,7 +107,7 @@ fn test_connecting_with_a_non_working_psql_connection_string(api: TestApi) {
     let mut url: url::Url = api.args.database_url().parse().unwrap();
     url.set_path("this_does_not_exist");
 
-    let output = api.run(&["--datasource", &url.to_string(), "can-connect-to-database"]);
+    let output = api.run(&["--datasource", url.as_ref(), "can-connect-to-database"]);
     assert_eq!(output.status.code(), Some(1));
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(stderr.contains(r#""error_code":"P1003""#), "{}", stderr);

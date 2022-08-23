@@ -110,7 +110,7 @@ fn parse_unsupported(_parser: &mut Parser<'_>) -> Option<DefaultValue> {
 }
 
 fn parse_datetime_default(parser: &mut Parser<'_>) -> Option<DefaultValue> {
-    let value = match parser.peek_token()? {
+    match parser.peek_token()? {
         Token::Identifier => {
             let func_name = parser.expect(Token::Identifier)?;
             if let Some(Token::OpeningBrace) = parser.peek_token() {
@@ -128,9 +128,7 @@ fn parse_datetime_default(parser: &mut Parser<'_>) -> Option<DefaultValue> {
             }
         }
         _ => None,
-    };
-
-    value
+    }
 }
 
 fn parse_enum_default(parser: &mut Parser<'_>) -> Option<DefaultValue> {

@@ -8,7 +8,7 @@ fn must_error_on_model_without_unique_criteria() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "Model": Each model must have at least one unique criteria that has only required fields. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the model.[0m
@@ -36,7 +36,7 @@ fn must_error_if_only_loose_unique_criterias_are_present() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "Model": Each model must have at least one unique criteria that has only required fields. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the model. The following unique criterias were not considered as they contain fields that are not required:
@@ -70,7 +70,7 @@ fn multiple_unnamed_arguments_must_error() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@unique": You provided multiple unnamed arguments. This is not possible. Did you forget the brackets? Did you mean `[firstName, lastName]`?[0m
@@ -100,7 +100,7 @@ fn multi_field_unique_indexes_on_relation_fields_must_error_and_give_nice_error_
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "User": The unique index definition refers to the relation fields identification. Index definitions must reference only scalar fields. Did you mean `@@unique([identificationId])`?[0m
@@ -130,7 +130,7 @@ fn multi_field_unique_indexes_on_relation_fields_must_error_and_give_nice_error_
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "Identification": The unique index definition refers to the relation fields user. Index definitions must reference only scalar fields.[0m
@@ -158,7 +158,7 @@ fn single_field_unique_on_relation_fields_must_error_nicely_with_one_underlying_
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@unique": The field `identification` is a relation field and cannot be marked with `unique`. Only scalar fields can be made unique. Did you mean to put it on `identificationId`?[0m
@@ -189,7 +189,7 @@ fn single_field_unique_on_relation_fields_must_error_nicely_with_many_underlying
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@unique": The field `identification` is a relation field and cannot be marked with `unique`. Only scalar fields can be made unique. Did you mean to provide `@@unique([identificationId1, identificationId2])`?[0m
@@ -215,7 +215,7 @@ fn stringified_field_names_in_unique_return_nice_error() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mExpected a constant literal value, but received string value `"firstName"`.[0m
@@ -223,6 +223,12 @@ fn stringified_field_names_in_unique_return_nice_error() {
         [1;94m   | [0m
         [1;94m 5 | [0m
         [1;94m 6 | [0m  @@unique([[1;91m"firstName"[0m, "lastName"])
+        [1;94m   | [0m
+        [1;91merror[0m: [1mExpected a constant literal value, but received string value `"lastName"`.[0m
+          [1;94m-->[0m  [4mschema.prisma:6[0m
+        [1;94m   | [0m
+        [1;94m 5 | [0m
+        [1;94m 6 | [0m  @@unique(["firstName", [1;91m"lastName"[0m])
         [1;94m   | [0m
     "#]];
 
@@ -239,7 +245,7 @@ fn must_error_when_unknown_fields_are_used() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "User": The unique index definition refers to the unknown fields: foo, bar.[0m
@@ -264,7 +270,7 @@ fn must_error_when_using_the_same_field_multiple_times() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "User": The unique index definition refers to the field email multiple times.[0m
@@ -294,7 +300,7 @@ fn invalid_name_for_compound_unique_must_error() {
         }
      "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "User": The `name` property within the `@@unique` attribute only allows for the following characters: `_a-zA-Z0-9`.[0m
@@ -329,7 +335,7 @@ fn mapping_unique_with_a_name_that_is_too_long_should_error() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "User": The constraint name 'IfYouAreGoingToPickTheNameYourselfYouShouldReallyPickSomethingShortAndSweetInsteadOfASuperLongNameViolatingLengthLimits' specified in the `map` argument for the `@@unique` constraint is too long for your chosen provider. The maximum allowed length is 64 bytes.[0m
@@ -365,7 +371,7 @@ fn naming_unique_to_a_field_name_should_error() {
         &[],
     );
 
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating model "User": The custom name `used` specified for the `@@unique` attribute is already used as a name for a field. Please choose a different name.[0m
@@ -397,7 +403,7 @@ fn naming_field_level_unique_should_error() {
         &[],
     );
 
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mNo such argument.[0m
@@ -425,7 +431,7 @@ fn duplicate_implicit_names_should_error() {
         &[],
     );
 
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@unique": The given constraint name `User_used_key` has to be unique in the following namespace: global for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
@@ -469,7 +475,7 @@ fn duplicate_custom_names_on_same_model_should_error() {
         &[],
     );
 
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@unique": The given custom name `foo` has to be unique on the model. Please provide a different name for the `name` argument.[0m

@@ -3,17 +3,17 @@ use crate::{
     common::preview_features::PreviewFeature,
     configuration::StringFromEnvVar,
     diagnostics::{DatamodelError, Diagnostics},
-    parser_database::{ValueListValidator, ValueValidator},
     Datasource,
 };
 use datamodel_connector::ReferentialIntegrity;
 use enumflags2::BitFlags;
 use mongodb_datamodel_connector::*;
-use parser_database::ast::WithDocumentation;
+use parser_database::{ast::WithDocumentation, coerce, coerce_array, coerce_opt};
 use sql_datamodel_connector::*;
-use std::{borrow::Cow, collections::HashMap, convert::TryFrom};
+use std::{borrow::Cow, collections::HashMap};
 
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
+const SCHEMAS_KEY: &str = "schemas";
 const SHADOW_DATABASE_URL_KEY: &str = "shadowDatabaseUrl";
 const URL_KEY: &str = "url";
 
@@ -61,7 +61,7 @@ impl DatasourceLoader {
         let mut args: HashMap<_, _> = ast_source
             .properties
             .iter()
-            .map(|arg| (arg.name.name.as_str(), (arg.span, ValueValidator::new(&arg.value))))
+            .map(|arg| (arg.name.name.as_str(), (arg.span, &arg.value)))
             .collect();
 
         let (_, provider_arg) = match args.remove("provider") {
@@ -76,14 +76,14 @@ impl DatasourceLoader {
             }
         };
 
-        if provider_arg.is_from_env() {
+        if provider_arg.is_env_expression() {
             let msg = Cow::Borrowed("A datasource must not use the env() function in the provider argument.");
             diagnostics.push_error(DatamodelError::new_functional_evaluation_error(msg, ast_source.span));
             return None;
         }
 
-        let provider = match provider_arg.as_string_literal() {
-            Some(("", _)) => {
+        let provider = match coerce_opt::string(provider_arg) {
+            Some("") => {
                 diagnostics.push_error(DatamodelError::new_source_validation_error(
                     "The provider argument in a datasource must not be empty",
                     source_name,
@@ -99,7 +99,7 @@ impl DatasourceLoader {
                 ));
                 return None;
             }
-            Some((provider, _)) => provider,
+            Some(provider) => provider,
         };
 
         let (_, url_arg) = match args.remove(URL_KEY) {
@@ -114,26 +114,16 @@ impl DatasourceLoader {
             }
         };
 
-        let url = match StringFromEnvVar::try_from(url_arg.value) {
-            Ok(str_from_env_var) => str_from_env_var,
-            Err(err) => {
-                diagnostics.push_error(err);
-                return None;
-            }
-        };
-
+        let url = StringFromEnvVar::coerce(url_arg, diagnostics)?;
         let shadow_database_url_arg = args.remove(SHADOW_DATABASE_URL_KEY);
 
         let shadow_database_url: Option<(StringFromEnvVar, Span)> =
             if let Some((_, shadow_database_url_arg)) = shadow_database_url_arg.as_ref() {
-                match StringFromEnvVar::try_from(shadow_database_url_arg.value) {
-                    Ok(shadow_database_url) => Some(shadow_database_url)
+                match StringFromEnvVar::coerce(shadow_database_url_arg, diagnostics) {
+                    Some(shadow_database_url) => Some(shadow_database_url)
                         .filter(|s| !s.as_literal().map(|lit| lit.is_empty()).unwrap_or(false))
                         .map(|url| (url, shadow_database_url_arg.span())),
-                    Err(err) => {
-                        diagnostics.push_error(err);
-                        None
-                    }
+                    None => None,
                 }
             } else {
                 None
@@ -190,14 +180,35 @@ impl DatasourceLoader {
             }
         }
 
+        let (schemas, schemas_span) = args
+            .remove(SCHEMAS_KEY)
+            .and_then(|(_, expr)| coerce_array(expr, &coerce::string_with_span, diagnostics).map(|b| (b, expr.span())))
+            .map(|(mut schemas, span)| {
+                schemas.sort_by(|(a, _), (b, _)| a.cmp(b));
+
+                for pair in schemas.windows(2) {
+                    if pair[0].0 == pair[1].0 {
+                        diagnostics.push_error(DatamodelError::new_static(
+                            "Duplicated schema names are not allowed",
+                            pair[0].1,
+                        ))
+                    }
+                }
+
+                (schemas, Some(span))
+            })
+            .unwrap_or_default();
+
         // we handle these elsewhere
-        let _ = args.remove("previewFeatures");
-        let _ = args.remove("referentialIntegrity");
+        args.remove("previewFeatures");
+        args.remove("referentialIntegrity");
         for (name, (span, _)) in args.into_iter() {
             diagnostics.push_error(DatamodelError::new_property_not_known_error(name, span));
         }
 
         Some(Datasource {
+            schemas: schemas.into_iter().map(|(s, span)| (s.to_owned(), span)).collect(),
+            schemas_span,
             name: source_name.to_string(),
             provider: provider.to_owned(),
             active_provider: active_connector.provider_name(),
@@ -223,7 +234,7 @@ generator client {
 "#;
 
 fn get_referential_integrity(
-    args: &HashMap<&str, (Span, ValueValidator<'_>)>,
+    args: &HashMap<&str, (Span, &ast::Expression)>,
     preview_features: BitFlags<PreviewFeature>,
     source: &SourceConfig,
     diagnostics: &mut Diagnostics,
@@ -238,10 +249,10 @@ fn get_referential_integrity(
 
             None
         } else {
-            match value.as_str() {
-                Ok("prisma") => Some(ReferentialIntegrity::Prisma),
-                Ok("foreignKeys") => Some(ReferentialIntegrity::ForeignKeys),
-                Ok(s) => {
+            match coerce::string(value, diagnostics)? {
+                "prisma" => Some(ReferentialIntegrity::Prisma),
+                "foreignKeys" => Some(ReferentialIntegrity::ForeignKeys),
+                s => {
                     let message = format!(
                         "Invalid referential integrity setting: \"{}\". Supported values: \"prisma\", \"foreignKeys\"",
                         s
@@ -254,26 +265,16 @@ fn get_referential_integrity(
 
                     None
                 }
-                Err(e) => {
-                    diagnostics.push_error(e);
-                    None
-                }
             }
         }
     })
 }
 
-fn preview_features_guardrail(args: &HashMap<&str, (Span, ValueValidator<'_>)>, diagnostics: &mut Diagnostics) {
+fn preview_features_guardrail(args: &HashMap<&str, (Span, &ast::Expression)>, diagnostics: &mut Diagnostics) {
     let arg = args.get(PREVIEW_FEATURES_KEY);
 
-    if let Some(val) = arg {
-        let span = val.0;
-        if let Ok(features) = val.1.as_array().to_str_vec() {
-            if features.is_empty() {
-                return;
-            }
-        }
+    if let Some((span, _)) = arg {
         let msg = "Preview features are only supported in the generator block. Please move this field to the generator block.";
-        diagnostics.push_error(DatamodelError::new_static(msg, span));
+        diagnostics.push_error(DatamodelError::new_static(msg, *span));
     }
 }

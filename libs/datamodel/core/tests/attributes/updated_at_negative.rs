@@ -9,7 +9,7 @@ fn should_fail_if_field_type_is_string() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@updatedAt": Fields that are marked with @updatedAt must be of type DateTime.[0m
@@ -37,7 +37,7 @@ fn should_fail_if_field_arity_is_list() {
         }
     "#};
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@updatedAt": Fields that are marked with @updatedAt cannot be lists.[0m

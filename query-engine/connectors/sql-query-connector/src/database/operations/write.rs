@@ -315,7 +315,7 @@ pub async fn update_records(
     }
 
     let updates = {
-        let ids: Vec<&SelectionResult> = ids.iter().map(|id| &*id).collect();
+        let ids: Vec<&SelectionResult> = ids.iter().collect();
         write::update_many(model, ids.as_slice(), args, trace_id)?
     };
 
@@ -334,7 +334,7 @@ pub async fn delete_records(
     trace_id: Option<String>,
 ) -> crate::Result<usize> {
     let ids = conn.filter_selectors(model, record_filter, trace_id.clone()).await?;
-    let ids: Vec<&SelectionResult> = ids.iter().map(|id| &*id).collect();
+    let ids: Vec<&SelectionResult> = ids.iter().collect();
     let count = ids.len();
 
     if count == 0 {

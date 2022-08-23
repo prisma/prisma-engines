@@ -144,6 +144,7 @@ pub fn compute_joins_aggregation(
     let last_aggr_join = compute_aggr_join(
         last_hop.into_relation_hop().unwrap(),
         aggregation_type,
+        None,
         ORDER_AGGREGATOR_ALIAS,
         join_prefix.as_str(),
         joins.last(),

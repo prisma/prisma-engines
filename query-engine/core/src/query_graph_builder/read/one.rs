@@ -19,7 +19,7 @@ pub fn find_unique(mut field: ParsedField, model: ModelRef) -> QueryGraphBuilder
     let model = model;
     let nested_fields = field.nested_fields.unwrap().fields;
     let (aggr_fields_pairs, nested_fields) = extractors::extract_nested_rel_aggr_selections(nested_fields);
-    let aggregation_selections: Vec<_> = utils::collect_relation_aggr_selections(&aggr_fields_pairs, &model);
+    let aggregation_selections = utils::collect_relation_aggr_selections(aggr_fields_pairs, &model)?;
     let selection_order: Vec<String> = utils::collect_selection_order(&nested_fields);
     let selected_fields = utils::collect_selected_fields(&nested_fields, None, &model);
     let nested = utils::collect_nested_queries(nested_fields, &model)?;

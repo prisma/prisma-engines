@@ -1,6 +1,4 @@
-use schema_ast::ast::WithDocumentation;
-
-use crate::{ast, walkers::Walker};
+use crate::{ast, ast::WithDocumentation, types, walkers::Walker};
 
 /// An `enum` declaration in the schema.
 pub type EnumWalker<'db> = Walker<'db, ast::EnumId>;
@@ -8,6 +6,10 @@ pub type EnumWalker<'db> = Walker<'db, ast::EnumId>;
 pub type EnumValueWalker<'db> = Walker<'db, (ast::EnumId, usize)>;
 
 impl<'db> EnumWalker<'db> {
+    fn attributes(self) -> &'db types::EnumAttributes {
+        &self.db.types.enum_attributes[&self.id]
+    }
+
     /// The name of the enum.
     pub fn name(self) -> &'db str {
         &self.ast_enum().name.name
@@ -36,9 +38,7 @@ impl<'db> EnumWalker<'db> {
     /// }
     /// ```
     pub fn mapped_name(self) -> Option<&'db str> {
-        self.db.types.enum_attributes[&self.id]
-            .mapped_name
-            .map(|id| &self.db[id])
+        self.attributes().mapped_name.map(|id| &self.db[id])
     }
 
     /// The values of the enum.
@@ -47,6 +47,16 @@ impl<'db> EnumWalker<'db> {
             db: self.db,
             id: (self.id, idx),
         })
+    }
+
+    /// The name of the schema the enum belongs to.
+    ///
+    /// ```ignore
+    /// @@schema("public")
+    ///          ^^^^^^^^
+    /// ```
+    pub fn schema(self) -> Option<(&'db str, ast::Span)> {
+        self.attributes().schema.map(|(id, span)| (&self.db[id], span))
     }
 }
 

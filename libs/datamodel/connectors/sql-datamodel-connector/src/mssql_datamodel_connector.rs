@@ -89,6 +89,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::AutoIncrementNonIndexedAllowed,
     ConnectorCapability::CompoundIds,
     ConnectorCapability::CreateMany,
+    ConnectorCapability::MultiSchema,
     ConnectorCapability::NamedDefaultValues,
     ConnectorCapability::NamedForeignKeys,
     ConnectorCapability::NamedPrimaryKeys,

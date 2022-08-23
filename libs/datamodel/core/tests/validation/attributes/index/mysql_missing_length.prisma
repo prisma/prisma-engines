@@ -1,0 +1,24 @@
+datasource test {
+    provider = "mysql"
+    url = env("TEST_DATABASE_URL")
+}
+
+model User {
+ id         Int    @id
+ firstName  String @unique @test.Text
+ 
+ @@index([firstName])
+}
+
+// [1;91merror[0m: [1mNative type `Text` cannot be unique in MySQL. Please use the `length` argument to the field in the index definition to allow this.[0m
+//   [1;94m-->[0m  [4mschema.prisma:8[0m
+// [1;94m   | [0m
+// [1;94m 7 | [0m id         Int    @id
+// [1;94m 8 | [0m firstName  String [1;91m@unique [0m@test.Text
+// [1;94m   | [0m
+// [1;91merror[0m: [1mYou cannot define an index on fields with native type `Text` of MySQL. Please use the `length` argument to the field in the index definition to allow this.[0m
+//   [1;94m-->[0m  [4mschema.prisma:10[0m
+// [1;94m   | [0m
+// [1;94m 9 | [0m 
+// [1;94m10 | [0m [1;91m@@index([firstName])[0m
+// [1;94m   | [0m

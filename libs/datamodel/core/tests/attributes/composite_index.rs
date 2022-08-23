@@ -282,7 +282,7 @@ fn should_not_work_outside_mongo() {
     "#};
 
     let dml = with_header(schema, crate::Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating model "B": The index definition refers to the unknown fields: a.field.[0m
@@ -312,7 +312,7 @@ fn should_not_work_outside_mongo_2() {
     "#};
 
     let dml = with_header(schema, crate::Provider::Postgres, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating: The argument fields must refer only to existing fields. The following fields do not exist in this model: a.field[0m
@@ -342,7 +342,7 @@ fn a_bonkers_definition_1() {
     "#};
 
     let dml = with_header(schema, crate::Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating: This line is not a valid field or attribute definition.[0m
@@ -373,7 +373,7 @@ fn a_bonkers_definition_2() {
     "#};
 
     let dml = with_header(schema, crate::Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating model "B": The index definition refers to the unknown fields:  in type A.[0m
@@ -403,7 +403,7 @@ fn a_bonkers_definition_3() {
     "#};
 
     let dml = with_header(schema, crate::Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating: This line is not a valid field or attribute definition.[0m
@@ -434,7 +434,7 @@ fn a_bonkers_definition_4() {
     "#};
 
     let dml = with_header(schema, crate::Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating: This line is not a valid field or attribute definition.[0m
@@ -465,7 +465,7 @@ fn a_bonkers_definition_5() {
     "#};
 
     let dml = with_header(schema, crate::Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating: This line is not a valid field or attribute definition.[0m
@@ -496,7 +496,7 @@ fn a_bonkers_definition_6() {
     "#};
 
     let dml = with_header(schema, crate::Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating: This line is not a valid field or attribute definition.[0m
@@ -526,7 +526,7 @@ fn id_cannot_use_composite_fields() {
     "#};
 
     let dml = with_header(schema, crate::Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating model "B": The multi field id declaration refers to the unknown fields a.id.[0m
@@ -560,7 +560,7 @@ fn relation_cannot_use_composite_fields() {
     "#};
 
     let dml = with_header(schema, crate::Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating: The argument fields must refer only to existing fields. The following fields do not exist in this model: a.field[0m
@@ -590,7 +590,7 @@ fn pointing_to_a_non_existing_type() {
     "#};
 
     let dml = with_header(schema, crate::Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mType "C" is neither a built-in type, nor refers to another model, custom type, or enum.[0m
@@ -622,7 +622,7 @@ fn index_to_a_missing_field_in_a_composite_type() {
     "#};
 
     let dml = with_header(schema, crate::Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating model "B": The index definition refers to the unknown fields: cat in type A.[0m
@@ -666,7 +666,7 @@ fn index_to_a_missing_composite_field() {
     "#};
 
     let dml = with_header(schema, crate::Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating model "B": The index definition refers to the unknown fields: b.[0m
@@ -711,7 +711,7 @@ fn non_composite_field_in_the_path() {
     "#};
 
     let dml = with_header(schema, crate::Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating model "B": The index definition refers to the unknown fields: b.field.[0m
@@ -758,7 +758,7 @@ fn non_composite_field_in_the_middle_of_the_path() {
     "#};
 
     let dml = with_header(schema, crate::Provider::Mongo, &[]);
-    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+    let error = parse_unwrap_err(&dml);
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating model "B": The index definition refers to the unknown fields: c.bonk.field.[0m
