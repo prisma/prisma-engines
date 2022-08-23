@@ -5,7 +5,7 @@ use std::fmt;
 macro_rules! features {
     ($( $variant:ident $(,)? ),*) => {
         #[enumflags2::bitflags]
-        #[repr(u32)]
+        #[repr(u64)]
         #[derive(Debug, Copy, Clone, PartialEq, Eq)]
         pub enum PreviewFeature {
             $( $variant,)*
