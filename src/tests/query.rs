@@ -678,7 +678,11 @@ async fn returning_insert(api: &mut dyn TestApi) -> crate::Result<()> {
 
     let res = api
         .conn()
-        .insert(Insert::from(insert).returning(vec!["id", "name"]))
+        .insert(
+            Insert::from(insert)
+                .returning(vec!["id", "name"])
+                .comment("this should be ignored"),
+        )
         .await;
 
     api.conn().raw_cmd(&format!("DROP TABLE {}", table)).await?;

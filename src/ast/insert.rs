@@ -230,7 +230,7 @@ impl<'a> Insert<'a> {
     /// let insert = Insert::from(query).comment("trace_id='5bd66ef5095369c7b0d1f8f4bd33716a', parent_id='c532cb4098ac3dd2'");
     /// let (sql, _) = Sqlite::build(insert)?;
     ///
-    /// assert_eq!("INSERT INTO `users` DEFAULT VALUES /* trace_id='5bd66ef5095369c7b0d1f8f4bd33716a', parent_id='c532cb4098ac3dd2' */", sql);
+    /// assert_eq!("INSERT INTO `users` DEFAULT VALUES; /* trace_id='5bd66ef5095369c7b0d1f8f4bd33716a', parent_id='c532cb4098ac3dd2' */", sql);
     /// # Ok(())
     /// # }
     /// ```
