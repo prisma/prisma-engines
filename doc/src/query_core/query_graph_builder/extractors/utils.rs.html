@@ -27,28 +27,30 @@
 <span id="21">21</span>
 <span id="22">22</span>
 <span id="23">23</span>
+<span id="24">24</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::schema_builder</span>;
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">IndexField</span>, <span class="ident">ModelRef</span>};
+<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">ModelRef</span>, <span class="ident">ScalarFieldRef</span>};
 
 <span class="doccomment">/// Attempts to resolve a field name to a compound field.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">resolve_compound_field</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IndexField</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">resolve_compound_field</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="ident">resolve_compound_id</span>(<span class="ident">name</span>, <span class="ident">model</span>).<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">resolve_index_fields</span>(<span class="ident">name</span>, <span class="ident">model</span>))
 }
 
 <span class="doccomment">/// Attempts to match a given name to the (schema) name of a compound id field on the model.</span>
-<span class="kw">fn</span> <span class="ident">resolve_compound_id</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IndexField</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">compound_id</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> {
-        (<span class="ident">name</span> <span class="op">==</span> <span class="ident">schema_builder::compound_id_field_name</span>(<span class="ident">pk</span>)).<span class="ident">then</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">IndexField::from_scalars</span>(<span class="ident">pk</span>.<span class="ident">fields</span>()))
-    })
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">resolve_compound_id</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="ident">model</span>
+        .<span class="ident">fields</span>()
+        .<span class="ident">compound_id</span>()
+        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> (<span class="ident">name</span> <span class="op">==</span> <span class="ident">schema_builder::compound_id_field_name</span>(<span class="ident">pk</span>)).<span class="ident">then</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">fields</span>()))
 }
 
 <span class="doccomment">/// Attempts to match a given name to the (schema) name of a compound indexes on the model and returns the first match.</span>
-<span class="kw">fn</span> <span class="ident">resolve_index_fields</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IndexField</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">resolve_index_fields</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="ident">model</span>
         .<span class="ident">unique_indexes</span>()
         .<span class="ident">into_iter</span>()
         .<span class="ident">find</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> <span class="ident">schema_builder::compound_index_field_name</span>(<span class="ident">index</span>) <span class="op">==</span> <span class="ident">name</span>)
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> <span class="ident">index</span>.<span class="ident">fields</span>().<span class="ident">to_vec</span>())
+        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> <span class="ident">index</span>.<span class="ident">fields</span>())
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0 (4b91a6ea7 2022-08-08)" ></div>

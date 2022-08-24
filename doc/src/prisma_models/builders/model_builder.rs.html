@@ -54,7 +54,6 @@
 <span id="48">48</span>
 <span id="49">49</span>
 <span id="50">50</span>
-<span id="51">51</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">FieldBuilder</span>, <span class="ident">IndexBuilder</span>, <span class="ident">PrimaryKeyBuilder</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">CompositeTypeRef</span>, <span class="ident">Fields</span>, <span class="ident">InternalDataModelWeakRef</span>, <span class="ident">Model</span>, <span class="ident">ModelRef</span>};
 <span class="kw">use</span> <span class="ident">once_cell::sync::OnceCell</span>;
@@ -97,12 +96,11 @@
         <span class="kw">let</span> <span class="ident">pk</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">primary_key</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="ident">all_fields</span>));
         <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">Fields::new</span>(<span class="ident">all_fields</span>, <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>), <span class="ident">pk</span>);
 
-        <span class="kw">let</span> <span class="ident">indexes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">indexes</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="ident">fields</span>.<span class="ident">all</span>)).<span class="ident">collect</span>();
+        <span class="kw">let</span> <span class="ident">indexes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">indexes</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="ident">fields</span>.<span class="ident">scalar</span>())).<span class="ident">collect</span>();
 
         <span class="comment">// The model is created here and fields WILL BE UNSET before now!</span>
         <span class="ident">model</span>.<span class="ident">fields</span>.<span class="ident">set</span>(<span class="ident">fields</span>).<span class="ident">unwrap</span>();
         <span class="ident">model</span>.<span class="ident">indexes</span>.<span class="ident">set</span>(<span class="ident">indexes</span>).<span class="ident">unwrap</span>();
-
         <span class="ident">model</span>
     }
 }
