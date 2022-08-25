@@ -281,7 +281,7 @@
                     <span class="string">&quot;You must pass the --shadow-database-url if you want to diff a migrations directory.&quot;</span>.<span class="ident">to_owned</span>(),
                 )),
                 (<span class="prelude-val">None</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::from_msg</span>(
-                    <span class="string">&quot;Could not determine the connector from the migrations directory (missing migrations_lock.toml).&quot;</span>
+                    <span class="string">&quot;Could not determine the connector from the migrations directory (missing migration_lock.toml).&quot;</span>
                         .<span class="ident">to_owned</span>(),
                 )),
             }
