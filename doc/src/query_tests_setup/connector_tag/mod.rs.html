@@ -254,7 +254,7 @@
     <span class="doccomment">///   implementing connector, like a file or a schema.</span>
     <span class="doccomment">/// - `is_ci` signals whether or not the test run is done on CI or not. May be important if local</span>
     <span class="doccomment">///   test run connection strings and CI connection strings differ because of networking.</span>
-    <span class="kw">fn</span> <span class="ident">connection_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">test_database</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">is_ci</span>: <span class="ident">bool</span>) -&gt; <span class="ident">String</span>;
+    <span class="kw">fn</span> <span class="ident">connection_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">test_database</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">is_ci</span>: <span class="ident">bool</span>, <span class="ident">is_multi_schema</span>: <span class="ident">bool</span>) -&gt; <span class="ident">String</span>;
 
     <span class="doccomment">/// Capabilities of the implementing connector.</span>
     <span class="kw">fn</span> <span class="ident">capabilities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">ConnectorCapability</span>];

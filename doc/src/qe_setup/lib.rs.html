@@ -186,14 +186,14 @@
 }
 
 <span class="doccomment">/// Database setup for connector-test-kit-rs.</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">setup</span>(<span class="ident">prisma_schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">setup</span>(<span class="ident">prisma_schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">db_schemas</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>]) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">source</span>, <span class="ident">url</span>, <span class="ident">_preview_features</span>) <span class="op">=</span> <span class="ident">parse_configuration</span>(<span class="ident">prisma_schema</span>)<span class="question-mark">?</span>;
 
     <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">source</span>.<span class="ident">active_provider</span> {
         <span class="ident">provider</span> <span class="kw">if</span> [<span class="ident">POSTGRES</span>.<span class="ident">provider_name</span>(), <span class="ident">COCKROACH</span>.<span class="ident">provider_name</span>()].<span class="ident">contains</span>(<span class="ident">provider</span>) =&gt; {
-            <span class="ident">postgres_setup</span>(<span class="ident">url</span>, <span class="ident">prisma_schema</span>).<span class="kw">await</span><span class="question-mark">?</span>
+            <span class="ident">postgres_setup</span>(<span class="ident">url</span>, <span class="ident">prisma_schema</span>, <span class="ident">db_schemas</span>).<span class="kw">await</span><span class="question-mark">?</span>
         }
-        <span class="ident">provider</span> <span class="kw">if</span> <span class="ident">MSSQL</span>.<span class="ident">is_provider</span>(<span class="ident">provider</span>) =&gt; <span class="ident">mssql_setup</span>(<span class="ident">url</span>, <span class="ident">prisma_schema</span>).<span class="kw">await</span><span class="question-mark">?</span>,
+        <span class="ident">provider</span> <span class="kw">if</span> <span class="ident">MSSQL</span>.<span class="ident">is_provider</span>(<span class="ident">provider</span>) =&gt; <span class="ident">mssql_setup</span>(<span class="ident">url</span>, <span class="ident">prisma_schema</span>, <span class="ident">db_schemas</span>).<span class="kw">await</span><span class="question-mark">?</span>,
         <span class="ident">provider</span> <span class="kw">if</span> <span class="ident">MYSQL</span>.<span class="ident">is_provider</span>(<span class="ident">provider</span>) =&gt; {
             <span class="ident">mysql_reset</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>).<span class="kw">await</span><span class="question-mark">?</span>;
             <span class="ident">diff_and_apply</span>(<span class="ident">prisma_schema</span>).<span class="kw">await</span>;
@@ -222,12 +222,12 @@
 }
 
 <span class="doccomment">/// Database teardown for connector-test-kit-rs.</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">teardown</span>(<span class="ident">prisma_schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">teardown</span>(<span class="ident">prisma_schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">db_schemas</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>]) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">source</span>, <span class="ident">url</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">parse_configuration</span>(<span class="ident">prisma_schema</span>)<span class="question-mark">?</span>;
 
     <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">source</span>.<span class="ident">active_provider</span> {
         <span class="ident">provider</span> <span class="kw">if</span> [<span class="ident">POSTGRES</span>.<span class="ident">provider_name</span>(), <span class="ident">COCKROACH</span>.<span class="ident">provider_name</span>()].<span class="ident">contains</span>(<span class="ident">provider</span>) =&gt; {
-            <span class="ident">postgres_teardown</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="ident">postgres_teardown</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>, <span class="ident">db_schemas</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         }
 
         <span class="ident">provider</span>

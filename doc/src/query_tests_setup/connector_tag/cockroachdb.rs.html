@@ -81,7 +81,7 @@
         <span class="ident">Box::new</span>(<span class="ident">SqlDatamodelRenderer::new</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">connection_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">database</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">is_ci</span>: <span class="ident">bool</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">connection_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">database</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">is_ci</span>: <span class="ident">bool</span>, <span class="ident">_is_multi_schema</span>: <span class="ident">bool</span>) -&gt; <span class="ident">String</span> {
         <span class="comment">// Use the same database and schema name for CockroachDB - unfortunately CockroachDB</span>
         <span class="comment">// can&#39;t handle 1 schema per test in a database well at this point in time.</span>
         <span class="kw">if</span> <span class="ident">is_ci</span> {
