@@ -106,8 +106,8 @@ impl Model {
 impl Debug for Model {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Model")
-            .field("schema", &self.schema_name().unwrap_or_default())
             .field("name", &self.name)
+            .field("schema", &self.schema_name().unwrap_or_default())
             .field("manifestation", &self.manifestation)
             .field("fields", &self.fields)
             .field("indexes", &self.indexes)
