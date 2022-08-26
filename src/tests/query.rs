@@ -332,7 +332,7 @@ async fn where_like(api: &mut dyn TestApi) -> crate::Result<()> {
 
     api.conn().insert(insert.into()).await?;
 
-    let query = Select::from_table(table).so_that("name".like("auk"));
+    let query = Select::from_table(table).so_that("name".like("%auk%"));
     let res = api.conn().select(query).await?;
 
     assert_eq!(1, res.len());
@@ -353,7 +353,7 @@ async fn where_not_like(api: &mut dyn TestApi) -> crate::Result<()> {
 
     api.conn().insert(insert.into()).await?;
 
-    let query = Select::from_table(table).so_that("name".not_like("auk"));
+    let query = Select::from_table(table).so_that("name".not_like("%auk%"));
     let res = api.conn().select(query).await?;
 
     assert_eq!(1, res.len());
@@ -3277,6 +3277,178 @@ async fn order_by_nulls_first_last(api: &mut dyn TestApi) -> crate::Result<()> {
 
     assert_eq!(res.get(3).unwrap()["name"], Value::text("a"));
     assert_eq!(res.get(3).unwrap()["age"], Value::int32(1));
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn concat_expressions(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api
+        .create_table("firstname varchar(255), lastname varchar(255)")
+        .await?;
+
+    let insert = Insert::single_into(&table)
+        .value("firstname", "John")
+        .value("lastname", "Doe");
+
+    api.conn().insert(insert.into()).await?;
+
+    let concat: Expression<'_> =
+        concat::<'_, Expression<'_>>(vec![col!("firstname").into(), " ".into(), col!("lastname").into()]).into();
+    let query = Select::from_table(table).value(concat.alias("concat"));
+
+    let res = api.conn().select(query).await?.into_single()?;
+    assert_eq!(res["concat"], Value::from("John Doe"));
+
+    Ok(())
+}
+
+#[cfg(feature = "postgresql")]
+#[test_each_connector(tags("postgresql"))]
+async fn all_in_expression(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api.create_table("id int").await?;
+
+    let insert = Insert::single_into(&table).value("id", 1);
+    api.conn().insert(insert.into()).await?;
+
+    // SELECT 1 = ALL(SELECT "Test".id FROM "Test");
+    let val: Expression<'_> = Value::from(1).into();
+    let expr: Expression<'_> = Select::from_table(&table).value(col!("id")).into();
+    let expr: Expression<'_> = val.equals(expr.all()).into();
+    let query = Select::from_table(&table).value(expr.alias("all"));
+
+    let res = api.conn().select(query.clone()).await?.into_single()?;
+    assert_eq!(res["all"], Value::from(true));
+
+    let insert = Insert::single_into(&table).value("id", 2);
+    api.conn().insert(insert.into()).await?;
+
+    let res = api.conn().select(query.clone()).await?.into_single()?;
+    assert_eq!(res["all"], Value::from(false));
+
+    Ok(())
+}
+
+#[cfg(feature = "postgresql")]
+#[test_each_connector(tags("postgresql"))]
+async fn any_in_expression(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api.create_table("id int").await?;
+
+    let insert = Insert::single_into(&table).value("id", 1);
+    api.conn().insert(insert.into()).await?;
+
+    // SELECT 1 = ANY(SELECT "Test".id FROM "Test");
+    let val: Expression<'_> = Value::from(1).into();
+    let expr: Expression<'_> = Select::from_table(&table).value(col!("id")).into();
+    let expr: Expression<'_> = val.equals(expr.any()).into();
+    let query = Select::from_table(&table).value(expr.alias("any"));
+
+    let res = api.conn().select(query.clone()).await?.into_single()?;
+    assert_eq!(res["any"], Value::from(true));
+
+    let insert = Insert::single_into(&table).value("id", 2);
+    api.conn().insert(insert.into()).await?;
+
+    let res = api.conn().select(query.clone()).await?.into_single()?;
+    assert_eq!(res["any"], Value::from(true));
+
+    Ok(())
+}
+
+#[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+#[test_each_connector(tags("postgresql", "mysql"))]
+async fn json_unquote_fun(api: &mut dyn TestApi) -> crate::Result<()> {
+    let json_type = match api.system() {
+        "postgres" => "jsonb",
+        _ => "json",
+    };
+    let table = api.create_table(&format!("json {}", json_type)).await?;
+
+    let insert = Insert::multi_into(&table, vec!["json"])
+        .values(vec![serde_json::json!("a")])
+        .values(vec![serde_json::json!(1)])
+        .values(vec![serde_json::json!({"a":"b"})])
+        .values(vec![serde_json::json!(["a", 1])]);
+
+    api.conn().insert(insert.into()).await?;
+
+    let expr: Expression<'_> = json_unquote(col!("json")).into();
+    let query = Select::from_table(&table).value(expr.alias("unquote"));
+
+    let res = api.conn().select(query.clone()).await?;
+
+    assert_eq!(res.get(0).unwrap()["unquote"], Value::text("a"));
+    assert_eq!(res.get(1).unwrap()["unquote"], Value::text("1"));
+    if api.connector_tag().intersects(Tags::MYSQL_MARIADB) {
+        assert_eq!(res.get(2).unwrap()["unquote"], Value::text("{\"a\":\"b\"}"));
+    } else {
+        assert_eq!(res.get(2).unwrap()["unquote"], Value::text("{\"a\": \"b\"}"));
+    }
+    if api.connector_tag().intersects(Tags::MYSQL_MARIADB) {
+        assert_eq!(res.get(3).unwrap()["unquote"], Value::text("[\"a\",1]"));
+    } else {
+        assert_eq!(res.get(3).unwrap()["unquote"], Value::text("[\"a\", 1]"));
+    }
+
+    Ok(())
+}
+
+#[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+#[test_each_connector(tags("postgresql", "mysql"))]
+async fn json_col_equal_json_col(api: &mut dyn TestApi) -> crate::Result<()> {
+    let json_type = match api.system() {
+        "postgres" => "jsonb",
+        _ => "json",
+    };
+    let table = api
+        .create_table(&format!(
+            "{}, json_1 {}, json_2 {}",
+            api.autogen_id("id"),
+            json_type,
+            json_type
+        ))
+        .await?;
+
+    let insert = Insert::multi_into(&table, vec!["id", "json_1", "json_2"])
+        .values(vec![
+            Value::from(1),
+            serde_json::json!({"a":"b"}).into(),
+            serde_json::json!({"a":"b"}).into(),
+        ])
+        .values(vec![
+            Value::from(2),
+            serde_json::json!({"a":{"b":"c"}}).into(),
+            serde_json::json!("c").into(),
+        ]);
+
+    api.conn().insert(insert.into()).await?;
+
+    let query = Select::from_table(&table)
+        .column("id")
+        .so_that(col!("json_1").equals(col!("json_2")));
+    let mut res = api.conn().select(query.clone()).await?.into_iter();
+
+    assert_eq!(res.next().unwrap()["id"], Value::int32(1));
+    assert_eq!(res.next(), None);
+
+    let path = match api.system() {
+        #[cfg(feature = "postgresql")]
+        "postgres" => JsonPath::array(["a", "b"]),
+        #[cfg(feature = "mysql")]
+        "mysql" => JsonPath::string("$.a.b"),
+        _ => unreachable!(),
+    };
+
+    // Ensures that using JSON_EXTRACT(`json_col`) = `json_col` works to prevents regressions on MySQL flavoured connectors.
+    let expr: Expression<'_> = json_extract(col!("json_1"), path, false).into();
+    let query = Select::from_table(&table)
+        .column("id")
+        .so_that(expr.equals(col!("json_2")));
+
+    let mut res = api.conn().select(query.clone()).await?.into_iter();
+
+    assert_eq!(res.next().unwrap()["id"], Value::int32(2));
+    assert_eq!(res.next(), None);
 
     Ok(())
 }

@@ -230,7 +230,7 @@ impl<'a> Comparable<'a> for Row<'a> {
 
     fn like<T>(self, pattern: T) -> Compare<'a>
     where
-        T: Into<Cow<'a, str>>,
+        T: Into<Expression<'a>>,
     {
         let value: Expression<'a> = self.into();
         value.like(pattern)
@@ -238,42 +238,10 @@ impl<'a> Comparable<'a> for Row<'a> {
 
     fn not_like<T>(self, pattern: T) -> Compare<'a>
     where
-        T: Into<Cow<'a, str>>,
+        T: Into<Expression<'a>>,
     {
         let value: Expression<'a> = self.into();
         value.not_like(pattern)
-    }
-
-    fn begins_with<T>(self, pattern: T) -> Compare<'a>
-    where
-        T: Into<Cow<'a, str>>,
-    {
-        let value: Expression<'a> = self.into();
-        value.begins_with(pattern)
-    }
-
-    fn not_begins_with<T>(self, pattern: T) -> Compare<'a>
-    where
-        T: Into<Cow<'a, str>>,
-    {
-        let value: Expression<'a> = self.into();
-        value.not_begins_with(pattern)
-    }
-
-    fn ends_into<T>(self, pattern: T) -> Compare<'a>
-    where
-        T: Into<Cow<'a, str>>,
-    {
-        let value: Expression<'a> = self.into();
-        value.ends_into(pattern)
-    }
-
-    fn not_ends_into<T>(self, pattern: T) -> Compare<'a>
-    where
-        T: Into<Cow<'a, str>>,
-    {
-        let value: Expression<'a> = self.into();
-        value.not_ends_into(pattern)
     }
 
     #[allow(clippy::wrong_self_convention)]
@@ -378,11 +346,21 @@ impl<'a> Comparable<'a> for Row<'a> {
     #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     fn json_type_equals<T>(self, json_type: T) -> Compare<'a>
     where
-        T: Into<JsonType>,
+        T: Into<JsonType<'a>>,
     {
         let value: Expression<'a> = self.into();
 
         value.json_type_equals(json_type)
+    }
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn json_type_not_equals<T>(self, json_type: T) -> Compare<'a>
+    where
+        T: Into<JsonType<'a>>,
+    {
+        let value: Expression<'a> = self.into();
+
+        value.json_type_not_equals(json_type)
     }
 
     #[cfg(feature = "postgresql")]
@@ -403,5 +381,19 @@ impl<'a> Comparable<'a> for Row<'a> {
         let value: Expression<'a> = self.into();
 
         value.not_matches(query)
+    }
+
+    #[cfg(feature = "postgresql")]
+    fn any(self) -> Compare<'a> {
+        let value: Expression<'a> = self.into();
+
+        value.any()
+    }
+
+    #[cfg(feature = "postgresql")]
+    fn all(self) -> Compare<'a> {
+        let value: Expression<'a> = self.into();
+
+        value.all()
     }
 }

@@ -60,7 +60,7 @@ impl<'a> Mysql<'a> {
 
         match (left, right) {
             #[cfg(feature = "json")]
-            (left, right) if left.is_json_value() && right.is_json_extract_fun() => {
+            (left, right) if left.is_json_value() && right.is_fun_retuning_json() => {
                 let quaint_value = json_to_quaint_value(left.into_json_value().unwrap())?;
 
                 self.visit_parameterized(quaint_value)?;
@@ -68,7 +68,7 @@ impl<'a> Mysql<'a> {
                 self.visit_expression(right)?;
             }
             #[cfg(feature = "json")]
-            (left, right) if left.is_json_extract_fun() && right.is_json_value() => {
+            (left, right) if left.is_fun_retuning_json() && right.is_json_value() => {
                 let quaint_value = json_to_quaint_value(right.into_json_value().unwrap())?;
 
                 self.visit_expression(left)?;
@@ -289,7 +289,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
     fn visit_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
         #[cfg(feature = "json")]
         {
-            if right.is_json_value() || left.is_json_value() {
+            if right.is_json_expr() || left.is_json_expr() {
                 self.surround_with("(", ")", |ref mut s| {
                     s.write("JSON_CONTAINS")?;
                     s.surround_with("(", ")", |s| {
@@ -321,7 +321,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
     fn visit_not_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
         #[cfg(feature = "json")]
         {
-            if right.is_json_value() || left.is_json_value() {
+            if right.is_json_expr() || left.is_json_expr() {
                 self.surround_with("(", ")", |ref mut s| {
                     s.write("NOT JSON_CONTAINS")?;
                     s.surround_with("(", ")", |s| {
@@ -391,11 +391,16 @@ impl<'a> Visitor<'a> for Mysql<'a> {
     }
 
     #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
-    fn visit_json_type_equals(&mut self, left: Expression<'a>, json_type: JsonType) -> visitor::Result {
+    fn visit_json_type_equals(&mut self, left: Expression<'a>, json_type: JsonType<'a>, not: bool) -> visitor::Result {
         self.write("(")?;
         self.write("JSON_TYPE")?;
         self.surround_with("(", ")", |s| s.visit_expression(left.clone()))?;
-        self.write(" = ")?;
+
+        if not {
+            self.write(" != ")?;
+        } else {
+            self.write(" = ")?;
+        }
 
         match json_type {
             JsonType::Array => {
@@ -420,6 +425,10 @@ impl<'a> Visitor<'a> for Mysql<'a> {
             }
             JsonType::Null => {
                 self.visit_expression(Value::text("NULL").into())?;
+            }
+            JsonType::ColumnRef(column) => {
+                self.write("JSON_TYPE")?;
+                self.surround_with("(", ")", |s| s.visit_column(*column))?;
             }
         }
 
@@ -512,6 +521,15 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         self.visit_expression(*extract.expr)?;
         self.write(", ")?;
         self.visit_parameterized(Value::text("$[0]"))?;
+        self.write(")")?;
+
+        Ok(())
+    }
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn visit_json_unquote(&mut self, json_unquote: JsonUnquote<'a>) -> visitor::Result {
+        self.write("JSON_UNQUOTE(")?;
+        self.visit_expression(*json_unquote.expr)?;
         self.write(")")?;
 
         Ok(())

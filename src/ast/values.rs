@@ -222,7 +222,7 @@ impl<'a> Value<'a> {
         Value::Int64(Some(value.into()))
     }
 
-    /// Creates a new 64-bit signed integer.
+    /// Creates a new 32-bit signed integer.
     pub fn integer<I>(value: I) -> Self
     where
         I: Into<i32>,

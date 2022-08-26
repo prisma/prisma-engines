@@ -285,7 +285,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
     }
 
     #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
-    fn visit_json_type_equals(&mut self, _left: Expression<'a>, _json_type: JsonType) -> visitor::Result {
+    fn visit_json_type_equals(&mut self, _left: Expression<'a>, _json_type: JsonType, _not: bool) -> visitor::Result {
         unimplemented!("JSON_TYPE is not yet supported on SQLite")
     }
 
@@ -316,6 +316,11 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
 
     #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     fn visit_json_extract_first_array_item(&mut self, _extract: JsonExtractFirstArrayElem<'a>) -> visitor::Result {
+        unimplemented!("JSON filtering is not yet supported on SQLite")
+    }
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn visit_json_unquote(&mut self, _json_unquote: JsonUnquote<'a>) -> visitor::Result {
         unimplemented!("JSON filtering is not yet supported on SQLite")
     }
 
@@ -351,6 +356,24 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
                 self.write(", ")?;
             }
         }
+
+        Ok(())
+    }
+
+    fn visit_concat(&mut self, concat: Concat<'a>) -> visitor::Result {
+        let len = concat.exprs.len();
+
+        self.surround_with("(", ")", |s| {
+            for (i, expr) in concat.exprs.into_iter().enumerate() {
+                s.visit_expression(expr)?;
+
+                if i < (len - 1) {
+                    s.write(" || ")?;
+                }
+            }
+
+            Ok(())
+        })?;
 
         Ok(())
     }
@@ -516,7 +539,7 @@ mod tests {
     fn test_select_where_like() {
         let expected = expected_values("SELECT `naukio`.* FROM `naukio` WHERE `word` LIKE ?", vec!["%meow%"]);
 
-        let query = Select::from_table("naukio").so_that("word".like("meow"));
+        let query = Select::from_table("naukio").so_that("word".like("%meow%"));
         let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected.0, sql);
@@ -530,7 +553,7 @@ mod tests {
             vec!["%meow%"],
         );
 
-        let query = Select::from_table("naukio").so_that("word".not_like("meow"));
+        let query = Select::from_table("naukio").so_that("word".not_like("%meow%"));
         let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected.0, sql);
@@ -539,9 +562,9 @@ mod tests {
 
     #[test]
     fn test_select_where_begins_with() {
-        let expected = expected_values("SELECT `naukio`.* FROM `naukio` WHERE `word` LIKE ?", vec!["meow%"]);
+        let expected = expected_values("SELECT `naukio`.* FROM `naukio` WHERE `word` LIKE ?", vec!["%meow"]);
 
-        let query = Select::from_table("naukio").so_that("word".begins_with("meow"));
+        let query = Select::from_table("naukio").so_that("word".like("%meow"));
         let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected.0, sql);
@@ -550,9 +573,9 @@ mod tests {
 
     #[test]
     fn test_select_where_not_begins_with() {
-        let expected = expected_values("SELECT `naukio`.* FROM `naukio` WHERE `word` NOT LIKE ?", vec!["meow%"]);
+        let expected = expected_values("SELECT `naukio`.* FROM `naukio` WHERE `word` NOT LIKE ?", vec!["%meow"]);
 
-        let query = Select::from_table("naukio").so_that("word".not_begins_with("meow"));
+        let query = Select::from_table("naukio").so_that("word".not_like("%meow"));
         let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected.0, sql);
@@ -561,9 +584,9 @@ mod tests {
 
     #[test]
     fn test_select_where_ends_into() {
-        let expected = expected_values("SELECT `naukio`.* FROM `naukio` WHERE `word` LIKE ?", vec!["%meow"]);
+        let expected = expected_values("SELECT `naukio`.* FROM `naukio` WHERE `word` LIKE ?", vec!["meow%"]);
 
-        let query = Select::from_table("naukio").so_that("word".ends_into("meow"));
+        let query = Select::from_table("naukio").so_that("word".like("meow%"));
         let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected.0, sql);
@@ -572,9 +595,9 @@ mod tests {
 
     #[test]
     fn test_select_where_not_ends_into() {
-        let expected = expected_values("SELECT `naukio`.* FROM `naukio` WHERE `word` NOT LIKE ?", vec!["%meow"]);
+        let expected = expected_values("SELECT `naukio`.* FROM `naukio` WHERE `word` NOT LIKE ?", vec!["meow%"]);
 
-        let query = Select::from_table("naukio").so_that("word".not_ends_into("meow"));
+        let query = Select::from_table("naukio").so_that("word".not_like("meow%"));
         let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected.0, sql);

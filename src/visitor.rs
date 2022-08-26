@@ -118,7 +118,10 @@ pub trait Visitor<'a> {
     fn visit_json_array_contains(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> Result;
 
     #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
-    fn visit_json_type_equals(&mut self, left: Expression<'a>, json_type: JsonType) -> Result;
+    fn visit_json_type_equals(&mut self, left: Expression<'a>, right: JsonType<'a>, not: bool) -> Result;
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn visit_json_unquote(&mut self, json_unquote: JsonUnquote<'a>) -> Result;
 
     #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_text_search(&mut self, text_search: TextSearch<'a>) -> Result;
@@ -649,68 +652,20 @@ pub trait Visitor<'a> {
         self.visit_expression(right)
     }
 
-    fn visit_like(&mut self, left: Expression<'a>, right: Cow<str>) -> Result {
+    fn visit_like(&mut self, left: Expression<'a>, right: Expression<'a>) -> Result {
         self.visit_expression(left)?;
-
-        self.add_parameter(Value::text(format!(
-            "{}{}{}",
-            Self::C_WILDCARD,
-            right,
-            Self::C_WILDCARD
-        )));
-
         self.write(" LIKE ")?;
-        self.parameter_substitution()
+        self.visit_expression(right)?;
+
+        Ok(())
     }
 
-    fn visit_not_like(&mut self, left: Expression<'a>, right: Cow<str>) -> Result {
+    fn visit_not_like(&mut self, left: Expression<'a>, right: Expression<'a>) -> Result {
         self.visit_expression(left)?;
-
-        self.add_parameter(Value::text(format!(
-            "{}{}{}",
-            Self::C_WILDCARD,
-            right,
-            Self::C_WILDCARD
-        )));
-
         self.write(" NOT LIKE ")?;
-        self.parameter_substitution()
-    }
+        self.visit_expression(right)?;
 
-    fn visit_begins_with(&mut self, left: Expression<'a>, right: Cow<str>) -> Result {
-        self.visit_expression(left)?;
-
-        self.add_parameter(Value::text(format!("{}{}", right, Self::C_WILDCARD)));
-
-        self.write(" LIKE ")?;
-        self.parameter_substitution()
-    }
-
-    fn visit_not_begins_with(&mut self, left: Expression<'a>, right: Cow<str>) -> Result {
-        self.visit_expression(left)?;
-
-        self.add_parameter(Value::text(format!("{}{}", right, Self::C_WILDCARD)));
-
-        self.write(" NOT LIKE ")?;
-        self.parameter_substitution()
-    }
-
-    fn visit_ends_with(&mut self, left: Expression<'a>, right: Cow<str>) -> Result {
-        self.visit_expression(left)?;
-
-        self.add_parameter(Value::text(format!("{}{}", Self::C_WILDCARD, right,)));
-
-        self.write(" LIKE ")?;
-        self.parameter_substitution()
-    }
-
-    fn visit_not_ends_with(&mut self, left: Expression<'a>, right: Cow<str>) -> Result {
-        self.visit_expression(left)?;
-
-        self.add_parameter(Value::text(format!("{}{}", Self::C_WILDCARD, right,)));
-
-        self.write(" NOT LIKE ")?;
-        self.parameter_substitution()
+        Ok(())
     }
 
     /// A comparison expression
@@ -866,12 +821,8 @@ pub trait Visitor<'a> {
                     self.visit_expression(right)
                 }
             },
-            Compare::Like(left, right) => self.visit_like(*left, right),
-            Compare::NotLike(left, right) => self.visit_not_like(*left, right),
-            Compare::BeginsWith(left, right) => self.visit_begins_with(*left, right),
-            Compare::NotBeginsWith(left, right) => self.visit_not_begins_with(*left, right),
-            Compare::EndsInto(left, right) => self.visit_ends_with(*left, right),
-            Compare::NotEndsInto(left, right) => self.visit_not_ends_with(*left, right),
+            Compare::Like(left, right) => self.visit_like(*left, *right),
+            Compare::NotLike(left, right) => self.visit_not_like(*left, *right),
             Compare::Null(column) => {
                 self.visit_expression(*column)?;
                 self.write(" IS NULL")
@@ -905,12 +856,23 @@ pub trait Visitor<'a> {
             Compare::JsonCompare(json_compare) => match json_compare {
                 JsonCompare::ArrayContains(left, right) => self.visit_json_array_contains(*left, *right, false),
                 JsonCompare::ArrayNotContains(left, right) => self.visit_json_array_contains(*left, *right, true),
-                JsonCompare::TypeEquals(left, json_type) => self.visit_json_type_equals(*left, json_type),
+                JsonCompare::TypeEquals(left, json_type) => self.visit_json_type_equals(*left, json_type, false),
+                JsonCompare::TypeNotEquals(left, json_type) => self.visit_json_type_equals(*left, json_type, true),
             },
             #[cfg(feature = "postgresql")]
             Compare::Matches(left, right) => self.visit_matches(*left, right, false),
             #[cfg(feature = "postgresql")]
             Compare::NotMatches(left, right) => self.visit_matches(*left, right, true),
+            #[cfg(feature = "postgresql")]
+            Compare::Any(left) => {
+                self.write("ANY")?;
+                self.surround_with("(", ")", |s| s.visit_expression(*left))
+            }
+            #[cfg(feature = "postgresql")]
+            Compare::All(left) => {
+                self.write("ALL")?;
+                self.surround_with("(", ")", |s| s.visit_expression(*left))
+            }
         }
     }
 
@@ -1016,6 +978,10 @@ pub trait Visitor<'a> {
             FunctionType::JsonExtractLastArrayElem(extract) => {
                 self.visit_json_extract_last_array_item(extract)?;
             }
+            #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+            FunctionType::JsonUnquote(unquote) => {
+                self.visit_json_unquote(unquote)?;
+            }
             #[cfg(any(feature = "postgresql", feature = "mysql"))]
             FunctionType::TextSearch(text_search) => {
                 self.visit_text_search(text_search)?;
@@ -1034,12 +1000,34 @@ pub trait Visitor<'a> {
             }
             #[cfg(feature = "mysql")]
             FunctionType::Uuid => self.write("uuid()")?,
+            FunctionType::Concat(concat) => {
+                self.visit_concat(concat)?;
+            }
         };
 
         if let Some(alias) = fun.alias {
             self.write(" AS ")?;
             self.delimited_identifiers(&[&*alias])?;
         }
+
+        Ok(())
+    }
+
+    fn visit_concat(&mut self, concat: Concat<'a>) -> Result {
+        let len = concat.exprs.len();
+
+        self.write("CONCAT")?;
+        self.surround_with("(", ")", |s| {
+            for (i, expr) in concat.exprs.into_iter().enumerate() {
+                s.visit_expression(expr)?;
+
+                if i < (len - 1) {
+                    s.write(", ")?;
+                }
+            }
+
+            Ok(())
+        })?;
 
         Ok(())
     }

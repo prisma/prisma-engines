@@ -3,7 +3,6 @@ use crate::ast::Expression;
 use std::borrow::Cow;
 
 #[derive(Debug, Clone, PartialEq)]
-#[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
 pub struct JsonExtract<'a> {
     pub(crate) column: Box<Expression<'a>>,
     pub(crate) path: JsonPath<'a>,
@@ -11,7 +10,6 @@ pub struct JsonExtract<'a> {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-#[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
 pub enum JsonPath<'a> {
     #[cfg(feature = "mysql")]
     String(Cow<'a, str>),
@@ -19,7 +17,6 @@ pub enum JsonPath<'a> {
     Array(Vec<Cow<'a, str>>),
 }
 
-#[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
 impl<'a> JsonPath<'a> {
     #[cfg(feature = "mysql")]
     pub fn string<S>(string: S) -> JsonPath<'a>
@@ -63,12 +60,11 @@ impl<'a> JsonPath<'a> {
 /// let extract: Expression = json_extract(Column::from(("users", "json")), JsonPath::string("$.a.b"), false).into();
 /// let query = Select::from_table("users").so_that(extract.equals("c"));
 /// let (sql, params) = Mysql::build(query)?;
-/// assert_eq!(r#"SELECT `users`.* FROM `users` WHERE JSON_EXTRACT(`users`.`json`, ?) = ?"#, sql);
-/// assert_eq!(vec![Value::text("$.a.b"), Value::text("c")], params);
+/// assert_eq!(r#"SELECT `users`.* FROM `users` WHERE (JSON_CONTAINS(JSON_EXTRACT(`users`.`json`, ?), ?) AND JSON_CONTAINS(?, JSON_EXTRACT(`users`.`json`, ?)))"#, sql);
+/// assert_eq!(vec![Value::text("$.a.b"), Value::text("c"), Value::text("c"), Value::text("$.a.b")], params);
 /// # Ok(())
 /// # }
 /// ```
-#[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
 pub fn json_extract<'a, C, P>(column: C, path: P, extract_as_string: bool) -> Function<'a>
 where
     C: Into<Expression<'a>>,

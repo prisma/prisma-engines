@@ -43,7 +43,21 @@ impl<'a> Expression<'a> {
         }
     }
 
+    #[cfg(feature = "json")]
+    pub(crate) fn is_json_expr(&self) -> bool {
+        match &self.kind {
+            #[cfg(feature = "json")]
+            ExpressionKind::Parameterized(Value::Json(_)) => true,
+            #[cfg(feature = "json")]
+            ExpressionKind::Value(expr) => expr.is_json_value(),
+            #[cfg(feature = "json")]
+            ExpressionKind::Function(fun) => fun.returns_json(),
+            _ => false,
+        }
+    }
+
     #[allow(dead_code)]
+    #[cfg(feature = "json")]
     pub(crate) fn is_json_value(&self) -> bool {
         match &self.kind {
             #[cfg(feature = "json")]
@@ -67,13 +81,9 @@ impl<'a> Expression<'a> {
     }
 
     #[allow(dead_code)]
-    pub(crate) fn is_json_extract_fun(&self) -> bool {
+    pub(crate) fn is_fun_retuning_json(&self) -> bool {
         match &self.kind {
-            ExpressionKind::Function(f) => match &f.typ_ {
-                #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
-                FunctionType::JsonExtract(_) => true,
-                _ => false,
-            },
+            ExpressionKind::Function(f) => f.returns_json(),
             _ => false,
         }
     }
@@ -371,44 +381,16 @@ impl<'a> Comparable<'a> for Expression<'a> {
 
     fn like<T>(self, pattern: T) -> Compare<'a>
     where
-        T: Into<Cow<'a, str>>,
+        T: Into<Expression<'a>>,
     {
-        Compare::Like(Box::new(self), pattern.into())
+        Compare::Like(Box::new(self), Box::new(pattern.into()))
     }
 
     fn not_like<T>(self, pattern: T) -> Compare<'a>
     where
-        T: Into<Cow<'a, str>>,
+        T: Into<Expression<'a>>,
     {
-        Compare::NotLike(Box::new(self), pattern.into())
-    }
-
-    fn begins_with<T>(self, pattern: T) -> Compare<'a>
-    where
-        T: Into<Cow<'a, str>>,
-    {
-        Compare::BeginsWith(Box::new(self), pattern.into())
-    }
-
-    fn not_begins_with<T>(self, pattern: T) -> Compare<'a>
-    where
-        T: Into<Cow<'a, str>>,
-    {
-        Compare::NotBeginsWith(Box::new(self), pattern.into())
-    }
-
-    fn ends_into<T>(self, pattern: T) -> Compare<'a>
-    where
-        T: Into<Cow<'a, str>>,
-    {
-        Compare::EndsInto(Box::new(self), pattern.into())
-    }
-
-    fn not_ends_into<T>(self, pattern: T) -> Compare<'a>
-    where
-        T: Into<Cow<'a, str>>,
-    {
-        Compare::NotEndsInto(Box::new(self), pattern.into())
+        Compare::NotLike(Box::new(self), Box::new(pattern.into()))
     }
 
     #[allow(clippy::wrong_self_convention)]
@@ -504,9 +486,17 @@ impl<'a> Comparable<'a> for Expression<'a> {
     #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     fn json_type_equals<T>(self, json_type: T) -> Compare<'a>
     where
-        T: Into<JsonType>,
+        T: Into<JsonType<'a>>,
     {
         Compare::JsonCompare(JsonCompare::TypeEquals(Box::new(self), json_type.into()))
+    }
+
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    fn json_type_not_equals<T>(self, json_type: T) -> Compare<'a>
+    where
+        T: Into<JsonType<'a>>,
+    {
+        Compare::JsonCompare(JsonCompare::TypeNotEquals(Box::new(self), json_type.into()))
     }
 
     #[cfg(feature = "postgresql")]
@@ -523,5 +513,15 @@ impl<'a> Comparable<'a> for Expression<'a> {
         T: Into<Cow<'a, str>>,
     {
         Compare::NotMatches(Box::new(self), query.into())
+    }
+
+    #[cfg(feature = "postgresql")]
+    fn any(self) -> Compare<'a> {
+        Compare::Any(Box::new(self))
+    }
+
+    #[cfg(feature = "postgresql")]
+    fn all(self) -> Compare<'a> {
+        Compare::All(Box::new(self))
     }
 }
