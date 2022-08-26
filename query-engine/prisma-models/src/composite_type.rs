@@ -57,3 +57,5 @@ impl PartialEq for CompositeType {
         self.name == other.name
     }
 }
+
+impl Eq for CompositeType {}

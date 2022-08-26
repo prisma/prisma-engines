@@ -1,6 +1,10 @@
-use crate::{orderby::OrderByData, IntoBson};
+use crate::{
+    filter::{convert_filter, FilterPrefix},
+    orderby::OrderByData,
+};
+use connector_interface::UniqueFilters;
 use mongodb::bson::{doc, Document};
-use prisma_models::{OrderBy, SelectionResult, SortOrder};
+use prisma_models::{OrderBy, SortOrder};
 
 #[derive(Debug, Clone)]
 pub(crate) struct CursorData {
@@ -18,7 +22,7 @@ pub(crate) struct CursorData {
 #[derive(Debug, Default)]
 pub(crate) struct CursorBuilder {
     /// The field-value combination the cursor .
-    cursor: SelectionResult,
+    cursor: UniqueFilters,
 
     /// Ordering to use. Influences how cursor conditions are build.
     /// Relies on the `OrderByBuilder` to compute the joins and prepare
@@ -31,7 +35,7 @@ pub(crate) struct CursorBuilder {
 }
 
 impl CursorBuilder {
-    pub fn new(cursor: SelectionResult, order: Vec<OrderBy>, reverse: bool) -> Self {
+    pub fn new(cursor: UniqueFilters, order: Vec<OrderBy>, reverse: bool) -> Self {
         let order_data = OrderByData::from_list(order);
 
         Self {
@@ -46,16 +50,7 @@ impl CursorBuilder {
         let cursor = self.cursor;
 
         // First, we need to pin the record specified by the cursor to find the order by values for the comparator.
-        let mut cursor_filters = vec![];
-
-        for (field, value) in cursor {
-            let bson = (&field, value).into_bson()?;
-            let field_name = format!("${}", field.db_name());
-
-            cursor_filters.push(doc! { "$eq": [field_name, bson]});
-        }
-
-        let cursor_filter = doc! { "$and": cursor_filters };
+        let (cursor_filter, _) = convert_filter(cursor.into_filter(), false, FilterPrefix::default())?.render();
         let mut bindings = Document::new();
 
         for order_data in self.order_data.iter() {

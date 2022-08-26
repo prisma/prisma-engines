@@ -24,7 +24,7 @@ pub struct ScalarField {
     pub native_type: Option<NativeTypeInstance>,
     pub container: ParentContainer,
 
-    pub(crate) is_unique: bool,
+    pub(crate) unique_index: OnceCell<Option<Index>>,
     pub(crate) read_only: OnceCell<bool>,
 }
 
@@ -45,8 +45,16 @@ impl ScalarField {
         matches!(self.arity, FieldArity::Required)
     }
 
-    pub fn unique(&self) -> bool {
-        self.is_unique || self.is_id()
+    pub fn unique_index(&self) -> &Option<Index> {
+        self.unique_index.get_or_init(|| None)
+    }
+
+    fn is_unique(&self) -> bool {
+        self.unique_index().is_some()
+    }
+
+    pub fn is_unique_or_id(&self) -> bool {
+        self.is_unique() || self.is_id()
     }
 
     pub fn db_name(&self) -> &str {
@@ -84,7 +92,7 @@ impl Debug for ScalarField {
             .field("db_name", &self.db_name)
             .field("default_value", &self.default_value)
             .field("model", &self.container().name())
-            .field("is_unique", &self.is_unique)
+            .field("is_unique", &self.is_unique())
             .field("read_only", &self.read_only)
             .finish()
     }
@@ -106,7 +114,7 @@ impl Hash for ScalarField {
         self.is_auto_generated_int_id.hash(state);
         self.internal_enum.hash(state);
         self.is_updated_at.hash(state);
-        self.is_unique.hash(state);
+        self.is_unique().hash(state);
         self.container.hash(state);
         self.arity.hash(state);
         self.db_name.hash(state);
@@ -122,7 +130,7 @@ impl PartialEq for ScalarField {
             && self.internal_enum == other.internal_enum
             && self.is_updated_at == other.is_updated_at
             && self.default_value == other.default_value
-            && self.is_unique == other.is_unique
+            && self.is_unique() == other.is_unique()
             && self.container == other.container
             && self.arity == other.arity
             && self.db_name == other.db_name

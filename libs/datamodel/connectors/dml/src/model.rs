@@ -315,11 +315,11 @@ pub enum SortOrder {
 /// A unique criteria is a set of fields through which a record can be uniquely identified.
 #[derive(Debug)]
 pub struct UniqueCriteria<'a> {
-    pub fields: Vec<&'a ScalarField>,
+    pub fields: Vec<&'a Field>,
 }
 
 impl<'a> UniqueCriteria<'a> {
-    pub fn new(fields: Vec<&'a ScalarField>) -> UniqueCriteria<'a> {
+    pub fn new(fields: Vec<&'a Field>) -> UniqueCriteria<'a> {
         UniqueCriteria { fields }
     }
 }
@@ -434,7 +434,7 @@ impl Model {
     }
 
     /// This should match the logic in `prisma_models::Model::primary_identifier`.
-    pub fn first_unique_criterion(&self) -> Vec<&ScalarField> {
+    pub fn first_unique_criterion(&self) -> Vec<&Field> {
         match self.strict_unique_criterias().first() {
             Some(criteria) => criteria.fields.clone(),
             None => panic!("Could not find the first unique criteria on model {}", self.name()),
@@ -464,12 +464,16 @@ impl Model {
     fn unique_criterias(&self, allow_optional: bool, disregard_unsupported: bool) -> Vec<UniqueCriteria> {
         let mut result = Vec::new();
 
-        let in_eligible = |field: &ScalarField| {
-            if disregard_unsupported {
-                field.is_commented_out || matches!(field.field_type, FieldType::Unsupported(_))
-            } else {
-                field.is_commented_out
+        let field_is_ineligible = |field: &Field| match field {
+            Field::ScalarField(sf) => {
+                if disregard_unsupported {
+                    sf.is_commented_out || matches!(sf.field_type, FieldType::Unsupported(_))
+                } else {
+                    sf.is_commented_out
+                }
             }
+            Field::CompositeField(cf) => cf.is_commented_out,
+            Field::RelationField(_) => true,
         };
 
         // first candidate: primary key
@@ -478,7 +482,7 @@ impl Model {
                 let id_fields: Vec<_> = pk
                     .fields
                     .iter()
-                    .map(|f| match self.find_scalar_field(&f.name) {
+                    .map(|f| match self.find_field(&f.name) {
                         Some(field) => field,
                         None => {
                             let error = formatdoc!(
@@ -502,7 +506,7 @@ impl Model {
                 if !id_fields.is_empty()
                     && !id_fields
                         .iter()
-                        .any(|f| in_eligible(f) || (f.is_optional() && !allow_optional))
+                        .any(|f| field_is_ineligible(f) || (f.is_optional() && !allow_optional))
                 {
                     result.push(UniqueCriteria::new(id_fields));
                 }
@@ -522,10 +526,11 @@ impl Model {
                         // TODO: remove this when supporting composite indices on QE
                         .filter(|f| f.path.len() == 1)
                         .map(|f| &f.path.first().unwrap().0)
-                        .map(|name| self.find_scalar_field(name).unwrap())
+                        .map(|name| self.find_field(name).unwrap())
                         .collect();
-                    let no_fields_are_ineligible = !fields.iter().any(|f| in_eligible(f));
+                    let no_fields_are_ineligible = !fields.iter().any(|f| field_is_ineligible(f));
                     let all_fields_are_required = fields.iter().all(|f| f.is_required());
+
                     ((all_fields_are_required || allow_optional) && no_fields_are_ineligible)
                         .then(|| UniqueCriteria::new(fields))
                 })
@@ -599,18 +604,28 @@ impl Model {
         })
     }
 
-    pub fn field_is_unique_and_defined_on_field(&self, name: &str) -> bool {
-        self.indices.iter().any(|i| {
-            let names_match = i
-                .fields
-                .iter()
-                .flat_map(|f| &f.path)
-                .last()
-                .map(|(field_name, _)| field_name == name)
-                .unwrap_or(false);
+    pub fn unique_index_defined_on_field(&self, name: &str) -> Option<&IndexDefinition> {
+        self.indices
+            .iter()
+            .find(|i| Self::index_is_unique_and_defined_on_field(i, name))
+    }
 
-            i.is_unique() && i.fields.len() == 1 && names_match && i.defined_on_field
-        })
+    pub fn field_is_unique_and_defined_on_field(&self, name: &str) -> bool {
+        self.indices
+            .iter()
+            .any(|i| Self::index_is_unique_and_defined_on_field(i, name))
+    }
+
+    fn index_is_unique_and_defined_on_field(index: &IndexDefinition, name: &str) -> bool {
+        let names_match = index
+            .fields
+            .iter()
+            .flat_map(|f| &f.path)
+            .last()
+            .map(|(field_name, _)| field_name == name)
+            .unwrap_or(false);
+
+        index.is_unique() && index.fields.len() == 1 && names_match && index.defined_on_field
     }
 
     pub fn field_is_primary(&self, field_name: &str) -> bool {

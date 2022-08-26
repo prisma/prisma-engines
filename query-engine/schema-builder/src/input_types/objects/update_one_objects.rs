@@ -90,7 +90,7 @@ pub(super) fn filter_checked_update_fields(
                     // underlying sequences (checked inputs only).
                     let is_not_autoinc = !sf.is_auto_generated_int_id
                         && !matches!(
-                            (&sf.type_identifier, sf.unique(), sf.is_autoincrement),
+                            (&sf.type_identifier, sf.is_unique_or_id(), sf.is_autoincrement),
                             (TypeIdentifier::Int, true, true)
                         );
 

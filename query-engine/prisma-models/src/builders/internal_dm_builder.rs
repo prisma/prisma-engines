@@ -8,7 +8,7 @@ use crate::{
     IndexType, InlineRelation, InternalDataModel, InternalDataModelRef, InternalEnum, InternalEnumValue,
     RelationLinkManifestation, RelationSide, RelationTable, TypeIdentifier,
 };
-use datamodel::dml::{self, CompositeTypeFieldType, Datamodel, Ignorable, WithDatabaseName};
+use datamodel::dml::{self, CompositeTypeFieldType, Datamodel, Ignorable, IndexDefinition, WithDatabaseName};
 use itertools::Itertools;
 use once_cell::sync::OnceCell;
 use std::sync::Arc;
@@ -114,6 +114,7 @@ fn model_field_builders(
                 arity: cf.arity,
                 type_name: cf.composite_type.clone(),
                 default_value: cf.default_value.clone(),
+                unique_index: model.unique_index_defined_on_field(&cf.name).map(index_builder),
             })),
             dml::Field::RelationField(rf) => {
                 let relation = relations
@@ -147,7 +148,7 @@ fn model_field_builders(
                     Some(FieldBuilder::Scalar(ScalarFieldBuilder {
                         name: sf.name.clone(),
                         type_identifier: sf.type_identifier(),
-                        is_unique: model.field_is_unique(&sf.name),
+                        unique_index: model.unique_index_defined_on_field(&sf.name).map(index_builder),
                         is_id: model.field_is_primary(&sf.name),
                         is_auto_generated_int_id: model.field_is_auto_generated_int_id(&sf.name),
                         is_autoincrement: sf.is_auto_increment(),
@@ -177,6 +178,7 @@ fn composite_field_builders(datamodel: &Datamodel, composite: &dml::CompositeTyp
                 type_name: type_name.clone(),
                 // No defaults on composite fields of type composite
                 default_value: None,
+                unique_index: None, // Composites can only have unique or id indexes defined in their model container
             })),
             CompositeTypeFieldType::Scalar(_, _) | CompositeTypeFieldType::Enum(_) => {
                 let type_ident = field.type_identifier();
@@ -187,7 +189,7 @@ fn composite_field_builders(datamodel: &Datamodel, composite: &dml::CompositeTyp
                     Some(FieldBuilder::Scalar(ScalarFieldBuilder {
                         name: field.name.clone(),
                         type_identifier: type_ident,
-                        is_unique: false, // Composites can't have uniques or ids at the moment.
+                        unique_index: None, // Composites can only have unique or id indexes defined in their model container
                         is_id: false,
                         is_auto_generated_int_id: false,
                         is_autoincrement: false,
@@ -218,27 +220,31 @@ fn relation_builders(placeholders: &[RelationPlaceholder]) -> Vec<RelationBuilde
         .collect()
 }
 
+fn index_builder(idx: &IndexDefinition) -> IndexBuilder {
+    IndexBuilder {
+        name: idx.name.clone(),
+        field_paths: idx
+            .fields
+            .clone()
+            .into_iter()
+            .map(|f| f.path.iter().map(|p| p.0.clone()).collect_vec())
+            .collect(),
+        typ: match idx.tpe {
+            dml::IndexType::Unique => IndexType::Unique,
+            dml::IndexType::Normal => IndexType::Normal,
+            // TODO: When introducing the indexes in QE, change this.
+            dml::IndexType::Fulltext => IndexType::Normal,
+        },
+    }
+}
+
 fn index_builders(model: &dml::Model) -> Vec<IndexBuilder> {
     model
         .indices
         .iter()
         .filter(|i| model.is_compound_index_supported(i))
         .filter(|idx| idx.fields.len() > 1 || idx.fields.iter().any(|field| field.path.len() > 1))
-        .map(|idx| IndexBuilder {
-            name: idx.name.clone(),
-            field_paths: idx
-                .fields
-                .clone()
-                .into_iter()
-                .map(|f| f.path.iter().map(|p| p.0.clone()).collect_vec())
-                .collect(),
-            typ: match idx.tpe {
-                dml::IndexType::Unique => IndexType::Unique,
-                dml::IndexType::Normal => IndexType::Normal,
-                // TODO: When introducing the indexes in QE, change this.
-                dml::IndexType::Fulltext => IndexType::Normal,
-            },
-        })
+        .map(index_builder)
         .collect()
 }
 

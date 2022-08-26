@@ -1,6 +1,6 @@
 use super::*;
 use crate::{ArgumentListLookup, FieldPair, ParsedField, ReadQuery};
-use connector::RelAggregationSelection;
+use connector::{RelAggregationSelection, UniqueFilters};
 use prisma_models::prelude::*;
 use schema_builder::constants::{aggregations::*, args};
 use std::sync::Arc;
@@ -131,9 +131,9 @@ pub fn merge_relation_selections(
 
 /// Ensures that if a cursor is provided, its fields are also selected.
 /// Necessary for post-processing of unstable orderings with cursor operations.
-pub fn merge_cursor_fields(selected_fields: FieldSelection, cursor: &Option<SelectionResult>) -> FieldSelection {
+pub fn merge_cursor_fields(selected_fields: FieldSelection, cursor: &Option<UniqueFilters>) -> FieldSelection {
     match cursor {
-        Some(cursor) => selected_fields.merge(cursor.into()),
+        Some(cursor) => selected_fields.merge(cursor.into_selection()),
         None => selected_fields,
     }
 }

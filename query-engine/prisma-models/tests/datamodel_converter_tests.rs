@@ -601,7 +601,7 @@ impl ScalarFieldAssertions for ScalarField {
     }
 
     fn assert_unique(&self) -> &Self {
-        assert!(self.unique());
+        assert!(self.is_unique_or_id());
         self
     }
 }

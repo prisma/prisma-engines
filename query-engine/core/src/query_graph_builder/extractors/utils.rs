@@ -21,3 +21,8 @@ fn resolve_index_fields(name: &str, model: &ModelRef) -> Option<Vec<IndexField>>
         .find(|index| schema_builder::compound_index_field_name(index) == name)
         .map(|index| index.fields().to_vec())
 }
+
+pub fn resolve_composite_index_field(name: &str, model: &ModelRef) -> Option<Vec<IndexField>> {
+    // model.indexes().into_iter().find(|i| i.fields().len() == 1 && i.f)
+    None
+}

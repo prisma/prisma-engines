@@ -97,14 +97,15 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
 
     // TODO (dom): This can probably be collapsed into just uniques and pks
     // Single unique or ID fields.
-    let unique_fields = model.fields().scalar().into_iter().filter(|f| f.unique());
+    let unique_fields = model.fields().all.iter().filter(|f| f.is_unique());
 
     let mut fields: Vec<InputField> = unique_fields
-        .map(|sf| {
-            let name = sf.name.clone();
-            let typ = map_scalar_input_type_for_field(ctx, &sf);
-
-            input_field(name, typ, None).optional()
+        .map(|field| match field {
+            ModelField::Scalar(sf) => scalar_unique_input_field(ctx, &sf).optional(),
+            ModelField::Composite(cf) => {
+                composite_unique_input_field(ctx, &CompositeIndexField::from(cf.clone()), false).optional()
+            }
+            ModelField::Relation(_) => unreachable!(),
         })
         .collect();
 
@@ -162,7 +163,7 @@ fn compound_field_unique_object_type(
         .iter()
         .map(|index_field| match index_field {
             IndexField::Scalar(sf) => scalar_unique_input_field(ctx, sf),
-            IndexField::Composite(cif) => composite_unique_input_field(ctx, cif),
+            IndexField::Composite(cpif) => composite_unique_input_field(ctx, cpif, false),
         })
         .collect();
 
@@ -170,42 +171,50 @@ fn compound_field_unique_object_type(
     Arc::downgrade(&input_object)
 }
 
-fn scalar_unique_input_field(ctx: &mut BuilderContext, field: &ScalarFieldRef) -> InputField {
-    // We build the entire path, return that field
-    let name = field.name.clone();
-    let typ = map_scalar_input_type_for_field(ctx, field);
+fn scalar_unique_input_field(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputField {
+    let name = sf.name.clone();
+    let typ = map_scalar_input_type_for_field(ctx, sf);
 
     input_field(name, typ, None)
 }
 
-fn composite_unique_input_field(ctx: &mut BuilderContext, cif: &CompositeIndexField) -> InputField {
-    // Build the composite _inside_ the field
-
-    // @@unique([location.address]) => LocationAddressCompoundUniqueInput { LocationAddressCompositeUniqueInput }
-    // @@unique([name, location.address]) => NameLocationAddressUniqueInput { String, LocationAddressCompositeUniqueInput }
-
+fn composite_unique_input_field(ctx: &mut BuilderContext, cif: &CompositeIndexField, nested: bool) -> InputField {
     let input_field_name = cif.field().name.clone();
-    let object_type = composite_field_unique_object_type(ctx, cif);
+    let object_type = composite_unique_object_type(ctx, cif);
 
-    input_field(input_field_name, InputType::object(object_type), None)
+    let input_type = if nested && cif.field().is_list() {
+        InputType::list(InputType::object(object_type))
+    } else {
+        InputType::object(object_type)
+    };
+
+    input_field(input_field_name, input_type, None)
+        .nullable_if(cif.field().is_optional())
+        .optional_if(cif.field().is_optional())
 }
 
-fn composite_field_unique_object_type(ctx: &mut BuilderContext, cif: &CompositeIndexField) -> InputObjectTypeWeakRef {
+fn composite_unique_object_type(ctx: &mut BuilderContext, cpif: &CompositeIndexField) -> InputObjectTypeWeakRef {
+    let partial = if cpif.is_partial() { "Partial" } else { "" };
     let ident = Identifier::new(
-        format!("{}CompositeUniqueInput", cif.path().iter().map(capitalize).join("")),
+        format!(
+            "{}{}CompositeUniqueInput",
+            cpif.path().iter().map(capitalize).join(""),
+            partial
+        ),
         PRISMA_NAMESPACE,
     );
+
     return_cached_input!(ctx, &ident);
 
     let obj = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, obj.clone());
 
-    let fields = cif
-        .nested()
+    let fields = cpif
+        .index_fields()
         .iter()
         .map(|index_field| match index_field {
             IndexField::Scalar(sf) => scalar_unique_input_field(ctx, sf),
-            IndexField::Composite(cif) => composite_unique_input_field(ctx, cif),
+            IndexField::Composite(cif) => composite_unique_input_field(ctx, cif, true),
         })
         .collect_vec();
 

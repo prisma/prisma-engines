@@ -1,4 +1,4 @@
-use crate::{parent_container::ParentContainer, prelude::*, InternalEnum};
+use crate::{builders::IndexBuilder, parent_container::ParentContainer, prelude::*, InternalEnum};
 use dml::{DefaultValue, FieldArity, NativeTypeInstance};
 use once_cell::sync::OnceCell;
 use std::{fmt::Debug, sync::Arc};
@@ -7,7 +7,7 @@ use std::{fmt::Debug, sync::Arc};
 pub struct ScalarFieldBuilder {
     pub name: String,
     pub type_identifier: TypeIdentifier,
-    pub is_unique: bool,
+    pub unique_index: Option<IndexBuilder>,
     pub is_id: bool,
     pub is_auto_generated_int_id: bool,
     pub is_autoincrement: bool,
@@ -34,10 +34,17 @@ impl ScalarFieldBuilder {
             default_value: self.default_value,
             native_type: self.native_type,
             container,
-            is_unique: self.is_unique,
+            unique_index: OnceCell::new(),
             read_only: OnceCell::new(),
         };
 
-        Arc::new(scalar)
+        let scalar = Arc::new(scalar);
+
+        scalar
+            .unique_index
+            .set(self.unique_index.map(|u| u.build(&[Field::Scalar(scalar.clone())])))
+            .unwrap();
+
+        scalar
     }
 }

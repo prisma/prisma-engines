@@ -1,6 +1,7 @@
 use crate::{
+    filter_conversion::AliasedCondition,
     join_utils::AliasedJoin,
-    model_extensions::{AsColumn, AsColumns, AsTable, SelectionResultExt},
+    model_extensions::{AsColumn, AsTable},
     ordering::OrderByDefinition,
     query_arguments_ext::QueryArgumentsExt,
 };
@@ -126,16 +127,11 @@ pub fn build(
     match query_arguments.cursor {
         None => (None, ConditionTree::NoCondition),
         Some(ref cursor) => {
-            let cursor_fields: Vec<_> = cursor.as_scalar_fields().expect("Cursor fields contain non-scalars.");
-            let cursor_values: Vec<_> = cursor.db_values();
-            let cursor_columns: Vec<_> = cursor_fields.as_slice().as_columns().collect();
-            let cursor_row = Row::from(cursor_columns);
-
             // Invariant: Cursors are unique. This means we can create a subquery to find at most one row
             // that contains all the values required for the ordering row comparison (order_subquery).
             // That does _not_ mean that this retrieved row has an ordering unique across all records, because
             // that can only be true if the orderBy contains a combination of fields that are unique, or a single unique field.
-            let cursor_condition = cursor_row.clone().equals(cursor_values.clone());
+            let cursor_condition = cursor.into_filter().aliased_cond(None);
 
             // Orderings for this query. Influences which fields we need to fetch for comparing order fields.
             let mut definitions = order_definitions(query_arguments, model, &order_by_defs);

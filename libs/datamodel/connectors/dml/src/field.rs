@@ -41,6 +41,7 @@ pub enum FieldType {
     Relation(RelationInfo),
     /// This is a field with an unsupported datatype. The content is the db's description of the type, it should enable migrate to create the type.
     Unsupported(String),
+    /// This is scalar field.
     Scalar(ScalarType, Option<NativeTypeInstance>),
     /// This is a composite type fields, with a composite type of the given type.
     CompositeType(String),
@@ -220,6 +221,22 @@ impl Field {
             Field::ScalarField(sf) => sf.is_generated,
             Field::RelationField(rf) => rf.is_generated,
             Field::CompositeField(_) => false,
+        }
+    }
+
+    pub fn is_optional(&self) -> bool {
+        match &self {
+            Field::ScalarField(sf) => sf.is_optional(),
+            Field::RelationField(rf) => rf.is_optional(),
+            Field::CompositeField(cf) => cf.is_optional(),
+        }
+    }
+
+    pub fn is_required(&self) -> bool {
+        match &self {
+            Field::ScalarField(sf) => sf.is_required(),
+            Field::RelationField(rf) => rf.is_required(),
+            Field::CompositeField(cf) => cf.is_required(),
         }
     }
 }
@@ -552,6 +569,14 @@ impl CompositeField {
             is_ignored: false,
             default_value: None,
         }
+    }
+
+    pub fn is_optional(&self) -> bool {
+        self.arity.is_optional()
+    }
+
+    pub fn is_required(&self) -> bool {
+        self.arity.is_required()
     }
 }
 

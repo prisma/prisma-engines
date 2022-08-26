@@ -11,6 +11,7 @@ mod json;
 mod list;
 mod relation;
 mod scalar;
+mod unique;
 
 pub use composite::*;
 pub use into_filter::*;
@@ -18,6 +19,7 @@ pub use json::*;
 pub use list::*;
 pub use relation::*;
 pub use scalar::*;
+pub use unique::*;
 
 #[derive(Debug, Clone, Eq, Hash, PartialEq)]
 pub enum Filter {

@@ -10,7 +10,7 @@ pub use scalar::*;
 use datamodel::dml::ScalarType;
 use std::{hash::Hash, sync::Arc};
 
-use crate::ModelRef;
+use crate::{Index, ModelRef};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Field {
@@ -88,9 +88,9 @@ impl Field {
 
     pub fn is_unique(&self) -> bool {
         match self {
-            Field::Scalar(ref sf) => sf.unique(),
+            Field::Scalar(ref sf) => sf.is_unique_or_id(),
+            Field::Composite(ref cf) => cf.is_unique(),
             Field::Relation(_) => false,
-            Field::Composite(_) => false,
         }
     }
 
@@ -110,6 +110,14 @@ impl Field {
         }
     }
 
+    pub fn unique_index(&self) -> &Option<Index> {
+        match self {
+            Field::Scalar(sf) => sf.unique_index(),
+            Field::Composite(cf) => cf.unique_index(),
+            Field::Relation(_) => &None,
+        }
+    }
+
     pub fn downgrade(&self) -> FieldWeak {
         match self {
             Field::Relation(field) => FieldWeak::Relation(Arc::downgrade(field)),
@@ -120,6 +128,14 @@ impl Field {
 
     pub fn as_composite(&self) -> Option<&CompositeFieldRef> {
         if let Self::Composite(v) = self {
+            Some(v)
+        } else {
+            None
+        }
+    }
+
+    pub fn as_scalar(&self) -> Option<&ScalarFieldRef> {
+        if let Self::Scalar(v) = self {
             Some(v)
         } else {
             None

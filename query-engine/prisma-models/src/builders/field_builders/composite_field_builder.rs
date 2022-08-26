@@ -1,5 +1,9 @@
-use crate::{parent_container::ParentContainer, CompositeField, CompositeFieldRef, CompositeTypeRef};
+use crate::{
+    builders::IndexBuilder, parent_container::ParentContainer, CompositeField, CompositeFieldRef, CompositeTypeRef,
+    Field,
+};
 use datamodel::dml::{DefaultValue, FieldArity};
+use once_cell::sync::OnceCell;
 use std::{fmt::Debug, sync::Arc};
 
 #[derive(Debug)]
@@ -9,6 +13,7 @@ pub struct CompositeFieldBuilder {
     pub arity: FieldArity,
     pub type_name: String,
     pub default_value: Option<DefaultValue>,
+    pub unique_index: Option<IndexBuilder>,
 }
 
 impl CompositeFieldBuilder {
@@ -24,8 +29,18 @@ impl CompositeFieldBuilder {
                 .clone(),
             arity: self.arity,
             container,
+            unique_index: OnceCell::new(),
         };
+        let composite = Arc::new(composite);
 
-        Arc::new(composite)
+        composite
+            .unique_index
+            .set(
+                self.unique_index
+                    .map(|u| u.build(&[Field::Composite(composite.clone())])),
+            )
+            .unwrap();
+
+        composite
     }
 }

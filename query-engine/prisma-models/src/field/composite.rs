@@ -1,5 +1,6 @@
-use crate::{parent_container::ParentContainer, CompositeTypeRef};
+use crate::{parent_container::ParentContainer, CompositeTypeRef, Index};
 use datamodel::dml::FieldArity;
+use once_cell::sync::OnceCell;
 use std::{
     fmt::{Debug, Display},
     hash::{Hash, Hasher},
@@ -13,6 +14,7 @@ pub type CompositeFieldWeak = Weak<CompositeField>;
 pub struct CompositeField {
     pub name: String,
     pub typ: CompositeTypeRef,
+    pub unique_index: OnceCell<Option<Index>>,
     pub(crate) db_name: Option<String>,
     pub(crate) arity: FieldArity,
     pub(crate) container: ParentContainer,
@@ -37,6 +39,18 @@ impl CompositeField {
 
     pub fn container(&self) -> &ParentContainer {
         &self.container
+    }
+
+    pub fn unique_index(&self) -> &Option<Index> {
+        self.unique_index.get_or_init(|| None)
+    }
+
+    pub fn is_unique(&self) -> bool {
+        self.unique_index().is_some()
+    }
+
+    pub fn arity(&self) -> FieldArity {
+        self.arity
     }
 }
 

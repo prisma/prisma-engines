@@ -3,6 +3,9 @@ mod filter_fold;
 mod filter_grouping;
 mod relation;
 mod scalar;
+pub mod unique;
+
+use self::unique::extract_unique_filters;
 
 use super::utils;
 use crate::{
@@ -15,83 +18,18 @@ use connector::{
 use filter_fold::*;
 use filter_grouping::*;
 use prisma_models::{
-    prelude::ParentContainer, CompositeFieldRef, CompositeIndexField, Field, IndexField, ModelRef, PrismaValue,
-    RelationFieldRef, ScalarFieldRef,
+    prelude::ParentContainer, CompositeFieldRef, Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef,
 };
 use schema_builder::constants::filters;
 use std::{collections::HashMap, convert::TryInto, str::FromStr};
 
 /// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.
 pub fn extract_unique_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraphBuilderResult<Filter> {
-    let filters = value_map
-        .into_iter()
-        .map(|(field_name, value): (String, ParsedInputValue)| {
-            // Always try to resolve regular fields first. If that fails, try to resolve compound fields.
-            match model.fields().find_from_scalar(&field_name) {
-                Ok(field) => {
-                    let value: PrismaValue = value.try_into()?;
-                    Ok(field.equals(value))
-                }
-                Err(_) => utils::resolve_compound_field(&field_name, &model)
-                    .ok_or_else(|| {
-                        QueryGraphBuilderError::AssertionError(format!(
-                            "Unable to resolve field {} to a field or set of scalar fields on model {}",
-                            field_name, model.name
-                        ))
-                    })
-                    .and_then(|fields| extract_compound_field(&fields, value)),
-            }
-        })
-        .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?;
+    let unique_filters = extract_unique_filters(value_map, model)?;
 
-    Ok(Filter::and(filters))
-}
+    dbg!(&unique_filters);
 
-fn extract_compound_field(index_fields: &[IndexField], value: ParsedInputValue) -> QueryGraphBuilderResult<Filter> {
-    let mut input_map: ParsedInputMap = value.try_into()?;
-    let mut filters = Vec::with_capacity(index_fields.len());
-
-    for index_field in index_fields {
-        match index_field {
-            IndexField::Scalar(sf) => {
-                let pv: PrismaValue = input_map.remove(&sf.name).unwrap().try_into()?;
-
-                filters.push(sf.equals(pv));
-            }
-            IndexField::Composite(cif) => {
-                filters.push(extract_composite_compound(cif, &mut input_map)?);
-            }
-        }
-    }
-
-    Ok(Filter::And(filters))
-}
-
-fn extract_composite_compound(
-    cif: &CompositeIndexField,
-    input_map: &mut ParsedInputMap,
-) -> QueryGraphBuilderResult<Filter> {
-    let mut inner_map: ParsedInputMap = input_map.remove(&cif.field().name).unwrap().try_into()?;
-    let mut filters: Vec<Filter> = vec![];
-
-    for index_field in cif.nested() {
-        match index_field {
-            IndexField::Scalar(sf) => {
-                let pv: PrismaValue = inner_map.remove(&sf.name).unwrap().try_into()?;
-
-                filters.push(sf.equals(pv));
-            }
-            IndexField::Composite(nested_cif) => {
-                filters.push(extract_composite_compound(nested_cif, &mut inner_map)?);
-            }
-        }
-    }
-
-    if cif.field().is_list() {
-        Ok(cif.field().some(Filter::And(filters))) // When field is in a list
-    } else {
-        Ok(cif.field().is(Filter::And(filters))) // Just a simple value
-    }
+    Ok(unique_filters.into_filter())
 }
 
 /// Extracts a regular filter potentially matching many records.

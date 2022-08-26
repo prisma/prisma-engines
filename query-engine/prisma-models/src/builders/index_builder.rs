@@ -57,6 +57,10 @@ impl IndexBuilder {
     fn build_index_fields(field_paths: Vec<FieldPath>, fields: &[Field]) -> Vec<IndexField> {
         let mut index_fields: Vec<IndexField> = vec![];
 
+        if field_paths.is_empty() {
+            return vec![];
+        }
+
         for (field_name, grouped_paths) in &field_paths.into_iter().group_by(|path| path.first().cloned().unwrap()) {
             let grouped_paths = grouped_paths.collect_vec();
             let field = fields.iter().find(|f| f.name() == field_name);
@@ -84,12 +88,17 @@ impl IndexBuilder {
 
 /// Consume the first item of each field paths. Used to recursively extract composite indexex.
 /// eg: [["a", "b", "c"], ["a", "b", "d"]] -> [["b", "c"], ["b", "d"]]
-pub fn consume_composite_paths(field_paths: Vec<FieldPath>) -> Vec<FieldPath> {
+/// eg: [["b"]] -> []
+fn consume_composite_paths(field_paths: Vec<FieldPath>) -> Vec<FieldPath> {
     field_paths
         .into_iter()
-        .map(|path| {
+        .filter_map(|path| {
             if let Some((_, rest)) = path.split_first() {
-                rest.to_vec()
+                if rest.is_empty() {
+                    None
+                } else {
+                    Some(rest.to_vec())
+                }
             } else {
                 unreachable!()
             }

@@ -1,9 +1,9 @@
 use super::*;
 use crate::{
     query_document::{ParsedArgument, ParsedInputMap},
-    QueryGraphBuilderError, QueryGraphBuilderResult,
+    unique, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use connector::QueryArguments;
+use connector::{QueryArguments, UniqueFilter, UniqueFilters};
 use prisma_models::prelude::*;
 use schema_builder::constants::{aggregations, args, ordering};
 use std::convert::TryInto;
@@ -21,7 +21,6 @@ pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> Q
                         cursor: extract_cursor(arg.value, model)?,
                         ..res
                     }),
-
                     args::TAKE => Ok(QueryArguments {
                         take: arg.value.try_into()?,
                         ..res
@@ -47,6 +46,8 @@ pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> Q
                         match val {
                             Some(m) => {
                                 let filter = Some(extract_filter(m, model)?);
+
+                                dbg!(&filter);
                                 Ok(QueryArguments { filter, ..res })
                             }
                             None => Ok(res),
@@ -283,59 +284,15 @@ fn extract_skip(value: ParsedInputValue) -> QueryGraphBuilderResult<Option<i64>>
     }
 }
 
-fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilderResult<Option<SelectionResult>> {
+fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilderResult<Option<UniqueFilters>> {
     let input_map: ParsedInputMap = value.try_into()?;
-    let mut pairs = vec![];
+    let unique_filters = unique::extract_unique_filters(input_map, model)?;
 
-    for (field_name, map_value) in input_map {
-        let additional_pairs = match model.fields().find_from_scalar(&field_name) {
-            Ok(field) => {
-                let value = map_value.try_into()?;
-                vec![(field, value)]
-            }
-            Err(_) => match utils::resolve_compound_field(&field_name, &model) {
-                Some(fields) => {
-                    let mut map: ParsedInputMap = map_value.try_into()?;
-
-                    extract_compound_indexes(&fields, &mut map)?
-                }
-                None => {
-                    return Err(QueryGraphBuilderError::AssertionError(format!(
-                        "Unable to resolve field {} to a field or a set of fields on model {}",
-                        field_name, model.name
-                    )))
-                }
-            },
-        };
-
-        pairs.extend(additional_pairs);
+    if unique_filters.is_empty() {
+        Ok(None)
+    } else {
+        Ok(Some(unique_filters))
     }
-
-    Ok(Some(SelectionResult::new(pairs)))
-}
-
-fn extract_compound_indexes(
-    index_fields: &[IndexField],
-    map: &mut ParsedInputMap,
-) -> QueryGraphBuilderResult<Vec<(ScalarFieldRef, PrismaValue)>> {
-    let mut pairs: Vec<(ScalarFieldRef, PrismaValue)> = vec![];
-
-    for index_field in index_fields {
-        match index_field {
-            IndexField::Scalar(sf) => {
-                let pv: PrismaValue = map.remove(&sf.name).unwrap().try_into()?;
-
-                pairs.push((sf.clone(), pv));
-            }
-            IndexField::Composite(cif) => {
-                let mut inner_map: ParsedInputMap = map.remove(&cif.field().name).unwrap().try_into()?;
-
-                pairs.extend(extract_compound_indexes(cif.nested(), &mut inner_map)?);
-            }
-        }
-    }
-
-    Ok(pairs)
 }
 
 /// Runs final transformations on the QueryArguments.

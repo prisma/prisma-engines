@@ -1,6 +1,6 @@
 use connector::QueryArguments;
 use itertools::Itertools;
-use prisma_models::{FieldSelection, ManyRecords, Record, SelectionResult};
+use prisma_models::{ManyRecords, Record, SelectionResult};
 use std::ops::Deref;
 
 #[derive(Debug)]
@@ -131,8 +131,8 @@ impl InMemoryRecordProcessor {
 
         // If we have a cursor, skip records until we find it for each parent id. Pagination is applied afterwards.
         if let Some(cursor) = &self.cursor {
-            let cursor_values: Vec<_> = cursor.values().collect();
-            let cursor_selection: FieldSelection = cursor.into();
+            let cursor_values: Vec<_> = cursor.values().cloned().collect();
+            let cursor_selection = cursor.into_selection();
             let field_names = &many_records.field_names;
 
             let mut current_parent_id = None;

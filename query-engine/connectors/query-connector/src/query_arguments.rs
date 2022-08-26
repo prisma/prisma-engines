@@ -1,4 +1,5 @@
-use crate::filter::Filter;
+use crate::{filter::Filter, UniqueFilters};
+
 use prisma_models::*;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -22,7 +23,7 @@ pub struct SkipAndLimit {
 #[derive(Clone)]
 pub struct QueryArguments {
     pub model: ModelRef,
-    pub cursor: Option<SelectionResult>,
+    pub cursor: Option<UniqueFilters>,
     pub take: Option<i64>,
     pub skip: Option<i64>,
     pub filter: Option<Filter>,
@@ -144,12 +145,12 @@ impl QueryArguments {
             index
                 .scalars()
                 .into_iter()
-                .all(|f| on_model.iter().any(|o| o.field == f))
+                .all(|f| on_model.iter().any(|o| o.field == *f))
         });
 
-        let source_contains_unique = on_model.iter().any(|o| o.field.unique());
+        let source_contains_unique = on_model.iter().any(|o| o.field.is_unique_or_id());
         let relations_contain_1to1_unique = on_relation.iter().any(|o| {
-            o.field.unique()
+            o.field.is_unique_or_id()
                 && o.path.iter().all(|hop| match hop {
                     OrderByHop::Relation(rf) => rf.relation().is_one_to_one(),
                     OrderByHop::Composite(_) => false, // Composites do not have uniques, as such they can't fulfill uniqueness requirement even if they're 1:1.
@@ -163,7 +164,7 @@ impl QueryArguments {
             })
         });
 
-        // [Dom] I'm not entirely sure why we're doing this, but I assume that optionals introduce NULLs that make the ordering inherently unstable?
+        // Optionals introduce NULLs that make the ordering unstable
         if has_optional_hop {
             return false;
         }
