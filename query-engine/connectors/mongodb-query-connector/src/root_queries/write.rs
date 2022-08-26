@@ -1,7 +1,7 @@
 use super::*;
 use crate::{
     error::DecorateErrorWithFieldInformationExtension,
-    filter::{convert_filter, FilterPrefix, MongoFilter},
+    filter::{FilterPrefix, MongoFilter, MongoFilterVisitor},
     logger, output_meta,
     query_builder::MongoReadQueryBuilder,
     root_queries::raw::{MongoCommand, MongoOperation},
@@ -163,7 +163,7 @@ pub async fn update_records<'conn>(
             })
             .collect::<crate::Result<Vec<_>>>()?
     } else {
-        let filter = convert_filter(record_filter.filter, false, FilterPrefix::default())?;
+        let filter = MongoFilterVisitor::new(FilterPrefix::default(), false).visit(record_filter.filter)?;
         find_ids(database, coll.clone(), session, model, filter).await?
     };
 
@@ -235,7 +235,7 @@ pub async fn delete_records<'conn>(
             })
             .collect::<crate::Result<Vec<_>>>()?
     } else {
-        let filter = convert_filter(record_filter.filter, false, FilterPrefix::default())?;
+        let filter = MongoFilterVisitor::new(FilterPrefix::default(), false).visit(record_filter.filter)?;
         find_ids(database, coll.clone(), session, model, filter).await?
     };
 

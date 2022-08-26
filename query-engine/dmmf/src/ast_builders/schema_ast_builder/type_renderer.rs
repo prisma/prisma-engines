@@ -1,5 +1,5 @@
 use super::{DmmfTypeReference, RenderContext, TypeLocation};
-use schema::{InputType, IntoArc, OutputType, ScalarType};
+use schema::{InputType, IntoArc, ObjectTag, OutputType, ScalarType};
 
 pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderContext) -> DmmfTypeReference {
     match output_type {
@@ -78,10 +78,16 @@ pub(super) fn render_input_type(input_type: &InputType, ctx: &mut RenderContext)
             ctx.mark_to_be_rendered(obj);
 
             let obj = obj.into_arc();
+
+            let location = match &obj.tag {
+                Some(ObjectTag::FieldRefType(_)) => TypeLocation::FieldRefTypes,
+                _ => TypeLocation::InputObjectTypes,
+            };
+
             let type_reference = DmmfTypeReference {
                 typ: obj.identifier.name().to_owned(),
                 namespace: Some(obj.identifier.namespace().to_owned()),
-                location: TypeLocation::InputObjectTypes,
+                location,
                 is_list: false,
             };
 
@@ -111,24 +117,10 @@ pub(super) fn render_input_type(input_type: &InputType, ctx: &mut RenderContext)
         }
 
         InputType::Scalar(ref scalar) => {
-            let stringified = match scalar {
-                ScalarType::Null => "Null",
-                ScalarType::String => "String",
-                ScalarType::Int => "Int",
-                ScalarType::BigInt => "BigInt",
-                ScalarType::Boolean => "Boolean",
-                ScalarType::Float => "Float",
-                ScalarType::Decimal => "Decimal",
-                ScalarType::DateTime => "DateTime",
-                ScalarType::Json => "Json",
-                ScalarType::UUID => "UUID",
-                ScalarType::JsonList => "Json",
-                ScalarType::Xml => "Xml",
-                ScalarType::Bytes => "Bytes",
-            };
+            let stringified = scalar.to_string();
 
             DmmfTypeReference {
-                typ: stringified.into(),
+                typ: stringified,
                 namespace: None,
                 location: TypeLocation::Scalar,
                 is_list: false,

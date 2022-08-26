@@ -45,13 +45,8 @@ impl IntoUpdateOperation for ScalarWriteOperation {
                 field_path,
                 doc! { "$divide": [dollar_field_path, (field, rhs).into_bson()?] },
             )),
-            ScalarWriteOperation::Unset(should_unset) => {
-                if should_unset {
-                    Some(UpdateOperation::unset(field_path))
-                } else {
-                    None
-                }
-            }
+            ScalarWriteOperation::Unset(true) => Some(UpdateOperation::unset(field_path)),
+            ScalarWriteOperation::Unset(false) => None,
             ScalarWriteOperation::Field(_) => unimplemented!(),
         };
 
@@ -112,7 +107,9 @@ impl IntoUpdateOperation for CompositeWriteOperation {
             }
             CompositeWriteOperation::DeleteMany { filter } => {
                 let elem_alias = format!("{}_item", path.identifier());
-                let (filter_doc, _) = filter::convert_filter(filter, true, format!("${}", &elem_alias))?.render();
+                let (filter_doc, _) = filter::MongoFilterVisitor::new(format!("${}", &elem_alias), true)
+                    .visit(filter)?
+                    .render();
 
                 let filter = doc! {
                     "$filter": {

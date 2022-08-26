@@ -163,7 +163,7 @@ pub trait QueryExt: Queryable + Send + Sync {
             .columns(id_cols)
             .append_trace(&Span::current())
             .add_trace_id(trace_id.clone())
-            .so_that(filter.aliased_cond(None));
+            .so_that(filter.aliased_cond(None, false));
 
         self.select_ids(select, model_id, trace_id).await
     }

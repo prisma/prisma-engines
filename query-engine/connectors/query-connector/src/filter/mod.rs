@@ -43,6 +43,18 @@ pub enum AggregationFilter {
     Max(Box<Filter>),
 }
 
+impl AggregationFilter {
+    pub fn filter(&self) -> &Filter {
+        match self {
+            AggregationFilter::Count(f) => f,
+            AggregationFilter::Average(f) => f,
+            AggregationFilter::Sum(f) => f,
+            AggregationFilter::Min(f) => f,
+            AggregationFilter::Max(f) => f,
+        }
+    }
+}
+
 impl Filter {
     pub fn and(filters: Vec<Filter>) -> Self {
         Filter::And(filters)
@@ -175,6 +187,14 @@ impl Filter {
     }
 
     pub fn as_scalar(&self) -> Option<&ScalarFilter> {
+        if let Self::Scalar(v) = self {
+            Some(v)
+        } else {
+            None
+        }
+    }
+
+    pub fn into_scalar(self) -> Option<ScalarFilter> {
         if let Self::Scalar(v) = self {
             Some(v)
         } else {

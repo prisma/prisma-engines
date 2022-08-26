@@ -3158,7 +3158,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#18d46a05237a363f847dd1d52c413d2c960d1d45"
+source = "git+https://github.com/weakky/quaint?branch=feat/any-all-operators-fork#2f74fce27ae65ec5034cc1ffbe7e0038580cd3ee"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
