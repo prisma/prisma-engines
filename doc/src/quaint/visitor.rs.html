@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/18d46a0/src/visitor.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>visitor.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/5a48e93/src/visitor.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>visitor.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
@@ -1088,18 +1088,6 @@
 <span id="1082">1082</span>
 <span id="1083">1083</span>
 <span id="1084">1084</span>
-<span id="1085">1085</span>
-<span id="1086">1086</span>
-<span id="1087">1087</span>
-<span id="1088">1088</span>
-<span id="1089">1089</span>
-<span id="1090">1090</span>
-<span id="1091">1091</span>
-<span id="1092">1092</span>
-<span id="1093">1093</span>
-<span id="1094">1094</span>
-<span id="1095">1095</span>
-<span id="1096">1096</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Visitors for reading an abstract SQL syntax tree, generating the query and</span>
 <span class="doccomment">//! gathering parameters in the right order.</span>
 <span class="doccomment">//!</span>
@@ -1220,7 +1208,10 @@
     <span class="kw">fn</span> <span class="ident">visit_json_array_contains</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">left</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">right</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">not</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span>;
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>, <span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)))]</span>
-    <span class="kw">fn</span> <span class="ident">visit_json_type_equals</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">left</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">json_type</span>: <span class="ident">JsonType</span>) -&gt; <span class="prelude-ty">Result</span>;
+    <span class="kw">fn</span> <span class="ident">visit_json_type_equals</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">left</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">right</span>: <span class="ident">JsonType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">not</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span>;
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>, <span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)))]</span>
+    <span class="kw">fn</span> <span class="ident">visit_json_unquote</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">json_unquote</span>: <span class="ident">JsonUnquote</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span>;
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>))]</span>
     <span class="kw">fn</span> <span class="ident">visit_text_search</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">text_search</span>: <span class="ident">TextSearch</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span>;
@@ -1751,68 +1742,20 @@
         <span class="self">self</span>.<span class="ident">visit_expression</span>(<span class="ident">right</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_like</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">left</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">right</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">visit_like</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">left</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">right</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span> {
         <span class="self">self</span>.<span class="ident">visit_expression</span>(<span class="ident">left</span>)<span class="question-mark">?</span>;
-
-        <span class="self">self</span>.<span class="ident">add_parameter</span>(<span class="ident">Value::text</span>(<span class="macro">format!</span>(
-            <span class="string">&quot;{}{}{}&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::C_WILDCARD</span>,
-            <span class="ident">right</span>,
-            <span class="ident"><span class="self">Self</span>::C_WILDCARD</span>
-        )));
-
         <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot; LIKE &quot;</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">parameter_substitution</span>()
+        <span class="self">self</span>.<span class="ident">visit_expression</span>(<span class="ident">right</span>)<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_not_like</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">left</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">right</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">visit_not_like</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">left</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">right</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span> {
         <span class="self">self</span>.<span class="ident">visit_expression</span>(<span class="ident">left</span>)<span class="question-mark">?</span>;
-
-        <span class="self">self</span>.<span class="ident">add_parameter</span>(<span class="ident">Value::text</span>(<span class="macro">format!</span>(
-            <span class="string">&quot;{}{}{}&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::C_WILDCARD</span>,
-            <span class="ident">right</span>,
-            <span class="ident"><span class="self">Self</span>::C_WILDCARD</span>
-        )));
-
         <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot; NOT LIKE &quot;</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">parameter_substitution</span>()
-    }
+        <span class="self">self</span>.<span class="ident">visit_expression</span>(<span class="ident">right</span>)<span class="question-mark">?</span>;
 
-    <span class="kw">fn</span> <span class="ident">visit_begins_with</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">left</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">right</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span> {
-        <span class="self">self</span>.<span class="ident">visit_expression</span>(<span class="ident">left</span>)<span class="question-mark">?</span>;
-
-        <span class="self">self</span>.<span class="ident">add_parameter</span>(<span class="ident">Value::text</span>(<span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">right</span>, <span class="ident"><span class="self">Self</span>::C_WILDCARD</span>)));
-
-        <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot; LIKE &quot;</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">parameter_substitution</span>()
-    }
-
-    <span class="kw">fn</span> <span class="ident">visit_not_begins_with</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">left</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">right</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span> {
-        <span class="self">self</span>.<span class="ident">visit_expression</span>(<span class="ident">left</span>)<span class="question-mark">?</span>;
-
-        <span class="self">self</span>.<span class="ident">add_parameter</span>(<span class="ident">Value::text</span>(<span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">right</span>, <span class="ident"><span class="self">Self</span>::C_WILDCARD</span>)));
-
-        <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot; NOT LIKE &quot;</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">parameter_substitution</span>()
-    }
-
-    <span class="kw">fn</span> <span class="ident">visit_ends_with</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">left</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">right</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span> {
-        <span class="self">self</span>.<span class="ident">visit_expression</span>(<span class="ident">left</span>)<span class="question-mark">?</span>;
-
-        <span class="self">self</span>.<span class="ident">add_parameter</span>(<span class="ident">Value::text</span>(<span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident"><span class="self">Self</span>::C_WILDCARD</span>, <span class="ident">right</span>,)));
-
-        <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot; LIKE &quot;</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">parameter_substitution</span>()
-    }
-
-    <span class="kw">fn</span> <span class="ident">visit_not_ends_with</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">left</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">right</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span> {
-        <span class="self">self</span>.<span class="ident">visit_expression</span>(<span class="ident">left</span>)<span class="question-mark">?</span>;
-
-        <span class="self">self</span>.<span class="ident">add_parameter</span>(<span class="ident">Value::text</span>(<span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident"><span class="self">Self</span>::C_WILDCARD</span>, <span class="ident">right</span>,)));
-
-        <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot; NOT LIKE &quot;</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">parameter_substitution</span>()
+        <span class="prelude-val">Ok</span>(())
     }
 
     <span class="doccomment">/// A comparison expression</span>
@@ -1968,12 +1911,8 @@
                     <span class="self">self</span>.<span class="ident">visit_expression</span>(<span class="ident">right</span>)
                 }
             },
-            <span class="ident">Compare::Like</span>(<span class="ident">left</span>, <span class="ident">right</span>) =&gt; <span class="self">self</span>.<span class="ident">visit_like</span>(<span class="kw-2">*</span><span class="ident">left</span>, <span class="ident">right</span>),
-            <span class="ident">Compare::NotLike</span>(<span class="ident">left</span>, <span class="ident">right</span>) =&gt; <span class="self">self</span>.<span class="ident">visit_not_like</span>(<span class="kw-2">*</span><span class="ident">left</span>, <span class="ident">right</span>),
-            <span class="ident">Compare::BeginsWith</span>(<span class="ident">left</span>, <span class="ident">right</span>) =&gt; <span class="self">self</span>.<span class="ident">visit_begins_with</span>(<span class="kw-2">*</span><span class="ident">left</span>, <span class="ident">right</span>),
-            <span class="ident">Compare::NotBeginsWith</span>(<span class="ident">left</span>, <span class="ident">right</span>) =&gt; <span class="self">self</span>.<span class="ident">visit_not_begins_with</span>(<span class="kw-2">*</span><span class="ident">left</span>, <span class="ident">right</span>),
-            <span class="ident">Compare::EndsInto</span>(<span class="ident">left</span>, <span class="ident">right</span>) =&gt; <span class="self">self</span>.<span class="ident">visit_ends_with</span>(<span class="kw-2">*</span><span class="ident">left</span>, <span class="ident">right</span>),
-            <span class="ident">Compare::NotEndsInto</span>(<span class="ident">left</span>, <span class="ident">right</span>) =&gt; <span class="self">self</span>.<span class="ident">visit_not_ends_with</span>(<span class="kw-2">*</span><span class="ident">left</span>, <span class="ident">right</span>),
+            <span class="ident">Compare::Like</span>(<span class="ident">left</span>, <span class="ident">right</span>) =&gt; <span class="self">self</span>.<span class="ident">visit_like</span>(<span class="kw-2">*</span><span class="ident">left</span>, <span class="kw-2">*</span><span class="ident">right</span>),
+            <span class="ident">Compare::NotLike</span>(<span class="ident">left</span>, <span class="ident">right</span>) =&gt; <span class="self">self</span>.<span class="ident">visit_not_like</span>(<span class="kw-2">*</span><span class="ident">left</span>, <span class="kw-2">*</span><span class="ident">right</span>),
             <span class="ident">Compare::Null</span>(<span class="ident">column</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">visit_expression</span>(<span class="kw-2">*</span><span class="ident">column</span>)<span class="question-mark">?</span>;
                 <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot; IS NULL&quot;</span>)
@@ -2007,12 +1946,23 @@
             <span class="ident">Compare::JsonCompare</span>(<span class="ident">json_compare</span>) =&gt; <span class="kw">match</span> <span class="ident">json_compare</span> {
                 <span class="ident">JsonCompare::ArrayContains</span>(<span class="ident">left</span>, <span class="ident">right</span>) =&gt; <span class="self">self</span>.<span class="ident">visit_json_array_contains</span>(<span class="kw-2">*</span><span class="ident">left</span>, <span class="kw-2">*</span><span class="ident">right</span>, <span class="bool-val">false</span>),
                 <span class="ident">JsonCompare::ArrayNotContains</span>(<span class="ident">left</span>, <span class="ident">right</span>) =&gt; <span class="self">self</span>.<span class="ident">visit_json_array_contains</span>(<span class="kw-2">*</span><span class="ident">left</span>, <span class="kw-2">*</span><span class="ident">right</span>, <span class="bool-val">true</span>),
-                <span class="ident">JsonCompare::TypeEquals</span>(<span class="ident">left</span>, <span class="ident">json_type</span>) =&gt; <span class="self">self</span>.<span class="ident">visit_json_type_equals</span>(<span class="kw-2">*</span><span class="ident">left</span>, <span class="ident">json_type</span>),
+                <span class="ident">JsonCompare::TypeEquals</span>(<span class="ident">left</span>, <span class="ident">json_type</span>) =&gt; <span class="self">self</span>.<span class="ident">visit_json_type_equals</span>(<span class="kw-2">*</span><span class="ident">left</span>, <span class="ident">json_type</span>, <span class="bool-val">false</span>),
+                <span class="ident">JsonCompare::TypeNotEquals</span>(<span class="ident">left</span>, <span class="ident">json_type</span>) =&gt; <span class="self">self</span>.<span class="ident">visit_json_type_equals</span>(<span class="kw-2">*</span><span class="ident">left</span>, <span class="ident">json_type</span>, <span class="bool-val">true</span>),
             },
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>)]</span>
             <span class="ident">Compare::Matches</span>(<span class="ident">left</span>, <span class="ident">right</span>) =&gt; <span class="self">self</span>.<span class="ident">visit_matches</span>(<span class="kw-2">*</span><span class="ident">left</span>, <span class="ident">right</span>, <span class="bool-val">false</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>)]</span>
             <span class="ident">Compare::NotMatches</span>(<span class="ident">left</span>, <span class="ident">right</span>) =&gt; <span class="self">self</span>.<span class="ident">visit_matches</span>(<span class="kw-2">*</span><span class="ident">left</span>, <span class="ident">right</span>, <span class="bool-val">true</span>),
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>)]</span>
+            <span class="ident">Compare::Any</span>(<span class="ident">left</span>) =&gt; {
+                <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;ANY&quot;</span>)<span class="question-mark">?</span>;
+                <span class="self">self</span>.<span class="ident">surround_with</span>(<span class="string">&quot;(&quot;</span>, <span class="string">&quot;)&quot;</span>, <span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">visit_expression</span>(<span class="kw-2">*</span><span class="ident">left</span>))
+            }
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>)]</span>
+            <span class="ident">Compare::All</span>(<span class="ident">left</span>) =&gt; {
+                <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;ALL&quot;</span>)<span class="question-mark">?</span>;
+                <span class="self">self</span>.<span class="ident">surround_with</span>(<span class="string">&quot;(&quot;</span>, <span class="string">&quot;)&quot;</span>, <span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">visit_expression</span>(<span class="kw-2">*</span><span class="ident">left</span>))
+            }
         }
     }
 
@@ -2118,6 +2068,10 @@
             <span class="ident">FunctionType::JsonExtractLastArrayElem</span>(<span class="ident">extract</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">visit_json_extract_last_array_item</span>(<span class="ident">extract</span>)<span class="question-mark">?</span>;
             }
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>, <span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)))]</span>
+            <span class="ident">FunctionType::JsonUnquote</span>(<span class="ident">unquote</span>) =&gt; {
+                <span class="self">self</span>.<span class="ident">visit_json_unquote</span>(<span class="ident">unquote</span>)<span class="question-mark">?</span>;
+            }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>))]</span>
             <span class="ident">FunctionType::TextSearch</span>(<span class="ident">text_search</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">visit_text_search</span>(<span class="ident">text_search</span>)<span class="question-mark">?</span>;
@@ -2136,12 +2090,34 @@
             }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)]</span>
             <span class="ident">FunctionType::Uuid</span> =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;uuid()&quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">FunctionType::Concat</span>(<span class="ident">concat</span>) =&gt; {
+                <span class="self">self</span>.<span class="ident">visit_concat</span>(<span class="ident">concat</span>)<span class="question-mark">?</span>;
+            }
         };
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">alias</span>) <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">alias</span> {
             <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot; AS &quot;</span>)<span class="question-mark">?</span>;
             <span class="self">self</span>.<span class="ident">delimited_identifiers</span>(<span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">alias</span>])<span class="question-mark">?</span>;
         }
+
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="kw">fn</span> <span class="ident">visit_concat</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">concat</span>: <span class="ident">Concat</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span> {
+        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">concat</span>.<span class="ident">exprs</span>.<span class="ident">len</span>();
+
+        <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;CONCAT&quot;</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">surround_with</span>(<span class="string">&quot;(&quot;</span>, <span class="string">&quot;)&quot;</span>, <span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
+            <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">expr</span>) <span class="kw">in</span> <span class="ident">concat</span>.<span class="ident">exprs</span>.<span class="ident">into_iter</span>().<span class="ident">enumerate</span>() {
+                <span class="ident">s</span>.<span class="ident">visit_expression</span>(<span class="ident">expr</span>)<span class="question-mark">?</span>;
+
+                <span class="kw">if</span> <span class="ident">i</span> <span class="op">&lt;</span> (<span class="ident">len</span> <span class="op">-</span> <span class="number">1</span>) {
+                    <span class="ident">s</span>.<span class="ident">write</span>(<span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
+                }
+            }
+
+            <span class="prelude-val">Ok</span>(())
+        })<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }

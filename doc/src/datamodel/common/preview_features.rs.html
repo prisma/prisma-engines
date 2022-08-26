@@ -153,6 +153,8 @@
 <span id="147">147</span>
 <span id="148">148</span>
 <span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -160,7 +162,7 @@
 <span class="macro">macro_rules!</span> <span class="ident">features</span> {
     ($( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant</span>:<span class="ident">ident</span> $(,)<span class="question-mark">?</span> ),<span class="kw-2">*</span>) =&gt; {
         <span class="attribute">#[<span class="ident">enumflags2::bitflags</span>]</span>
-        <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
+        <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u64</span>)]</span>
         <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
         <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">PreviewFeature</span> {
             $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant</span>,)<span class="op">*</span>
@@ -221,6 +223,7 @@
     <span class="ident">OrderByNulls</span>,
     <span class="ident">MultiSchema</span>,
     <span class="ident">FilteredRelationCount</span>,
+    <span class="ident">FieldReference</span>
 );
 
 <span class="doccomment">/// Generator preview features</span>
@@ -234,6 +237,7 @@
          <span class="op">|</span> <span class="ident">Metrics</span>
          <span class="op">|</span> <span class="ident">OrderByNulls</span>
          <span class="op">|</span> <span class="ident">FilteredRelationCount</span>
+         <span class="op">|</span> <span class="ident">FieldReference</span>
     }),
     <span class="ident">deprecated</span>: <span class="macro">enumflags2::make_bitflags!</span>(<span class="ident">PreviewFeature</span>::{
         <span class="ident">AtomicNumberOperations</span>

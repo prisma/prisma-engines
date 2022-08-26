@@ -483,7 +483,7 @@
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">error::DecorateErrorWithFieldInformationExtension</span>,
-    <span class="ident">filter</span>::{<span class="ident">convert_filter</span>, <span class="ident">FilterPrefix</span>, <span class="ident">MongoFilter</span>},
+    <span class="ident">filter</span>::{<span class="ident">FilterPrefix</span>, <span class="ident">MongoFilter</span>, <span class="ident">MongoFilterVisitor</span>},
     <span class="ident">logger</span>, <span class="ident">output_meta</span>,
     <span class="ident">query_builder::MongoReadQueryBuilder</span>,
     <span class="ident">root_queries::raw</span>::{<span class="ident">MongoCommand</span>, <span class="ident">MongoOperation</span>},
@@ -645,7 +645,7 @@
             })
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>
     } <span class="kw">else</span> {
-        <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">convert_filter</span>(<span class="ident">record_filter</span>.<span class="ident">filter</span>, <span class="bool-val">false</span>, <span class="ident">FilterPrefix::default</span>())<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">MongoFilterVisitor::new</span>(<span class="ident">FilterPrefix::default</span>(), <span class="bool-val">false</span>).<span class="ident">visit</span>(<span class="ident">record_filter</span>.<span class="ident">filter</span>)<span class="question-mark">?</span>;
         <span class="ident">find_ids</span>(<span class="ident">database</span>, <span class="ident">coll</span>.<span class="ident">clone</span>(), <span class="ident">session</span>, <span class="ident">model</span>, <span class="ident">filter</span>).<span class="kw">await</span><span class="question-mark">?</span>
     };
 
@@ -717,7 +717,7 @@
             })
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>
     } <span class="kw">else</span> {
-        <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">convert_filter</span>(<span class="ident">record_filter</span>.<span class="ident">filter</span>, <span class="bool-val">false</span>, <span class="ident">FilterPrefix::default</span>())<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">MongoFilterVisitor::new</span>(<span class="ident">FilterPrefix::default</span>(), <span class="bool-val">false</span>).<span class="ident">visit</span>(<span class="ident">record_filter</span>.<span class="ident">filter</span>)<span class="question-mark">?</span>;
         <span class="ident">find_ids</span>(<span class="ident">database</span>, <span class="ident">coll</span>.<span class="ident">clone</span>(), <span class="ident">session</span>, <span class="ident">model</span>, <span class="ident">filter</span>).<span class="kw">await</span><span class="question-mark">?</span>
     };
 

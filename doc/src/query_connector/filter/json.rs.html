@@ -202,10 +202,12 @@
 <span id="196">196</span>
 <span id="197">197</span>
 <span id="198">198</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span id="199">199</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::scalar</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Filter</span>, <span class="ident">JsonCompare</span>, <span class="ident">ScalarFilter</span>};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Filter</span>, <span class="ident">JsonCompare</span>, <span class="ident">JsonCondition</span>, <span class="ident">QueryMode</span>, <span class="ident">ScalarCondition</span>, <span class="ident">ScalarFilter</span>, <span class="ident">ScalarProjection</span>};
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">PrismaValue</span>, <span class="ident">ScalarFieldRef</span>};
+<span class="kw">use</span> <span class="ident">prisma_models::ScalarFieldRef</span>;
+<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">JsonTargetType</span> {
@@ -222,7 +224,7 @@
 <span class="kw">impl</span> <span class="ident">JsonCompare</span> <span class="kw">for</span> <span class="ident">ScalarFieldRef</span> {
     <span class="kw">fn</span> <span class="ident">json_contains</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>, <span class="ident">target_type</span>: <span class="ident">JsonTargetType</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
+        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>,
     {
         <span class="ident">Filter::from</span>(<span class="ident">ScalarFilter</span> {
             <span class="ident">condition</span>: <span class="ident">ScalarCondition::JsonCompare</span>(<span class="ident">JsonCondition</span> {
@@ -237,7 +239,7 @@
 
     <span class="kw">fn</span> <span class="ident">json_not_contains</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>, <span class="ident">target_type</span>: <span class="ident">JsonTargetType</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
+        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>,
     {
         <span class="ident">Filter::from</span>(<span class="ident">ScalarFilter</span> {
             <span class="ident">condition</span>: <span class="ident">ScalarCondition::JsonCompare</span>(<span class="ident">JsonCondition</span> {
@@ -252,7 +254,7 @@
 
     <span class="kw">fn</span> <span class="ident">json_starts_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>, <span class="ident">target_type</span>: <span class="ident">JsonTargetType</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
+        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>,
     {
         <span class="ident">Filter::from</span>(<span class="ident">ScalarFilter</span> {
             <span class="ident">condition</span>: <span class="ident">ScalarCondition::JsonCompare</span>(<span class="ident">JsonCondition</span> {
@@ -267,7 +269,7 @@
 
     <span class="kw">fn</span> <span class="ident">json_not_starts_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>, <span class="ident">target_type</span>: <span class="ident">JsonTargetType</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
+        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>,
     {
         <span class="ident">Filter::from</span>(<span class="ident">ScalarFilter</span> {
             <span class="ident">condition</span>: <span class="ident">ScalarCondition::JsonCompare</span>(<span class="ident">JsonCondition</span> {
@@ -282,7 +284,7 @@
 
     <span class="kw">fn</span> <span class="ident">json_ends_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>, <span class="ident">target_type</span>: <span class="ident">JsonTargetType</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
+        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>,
     {
         <span class="ident">Filter::from</span>(<span class="ident">ScalarFilter</span> {
             <span class="ident">condition</span>: <span class="ident">ScalarCondition::JsonCompare</span>(<span class="ident">JsonCondition</span> {
@@ -297,7 +299,7 @@
 
     <span class="kw">fn</span> <span class="ident">json_not_ends_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>, <span class="ident">target_type</span>: <span class="ident">JsonTargetType</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
+        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>,
     {
         <span class="ident">Filter::from</span>(<span class="ident">ScalarFilter</span> {
             <span class="ident">condition</span>: <span class="ident">ScalarCondition::JsonCompare</span>(<span class="ident">JsonCondition</span> {
@@ -312,7 +314,7 @@
 
     <span class="kw">fn</span> <span class="ident">json_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
+        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>,
     {
         <span class="ident">Filter::from</span>(<span class="ident">ScalarFilter</span> {
             <span class="ident">condition</span>: <span class="ident">ScalarCondition::JsonCompare</span>(<span class="ident">JsonCondition</span> {
@@ -327,7 +329,7 @@
 
     <span class="kw">fn</span> <span class="ident">json_not_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
+        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>,
     {
         <span class="ident">Filter::from</span>(<span class="ident">ScalarFilter</span> {
             <span class="ident">condition</span>: <span class="ident">ScalarCondition::JsonCompare</span>(<span class="ident">JsonCondition</span> {
@@ -342,7 +344,7 @@
 
     <span class="kw">fn</span> <span class="ident">json_less_than</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
+        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>,
     {
         <span class="ident">Filter::from</span>(<span class="ident">ScalarFilter</span> {
             <span class="ident">condition</span>: <span class="ident">ScalarCondition::JsonCompare</span>(<span class="ident">JsonCondition</span> {
@@ -357,7 +359,7 @@
 
     <span class="kw">fn</span> <span class="ident">json_less_than_or_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
+        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>,
     {
         <span class="ident">Filter::from</span>(<span class="ident">ScalarFilter</span> {
             <span class="ident">condition</span>: <span class="ident">ScalarCondition::JsonCompare</span>(<span class="ident">JsonCondition</span> {
@@ -372,7 +374,7 @@
 
     <span class="kw">fn</span> <span class="ident">json_greater_than</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
+        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>,
     {
         <span class="ident">Filter::from</span>(<span class="ident">ScalarFilter</span> {
             <span class="ident">condition</span>: <span class="ident">ScalarCondition::JsonCompare</span>(<span class="ident">JsonCondition</span> {
@@ -387,7 +389,7 @@
 
     <span class="kw">fn</span> <span class="ident">json_greater_than_or_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
+        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>,
     {
         <span class="ident">Filter::from</span>(<span class="ident">ScalarFilter</span> {
             <span class="ident">condition</span>: <span class="ident">ScalarCondition::JsonCompare</span>(<span class="ident">JsonCondition</span> {

@@ -279,10 +279,21 @@
 <span id="273">273</span>
 <span id="274">274</span>
 <span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">fmt::Debug</span>;
 <span class="kw">use</span> <span class="ident">once_cell::sync::OnceCell</span>;
-<span class="kw">use</span> <span class="ident">prisma_models::dml</span>;
+<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">dml</span>, <span class="ident">prelude::ParentContainer</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">boxed::Box</span>, <span class="ident">fmt</span>, <span class="ident">sync::Arc</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>)]</span>
@@ -295,9 +306,13 @@
 
 <span class="doccomment">/// Object tags help differentiating objects during parsing / raw input data processing,</span>
 <span class="doccomment">/// especially if complex object unions are present.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ObjectTag</span> {
     <span class="ident">CompositeEnvelope</span>,
+    <span class="ident">RelationEnvelope</span>,
+    <span class="comment">// Holds the type against which a field can be compared</span>
+    <span class="ident">FieldRefType</span>(<span class="ident">InputType</span>),
+    <span class="ident">WhereInputType</span>(<span class="ident">ParentContainer</span>),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">PartialEq</span>)]</span>
@@ -546,6 +561,13 @@
             <span class="ident"><span class="self">Self</span>::List</span>(<span class="ident">inner</span>) =&gt; <span class="ident">inner</span>.<span class="ident">is_empty</span>(),
             <span class="ident"><span class="self">Self</span>::Object</span>(<span class="ident">weak</span>) =&gt; <span class="ident">weak</span>.<span class="ident">into_arc</span>().<span class="ident">is_empty</span>(),
         }
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_json</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="macro">matches!</span>(
+            <span class="self">self</span>,
+            <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">ScalarType::Json</span>) <span class="op">|</span> <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">ScalarType::JsonList</span>)
+        )
     }
 }
 

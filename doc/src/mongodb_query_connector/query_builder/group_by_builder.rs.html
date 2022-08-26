@@ -223,7 +223,20 @@
 <span id="217">217</span>
 <span id="218">218</span>
 <span id="219">219</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">connector_interface</span>::{<span class="ident">AggregationSelection</span>, <span class="ident">Filter</span>, <span class="ident">ScalarProjection</span>};
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>::<span class="kw-2">*</span>;
+
+<span class="kw">use</span> <span class="ident">connector_interface</span>::{<span class="ident">AggregationSelection</span>, <span class="ident">Filter</span>};
 <span class="kw">use</span> <span class="ident">mongodb::bson</span>::{<span class="ident">doc</span>, <span class="ident">Bson</span>, <span class="ident">Document</span>};
 <span class="kw">use</span> <span class="ident">prisma_models::ScalarFieldRef</span>;
 <span class="kw">use</span> <span class="ident">std::collections::HashSet</span>;
@@ -240,12 +253,24 @@
 
 <span class="doccomment">/// A generic aggregation type that abstracts selections &amp; filter aggregations.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">enum</span> <span class="ident">AggregationType</span> {
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AggregationType</span> {
     <span class="ident">Count</span>,
     <span class="ident">Min</span>,
     <span class="ident">Max</span>,
     <span class="ident">Sum</span>,
     <span class="ident">Average</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">AggregationType</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">AggregationType::Count</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;count&quot;</span>),
+            <span class="ident">AggregationType::Min</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;min&quot;</span>),
+            <span class="ident">AggregationType::Max</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;max&quot;</span>),
+            <span class="ident">AggregationType::Sum</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;sum&quot;</span>),
+            <span class="ident">AggregationType::Average</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;avg&quot;</span>),
+        }
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">GroupByBuilder</span> {
@@ -266,7 +291,7 @@
             <span class="ident">group_doc</span>.<span class="ident">into</span>()
         };
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">group_stage</span> <span class="op">=</span> <span class="macro">doc!</span> { <span class="string">&quot;_id&quot;</span>: <span class="ident">grouping</span> };
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">group_stage</span> <span class="op">=</span> <span class="macro">doc!</span> { <span class="ident">group_by::UNDERSCORE_ID</span>: <span class="ident">grouping</span> };
         <span class="comment">// Needed for field-count aggregations</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">project_stage</span> <span class="op">=</span> <span class="macro">doc!</span> {};
 
@@ -400,10 +425,7 @@
 
     <span class="kw">fn</span> <span class="ident">insert_from_filter</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">filter</span>: <span class="kw-2">&amp;</span><span class="ident">Filter</span>, <span class="ident">aggregation_type</span>: <span class="ident">AggregationType</span>) {
         <span class="kw">let</span> <span class="ident">scalar_filter</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">as_scalar</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">scalar_filter</span>.<span class="ident">projection</span> {
-            <span class="ident">ScalarProjection::Single</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>,
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
-        };
+        <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">scalar_filter</span>.<span class="ident">projection</span>.<span class="ident">as_single</span>().<span class="ident">unwrap</span>();
 
         <span class="self">self</span>.<span class="ident">insert_grouping</span>(<span class="ident">field</span>, <span class="kw-2">&amp;</span><span class="ident">aggregation_type</span>);
     }

@@ -171,6 +171,7 @@
 <span id="165">165</span>
 <span id="166">166</span>
 <span id="167">167</span>
+<span id="168">168</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">str::FromStr</span>};
 
 <span class="doccomment">/// Not all Databases are created equal. Hence connectors for our datasources support different capabilities.</span>
@@ -248,10 +249,11 @@
     <span class="ident">WritableAutoincField</span>,
     <span class="ident">CreateSkipDuplicates</span>,
     <span class="ident">UpdateableId</span>,
-    <span class="ident">JsonFiltering</span>,
-    <span class="ident">JsonFilteringJsonPath</span>,
-    <span class="ident">JsonFilteringArrayPath</span>,
-    <span class="ident">JsonFilteringAlphanumeric</span>,
+    <span class="ident">JsonFiltering</span>, <span class="comment">// Used as an umbrella in tests to filter for connectors that supports json filtering.</span>
+    <span class="ident">JsonFilteringJsonPath</span>, <span class="comment">// Connector supports filtering json fields using json path (eg: mysql).</span>
+    <span class="ident">JsonFilteringArrayPath</span>, <span class="comment">// Connector supports filtering json fields using array path (eg: postgres).</span>
+    <span class="ident">JsonFilteringAlphanumeric</span>, <span class="comment">// Connector supports alphanumeric json filters (gt, gte, lt, lte...).</span>
+    <span class="ident">JsonFilteringAlphanumericFieldRef</span>, <span class="comment">// Connector supports alphanumeric json filters against a json field reference.</span>
     <span class="ident">CompoundIds</span>,
     <span class="ident">AnyId</span>, <span class="comment">// Any (or combination of) uniques and not only id fields can constitute an id for a model.</span>
     <span class="ident">SqlQueryRaw</span>,

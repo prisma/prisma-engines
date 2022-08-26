@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/18d46a0/src/visitor/mssql.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mssql.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/5a48e93/src/visitor/mssql.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mssql.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
@@ -1808,9 +1808,14 @@
 <span id="1802">1802</span>
 <span id="1803">1803</span>
 <span id="1804">1804</span>
+<span id="1805">1805</span>
+<span id="1806">1806</span>
+<span id="1807">1807</span>
+<span id="1808">1808</span>
+<span id="1809">1809</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Visitor</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>, <span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">JsonExtract</span>, <span class="ident">JsonType</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">JsonExtract</span>, <span class="ident">JsonType</span>, <span class="ident">JsonUnquote</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>::{
         <span class="ident">Column</span>, <span class="ident">Comparable</span>, <span class="ident">Expression</span>, <span class="ident">ExpressionKind</span>, <span class="ident">Insert</span>, <span class="ident">IntoRaw</span>, <span class="ident">Join</span>, <span class="ident">JoinData</span>, <span class="ident">Joinable</span>, <span class="ident">Merge</span>, <span class="ident">OnConflict</span>,
@@ -2458,8 +2463,13 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>, <span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)))]</span>
-    <span class="kw">fn</span> <span class="ident">visit_json_type_equals</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_left</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">_json_type</span>: <span class="ident">JsonType</span>) -&gt; <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">visit_json_type_equals</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_left</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">_json_type</span>: <span class="ident">JsonType</span>, <span class="ident">_not</span>: <span class="ident">bool</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="macro">unimplemented!</span>(<span class="string">&quot;JSON_TYPE is not yet supported on MSSQL&quot;</span>)
+    }
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>, <span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)))]</span>
+    <span class="kw">fn</span> <span class="ident">visit_json_unquote</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_json_unquote</span>: <span class="ident">JsonUnquote</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">visitor::Result</span> {
+        <span class="macro">unimplemented!</span>(<span class="string">&quot;JSON filtering is not yet supported on MSSQL&quot;</span>)
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>)]</span>
@@ -2672,7 +2682,7 @@
     <span class="kw">fn</span> <span class="ident">test_select_where_like</span>() {
         <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">expected_values</span>(<span class="string">&quot;SELECT [naukio].* FROM [naukio] WHERE [word] LIKE @P1&quot;</span>, <span class="macro">vec!</span>[<span class="string">&quot;%meow%&quot;</span>]);
 
-        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Select::from_table</span>(<span class="string">&quot;naukio&quot;</span>).<span class="ident">so_that</span>(<span class="string">&quot;word&quot;</span>.<span class="ident">like</span>(<span class="string">&quot;meow&quot;</span>));
+        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Select::from_table</span>(<span class="string">&quot;naukio&quot;</span>).<span class="ident">so_that</span>(<span class="string">&quot;word&quot;</span>.<span class="ident">like</span>(<span class="string">&quot;%meow%&quot;</span>));
         <span class="kw">let</span> (<span class="ident">sql</span>, <span class="ident">params</span>) <span class="op">=</span> <span class="ident">Mssql::build</span>(<span class="ident">query</span>).<span class="ident">unwrap</span>();
 
         <span class="macro">assert_eq!</span>(<span class="ident">expected</span>.<span class="number">0</span>, <span class="ident">sql</span>);
@@ -2686,7 +2696,7 @@
             <span class="macro">vec!</span>[<span class="string">&quot;%meow%&quot;</span>],
         );
 
-        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Select::from_table</span>(<span class="string">&quot;naukio&quot;</span>).<span class="ident">so_that</span>(<span class="string">&quot;word&quot;</span>.<span class="ident">not_like</span>(<span class="string">&quot;meow&quot;</span>));
+        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Select::from_table</span>(<span class="string">&quot;naukio&quot;</span>).<span class="ident">so_that</span>(<span class="string">&quot;word&quot;</span>.<span class="ident">not_like</span>(<span class="string">&quot;%meow%&quot;</span>));
         <span class="kw">let</span> (<span class="ident">sql</span>, <span class="ident">params</span>) <span class="op">=</span> <span class="ident">Mssql::build</span>(<span class="ident">query</span>).<span class="ident">unwrap</span>();
 
         <span class="macro">assert_eq!</span>(<span class="ident">expected</span>.<span class="number">0</span>, <span class="ident">sql</span>);
@@ -2695,9 +2705,9 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_select_where_begins_with</span>() {
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">expected_values</span>(<span class="string">&quot;SELECT [naukio].* FROM [naukio] WHERE [word] LIKE @P1&quot;</span>, <span class="macro">vec!</span>[<span class="string">&quot;meow%&quot;</span>]);
+        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">expected_values</span>(<span class="string">&quot;SELECT [naukio].* FROM [naukio] WHERE [word] LIKE @P1&quot;</span>, <span class="macro">vec!</span>[<span class="string">&quot;%meow&quot;</span>]);
 
-        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Select::from_table</span>(<span class="string">&quot;naukio&quot;</span>).<span class="ident">so_that</span>(<span class="string">&quot;word&quot;</span>.<span class="ident">begins_with</span>(<span class="string">&quot;meow&quot;</span>));
+        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Select::from_table</span>(<span class="string">&quot;naukio&quot;</span>).<span class="ident">so_that</span>(<span class="string">&quot;word&quot;</span>.<span class="ident">like</span>(<span class="string">&quot;%meow&quot;</span>));
         <span class="kw">let</span> (<span class="ident">sql</span>, <span class="ident">params</span>) <span class="op">=</span> <span class="ident">Mssql::build</span>(<span class="ident">query</span>).<span class="ident">unwrap</span>();
 
         <span class="macro">assert_eq!</span>(<span class="ident">expected</span>.<span class="number">0</span>, <span class="ident">sql</span>);
@@ -2708,10 +2718,10 @@
     <span class="kw">fn</span> <span class="ident">test_select_where_not_begins_with</span>() {
         <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">expected_values</span>(
             <span class="string">&quot;SELECT [naukio].* FROM [naukio] WHERE [word] NOT LIKE @P1&quot;</span>,
-            <span class="macro">vec!</span>[<span class="string">&quot;meow%&quot;</span>],
+            <span class="macro">vec!</span>[<span class="string">&quot;%meow&quot;</span>],
         );
 
-        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Select::from_table</span>(<span class="string">&quot;naukio&quot;</span>).<span class="ident">so_that</span>(<span class="string">&quot;word&quot;</span>.<span class="ident">not_begins_with</span>(<span class="string">&quot;meow&quot;</span>));
+        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Select::from_table</span>(<span class="string">&quot;naukio&quot;</span>).<span class="ident">so_that</span>(<span class="string">&quot;word&quot;</span>.<span class="ident">not_like</span>(<span class="string">&quot;%meow&quot;</span>));
         <span class="kw">let</span> (<span class="ident">sql</span>, <span class="ident">params</span>) <span class="op">=</span> <span class="ident">Mssql::build</span>(<span class="ident">query</span>).<span class="ident">unwrap</span>();
 
         <span class="macro">assert_eq!</span>(<span class="ident">expected</span>.<span class="number">0</span>, <span class="ident">sql</span>);
@@ -2720,9 +2730,9 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_select_where_ends_into</span>() {
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">expected_values</span>(<span class="string">&quot;SELECT [naukio].* FROM [naukio] WHERE [word] LIKE @P1&quot;</span>, <span class="macro">vec!</span>[<span class="string">&quot;%meow&quot;</span>]);
+        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">expected_values</span>(<span class="string">&quot;SELECT [naukio].* FROM [naukio] WHERE [word] LIKE @P1&quot;</span>, <span class="macro">vec!</span>[<span class="string">&quot;meow%&quot;</span>]);
 
-        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Select::from_table</span>(<span class="string">&quot;naukio&quot;</span>).<span class="ident">so_that</span>(<span class="string">&quot;word&quot;</span>.<span class="ident">ends_into</span>(<span class="string">&quot;meow&quot;</span>));
+        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Select::from_table</span>(<span class="string">&quot;naukio&quot;</span>).<span class="ident">so_that</span>(<span class="string">&quot;word&quot;</span>.<span class="ident">like</span>(<span class="string">&quot;meow%&quot;</span>));
         <span class="kw">let</span> (<span class="ident">sql</span>, <span class="ident">params</span>) <span class="op">=</span> <span class="ident">Mssql::build</span>(<span class="ident">query</span>).<span class="ident">unwrap</span>();
 
         <span class="macro">assert_eq!</span>(<span class="ident">expected</span>.<span class="number">0</span>, <span class="ident">sql</span>);
@@ -2733,10 +2743,10 @@
     <span class="kw">fn</span> <span class="ident">test_select_where_not_ends_into</span>() {
         <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">expected_values</span>(
             <span class="string">&quot;SELECT [naukio].* FROM [naukio] WHERE [word] NOT LIKE @P1&quot;</span>,
-            <span class="macro">vec!</span>[<span class="string">&quot;%meow&quot;</span>],
+            <span class="macro">vec!</span>[<span class="string">&quot;meow%&quot;</span>],
         );
 
-        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Select::from_table</span>(<span class="string">&quot;naukio&quot;</span>).<span class="ident">so_that</span>(<span class="string">&quot;word&quot;</span>.<span class="ident">not_ends_into</span>(<span class="string">&quot;meow&quot;</span>));
+        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Select::from_table</span>(<span class="string">&quot;naukio&quot;</span>).<span class="ident">so_that</span>(<span class="string">&quot;word&quot;</span>.<span class="ident">not_like</span>(<span class="string">&quot;meow%&quot;</span>));
         <span class="kw">let</span> (<span class="ident">sql</span>, <span class="ident">params</span>) <span class="op">=</span> <span class="ident">Mssql::build</span>(<span class="ident">query</span>).<span class="ident">unwrap</span>();
 
         <span class="macro">assert_eq!</span>(<span class="ident">expected</span>.<span class="number">0</span>, <span class="ident">sql</span>);

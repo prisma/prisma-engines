@@ -543,6 +543,7 @@
 <span id="537">537</span>
 <span id="538">538</span>
 <span id="539">539</span>
+<span id="540">540</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::schema</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">bigdecimal</span>::{<span class="ident">BigDecimal</span>, <span class="ident">ToPrimitive</span>};
@@ -1061,7 +1062,8 @@
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">QueryParserError::new</span>(<span class="ident">path</span>, <span class="ident">error_kind</span>));
         }
 
-        <span class="ident">map</span>.<span class="ident">set_tag</span>(<span class="ident">schema_object</span>.<span class="ident">tag</span>);
+        <span class="ident">map</span>.<span class="ident">set_tag</span>(<span class="ident">schema_object</span>.<span class="ident">tag</span>.<span class="ident">clone</span>());
+
         <span class="prelude-val">Ok</span>(<span class="ident">map</span>)
     }
 }

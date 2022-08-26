@@ -245,6 +245,26 @@
 <span id="239">239</span>
 <span id="240">240</span>
 <span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">composite</span>;
 <span class="kw">mod</span> <span class="ident">relation</span>;
 <span class="kw">mod</span> <span class="ident">scalar</span>;
@@ -443,6 +463,26 @@
             <span class="self">self</span>,
             <span class="ident">TypeIdentifier::Int</span> <span class="op">|</span> <span class="ident">TypeIdentifier::BigInt</span> <span class="op">|</span> <span class="ident">TypeIdentifier::Float</span> <span class="op">|</span> <span class="ident">TypeIdentifier::Decimal</span>
         )
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">TypeIdentifier</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">TypeIdentifier::String</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;String&quot;</span>),
+            <span class="ident">TypeIdentifier::Int</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Int&quot;</span>),
+            <span class="ident">TypeIdentifier::BigInt</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;BigInt&quot;</span>),
+            <span class="ident">TypeIdentifier::Float</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Float&quot;</span>),
+            <span class="ident">TypeIdentifier::Decimal</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Decimal&quot;</span>),
+            <span class="ident">TypeIdentifier::Boolean</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Boolean&quot;</span>),
+            <span class="ident">TypeIdentifier::Enum</span>(<span class="ident">e</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Enum({})&quot;</span>, <span class="ident">e</span>),
+            <span class="ident">TypeIdentifier::UUID</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;UUID&quot;</span>),
+            <span class="ident">TypeIdentifier::Json</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Json&quot;</span>),
+            <span class="ident">TypeIdentifier::Xml</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Xml&quot;</span>),
+            <span class="ident">TypeIdentifier::DateTime</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;DateTime&quot;</span>),
+            <span class="ident">TypeIdentifier::Bytes</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Bytes&quot;</span>),
+            <span class="ident">TypeIdentifier::Unsupported</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Unsupported&quot;</span>),
+        }
     }
 }
 

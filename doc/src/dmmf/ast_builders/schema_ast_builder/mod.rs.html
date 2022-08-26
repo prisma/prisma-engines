@@ -219,6 +219,18 @@
 <span id="213">213</span>
 <span id="214">214</span>
 <span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">enum_renderer</span>;
 <span class="kw">mod</span> <span class="ident">field_renderer</span>;
 <span class="kw">mod</span> <span class="ident">object_renderer</span>;
@@ -321,6 +333,18 @@
             <span class="ident">Entry::Occupied</span>(<span class="kw-2">mut</span> <span class="ident">v</span>) =&gt; <span class="ident">v</span>.<span class="ident">get_mut</span>().<span class="ident">push</span>(<span class="ident">output_type</span>),
             <span class="ident">Entry::Vacant</span>(<span class="ident">v</span>) =&gt; {
                 <span class="ident">v</span>.<span class="ident">insert</span>(<span class="macro">vec!</span>[<span class="ident">output_type</span>]);
+            }
+        };
+
+        <span class="self">self</span>.<span class="ident">mark_as_rendered</span>(<span class="ident">identifier</span>);
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_field_ref_type</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">identifier</span>: <span class="ident">Identifier</span>, <span class="ident">ref_type</span>: <span class="ident">DmmfFieldRefType</span>) {
+        <span class="comment">// Field ref types from the namespace</span>
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">field_ref_types</span>.<span class="ident">entry</span>(<span class="ident">identifier</span>.<span class="ident">namespace</span>().<span class="ident">to_owned</span>()) {
+            <span class="ident">Entry::Occupied</span>(<span class="kw-2">mut</span> <span class="ident">v</span>) =&gt; <span class="ident">v</span>.<span class="ident">get_mut</span>().<span class="ident">push</span>(<span class="ident">ref_type</span>),
+            <span class="ident">Entry::Vacant</span>(<span class="ident">v</span>) =&gt; {
+                <span class="ident">v</span>.<span class="ident">insert</span>(<span class="macro">vec!</span>[<span class="ident">ref_type</span>]);
             }
         };
 

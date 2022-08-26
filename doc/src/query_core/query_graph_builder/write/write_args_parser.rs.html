@@ -240,18 +240,12 @@
 <span id="234">234</span>
 <span id="235">235</span>
 <span id="236">236</span>
-<span id="237">237</span>
-<span id="238">238</span>
-<span id="239">239</span>
-<span id="240">240</span>
-<span id="241">241</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::query_document</span>::{<span class="ident">ParsedInputMap</span>, <span class="ident">ParsedInputValue</span>};
 <span class="kw">use</span> <span class="ident">connector</span>::{<span class="ident">DatasourceFieldName</span>, <span class="ident">WriteArgs</span>, <span class="ident">WriteOperation</span>};
 <span class="kw">use</span> <span class="ident">prisma_models</span>::{
     <span class="ident">CompositeFieldRef</span>, <span class="ident">Field</span>, <span class="ident">ModelRef</span>, <span class="ident">PrismaValue</span>, <span class="ident">RelationFieldRef</span>, <span class="ident">ScalarFieldRef</span>, <span class="ident">TypeIdentifier</span>,
 };
-<span class="kw">use</span> <span class="ident">schema::ObjectTag</span>;
 <span class="kw">use</span> <span class="ident">schema_builder::constants</span>::{<span class="ident">args</span>, <span class="ident">json_null</span>, <span class="ident">operations</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryInto</span>, <span class="ident">sync::Arc</span>};
 
@@ -298,10 +292,6 @@
             },
         )
     }
-}
-
-<span class="kw">fn</span> <span class="ident">is_composite_envelope</span>(<span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">ParsedInputMap</span>) -&gt; <span class="ident">bool</span> {
-    <span class="macro">matches!</span>(<span class="ident">map</span>.<span class="ident">tag</span>, <span class="prelude-val">Some</span>(<span class="ident">ObjectTag::CompositeEnvelope</span>))
 }
 
 <span class="kw">fn</span> <span class="ident">parse_scalar</span>(<span class="ident">sf</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>, <span class="ident">v</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">WriteOperation</span>, <span class="ident">QueryGraphBuilderError</span><span class="op">&gt;</span> {
@@ -368,7 +358,7 @@
         <span class="comment">// - Operation envelope with further actions nested.</span>
         <span class="comment">// - Single object set shorthand.</span>
         <span class="ident">ParsedInputValue::Map</span>(<span class="ident">map</span>) =&gt; {
-            <span class="kw">if</span> <span class="ident">is_composite_envelope</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>) {
+            <span class="kw">if</span> <span class="ident">map</span>.<span class="ident">is_composite_envelope</span>() {
                 <span class="ident">parse_composite_envelope</span>(<span class="ident">cf</span>, <span class="ident">map</span>, <span class="ident">path</span>)
             } <span class="kw">else</span> {
                 <span class="kw">let</span> <span class="ident">pv</span>: <span class="ident">PrismaValue</span> <span class="op">=</span> <span class="ident">ParsedInputValue::Map</span>(<span class="ident">map</span>).<span class="ident">try_into</span>()<span class="question-mark">?</span>;
