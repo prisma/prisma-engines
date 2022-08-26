@@ -1,34 +1,54 @@
-use super::Filter;
+use super::*;
+
 use crate::compare::ScalarListCompare;
-use prisma_models::{PrismaValue, ScalarField};
+use prisma_models::{ScalarField, ScalarFieldRef};
 use std::sync::Arc;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ScalarListFilter {
-    pub field: Arc<ScalarField>,
+    pub field: ScalarFieldRef,
     pub condition: ScalarListCondition,
+}
+
+impl ScalarListFilter {
+    /// Returns the referenced field of the filter condition if there's one
+    pub fn as_field_ref(&self) -> Option<&ScalarFieldRef> {
+        self.condition.as_field_ref()
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ScalarListCondition {
     /// List contains the given value
-    Contains(PrismaValue),
+    Contains(ConditionValue),
 
     /// List contains all the given values
-    ContainsEvery(Vec<PrismaValue>),
+    ContainsEvery(ConditionListValue),
 
     /// List contains some of the given values
-    ContainsSome(Vec<PrismaValue>),
+    ContainsSome(ConditionListValue),
 
     /// List emptiness check
     IsEmpty(bool),
+}
+
+impl ScalarListCondition {
+    /// Returns the referenced field of the filter condition if there's one
+    pub fn as_field_ref(&self) -> Option<&ScalarFieldRef> {
+        match self {
+            ScalarListCondition::Contains(v) => v.as_field_ref(),
+            ScalarListCondition::ContainsEvery(v) => v.as_field_ref(),
+            ScalarListCondition::ContainsSome(v) => v.as_field_ref(),
+            ScalarListCondition::IsEmpty(_) => None,
+        }
+    }
 }
 
 #[allow(warnings)]
 impl ScalarListCompare for Arc<ScalarField> {
     fn contains_element<T>(&self, value: T) -> Filter
     where
-        T: Into<PrismaValue>,
+        T: Into<ConditionValue>,
     {
         Filter::from(ScalarListFilter {
             field: Arc::clone(self),
@@ -36,23 +56,23 @@ impl ScalarListCompare for Arc<ScalarField> {
         })
     }
 
-    fn contains_every_element<T>(&self, values: Vec<T>) -> Filter
+    fn contains_every_element<T>(&self, values: T) -> Filter
     where
-        T: Into<PrismaValue>,
+        T: Into<ConditionListValue>,
     {
         Filter::from(ScalarListFilter {
             field: Arc::clone(self),
-            condition: ScalarListCondition::ContainsEvery(values.into_iter().map(Into::into).collect()),
+            condition: ScalarListCondition::ContainsEvery(values.into()),
         })
     }
 
-    fn contains_some_element<T>(&self, values: Vec<T>) -> Filter
+    fn contains_some_element<T>(&self, values: T) -> Filter
     where
-        T: Into<PrismaValue>,
+        T: Into<ConditionListValue>,
     {
         Filter::from(ScalarListFilter {
             field: Arc::clone(self),
-            condition: ScalarListCondition::ContainsSome(values.into_iter().map(Into::into).collect()),
+            condition: ScalarListCondition::ContainsSome(values.into()),
         })
     }
 

@@ -1,4 +1,6 @@
-use connector_interface::{AggregationSelection, Filter, ScalarProjection};
+use crate::constants::*;
+
+use connector_interface::{AggregationSelection, Filter};
 use mongodb::bson::{doc, Bson, Document};
 use prisma_models::ScalarFieldRef;
 use std::collections::HashSet;
@@ -15,12 +17,24 @@ pub struct GroupByBuilder {
 
 /// A generic aggregation type that abstracts selections & filter aggregations.
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
-enum AggregationType {
+pub enum AggregationType {
     Count,
     Min,
     Max,
     Sum,
     Average,
+}
+
+impl std::fmt::Display for AggregationType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            AggregationType::Count => write!(f, "count"),
+            AggregationType::Min => write!(f, "min"),
+            AggregationType::Max => write!(f, "max"),
+            AggregationType::Sum => write!(f, "sum"),
+            AggregationType::Average => write!(f, "avg"),
+        }
+    }
 }
 
 impl GroupByBuilder {
@@ -41,7 +55,7 @@ impl GroupByBuilder {
             group_doc.into()
         };
 
-        let mut group_stage = doc! { "_id": grouping };
+        let mut group_stage = doc! { group_by::UNDERSCORE_ID: grouping };
         // Needed for field-count aggregations
         let mut project_stage = doc! {};
 
@@ -175,10 +189,7 @@ impl GroupByBuilder {
 
     fn insert_from_filter(&mut self, filter: &Filter, aggregation_type: AggregationType) {
         let scalar_filter = filter.as_scalar().unwrap();
-        let field = match &scalar_filter.projection {
-            ScalarProjection::Single(sf) => sf,
-            _ => unreachable!(),
-        };
+        let field = scalar_filter.projection.as_single().unwrap();
 
         self.insert_grouping(field, &aggregation_type);
     }

@@ -101,6 +101,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::WritableAutoincField,
     ConnectorCapability::CreateSkipDuplicates,
     ConnectorCapability::UpdateableId,
+    ConnectorCapability::JsonFiltering,
     ConnectorCapability::JsonFilteringJsonPath,
     ConnectorCapability::JsonFilteringAlphanumeric,
     ConnectorCapability::CreateManyWriteableAutoIncId,

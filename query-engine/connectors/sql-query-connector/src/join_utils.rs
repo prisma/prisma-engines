@@ -74,7 +74,7 @@ fn compute_aggr_join_one2m(
     };
     let select_columns = right_fields.iter().map(|f| f.as_column());
     let conditions: ConditionTree = filter
-        .map(|f| f.aliased_cond(None))
+        .map(|f| f.aliased_cond(None, false))
         .unwrap_or(ConditionTree::NoCondition);
 
     // + SELECT Child.<fk> FROM Child WHERE <FILTER>
@@ -151,7 +151,7 @@ fn compute_aggr_join_m2m(
     let parent_ids: ModelProjection = rf.model().primary_identifier().into();
     // Rendered filters
     let conditions: ConditionTree = filter
-        .map(|f| f.aliased_cond(None))
+        .map(|f| f.aliased_cond(None, false))
         .unwrap_or(ConditionTree::NoCondition);
 
     // + SELECT _ParentToChild.ChildId FROM Child WHERE <FILTER>

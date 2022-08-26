@@ -815,7 +815,7 @@ mod to_one_rel {
                     id
                 }
             }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         Ok(())
@@ -861,7 +861,7 @@ mod to_one_rel {
                     id
                 }
             }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         Ok(())

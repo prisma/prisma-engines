@@ -1,7 +1,7 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schemas::json), only(Postgres))]
-mod json_path {
+#[test_suite(schema(schemas::json), capabilities(JsonFiltering), exclude(MySql(5.6)))]
+mod json_filters {
     use indoc::indoc;
     use query_engine_tests::{assert_error, is_one_of, run_query, ConnectorTag, MySqlVersion, Runner};
 
@@ -97,7 +97,7 @@ mod json_path {
         Ok(())
     }
 
-    #[connector_test(schema(pg_json), capabilities(JsonFilteringArrayPath))]
+    #[connector_test(schema(pg_json), capabilities(JsonFilteringArrayPath), exclude(CockroachDb))]
     async fn extract_array_path_pg_json(runner: Runner) -> TestResult<()> {
         extract_array_path_runner(runner).await?;
 
@@ -173,6 +173,7 @@ mod json_path {
         create_row(&runner, 7, r#"[1, null, 2]"#, true).await?;
         create_row(&runner, 8, r#"[1, [null], 2]"#, true).await?;
 
+        // array_contains
         insta::assert_snapshot!(
             run_query!(
                 runner,
@@ -180,13 +181,28 @@ mod json_path {
             ),
             @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
-
         insta::assert_snapshot!(
             run_query!(
                 runner,
                 jsonq(&runner, r#"array_contains: "[\"a\"]""#, None)
             ),
             @r###"{"data":{"findManyTestModel":[{"id":4}]}}"###
+        );
+
+        // NOT array_contains
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                not_jsonq(&runner, r#"array_contains: "[3]""#, None)
+            ),
+            @r###"{"data":{"findManyTestModel":[{"id":4},{"id":6},{"id":7},{"id":8}]}}"###
+        );
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                not_jsonq(&runner, r#"array_contains: "[\"a\"]""#, None)
+            ),
+            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":6},{"id":7},{"id":8}]}}"###
         );
 
         // MySQL has slightly different semantics and also coerces null to [null].
@@ -304,6 +320,47 @@ mod json_path {
             @r###"{"data":{"findManyTestModel":[{"id":9}]}}"###
         );
 
+        // NOT
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                not_jsonq(&runner, r#"array_starts_with: "3" "#, None)
+            ),
+            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":4},{"id":6},{"id":8},{"id":9}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                not_jsonq(&runner, r#"array_starts_with: "\"a\"" "#, None)
+            ),
+            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":6},{"id":8},{"id":9}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                not_jsonq(&runner, r#"array_starts_with: "[1, 2]" "#, None)
+            ),
+            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":4},{"id":8},{"id":9}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                not_jsonq(&runner, r#"array_starts_with: "null" "#, None)
+            ),
+            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":4},{"id":6},{"id":9}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                not_jsonq(&runner, r#"array_starts_with: "[null]" "#, None)
+            ),
+            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":4},{"id":6},{"id":8}]}}"###
+        );
+
         Ok(())
     }
 
@@ -370,6 +427,47 @@ mod json_path {
             @r###"{"data":{"findManyTestModel":[{"id":9}]}}"###
         );
 
+        // NOT
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                not_jsonq(&runner, r#"array_ends_with: "3" "#, None)
+            ),
+            @r###"{"data":{"findManyTestModel":[{"id":2},{"id":3},{"id":4},{"id":8},{"id":9}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                not_jsonq(&runner, r#"array_ends_with: "\"b\"" "#, None)
+            ),
+            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":4},{"id":8},{"id":9}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                not_jsonq(&runner, r#"array_ends_with: "[3, 4]" "#, None)
+            ),
+            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":8},{"id":9}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                not_jsonq(&runner, r#"array_ends_with: "null" "#, None)
+            ),
+            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":9}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                not_jsonq(&runner, r#"array_ends_with: "[null]" "#, None)
+            ),
+            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":8}]}}"###
+        );
+
         Ok(())
     }
 
@@ -399,6 +497,16 @@ mod json_path {
             ),
             @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
+
+        // NOT
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                not_jsonq(&runner, r#"string_contains: "ab" "#, None)
+            ),
+            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
+
         Ok(())
     }
 
@@ -421,6 +529,7 @@ mod json_path {
         create_row(&runner, 2, r#"\"fool\""#, true).await?;
         create_row(&runner, 3, r#"[\"foo\"]"#, true).await?;
 
+        // string_starts_with
         insta::assert_snapshot!(
             run_query!(
                 runner,
@@ -428,6 +537,16 @@ mod json_path {
             ),
             @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
+
+        // NOT string_starts_with
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                not_jsonq(&runner, r#"string_starts_with: "ab" "#, None)
+            ),
+            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
+
         Ok(())
     }
 
@@ -457,6 +576,16 @@ mod json_path {
             ),
             @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
+
+        // NOT
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                not_jsonq(&runner, r#"string_ends_with: "oo" "#, None)
+            ),
+            @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
         Ok(())
     }
 
@@ -637,7 +766,6 @@ mod json_path {
             ),
             @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[3,4,5]}}"},{"json":"{\"a\":{\"b\":[3,4,6]}}"}]}}"###
         );
-
         insta::assert_snapshot!(
             run_query!(
                 runner,
@@ -655,6 +783,41 @@ mod json_path {
             @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":1}}"},{"json":"{\"a\":{\"b\":2.4}}"}]}}"###
         );
 
+        // NOT
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                format!(r#"query {{
+                    findManyTestModel(
+                        where: {{ NOT: {{ json: {{ {}, array_contains: "3", array_starts_with: "3" }} }} }},
+                        cursor: {{ id: 2 }},
+                        take: 2
+                    ) {{ json }}
+                }}"#, json_path(&runner))
+            ),
+            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[5,6,7]}}"}]}}"###
+        );
+        // 1, 2.4, 3
+        // filter: false, true, false
+        // negated: true, false, true
+        // result: 1, 3
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                format!(r#"query {{
+                    findManyTestModel(
+                        where: {{
+                            NOT: {{ AND: [
+                                    {{ json: {{ {}, gt: "1" }} }},
+                                    {{ json: {{ {}, lt: "3" }} }},
+                            ]}}
+                        }}
+                    ) {{ json }}
+                }}"#, json_path(&runner), json_path(&runner))
+            ),
+            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":1}}"},{"json":"{\"a\":{\"b\":3}}"}]}}"###
+        );
+
         Ok(())
     }
 
@@ -670,6 +833,38 @@ mod json_path {
     #[connector_test(only(Postgres), exclude(CockroachDb))]
     async fn multi_filtering(runner: Runner) -> TestResult<()> {
         multi_filtering_runner(runner).await?;
+
+        Ok(())
+    }
+
+    #[connector_test(schema(json_opt))]
+    async fn string_contains_does_not_error(runner: Runner) -> TestResult<()> {
+        // NOTE: with string operations the results are always empty because we check for an object, not a string
+        // in any case, this should not fail, it will work and return an empty result
+        insta::assert_snapshot!(
+            run_query!(&runner, r#"query { findFirstTestModel(where: { json: { string_contains: "foo" }  }) { id }}"#),
+            @r###"{"data":{"findFirstTestModel":null}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(json_opt))]
+    async fn string_begins_with_does_not_error(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+            run_query!(&runner, r#"query { findFirstTestModel(where: { json: { string_starts_with: "foo" }  }) { id }}"#),
+            @r###"{"data":{"findFirstTestModel":null}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(json_opt))]
+    async fn string_ends_with_does_not_error(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+            run_query!(&runner, r#"query { findFirstTestModel(where: { json: { string_ends_with: "foo" }  }) { id }}"#),
+            @r###"{"data":{"findFirstTestModel":null}}"###
+        );
 
         Ok(())
     }
@@ -694,6 +889,15 @@ mod json_path {
 
         format!(
             r#"query {{ findManyTestModel(where: {{ json: {{ {}, {} }} }} ) {{ id }} }}"#,
+            filter, path
+        )
+    }
+
+    fn not_jsonq(runner: &Runner, filter: &str, path: Option<&str>) -> String {
+        let path = path.unwrap_or_else(|| json_path(runner));
+
+        format!(
+            r#"query {{ findManyTestModel(where: {{ NOT: {{ json: {{ {}, {} }} }} }} ) {{ id }} }}"#,
             filter, path
         )
     }
