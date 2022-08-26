@@ -140,12 +140,13 @@ pub trait QueryExt: Queryable + Send + Sync {
         &self,
         model: &ModelRef,
         record_filter: RecordFilter,
+        for_update: bool,
         trace_id: Option<String>,
     ) -> crate::Result<Vec<SelectionResult>> {
         if let Some(selectors) = record_filter.selectors {
             Ok(selectors)
         } else {
-            self.filter_ids(model, record_filter.filter, trace_id).await
+            self.filter_ids(model, record_filter.filter, for_update, trace_id).await
         }
     }
 
@@ -154,16 +155,21 @@ pub trait QueryExt: Queryable + Send + Sync {
         &self,
         model: &ModelRef,
         filter: Filter,
+        for_update: bool,
         trace_id: Option<String>,
     ) -> crate::Result<Vec<SelectionResult>> {
         let model_id: ModelProjection = model.primary_identifier().into();
         let id_cols: Vec<Column<'static>> = model_id.as_columns().collect();
 
-        let select = Select::from_table(model.as_table())
+        let mut select = Select::from_table(model.as_table())
             .columns(id_cols)
             .append_trace(&Span::current())
             .add_trace_id(trace_id.clone())
             .so_that(filter.aliased_cond(None));
+
+        if for_update {
+            select = select.for_update();
+        }
 
         self.select_ids(select, model_id, trace_id).await
     }

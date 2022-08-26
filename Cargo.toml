@@ -55,3 +55,6 @@ opt-level = 3
 codegen-units = 1
 opt-level = 'z' # Optimize for size.
 #strip="symbols"
+
+[patch."https://github.com/prisma/quaint"]
+quaint = {git = "https://github.com/garrensmith/quaint", branch = "add-for-update"}
