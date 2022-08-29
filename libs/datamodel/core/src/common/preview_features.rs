@@ -81,6 +81,7 @@ pub const GENERATOR: FeatureMap = FeatureMap {
          | OrderByNulls
          | FilteredRelationCount
          | FieldReference
+         | MultiSchema
     }),
     deprecated: enumflags2::make_bitflags!(PreviewFeature::{
         AtomicNumberOperations
@@ -107,7 +108,7 @@ pub const GENERATOR: FeatureMap = FeatureMap {
         | ImprovedQueryRaw
         | DataProxy
     }),
-    hidden: enumflags2::make_bitflags!(PreviewFeature::{MultiSchema}),
+    hidden: BitFlags::EMPTY,
 };
 
 #[derive(Debug)]
