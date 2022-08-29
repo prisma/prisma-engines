@@ -23,11 +23,5 @@ enumflags2 = "0.7"
 indoc = "1"
 either = "1.6"
 
-[dev-dependencies]
-dissimilar = "1.0.4"
-expect-test = "1.1.0"
-native-types = { path = "../../native-types" }
-pretty_assertions = "0.6.1"
-
 [features]
 default_generators = ["dml/default_generators"]
