@@ -5,8 +5,8 @@ use crate::{
     sql_migration::{AlterColumn, AlterEnum, AlterTable, RedefineTable, SequenceChange, SequenceChanges, TableChange},
     sql_schema_differ::{ColumnChange, ColumnChanges},
 };
-use datamodel::dml::PrismaValue;
 use native_types::{CockroachType, PostgresType};
+use psl::dml::PrismaValue;
 use sql_ddl::{postgres as ddl, IndexColumn, SortOrder};
 use sql_schema_describer::{
     postgres::{PostgresSchemaExt, SqlIndexAlgorithm},

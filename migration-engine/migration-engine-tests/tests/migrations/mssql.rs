@@ -1,6 +1,6 @@
-use datamodel::parser_database::SourceFile;
 use migration_core::migration_connector::DiffTarget;
 use migration_engine_tests::test_api::*;
+use psl::parser_database::SourceFile;
 
 #[test_connector(tags(Mssql))]
 fn reset_clears_udts(api: TestApi) {

@@ -16,10 +16,10 @@ mod sql_schema_calculator;
 mod sql_schema_differ;
 
 use database_schema::SqlDatabaseSchema;
-use datamodel::ValidatedSchema;
 use flavour::{MssqlFlavour, MysqlFlavour, PostgresFlavour, SqlFlavour, SqliteFlavour};
 use migration_connector::{migrations_directory::MigrationDirectory, *};
 use pair::Pair;
+use psl::ValidatedSchema;
 use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};
 use sql_schema_describer as sql;
 use std::sync::Arc;
@@ -116,8 +116,7 @@ impl SqlMigrationConnector {
     ) -> ConnectorResult<SqlDatabaseSchema> {
         match target {
             DiffTarget::Datamodel(schema) => {
-                let schema =
-                    datamodel::parse_schema_parserdb(schema).map_err(ConnectorError::new_schema_parser_error)?;
+                let schema = psl::parse_schema_parserdb(schema).map_err(ConnectorError::new_schema_parser_error)?;
                 Ok(sql_schema_calculator::calculate_sql_schema(
                     &schema,
                     self.flavour.as_ref(),

@@ -771,7 +771,7 @@ fn prisma_type(native_type: &str) -> &str {
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn safe_casts_with_existing_data_should_work(api: TestApi) {
-    let connector = sql_datamodel_connector::POSTGRES;
+    let connector = psl::builtin_connectors::POSTGRES;
 
     for (from, seed, casts) in SAFE_CASTS.iter() {
         let span = tracing::info_span!("SafeCasts", from = %from, to = ?casts, seed = ?seed);
@@ -865,7 +865,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn risky_casts_with_existing_data_should_warn(api: TestApi) {
-    let connector = sql_datamodel_connector::POSTGRES;
+    let connector = psl::builtin_connectors::POSTGRES;
 
     for (from, seed, casts) in RISKY_CASTS.iter() {
         let mut previous_columns = "".to_string();
@@ -968,7 +968,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn not_castable_with_existing_data_should_warn(api: TestApi) {
-    let connector = sql_datamodel_connector::POSTGRES;
+    let connector = psl::builtin_connectors::POSTGRES;
     let mut warnings = Vec::new();
 
     for (from, seed, casts) in NOT_CASTABLE.iter() {
@@ -1158,7 +1158,7 @@ static SAFE_CASTS_NON_LIST_TO_STRING: CastList = Lazy::new(|| {
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
-    let connector = sql_datamodel_connector::POSTGRES;
+    let connector = psl::builtin_connectors::POSTGRES;
 
     for (to, from) in SAFE_CASTS_NON_LIST_TO_STRING.iter() {
         let mut previous_columns = "".to_string();

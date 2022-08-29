@@ -1,10 +1,10 @@
-use datamodel::{
+use mongodb_schema_describer::{IndexField, IndexFieldProperty, MongoSchema};
+use psl::{
     builtin_connectors::MONGODB,
     datamodel_connector::walker_ext_traits::*,
     parser_database::{IndexType, SortOrder},
     ValidatedSchema,
 };
-use mongodb_schema_describer::{IndexField, IndexFieldProperty, MongoSchema};
 
 /// Datamodel -> MongoSchema
 pub(crate) fn calculate(datamodel: &ValidatedSchema) -> MongoSchema {

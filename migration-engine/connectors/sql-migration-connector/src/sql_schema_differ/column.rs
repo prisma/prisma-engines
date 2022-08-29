@@ -1,6 +1,6 @@
 use crate::{flavour::SqlFlavour, pair::Pair};
-use datamodel::dml::PrismaValue;
 use enumflags2::BitFlags;
+use psl::dml::PrismaValue;
 use sql_schema_describer::{walkers::ColumnWalker, DefaultKind};
 
 pub(crate) fn all_changes(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> ColumnChanges {

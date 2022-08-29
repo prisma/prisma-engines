@@ -1,5 +1,4 @@
 use crate::error::Error;
-use datamodel::{dml::Datamodel, Configuration};
 use introspection_connector::{
     CompositeTypeDepth, ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionContext,
     IntrospectionResultOutput,
@@ -7,6 +6,7 @@ use introspection_connector::{
 use jsonrpc_core::BoxFuture;
 use jsonrpc_derive::rpc;
 use mongodb_introspection_connector::MongoDbIntrospectionConnector;
+use psl::{dml::Datamodel, Configuration};
 use serde_derive::*;
 use sql_introspection_connector::SqlIntrospectionConnector;
 
@@ -69,7 +69,7 @@ impl Rpc for RpcImpl {
 
 impl RpcImpl {
     async fn load_connector(schema: &str) -> Result<(Configuration, String, Box<dyn IntrospectionConnector>), Error> {
-        let config = datamodel::parse_configuration(schema)
+        let config = psl::parse_configuration(schema)
             .map_err(|diagnostics| Error::DatamodelError(diagnostics.to_pretty_string("schema.prisma", schema)))?;
 
         let preview_features = config.subject.preview_features();
@@ -125,7 +125,7 @@ impl RpcImpl {
                     Err(Error::IntrospectionResultEmpty)
                 } else {
                     Ok(IntrospectionResultOutput {
-                        datamodel: datamodel::render_datamodel_and_config_to_string(
+                        datamodel: psl::render_datamodel_and_config_to_string(
                             &introspection_result.data_model,
                             &config,
                         ),
@@ -142,7 +142,7 @@ impl RpcImpl {
 
     /// This function parses the provided schema and returns the contained Datamodel.
     pub fn parse_datamodel(schema: &str) -> RpcResult<Datamodel> {
-        let final_dm = datamodel::parse_datamodel(schema)
+        let final_dm = psl::parse_datamodel(schema)
             .map(|d| d.subject)
             .map_err(|err| Error::DatamodelError(err.to_pretty_string("schema.prisma", schema)))?;
 

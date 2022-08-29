@@ -3,7 +3,7 @@ mod sql_schema_calculator_flavour;
 pub(super) use sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour;
 
 use crate::{flavour::SqlFlavour, SqlDatabaseSchema};
-use datamodel::{
+use psl::{
     datamodel_connector::{walker_ext_traits::*, ReferentialAction, ScalarType},
     dml::{prisma_value, PrismaValue},
     parser_database::{
@@ -30,7 +30,7 @@ pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn Sq
     if datamodel
         .configuration
         .preview_features()
-        .contains(datamodel::common::preview_features::PreviewFeature::MultiSchema)
+        .contains(psl::common::preview_features::PreviewFeature::MultiSchema)
     {
         if let Some(ds) = context.datamodel.configuration.datasources.get(0) {
             for (schema, _) in &ds.schemas {

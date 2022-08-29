@@ -1,5 +1,6 @@
+use super::SqlSchemaCalculatorFlavour;
 use crate::flavour::{MssqlFlavour, SqlFlavour};
-use datamodel::{
+use psl::{
     datamodel_connector::walker_ext_traits::{DefaultValueExt, IndexWalkerExt},
     parser_database::walkers::*,
 };
@@ -7,8 +8,6 @@ use sql_schema_describer::{
     mssql::{IndexBits, MssqlSchemaExt},
     ForeignKeyAction,
 };
-
-use super::SqlSchemaCalculatorFlavour;
 
 impl SqlSchemaCalculatorFlavour for MssqlFlavour {
     fn default_constraint_name(&self, default_value: DefaultValueWalker<'_>) -> Option<String> {
