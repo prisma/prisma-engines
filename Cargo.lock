@@ -686,18 +686,14 @@ dependencies = [
  "chrono",
  "datamodel-connector",
  "diagnostics",
- "dissimilar",
  "dml",
  "either",
  "enumflags2",
- "expect-test",
  "indoc",
  "itertools",
  "mongodb-datamodel-connector",
- "native-types",
  "once_cell",
  "parser-database",
- "pretty_assertions",
  "regex",
  "schema-ast",
  "serde",
@@ -3138,6 +3134,10 @@ name = "psl"
 version = "0.1.0"
 dependencies = [
  "datamodel",
+ "dissimilar",
+ "expect-test",
+ "indoc",
+ "native-types",
 ]
 
 [[package]]
