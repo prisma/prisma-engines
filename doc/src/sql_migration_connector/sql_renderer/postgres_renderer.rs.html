@@ -1860,14 +1860,14 @@
     }
 
     <span class="kw">match</span> <span class="ident">default</span>.<span class="ident">kind</span>() {
-        <span class="ident">DefaultKind::DbGenerated</span>(<span class="ident">val</span>) =&gt; <span class="ident">Cow::Borrowed</span>(<span class="ident">val</span>.<span class="ident">as_str</span>()),
+        <span class="ident">DefaultKind::DbGenerated</span>(<span class="prelude-val">Some</span>(<span class="ident">val</span>)) =&gt; <span class="ident">Cow::Borrowed</span>(<span class="ident">val</span>.<span class="ident">as_str</span>()),
         <span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::String</span>(<span class="ident">val</span>)) <span class="op">|</span> <span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::Enum</span>(<span class="ident">val</span>)) =&gt; {
             <span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, <span class="ident">escape_string_literal</span>(<span class="ident">val</span>)).<span class="ident">into</span>()
         }
         <span class="ident">DefaultKind::Now</span> =&gt; <span class="string">&quot;CURRENT_TIMESTAMP&quot;</span>.<span class="ident">into</span>(),
         <span class="ident">DefaultKind::Value</span>(<span class="ident">value</span>) =&gt; <span class="ident">render_constant_default</span>(<span class="ident">value</span>, <span class="ident">full_data_type</span>),
         <span class="ident">DefaultKind::UniqueRowid</span> =&gt; <span class="string">&quot;unique_rowid()&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">DefaultKind::Sequence</span>(<span class="kw">_</span>) =&gt; <span class="ident">Default::default</span>(),
+        <span class="ident">DefaultKind::Sequence</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">DefaultKind::DbGenerated</span>(<span class="prelude-val">None</span>) =&gt; <span class="ident">Default::default</span>(),
     }
 }
 

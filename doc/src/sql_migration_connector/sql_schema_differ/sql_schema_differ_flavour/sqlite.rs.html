@@ -65,6 +65,10 @@
 <span id="59">59</span>
 <span id="60">60</span>
 <span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SqlSchemaDifferFlavour</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">flavour::SqliteFlavour</span>, <span class="ident">pair::Pair</span>, <span class="ident">sql_schema_differ::column::ColumnTypeChange</span>,
@@ -82,6 +86,10 @@
     }
 
     <span class="kw">fn</span> <span class="ident">can_rename_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="bool-val">false</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">column_autoincrement_changed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_columns</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
         <span class="bool-val">false</span>
     }
 

@@ -1290,12 +1290,12 @@
     <span class="doccomment">/// A unique row ID,</span>
     <span class="ident">UniqueRowid</span>,
     <span class="doccomment">/// An unrecognized Default Value</span>
-    <span class="ident">DbGenerated</span>(<span class="ident">String</span>),
+    <span class="ident">DbGenerated</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">DefaultValue</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_generated</span>(<span class="ident">val</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">DefaultKind::DbGenerated</span>(<span class="ident">val</span>.<span class="ident">into</span>()))
+        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">DefaultKind::DbGenerated</span>(<span class="prelude-val">Some</span>(<span class="ident">val</span>.<span class="ident">into</span>())))
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">now</span>() -&gt; <span class="self">Self</span> {

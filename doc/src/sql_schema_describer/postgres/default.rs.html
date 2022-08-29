@@ -823,7 +823,7 @@
 
     <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">parsed_default</span> {
         <span class="prelude-val">Some</span>(<span class="ident">default_value</span>) =&gt; <span class="ident">default_value</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>.<span class="ident">to_owned</span>()),
     })
 }
 
@@ -1239,7 +1239,7 @@
 
     <span class="ident">values</span>
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">values</span><span class="op">|</span> <span class="ident">DefaultValue::value</span>(<span class="ident">PrismaValue::List</span>(<span class="ident">values</span>)))
-        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DefaultValue::db_generated</span>(<span class="ident">parser</span>.<span class="ident">input</span>))
+        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DefaultValue::db_generated</span>(<span class="ident">parser</span>.<span class="ident">input</span>.<span class="ident">to_owned</span>()))
 }
 
 <span class="doccomment">/// Some(()) on valid cast or absence of cast. None if we can&#39;t make sense of the input.</span>
