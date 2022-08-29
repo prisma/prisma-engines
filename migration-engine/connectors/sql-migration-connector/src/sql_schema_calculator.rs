@@ -462,9 +462,8 @@ fn push_column_for_builtin_scalar_type(
     let default: Option<ColumnDefault> = field.default_value().map(|v| {
         let column_default = {
             if v.is_dbgenerated() {
-                unwrap_dbgenerated(v.value())
-                    .map(|v| ColumnDefault::Available(sql::DefaultValue::new(sql::DefaultKind::DbGenerated(v))))
-                    .unwrap_or(ColumnDefault::NA)
+                let value = unwrap_dbgenerated(v.value());
+                ColumnDefault::Available(sql::DefaultValue::new(sql::DefaultKind::DbGenerated(value)))
             } else if v.is_now() {
                 ColumnDefault::Available(sql::DefaultValue::now())
             } else if v.is_autoincrement() {

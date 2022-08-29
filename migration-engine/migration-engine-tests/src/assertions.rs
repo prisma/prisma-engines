@@ -423,7 +423,7 @@ impl<'a> ColumnAssertion<'a> {
         let found = self.column.default();
 
         match found.map(|d| d.kind()) {
-            Some(DefaultKind::DbGenerated(val)) => assert!(
+            Some(DefaultKind::DbGenerated(Some(val))) => assert!(
                 val == expected,
                 "Assertion failed. Expected the default value for `{}` to be dbgenerated with `{:?}`, got `{:?}`",
                 self.column.name(),

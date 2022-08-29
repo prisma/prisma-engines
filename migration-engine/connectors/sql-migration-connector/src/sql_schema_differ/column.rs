@@ -92,6 +92,7 @@ fn defaults_match(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> boo
         (Some(DefaultKind::DbGenerated(_)), Some(DefaultKind::Value(_))) => false,
         (Some(DefaultKind::DbGenerated(_)), Some(DefaultKind::Now)) => false,
         (Some(DefaultKind::DbGenerated(_)), None) => false,
+        (_, Some(DefaultKind::DbGenerated(None))) => true,
 
         (Some(DefaultKind::Sequence(_)), None) => true, // sequences are dropped separately
         (Some(DefaultKind::Sequence(_)), Some(DefaultKind::Value(_))) => false,
@@ -104,7 +105,7 @@ fn defaults_match(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> boo
         (None, Some(DefaultKind::Value(_))) => false,
         (None, Some(DefaultKind::Now)) => false,
 
-        (Some(DefaultKind::DbGenerated(prev)), Some(DefaultKind::DbGenerated(next))) => {
+        (Some(DefaultKind::DbGenerated(Some(prev))), Some(DefaultKind::DbGenerated(Some(next)))) => {
             (prev.eq_ignore_ascii_case(next)) && names_match
         }
         (_, Some(DefaultKind::DbGenerated(_))) => false,

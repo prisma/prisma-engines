@@ -3359,7 +3359,9 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                         default: Some(
                             DefaultValue {
                                 kind: DbGenerated(
-                                    "(abs(8) + abs(8))",
+                                    Some(
+                                        "(abs(8) + abs(8))",
+                                    ),
                                 ),
                                 constraint_name: None,
                             },
@@ -3386,7 +3388,9 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                         default: Some(
                             DefaultValue {
                                 kind: DbGenerated(
-                                    "(abs(8))",
+                                    Some(
+                                        "(abs(8))",
+                                    ),
                                 ),
                                 constraint_name: None,
                             },
@@ -3413,7 +3417,9 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                         default: Some(
                             DefaultValue {
                                 kind: DbGenerated(
-                                    "(abs(8))",
+                                    Some(
+                                        "(abs(8))",
+                                    ),
                                 ),
                                 constraint_name: None,
                             },
@@ -3447,7 +3453,9 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                         default: Some(
                             DefaultValue {
                                 kind: DbGenerated(
-                                    "(abs(8))",
+                                    Some(
+                                        "(abs(8))",
+                                    ),
                                 ),
                                 constraint_name: None,
                             },
@@ -3474,7 +3482,9 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                         default: Some(
                             DefaultValue {
                                 kind: DbGenerated(
-                                    "(ifnull(1,0))",
+                                    Some(
+                                        "(ifnull(1,0))",
+                                    ),
                                 ),
                                 constraint_name: None,
                             },
@@ -3503,7 +3513,9 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                         default: Some(
                             DefaultValue {
                                 kind: DbGenerated(
-                                    "(left(uuid(),8))",
+                                    Some(
+                                        "(left(uuid(),8))",
+                                    ),
                                 ),
                                 constraint_name: None,
                             },
@@ -3559,7 +3571,9 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                         default: Some(
                             DefaultValue {
                                 kind: DbGenerated(
-                                    "(sysdate() - interval 31 day)",
+                                    Some(
+                                        "(sysdate() - interval 31 day)",
+                                    ),
                                 ),
                                 constraint_name: None,
                             },
@@ -3588,7 +3602,9 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                         default: Some(
                             DefaultValue {
                                 kind: DbGenerated(
-                                    "(conv(10,10,2))",
+                                    Some(
+                                        "(conv(10,10,2))",
+                                    ),
                                 ),
                                 constraint_name: None,
                             },
@@ -3615,7 +3631,9 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                         default: Some(
                             DefaultValue {
                                 kind: DbGenerated(
-                                    "(trim(_utf8mb4\\'{} \\'))",
+                                    Some(
+                                        "(trim(_utf8mb4\\'{} \\'))",
+                                    ),
                                 ),
                                 constraint_name: None,
                             },
@@ -3640,7 +3658,9 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                         default: Some(
                             DefaultValue {
                                 kind: DbGenerated(
-                                    "(trim(_utf8mb4\\'x-small   \\'))",
+                                    Some(
+                                        "(trim(_utf8mb4\\'x-small   \\'))",
+                                    ),
                                 ),
                                 constraint_name: None,
                             },
@@ -3663,7 +3683,9 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                         default: Some(
                             DefaultValue {
                                 kind: DbGenerated(
-                                    "(trim(_utf8mb4\\' \\'))",
+                                    Some(
+                                        "(trim(_utf8mb4\\' \\'))",
+                                    ),
                                 ),
                                 constraint_name: None,
                             },

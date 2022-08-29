@@ -60,7 +60,9 @@ pub(crate) fn calculate_default(column: sql::ColumnWalker<'_>, ctx: &mut Context
             column,
         )),
         (Some(sql::DefaultKind::DbGenerated(default_string)), _) => Some(set_default(
-            dml::DefaultValue::new_expression(dml::ValueGenerator::new_dbgenerated(default_string.clone())),
+            dml::DefaultValue::new_expression(dml::ValueGenerator::new_dbgenerated(
+                default_string.as_ref().unwrap().clone(),
+            )),
             column,
         )),
         (Some(sql::DefaultKind::Value(val)), _) => {
