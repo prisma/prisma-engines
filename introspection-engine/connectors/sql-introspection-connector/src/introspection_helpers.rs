@@ -49,6 +49,18 @@ pub(crate) fn is_relay_table(table: TableWalker<'_>) -> bool {
             .any(|col| col.name().eq_ignore_ascii_case("stablemodelidentifier"))
 }
 
+pub(crate) fn has_created_at_and_updated_at(table: TableWalker<'_>) -> bool {
+    let has_created_at = table.columns().any(|col| {
+        col.name().eq_ignore_ascii_case("createdat") && col.column_type().family == ColumnTypeFamily::DateTime
+    });
+
+    let has_updated_at = table.columns().any(|col| {
+        col.name().eq_ignore_ascii_case("updatedat") && col.column_type().family == ColumnTypeFamily::DateTime
+    });
+
+    has_created_at && has_updated_at
+}
+
 pub(crate) fn is_prisma_1_or_11_list_table(table: TableWalker<'_>) -> bool {
     table.columns().len() == 3
         && table.columns().any(|col| col.name().eq_ignore_ascii_case("nodeid"))
