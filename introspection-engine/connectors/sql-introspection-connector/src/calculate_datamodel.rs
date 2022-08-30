@@ -5,8 +5,7 @@ use crate::{
     prisma_1_defaults::*,
     re_introspection::enrich,
     sanitize_datamodel_names::{sanitization_leads_to_duplicate_names, sanitize_datamodel_names},
-    version_checker::VersionChecker,
-    SqlFamilyTrait, SqlIntrospectionResult,
+    version_checker, SqlFamilyTrait, SqlIntrospectionResult,
 };
 use datamodel::{builtin_connectors::*, common::preview_features::PreviewFeature, dml::Datamodel, Datasource};
 use enumflags2::BitFlags;
@@ -47,10 +46,8 @@ pub fn calculate_datamodel(
         sql_family: ctx.sql_family(),
     };
 
-    let mut version_check = VersionChecker::new(schema, &ctx);
-
     // 1to1 translation of the sql schema
-    introspect(&mut version_check, &mut context)?;
+    introspect(&mut context)?;
 
     if !sanitization_leads_to_duplicate_names(context.datamodel) {
         // our opinionation about valid names
@@ -70,7 +67,7 @@ pub fn calculate_datamodel(
     warnings.append(&mut commenting_out_guardrails(&mut datamodel, &ctx));
 
     // try to identify whether the schema was created by a previous Prisma version
-    let version = version_check.version(&warnings, &datamodel);
+    let version = version_checker::check_prisma_version(schema, &ctx, &mut warnings);
 
     // if based on a previous Prisma version add id default opinionations
     add_prisma_1_id_defaults(&version, &mut datamodel, schema, &mut warnings, &ctx);
