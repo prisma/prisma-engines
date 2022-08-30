@@ -7,8 +7,10 @@ use crate::{
 };
 use datamodel_connector::ReferentialIntegrity;
 use enumflags2::BitFlags;
+#[cfg(feature = "mongodb")]
 use mongodb_datamodel_connector::*;
 use parser_database::{ast::WithDocumentation, coerce, coerce_array, coerce_opt};
+#[cfg(feature = "sql")]
 use sql_datamodel_connector::*;
 use std::{borrow::Cow, collections::HashMap};
 
@@ -135,11 +137,17 @@ impl DatasourceLoader {
         let referential_integrity = get_referential_integrity(&args, preview_features, ast_source, diagnostics);
 
         let active_connector: &'static dyn datamodel_connector::Connector = match provider {
+            #[cfg(feature = "sql")]
             p if MYSQL.is_provider(p) => MYSQL,
+            #[cfg(feature = "sql")]
             p if POSTGRES.is_provider(p) => POSTGRES,
+            #[cfg(feature = "sql")]
             p if SQLITE.is_provider(p) => SQLITE,
+            #[cfg(feature = "sql")]
             p if MSSQL.is_provider(p) => MSSQL,
+            #[cfg(feature = "mongodb")]
             p if MONGODB.is_provider(p) => MONGODB,
+            #[cfg(feature = "sql")]
             p if COCKROACH.is_provider(p) => COCKROACH,
 
             _ => {

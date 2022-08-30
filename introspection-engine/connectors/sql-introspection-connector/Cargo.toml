@@ -10,7 +10,7 @@ vendored-openssl = ["quaint/vendored-openssl"]
 [dependencies]
 anyhow = "1.0.26"
 async-trait = "0.1.17"
-datamodel = { path = "../../../libs/datamodel/core" }
+datamodel = { path = "../../../libs/datamodel/core", features = ["sql"] }
 native-types = { path = "../../../libs/native-types" }
 introspection-connector = { path = "../introspection-connector" }
 once_cell = "1.3"

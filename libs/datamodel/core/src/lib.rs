@@ -30,7 +30,9 @@ use parser_database::{ast, ParserDatabase, SourceFile};
 use std::sync::Arc;
 
 pub mod builtin_connectors {
+    #[cfg(feature = "mongodb")]
     pub use mongodb_datamodel_connector::*;
+    #[cfg(feature = "sql")]
     pub use sql_datamodel_connector::*;
 }
 

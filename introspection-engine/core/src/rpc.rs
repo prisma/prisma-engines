@@ -5,6 +5,7 @@ use introspection_connector::{
 };
 use jsonrpc_core::BoxFuture;
 use jsonrpc_derive::rpc;
+#[cfg(feature = "mongodb")]
 use mongodb_introspection_connector::MongoDbIntrospectionConnector;
 use psl::{dml::Datamodel, Configuration};
 use serde_derive::*;
@@ -83,6 +84,12 @@ impl RpcImpl {
             .map_err(|diagnostics| Error::DatamodelError(diagnostics.to_pretty_string("schema.prisma", schema)))?;
 
         let connector: Box<dyn IntrospectionConnector> = if connection_string.starts_with("mongo") {
+            #[cfg(not(feature = "mongodb"))]
+            return Err(Error::Generic(
+                "MongoDB supported is not enabled on the Prisma engines.".into(),
+            ))?;
+
+            #[cfg(feature = "mongodb")]
             Box::new(MongoDbIntrospectionConnector::new(&connection_string).await?)
         } else {
             Box::new(SqlIntrospectionConnector::new(&connection_string, preview_features).await?)

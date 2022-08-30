@@ -3,6 +3,11 @@ name = "psl"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+default = []
+mongodb = ["psl-core/mongodb"]
+sql = ["psl-core/sql"]
+
 [dependencies]
 psl-core = { path = "../../libs/datamodel/core", package = "datamodel", default-features = false }
 

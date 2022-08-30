@@ -3,11 +3,13 @@ use crate::CoreError;
 use connection_string::JdbcString;
 use connector::Connector;
 use datamodel::{builtin_connectors::*, common::preview_features::PreviewFeature, Datasource};
-use mongodb_client::MongoConnectionString;
 use sql_connector::*;
 use std::collections::HashMap;
 use std::str::FromStr;
 use url::Url;
+
+#[cfg(feature = "mongodb")]
+use mongodb_client::MongoConnectionString;
 
 #[cfg(feature = "mongodb")]
 use mongodb_connector::MongoDb;

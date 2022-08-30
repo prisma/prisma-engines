@@ -1,6 +1,6 @@
 use mongodb_schema_describer::{IndexField, IndexFieldProperty, MongoSchema};
 use psl::{
-    builtin_connectors::MONGODB,
+    builtin_connectors,
     datamodel_connector::walker_ext_traits::*,
     parser_database::{IndexType, SortOrder},
     ValidatedSchema,
@@ -14,7 +14,7 @@ pub(crate) fn calculate(datamodel: &ValidatedSchema) -> MongoSchema {
         let collection_id = schema.push_collection(model.database_name().to_owned());
 
         for index in model.indexes() {
-            let name = index.constraint_name(MONGODB);
+            let name = index.constraint_name(builtin_connectors::MONGODB);
 
             let fields = index
                 .scalar_field_attributes()

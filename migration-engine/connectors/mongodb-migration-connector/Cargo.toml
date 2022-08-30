@@ -4,7 +4,7 @@ name = "mongodb-migration-connector"
 version = "0.1.0"
 
 [dependencies]
-psl = { path = "../../../psl/psl" }
+psl = { path = "../../../psl/psl", features = ["mongodb"] }
 mongodb-client = { path = "../../../libs/mongodb-client" }
 mongodb-schema-describer = { path = "../../../libs/mongodb-schema-describer" }
 migration-connector = { path = "../migration-connector" }

@@ -4,15 +4,18 @@ version = "0.1.0"
 edition = "2021"
 
 [features]
+default = ["mongodb", "sql"]
 vendored-openssl = ["sql-introspection-connector/vendored-openssl"]
+mongodb = ["mongodb-introspection-connector"]
+sql = ["sql-introspection-connector"]
 
 # Please keep the pyramid form
 [dependencies]
 psl = { path = "../../psl/psl" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 introspection-connector = { path = "../connectors/introspection-connector" }
-sql-introspection-connector = { path = "../connectors/sql-introspection-connector" }
-mongodb-introspection-connector = { path = "../connectors/mongodb-introspection-connector" }
+sql-introspection-connector = { path = "../connectors/sql-introspection-connector", optional = true }
+mongodb-introspection-connector = { path = "../connectors/mongodb-introspection-connector", optional = true }
 
 serde = "1.0"
 serde_json = { version = "1.0", features = ["float_roundtrip"] }
