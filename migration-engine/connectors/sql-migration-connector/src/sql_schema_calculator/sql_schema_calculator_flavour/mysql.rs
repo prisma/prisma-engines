@@ -1,6 +1,6 @@
 use super::{super::Context, SqlSchemaCalculatorFlavour};
 use crate::flavour::MysqlFlavour;
-use datamodel::parser_database::walkers::*;
+use psl::parser_database::walkers::*;
 use sql_schema_describer as sql;
 
 impl SqlSchemaCalculatorFlavour for MysqlFlavour {

@@ -1,6 +1,6 @@
 use super::SqlSchemaCalculatorFlavour;
 use crate::flavour::SqliteFlavour;
-use datamodel::{datamodel_connector::ScalarType, parser_database::walkers::*};
+use psl::{datamodel_connector::ScalarType, parser_database::walkers::*};
 
 impl SqlSchemaCalculatorFlavour for SqliteFlavour {
     // Integer primary keys on SQLite are automatically assigned the rowid, which means they are automatically autoincrementing.

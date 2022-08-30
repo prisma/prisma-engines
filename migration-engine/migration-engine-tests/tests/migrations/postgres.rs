@@ -1,6 +1,6 @@
-use datamodel::parser_database::SourceFile;
 use migration_core::migration_connector::DiffTarget;
 use migration_engine_tests::test_api::*;
+use psl::parser_database::SourceFile;
 use quaint::Value;
 use sql_schema_describer::ColumnTypeFamily;
 use std::fmt::Write;

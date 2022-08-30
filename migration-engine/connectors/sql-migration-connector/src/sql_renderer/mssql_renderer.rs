@@ -6,9 +6,9 @@ use crate::{
     pair::Pair,
     sql_migration::{AlterEnum, AlterTable, RedefineTable},
 };
-use datamodel::dml::PrismaValue;
 use indoc::{formatdoc, indoc};
 use native_types::{MsSqlType, MsSqlTypeParameter};
+use psl::dml::PrismaValue;
 use sql_schema_describer::{self as sql, mssql::MssqlSchemaExt};
 use std::{borrow::Cow, fmt::Write};
 

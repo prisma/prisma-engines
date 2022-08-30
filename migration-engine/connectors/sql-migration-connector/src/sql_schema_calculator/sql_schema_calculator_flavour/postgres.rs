@@ -1,11 +1,11 @@
 use super::{super::Context, SqlSchemaCalculatorFlavour};
 use crate::flavour::{PostgresFlavour, SqlFlavour};
-use datamodel::{
+use either::Either;
+use psl::{
     builtin_connectors::cockroach_datamodel_connector::SequenceFunction,
     datamodel_connector::walker_ext_traits::IndexWalkerExt,
     parser_database::{walkers::*, IndexAlgorithm, OperatorClass},
 };
-use either::Either;
 use sql_schema_describer::{self as sql, postgres::PostgresSchemaExt};
 
 impl SqlSchemaCalculatorFlavour for PostgresFlavour {

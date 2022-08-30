@@ -5,9 +5,9 @@ use crate::{
     sql_migration::{AlterColumn, AlterEnum, AlterTable, RedefineTable, TableChange},
     sql_schema_differ::ColumnChanges,
 };
-use datamodel::dml::PrismaValue;
 use native_types::MySqlType;
 use once_cell::sync::Lazy;
+use psl::dml::PrismaValue;
 use regex::Regex;
 use sql_ddl::{mysql as ddl, IndexColumn, SortOrder};
 use sql_schema_describer::{

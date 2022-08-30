@@ -3,13 +3,13 @@ mod shadow_db;
 
 use self::connection::*;
 use crate::{error::SystemDatabase, flavour::SqlFlavour};
-use datamodel::{parser_database::ScalarType, ValidatedSchema};
 use enumflags2::BitFlags;
 use indoc::indoc;
 use migration_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult,
 };
 use once_cell::sync::Lazy;
+use psl::{datamodel_connector, parser_database::ScalarType, ValidatedSchema};
 use quaint::connector::MysqlUrl;
 use regex::{Regex, RegexSet};
 use sql_schema_describer::SqlSchema;
@@ -87,8 +87,8 @@ impl SqlFlavour for MysqlFlavour {
         "mysql"
     }
 
-    fn datamodel_connector(&self) -> &'static dyn datamodel::datamodel_connector::Connector {
-        datamodel::builtin_connectors::MYSQL
+    fn datamodel_connector(&self) -> &'static dyn datamodel_connector::Connector {
+        psl::builtin_connectors::MYSQL
     }
 
     fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {

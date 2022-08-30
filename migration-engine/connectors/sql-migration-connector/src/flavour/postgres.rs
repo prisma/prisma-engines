@@ -118,11 +118,11 @@ impl SqlFlavour for PostgresFlavour {
         }
     }
 
-    fn datamodel_connector(&self) -> &'static dyn datamodel::datamodel_connector::Connector {
+    fn datamodel_connector(&self) -> &'static dyn psl::datamodel_connector::Connector {
         if self.is_cockroachdb() {
-            datamodel::builtin_connectors::COCKROACH
+            psl::builtin_connectors::COCKROACH
         } else {
-            datamodel::builtin_connectors::POSTGRES
+            psl::builtin_connectors::POSTGRES
         }
     }
 

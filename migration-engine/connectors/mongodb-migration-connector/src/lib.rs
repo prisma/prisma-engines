@@ -12,11 +12,11 @@ mod migration_step_applier;
 mod schema_calculator;
 
 use client_wrapper::Client;
-use datamodel::common::preview_features::PreviewFeature;
 use enumflags2::BitFlags;
 use migration::MongoDbMigration;
 use migration_connector::{migrations_directory::MigrationDirectory, *};
 use mongodb_schema_describer::MongoSchema;
+use psl::common::preview_features::PreviewFeature;
 use std::{future, sync::Arc};
 use tokio::sync::OnceCell;
 
@@ -53,7 +53,7 @@ impl MongoDbMigrationConnector {
         match target {
             DiffTarget::Datamodel(schema) => {
                 let validated_schema =
-                    datamodel::parse_schema_parserdb(schema).map_err(ConnectorError::new_schema_parser_error)?;
+                    psl::parse_schema_parserdb(schema).map_err(ConnectorError::new_schema_parser_error)?;
                 Ok(schema_calculator::calculate(&validated_schema))
             }
             DiffTarget::Database => self.client().await?.describe().await,

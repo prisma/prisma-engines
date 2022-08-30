@@ -19,8 +19,8 @@ pub use diff::DiffTarget;
 pub use error::{ConnectorError, ConnectorResult};
 pub use migration_persistence::{MigrationPersistence, MigrationRecord, PersistenceNotInitializedError, Timestamp};
 
-use datamodel::ValidatedSchema;
 use migrations_directory::MigrationDirectory;
+use psl::ValidatedSchema;
 use std::sync::Arc;
 
 /// Alias for a pinned, boxed future, used by the traits.

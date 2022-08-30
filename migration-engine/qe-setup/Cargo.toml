@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-datamodel = { path = "../../libs/datamodel/core" }
+psl = { path = "../../psl/psl" }
 mongodb-client = { path = "../../libs/mongodb-client" }
 migration-core = { path = "../core" }
 
