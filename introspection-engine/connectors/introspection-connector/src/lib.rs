@@ -52,7 +52,7 @@ pub struct IntrospectionResult {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Warning {
-    pub code: i16,
+    pub code: u32,
     pub message: String,
     pub affected: Value,
 }

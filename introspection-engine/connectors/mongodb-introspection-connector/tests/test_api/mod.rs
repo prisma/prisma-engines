@@ -37,7 +37,7 @@ impl TestResult {
     }
 
     #[track_caller]
-    pub fn assert_warning_code(&self, code: i16) {
+    pub fn assert_warning_code(&self, code: u32) {
         assert!(self.warnings.iter().any(|w| w.code == code), "{:#?}", self.warnings)
     }
 

@@ -6,6 +6,7 @@ use datamodel_connector::{Connector, ConnectorCapabilities, ReferentialIntegrity
 use std::{borrow::Cow, path::Path};
 
 /// a `datasource` from the prisma schema.
+#[derive(Clone)]
 pub struct Datasource {
     pub name: String,
     /// The provider string

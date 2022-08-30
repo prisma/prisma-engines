@@ -159,6 +159,28 @@ impl MigrationConnector for MongoDbMigrationConnector {
         Box::pin(future::ready(Ok(())))
     }
 
+    fn introspect<'a>(
+        &'a mut self,
+        schema: &'a psl::ValidatedSchema,
+        ctx: IntrospectionContext,
+    ) -> BoxFuture<'a, ConnectorResult<IntrospectionResult>> {
+        Box::pin(async move {
+            let previous_datamodel = psl::lift(schema);
+            let url: String = ctx.source.load_url(|v| std::env::var(v).ok()).map_err(|err| {
+                migration_connector::ConnectorError::new_schema_parser_error(
+                    err.to_pretty_string("schema.prisma", schema.db.source()),
+                )
+            })?;
+            let connector = mongodb_introspection_connector::MongoDbIntrospectionConnector::new(&url)
+                .await
+                .map_err(|err| ConnectorError::from_source(err, "Introspection error"))?;
+            connector
+                .introspect(&previous_datamodel, ctx)
+                .await
+                .map_err(|err| ConnectorError::from_source(err, "Introspection error"))
+        })
+    }
+
     fn render_script(
         &self,
         _migration: &Migration,

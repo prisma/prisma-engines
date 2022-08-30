@@ -9,6 +9,7 @@ migration-connector = { path = "../migration-connector" }
 native-types = { path = "../../../libs/native-types" }
 sql-schema-describer = { path = "../../../libs/sql-schema-describer" }
 sql-ddl = { path = "../../../libs/sql-ddl" }
+sql-introspection-connector = { path = "../../../introspection-engine/connectors/sql-introspection-connector" }
 user-facing-errors = { path = "../../../libs/user-facing-errors", features = ["sql"] }
 
 chrono = { version = "0.4" }

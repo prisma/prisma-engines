@@ -1,0 +1,37 @@
+[methods.introspect]
+description = "Introspect the database (db pull)"
+requestShape = "introspectParams"
+responseShape = "introspectResult"
+
+[recordShapes.introspectParams]
+description = "Params type for the introspect method."
+
+[recordShapes.introspectParams.fields.schema]
+shape = "string"
+
+[recordShapes.introspectParams.fields.force]
+shape = "bool"
+
+[recordShapes.introspectParams.fields.compositeTypeDepth]
+shape = "u32"
+
+[recordShapes.introspectResult]
+description = "Result type for the introspect method."
+
+[recordShapes.introspectResult.fields.datamodel]
+shape = "string"
+
+[recordShapes.introspectResult.fields.warnings]
+shape = "introspectionWarning"
+isList = true
+
+[recordShapes.introspectResult.fields.version]
+shape = "string"
+
+[recordShapes.introspectionWarning]
+
+[recordShapes.introspectionWarning.fields.code]
+shape = "u32"
+
+[recordShapes.introspectionWarning.fields.message]
+shape = "string"

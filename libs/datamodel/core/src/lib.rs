@@ -53,6 +53,7 @@ pub fn parse_schema(schema_str: &str) -> Result<(Configuration, dml::Datamodel),
 pub struct ValidatedSchema {
     pub configuration: Configuration,
     pub db: parser_database::ParserDatabase,
+    pub connector: &'static dyn datamodel_connector::Connector,
     referential_integrity: datamodel_connector::ReferentialIntegrity,
 }
 
@@ -86,6 +87,7 @@ pub fn parse_schema_parserdb(file: impl Into<SourceFile>) -> Result<ValidatedSch
             generators,
             datasources,
         },
+        connector: out.connector,
         db: out.db,
         referential_integrity: out.referential_integrity,
     })
@@ -196,6 +198,11 @@ pub fn render_datamodel_and_config_to_string(
     render::render_configuration(config, &mut out);
     render::render_datamodel(render::RenderParams { datasource, datamodel }, &mut out);
     reformat(&out, DEFAULT_INDENT_WIDTH).expect("Internal error: failed to reformat introspected schema")
+}
+
+/// Validated schema -> dml::Datamodel.
+pub fn lift(schema: &ValidatedSchema) -> dml::Datamodel {
+    lift::LiftAstToDml::new(&schema.db, schema.connector, schema.referential_integrity()).lift()
 }
 
 fn preview_features(generators: &[Generator]) -> BitFlags<PreviewFeature> {
