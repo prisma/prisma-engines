@@ -76,6 +76,9 @@
 <span id="70">70</span>
 <span id="71">71</span>
 <span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The external facing programmatic API to the migration engine.</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">commands</span>, <span class="ident">json_rpc::types</span>::<span class="kw-2">*</span>, <span class="ident">CoreResult</span>};
@@ -126,6 +129,9 @@
 
     <span class="doccomment">/// Evaluate the consequences of running the next migration we would generate, given the current state of a Prisma schema.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">evaluate_data_loss</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="ident">EvaluateDataLossInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">EvaluateDataLossOutput</span><span class="op">&gt;</span>;
+
+    <span class="doccomment">/// Introspect the database schema.</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">introspect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="ident">IntrospectParams</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">IntrospectResult</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// List the migration directories.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">list_migration_directories</span>(

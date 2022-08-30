@@ -177,6 +177,7 @@
 <span id="171">171</span>
 <span id="172">172</span>
 <span id="173">173</span>
+<span id="174">174</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">configuration::StringFromEnvVar</span>,
     <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>, <span class="ident">Span</span>},
@@ -185,6 +186,7 @@
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">path::Path</span>};
 
 <span class="doccomment">/// a `datasource` from the prisma schema.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Datasource</span> {
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="doccomment">/// The provider string</span>

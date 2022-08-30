@@ -202,6 +202,14 @@
 <span id="196">196</span>
 <span id="197">197</span>
 <span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>, <span class="ident">missing_docs</span>)]</span>
 
 <span class="doccomment">//! This crate defines the API exposed by the connectors to the migration engine core. The entry point for this API is the [MigrationConnector](trait.MigrationConnector.html) trait.</span>
@@ -221,6 +229,7 @@
 };
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">diff::DiffTarget</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ConnectorResult</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">introspection_connector</span>::{<span class="ident">IntrospectionConnector</span>, <span class="ident">IntrospectionContext</span>, <span class="ident">IntrospectionResult</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">migration_persistence</span>::{<span class="ident">MigrationPersistence</span>, <span class="ident">MigrationRecord</span>, <span class="ident">PersistenceNotInitializedError</span>, <span class="ident">Timestamp</span>};
 
 <span class="kw">use</span> <span class="ident">migrations_directory::MigrationDirectory</span>;
@@ -393,6 +402,13 @@
         <span class="ident">target</span>: <span class="ident">DiffTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
         <span class="ident">shadow_database_connection_string</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">DatabaseSchema</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+
+    <span class="doccomment">/// In-tro-spec-shon.</span>
+    <span class="kw">fn</span> <span class="ident">introspect</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ValidatedSchema</span>,
+        <span class="ident">ctx</span>: <span class="ident">introspection_connector::IntrospectionContext</span>,
+    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">introspection_connector::IntrospectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// If possible, check that the passed in migrations apply cleanly.</span>
     <span class="kw">fn</span> <span class="ident">validate_migrations</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
