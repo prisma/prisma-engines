@@ -584,12 +584,12 @@ pub enum DefaultKind {
     /// A unique row ID,
     UniqueRowid,
     /// An unrecognized Default Value
-    DbGenerated(String),
+    DbGenerated(Option<String>),
 }
 
 impl DefaultValue {
     pub fn db_generated(val: impl Into<String>) -> Self {
-        Self::new(DefaultKind::DbGenerated(val.into()))
+        Self::new(DefaultKind::DbGenerated(Some(val.into())))
     }
 
     pub fn now() -> Self {

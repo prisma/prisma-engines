@@ -293,6 +293,10 @@ fn schemas_with_dbgenerated_work(api: TestApi) {
     "#;
 
     api.schema_push_w_datasource(dm1).send().assert_green();
+    api.schema_push_w_datasource(dm1)
+        .send()
+        .assert_green()
+        .assert_no_steps();
 }
 
 #[test_connector(tags(Mysql8, Mariadb), exclude(Vitess))]

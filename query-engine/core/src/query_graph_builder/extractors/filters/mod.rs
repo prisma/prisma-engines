@@ -15,8 +15,7 @@ use connector::{
 use filter_fold::*;
 use filter_grouping::*;
 use prisma_models::{
-    prelude::ParentContainer, CompositeFieldRef, CompositeIndexField, Field, IndexField, ModelRef, PrismaValue,
-    RelationFieldRef, ScalarFieldRef,
+    prelude::ParentContainer, CompositeFieldRef, Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef,
 };
 use schema_builder::constants::filters;
 use std::{collections::HashMap, convert::TryInto, str::FromStr};
@@ -39,7 +38,7 @@ pub fn extract_unique_filter(value_map: ParsedInputMap, model: &ModelRef) -> Que
                             field_name, model.name
                         ))
                     })
-                    .and_then(|fields| extract_compound_field(&fields, value)),
+                    .and_then(|fields| handle_compound_field(fields, value)),
             }
         })
         .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?;
@@ -47,51 +46,18 @@ pub fn extract_unique_filter(value_map: ParsedInputMap, model: &ModelRef) -> Que
     Ok(Filter::and(filters))
 }
 
-fn extract_compound_field(index_fields: &[IndexField], value: ParsedInputValue) -> QueryGraphBuilderResult<Filter> {
+fn handle_compound_field(fields: Vec<ScalarFieldRef>, value: ParsedInputValue) -> QueryGraphBuilderResult<Filter> {
     let mut input_map: ParsedInputMap = value.try_into()?;
-    let mut filters = Vec::with_capacity(index_fields.len());
 
-    for index_field in index_fields {
-        match index_field {
-            IndexField::Scalar(sf) => {
-                let pv: PrismaValue = input_map.remove(&sf.name).unwrap().try_into()?;
-
-                filters.push(sf.equals(pv));
-            }
-            IndexField::Composite(cif) => {
-                filters.push(extract_composite_compound(cif, &mut input_map)?);
-            }
-        }
-    }
+    let filters: Vec<Filter> = fields
+        .into_iter()
+        .map(|sf| {
+            let pv: PrismaValue = input_map.remove(&sf.name).unwrap().try_into()?;
+            Ok(sf.equals(pv))
+        })
+        .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
 
     Ok(Filter::And(filters))
-}
-
-fn extract_composite_compound(
-    cif: &CompositeIndexField,
-    input_map: &mut ParsedInputMap,
-) -> QueryGraphBuilderResult<Filter> {
-    let mut inner_map: ParsedInputMap = input_map.remove(&cif.field().name).unwrap().try_into()?;
-    let mut filters: Vec<Filter> = vec![];
-
-    for index_field in cif.nested() {
-        match index_field {
-            IndexField::Scalar(sf) => {
-                let pv: PrismaValue = inner_map.remove(&sf.name).unwrap().try_into()?;
-
-                filters.push(sf.equals(pv));
-            }
-            IndexField::Composite(nested_cif) => {
-                filters.push(extract_composite_compound(nested_cif, &mut inner_map)?);
-            }
-        }
-    }
-
-    if cif.field().is_list() {
-        Ok(cif.field().some(Filter::And(filters))) // When field is in a list
-    } else {
-        Ok(cif.field().is(Filter::And(filters))) // Just a simple value
-    }
 }
 
 /// Extracts a regular filter potentially matching many records.
@@ -233,8 +199,9 @@ fn fold_search_filters(filters: &Vec<Filter>) -> Vec<Filter> {
         match filter {
             Filter::Scalar(ref sf) => match sf.condition {
                 ScalarCondition::Search(ref pv, _) => {
+                    let pv = pv.as_value().unwrap();
                     // If there's already an entry, then store the "additional" projections that will need to be merged
-                    if let Some(projections) = projections_by_val.get_mut(&pv) {
+                    if let Some(projections) = projections_by_val.get_mut(pv) {
                         projections.push(sf.projection.clone());
                     } else {
                         // Otherwise, store the first search filter found on which we'll merge the additional projections
@@ -291,7 +258,8 @@ fn extract_scalar_filters(field: &ScalarFieldRef, value: ParsedInputValue) -> Qu
                 Some(i) => parse_query_mode(i)?,
                 None => QueryMode::Default,
             };
-            let mut filters: Vec<Filter> = scalar::parse(filter_map, field, false)?;
+
+            let mut filters: Vec<Filter> = scalar::ScalarFilterParser::new(field, false).parse(filter_map)?;
 
             filters.iter_mut().for_each(|f| f.set_mode(mode.clone()));
             Ok(filters)
@@ -310,19 +278,16 @@ fn extract_relation_filters(field: &RelationFieldRef, value: ParsedInputValue) -
         // Implicit is null filter (`where: { <field>: null }`)
         ParsedInputValue::Single(PrismaValue::Null) => Ok(vec![field.one_relation_is_null()]),
 
-        // Either implicit `is`, or complex filter.
+        // Complex relation filter
+        ParsedInputValue::Map(filter_map) if filter_map.is_relation_envelope() => filter_map
+            .clone()
+            .into_iter()
+            .map(|(k, v)| relation::parse(&k, field, v))
+            .collect::<QueryGraphBuilderResult<Vec<_>>>(),
+
+        // Implicit is
         ParsedInputValue::Map(filter_map) => {
-            // Two options: An intermediate object with `is`, `every`, etc., or directly the object to filter with implicit `is`.
-            // There are corner cases where it is unclear what object should be used, due to overlap of fields of the related model and the filter object.
-            // The parse heuristic is to first try to parse the map as the full filter object and if that fails, parse it as implicit `is` filter instead.
-            filter_map
-                .clone()
-                .into_iter()
-                .map(|(k, v)| relation::parse(&k, field, v))
-                .collect::<QueryGraphBuilderResult<Vec<_>>>()
-                .or_else(|_| {
-                    extract_filter(filter_map, &field.related_model()).map(|filter| vec![field.to_one_related(filter)])
-                })
+            extract_filter(filter_map, &field.related_model()).map(|filter| vec![field.to_one_related(filter)])
         }
 
         x => Err(QueryGraphBuilderError::InputError(format!(

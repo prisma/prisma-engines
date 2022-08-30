@@ -40,12 +40,11 @@ impl ModelBuilder {
         let pk = self.primary_key.map(|pk| pk.build(&all_fields));
         let fields = Fields::new(all_fields, Arc::downgrade(&model), pk);
 
-        let indexes = self.indexes.into_iter().map(|i| i.build(&fields.all)).collect();
+        let indexes = self.indexes.into_iter().map(|i| i.build(&fields.scalar())).collect();
 
         // The model is created here and fields WILL BE UNSET before now!
         model.fields.set(fields).unwrap();
         model.indexes.set(indexes).unwrap();
-
         model
     }
 }

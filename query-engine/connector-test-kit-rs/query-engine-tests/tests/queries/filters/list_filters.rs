@@ -9,20 +9,82 @@ mod lists {
     async fn equality(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
 
-        list_query(&runner, "string", "equals", r#"["a", "A", "c"]"#, vec![1]).await?;
-        list_query(&runner, "int", "equals", r#"[1, 2, 3]"#, vec![1]).await?;
-        list_query(&runner, "float", "equals", r#"[1.1, 2.2, 3.3]"#, vec![1]).await?;
-        list_query(&runner, "bInt", "equals", r#"["100", "200", "300"]"#, vec![1]).await?;
-        list_query(&runner, "bool", "equals", r#"[true]"#, vec![1]).await?;
-        list_query(&runner, "bytes", "equals", r#"["dGVzdA==", "dA=="]"#, vec![1]).await?;
-        list_query(
-            &runner,
-            "dt",
-            "equals",
-            r#"["1969-01-01T10:33:59.000Z", "2018-12-05T12:34:23.000Z"]"#,
-            vec![1],
-        )
-        .await?;
+        // string equals
+        insta::assert_snapshot!(
+          list_query(&runner, "string", "equals", r#"["a", "A", "c"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        // string NOT equals
+        insta::assert_snapshot!(
+          not_list_query(&runner, "string", "equals", r#"["a", "A", "c"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
+        // int equals
+        insta::assert_snapshot!(
+          list_query(&runner, "int", "equals", r#"[1, 2, 3]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        // int NOT equals
+        insta::assert_snapshot!(
+          not_list_query(&runner, "int", "equals", r#"[1, 2, 3]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
+        // float equals
+        insta::assert_snapshot!(
+          list_query(&runner, "float", "equals", r#"[1.1, 2.2, 3.3]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        // float NOT equals
+        insta::assert_snapshot!(
+          not_list_query(&runner, "float", "equals", r#"[1.1, 2.2, 3.3]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
+        // bInt equals
+        insta::assert_snapshot!(
+          list_query(&runner, "bInt", "equals", r#"["100", "200", "300"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        // bInt NOT equals
+        insta::assert_snapshot!(
+          not_list_query(&runner, "bInt", "equals", r#"["100", "200", "300"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
+        // bool equals
+        insta::assert_snapshot!(
+          list_query(&runner, "bool", "equals", r#"[true]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        // bool NOT equals
+        insta::assert_snapshot!(
+          not_list_query(&runner, "bool", "equals", r#"[true]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
+        // bytes equals
+        insta::assert_snapshot!(
+          list_query(&runner, "bytes", "equals", r#"["dGVzdA==", "dA=="]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        // bytes NOT equals
+        insta::assert_snapshot!(
+          not_list_query(&runner, "bytes", "equals", r#"["dGVzdA==", "dA=="]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
+        // datetime equals
+        insta::assert_snapshot!(
+          list_query(&runner, "dt", "equals", r#"["1969-01-01T10:33:59.000Z", "2018-12-05T12:34:23.000Z"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        // datetime NOT equals
+        insta::assert_snapshot!(
+          not_list_query(&runner, "dt", "equals", r#"["1969-01-01T10:33:59.000Z", "2018-12-05T12:34:23.000Z"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
 
         Ok(())
     }
@@ -31,13 +93,82 @@ mod lists {
     async fn has(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
 
-        list_query(&runner, "string", "has", r#""A""#, vec![1]).await?;
-        list_query(&runner, "int", "has", "2", vec![1]).await?;
-        list_query(&runner, "float", "has", "1.1", vec![1]).await?;
-        list_query(&runner, "bInt", "has", r#""200""#, vec![1]).await?;
-        list_query(&runner, "dt", "has", r#""2018-12-05T12:34:23.000Z""#, vec![1]).await?;
-        list_query(&runner, "bool", "has", "true", vec![1]).await?;
-        list_query(&runner, "bytes", "has", r#""dGVzdA==""#, vec![1]).await?;
+        // has string
+        insta::assert_snapshot!(
+          list_query(&runner, "string", "has", r#""A""#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        // has NOT string
+        insta::assert_snapshot!(
+          not_list_query(&runner, "string", "has", r#""A""#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
+        // has int
+        insta::assert_snapshot!(
+          list_query(&runner, "int", "has", "2").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        // has NOT int
+        insta::assert_snapshot!(
+          not_list_query(&runner, "int", "has", "2").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
+        // has float
+        insta::assert_snapshot!(
+          list_query(&runner, "float", "has", "1.1").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        // has NOT float
+        insta::assert_snapshot!(
+          not_list_query(&runner, "float", "has", "1.1").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
+        // has bInt
+        insta::assert_snapshot!(
+          list_query(&runner, "bInt", "has", r#""200""#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        // has NOT bInt
+        insta::assert_snapshot!(
+          not_list_query(&runner, "bInt", "has", r#""200""#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
+        // has datetime
+        insta::assert_snapshot!(
+          list_query(&runner, "dt", "has", r#""2018-12-05T12:34:23.000Z""#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        // has NOT datetime
+        insta::assert_snapshot!(
+          not_list_query(&runner, "dt", "has", r#""2018-12-05T12:34:23.000Z""#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
+        // has boolean
+        insta::assert_snapshot!(
+        list_query(&runner, "bool", "has", "true").await?,
+         @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        // has NOT boolean
+        insta::assert_snapshot!(
+        not_list_query(&runner, "bool", "has", "true").await?,
+         @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
+        // has bytes
+        insta::assert_snapshot!(
+            list_query(&runner, "bytes", "has", r#""dGVzdA==""#).await?,
+            @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        // has NOT bytes
+        insta::assert_snapshot!(
+            not_list_query(&runner, "bytes", "has", r#""dGVzdA==""#).await?,
+            @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
 
         Ok(())
     }
@@ -46,30 +177,149 @@ mod lists {
     async fn has_some(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
 
-        list_query(&runner, "string", "hasSome", r#"["A", "c"]"#, vec![1]).await?;
-        list_query(&runner, "int", "hasSome", r#"[2, 10]"#, vec![1]).await?;
-        list_query(&runner, "float", "hasSome", r#"[1.1, 5.5]"#, vec![1]).await?;
-        list_query(&runner, "bInt", "hasSome", r#"["200", "5000"]"#, vec![1]).await?;
-        list_query(&runner, "bool", "hasSome", r#"[true, false]"#, vec![1]).await?;
-        list_query(&runner, "string", "hasSome", r#"[]"#, vec![]).await?;
+        // string hasSome
+        insta::assert_snapshot!(
+          list_query(&runner, "string", "hasSome", r#"["A", "c"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        insta::assert_snapshot!(
+          list_query(&runner, "string", "hasSome", r#"[]"#).await?,
+          @r###"{"data":{"findManyTestModel":[]}}"###
+        );
 
-        list_query(
-            &runner,
-            "dt",
-            "hasSome",
-            r#"["2018-12-05T12:34:23.000Z", "2019-12-05T12:34:23.000Z"]"#,
-            vec![1],
-        )
-        .await?;
+        // string NOT hasSome
+        insta::assert_snapshot!(
+          not_list_query(&runner, "string", "hasSome", r#"["A", "c"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+        insta::assert_snapshot!(
+          not_list_query(&runner, "string", "hasSome", r#"[]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
 
-        list_query(
-            &runner,
-            "bytes",
-            "hasSome",
-            r#"["dGVzdA==", "bG9va2luZyBmb3Igc29tZXRoaW5nPw=="]"#,
-            vec![1],
-        )
-        .await?;
+        // int hasSome
+        insta::assert_snapshot!(
+          list_query(&runner, "int", "hasSome", r#"[2, 10]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        insta::assert_snapshot!(
+          list_query(&runner, "int", "hasSome", r#"[]"#).await?,
+          @r###"{"data":{"findManyTestModel":[]}}"###
+        );
+
+        // int NOT hasSome
+        insta::assert_snapshot!(
+          not_list_query(&runner, "int", "hasSome", r#"[2, 10]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+        insta::assert_snapshot!(
+          not_list_query(&runner, "int", "hasSome", r#"[]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
+
+        // float hasSome
+        insta::assert_snapshot!(
+          list_query(&runner, "float", "hasSome", r#"[1.1, 5.5]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        insta::assert_snapshot!(
+          list_query(&runner, "float", "hasSome", r#"[]"#).await?,
+          @r###"{"data":{"findManyTestModel":[]}}"###
+        );
+
+        // float NOT hasSome
+        insta::assert_snapshot!(
+          not_list_query(&runner, "float", "hasSome", r#"[1.1, 5.5]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+        insta::assert_snapshot!(
+          not_list_query(&runner, "float", "hasSome", r#"[]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
+
+        // bInt hasSome
+        insta::assert_snapshot!(
+          list_query(&runner, "bInt", "hasSome", r#"["200", "5000"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        insta::assert_snapshot!(
+          list_query(&runner, "bInt", "hasSome", r#"[]"#).await?,
+          @r###"{"data":{"findManyTestModel":[]}}"###
+        );
+
+        // bInt NOT hasSome
+        insta::assert_snapshot!(
+          not_list_query(&runner, "bInt", "hasSome", r#"["200", "5000"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+        insta::assert_snapshot!(
+          not_list_query(&runner, "bInt", "hasSome", r#"[]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
+
+        // bool hasSome
+        insta::assert_snapshot!(
+          list_query(&runner, "bool", "hasSome", r#"[true, false]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        insta::assert_snapshot!(
+          list_query(&runner, "bool", "hasSome", r#"[]"#).await?,
+          @r###"{"data":{"findManyTestModel":[]}}"###
+        );
+
+        // bool NOT hasSome
+        insta::assert_snapshot!(
+          not_list_query(&runner, "bool", "hasSome", r#"[true, false]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+        insta::assert_snapshot!(
+          not_list_query(&runner, "bool", "hasSome", r#"[]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
+
+        // dt hasSome
+        insta::assert_snapshot!(
+          list_query(
+              &runner,
+              "dt",
+              "hasSome",
+              r#"["2018-12-05T12:34:23.000Z", "2019-12-05T12:34:23.000Z"]"#,
+          )
+          .await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        insta::assert_snapshot!(
+          list_query(
+              &runner,
+              "bytes",
+              "hasSome",
+              r#"["dGVzdA==", "bG9va2luZyBmb3Igc29tZXRoaW5nPw=="]"#,
+          )
+          .await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        // dt NOT hasSome
+        insta::assert_snapshot!(
+          not_list_query(
+              &runner,
+              "dt",
+              "hasSome",
+              r#"["2018-12-05T12:34:23.000Z", "2019-12-05T12:34:23.000Z"]"#,
+          )
+          .await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+        insta::assert_snapshot!(
+          not_list_query(
+              &runner,
+              "bytes",
+              "hasSome",
+              r#"["dGVzdA==", "bG9va2luZyBmb3Igc29tZXRoaW5nPw=="]"#,
+          )
+          .await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
 
         Ok(())
     }
@@ -78,40 +328,169 @@ mod lists {
     async fn has_every(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
 
-        list_query(&runner, "string", "hasEvery", r#"["A", "d"]"#, vec![]).await?;
-        list_query(&runner, "string", "hasEvery", r#"["A"]"#, vec![1]).await?;
+        // string hasEvery
+        insta::assert_snapshot!(
+          list_query(&runner, "string", "hasEvery", r#"["A", "d"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[]}}"###
+        );
+        insta::assert_snapshot!(
+          list_query(&runner, "string", "hasEvery", r#"["A"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
 
-        list_query(&runner, "int", "hasEvery", r#"[2, 10]"#, vec![]).await?;
-        list_query(&runner, "int", "hasEvery", r#"[2]"#, vec![1]).await?;
+        // string NOT hasEvery
+        insta::assert_snapshot!(
+          not_list_query(&runner, "string", "hasEvery", r#"["A", "d"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
+        insta::assert_snapshot!(
+          not_list_query(&runner, "string", "hasEvery", r#"["A"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
 
-        list_query(&runner, "float", "hasEvery", r#"[1.1, 5.5]"#, vec![]).await?;
-        list_query(&runner, "float", "hasEvery", r#"[1.1]"#, vec![1]).await?;
+        // int hasEvery
+        insta::assert_snapshot!(
+          list_query(&runner, "int", "hasEvery", r#"[2, 10]"#).await?,
+          @r###"{"data":{"findManyTestModel":[]}}"###
+        );
+        insta::assert_snapshot!(
+          list_query(&runner, "int", "hasEvery", r#"[2]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
 
-        list_query(&runner, "bInt", "hasEvery", r#"["200", "5000"]"#, vec![]).await?;
-        list_query(&runner, "bInt", "hasEvery", r#"["200"]"#, vec![1]).await?;
+        // int NOT hasEvery
+        insta::assert_snapshot!(
+          not_list_query(&runner, "int", "hasEvery", r#"[2, 10]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
+        insta::assert_snapshot!(
+          not_list_query(&runner, "int", "hasEvery", r#"[2]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
 
-        list_query(&runner, "dt", "hasEvery", r#"["2018-12-05T12:34:23.000Z"]"#, vec![1]).await?;
-        list_query(
+        // float hasEvery
+        insta::assert_snapshot!(
+          list_query(&runner, "float", "hasEvery", r#"[1.1, 5.5]"#).await?,
+          @r###"{"data":{"findManyTestModel":[]}}"###
+        );
+        insta::assert_snapshot!(
+          list_query(&runner, "float", "hasEvery", r#"[1.1]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        // float NOT hasEvery
+        insta::assert_snapshot!(
+          not_list_query(&runner, "float", "hasEvery", r#"[1.1, 5.5]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
+        insta::assert_snapshot!(
+          not_list_query(&runner, "float", "hasEvery", r#"[1.1]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
+        // bInt hasEvery
+        insta::assert_snapshot!(
+          list_query(&runner, "bInt", "hasEvery", r#"["200", "5000"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[]}}"###
+        );
+        insta::assert_snapshot!(
+          list_query(&runner, "bInt", "hasEvery", r#"["200"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        // bInt NOT hasEvery
+        insta::assert_snapshot!(
+          not_list_query(&runner, "bInt", "hasEvery", r#"["200", "5000"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
+        insta::assert_snapshot!(
+          not_list_query(&runner, "bInt", "hasEvery", r#"["200"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
+        // dt hasEvery
+        insta::assert_snapshot!(
+          list_query(&runner, "dt", "hasEvery", r#"["2018-12-05T12:34:23.000Z"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        insta::assert_snapshot!(
+          list_query(
             &runner,
             "dt",
             "hasEvery",
             r#"["2018-12-05T12:34:23.000Z", "2019-12-05T12:34:23.000Z"]"#,
-            vec![],
-        )
-        .await?;
+          )
+          .await?,
+          @r###"{"data":{"findManyTestModel":[]}}"###
+        );
 
-        list_query(&runner, "bool", "hasEvery", r#"[true, false]"#, vec![]).await?;
-        list_query(&runner, "bool", "hasEvery", r#"[true]"#, vec![1]).await?;
+        // dt NOT hasEvery
+        insta::assert_snapshot!(
+          not_list_query(&runner, "dt", "hasEvery", r#"["2018-12-05T12:34:23.000Z"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+        insta::assert_snapshot!(
+          not_list_query(
+            &runner,
+            "dt",
+            "hasEvery",
+            r#"["2018-12-05T12:34:23.000Z", "2019-12-05T12:34:23.000Z"]"#,
+          )
+          .await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
 
-        list_query(&runner, "bytes", "hasEvery", r#"["dGVzdA=="]"#, vec![1]).await?;
-        list_query(
+        // bool hasEvery
+        insta::assert_snapshot!(
+          list_query(&runner, "bool", "hasEvery", r#"[true, false]"#).await?,
+          @r###"{"data":{"findManyTestModel":[]}}"###
+        );
+        insta::assert_snapshot!(
+          list_query(&runner, "bool", "hasEvery", r#"[true]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        // bool NOT hasEvery
+        insta::assert_snapshot!(
+          not_list_query(&runner, "bool", "hasEvery", r#"[true, false]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
+        insta::assert_snapshot!(
+          not_list_query(&runner, "bool", "hasEvery", r#"[true]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
+        // bytes hasEvery
+        insta::assert_snapshot!(
+          list_query(&runner, "bytes", "hasEvery", r#"["dGVzdA=="]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        insta::assert_snapshot!(
+          list_query(
             &runner,
             "bytes",
             "hasEvery",
             r#"["dGVzdA==", "bG9va2luZyBmb3Igc29tZXRoaW5nPw=="]"#,
-            vec![],
-        )
-        .await?;
+          )
+          .await?,
+          @r###"{"data":{"findManyTestModel":[]}}"###
+        );
+
+        // bytes NOT hasEvery
+        insta::assert_snapshot!(
+          not_list_query(&runner, "bytes", "hasEvery", r#"["dGVzdA=="]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+        insta::assert_snapshot!(
+          not_list_query(
+            &runner,
+            "bytes",
+            "hasEvery",
+            r#"["dGVzdA==", "bG9va2luZyBmb3Igc29tZXRoaW5nPw=="]"#,
+          )
+          .await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
 
         Ok(())
     }
@@ -120,21 +499,125 @@ mod lists {
     async fn is_empty(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
 
-        list_query(&runner, "string", "isEmpty", "true", vec![2]).await?;
-        list_query(&runner, "int", "isEmpty", "true", vec![2]).await?;
-        list_query(&runner, "float", "isEmpty", "true", vec![2]).await?;
-        list_query(&runner, "bInt", "isEmpty", "true", vec![2]).await?;
-        list_query(&runner, "dt", "isEmpty", "true", vec![2]).await?;
-        list_query(&runner, "bool", "isEmpty", "true", vec![2]).await?;
+        // string isEmpty
+        insta::assert_snapshot!(
+          list_query(&runner, "string", "isEmpty", "true").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+        insta::assert_snapshot!(
+          list_query(&runner, "string", "isEmpty", "false").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
 
-        list_query(&runner, "string", "isEmpty", "false", vec![1]).await?;
-        list_query(&runner, "int", "isEmpty", "false", vec![1]).await?;
-        list_query(&runner, "float", "isEmpty", "false", vec![1]).await?;
-        list_query(&runner, "bInt", "isEmpty", "false", vec![1]).await?;
-        list_query(&runner, "dt", "isEmpty", "false", vec![1]).await?;
-        list_query(&runner, "bool", "isEmpty", "false", vec![1]).await?;
+        // string NOT isEmpty
+        insta::assert_snapshot!(
+          not_list_query(&runner, "string", "isEmpty", "true").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        insta::assert_snapshot!(
+          not_list_query(&runner, "string", "isEmpty", "false").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
 
-        list_query(&runner, "string", "hasSome", "[]", vec![]).await?;
+        // int isEmpty
+        insta::assert_snapshot!(
+          list_query(&runner, "int", "isEmpty", "true").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+        insta::assert_snapshot!(
+          list_query(&runner, "int", "isEmpty", "false").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        // int NOT isEmpty
+        insta::assert_snapshot!(
+          not_list_query(&runner, "int", "isEmpty", "true").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        insta::assert_snapshot!(
+          not_list_query(&runner, "int", "isEmpty", "false").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
+        // float isEmpty
+        insta::assert_snapshot!(
+          list_query(&runner, "float", "isEmpty", "true").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+        insta::assert_snapshot!(
+          list_query(&runner, "float", "isEmpty", "false").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        // float NOT isEmpty
+        insta::assert_snapshot!(
+          not_list_query(&runner, "float", "isEmpty", "true").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        insta::assert_snapshot!(
+          not_list_query(&runner, "float", "isEmpty", "false").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
+        // bInt isEmpty
+        insta::assert_snapshot!(
+          list_query(&runner, "bInt", "isEmpty", "true").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+        insta::assert_snapshot!(
+          list_query(&runner, "bInt", "isEmpty", "false").await?,
+        @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        // bInt isEmpty
+        insta::assert_snapshot!(
+          not_list_query(&runner, "bInt", "isEmpty", "true").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        insta::assert_snapshot!(
+          not_list_query(&runner, "bInt", "isEmpty", "false").await?,
+        @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
+        // dt isEmpty
+        insta::assert_snapshot!(
+          list_query(&runner, "dt", "isEmpty", "true").await?,
+        @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+        insta::assert_snapshot!(
+          list_query(&runner, "dt", "isEmpty", "false").await?,
+        @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        // dt NOT isEmpty
+        insta::assert_snapshot!(
+          not_list_query(&runner, "dt", "isEmpty", "true").await?,
+        @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        insta::assert_snapshot!(
+          not_list_query(&runner, "dt", "isEmpty", "false").await?,
+        @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
+        // bool isEmpty
+        insta::assert_snapshot!(
+          list_query(&runner, "bool", "isEmpty", "true").await?,
+        @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+        insta::assert_snapshot!(
+          list_query(&runner, "bool", "isEmpty", "false").await?,
+        @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        // bool NOT isEmpty
+        insta::assert_snapshot!(
+          not_list_query(&runner, "bool", "isEmpty", "true").await?,
+        @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        insta::assert_snapshot!(
+          not_list_query(&runner, "bool", "isEmpty", "false").await?,
+        @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
 
         Ok(())
     }
@@ -143,8 +626,26 @@ mod lists {
     #[connector_test(exclude(CockroachDB))]
     async fn is_empty_bytes(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
-        list_query(&runner, "bytes", "isEmpty", "true", vec![2]).await?;
-        list_query(&runner, "bytes", "isEmpty", "false", vec![1]).await?;
+
+        // isEmpty bytes
+        insta::assert_snapshot!(
+          list_query(&runner, "bytes", "isEmpty", "true").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+        insta::assert_snapshot!(
+          list_query(&runner, "bytes", "isEmpty", "false").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        // NOT isEmpty bytes
+        insta::assert_snapshot!(
+          not_list_query(&runner, "bytes", "isEmpty", "true").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        insta::assert_snapshot!(
+          not_list_query(&runner, "bytes", "isEmpty", "false").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
 
         Ok(())
     }
@@ -156,6 +657,11 @@ mod lists {
         insta::assert_snapshot!(
           run_query!(&runner, r#"query { findManyTestModel(where: { string: { hasEvery: [] }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { string: { hasEvery: [] } }}) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[]}}"###
         );
 
         Ok(())
@@ -221,21 +727,57 @@ mod decimal_lists {
     #[connector_test]
     async fn equality(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
-        list_query(&runner, "decimal", "equals", r#"["11.11", "22.22", "33.33"]"#, vec![1]).await?;
+
+        // equals decimal
+        insta::assert_snapshot!(
+          list_query(&runner, "decimal", "equals", r#"["11.11", "22.22", "33.33"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        // NOT equals decimal
+        insta::assert_snapshot!(
+          not_list_query(&runner, "decimal", "equals", r#"["11.11", "22.22", "33.33"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
         Ok(())
     }
 
     #[connector_test]
     async fn has(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
-        list_query(&runner, "decimal", "has", "33.33", vec![1]).await?;
+
+        // has
+        insta::assert_snapshot!(
+          list_query(&runner, "decimal", "has", "33.33").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        // NOT has
+        insta::assert_snapshot!(
+          not_list_query(&runner, "decimal", "has", "33.33").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
         Ok(())
     }
 
     #[connector_test]
     async fn has_some(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
-        list_query(&runner, "decimal", "hasSome", r#"[55.55, 33.33]"#, vec![1]).await?;
+
+        // hasSome decimal
+        insta::assert_snapshot!(
+          list_query(&runner, "decimal", "hasSome", r#"[55.55, 33.33]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        // NOT hasSome decimal
+        insta::assert_snapshot!(
+          not_list_query(&runner, "decimal", "hasSome", r#"[55.55, 33.33]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
         Ok(())
     }
 
@@ -243,8 +785,25 @@ mod decimal_lists {
     async fn has_every(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
 
-        list_query(&runner, "decimal", "hasEvery", r#"[55.55, 33.33]"#, vec![]).await?;
-        list_query(&runner, "decimal", "hasEvery", r#"[33.33]"#, vec![1]).await?;
+        // hasEvery decimal
+        insta::assert_snapshot!(
+          list_query(&runner, "decimal", "hasEvery", r#"[55.55, 33.33]"#).await?,
+          @r###"{"data":{"findManyTestModel":[]}}"###
+        );
+        insta::assert_snapshot!(
+          list_query(&runner, "decimal", "hasEvery", r#"[33.33]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        // NOT hasEvery decimal
+        insta::assert_snapshot!(
+          not_list_query(&runner, "decimal", "hasEvery", r#"[55.55, 33.33]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
+        insta::assert_snapshot!(
+          not_list_query(&runner, "decimal", "hasEvery", r#"[33.33]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
 
         Ok(())
     }
@@ -253,8 +812,25 @@ mod decimal_lists {
     async fn is_empty(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
 
-        list_query(&runner, "decimal", "isEmpty", "true", vec![2]).await?;
-        list_query(&runner, "decimal", "isEmpty", "false", vec![1]).await?;
+        // isEmpty decimal
+        insta::assert_snapshot!(
+          list_query(&runner, "decimal", "isEmpty", "true").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+        insta::assert_snapshot!(
+          list_query(&runner, "decimal", "isEmpty", "false").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        // NOT isEmpty decimal
+        insta::assert_snapshot!(
+          not_list_query(&runner, "decimal", "isEmpty", "true").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        insta::assert_snapshot!(
+          not_list_query(&runner, "decimal", "isEmpty", "false").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
 
         Ok(())
     }
@@ -263,9 +839,16 @@ mod decimal_lists {
     async fn has_every_empty(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
 
+        // hasEvery decimal
         insta::assert_snapshot!(
           run_query!(&runner, r#"query { findManyTestModel(where: { decimal: { hasEvery: [] }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
+
+        // NOT hasEvery decimal
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { decimal: { hasEvery: [] }}}) { id }}"#),
+          @r###"{"data":{"findManyTestModel":[]}}"###
         );
 
         Ok(())
@@ -321,16 +904,25 @@ mod json_lists {
     async fn equality(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
 
-        list_query(
-            &runner,
-            "json",
-            "equals",
-            r#"["{}", "{\"int\":5}", "[1, 2, 3]"]"#,
-            vec![1],
-        )
-        .await?;
+        // equals json
+        insta::assert_snapshot!(
+          list_query(&runner, "json", "equals", r#"["{}", "{\"int\":5}", "[1, 2, 3]"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        insta::assert_snapshot!(
+          list_query(&runner, "json", "equals", r#"["null", "\"test\""]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":3}]}}"###
+        );
 
-        list_query(&runner, "json", "equals", r#"["null", "\"test\""]"#, vec![3]).await?;
+        // NOT equals json
+        insta::assert_snapshot!(
+          not_list_query(&runner, "json", "equals", r#"["{}", "{\"int\":5}", "[1, 2, 3]"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2},{"id":3}]}}"###
+        );
+        insta::assert_snapshot!(
+          not_list_query(&runner, "json", "equals", r#"["null", "\"test\""]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
 
         Ok(())
     }
@@ -339,8 +931,25 @@ mod json_lists {
     async fn has(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
 
-        list_query(&runner, "json", "has", r#""[1, 2, 3]""#, vec![1]).await?;
-        list_query(&runner, "json", "has", r#""null""#, vec![3]).await?;
+        // has json
+        insta::assert_snapshot!(
+          list_query(&runner, "json", "has", r#""[1, 2, 3]""#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        insta::assert_snapshot!(
+          list_query(&runner, "json", "has", r#""null""#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":3}]}}"###
+        );
+
+        // NOT has json
+        insta::assert_snapshot!(
+          not_list_query(&runner, "json", "has", r#""[1, 2, 3]""#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2},{"id":3}]}}"###
+        );
+        insta::assert_snapshot!(
+          not_list_query(&runner, "json", "has", r#""null""#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
 
         Ok(())
     }
@@ -349,8 +958,25 @@ mod json_lists {
     async fn has_some(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
 
-        list_query(&runner, "json", "hasSome", r#"["{}", "[1]"]"#, vec![1]).await?;
-        list_query(&runner, "json", "hasSome", r#"["null", "\"test 2\""]"#, vec![3]).await?;
+        // hasSome json
+        insta::assert_snapshot!(
+          list_query(&runner, "json", "hasSome", r#"["{}", "[1]"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        insta::assert_snapshot!(
+          list_query(&runner, "json", "hasSome", r#"["null", "\"test 2\""]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":3}]}}"###
+        );
+
+        // NOT hasSome json
+        insta::assert_snapshot!(
+          not_list_query(&runner, "json", "hasSome", r#"["{}", "[1]"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2},{"id":3}]}}"###
+        );
+        insta::assert_snapshot!(
+          not_list_query(&runner, "json", "hasSome", r#"["null", "\"test 2\""]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
 
         Ok(())
     }
@@ -359,9 +985,33 @@ mod json_lists {
     async fn has_every(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
 
-        list_query(&runner, "json", "hasEvery", r#"["{}", "[1]"]"#, vec![]).await?;
-        list_query(&runner, "json", "hasEvery", r#"["{}"]"#, vec![1]).await?;
-        list_query(&runner, "json", "hasEvery", r#"["null"]"#, vec![3]).await?;
+        // hasEvery json
+        insta::assert_snapshot!(
+          list_query(&runner, "json", "hasEvery", r#"["{}", "[1]"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[]}}"###
+        );
+        insta::assert_snapshot!(
+          list_query(&runner, "json", "hasEvery", r#"["{}"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        insta::assert_snapshot!(
+          list_query(&runner, "json", "hasEvery", r#"["null"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":3}]}}"###
+        );
+
+        // NOT hasEvery json
+        insta::assert_snapshot!(
+          not_list_query(&runner, "json", "hasEvery", r#"["{}", "[1]"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3}]}}"###
+        );
+        insta::assert_snapshot!(
+          not_list_query(&runner, "json", "hasEvery", r#"["{}"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2},{"id":3}]}}"###
+        );
+        insta::assert_snapshot!(
+          not_list_query(&runner, "json", "hasEvery", r#"["null"]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+        );
 
         Ok(())
     }
@@ -370,8 +1020,25 @@ mod json_lists {
     async fn is_empty(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
 
-        list_query(&runner, "json", "isEmpty", "true", vec![2]).await?;
-        list_query(&runner, "json", "isEmpty", "false", vec![1, 3]).await?;
+        // isEmpty json
+        insta::assert_snapshot!(
+          list_query(&runner, "json", "isEmpty", "true").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+        insta::assert_snapshot!(
+          list_query(&runner, "json", "isEmpty", "false").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":3}]}}"###
+        );
+
+        // NOT isEmpty json
+        insta::assert_snapshot!(
+          not_list_query(&runner, "json", "isEmpty", "true").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":3}]}}"###
+        );
+        insta::assert_snapshot!(
+          not_list_query(&runner, "json", "isEmpty", "false").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
 
         Ok(())
     }
@@ -443,7 +1110,18 @@ mod enum_lists {
     #[connector_test(exclude(CockroachDB))]
     async fn equality(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
-        list_query(&runner, "enum", "equals", r#"[A, B, B, A]"#, vec![1]).await?;
+
+        // equals enum
+        insta::assert_snapshot!(
+          list_query(&runner, "enum", "equals", r#"[A, B, B, A]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        // NOT equals enum
+        insta::assert_snapshot!(
+          not_list_query(&runner, "enum", "equals", r#"[A, B, B, A]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
 
         Ok(())
     }
@@ -451,7 +1129,18 @@ mod enum_lists {
     #[connector_test]
     async fn has(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
-        list_query(&runner, "enum", "has", "A", vec![1]).await?;
+
+        // has enum
+        insta::assert_snapshot!(
+          list_query(&runner, "enum", "has", "A").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        // NOT has enum
+        insta::assert_snapshot!(
+          not_list_query(&runner, "enum", "has", "A").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
 
         Ok(())
     }
@@ -459,7 +1148,18 @@ mod enum_lists {
     #[connector_test]
     async fn has_some(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
-        list_query(&runner, "enum", "hasSome", r#"[A]"#, vec![1]).await?;
+
+        // hasSome enum
+        insta::assert_snapshot!(
+          list_query(&runner, "enum", "hasSome", r#"[A]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        // NOT hasSome enum
+        insta::assert_snapshot!(
+          not_list_query(&runner, "enum", "hasSome", r#"[A]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
 
         Ok(())
     }
@@ -467,7 +1167,18 @@ mod enum_lists {
     #[connector_test]
     async fn has_every(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
-        list_query(&runner, "enum", "hasEvery", r#"[A, B]"#, vec![1]).await?;
+
+        // hasEvery enum
+        insta::assert_snapshot!(
+          list_query(&runner, "enum", "hasEvery", r#"[A, B]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        // NOT hasEvery enum
+        insta::assert_snapshot!(
+          not_list_query(&runner, "enum", "hasEvery", r#"[A, B]"#).await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
 
         Ok(())
     }
@@ -477,8 +1188,25 @@ mod enum_lists {
     async fn is_empty(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
 
-        list_query(&runner, "enum", "isEmpty", "true", vec![2]).await?;
-        list_query(&runner, "enum", "isEmpty", "false", vec![1]).await?;
+        // isEmpty enum
+        insta::assert_snapshot!(
+          list_query(&runner, "enum", "isEmpty", "true").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+        insta::assert_snapshot!(
+          list_query(&runner, "enum", "isEmpty", "false").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        // NOT isEmpty enum
+        insta::assert_snapshot!(
+          not_list_query(&runner, "enum", "isEmpty", "true").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+        insta::assert_snapshot!(
+          not_list_query(&runner, "enum", "isEmpty", "false").await?,
+          @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
 
         Ok(())
     }
@@ -523,43 +1251,41 @@ mod enum_lists {
     }
 }
 
-async fn list_query(
-    runner: &Runner,
-    field: &str,
-    operation: &str,
-    comparator: &str,
-    expected_ids: Vec<i32>,
-) -> TestResult<()> {
-    let result = runner
-        .query(format!(
-            indoc::indoc! { r#"
-                query {{
-                  findManyTestModel(where: {{
-                    {}: {{ {}: {} }}
-                  }}) {{
-                    id
-                  }}
-                }}
-                "#},
+async fn list_query(runner: &Runner, field: &str, operation: &str, comparator: &str) -> TestResult<String> {
+    let res = run_query!(
+        runner,
+        format!(
+            r#"query {{
+              findManyTestModel(where: {{
+                {}: {{ {}: {} }}
+              }}) {{
+                id
+              }}
+            }}
+            "#,
             field, operation, comparator
-        ))
-        .await?;
-
-    result.assert_success();
-
-    if expected_ids.is_empty() {
-        assert_eq!(result.to_string(), r#"{"data":{"findManyTestModel":[]}}"#);
-    } else {
-        let stringified: Vec<_> = expected_ids
-            .into_iter()
-            .map(|id| format!(r#"{{"id":{}}}"#, id))
-            .collect();
-
-        assert_eq!(
-            result.to_string(),
-            format!(r#"{{"data":{{"findManyTestModel":[{}]}}}}"#, stringified.join(","))
         )
-    }
+    );
 
-    Ok(())
+    Ok(res)
+}
+
+async fn not_list_query(runner: &Runner, field: &str, operation: &str, comparator: &str) -> TestResult<String> {
+    let res = run_query!(
+        runner,
+        format!(
+            r#"
+            query {{
+                findManyTestModel(where: {{
+                NOT: {{ {}: {{ {}: {} }} }}
+                }}) {{
+                id
+                }}
+            }}
+            "#,
+            field, operation, comparator
+        )
+    );
+
+    Ok(res)
 }

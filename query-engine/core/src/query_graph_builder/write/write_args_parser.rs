@@ -4,7 +4,6 @@ use connector::{DatasourceFieldName, WriteArgs, WriteOperation};
 use prisma_models::{
     CompositeFieldRef, Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef, TypeIdentifier,
 };
-use schema::ObjectTag;
 use schema_builder::constants::{args, json_null, operations};
 use std::{convert::TryInto, sync::Arc};
 
@@ -51,10 +50,6 @@ impl WriteArgsParser {
             },
         )
     }
-}
-
-fn is_composite_envelope(map: &ParsedInputMap) -> bool {
-    matches!(map.tag, Some(ObjectTag::CompositeEnvelope))
 }
 
 fn parse_scalar(sf: &ScalarFieldRef, v: ParsedInputValue) -> Result<WriteOperation, QueryGraphBuilderError> {
@@ -121,7 +116,7 @@ fn parse_composite_writes(
         // - Operation envelope with further actions nested.
         // - Single object set shorthand.
         ParsedInputValue::Map(map) => {
-            if is_composite_envelope(&map) {
+            if map.is_composite_envelope() {
                 parse_composite_envelope(cf, map, path)
             } else {
                 let pv: PrismaValue = ParsedInputValue::Map(map).try_into()?;

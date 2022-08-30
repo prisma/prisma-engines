@@ -229,3 +229,25 @@ pub enum ScalarType {
     Xml,
     Bytes,
 }
+
+impl std::fmt::Display for ScalarType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let typ = match self {
+            ScalarType::Null => "Null",
+            ScalarType::String => "String",
+            ScalarType::Int => "Int",
+            ScalarType::BigInt => "BigInt",
+            ScalarType::Boolean => "Boolean",
+            ScalarType::Float => "Float",
+            ScalarType::Decimal => "Decimal",
+            ScalarType::DateTime => "DateTime",
+            ScalarType::Json => "Json",
+            ScalarType::UUID => "UUID",
+            ScalarType::JsonList => "Json",
+            ScalarType::Xml => "Xml",
+            ScalarType::Bytes => "Bytes",
+        };
+
+        write!(f, "{}", typ)
+    }
+}

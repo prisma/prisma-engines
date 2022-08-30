@@ -5,3 +5,9 @@ edition = "2021"
 
 [dependencies]
 psl-core = { path = "../../libs/datamodel/core", package = "datamodel" }
+
+[dev-dependencies]
+dissimilar = "1.0.4"
+expect-test = "1.1.0"
+indoc = "1"
+native-types = { path = "../../libs/native-types" }

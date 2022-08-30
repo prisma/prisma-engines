@@ -36,9 +36,18 @@ pub fn render_test_datamodel(
     template: String,
     excluded_features: &[&str],
     referential_integrity_override: Option<String>,
+    db_schemas: &[&str],
 ) -> String {
     let tag = config.test_connector_tag().unwrap();
     let preview_features = render_preview_features(excluded_features);
+
+    let is_multi_schema = !db_schemas.is_empty();
+
+    let schema_def = if is_multi_schema {
+        format!("schemas = {:?}", db_schemas)
+    } else {
+        String::default()
+    };
 
     let datasource_with_generator = format!(
         indoc! {r#"
@@ -46,6 +55,7 @@ pub fn render_test_datamodel(
                 provider = "{}"
                 url = "{}"
                 referentialIntegrity = "{}"
+                {}
             }}
 
             generator client {{
@@ -54,8 +64,9 @@ pub fn render_test_datamodel(
             }}
         "#},
         tag.datamodel_provider(),
-        tag.connection_string(test_database, config.is_ci()),
+        tag.connection_string(test_database, config.is_ci(), is_multi_schema),
         referential_integrity_override.unwrap_or_else(|| tag.referential_integrity().to_string()),
+        schema_def,
         preview_features
     );
 

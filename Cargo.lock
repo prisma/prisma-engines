@@ -686,18 +686,14 @@ dependencies = [
  "chrono",
  "datamodel-connector",
  "diagnostics",
- "dissimilar",
  "dml",
  "either",
  "enumflags2",
- "expect-test",
  "indoc",
  "itertools",
  "mongodb-datamodel-connector",
- "native-types",
  "once_cell",
  "parser-database",
- "pretty_assertions",
  "regex",
  "schema-ast",
  "serde",
@@ -3138,6 +3134,10 @@ name = "psl"
 version = "0.1.0"
 dependencies = [
  "datamodel",
+ "dissimilar",
+ "expect-test",
+ "indoc",
+ "native-types",
 ]
 
 [[package]]
@@ -3158,7 +3158,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#fb4fe90682b4fecb485fd0d6975dd15a3bc9616b"
+source = "git+https://github.com/prisma/quaint#5a48e93cefb0b6d914fb59f2c34baf64ca57b99b"
 dependencies = [
  "async-trait",
  "base64 0.12.3",

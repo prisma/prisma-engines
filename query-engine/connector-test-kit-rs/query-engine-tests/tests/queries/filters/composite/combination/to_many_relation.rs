@@ -62,7 +62,7 @@ mod to_many_rel {
                     id
                 }
             }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":4},{"id":5},{"id":6}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":6}]}}"###
         );
 
         // Explanation:

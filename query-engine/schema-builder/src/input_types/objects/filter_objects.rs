@@ -1,6 +1,7 @@
 use super::*;
+
 use constants::filters;
-use prisma_models::{prelude::ParentContainer, CompositeFieldRef, CompositeIndexField, IndexField};
+use prisma_models::{prelude::ParentContainer, CompositeFieldRef};
 use std::sync::Arc;
 
 pub(crate) fn scalar_filter_object_type(
@@ -12,7 +13,10 @@ pub(crate) fn scalar_filter_object_type(
     let ident = Identifier::new(format!("{}ScalarWhere{}Input", model.name, aggregate), PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
 
-    let input_object = Arc::new(init_input_object_type(ident.clone()));
+    let mut input_object = init_input_object_type(ident.clone());
+    input_object.set_tag(ObjectTag::WhereInputType(ParentContainer::Model(Arc::downgrade(model))));
+
+    let input_object = Arc::new(input_object);
     ctx.cache_input_type(ident, input_object.clone());
 
     let weak_ref = Arc::downgrade(&input_object);
@@ -52,7 +56,10 @@ where
     let ident = Identifier::new(format!("{}WhereInput", container.name()), PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
 
-    let input_object = Arc::new(init_input_object_type(ident.clone()));
+    let mut input_object = init_input_object_type(ident.clone());
+    input_object.set_tag(ObjectTag::WhereInputType(container.clone()));
+
+    let input_object = Arc::new(input_object);
     ctx.cache_input_type(ident, input_object.clone());
 
     let weak_ref = Arc::downgrade(&input_object);
@@ -112,6 +119,7 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
     let compound_unique_fields: Vec<InputField> = model
         .unique_indexes()
         .into_iter()
+        .filter(|index| index.fields.len() > 1)
         .map(|index| {
             let typ = compound_field_unique_object_type(ctx, model, index.name.as_ref(), index.fields());
             let name = compound_index_field_name(index);
@@ -123,8 +131,7 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
     // @@id compound field (there can be only one per model).
     let compound_id_field = model.fields().compound_id().map(|pk| {
         let name = compound_id_field_name(pk);
-        let typ =
-            compound_field_unique_object_type(ctx, model, pk.alias.as_ref(), &IndexField::from_scalars(pk.fields()));
+        let typ = compound_field_unique_object_type(ctx, model, pk.alias.as_ref(), pk.fields());
 
         input_field(name, InputType::object(typ), None).optional()
     });
@@ -142,13 +149,13 @@ fn compound_field_unique_object_type(
     ctx: &mut BuilderContext,
     model: &ModelRef,
     alias: Option<&String>,
-    index_fields: &[IndexField],
+    from_fields: Vec<ScalarFieldRef>,
 ) -> InputObjectTypeWeakRef {
     let ident = Identifier::new(
         format!(
             "{}{}CompoundUniqueInput",
             model.name,
-            compound_object_name(alias, index_fields)
+            compound_object_name(alias, &from_fields)
         ),
         PRISMA_NAMESPACE,
     );
@@ -158,60 +165,18 @@ fn compound_field_unique_object_type(
     let input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());
 
-    let fields = index_fields
-        .iter()
-        .map(|index_field| match index_field {
-            IndexField::Scalar(sf) => scalar_unique_input_field(ctx, sf),
-            IndexField::Composite(cif) => composite_unique_input_field(ctx, cif),
+    let object_fields = from_fields
+        .into_iter()
+        .map(|field| {
+            let name = field.name.clone();
+            let typ = map_scalar_input_type_for_field(ctx, &field);
+
+            input_field(name, typ, None)
         })
         .collect();
 
-    input_object.set_fields(fields);
+    input_object.set_fields(object_fields);
     Arc::downgrade(&input_object)
-}
-
-fn scalar_unique_input_field(ctx: &mut BuilderContext, field: &ScalarFieldRef) -> InputField {
-    // We build the entire path, return that field
-    let name = field.name.clone();
-    let typ = map_scalar_input_type_for_field(ctx, field);
-
-    input_field(name, typ, None)
-}
-
-fn composite_unique_input_field(ctx: &mut BuilderContext, cif: &CompositeIndexField) -> InputField {
-    // Build the composite _inside_ the field
-
-    // @@unique([location.address]) => LocationAddressCompoundUniqueInput { LocationAddressCompositeUniqueInput }
-    // @@unique([name, location.address]) => NameLocationAddressUniqueInput { String, LocationAddressCompositeUniqueInput }
-
-    let input_field_name = cif.field().name.clone();
-    let object_type = composite_field_unique_object_type(ctx, cif);
-
-    input_field(input_field_name, InputType::object(object_type), None)
-}
-
-fn composite_field_unique_object_type(ctx: &mut BuilderContext, cif: &CompositeIndexField) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new(
-        format!("{}CompositeUniqueInput", cif.path().iter().map(capitalize).join("")),
-        PRISMA_NAMESPACE,
-    );
-    return_cached_input!(ctx, &ident);
-
-    let obj = Arc::new(init_input_object_type(ident.clone()));
-    ctx.cache_input_type(ident, obj.clone());
-
-    let fields = cif
-        .nested()
-        .iter()
-        .map(|index_field| match index_field {
-            IndexField::Scalar(sf) => scalar_unique_input_field(ctx, sf),
-            IndexField::Composite(cif) => composite_unique_input_field(ctx, cif),
-        })
-        .collect_vec();
-
-    obj.set_fields(fields);
-
-    Arc::downgrade(&obj)
 }
 
 /// Object used for full composite equality, e.g. `{ field: "value", field2: 123 } == { field: "value" }`.

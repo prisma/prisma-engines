@@ -45,13 +45,8 @@ impl IntoUpdateOperation for ScalarWriteOperation {
                 field_path,
                 doc! { "$divide": [dollar_field_path, (field, rhs).into_bson()?] },
             )),
-            ScalarWriteOperation::Unset(should_unset) => {
-                if should_unset {
-                    Some(UpdateOperation::unset(field_path))
-                } else {
-                    None
-                }
-            }
+            ScalarWriteOperation::Unset(true) => Some(UpdateOperation::unset(field_path)),
+            ScalarWriteOperation::Unset(false) => None,
             ScalarWriteOperation::Field(_) => unimplemented!(),
         };
 
@@ -112,7 +107,9 @@ impl IntoUpdateOperation for CompositeWriteOperation {
             }
             CompositeWriteOperation::DeleteMany { filter } => {
                 let elem_alias = format!("{}_item", path.identifier());
-                let (filter_doc, _) = filter::convert_filter(filter, true, format!("${}", &elem_alias))?.render();
+                let (filter_doc, _) = filter::MongoFilterVisitor::new(format!("${}", &elem_alias), true)
+                    .visit(filter)?
+                    .render();
 
                 let filter = doc! {
                     "$filter": {
@@ -133,52 +130,42 @@ impl IntoUpdateOperation for CompositeWriteOperation {
 fn render_push_update_doc(rhs: PrismaValue, field: &Field, field_path: FieldPath) -> crate::Result<UpdateOperation> {
     let dollar_field_path = field_path.dollar_path(true);
 
-    let doc = match rhs {
+    let values = match rhs {
         PrismaValue::List(vals) => {
-            let vals = vals
-                .into_iter()
+            vals.into_iter()
                 .map(|val| (field, val).into_bson())
                 .collect::<crate::Result<Vec<_>>>()?
                 .into_iter()
                 .map(|bson| {
                     // Strip the list from the BSON values. [Todo] This is unfortunately necessary right now due to how the
                     // conversion is set up with native types, we should clean that up at some point (move from traits to fns?).
-                    match bson {
+                    let bson = match bson {
                         Bson::Array(mut inner) if field.is_composite() => inner.pop().unwrap(),
                         _ => bson,
-                    }
+                    };
+
+                    Bson::Document(doc! { "$literal": bson })
                 })
-                .collect();
-
-            let bson_array = Bson::Array(vals);
-
-            UpdateOperation::generic(
-                field_path,
-                doc! {
-                    "$ifNull": [
-                        { "$concatArrays": [dollar_field_path, bson_array.clone()] },
-                        bson_array
-                    ]
-                },
-            )
+                .collect()
         }
-        val => {
-            let bson_val = match (field, val).into_bson()? {
-                bson @ Bson::Array(_) => bson,
-                bson => Bson::Array(vec![bson]),
-            };
-
-            UpdateOperation::generic(
-                field_path,
-                doc! {
-                    "$ifNull": [
-                        { "$concatArrays": [dollar_field_path, bson_val.clone()] },
-                        bson_val
-                    ]
-                },
-            )
-        }
+        val => match (field, val).into_bson()? {
+            Bson::Array(inner) => inner
+                .into_iter()
+                .map(|val| Bson::Document(doc! { "$literal": val }))
+                .collect(),
+            bson => vec![Bson::Document(doc! { "$literal": bson })],
+        },
     };
 
-    Ok(doc)
+    let bson_array = Bson::Array(values);
+
+    Ok(UpdateOperation::generic(
+        field_path,
+        doc! {
+            "$ifNull": [
+                { "$concatArrays": [dollar_field_path, bson_array.clone()] },
+                bson_array
+            ]
+        },
+    ))
 }

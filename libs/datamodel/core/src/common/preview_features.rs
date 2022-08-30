@@ -66,6 +66,7 @@ features!(
     OrderByNulls,
     MultiSchema,
     FilteredRelationCount,
+    FieldReference
     DenoDeploy,
 );
 
@@ -80,6 +81,7 @@ pub const GENERATOR: FeatureMap = FeatureMap {
          | Metrics
          | OrderByNulls
          | FilteredRelationCount
+         | FieldReference
          | DenoDeploy
     }),
     deprecated: enumflags2::make_bitflags!(PreviewFeature::{

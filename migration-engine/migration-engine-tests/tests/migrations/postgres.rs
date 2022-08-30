@@ -724,3 +724,32 @@ fn bigint_defaults_work(api: TestApi) {
     api.schema_push(schema).send().assert_green();
     api.schema_push(schema).send().assert_green().assert_no_steps();
 }
+
+// https://github.com/prisma/prisma/issues/14799
+#[test_connector(tags(Postgres12), exclude(CockroachDb))]
+fn dbgenerated_on_generated_columns_is_idempotent(api: TestApi) {
+    let sql = r#"
+        CREATE TABLE "table" (
+         "id" TEXT NOT NULL,
+         "hereBeDragons" TEXT NOT NULL GENERATED ALWAYS AS ('this row ID is: '::text || "id") STORED,
+
+         CONSTRAINT "table_pkey" PRIMARY KEY ("id")
+        );
+    "#;
+
+    api.raw_cmd(sql);
+
+    let schema = r#"
+        datasource db {
+            provider = "postgresql"
+            url = env("TEST_DATABASE_URL")
+        }
+
+        model table {
+            id String @id
+            hereBeDragons String @default(dbgenerated())
+        }
+    "#;
+
+    api.schema_push(schema).send().assert_green().assert_no_steps();
+}

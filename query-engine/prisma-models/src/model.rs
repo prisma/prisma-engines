@@ -22,6 +22,22 @@ pub struct Model {
 }
 
 impl Model {
+    /// Returns the schema name for the model
+    /// which is the contents of the @@schema("...") attribute
+    pub fn schema_name(&self) -> Option<String> {
+        self.dml_model.schema.clone()
+    }
+
+    pub fn db_name_with_schema(&self) -> (String, String) {
+        let schema_prefix = self
+            .schema_name()
+            .unwrap_or_else(|| self.internal_data_model().db_name.clone());
+
+        let model_db_name = self.db_name().to_string();
+
+        (schema_prefix, model_db_name)
+    }
+
     pub(crate) fn finalize(&self) {
         self.fields.get().unwrap().finalize();
     }
@@ -70,6 +86,8 @@ impl Model {
             .collect()
     }
 
+    /// The name of the model in the database
+    /// For a sql database this will be the Table name for this model
     pub fn db_name(&self) -> &str {
         self.db_name_opt().unwrap_or_else(|| self.name.as_ref())
     }
@@ -89,6 +107,7 @@ impl Debug for Model {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Model")
             .field("name", &self.name)
+            .field("schema", &self.schema_name().unwrap_or_default())
             .field("manifestation", &self.manifestation)
             .field("fields", &self.fields)
             .field("indexes", &self.indexes)
