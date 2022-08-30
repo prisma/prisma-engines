@@ -530,13 +530,13 @@
 
 <span class="kw">use</span> <span class="ident"><span class="self">self</span>::connection</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::SystemDatabase</span>, <span class="ident">flavour::SqlFlavour</span>};
-<span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">parser_database::ScalarType</span>, <span class="ident">ValidatedSchema</span>};
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">indoc::indoc</span>;
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{
     <span class="ident">migrations_directory::MigrationDirectory</span>, <span class="ident">BoxFuture</span>, <span class="ident">ConnectorError</span>, <span class="ident">ConnectorParams</span>, <span class="ident">ConnectorResult</span>,
 };
 <span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
+<span class="kw">use</span> <span class="ident">psl</span>::{<span class="ident">datamodel_connector</span>, <span class="ident">parser_database::ScalarType</span>, <span class="ident">ValidatedSchema</span>};
 <span class="kw">use</span> <span class="ident">quaint::connector::MysqlUrl</span>;
 <span class="kw">use</span> <span class="ident">regex</span>::{<span class="ident">Regex</span>, <span class="ident">RegexSet</span>};
 <span class="kw">use</span> <span class="ident">sql_schema_describer::SqlSchema</span>;
@@ -614,8 +614,8 @@
         <span class="string">&quot;mysql&quot;</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">datamodel_connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">datamodel::datamodel_connector::Connector</span> {
-        <span class="ident">datamodel::builtin_connectors::MYSQL</span>
+    <span class="kw">fn</span> <span class="ident">datamodel_connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">datamodel_connector::Connector</span> {
+        <span class="ident">psl::builtin_connectors::MYSQL</span>
     }
 
     <span class="kw">fn</span> <span class="ident">describe_schema</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span><span class="op">&gt;</span> {

@@ -374,12 +374,12 @@
 <span id="368">368</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident"><span class="kw">super</span>::Context</span>, <span class="ident">SqlSchemaCalculatorFlavour</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::flavour</span>::{<span class="ident">PostgresFlavour</span>, <span class="ident">SqlFlavour</span>};
-<span class="kw">use</span> <span class="ident">datamodel</span>::{
+<span class="kw">use</span> <span class="ident">either::Either</span>;
+<span class="kw">use</span> <span class="ident">psl</span>::{
     <span class="ident">builtin_connectors::cockroach_datamodel_connector::SequenceFunction</span>,
     <span class="ident">datamodel_connector::walker_ext_traits::IndexWalkerExt</span>,
     <span class="ident">parser_database</span>::{<span class="ident">walkers</span>::<span class="kw-2">*</span>, <span class="ident">IndexAlgorithm</span>, <span class="ident">OperatorClass</span>},
 };
-<span class="kw">use</span> <span class="ident">either::Either</span>;
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">sql</span>, <span class="ident">postgres::PostgresSchemaExt</span>};
 
 <span class="kw">impl</span> <span class="ident">SqlSchemaCalculatorFlavour</span> <span class="kw">for</span> <span class="ident">PostgresFlavour</span> {

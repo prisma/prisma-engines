@@ -319,12 +319,12 @@
     <span class="ident">sql_destructive_change_checker::DestructiveChangeCheckerFlavour</span>, <span class="ident">sql_renderer::SqlRenderer</span>,
     <span class="ident">sql_schema_calculator::SqlSchemaCalculatorFlavour</span>, <span class="ident">sql_schema_differ::SqlSchemaDifferFlavour</span>,
 };
-<span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">common::preview_features::PreviewFeature</span>, <span class="ident">ValidatedSchema</span>};
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{
     <span class="ident">migrations_directory::MigrationDirectory</span>, <span class="ident">BoxFuture</span>, <span class="ident">ConnectorError</span>, <span class="ident">ConnectorParams</span>, <span class="ident">ConnectorResult</span>,
     <span class="ident">MigrationRecord</span>, <span class="ident">PersistenceNotInitializedError</span>,
 };
+<span class="kw">use</span> <span class="ident">psl</span>::{<span class="ident">common::preview_features::PreviewFeature</span>, <span class="ident">ValidatedSchema</span>};
 <span class="kw">use</span> <span class="ident">quaint::prelude</span>::{<span class="ident">ConnectionInfo</span>, <span class="ident">Table</span>};
 <span class="kw">use</span> <span class="ident">sql_schema_describer::SqlSchema</span>;
 <span class="kw">use</span> <span class="ident">std::fmt::Debug</span>;
@@ -440,7 +440,7 @@
     <span class="kw">fn</span> <span class="ident">create_migrations_table</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// The datamodel connector corresponding to the flavour</span>
-    <span class="kw">fn</span> <span class="ident">datamodel_connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">datamodel::datamodel_connector::Connector</span>;
+    <span class="kw">fn</span> <span class="ident">datamodel_connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">psl::datamodel_connector::Connector</span>;
 
     <span class="kw">fn</span> <span class="ident">describe_schema</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 

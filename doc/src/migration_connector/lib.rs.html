@@ -223,8 +223,8 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ConnectorResult</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">migration_persistence</span>::{<span class="ident">MigrationPersistence</span>, <span class="ident">MigrationRecord</span>, <span class="ident">PersistenceNotInitializedError</span>, <span class="ident">Timestamp</span>};
 
-<span class="kw">use</span> <span class="ident">datamodel::ValidatedSchema</span>;
 <span class="kw">use</span> <span class="ident">migrations_directory::MigrationDirectory</span>;
+<span class="kw">use</span> <span class="ident">psl::ValidatedSchema</span>;
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
 <span class="doccomment">/// Alias for a pinned, boxed future, used by the traits.</span>

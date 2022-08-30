@@ -221,8 +221,8 @@
 <span id="215">215</span>
 <span id="216">216</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">flavour::SqlFlavour</span>, <span class="ident">pair::Pair</span>};
-<span class="kw">use</span> <span class="ident">datamodel::dml::PrismaValue</span>;
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
+<span class="kw">use</span> <span class="ident">psl::dml::PrismaValue</span>;
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="ident">walkers::ColumnWalker</span>, <span class="ident">DefaultKind</span>};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">all_changes</span>(<span class="ident">cols</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">flavour</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">SqlFlavour</span>) -&gt; <span class="ident">ColumnChanges</span> {

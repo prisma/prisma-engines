@@ -609,14 +609,14 @@
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">field_type::FieldType</span>, <span class="ident">CompositeTypeDepth</span>};
 <span class="kw">use</span> <span class="ident">convert_case</span>::{<span class="ident">Case</span>, <span class="ident">Casing</span>};
-<span class="kw">use</span> <span class="ident">datamodel::dml</span>::{
-    <span class="self">self</span>, <span class="ident">CompositeType</span>, <span class="ident">CompositeTypeField</span>, <span class="ident">CompositeTypeFieldType</span>, <span class="ident">Datamodel</span>, <span class="ident">DefaultValue</span>, <span class="ident">Field</span>, <span class="ident">FieldArity</span>, <span class="ident">Model</span>,
-    <span class="ident">PrimaryKeyDefinition</span>, <span class="ident">PrimaryKeyField</span>, <span class="ident">ScalarField</span>, <span class="ident">ScalarType</span>, <span class="ident">ValueGenerator</span>, <span class="ident">WithDatabaseName</span>,
-};
 <span class="kw">use</span> <span class="ident">introspection_connector::Warning</span>;
 <span class="kw">use</span> <span class="ident">mongodb::bson</span>::{<span class="ident">Bson</span>, <span class="ident">Document</span>};
 <span class="kw">use</span> <span class="ident">mongodb_schema_describer::IndexWalker</span>;
 <span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
+<span class="kw">use</span> <span class="ident">psl::dml</span>::{
+    <span class="self">self</span>, <span class="ident">CompositeType</span>, <span class="ident">CompositeTypeField</span>, <span class="ident">CompositeTypeFieldType</span>, <span class="ident">Datamodel</span>, <span class="ident">DefaultValue</span>, <span class="ident">Field</span>, <span class="ident">FieldArity</span>, <span class="ident">Model</span>,
+    <span class="ident">PrimaryKeyDefinition</span>, <span class="ident">PrimaryKeyField</span>, <span class="ident">ScalarField</span>, <span class="ident">ScalarType</span>, <span class="ident">ValueGenerator</span>, <span class="ident">WithDatabaseName</span>,
+};
 <span class="kw">use</span> <span class="ident">regex::Regex</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">borrow::Cow</span>,

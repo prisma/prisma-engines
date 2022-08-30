@@ -859,9 +859,9 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">migration_assertions</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">quaint_result_set_ext</span>::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident">datamodel::datamodel_connector::Connector</span>;
 <span class="kw">use</span> <span class="ident">pretty_assertions::assert_eq</span>;
 <span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
+<span class="kw">use</span> <span class="ident">psl::datamodel_connector::Connector</span>;
 <span class="kw">use</span> <span class="ident">sql</span>::{
     <span class="ident">postgres::PostgresSchemaExt</span>,
     <span class="ident">walkers</span>::{<span class="ident">ColumnWalker</span>, <span class="ident">ForeignKeyWalker</span>, <span class="ident">IndexWalker</span>, <span class="ident">TableWalker</span>},

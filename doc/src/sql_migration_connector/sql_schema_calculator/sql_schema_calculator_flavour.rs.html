@@ -57,7 +57,7 @@
 <span class="kw">mod</span> <span class="ident">postgres</span>;
 <span class="kw">mod</span> <span class="ident">sqlite</span>;
 
-<span class="kw">use</span> <span class="ident">datamodel::parser_database</span>::{<span class="ident">ast::FieldArity</span>, <span class="ident">walkers</span>::<span class="kw-2">*</span>};
+<span class="kw">use</span> <span class="ident">psl::parser_database</span>::{<span class="ident">ast::FieldArity</span>, <span class="ident">walkers</span>::<span class="kw-2">*</span>};
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">sql</span>, <span class="ident">ColumnArity</span>, <span class="ident">ColumnType</span>, <span class="ident">ColumnTypeFamily</span>};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">SqlSchemaCalculatorFlavour</span> {

@@ -213,11 +213,11 @@
 <span class="kw">mod</span> <span class="ident">schema_calculator</span>;
 
 <span class="kw">use</span> <span class="ident">client_wrapper::Client</span>;
-<span class="kw">use</span> <span class="ident">datamodel::common::preview_features::PreviewFeature</span>;
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">migration::MongoDbMigration</span>;
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{<span class="ident">migrations_directory::MigrationDirectory</span>, <span class="kw-2">*</span>};
 <span class="kw">use</span> <span class="ident">mongodb_schema_describer::MongoSchema</span>;
+<span class="kw">use</span> <span class="ident">psl::common::preview_features::PreviewFeature</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">future</span>, <span class="ident">sync::Arc</span>};
 <span class="kw">use</span> <span class="ident">tokio::sync::OnceCell</span>;
 
@@ -254,7 +254,7 @@
         <span class="kw">match</span> <span class="ident">target</span> {
             <span class="ident">DiffTarget::Datamodel</span>(<span class="ident">schema</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">validated_schema</span> <span class="op">=</span>
-                    <span class="ident">datamodel::parse_schema_parserdb</span>(<span class="ident">schema</span>).<span class="ident">map_err</span>(<span class="ident">ConnectorError::new_schema_parser_error</span>)<span class="question-mark">?</span>;
+                    <span class="ident">psl::parse_schema_parserdb</span>(<span class="ident">schema</span>).<span class="ident">map_err</span>(<span class="ident">ConnectorError::new_schema_parser_error</span>)<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class="ident">schema_calculator::calculate</span>(<span class="kw-2">&amp;</span><span class="ident">validated_schema</span>))
             }
             <span class="ident">DiffTarget::Database</span> =&gt; <span class="self">self</span>.<span class="ident">client</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">describe</span>().<span class="kw">await</span>,

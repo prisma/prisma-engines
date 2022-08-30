@@ -145,7 +145,6 @@
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error</span>::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">common::preview_features::PreviewFeature</span>, <span class="ident">dml::Datamodel</span>};
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">futures::TryStreamExt</span>;
 <span class="kw">use</span> <span class="ident">indoc::formatdoc</span>;
@@ -155,6 +154,7 @@
 };
 <span class="kw">use</span> <span class="ident">mongodb</span>::{<span class="ident">Client</span>, <span class="ident">Database</span>};
 <span class="kw">use</span> <span class="ident">mongodb_schema_describer::MongoSchema</span>;
+<span class="kw">use</span> <span class="ident">psl</span>::{<span class="ident">common::preview_features::PreviewFeature</span>, <span class="ident">dml::Datamodel</span>};
 <span class="kw">use</span> <span class="ident">user_facing_errors</span>::{<span class="ident">common::InvalidConnectionString</span>, <span class="ident">KnownError</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>

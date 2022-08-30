@@ -272,9 +272,9 @@
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Name</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sampler::field_type::FieldType</span>;
 <span class="kw">use</span> <span class="ident">convert_case</span>::{<span class="ident">Case</span>, <span class="ident">Casing</span>};
-<span class="kw">use</span> <span class="ident">datamodel::dml</span>::{<span class="self">self</span>, <span class="ident">WithDatabaseName</span>, <span class="ident">WithName</span>};
 <span class="kw">use</span> <span class="ident">introspection_connector::Warning</span>;
 <span class="kw">use</span> <span class="ident">mongodb_schema_describer</span>::{<span class="ident">IndexFieldProperty</span>, <span class="ident">IndexWalker</span>};
+<span class="kw">use</span> <span class="ident">psl::dml</span>::{<span class="self">self</span>, <span class="ident">WithDatabaseName</span>, <span class="ident">WithName</span>};
 <span class="kw">use</span> <span class="ident">std::collections::BTreeMap</span>;
 
 <span class="doccomment">/// Add described indices to the models.</span>

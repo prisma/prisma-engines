@@ -600,8 +600,8 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">datamodel_connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">datamodel::datamodel_connector::Connector</span> {
-        <span class="ident">datamodel::builtin_connectors::MSSQL</span>
+    <span class="kw">fn</span> <span class="ident">datamodel_connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">psl::datamodel_connector::Connector</span> {
+        <span class="ident">psl::builtin_connectors::MSSQL</span>
     }
 
     <span class="kw">fn</span> <span class="ident">describe_schema</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span><span class="op">&gt;</span> {

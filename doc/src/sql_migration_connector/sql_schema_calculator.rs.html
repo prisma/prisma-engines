@@ -607,7 +607,7 @@
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">use</span> <span class="ident">sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">flavour::SqlFlavour</span>, <span class="ident">SqlDatabaseSchema</span>};
-<span class="kw">use</span> <span class="ident">datamodel</span>::{
+<span class="kw">use</span> <span class="ident">psl</span>::{
     <span class="ident">datamodel_connector</span>::{<span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ScalarType</span>},
     <span class="ident">dml</span>::{<span class="ident">prisma_value</span>, <span class="ident">PrismaValue</span>},
     <span class="ident">parser_database</span>::{
@@ -634,7 +634,7 @@
     <span class="kw">if</span> <span class="ident">datamodel</span>
         .<span class="ident">configuration</span>
         .<span class="ident">preview_features</span>()
-        .<span class="ident">contains</span>(<span class="ident">datamodel::common::preview_features::PreviewFeature::MultiSchema</span>)
+        .<span class="ident">contains</span>(<span class="ident">psl::common::preview_features::PreviewFeature::MultiSchema</span>)
     {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ds</span>) <span class="op">=</span> <span class="ident">context</span>.<span class="ident">datamodel</span>.<span class="ident">configuration</span>.<span class="ident">datasources</span>.<span class="ident">get</span>(<span class="number">0</span>) {
             <span class="kw">for</span> (<span class="ident">schema</span>, <span class="kw">_</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">ds</span>.<span class="ident">schemas</span> {

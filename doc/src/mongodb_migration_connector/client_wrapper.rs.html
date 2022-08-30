@@ -71,12 +71,12 @@
 <span id="65">65</span>
 <span id="66">66</span>
 <span id="67">67</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel::common::preview_features::PreviewFeature</span>;
-<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ConnectorResult</span>};
 <span class="kw">use</span> <span class="ident">mongodb</span>::{<span class="ident">error::Error</span> <span class="kw">as</span> <span class="ident">MongoError</span>, <span class="ident">options::WriteConcern</span>};
 <span class="kw">use</span> <span class="ident">mongodb_client::MongoConnectionString</span>;
 <span class="kw">use</span> <span class="ident">mongodb_schema_describer::MongoSchema</span>;
+<span class="kw">use</span> <span class="ident">psl::common::preview_features::PreviewFeature</span>;
 
 <span class="doccomment">/// Abstraction over a mongodb connection (exposed for tests).</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Client</span> {

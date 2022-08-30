@@ -21,7 +21,7 @@
 <span id="15">15</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SqlSchemaCalculatorFlavour</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::flavour::SqliteFlavour</span>;
-<span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">datamodel_connector::ScalarType</span>, <span class="ident">parser_database::walkers</span>::<span class="kw-2">*</span>};
+<span class="kw">use</span> <span class="ident">psl</span>::{<span class="ident">datamodel_connector::ScalarType</span>, <span class="ident">parser_database::walkers</span>::<span class="kw-2">*</span>};
 
 <span class="kw">impl</span> <span class="ident">SqlSchemaCalculatorFlavour</span> <span class="kw">for</span> <span class="ident">SqliteFlavour</span> {
     <span class="comment">// Integer primary keys on SQLite are automatically assigned the rowid, which means they are automatically autoincrementing.</span>

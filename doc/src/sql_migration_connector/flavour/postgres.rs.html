@@ -685,11 +685,11 @@ SET enable_experimental_alter_column_type_general = true;
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">datamodel_connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">datamodel::datamodel_connector::Connector</span> {
+    <span class="kw">fn</span> <span class="ident">datamodel_connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">psl::datamodel_connector::Connector</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_cockroachdb</span>() {
-            <span class="ident">datamodel::builtin_connectors::COCKROACH</span>
+            <span class="ident">psl::builtin_connectors::COCKROACH</span>
         } <span class="kw">else</span> {
-            <span class="ident">datamodel::builtin_connectors::POSTGRES</span>
+            <span class="ident">psl::builtin_connectors::POSTGRES</span>
         }
     }
 

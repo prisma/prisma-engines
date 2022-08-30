@@ -138,13 +138,11 @@
 <span id="132">132</span>
 <span id="133">133</span>
 <span id="134">134</span>
-<span id="135">135</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel::dml</span>::{<span class="self">self</span>, <span class="ident">NativeTypeInstance</span>, <span class="ident">ScalarType</span>};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::statistics::Name</span>;
 <span class="kw">use</span> <span class="ident">mongodb::bson::Bson</span>;
 <span class="kw">use</span> <span class="ident">native_types::MongoDbType</span>;
+<span class="kw">use</span> <span class="ident">psl::dml</span>::{<span class="self">self</span>, <span class="ident">NativeTypeInstance</span>, <span class="ident">ScalarType</span>};
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
-
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::statistics::Name</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum</span> <span class="ident">FieldType</span> {

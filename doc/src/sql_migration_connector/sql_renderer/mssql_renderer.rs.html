@@ -545,9 +545,9 @@
     <span class="ident">pair::Pair</span>,
     <span class="ident">sql_migration</span>::{<span class="ident">AlterEnum</span>, <span class="ident">AlterTable</span>, <span class="ident">RedefineTable</span>},
 };
-<span class="kw">use</span> <span class="ident">datamodel::dml::PrismaValue</span>;
 <span class="kw">use</span> <span class="ident">indoc</span>::{<span class="ident">formatdoc</span>, <span class="ident">indoc</span>};
 <span class="kw">use</span> <span class="ident">native_types</span>::{<span class="ident">MsSqlType</span>, <span class="ident">MsSqlTypeParameter</span>};
+<span class="kw">use</span> <span class="ident">psl::dml::PrismaValue</span>;
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">sql</span>, <span class="ident">mssql::MssqlSchemaExt</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">fmt::Write</span>};
 

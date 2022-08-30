@@ -354,9 +354,9 @@
     <span class="ident">pair::Pair</span>,
     <span class="ident">sql_migration</span>::{<span class="ident">AlterEnum</span>, <span class="ident">AlterTable</span>, <span class="ident">RedefineTable</span>, <span class="ident">TableChange</span>},
 };
-<span class="kw">use</span> <span class="ident">datamodel::dml::PrismaValue</span>;
 <span class="kw">use</span> <span class="ident">indoc::formatdoc</span>;
 <span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
+<span class="kw">use</span> <span class="ident">psl::dml::PrismaValue</span>;
 <span class="kw">use</span> <span class="ident">regex::Regex</span>;
 <span class="kw">use</span> <span class="ident">sql_ddl::sqlite</span> <span class="kw">as</span> <span class="ident">ddl</span>;
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="ident">walkers</span>::<span class="kw-2">*</span>, <span class="kw-2">*</span>};
