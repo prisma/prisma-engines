@@ -66,7 +66,7 @@ features!(
     OrderByNulls,
     MultiSchema,
     FilteredRelationCount,
-    FieldReference
+    FieldReference,
     DenoDeploy,
 );
 
