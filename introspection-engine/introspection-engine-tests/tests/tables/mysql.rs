@@ -415,7 +415,7 @@ async fn missing_select_rights(api: &TestApi) -> TestResult {
     let ctx = IntrospectionContext::new(config, Default::default());
 
     let res = conn.introspect(&ctx).await.unwrap();
-    assert!(res.data_model.is_empty());
+    assert!(res.is_empty);
 
     Ok(())
 }

@@ -16,9 +16,9 @@ static EMPTY_ENUM_PLACEHOLDER: &str = "EMPTY_ENUM_VALUE";
 static RE_START: Lazy<Regex> = Lazy::new(|| Regex::new("^[^a-zA-Z]+").unwrap());
 static RE: Lazy<Regex> = Lazy::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
 
-pub(crate) fn sanitize_datamodel_names(ctx: &mut Context) {
-    let enum_renames = sanitize_models(ctx);
-    sanitize_enums(&enum_renames, ctx);
+pub(crate) fn sanitize_datamodel_names(ctx: &Context, datamodel: &mut Datamodel) {
+    let enum_renames = sanitize_models(ctx, datamodel);
+    sanitize_enums(&enum_renames, datamodel);
 }
 
 // if after opionated renames we have duplicated names, e.g. a database with
@@ -42,11 +42,11 @@ pub fn sanitization_leads_to_duplicate_names(datamodel: &Datamodel) -> bool {
 }
 
 // Todo: Sanitizing might need to be adjusted to also change the fields in the RelationInfo
-fn sanitize_models(ctx: &mut Context) -> HashMap<String, (String, Option<String>)> {
+fn sanitize_models(ctx: &Context, datamodel: &mut Datamodel) -> HashMap<String, (String, Option<String>)> {
     let mut enum_renames = HashMap::new();
     let sql_family = ctx.sql_family();
 
-    for model in ctx.datamodel.models_mut() {
+    for model in datamodel.models_mut() {
         rename_reserved(model);
         sanitize_name(model);
 
@@ -132,8 +132,8 @@ fn sanitize_models(ctx: &mut Context) -> HashMap<String, (String, Option<String>
     enum_renames
 }
 
-fn sanitize_enums(enum_renames: &HashMap<String, (String, Option<String>)>, ctx: &mut Context) {
-    for enm in ctx.datamodel.enums_mut() {
+fn sanitize_enums(enum_renames: &HashMap<String, (String, Option<String>)>, datamodel: &mut Datamodel) {
+    for enm in datamodel.enums_mut() {
         if let Some((sanitized_name, db_name)) = enum_renames.get(&enm.name) {
             if enm.database_name().is_none() {
                 enm.set_database_name(db_name.clone());

@@ -309,10 +309,9 @@ impl GenericApi for EngineState {
                 let ctx = migration_connector::IntrospectionContext::new(schema, composite_type_depth);
                 Box::pin(async move {
                     let result = connector.introspect(&ctx).await?;
-                    let rendered_result =
-                        psl::render_datamodel_and_config_to_string(&result.data_model, ctx.configuration());
+
                     Ok(IntrospectResult {
-                        datamodel: rendered_result,
+                        datamodel: result.data_model,
                         version: format!("{:?}", result.version),
                         warnings: result
                             .warnings
