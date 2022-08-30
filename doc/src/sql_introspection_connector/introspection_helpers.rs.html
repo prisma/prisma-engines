@@ -557,6 +557,18 @@
 <span id="551">551</span>
 <span id="552">552</span>
 <span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">calculate_datamodel::CalculateDatamodelContext</span> <span class="kw">as</span> <span class="ident">Context</span>, <span class="ident">SqlError</span>, <span class="ident">SqlFamilyTrait</span>};
 <span class="kw">use</span> <span class="ident">datamodel</span>::{
     <span class="ident">common</span>::{<span class="ident">preview_features::PreviewFeature</span>, <span class="ident">RelationNames</span>},
@@ -606,6 +618,18 @@
         <span class="op">&amp;&amp;</span> <span class="ident">table</span>
             .<span class="ident">columns</span>()
             .<span class="ident">any</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">name</span>().<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;stablemodelidentifier&quot;</span>))
+}
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">has_created_at_and_updated_at</span>(<span class="ident">table</span>: <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">let</span> <span class="ident">has_created_at</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> {
+        <span class="ident">col</span>.<span class="ident">name</span>().<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;createdat&quot;</span>) <span class="op">&amp;&amp;</span> <span class="ident">col</span>.<span class="ident">column_type</span>().<span class="ident">family</span> <span class="op">==</span> <span class="ident">ColumnTypeFamily::DateTime</span>
+    });
+
+    <span class="kw">let</span> <span class="ident">has_updated_at</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> {
+        <span class="ident">col</span>.<span class="ident">name</span>().<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;updatedat&quot;</span>) <span class="op">&amp;&amp;</span> <span class="ident">col</span>.<span class="ident">column_type</span>().<span class="ident">family</span> <span class="op">==</span> <span class="ident">ColumnTypeFamily::DateTime</span>
+    });
+
+    <span class="ident">has_created_at</span> <span class="op">&amp;&amp;</span> <span class="ident">has_updated_at</span>
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_prisma_1_or_11_list_table</span>(<span class="ident">table</span>: <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
