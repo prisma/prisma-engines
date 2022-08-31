@@ -57,4 +57,4 @@ opt-level = 'z' # Optimize for size.
 #strip="symbols"
 
 [patch."https://github.com/prisma/quaint"]
-quaint = {git = "https://github.com/garrensmith/quaint", branch = "add-for-update"}
+quaint = {git = "https://github.com/garrensmith/quaint", branch = "add-for-update" }

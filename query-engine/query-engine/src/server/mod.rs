@@ -5,7 +5,7 @@ use hyper::{header::CONTENT_TYPE, Body, HeaderMap, Method, Request, Response, Se
 use opentelemetry::{global, propagation::Extractor, Context};
 use query_core::{schema::QuerySchemaRenderer, TxId};
 use query_engine_metrics::{MetricFormat, MetricRegistry};
-use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlHandler, TxInput};
+use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlBody, GraphQlHandler, TxInput};
 use serde_json::json;
 use std::collections::HashMap;
 use std::net::SocketAddr;
@@ -212,8 +212,7 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
         let body_start = req.into_body();
         // block and buffer request until the request has completed
         let full_body = hyper::body::to_bytes(body_start).await?;
-
-        match serde_json::from_slice(full_body.as_ref()) {
+        match serde_json::from_slice::<GraphQlBody>(full_body.as_ref()) {
             Ok(body) => {
                 let handler = GraphQlHandler::new(&*state.cx.executor, state.cx.query_schema());
                 let result = handler.handle(body, tx_id, trace_id).instrument(span).await;

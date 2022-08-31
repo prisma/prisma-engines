@@ -1,6 +1,6 @@
-use crate::model_extensions::*;
 use crate::sql_trace::SqlTraceComment;
-use connector_interface::{DatasourceFieldName, ScalarWriteOperation, WriteArgs};
+use crate::{filter_conversion::AliasedCondition, model_extensions::*};
+use connector_interface::{DatasourceFieldName, RecordFilter, ScalarWriteOperation, WriteArgs};
 use itertools::Itertools;
 use prisma_models::*;
 use quaint::ast::*;
@@ -103,6 +103,7 @@ pub fn update_many(
     ids: &[&SelectionResult],
     args: WriteArgs,
     trace_id: Option<String>,
+    record_filter: RecordFilter,
 ) -> crate::Result<Vec<Query<'static>>> {
     if args.args.is_empty() || ids.is_empty() {
         return Ok(Vec::new());
@@ -159,9 +160,12 @@ pub fn update_many(
             acc.set(name, value)
         });
 
+    let main_filter = record_filter.filter.aliased_cond(None);
     let query = query.append_trace(&Span::current()).add_trace_id(trace_id);
     let columns: Vec<_> = ModelProjection::from(model.primary_identifier()).as_columns().collect();
-    let result: Vec<Query> = super::chunked_conditions(&columns, ids, |conditions| query.clone().so_that(conditions));
+    let result: Vec<Query> = super::chunked_conditions(&columns, ids, |conditions| {
+        query.clone().so_that(conditions).so_that(main_filter.clone())
+    });
 
     Ok(result)
 }

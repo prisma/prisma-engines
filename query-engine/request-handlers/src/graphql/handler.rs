@@ -7,6 +7,7 @@ use query_core::{
     QueryValue, ResponseData, TxId,
 };
 use std::{fmt, panic::AssertUnwindSafe};
+use tracing::info_span;
 
 pub struct GraphQlHandler<'a> {
     executor: &'a (dyn QueryExecutor + Send + Sync + 'a),
@@ -26,6 +27,8 @@ impl<'a> GraphQlHandler<'a> {
 
     pub async fn handle(&self, body: GraphQlBody, tx_id: Option<TxId>, trace_id: Option<String>) -> PrismaResponse {
         tracing::debug!("Incoming GraphQL query: {:?}", body);
+        let q = body.to_string();
+        let _z = info_span!("prisma:garren:graph_query", query = q.as_str(), user_facing = true);
 
         match body.into_doc() {
             Ok(QueryDocument::Single(query)) => self.handle_single(query, tx_id, trace_id).await,

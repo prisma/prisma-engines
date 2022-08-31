@@ -167,9 +167,9 @@ pub trait QueryExt: Queryable + Send + Sync {
             .add_trace_id(trace_id.clone())
             .so_that(filter.aliased_cond(None));
 
-        if for_update {
-            select = select.for_update();
-        }
+        // if for_update {
+        //     select = select.for_update();
+        // }
 
         self.select_ids(select, model_id, trace_id).await
     }

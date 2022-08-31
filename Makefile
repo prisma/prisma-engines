@@ -201,7 +201,7 @@ validate:
 	cargo run --bin test-cli -- validate-datamodel dev_datamodel.prisma
 
 qe:
-	cargo run --bin query-engine -- --enable-playground --enable-raw-queries --enable-metrics --enable-open-telemetry
+	cargo run --bin query-engine -- --enable-playground --enable-raw-queries --enable-metrics --enable-open-telemetry --open-telemetry-endpoint http://127.0.0.1:4317
 
 qe-dmmf:
 	cargo run --bin query-engine -- cli dmmf > dmmf.json

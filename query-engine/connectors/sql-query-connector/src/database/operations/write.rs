@@ -308,7 +308,7 @@ pub async fn update_records(
     trace_id: Option<String>,
 ) -> crate::Result<Vec<SelectionResult>> {
     let ids = conn
-        .filter_selectors(model, record_filter, true, trace_id.clone())
+        .filter_selectors(model, record_filter.clone(), true, trace_id.clone())
         .await?;
     let id_args = pick_args(&model.primary_identifier().into(), &args);
 
@@ -318,11 +318,15 @@ pub async fn update_records(
 
     let updates = {
         let ids: Vec<&SelectionResult> = ids.iter().collect();
-        write::update_many(model, ids.as_slice(), args, trace_id)?
+        write::update_many(model, ids.as_slice(), args, trace_id, record_filter)?
     };
 
     for update in updates {
-        conn.query(update).await?;
+        let out = conn.execute(update).await?;
+        println!("QUERY OUT {:?}", out);
+        if out == 0 {
+            return Ok(vec![]);
+        }
     }
 
     Ok(merge_write_args(ids, id_args))
@@ -336,7 +340,7 @@ pub async fn delete_records(
     trace_id: Option<String>,
 ) -> crate::Result<usize> {
     let ids = conn
-        .filter_selectors(model, record_filter, true, trace_id.clone())
+        .filter_selectors(model, record_filter, false, trace_id.clone())
         .await?;
     let ids: Vec<&SelectionResult> = ids.iter().collect();
     let count = ids.len();

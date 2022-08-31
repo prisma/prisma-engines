@@ -49,6 +49,15 @@ impl From<&str> for SingleQuery {
     }
 }
 
+impl ToString for GraphQlBody {
+    fn to_string(&self) -> String {
+        match self {
+            GraphQlBody::Single(single) => single.query.clone(),
+            _ => String::default(),
+        }
+    }
+}
+
 impl GraphQlBody {
     /// Convert a `GraphQlBody` into a `QueryDocument`.
     pub(crate) fn into_doc(self) -> crate::Result<QueryDocument> {
