@@ -1,5 +1,4 @@
 [package]
-authors = ["Arve Knudsen <arve.knudsen@gmail.com>"]
 edition = "2021"
 name = "sql-schema-describer"
 version = "0.1.0"
@@ -34,7 +33,6 @@ features = [
 ]
 
 [dev-dependencies]
-barrel = { git = "https://github.com/prisma/barrel.git", features = ["sqlite3", "mysql", "pg", "mssql"], branch = "mssql-support" }
 expect-test = "1.2.2"
 pretty_assertions = "0.6"
 test-macros = { path = "../test-macros" }

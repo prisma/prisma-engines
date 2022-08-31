@@ -1,5 +1,4 @@
 use crate::test_api::*;
-use barrel::{types, Migration};
 use pretty_assertions::assert_eq;
 use sql_schema_describer::*;
 
@@ -44,51 +43,50 @@ fn procedures_can_be_described(api: TestApi) {
 
 #[test_connector(tags(Mysql), exclude(Mysql8, Mysql56, Mariadb))]
 fn all_mysql_column_types_must_work(api: TestApi) {
-    let mut migration = Migration::new().schema(api.db_name());
-    migration.create_table("User", move |t| {
-        t.add_column("primary_col", types::primary());
-        t.add_column("int_col", types::custom("int"));
-        t.add_column("smallint_col", types::custom("smallint"));
-        t.add_column("tinyint4_col", types::custom("tinyint(4)"));
-        t.add_column("tinyint1_col", types::custom("tinyint(1)"));
-        t.add_column("mediumint_col", types::custom("mediumint"));
-        t.add_column("bigint_col", types::custom("bigint"));
-        t.add_column("decimal_col", types::custom("decimal"));
-        t.add_column("numeric_col", types::custom("numeric"));
-        t.add_column("float_col", types::custom("float"));
-        t.add_column("double_col", types::custom("double"));
-        t.add_column("date_col", types::custom("date"));
-        t.add_column("time_col", types::custom("time"));
-        t.add_column("datetime_col", types::custom("datetime"));
-        t.add_column("timestamp_col", types::custom("timestamp"));
-        t.add_column("year_col", types::custom("year"));
-        t.add_column("char_col", types::custom("char"));
-        t.add_column("varchar_col", types::custom("varchar(255)"));
-        t.add_column("text_col", types::custom("text"));
-        t.add_column("tinytext_col", types::custom("tinytext"));
-        t.add_column("mediumtext_col", types::custom("mediumtext"));
-        t.add_column("longtext_col", types::custom("longtext"));
-        t.add_column("enum_col", types::custom("enum('a', 'b')"));
-        t.add_column("set_col", types::custom("set('a', 'b')"));
-        t.add_column("binary_col", types::custom("binary"));
-        t.add_column("varbinary_col", types::custom("varbinary(255)"));
-        t.add_column("blob_col", types::custom("blob"));
-        t.add_column("tinyblob_col", types::custom("tinyblob"));
-        t.add_column("mediumblob_col", types::custom("mediumblob"));
-        t.add_column("longblob_col", types::custom("longblob"));
-        t.add_column("geometry_col", types::custom("geometry"));
-        t.add_column("point_col", types::custom("point"));
-        t.add_column("linestring_col", types::custom("linestring"));
-        t.add_column("polygon_col", types::custom("polygon"));
-        t.add_column("multipoint_col", types::custom("multipoint"));
-        t.add_column("multilinestring_col", types::custom("multilinestring"));
-        t.add_column("multipolygon_col", types::custom("multipolygon"));
-        t.add_column("geometrycollection_col", types::custom("geometrycollection"));
-        t.add_column("json_col", types::custom("json"));
-    });
-
-    let full_sql = migration.make::<barrel::backend::MySql>();
-    api.raw_cmd(&full_sql);
+    let sql = r#"
+        CREATE TABLE `User` (
+        id INTEGER AUTO_INCREMENT PRIMARY KEY,
+        `int_col` int,
+        `smallint_col` smallint,
+        `tinyint4_col` tinyint(4),
+        `tinyint1_col` tinyint(1),
+        `mediumint_col` mediumint,
+        `bigint_col` bigint,
+        `decimal_col` decimal,
+        `numeric_col` numeric,
+        `float_col` float,
+        `double_col` double,
+        `date_col` date,
+        `time_col` time,
+        `datetime_col` datetime,
+        `timestamp_col` timestamp,
+        `year_col` year,
+        `char_col` char,
+        `varchar_col` varchar(255),
+        `text_col` text,
+        `tinytext_col` tinytext,
+        `mediumtext_col` mediumtext,
+        `longtext_col` longtext,
+        `enum_col` enum('a', 'b'),
+        `set_col` set('a', 'b'),
+        `binary_col` binary,
+        `varbinary_col` varbinary(255),
+        `blob_col` blob,
+        `tinyblob_col` tinyblob,
+        `mediumblob_col` mediumblob,
+        `longblob_col` longblob,
+        `geometry_col` geometry,
+        `point_col` point,
+        `linestring_col` linestring,
+        `polygon_col` polygon,
+        `multipoint_col` multipoint,
+        `multilinestring_col` multilinestring,
+        `multipolygon_col` multipolygon,
+        `geometrycollection_col` geometrycollection,
+        `json_col` json
+        );
+    "#;
+    api.raw_cmd(sql);
     let expectation = expect![[r#"
         SqlSchema {
             namespaces: [],
@@ -118,7 +116,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         0,
                     ),
                     Column {
-                        name: "primary_col",
+                        name: "id",
                         tpe: ColumnType {
                             full_data_type: "int(11)",
                             family: Int,
@@ -142,7 +140,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "int(11)",
                             family: Int,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 String(
                                     "Int",
@@ -162,7 +160,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "smallint(6)",
                             family: Int,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 String(
                                     "SmallInt",
@@ -182,7 +180,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "tinyint(4)",
                             family: Int,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 String(
                                     "TinyInt",
@@ -202,7 +200,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "tinyint(1)",
                             family: Boolean,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 String(
                                     "TinyInt",
@@ -222,7 +220,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "mediumint(9)",
                             family: Int,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 String(
                                     "MediumInt",
@@ -242,7 +240,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "bigint(20)",
                             family: BigInt,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 String(
                                     "BigInt",
@@ -262,7 +260,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "decimal(10,0)",
                             family: Decimal,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 Object({
                                     "Decimal": Array([
@@ -289,7 +287,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "decimal(10,0)",
                             family: Decimal,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 Object({
                                     "Decimal": Array([
@@ -316,7 +314,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "float",
                             family: Float,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 String(
                                     "Float",
@@ -336,7 +334,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "double",
                             family: Float,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 String(
                                     "Double",
@@ -356,7 +354,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "date",
                             family: DateTime,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 String(
                                     "Date",
@@ -376,7 +374,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "time",
                             family: DateTime,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 Object({
                                     "Time": Number(
@@ -398,7 +396,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "datetime",
                             family: DateTime,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 Object({
                                     "DateTime": Number(
@@ -447,7 +445,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "year(4)",
                             family: Int,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 String(
                                     "Year",
@@ -467,7 +465,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "char(1)",
                             family: String,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 Object({
                                     "Char": Number(
@@ -489,7 +487,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "varchar(255)",
                             family: String,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 Object({
                                     "VarChar": Number(
@@ -511,7 +509,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "text",
                             family: String,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 String(
                                     "Text",
@@ -531,7 +529,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "tinytext",
                             family: String,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 String(
                                     "TinyText",
@@ -551,7 +549,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "mediumtext",
                             family: String,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 String(
                                     "MediumText",
@@ -571,7 +569,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "longtext",
                             family: String,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 String(
                                     "LongText",
@@ -593,7 +591,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             family: Enum(
                                 "User_enum_col",
                             ),
-                            arity: Required,
+                            arity: Nullable,
                             native_type: None,
                         },
                         default: None,
@@ -609,7 +607,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "set('a','b')",
                             family: String,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: None,
                         },
                         default: None,
@@ -625,7 +623,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "binary(1)",
                             family: Binary,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 Object({
                                     "Binary": Number(
@@ -647,7 +645,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "varbinary(255)",
                             family: Binary,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 Object({
                                     "VarBinary": Number(
@@ -669,7 +667,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "blob",
                             family: Binary,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 String(
                                     "Blob",
@@ -689,7 +687,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "tinyblob",
                             family: Binary,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 String(
                                     "TinyBlob",
@@ -709,7 +707,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "mediumblob",
                             family: Binary,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 String(
                                     "MediumBlob",
@@ -729,7 +727,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "longblob",
                             family: Binary,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 String(
                                     "LongBlob",
@@ -751,7 +749,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             family: Unsupported(
                                 "geometry",
                             ),
-                            arity: Required,
+                            arity: Nullable,
                             native_type: None,
                         },
                         default: None,
@@ -769,7 +767,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             family: Unsupported(
                                 "point",
                             ),
-                            arity: Required,
+                            arity: Nullable,
                             native_type: None,
                         },
                         default: None,
@@ -787,7 +785,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             family: Unsupported(
                                 "linestring",
                             ),
-                            arity: Required,
+                            arity: Nullable,
                             native_type: None,
                         },
                         default: None,
@@ -805,7 +803,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             family: Unsupported(
                                 "polygon",
                             ),
-                            arity: Required,
+                            arity: Nullable,
                             native_type: None,
                         },
                         default: None,
@@ -823,7 +821,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             family: Unsupported(
                                 "multipoint",
                             ),
-                            arity: Required,
+                            arity: Nullable,
                             native_type: None,
                         },
                         default: None,
@@ -841,7 +839,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             family: Unsupported(
                                 "multilinestring",
                             ),
-                            arity: Required,
+                            arity: Nullable,
                             native_type: None,
                         },
                         default: None,
@@ -859,7 +857,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             family: Unsupported(
                                 "multipolygon",
                             ),
-                            arity: Required,
+                            arity: Nullable,
                             native_type: None,
                         },
                         default: None,
@@ -877,7 +875,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             family: Unsupported(
                                 "geometrycollection",
                             ),
-                            arity: Required,
+                            arity: Nullable,
                             native_type: None,
                         },
                         default: None,
@@ -893,7 +891,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "json",
                             family: Json,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
                                 String(
                                     "Json",
@@ -941,51 +939,50 @@ fn all_mysql_column_types_must_work(api: TestApi) {
 
 #[test_connector(tags(Mariadb))]
 fn all_mariadb_column_types_must_work(api: TestApi) {
-    let mut migration = Migration::new().schema(api.db_name());
-    migration.create_table("User", move |t| {
-        t.add_column("primary_col", types::primary());
-        t.add_column("int_col", types::custom("int"));
-        t.add_column("smallint_col", types::custom("smallint"));
-        t.add_column("tinyint4_col", types::custom("tinyint(4)"));
-        t.add_column("tinyint1_col", types::custom("tinyint(1)"));
-        t.add_column("mediumint_col", types::custom("mediumint"));
-        t.add_column("bigint_col", types::custom("bigint"));
-        t.add_column("decimal_col", types::custom("decimal"));
-        t.add_column("numeric_col", types::custom("numeric"));
-        t.add_column("float_col", types::custom("float"));
-        t.add_column("double_col", types::custom("double"));
-        t.add_column("date_col", types::custom("date"));
-        t.add_column("time_col", types::custom("time"));
-        t.add_column("datetime_col", types::custom("datetime"));
-        t.add_column("timestamp_col", types::custom("timestamp"));
-        t.add_column("year_col", types::custom("year"));
-        t.add_column("char_col", types::custom("char"));
-        t.add_column("varchar_col", types::custom("varchar(255)"));
-        t.add_column("text_col", types::custom("text"));
-        t.add_column("tinytext_col", types::custom("tinytext"));
-        t.add_column("mediumtext_col", types::custom("mediumtext"));
-        t.add_column("longtext_col", types::custom("longtext"));
-        t.add_column("enum_col", types::custom("enum('a', 'b')"));
-        t.add_column("set_col", types::custom("set('a', 'b')"));
-        t.add_column("binary_col", types::custom("binary"));
-        t.add_column("varbinary_col", types::custom("varbinary(255)"));
-        t.add_column("blob_col", types::custom("blob"));
-        t.add_column("tinyblob_col", types::custom("tinyblob"));
-        t.add_column("mediumblob_col", types::custom("mediumblob"));
-        t.add_column("longblob_col", types::custom("longblob"));
-        t.add_column("geometry_col", types::custom("geometry"));
-        t.add_column("point_col", types::custom("point"));
-        t.add_column("linestring_col", types::custom("linestring"));
-        t.add_column("polygon_col", types::custom("polygon"));
-        t.add_column("multipoint_col", types::custom("multipoint"));
-        t.add_column("multilinestring_col", types::custom("multilinestring"));
-        t.add_column("multipolygon_col", types::custom("multipolygon"));
-        t.add_column("geometrycollection_col", types::custom("geometrycollection"));
-        t.add_column("json_col", types::custom("json"));
-    });
-
-    let full_sql = migration.make::<barrel::backend::MySql>();
-    api.raw_cmd(&full_sql);
+    let sql = r#"
+        CREATE TABLE `User` (
+        primary_col INTEGER AUTO_INCREMENT PRIMARY KEY,
+        `int_col` int NOT NULL,
+        `smallint_col` smallint NOT NULL,
+        `tinyint4_col` tinyint(4) NOT NULL,
+        `tinyint1_col` tinyint(1) NOT NULL,
+        `mediumint_col` mediumint NOT NULL,
+        `bigint_col` bigint NOT NULL,
+        `decimal_col` decimal NOT NULL,
+        `numeric_col` numeric NOT NULL,
+        `float_col` float NOT NULL,
+        `double_col` double NOT NULL,
+        `date_col` date NOT NULL,
+        `time_col` time NOT NULL,
+        `datetime_col` datetime NOT NULL,
+        `timestamp_col` timestamp NOT NULL,
+        `year_col` year NOT NULL,
+        `char_col` char NOT NULL,
+        `varchar_col` varchar(255) NOT NULL,
+        `text_col` text NOT NULL,
+        `tinytext_col` tinytext NOT NULL,
+        `mediumtext_col` mediumtext NOT NULL,
+        `longtext_col` longtext NOT NULL,
+        `enum_col` enum('a', 'b') NOT NULL,
+        `set_col` set('a', 'b') NOT NULL,
+        `binary_col` binary NOT NULL,
+        `varbinary_col` varbinary(255) NOT NULL,
+        `blob_col` blob NOT NULL,
+        `tinyblob_col` tinyblob NOT NULL,
+        `mediumblob_col` mediumblob NOT NULL,
+        `longblob_col` longblob NOT NULL,
+        `geometry_col` geometry NOT NULL,
+        `point_col` point NOT NULL,
+        `linestring_col` linestring NOT NULL,
+        `polygon_col` polygon NOT NULL,
+        `multipoint_col` multipoint NOT NULL,
+        `multilinestring_col` multilinestring NOT NULL,
+        `multipolygon_col` multipolygon NOT NULL,
+        `geometrycollection_col` geometrycollection NOT NULL,
+        `json_col` json NOT NULL
+        );
+    "#;
+    api.raw_cmd(sql);
     let expectation = expect![[r#"
         SqlSchema {
             namespaces: [],
@@ -1838,51 +1835,53 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
 
 #[test_connector(tags(Mysql8))]
 fn all_mysql_8_column_types_must_work(api: TestApi) {
-    let mut migration = Migration::new().schema(api.db_name());
-    migration.create_table("User", move |t| {
-        t.add_column("primary_col", types::primary());
-        t.add_column("int_col", types::custom("int"));
-        t.add_column("smallint_col", types::custom("smallint"));
-        t.add_column("tinyint4_col", types::custom("tinyint(4)"));
-        t.add_column("tinyint1_col", types::custom("tinyint(1)"));
-        t.add_column("mediumint_col", types::custom("mediumint"));
-        t.add_column("bigint_col", types::custom("bigint"));
-        t.add_column("decimal_col", types::custom("decimal"));
-        t.add_column("numeric_col", types::custom("numeric"));
-        t.add_column("float_col", types::custom("float"));
-        t.add_column("double_col", types::custom("double"));
-        t.add_column("date_col", types::custom("date"));
-        t.add_column("time_col", types::custom("time"));
-        t.add_column("datetime_col", types::custom("datetime"));
-        t.add_column("timestamp_col", types::custom("timestamp"));
-        t.add_column("year_col", types::custom("year"));
-        t.add_column("char_col", types::custom("char"));
-        t.add_column("varchar_col", types::custom("varchar(255)"));
-        t.add_column("text_col", types::custom("text"));
-        t.add_column("tinytext_col", types::custom("tinytext"));
-        t.add_column("mediumtext_col", types::custom("mediumtext"));
-        t.add_column("longtext_col", types::custom("longtext"));
-        t.add_column("enum_col", types::custom("enum('a', 'b')"));
-        t.add_column("set_col", types::custom("set('a', 'b')"));
-        t.add_column("binary_col", types::custom("binary"));
-        t.add_column("varbinary_col", types::custom("varbinary(255)"));
-        t.add_column("blob_col", types::custom("blob"));
-        t.add_column("tinyblob_col", types::custom("tinyblob"));
-        t.add_column("mediumblob_col", types::custom("mediumblob"));
-        t.add_column("longblob_col", types::custom("longblob"));
-        t.add_column("geometry_col", types::custom("geometry"));
-        t.add_column("point_col", types::custom("point"));
-        t.add_column("linestring_col", types::custom("linestring"));
-        t.add_column("polygon_col", types::custom("polygon"));
-        t.add_column("multipoint_col", types::custom("multipoint"));
-        t.add_column("multilinestring_col", types::custom("multilinestring"));
-        t.add_column("multipolygon_col", types::custom("multipolygon"));
-        t.add_column("geometrycollection_col", types::custom("geometrycollection"));
-        t.add_column("json_col", types::custom("json"));
-    });
+    let sql = r#"
+        CREATE TABLE `User` (
+        primary_col INTEGER AUTO_INCREMENT PRIMARY KEY,
+        `int_col` int NOT NULL,
+        `smallint_col` smallint NOT NULL,
+        `tinyint4_col` tinyint(4) NOT NULL,
+        `tinyint1_col` tinyint(1) NOT NULL,
+        `mediumint_col` mediumint NOT NULL,
+        `bigint_col` bigint NOT NULL,
+        `decimal_col` decimal NOT NULL,
+        `numeric_col` numeric NOT NULL,
+        `float_col` float NOT NULL,
+        `double_col` double NOT NULL,
+        `date_col` date NOT NULL,
+        `time_col` time NOT NULL,
+        `datetime_col` datetime NOT NULL,
+        `timestamp_col` timestamp NOT NULL,
+        `year_col` year NOT NULL,
+        `char_col` char NOT NULL,
+        `varchar_col` varchar(255) NOT NULL,
+        `text_col` text NOT NULL,
+        `tinytext_col` tinytext NOT NULL,
+        `mediumtext_col` mediumtext NOT NULL,
+        `longtext_col` longtext NOT NULL,
+        `enum_col` enum('a', 'b') NOT NULL,
+        `set_col` set('a', 'b') NOT NULL,
+        `binary_col` binary NOT NULL,
+        `varbinary_col` varbinary(255) NOT NULL,
+        `blob_col` blob NOT NULL,
+        `tinyblob_col` tinyblob NOT NULL,
+        `mediumblob_col` mediumblob NOT NULL,
+        `longblob_col` longblob NOT NULL,
+        `geometry_col` geometry NOT NULL,
+        `point_col` point NOT NULL,
+        `linestring_col` linestring NOT NULL,
+        `polygon_col` polygon NOT NULL,
+        `multipoint_col` multipoint NOT NULL,
+        `multilinestring_col` multilinestring NOT NULL,
+        `multipolygon_col` multipolygon NOT NULL,
+        `geometrycollection_col` geometrycollection NOT NULL,
+        `json_col` json NOT NULL
+        );
 
-    let full_sql = migration.make::<barrel::backend::MySql>();
-    api.raw_cmd(&full_sql);
+    "#;
+
+    api.raw_cmd(sql);
+
     let expectation = expect![[r#"
         SqlSchema {
             namespaces: [],
@@ -2774,65 +2773,28 @@ fn mysql_foreign_key_on_delete_must_be_handled(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Mysql8))]
-fn mysql_multi_field_indexes_must_be_inferred(api: TestApi) {
-    let mut migration = Migration::new().schema(api.db_name());
-    migration.create_table("Employee", move |t| {
-        t.add_column("id", types::primary());
-        t.add_column("age", types::integer());
-        t.add_column("name", types::varchar(200));
-        t.add_index("age_and_name_index", types::index(vec!["name", "age"]).unique(true));
-    });
-
-    let full_sql = migration.make::<barrel::backend::MySql>();
-    api.raw_cmd(&full_sql);
-    let result = api.describe();
-    result.assert_table("Employee", |t| {
-        t.assert_index_on_columns(&["name", "age"], |idx| idx.assert_name("age_and_name_index"))
-    });
-}
-
-#[test_connector(tags(Mysql), exclude(Mysql8))]
-fn old_mysql_multi_field_indexes_must_be_inferred(api: TestApi) {
-    let mut migration = Migration::new().schema(api.db_name());
-    migration.create_table("Employee", move |t| {
-        t.add_column("id", types::primary());
-        t.add_column("age", types::integer());
-        t.add_column("name", types::varchar(200));
-        t.add_index("age_and_name_index", types::index(vec!["name", "age"]).unique(true));
-    });
-
-    let full_sql = migration.make::<barrel::backend::MySql>();
-    api.raw_cmd(&full_sql);
-    let result = api.describe();
-    result.assert_table("Employee", |t| {
-        t.assert_index_on_columns(&["name", "age"], |idx| idx.assert_name("age_and_name_index"))
-    });
-}
-
 #[test_connector(tags(Mysql))]
 fn mysql_join_table_unique_indexes_must_be_inferred(api: TestApi) {
-    let mut migration = Migration::new().schema(api.db_name());
+    let sql = r#"
+        CREATE TABLE `Cat` (
+            id INTEGER AUTO_INCREMENT PRIMARY KEY,
+            name TEXT
+        );
 
-    migration.create_table("Cat", move |t| {
-        t.add_column("id", types::primary());
-        t.add_column("name", types::text());
-    });
+        CREATE TABLE `Human` (
+            id INTEGER AUTO_INCREMENT PRIMARY KEY,
+            name TEXT
+        );
 
-    migration.create_table("Human", move |t| {
-        t.add_column("id", types::primary());
-        t.add_column("name", types::text());
-    });
+        CREATE TABLE `CatToHuman` (
+            cat INTEGER REFERENCES `Cat`(id),
+            human INTEGER REFERENCES `Human`(id),
+            relationship TEXT
+        );
 
-    migration.create_table("CatToHuman", move |t| {
-        t.add_column("cat", types::foreign("Cat", "id").nullable(true));
-        t.add_column("human", types::foreign("Human", "id").nullable(true));
-        t.add_column("relationship", types::text());
-        t.add_index("cat_and_human_index", types::index(vec!["cat", "human"]).unique(true));
-    });
-
-    let full_sql = migration.make::<barrel::backend::MySql>();
-    api.raw_cmd(&full_sql);
+        CREATE UNIQUE INDEX cat_and_human_index ON `CatToHuman`(cat, human);
+    "#;
+    api.raw_cmd(sql);
 
     api.describe().assert_table("CatToHuman", |t| {
         t.assert_index_on_columns(&["cat", "human"], |idx| {

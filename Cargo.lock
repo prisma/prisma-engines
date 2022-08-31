@@ -4234,7 +4234,6 @@ name = "sql-schema-describer"
 version = "0.1.0"
 dependencies = [
  "async-trait",
- "barrel",
  "bigdecimal 0.2.2",
  "enumflags2",
  "expect-test",
