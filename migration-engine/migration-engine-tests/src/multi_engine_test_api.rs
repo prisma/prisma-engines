@@ -11,8 +11,8 @@ use crate::{
     assertions::SchemaAssertion,
     commands::{ApplyMigrations, CreateMigration, DiagnoseMigrationHistory, Reset, SchemaPush},
 };
-use datamodel::common::preview_features::PreviewFeature;
 use migration_core::migration_connector::{ConnectorParams, MigrationConnector};
+use psl::common::preview_features::PreviewFeature;
 use quaint::{
     prelude::{ConnectionInfo, Queryable, ResultSet},
     single::Quaint,

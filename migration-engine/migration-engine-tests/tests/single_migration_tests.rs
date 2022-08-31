@@ -71,9 +71,9 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
 
     let migration: String = test_api.connector_diff(
         migration_core::migration_connector::DiffTarget::Empty,
-        migration_core::migration_connector::DiffTarget::Datamodel(
-            datamodel::parser_database::SourceFile::new_allocated(text.clone()),
-        ),
+        migration_core::migration_connector::DiffTarget::Datamodel(psl::parser_database::SourceFile::new_allocated(
+            text.clone(),
+        )),
     );
 
     test_api.raw_cmd(&migration); // check that it runs

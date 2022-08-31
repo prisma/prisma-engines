@@ -1,10 +1,10 @@
-use datamodel::common::preview_features::PreviewFeature;
 use enumflags2::BitFlags;
 use introspection_connector::{CompositeTypeDepth, IntrospectionConnector, IntrospectionContext, Warning};
 use mongodb::Database;
 use mongodb_introspection_connector::MongoDbIntrospectionConnector;
 use names::Generator;
 use once_cell::sync::Lazy;
+use psl::common::preview_features::PreviewFeature;
 use std::{future::Future, io::Write};
 use tokio::runtime::Runtime;
 
@@ -37,7 +37,7 @@ impl TestResult {
     }
 
     #[track_caller]
-    pub fn assert_warning_code(&self, code: i16) {
+    pub fn assert_warning_code(&self, code: u32) {
         assert!(self.warnings.iter().any(|w| w.code == code), "{:#?}", self.warnings)
     }
 
@@ -103,8 +103,8 @@ where
         features,
     );
 
-    let mut config = datamodel::parse_configuration(&datamodel_string).unwrap();
-    let datamodel = datamodel::parse_datamodel(&datamodel_string).unwrap();
+    let mut config = psl::parse_configuration(&datamodel_string).unwrap();
+    let datamodel = psl::parse_datamodel(&datamodel_string).unwrap();
 
     let ctx = IntrospectionContext {
         source: config.subject.datasources.pop().unwrap(),
@@ -125,10 +125,10 @@ where
         database.drop(None).await.unwrap();
 
         let res = res.unwrap();
-        let config = datamodel::parse_configuration(&datamodel_string).unwrap().subject;
+        let config = psl::parse_configuration(&datamodel_string).unwrap().subject;
 
         TestResult {
-            datamodel: datamodel::render_datamodel_to_string(&res.data_model, Some(&config)),
+            datamodel: psl::render_datamodel_to_string(&res.data_model, Some(&config)),
             warnings: res.warnings,
         }
     })

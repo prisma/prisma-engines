@@ -4,9 +4,9 @@ use crate::{
     pair::Pair,
     sql_migration::{AlterEnum, AlterTable, RedefineTable, TableChange},
 };
-use datamodel::dml::PrismaValue;
 use indoc::formatdoc;
 use once_cell::sync::Lazy;
+use psl::dml::PrismaValue;
 use regex::Regex;
 use sql_ddl::sqlite as ddl;
 use sql_schema_describer::{walkers::*, *};

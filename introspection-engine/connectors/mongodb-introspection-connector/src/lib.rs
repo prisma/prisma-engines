@@ -4,7 +4,6 @@ mod warnings;
 
 pub use error::*;
 
-use datamodel::{common::preview_features::PreviewFeature, dml::Datamodel};
 use enumflags2::BitFlags;
 use futures::TryStreamExt;
 use indoc::formatdoc;
@@ -14,6 +13,7 @@ use introspection_connector::{
 };
 use mongodb::{Client, Database};
 use mongodb_schema_describer::MongoSchema;
+use psl::{common::preview_features::PreviewFeature, dml::Datamodel};
 use user_facing_errors::{common::InvalidConnectionString, KnownError};
 
 #[derive(Debug)]

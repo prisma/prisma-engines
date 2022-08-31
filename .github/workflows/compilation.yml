@@ -37,3 +37,5 @@ jobs:
       - run: "cargo clean && cargo build --release -p query-engine-node-api"
         name: "Compile Query Engine Library"
 
+      - name: "Check that Cargo.lock did not change"
+        run: "git diff --exit-code"

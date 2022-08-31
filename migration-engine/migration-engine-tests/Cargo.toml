@@ -4,8 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-datamodel = { path = "../../libs/datamodel/core" }
-sql-datamodel-connector= { path = "../../libs/datamodel/connectors/sql-datamodel-connector" }
+psl = { path = "../../psl/psl" }
 migration-core = { path = "../core" }
 sql-migration-connector = { path = "../connectors/sql-migration-connector" }
 sql-schema-describer = { path = "../../libs/sql-schema-describer" }

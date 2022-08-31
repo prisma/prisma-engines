@@ -1,7 +1,6 @@
 [package]
 name = "introspection-core"
 version = "0.1.0"
-authors = ["Marcus Böhm <boehm@prisma.io>"]
 edition = "2021"
 
 [features]
@@ -9,7 +8,7 @@ vendored-openssl = ["sql-introspection-connector/vendored-openssl"]
 
 # Please keep the pyramid form
 [dependencies]
-datamodel = { path = "../../libs/datamodel/core" }
+psl = { path = "../../psl/psl" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 introspection-connector = { path = "../connectors/introspection-connector" }
 sql-introspection-connector = { path = "../connectors/sql-introspection-connector" }

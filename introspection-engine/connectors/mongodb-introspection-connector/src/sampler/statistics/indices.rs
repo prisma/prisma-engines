@@ -1,9 +1,9 @@
 use super::Name;
 use crate::sampler::field_type::FieldType;
 use convert_case::{Case, Casing};
-use datamodel::dml::{self, WithDatabaseName, WithName};
 use introspection_connector::Warning;
 use mongodb_schema_describer::{IndexFieldProperty, IndexWalker};
+use psl::dml::{self, WithDatabaseName, WithName};
 use std::collections::BTreeMap;
 
 /// Add described indices to the models.

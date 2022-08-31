@@ -3,7 +3,7 @@ mod mysql;
 mod postgres;
 mod sqlite;
 
-use datamodel::parser_database::{ast::FieldArity, walkers::*};
+use psl::parser_database::{ast::FieldArity, walkers::*};
 use sql_schema_describer::{self as sql, ColumnArity, ColumnType, ColumnTypeFamily};
 
 pub(crate) trait SqlSchemaCalculatorFlavour {
