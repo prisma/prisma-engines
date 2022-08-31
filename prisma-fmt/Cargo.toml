@@ -1,7 +1,6 @@
 [package]
 name = "prisma-fmt"
 version = "0.1.0"
-authors = ["Emanuel Joebstl <emanuel.joebstl@gmail.com>"]
 edition = "2021"
 
 [dependencies]
