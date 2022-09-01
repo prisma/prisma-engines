@@ -1,0 +1,13 @@
+model User {
+  id   Int   @id
+  Seat Seat?
+}
+
+model Seat {
+  id        Int    @id @default(autoincrement())
+  movie     String @unique
+  userId    Int?   @unique
+  claimedBy User?  @relation(fields: [userId], references: [id])
+  version   Int    @default(0)
+  @@unique([id, version])
+}
