@@ -71,6 +71,10 @@ impl QueryResult {
         }
     }
 
+    pub fn to_json_value(&self) -> serde_json::Value {
+        serde_json::to_value(&self.response).unwrap()
+    }
+
     pub fn to_string_pretty(&self) -> String {
         serde_json::to_string_pretty(&self.response).unwrap()
     }
