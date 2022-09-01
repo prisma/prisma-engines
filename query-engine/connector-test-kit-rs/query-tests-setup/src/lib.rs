@@ -83,10 +83,11 @@ impl<'a, A: 'a, B: 'a, Fut: Future + 'a, F: FnOnce(&'a A, &'a B) -> Fut> AsyncFn
 }
 
 #[allow(clippy::too_many_arguments)]
+#[inline(never)] // currently not inlined, but let's make sure it doesn't change
 pub fn run_relation_link_test<F>(
-    enabled_connectors: Vec<ConnectorTag>,
+    enabled_connectors: &[ConnectorTag],
     capabilities: &mut Vec<ConnectorCapability>,
-    required_capabilities: Vec<&str>,
+    required_capabilities: &[&str],
     datamodel: &str,
     dm_with_params: &str,
     test_name: &str,
