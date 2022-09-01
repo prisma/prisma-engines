@@ -28,11 +28,7 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
     let handler = args.schema.unwrap().handler_path;
 
     // Renders the connectors as list to use in the code.
-    let connectors = connectors.into_iter().map(quote_connector).reduce(|aggr, next| {
-        quote! {
-            #aggr, #next
-        }
-    });
+    let connectors = connectors.into_iter().map(quote_connector);
 
     let mut test_function = parse_macro_input!(input as ItemFn);
 
@@ -88,15 +84,15 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
         #[test]
         fn #test_fn_ident() {
             let config = &query_tests_setup::CONFIG;
-            let enabled_connectors = vec![
-                #connectors
+            let enabled_connectors = &[
+                #(#connectors,)*
             ];
 
-            let capabilities: Vec<ConnectorCapability> = vec![
+            let capabilities: &[ConnectorCapability] = &[
                 #(#capabilities),*
             ];
 
-            if ConnectorTag::should_run(&config, &enabled_connectors, &capabilities, #test_name) {
+            if ConnectorTag::should_run(&config, enabled_connectors, capabilities, #test_name) {
                 let template = #handler();
                 let datamodel = query_tests_setup::render_test_datamodel(config, #test_database, template, #excluded_features, #referential_override, #db_schemas);
                 let connector = config.test_connector_tag().unwrap();
@@ -104,8 +100,6 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
                 let metrics_for_subscriber = metrics.clone();
 
                 query_tests_setup::run_with_tokio(async move {
-                    tracing::debug!("Used datamodel:\n {}", datamodel.yellow());
-
                     query_tests_setup::setup_project(&datamodel, #db_schemas).await.unwrap();
 
                     let requires_teardown = connector.requires_teardown();
