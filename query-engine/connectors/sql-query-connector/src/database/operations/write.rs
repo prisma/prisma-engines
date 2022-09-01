@@ -1,3 +1,4 @@
+use crate::filter_conversion::AliasedCondition;
 use crate::sql_trace::SqlTraceComment;
 use crate::{error::SqlError, model_extensions::*, query_builder::write, sql_info::SqlInfo, QueryExt};
 use connector_interface::*;
@@ -310,11 +311,11 @@ pub async fn update_records(
     let ids = conn
         .filter_selectors(model, record_filter.clone(), true, trace_id.clone())
         .await?;
-    let id_args = pick_args(&model.primary_identifier().into(), &args);
 
     if ids.is_empty() {
         return Ok(vec![]);
     }
+    let id_args = pick_args(&model.primary_identifier().into(), &args);
 
     let updates = {
         let ids: Vec<&SelectionResult> = ids.iter().collect();

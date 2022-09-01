@@ -164,7 +164,8 @@ pub fn update_many(
     let query = query.append_trace(&Span::current()).add_trace_id(trace_id);
     let columns: Vec<_> = ModelProjection::from(model.primary_identifier()).as_columns().collect();
     let result: Vec<Query> = super::chunked_conditions(&columns, ids, |conditions| {
-        query.clone().so_that(conditions).so_that(main_filter.clone())
+        let x = conditions.and(main_filter.clone());
+        query.clone().so_that(x)
     });
 
     Ok(result)
