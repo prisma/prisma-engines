@@ -428,7 +428,7 @@ mod json_filter {
 
     pub async fn test_data_list(runner: &Runner) -> TestResult<()> {
         run_query!(
-            &runner,
+            runner,
             r#"
               mutation { createOneTestModel(data: {
                   id: 1,
@@ -440,7 +440,7 @@ mod json_filter {
         );
 
         run_query!(
-            &runner,
+            runner,
             r#"
               mutation { createOneTestModel(data: {
                   id: 2,
@@ -451,7 +451,7 @@ mod json_filter {
             "#
         );
 
-        run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 3 }) { id }}"#);
+        run_query!(runner, r#"mutation { createOneTestModel(data: { id: 3 }) { id }}"#);
 
         Ok(())
     }

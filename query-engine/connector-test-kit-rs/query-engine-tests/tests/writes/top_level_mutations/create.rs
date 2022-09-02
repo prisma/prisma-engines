@@ -87,7 +87,7 @@ mod create {
         Ok(())
     }
 
-    // "A Create Mutation" should "create and return item with explicit null attributes"
+    // A Create Mutation should create and return item with explicit null attributes
     #[connector_test]
     async fn return_item_explicit_null_attrs(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
@@ -105,9 +105,25 @@ mod create {
         Ok(())
     }
 
-    // "A Create Mutation" should "create and return item with explicit null attributes when other mutation has explicit non-null values"
+    // "A Create Mutation" should "create and return item with implicit null attributes and createdAt should be set"
     #[connector_test]
-    async fn return_item_explicit_null_attrs_other_mut(runner: Runner) -> TestResult<()> {
+    async fn return_item_implicit_null_attr(runner: Runner) -> TestResult<()> {
+        // if the query succeeds createdAt did work. If would not have been set we would get a NullConstraintViolation.
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            createOneScalarModel(data:{ id: "1" }){
+              optString, optInt, optFloat, optBoolean, optEnum
+            }
+          }"#),
+          @r###"{"data":{"createOneScalarModel":{"optString":null,"optInt":null,"optFloat":null,"optBoolean":null,"optEnum":null}}}"###
+        );
+
+        Ok(())
+    }
+
+    // A Create Mutation should create and return item with explicit null values after previous mutation with explicit non-null values
+    #[connector_test]
+    async fn return_item_non_null_attrs_then_explicit_null_attrs(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
             createOneScalarModel(
@@ -127,22 +143,6 @@ mod create {
               optString, optInt, optFloat, optBoolean, optEnum
             }
            }"#),
-          @r###"{"data":{"createOneScalarModel":{"optString":null,"optInt":null,"optFloat":null,"optBoolean":null,"optEnum":null}}}"###
-        );
-
-        Ok(())
-    }
-
-    // "A Create Mutation" should "create and return item with implicit null attributes and createdAt should be set"
-    #[connector_test]
-    async fn return_item_implicit_null_attr(runner: Runner) -> TestResult<()> {
-        // if the query succeeds createdAt did work. If would not have been set we would get a NullConstraintViolation.
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
-            createOneScalarModel(data:{ id: "1" }){
-              optString, optInt, optFloat, optBoolean, optEnum
-            }
-          }"#),
           @r###"{"data":{"createOneScalarModel":{"optString":null,"optInt":null,"optFloat":null,"optBoolean":null,"optEnum":null}}}"###
         );
 

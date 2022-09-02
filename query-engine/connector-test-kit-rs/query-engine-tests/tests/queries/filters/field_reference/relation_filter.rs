@@ -303,7 +303,7 @@ mod relation_filter {
 
     async fn create_to_many_data(runner: &Runner) -> TestResult<()> {
         create_row(
-            &runner,
+            runner,
             r#"{
               id: 1,
               children: {
@@ -324,7 +324,7 @@ mod relation_filter {
         )
         .await?;
         create_row(
-            &runner,
+            runner,
             r#"{
               id: 2,
               children: {
@@ -345,7 +345,7 @@ mod relation_filter {
         )
         .await?;
         create_row(
-            &runner,
+            runner,
             r#"{
               id: 3,
               children: {

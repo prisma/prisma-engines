@@ -245,7 +245,7 @@ mod decimal_filter {
 
     pub async fn test_list_data(runner: &Runner) -> TestResult<()> {
         run_query!(
-            &runner,
+            runner,
             r#"mutation { createOneTestModel(data: {
                 id: 1,
                 dec: "1.5",
@@ -254,7 +254,7 @@ mod decimal_filter {
             }) { id }}"#
         );
         run_query!(
-            &runner,
+            runner,
             r#"mutation { createOneTestModel(data: {
                 id: 2,
                 dec: "1.2",
