@@ -16,7 +16,6 @@ pub use datamodel_rendering::*;
 pub use error::*;
 pub use logging::*;
 pub use query_core;
-use query_engine_metrics::MetricRegistry;
 pub use query_result::*;
 pub use runner::*;
 pub use schema_gen::*;
@@ -25,6 +24,7 @@ pub use templating::*;
 use colored::Colorize;
 use datamodel_connector::ConnectorCapability;
 use lazy_static::lazy_static;
+use query_engine_metrics::MetricRegistry;
 use std::future::Future;
 use std::sync::Once;
 use tokio::runtime::Builder;
@@ -35,6 +35,9 @@ pub type TestResult<T> = Result<T, TestError>;
 lazy_static! {
     /// Test configuration, loaded once at runtime.
     pub static ref CONFIG: TestConfig = TestConfig::load().unwrap();
+
+    /// The log level from the environment.
+    pub static ref ENV_LOG_LEVEL: String = std::env::var("LOG_LEVEL").unwrap_or_else(|_| "info".to_owned());
 }
 
 /// Setup of everything as defined in the passed datamodel.
@@ -102,7 +105,7 @@ pub fn run_relation_link_test<F>(
     // The implementation of the function is separated from this façade because of monomorphization
     // cost. Only `boxify` is instantiated for each instance of run_relation_link_test, not the
     // whole larger function body. This measurably improves compile times of query-engine-tests.
-
+    /// Helper for test return type erasure.
     fn boxify<F>(f: F) -> impl for<'a> Fn(&'a Runner, &'a DatamodelWithParams) -> BoxFuture<'a, TestResult<()>>
     where
         F: (for<'a> AsyncFn<'a, Runner, DatamodelWithParams, TestResult<()>>) + 'static,
@@ -169,10 +172,109 @@ fn run_relation_link_test_impl(
                     teardown_project(&datamodel, Default::default()).await.unwrap();
                 }
             }
-            .with_subscriber(test_tracing_subscriber(
-                std::env::var("LOG_LEVEL").unwrap_or_else(|_| "info".to_string()),
-                metrics_for_subscriber,
-            )),
+            .with_subscriber(test_tracing_subscriber(&ENV_LOG_LEVEL, metrics_for_subscriber)),
         );
     }
+}
+
+pub trait ConnectorTestFn: Copy + 'static {
+    type Fut: Future<Output = TestResult<()>>;
+
+    fn call(self, runner: Runner) -> Self::Fut;
+}
+
+impl<T, F> ConnectorTestFn for T
+where
+    T: Fn(Runner) -> F + Copy + 'static,
+    F: Future<Output = TestResult<()>>,
+{
+    type Fut = F;
+
+    fn call(self, runner: Runner) -> Self::Fut {
+        self(runner)
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+pub fn run_connector_test<T>(
+    test_name: &'static str,
+    test_database_name: &str,
+    enabled_connectors: &[ConnectorTag],
+    capabilities: &[ConnectorCapability],
+    excluded_features: &[&str],
+    handler: fn() -> String,
+    db_schemas: &[&str],
+    referential_override: Option<String>,
+    test_fn: T,
+) where
+    T: ConnectorTestFn,
+{
+    // The implementation of the function is separated from this façade because of monomorphization
+    // cost. Only `boxify` is instantiated for each instance of run_connector_test, not the whole
+    // larger function body. This measurably improves compile times of query-engine-tests.
+    fn boxify(test_fn: impl ConnectorTestFn) -> impl Fn(Runner) -> BoxFuture<'static, TestResult<()>> {
+        move |runner| Box::pin(test_fn.call(runner))
+    }
+
+    run_connector_test_impl(
+        test_name,
+        test_database_name,
+        enabled_connectors,
+        capabilities,
+        excluded_features,
+        handler,
+        db_schemas,
+        referential_override,
+        &boxify(test_fn),
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+#[inline(never)]
+pub fn run_connector_test_impl(
+    test_name: &'static str,
+    test_database_name: &str,
+    enabled_connectors: &[ConnectorTag],
+    capabilities: &[ConnectorCapability],
+    excluded_features: &[&str],
+    handler: fn() -> String,
+    db_schemas: &[&str],
+    referential_override: Option<String>,
+    test_fn: &dyn Fn(Runner) -> BoxFuture<'static, TestResult<()>>,
+) {
+    let config: &'static _ = &crate::CONFIG;
+    if !ConnectorTag::should_run(config, enabled_connectors, capabilities, test_name) {
+        return;
+    }
+
+    let template = handler();
+    let datamodel = crate::render_test_datamodel(
+        config,
+        test_database_name,
+        template,
+        excluded_features,
+        referential_override,
+        db_schemas,
+    );
+    let connector = config.test_connector_tag().unwrap();
+    let metrics = crate::setup_metrics();
+    let metrics_for_subscriber = metrics.clone();
+
+    crate::run_with_tokio(
+        async {
+            crate::setup_project(&datamodel, db_schemas).await.unwrap();
+
+            let requires_teardown = connector.requires_teardown();
+            let runner = Runner::load(crate::CONFIG.runner(), datamodel.clone(), connector, metrics)
+                .await
+                .unwrap();
+
+            test_fn(runner).await.unwrap();
+
+            if requires_teardown {
+                crate::teardown_project(&datamodel, db_schemas).await.unwrap();
+            }
+        }
+        .with_subscriber(test_tracing_subscriber(&ENV_LOG_LEVEL, metrics_for_subscriber)),
+    );
 }

@@ -25,7 +25,7 @@ type Sub = Layered<
     >,
 >;
 
-pub fn test_tracing_subscriber(log_config: String, metrics: MetricRegistry) -> Sub {
+pub fn test_tracing_subscriber(log_config: &str, metrics: MetricRegistry) -> Sub {
     let filter = create_env_filter(true, log_config);
 
     let fmt_layer = tracing_subscriber::fmt::layer()
@@ -38,7 +38,7 @@ pub fn test_tracing_subscriber(log_config: String, metrics: MetricRegistry) -> S
         .with(ErrorLayer::default())
 }
 
-fn create_env_filter(log_queries: bool, qe_log_level: String) -> EnvFilter {
+fn create_env_filter(log_queries: bool, qe_log_level: &str) -> EnvFilter {
     let mut filter = EnvFilter::from_default_env()
         .add_directive("tide=error".parse().unwrap())
         .add_directive("tonic=error".parse().unwrap())
