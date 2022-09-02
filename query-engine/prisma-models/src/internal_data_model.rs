@@ -58,12 +58,28 @@ impl InternalDataModel {
             .ok_or_else(|| DomainError::ModelNotFound { name: name.to_string() })
     }
 
-    pub fn find_relation(&self, name: &str) -> crate::Result<RelationWeakRef> {
+    /// This method takes the two models at the ends of the relation as a first argument, because
+    /// relation names are scoped by the pair of models in the relation. Relation names are _not_
+    /// globally unique.
+    pub fn find_relation(&self, model_names: (&str, &str), relation_name: &str) -> crate::Result<RelationWeakRef> {
         self.relations
             .get()
-            .and_then(|relations| relations.iter().find(|relation| relation.name == name))
+            .and_then(|relations| {
+                // The scope for a relation name is only between two models. Every pair of models
+                // has its own scope for relation names.
+                relations.iter().find(|relation| {
+                    relation.name == relation_name
+                        && ((relation.is_self_relation()
+                            && model_names.0 == model_names.1
+                            && relation.model_a_name == model_names.0) // self relation
+                            || (model_names.0 == relation.model_a_name && model_names.1 == relation.model_b_name)
+                            || (model_names.0 == relation.model_b_name && model_names.1 == relation.model_a_name))
+                })
+            })
             .map(Arc::downgrade)
-            .ok_or_else(|| DomainError::RelationNotFound { name: name.to_string() })
+            .ok_or_else(|| DomainError::RelationNotFound {
+                name: relation_name.to_owned(),
+            })
     }
 
     /// Finds all non-list relation fields pointing to the given model.
