@@ -99,6 +99,46 @@ mod update {
         schema.to_owned()
     }
 
+    fn schema_8() -> String {
+        let schema = indoc! {
+            r#"model TestModel {
+              id                    Int       @id
+              test                  Int?
+              updatedAt_w_default   DateTime  @default(now()) @updatedAt
+              updatedAt_wo_default  DateTime? @updatedAt
+              createdAt             DateTime  @default(now())
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // "UpdatedAt and createdAt" should "be mutable with an update"
+    #[connector_test(schema(schema_8))]
+    async fn updated_at_with_default(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1}"#).await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            updateOneTestModel(
+              where: { id: 1 }
+              data: {
+                test: 1
+              }
+            ) {
+              id
+              test
+              updatedAt_w_default
+              updatedAt_wo_default
+              createdAt
+            }
+          }"#),
+          @r###"{"data":{"updateOneTestModel":{"createdAt":"2000-01-01T00:00:00.000Z","updatedAt":"2001-01-01T00:00:00.000Z"}}}"###
+        );
+
+        Ok(())
+    }
+
     //"An updateOne mutation" should "update an item"
     #[connector_test(schema(schema_1))]
     async fn update_an_item(runner: Runner) -> TestResult<()> {
