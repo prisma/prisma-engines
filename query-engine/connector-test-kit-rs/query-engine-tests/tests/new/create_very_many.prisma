@@ -1,0 +1,11 @@
+model Dictionary {
+    id     String @id @default(uuid())
+    entries Entry[]
+}
+
+model Entry {
+    id           BigInt @id @default(autoincrement())
+    term         String
+    dictionaryId String?
+    Dictionary   Dictionary? @relation(fields: [dictionaryId], references: [id])
+}

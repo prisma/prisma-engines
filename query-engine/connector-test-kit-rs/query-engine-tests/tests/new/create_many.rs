@@ -1,5 +1,33 @@
 use query_engine_tests::*;
 
+/// Reproduction for https://github.com/prisma/prisma/issues/9372
+mod create_very_many {
+    use super::*;
+
+    fn basic() -> String {
+        include_str!("create_very_many.prisma").to_owned()
+    }
+
+    #[connector_test(suite = "wat", schema(basic))]
+    async fn create_very_many(runner: Runner) -> TestResult<()> {
+        use std::fmt::Write;
+
+        const RECORDS: usize = 150_000;
+
+        let mut items = String::with_capacity(3 * RECORDS);
+        for i in 0..RECORDS {
+            write!(items, "{{term:\"{}\"}},", i).unwrap();
+        }
+
+        let query = format!("mutation {{ createOneDictionary(data: {{ entries: {{ create: [{items}] }} }}) {{ id }} }}");
+        let result = runner.query(query).await?;
+        dbg!(result.to_string_pretty());
+        result.assert_success();
+
+        Ok(())
+    }
+}
+
 /// New test to check that SQL Server doesn't allow writing autoincrement IDs.
 #[test_suite(schema(autoinc_id), only(SqlServer))]
 mod sql_server {
