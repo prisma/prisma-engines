@@ -2,7 +2,7 @@ use crate::serialization_ast::datamodel_ast::{
     Datamodel, Enum, EnumValue, Field, Function, Model, PrimaryKey, UniqueIndex,
 };
 use bigdecimal::ToPrimitive;
-use datamodel::dml::{self, CompositeTypeFieldType, FieldType, Ignorable, PrismaValue, ScalarType};
+use psl::dml::{self, CompositeTypeFieldType, FieldType, Ignorable, PrismaValue, ScalarType};
 
 pub fn schema_to_dmmf(schema: &dml::Datamodel) -> Datamodel {
     let mut datamodel = Datamodel {
@@ -281,12 +281,12 @@ fn get_relation_delete_strategy(field: &dml::Field) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::schema_to_dmmf;
-    use datamodel::dml::Datamodel;
     use pretty_assertions::assert_eq;
+    use psl::dml::Datamodel;
     use std::fs;
 
     pub(crate) fn parse(datamodel_string: &str) -> Datamodel {
-        match datamodel::parse_datamodel(datamodel_string) {
+        match psl::parse_datamodel(datamodel_string) {
             Ok(s) => s.subject,
             Err(errs) => {
                 panic!(
@@ -297,7 +297,7 @@ mod tests {
         }
     }
 
-    fn render_to_dmmf(schema: &datamodel::dml::Datamodel) -> String {
+    fn render_to_dmmf(schema: &psl::dml::Datamodel) -> String {
         let dmmf = schema_to_dmmf(schema);
         serde_json::to_string_pretty(&dmmf).expect("Failed to render JSON")
     }

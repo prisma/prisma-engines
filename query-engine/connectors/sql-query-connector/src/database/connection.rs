@@ -6,9 +6,9 @@ use connector_interface::{
     self as connector, filter::Filter, AggregationRow, AggregationSelection, Connection, QueryArguments,
     ReadOperations, RecordFilter, Transaction, WriteArgs, WriteOperations,
 };
-use datamodel::common::preview_features::PreviewFeature;
 use prisma_models::{prelude::*, SelectionResult};
 use prisma_value::PrismaValue;
+use psl::common::preview_features::PreviewFeature;
 use quaint::{
     connector::{IsolationLevel, TransactionCapable},
     prelude::ConnectionInfo,

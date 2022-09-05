@@ -4,8 +4,8 @@ use crate::warnings::{
     ModelAndFieldAndType,
 };
 use crate::SqlFamilyTrait;
-use datamodel::dml::{Datamodel, FieldType};
 use introspection_connector::{IntrospectionContext, Warning};
+use psl::dml::{Datamodel, FieldType};
 
 pub fn commenting_out_guardrails(datamodel: &mut Datamodel, ctx: &IntrospectionContext) -> Vec<Warning> {
     let mut warnings = vec![];

@@ -3,9 +3,8 @@ use crate::{
     warnings::*,
     SqlFamilyTrait,
 };
-use datamodel::dml::{self, Datamodel, DefaultValue, Field, FieldType, Ignorable, ValueGenerator, WithName};
 use introspection_connector::{IntrospectionContext, Warning};
-use prisma_value::PrismaValue;
+use psl::dml::{self, Datamodel, DefaultValue, Field, FieldType, Ignorable, PrismaValue, ValueGenerator, WithName};
 use std::{
     cmp::Ordering::{self, Equal, Greater, Less},
     collections::{BTreeSet, HashMap},

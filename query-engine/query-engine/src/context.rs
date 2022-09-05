@@ -1,6 +1,6 @@
 use crate::{PrismaError, PrismaResult};
-use datamodel::{dml::Datamodel, Configuration};
 use prisma_models::InternalDataModelBuilder;
+use psl::{dml::Datamodel, Configuration};
 use query_core::{executor, schema::QuerySchemaRef, schema_builder, QueryExecutor};
 use query_engine_metrics::MetricRegistry;
 use std::{env, fmt, sync::Arc};

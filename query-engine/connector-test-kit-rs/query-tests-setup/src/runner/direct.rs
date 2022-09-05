@@ -19,7 +19,7 @@ pub struct DirectRunner {
 #[async_trait::async_trait]
 impl RunnerInterface for DirectRunner {
     async fn load(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<Self> {
-        let config = datamodel::parse_configuration(&datamodel).unwrap().subject;
+        let config = psl::parse_configuration(&datamodel).unwrap().subject;
         let data_source = config.datasources.first().expect("No valid data source found");
         let preview_features: Vec<_> = config.preview_features().iter().collect();
         let url = data_source.load_url(|key| env::var(key).ok()).unwrap();

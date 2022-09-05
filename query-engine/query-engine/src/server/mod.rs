@@ -1,8 +1,8 @@
 use crate::{context::PrismaContext, opt::PrismaOpt, PrismaResult};
-use datamodel::common::preview_features::PreviewFeature;
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{header::CONTENT_TYPE, Body, HeaderMap, Method, Request, Response, Server, StatusCode};
 use opentelemetry::{global, propagation::Extractor, Context};
+use psl::common::preview_features::PreviewFeature;
 use query_core::{schema::QuerySchemaRenderer, TxId};
 use query_engine_metrics::{MetricFormat, MetricRegistry};
 use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlHandler, TxInput};

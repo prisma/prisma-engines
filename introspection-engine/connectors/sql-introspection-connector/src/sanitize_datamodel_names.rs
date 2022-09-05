@@ -1,13 +1,12 @@
 use crate::{calculate_datamodel::CalculateDatamodelContext as Context, SqlFamilyTrait};
-use datamodel::{
+use once_cell::sync::Lazy;
+use psl::{
     dml::{
-        Datamodel, DefaultKind, DefaultValue, Field, FieldType, IndexField, Model, PrimaryKeyField, ValueGenerator,
-        WithDatabaseName, WithName,
+        Datamodel, DefaultKind, DefaultValue, Field, FieldType, IndexField, Model, PrimaryKeyField, PrismaValue,
+        ValueGenerator, WithDatabaseName, WithName,
     },
     is_reserved_type_name,
 };
-use once_cell::sync::Lazy;
-use prisma_value::PrismaValue;
 use quaint::prelude::SqlFamily;
 use regex::Regex;
 use std::collections::HashMap;

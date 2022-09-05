@@ -1,5 +1,5 @@
 use crate::{InternalEnum, InternalEnumValue, TypeIdentifier};
-use datamodel::dml::{self, Ignorable, NativeTypeInstance};
+use psl::dml::{self, Ignorable, NativeTypeInstance};
 
 pub trait ModelConverterUtilities {
     // A model is supported if it has at least one indexed/unique field or compound index that's supported.

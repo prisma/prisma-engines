@@ -9,10 +9,10 @@ use connector_interface::{
     error::{ConnectorError, ErrorKind},
     Connector,
 };
-use datamodel::Datasource;
 use futures::Future;
 use mongodb::Client;
 use prisma_models::prelude::*;
+use psl::Datasource;
 
 use crate::error::MongoError;
 

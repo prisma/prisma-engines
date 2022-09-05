@@ -4,11 +4,11 @@ use crate::{
 };
 use async_trait::async_trait;
 use connector_interface::{filter::Filter, RecordFilter};
-use datamodel::common::preview_features::PreviewFeature;
 use futures::future::FutureExt;
 use itertools::Itertools;
 use opentelemetry::trace::TraceFlags;
 use prisma_models::*;
+use psl::common::preview_features::PreviewFeature;
 use quaint::{
     ast::*,
     connector::{self, Queryable},

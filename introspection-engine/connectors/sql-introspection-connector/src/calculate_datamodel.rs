@@ -7,9 +7,9 @@ use crate::{
     sanitize_datamodel_names::{sanitization_leads_to_duplicate_names, sanitize_datamodel_names},
     version_checker, SqlFamilyTrait, SqlIntrospectionResult,
 };
-use datamodel::{builtin_connectors::*, common::preview_features::PreviewFeature, dml::Datamodel, Datasource};
 use enumflags2::BitFlags;
 use introspection_connector::{IntrospectionContext, IntrospectionResult};
+use psl::{builtin_connectors::*, common::preview_features::PreviewFeature, dml::Datamodel, Datasource};
 use quaint::prelude::SqlFamily;
 use sql_schema_describer::SqlSchema;
 use tracing::debug;

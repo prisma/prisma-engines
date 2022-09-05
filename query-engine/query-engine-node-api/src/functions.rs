@@ -1,8 +1,8 @@
 use crate::error::ApiError;
-use datamodel_connector::ConnectorCapabilities;
 use napi::{bindgen_prelude::*, JsUnknown};
 use napi_derive::napi;
 use prisma_models::InternalDataModelBuilder;
+use psl::datamodel_connector::ConnectorCapabilities;
 use query_core::{schema::QuerySchemaRef, schema_builder};
 use request_handlers::dmmf;
 use std::{
@@ -27,10 +27,10 @@ pub fn version() -> Version {
 
 #[napi]
 pub fn dmmf(datamodel_string: String) -> napi::Result<String> {
-    let datamodel = datamodel::parse_datamodel(&datamodel_string)
-        .map_err(|errors| ApiError::conversion(errors, &datamodel_string))?;
+    let datamodel =
+        psl::parse_datamodel(&datamodel_string).map_err(|errors| ApiError::conversion(errors, &datamodel_string))?;
 
-    let config = datamodel::parse_configuration(&datamodel_string)
+    let config = psl::parse_configuration(&datamodel_string)
         .map_err(|errors| ApiError::conversion(errors, &datamodel_string))?;
     let datasource = config.subject.datasources.first();
 
@@ -79,8 +79,7 @@ pub fn get_config(js_env: Env, options: JsUnknown) -> napi::Result<JsUnknown> {
     } = options;
 
     let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
-    let mut config =
-        datamodel::parse_configuration(&datamodel).map_err(|errors| ApiError::conversion(errors, &datamodel))?;
+    let mut config = psl::parse_configuration(&datamodel).map_err(|errors| ApiError::conversion(errors, &datamodel))?;
 
     if !ignore_env_var_errors {
         config
@@ -89,7 +88,7 @@ pub fn get_config(js_env: Env, options: JsUnknown) -> napi::Result<JsUnknown> {
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
     }
 
-    let serialized = datamodel::mcf::config_to_mcf_json_value(&config);
+    let serialized = psl::mcf::config_to_mcf_json_value(&config);
 
     js_env.to_js_value(&serialized)
 }

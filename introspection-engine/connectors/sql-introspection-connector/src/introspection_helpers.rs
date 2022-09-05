@@ -1,5 +1,5 @@
 use crate::{calculate_datamodel::CalculateDatamodelContext as Context, SqlError, SqlFamilyTrait};
-use datamodel::{
+use psl::{
     common::{preview_features::PreviewFeature, RelationNames},
     dml::{
         Datamodel, FieldArity, FieldType, IndexAlgorithm, IndexDefinition, IndexField, Model, OperatorClass,
@@ -154,12 +154,12 @@ pub fn calculate_many_to_many_field(
 
 pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &mut Context) -> Option<IndexDefinition> {
     let tpe = match index.index_type() {
-        IndexType::Unique => datamodel::dml::IndexType::Unique,
-        IndexType::Normal => datamodel::dml::IndexType::Normal,
+        IndexType::Unique => psl::dml::IndexType::Unique,
+        IndexType::Normal => psl::dml::IndexType::Normal,
         IndexType::Fulltext if ctx.preview_features.contains(PreviewFeature::FullTextIndex) => {
-            datamodel::dml::IndexType::Fulltext
+            psl::dml::IndexType::Fulltext
         }
-        IndexType::Fulltext => datamodel::dml::IndexType::Normal,
+        IndexType::Fulltext => psl::dml::IndexType::Normal,
         IndexType::PrimaryKey => return None,
     };
 
@@ -390,7 +390,7 @@ pub(crate) fn calculate_scalar_field_type_with_native_types(
                 let native_type_instance = ctx.source.active_connector.introspect_native_type(native_type.clone());
                 FieldType::Scalar(
                     scal_type,
-                    Some(datamodel::dml::NativeTypeInstance {
+                    Some(psl::dml::NativeTypeInstance {
                         args: native_type_instance.args,
                         serialized_native_type: native_type_instance.serialized_native_type,
                         name: native_type_instance.name,
