@@ -468,7 +468,7 @@ fn duplicate_relation_name() {
           
         "#;
 
-    let (_, dml) = datamodel::parse_schema(schema).unwrap();
+    let (_, dml) = psl::parse_schema(schema).unwrap();
     let res = std::panic::catch_unwind(|| InternalDataModelBuilder::from(&dml));
 
     assert!(res.is_ok());

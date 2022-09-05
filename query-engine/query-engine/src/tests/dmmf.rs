@@ -3,15 +3,15 @@ use crate::{
     opt::{CliOpt, PrismaOpt, Subcommand},
     PrismaResult,
 };
-use datamodel_connector::ConnectorCapabilities;
 use prisma_models::InternalDataModelBuilder;
+use psl::datamodel_connector::ConnectorCapabilities;
 use query_core::{schema::QuerySchema, schema_builder};
 use serial_test::serial;
 use std::sync::Arc;
 
-pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml::Datamodel) {
-    let config = datamodel::parse_configuration(datamodel_string).unwrap();
-    let dm = datamodel::parse_datamodel(datamodel_string).unwrap().subject;
+pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, psl::dml::Datamodel) {
+    let config = psl::parse_configuration(datamodel_string).unwrap();
+    let dm = psl::parse_datamodel(datamodel_string).unwrap().subject;
     let datasource = config.subject.datasources.first();
 
     let capabilities = datasource

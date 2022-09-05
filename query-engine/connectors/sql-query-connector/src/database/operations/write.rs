@@ -1,10 +1,10 @@
 use crate::sql_trace::SqlTraceComment;
 use crate::{error::SqlError, model_extensions::*, query_builder::write, sql_info::SqlInfo, QueryExt};
 use connector_interface::*;
-use datamodel::common::preview_features::PreviewFeature;
 use itertools::Itertools;
 use prisma_models::*;
-use prisma_value::PrismaValue;
+use psl::common::preview_features::PreviewFeature;
+use psl::dml::prisma_value::PrismaValue;
 use quaint::{
     error::ErrorKind,
     prelude::{native_uuid, uuid_to_bin, uuid_to_bin_swapped, Aliasable, Select, SqlFamily},

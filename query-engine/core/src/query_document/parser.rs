@@ -2,10 +2,10 @@ use super::*;
 use crate::schema::*;
 use bigdecimal::{BigDecimal, ToPrimitive};
 use chrono::prelude::*;
-use datamodel::dml::{ValueGenerator, ValueGeneratorFn};
 use indexmap::IndexMap;
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
+use psl::dml::{ValueGenerator, ValueGeneratorFn};
 use std::{borrow::Borrow, collections::HashSet, convert::TryFrom, str::FromStr, sync::Arc};
 use uuid::Uuid;
 
@@ -449,7 +449,7 @@ impl QueryDocumentParser {
                 match &field.default_value {
                     Some(default_value) => {
                         let query_value = match &default_value.kind {
-                            datamodel::dml::DefaultKind::Expression(ref expr)
+                            psl::dml::DefaultKind::Expression(ref expr)
                                 if matches!(expr.generator(), ValueGeneratorFn::Now) =>
                             {
                                 self.default_now.clone().into()

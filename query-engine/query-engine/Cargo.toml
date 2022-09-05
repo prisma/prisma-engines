@@ -18,8 +18,7 @@ async-trait = "0.1"
 base64 = "0.12"
 connection-string = "0.1.10"
 connector = { path = "../connectors/query-connector", package = "query-connector" }
-datamodel = { path = "../../libs/datamodel/core" }
-datamodel-connector = { path = "../../libs/datamodel/connectors/datamodel-connector" }
+psl = { path = "../../psl/psl" }
 graphql-parser = { git = "https://github.com/prisma/graphql-parser" }
 indexmap = { version = "1.7", features = ["serde-1"] }
 itertools = "0.10"

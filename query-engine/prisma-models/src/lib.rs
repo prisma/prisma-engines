@@ -27,7 +27,6 @@ pub mod prelude;
 
 pub use builders::InternalDataModelBuilder;
 pub use composite_type::*;
-pub use datamodel::dml;
 pub use error::*;
 pub use field::*;
 pub use field_selection::*;
@@ -39,12 +38,13 @@ pub use model::*;
 pub use order_by::*;
 pub use prisma_value_ext::*;
 pub use projections::*;
+pub use psl::dml;
 pub use record::*;
 pub use relation::*;
 pub use selection_result::*;
 
 // Re-exports
-pub extern crate datamodel;
 pub use prisma_value::*;
+pub use psl;
 
 pub type Result<T> = std::result::Result<T, DomainError>;

@@ -6,18 +6,18 @@ mod sql_server;
 mod sqlite;
 mod vitess;
 
-use cockroachdb::*;
-use datamodel_connector::ConnectorCapability;
-use enum_dispatch::enum_dispatch;
 pub use mongodb::*;
 pub use mysql::*;
 pub use postgres::*;
 pub use sql_server::*;
 pub use sqlite::*;
-use std::{convert::TryFrom, fmt};
 pub use vitess::*;
 
 use crate::{datamodel_rendering::DatamodelRenderer, TestConfig, TestError};
+use cockroachdb::*;
+use enum_dispatch::enum_dispatch;
+use psl::datamodel_connector::ConnectorCapability;
+use std::{convert::TryFrom, fmt};
 
 #[enum_dispatch]
 pub trait ConnectorTagInterface {

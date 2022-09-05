@@ -1,11 +1,11 @@
 use crate::calculate_datamodel::CalculateDatamodelContext as Context;
-use datamodel::dml;
+use psl::dml;
 use sql_schema_describer::{self as sql, postgres::PostgresSchemaExt};
 
 pub(crate) fn calculate_default(column: sql::ColumnWalker<'_>, ctx: &mut Context) -> Option<dml::DefaultValue> {
     match (column.default().map(|d| d.kind()), &column.column_type_family()) {
         (Some(sql::DefaultKind::Sequence(name)), _) if ctx.is_cockroach() => {
-            use prisma_value::PrismaValue;
+            use dml::PrismaValue;
 
             let connector_data: &PostgresSchemaExt = ctx.schema.downcast_connector_data();
             let sequence_idx = connector_data

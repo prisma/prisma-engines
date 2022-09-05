@@ -11,7 +11,7 @@ pub struct ModelBuilder {
     pub primary_key: Option<PrimaryKeyBuilder>,
     pub indexes: Vec<IndexBuilder>,
     pub supports_create_operation: bool,
-    pub dml_model: datamodel::dml::Model,
+    pub dml_model: psl::dml::Model,
 }
 
 impl ModelBuilder {

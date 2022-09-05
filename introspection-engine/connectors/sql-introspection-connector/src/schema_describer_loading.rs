@@ -1,4 +1,4 @@
-use datamodel::builtin_connectors::POSTGRES;
+use psl::builtin_connectors::POSTGRES;
 use quaint::prelude::{ConnectionInfo, Queryable, SqlFamily};
 use sql_schema_describer::{postgres::Circumstances, SqlSchemaDescriberBackend};
 

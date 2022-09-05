@@ -1,7 +1,7 @@
 use crate::{error::ApiError, log_callback::LogCallback, logger::Logger};
-use datamodel::{common::preview_features::PreviewFeature, dml::Datamodel, ValidatedConfiguration};
 use futures::FutureExt;
 use prisma_models::InternalDataModelBuilder;
+use psl::{common::preview_features::PreviewFeature, dml::Datamodel, ValidatedConfiguration};
 use query_core::{
     executor,
     schema::{QuerySchema, QuerySchemaRenderer},
@@ -159,9 +159,9 @@ impl QueryEngine {
         let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
 
         let config = if ignore_env_var_errors {
-            datamodel::parse_configuration(&datamodel).map_err(|errors| ApiError::conversion(errors, &datamodel))?
+            psl::parse_configuration(&datamodel).map_err(|errors| ApiError::conversion(errors, &datamodel))?
         } else {
-            datamodel::parse_configuration(&datamodel)
+            psl::parse_configuration(&datamodel)
                 .and_then(|mut config| {
                     config
                         .subject
@@ -177,7 +177,7 @@ impl QueryEngine {
             .validate_that_one_datasource_is_provided()
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
 
-        let ast = datamodel::parse_datamodel(&datamodel)
+        let ast = psl::parse_datamodel(&datamodel)
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?
             .subject;
 
@@ -292,7 +292,7 @@ impl QueryEngine {
                 let mut inner = self.inner.write().await;
                 let engine = inner.as_engine()?;
 
-                let config = datamodel::parse_configuration(&engine.datamodel.raw)
+                let config = psl::parse_configuration(&engine.datamodel.raw)
                     .map_err(|errors| ApiError::conversion(errors, &engine.datamodel.raw))?;
 
                 let builder = EngineBuilder {

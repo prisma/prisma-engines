@@ -1,8 +1,10 @@
-use crate::warnings::{warning_default_cuid_warning, warning_default_uuid_warning, ModelAndField};
-use crate::SqlFamilyTrait;
-use datamodel::dml::{self, Datamodel, ValueGenerator};
+use crate::{
+    warnings::{warning_default_cuid_warning, warning_default_uuid_warning, ModelAndField},
+    SqlFamilyTrait,
+};
 use introspection_connector::{IntrospectionContext, Version, Warning};
 use native_types::{MySqlType, PostgresType};
+use psl::dml::{self, Datamodel, ValueGenerator};
 use sql_schema_describer::SqlSchema;
 
 pub fn add_prisma_1_id_defaults(

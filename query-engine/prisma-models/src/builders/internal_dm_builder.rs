@@ -8,8 +8,8 @@ use crate::{
     IndexType, InlineRelation, InternalDataModel, InternalDataModelRef, InternalEnum, InternalEnumValue,
     RelationLinkManifestation, RelationSide, RelationTable, TypeIdentifier,
 };
-use datamodel::dml::{self, CompositeTypeFieldType, Datamodel, Ignorable, WithDatabaseName};
 use once_cell::sync::OnceCell;
+use psl::dml::{self, CompositeTypeFieldType, Datamodel, Ignorable, WithDatabaseName};
 use std::sync::Arc;
 
 #[derive(Debug, Default)]
@@ -22,7 +22,7 @@ pub struct InternalDataModelBuilder {
 
 impl InternalDataModelBuilder {
     pub fn new(datamodel: &str) -> Self {
-        let datamodel = datamodel::parse_datamodel(datamodel)
+        let datamodel = psl::parse_datamodel(datamodel)
             .expect("Expected valid datamodel.")
             .subject;
 

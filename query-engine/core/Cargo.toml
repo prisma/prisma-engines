@@ -18,8 +18,7 @@ connection-string = "0.1"
 connector = { path = "../connectors/query-connector", package = "query-connector" }
 crossbeam-queue = "0.3.5"
 mongodb-client = { path = "../../libs/mongodb-client/" }
-datamodel = { path = "../../libs/datamodel/core" }
-datamodel-connector = { path = "../../libs/datamodel/connectors/datamodel-connector" }
+psl = { path = "../../psl/psl" }
 futures = "0.3"
 im = "15.1.0"
 indexmap = { version = "1.7", features = ["serde-1"] }

@@ -42,8 +42,8 @@ mod utils;
 use cache::TypeRefCache;
 use datamodel_connector::{ConnectorCapabilities, ConnectorCapability, ReferentialIntegrity};
 use prisma_models::{
-    datamodel::common::preview_features::PreviewFeature, CompositeTypeRef, Field as ModelField, Index,
-    InternalDataModelRef, ModelRef, RelationFieldRef, TypeIdentifier,
+    psl::common::preview_features::PreviewFeature, CompositeTypeRef, Field as ModelField, Index, InternalDataModelRef,
+    ModelRef, RelationFieldRef, TypeIdentifier,
 };
 use schema::*;
 use std::sync::Arc;

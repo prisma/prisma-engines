@@ -22,8 +22,8 @@ pub use schema_gen::*;
 pub use templating::*;
 
 use colored::Colorize;
-use datamodel_connector::ConnectorCapability;
 use lazy_static::lazy_static;
+use psl::datamodel_connector::ConnectorCapability;
 use query_engine_metrics::MetricRegistry;
 use std::future::Future;
 use std::sync::Once;

@@ -1,6 +1,6 @@
 use crate::{error::PrismaError, PrismaResult};
-use datamodel::dml::Datamodel;
-use datamodel::ValidatedConfiguration;
+use psl::dml::Datamodel;
+use psl::ValidatedConfiguration;
 use serde::Deserialize;
 use std::env;
 use std::{ffi::OsStr, fs::File, io::Read};
@@ -135,7 +135,7 @@ impl PrismaOpt {
     pub fn datamodel(&self) -> PrismaResult<Datamodel> {
         let datamodel_str = self.datamodel_str()?;
 
-        let datamodel = datamodel::parse_datamodel(datamodel_str);
+        let datamodel = psl::parse_datamodel(datamodel_str);
 
         match datamodel {
             Err(errors) => Err(PrismaError::ConversionError(errors, datamodel_str.to_string())),
@@ -154,9 +154,9 @@ impl PrismaOpt {
         };
 
         let config_result = if ignore_env_errors {
-            datamodel::parse_configuration(datamodel_str)
+            psl::parse_configuration(datamodel_str)
         } else {
-            datamodel::parse_configuration(datamodel_str).and_then(|mut config| {
+            psl::parse_configuration(datamodel_str).and_then(|mut config| {
                 config
                     .subject
                     .resolve_datasource_urls_from_env(&datasource_url_overrides, |key| env::var(key).ok())?;

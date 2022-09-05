@@ -42,8 +42,8 @@ path = "../../../libs/prisma-value"
 features = ["serde"]
 version = "0.4"
 
-[dependencies.datamodel]
-path = "../../../libs/datamodel/core"
+[dependencies.psl]
+path = "../../../psl/psl"
 
 [dependencies.serde]
 features = ["derive"]

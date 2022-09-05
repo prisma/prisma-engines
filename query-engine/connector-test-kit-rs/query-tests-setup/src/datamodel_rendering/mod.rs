@@ -5,10 +5,10 @@ pub use mongodb_renderer::*;
 pub use sql_renderer::*;
 
 use crate::{templating, ConnectorTagInterface, DatamodelFragment, IdFragment, M2mFragment, TestConfig};
-use datamodel::common::preview_features::GENERATOR;
 use indoc::indoc;
 use itertools::Itertools;
 use lazy_static::lazy_static;
+use psl::common::preview_features::GENERATOR;
 use regex::Regex;
 
 lazy_static! {

@@ -1,5 +1,5 @@
-use datamodel::datamodel_connector::{ConnectorCapabilities, ConnectorCapability};
 use once_cell::sync::Lazy;
+use psl::datamodel_connector::{ConnectorCapabilities, ConnectorCapability};
 use quaint::prelude::ConnectionInfo;
 use std::env;
 

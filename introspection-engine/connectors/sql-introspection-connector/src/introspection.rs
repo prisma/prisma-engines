@@ -7,7 +7,7 @@ use crate::{
     },
     SqlError, SqlFamilyTrait,
 };
-use datamodel::dml::{self, Field, Model, PrimaryKeyDefinition, PrimaryKeyField, RelationField, SortOrder};
+use psl::dml::{self, Field, Model, PrimaryKeyDefinition, PrimaryKeyField, RelationField, SortOrder};
 use sql_schema_describer::{walkers::TableWalker, ForeignKeyId, SQLSortOrder};
 use std::collections::HashSet;
 use tracing::debug;
