@@ -67,7 +67,7 @@
     <span class="kw">pub</span> <span class="ident">primary_key</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrimaryKeyBuilder</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">indexes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IndexBuilder</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">supports_create_operation</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">dml_model</span>: <span class="ident">datamodel::dml::Model</span>,
+    <span class="kw">pub</span> <span class="ident">dml_model</span>: <span class="ident">psl::dml::Model</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">ModelBuilder</span> {

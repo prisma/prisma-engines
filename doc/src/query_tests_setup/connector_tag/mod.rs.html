@@ -227,18 +227,18 @@
 <span class="kw">mod</span> <span class="ident">sqlite</span>;
 <span class="kw">mod</span> <span class="ident">vitess</span>;
 
-<span class="kw">use</span> <span class="ident">cockroachdb</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">datamodel_connector::ConnectorCapability</span>;
-<span class="kw">use</span> <span class="ident">enum_dispatch::enum_dispatch</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">mongodb</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">mysql</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">postgres</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sql_server</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sqlite</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryFrom</span>, <span class="ident">fmt</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">vitess</span>::<span class="kw-2">*</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">datamodel_rendering::DatamodelRenderer</span>, <span class="ident">TestConfig</span>, <span class="ident">TestError</span>};
+<span class="kw">use</span> <span class="ident">cockroachdb</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">enum_dispatch::enum_dispatch</span>;
+<span class="kw">use</span> <span class="ident">psl::datamodel_connector::ConnectorCapability</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryFrom</span>, <span class="ident">fmt</span>};
 
 <span class="attribute">#[<span class="ident">enum_dispatch</span>]</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ConnectorTagInterface</span> {

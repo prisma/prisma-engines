@@ -184,8 +184,8 @@
     <span class="ident">ModelAndFieldAndType</span>,
 };
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::SqlFamilyTrait</span>;
-<span class="kw">use</span> <span class="ident">datamodel::dml</span>::{<span class="ident">Datamodel</span>, <span class="ident">FieldType</span>};
 <span class="kw">use</span> <span class="ident">introspection_connector</span>::{<span class="ident">IntrospectionContext</span>, <span class="ident">Warning</span>};
+<span class="kw">use</span> <span class="ident">psl::dml</span>::{<span class="ident">Datamodel</span>, <span class="ident">FieldType</span>};
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">commenting_out_guardrails</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Datamodel</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">IntrospectionContext</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Warning</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">warnings</span> <span class="op">=</span> <span class="macro">vec!</span>[];

@@ -154,9 +154,9 @@
 <span id="148">148</span>
 <span id="149">149</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">connector_interface</span>::{<span class="ident">AggregationSelection</span>, <span class="ident">RelAggregationSelection</span>};
-<span class="kw">use</span> <span class="ident">datamodel::dml::FieldArity</span>;
 <span class="kw">use</span> <span class="ident">indexmap::IndexMap</span>;
 <span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">FieldSelection</span>, <span class="ident">PrismaValue</span>, <span class="ident">ScalarFieldRef</span>, <span class="ident">SelectedField</span>, <span class="ident">TypeIdentifier</span>};
+<span class="kw">use</span> <span class="ident">psl::dml::FieldArity</span>;
 
 <span class="doccomment">/// Maps field db field names to their meta information.</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">OutputMetaMapping</span> <span class="op">=</span> <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">OutputMeta</span><span class="op">&gt;</span>;
@@ -249,7 +249,7 @@
 
     <span class="comment">// Only add a possible default return if the field is required.</span>
     <span class="kw">let</span> <span class="ident">default</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">default_value</span>.<span class="ident">clone</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">dv</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">dv</span>.<span class="ident">into_kind</span>() {
-        <span class="ident">datamodel::dml::DefaultKind::Single</span>(<span class="ident">pv</span>) <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">is_required</span>() =&gt; <span class="prelude-val">Some</span>(<span class="ident">pv</span>),
+        <span class="ident">psl::dml::DefaultKind::Single</span>(<span class="ident">pv</span>) <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">is_required</span>() =&gt; <span class="prelude-val">Some</span>(<span class="ident">pv</span>),
         <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
     });
 

@@ -99,10 +99,10 @@
     <span class="ident">error</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ErrorKind</span>},
     <span class="ident">Connector</span>,
 };
-<span class="kw">use</span> <span class="ident">datamodel::Datasource</span>;
 <span class="kw">use</span> <span class="ident">futures::Future</span>;
 <span class="kw">use</span> <span class="ident">mongodb::Client</span>;
 <span class="kw">use</span> <span class="ident">prisma_models::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">psl::Datasource</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::MongoError</span>;
 

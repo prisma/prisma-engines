@@ -570,7 +570,7 @@
 <span id="564">564</span>
 <span id="565">565</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">calculate_datamodel::CalculateDatamodelContext</span> <span class="kw">as</span> <span class="ident">Context</span>, <span class="ident">SqlError</span>, <span class="ident">SqlFamilyTrait</span>};
-<span class="kw">use</span> <span class="ident">datamodel</span>::{
+<span class="kw">use</span> <span class="ident">psl</span>::{
     <span class="ident">common</span>::{<span class="ident">preview_features::PreviewFeature</span>, <span class="ident">RelationNames</span>},
     <span class="ident">dml</span>::{
         <span class="ident">Datamodel</span>, <span class="ident">FieldArity</span>, <span class="ident">FieldType</span>, <span class="ident">IndexAlgorithm</span>, <span class="ident">IndexDefinition</span>, <span class="ident">IndexField</span>, <span class="ident">Model</span>, <span class="ident">OperatorClass</span>,
@@ -725,12 +725,12 @@
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_index</span>(<span class="ident">index</span>: <span class="ident">sql::walkers::IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IndexDefinition</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">tpe</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">index</span>.<span class="ident">index_type</span>() {
-        <span class="ident">IndexType::Unique</span> =&gt; <span class="ident">datamodel::dml::IndexType::Unique</span>,
-        <span class="ident">IndexType::Normal</span> =&gt; <span class="ident">datamodel::dml::IndexType::Normal</span>,
+        <span class="ident">IndexType::Unique</span> =&gt; <span class="ident">psl::dml::IndexType::Unique</span>,
+        <span class="ident">IndexType::Normal</span> =&gt; <span class="ident">psl::dml::IndexType::Normal</span>,
         <span class="ident">IndexType::Fulltext</span> <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::FullTextIndex</span>) =&gt; {
-            <span class="ident">datamodel::dml::IndexType::Fulltext</span>
+            <span class="ident">psl::dml::IndexType::Fulltext</span>
         }
-        <span class="ident">IndexType::Fulltext</span> =&gt; <span class="ident">datamodel::dml::IndexType::Normal</span>,
+        <span class="ident">IndexType::Fulltext</span> =&gt; <span class="ident">psl::dml::IndexType::Normal</span>,
         <span class="ident">IndexType::PrimaryKey</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
     };
 
@@ -961,7 +961,7 @@
                 <span class="kw">let</span> <span class="ident">native_type_instance</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">source</span>.<span class="ident">active_connector</span>.<span class="ident">introspect_native_type</span>(<span class="ident">native_type</span>.<span class="ident">clone</span>());
                 <span class="ident">FieldType::Scalar</span>(
                     <span class="ident">scal_type</span>,
-                    <span class="prelude-val">Some</span>(<span class="ident">datamodel::dml::NativeTypeInstance</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">psl::dml::NativeTypeInstance</span> {
                         <span class="ident">args</span>: <span class="ident">native_type_instance</span>.<span class="ident">args</span>,
                         <span class="ident">serialized_native_type</span>: <span class="ident">native_type_instance</span>.<span class="ident">serialized_native_type</span>,
                         <span class="ident">name</span>: <span class="ident">native_type_instance</span>.<span class="ident">name</span>,

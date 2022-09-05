@@ -352,7 +352,7 @@
     <span class="ident">Datamodel</span>, <span class="ident">Enum</span>, <span class="ident">EnumValue</span>, <span class="ident">Field</span>, <span class="ident">Function</span>, <span class="ident">Model</span>, <span class="ident">PrimaryKey</span>, <span class="ident">UniqueIndex</span>,
 };
 <span class="kw">use</span> <span class="ident">bigdecimal::ToPrimitive</span>;
-<span class="kw">use</span> <span class="ident">datamodel::dml</span>::{<span class="self">self</span>, <span class="ident">CompositeTypeFieldType</span>, <span class="ident">FieldType</span>, <span class="ident">Ignorable</span>, <span class="ident">PrismaValue</span>, <span class="ident">ScalarType</span>};
+<span class="kw">use</span> <span class="ident">psl::dml</span>::{<span class="self">self</span>, <span class="ident">CompositeTypeFieldType</span>, <span class="ident">FieldType</span>, <span class="ident">Ignorable</span>, <span class="ident">PrismaValue</span>, <span class="ident">ScalarType</span>};
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema_to_dmmf</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Datamodel</span>) -&gt; <span class="ident">Datamodel</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">Datamodel</span> {
@@ -631,12 +631,12 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::schema_to_dmmf</span>;
-    <span class="kw">use</span> <span class="ident">datamodel::dml::Datamodel</span>;
     <span class="kw">use</span> <span class="ident">pretty_assertions::assert_eq</span>;
+    <span class="kw">use</span> <span class="ident">psl::dml::Datamodel</span>;
     <span class="kw">use</span> <span class="ident">std::fs</span>;
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">datamodel_string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Datamodel</span> {
-        <span class="kw">match</span> <span class="ident">datamodel::parse_datamodel</span>(<span class="ident">datamodel_string</span>) {
+        <span class="kw">match</span> <span class="ident">psl::parse_datamodel</span>(<span class="ident">datamodel_string</span>) {
             <span class="prelude-val">Ok</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">subject</span>,
             <span class="prelude-val">Err</span>(<span class="ident">errs</span>) =&gt; {
                 <span class="macro">panic!</span>(
@@ -647,7 +647,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">render_to_dmmf</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">datamodel::dml::Datamodel</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">render_to_dmmf</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">psl::dml::Datamodel</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="ident">dmmf</span> <span class="op">=</span> <span class="ident">schema_to_dmmf</span>(<span class="ident">schema</span>);
         <span class="ident">serde_json::to_string_pretty</span>(<span class="kw-2">&amp;</span><span class="ident">dmmf</span>).<span class="ident">expect</span>(<span class="string">&quot;Failed to render JSON&quot;</span>)
     }

@@ -467,10 +467,10 @@
 <span id="461">461</span>
 <span id="462">462</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">context::PrismaContext</span>, <span class="ident">opt::PrismaOpt</span>, <span class="ident">PrismaResult</span>};
-<span class="kw">use</span> <span class="ident">datamodel::common::preview_features::PreviewFeature</span>;
 <span class="kw">use</span> <span class="ident">hyper::service</span>::{<span class="ident">make_service_fn</span>, <span class="ident">service_fn</span>};
 <span class="kw">use</span> <span class="ident">hyper</span>::{<span class="ident">header::CONTENT_TYPE</span>, <span class="ident">Body</span>, <span class="ident">HeaderMap</span>, <span class="ident">Method</span>, <span class="ident">Request</span>, <span class="ident">Response</span>, <span class="ident">Server</span>, <span class="ident">StatusCode</span>};
 <span class="kw">use</span> <span class="ident">opentelemetry</span>::{<span class="ident">global</span>, <span class="ident">propagation::Extractor</span>, <span class="ident">Context</span>};
+<span class="kw">use</span> <span class="ident">psl::common::preview_features::PreviewFeature</span>;
 <span class="kw">use</span> <span class="ident">query_core</span>::{<span class="ident">schema::QuerySchemaRenderer</span>, <span class="ident">TxId</span>};
 <span class="kw">use</span> <span class="ident">query_engine_metrics</span>::{<span class="ident">MetricFormat</span>, <span class="ident">MetricRegistry</span>};
 <span class="kw">use</span> <span class="ident">request_handlers</span>::{<span class="ident">dmmf</span>, <span class="ident">GraphQLSchemaRenderer</span>, <span class="ident">GraphQlHandler</span>, <span class="ident">TxInput</span>};

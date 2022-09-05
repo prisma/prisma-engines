@@ -212,11 +212,11 @@
 };
 <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
 <span class="kw">use</span> <span class="ident">connector_interface</span>::{<span class="ident">filter::Filter</span>, <span class="ident">RecordFilter</span>};
-<span class="kw">use</span> <span class="ident">datamodel::common::preview_features::PreviewFeature</span>;
 <span class="kw">use</span> <span class="ident">futures::future::FutureExt</span>;
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 <span class="kw">use</span> <span class="ident">opentelemetry::trace::TraceFlags</span>;
 <span class="kw">use</span> <span class="ident">prisma_models</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">psl::common::preview_features::PreviewFeature</span>;
 <span class="kw">use</span> <span class="ident">quaint</span>::{
     <span class="ident">ast</span>::<span class="kw-2">*</span>,
     <span class="ident">connector</span>::{<span class="self">self</span>, <span class="ident">Queryable</span>},

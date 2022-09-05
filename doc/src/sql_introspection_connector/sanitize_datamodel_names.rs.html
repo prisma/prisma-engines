@@ -252,17 +252,15 @@
 <span id="246">246</span>
 <span id="247">247</span>
 <span id="248">248</span>
-<span id="249">249</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">calculate_datamodel::CalculateDatamodelContext</span> <span class="kw">as</span> <span class="ident">Context</span>, <span class="ident">SqlFamilyTrait</span>};
-<span class="kw">use</span> <span class="ident">datamodel</span>::{
+<span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
+<span class="kw">use</span> <span class="ident">psl</span>::{
     <span class="ident">dml</span>::{
-        <span class="ident">Datamodel</span>, <span class="ident">DefaultKind</span>, <span class="ident">DefaultValue</span>, <span class="ident">Field</span>, <span class="ident">FieldType</span>, <span class="ident">IndexField</span>, <span class="ident">Model</span>, <span class="ident">PrimaryKeyField</span>, <span class="ident">ValueGenerator</span>,
-        <span class="ident">WithDatabaseName</span>, <span class="ident">WithName</span>,
+        <span class="ident">Datamodel</span>, <span class="ident">DefaultKind</span>, <span class="ident">DefaultValue</span>, <span class="ident">Field</span>, <span class="ident">FieldType</span>, <span class="ident">IndexField</span>, <span class="ident">Model</span>, <span class="ident">PrimaryKeyField</span>, <span class="ident">PrismaValue</span>,
+        <span class="ident">ValueGenerator</span>, <span class="ident">WithDatabaseName</span>, <span class="ident">WithName</span>,
     },
     <span class="ident">is_reserved_type_name</span>,
 };
-<span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
-<span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
 <span class="kw">use</span> <span class="ident">quaint::prelude::SqlFamily</span>;
 <span class="kw">use</span> <span class="ident">regex::Regex</span>;
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;

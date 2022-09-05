@@ -491,8 +491,8 @@
     <span class="ident">IndexType</span>, <span class="ident">InlineRelation</span>, <span class="ident">InternalDataModel</span>, <span class="ident">InternalDataModelRef</span>, <span class="ident">InternalEnum</span>, <span class="ident">InternalEnumValue</span>,
     <span class="ident">RelationLinkManifestation</span>, <span class="ident">RelationSide</span>, <span class="ident">RelationTable</span>, <span class="ident">TypeIdentifier</span>,
 };
-<span class="kw">use</span> <span class="ident">datamodel::dml</span>::{<span class="self">self</span>, <span class="ident">CompositeTypeFieldType</span>, <span class="ident">Datamodel</span>, <span class="ident">Ignorable</span>, <span class="ident">WithDatabaseName</span>};
 <span class="kw">use</span> <span class="ident">once_cell::sync::OnceCell</span>;
+<span class="kw">use</span> <span class="ident">psl::dml</span>::{<span class="self">self</span>, <span class="ident">CompositeTypeFieldType</span>, <span class="ident">Datamodel</span>, <span class="ident">Ignorable</span>, <span class="ident">WithDatabaseName</span>};
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
@@ -505,7 +505,7 @@
 
 <span class="kw">impl</span> <span class="ident">InternalDataModelBuilder</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">datamodel::parse_datamodel</span>(<span class="ident">datamodel</span>)
+        <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">psl::parse_datamodel</span>(<span class="ident">datamodel</span>)
             .<span class="ident">expect</span>(<span class="string">&quot;Expected valid datamodel.&quot;</span>)
             .<span class="ident">subject</span>;
 
