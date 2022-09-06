@@ -1917,9 +1917,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             family: Int,
                             arity: Required,
                             native_type: Some(
-                                String(
-                                    "Int",
-                                ),
+                                String("Int"),
                             ),
                         },
                         default: None,
@@ -1937,9 +1935,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             family: Int,
                             arity: Required,
                             native_type: Some(
-                                String(
-                                    "Int",
-                                ),
+                                String("Int"),
                             ),
                         },
                         default: None,
@@ -1957,9 +1953,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             family: Int,
                             arity: Required,
                             native_type: Some(
-                                String(
-                                    "SmallInt",
-                                ),
+                                String("SmallInt"),
                             ),
                         },
                         default: None,
@@ -1977,9 +1971,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             family: Int,
                             arity: Required,
                             native_type: Some(
-                                String(
-                                    "TinyInt",
-                                ),
+                                String("TinyInt"),
                             ),
                         },
                         default: None,
@@ -1997,9 +1989,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             family: Boolean,
                             arity: Required,
                             native_type: Some(
-                                String(
-                                    "TinyInt",
-                                ),
+                                String("TinyInt"),
                             ),
                         },
                         default: None,
@@ -2017,9 +2007,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             family: Int,
                             arity: Required,
                             native_type: Some(
-                                String(
-                                    "MediumInt",
-                                ),
+                                String("MediumInt"),
                             ),
                         },
                         default: None,
@@ -2037,9 +2025,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             family: BigInt,
                             arity: Required,
                             native_type: Some(
-                                String(
-                                    "BigInt",
-                                ),
+                                String("BigInt"),
                             ),
                         },
                         default: None,
@@ -2057,16 +2043,12 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             family: Decimal,
                             arity: Required,
                             native_type: Some(
-                                Object({
-                                    "Decimal": Array([
-                                        Number(
-                                            10,
-                                        ),
-                                        Number(
-                                            0,
-                                        ),
-                                    ]),
-                                }),
+                                Object {
+                                    "Decimal": Array [
+                                        Number(10),
+                                        Number(0),
+                                    ],
+                                },
                             ),
                         },
                         default: None,
@@ -2084,16 +2066,12 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             family: Decimal,
                             arity: Required,
                             native_type: Some(
-                                Object({
-                                    "Decimal": Array([
-                                        Number(
-                                            10,
-                                        ),
-                                        Number(
-                                            0,
-                                        ),
-                                    ]),
-                                }),
+                                Object {
+                                    "Decimal": Array [
+                                        Number(10),
+                                        Number(0),
+                                    ],
+                                },
                             ),
                         },
                         default: None,
@@ -2111,9 +2089,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             family: Float,
                             arity: Required,
                             native_type: Some(
-                                String(
-                                    "Float",
-                                ),
+                                String("Float"),
                             ),
                         },
                         default: None,
@@ -2131,9 +2107,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             family: Float,
                             arity: Required,
                             native_type: Some(
-                                String(
-                                    "Double",
-                                ),
+                                String("Double"),
                             ),
                         },
                         default: None,
@@ -2151,9 +2125,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             family: DateTime,
                             arity: Required,
                             native_type: Some(
-                                String(
-                                    "Date",
-                                ),
+                                String("Date"),
                             ),
                         },
                         default: None,
@@ -2171,11 +2143,9 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             family: DateTime,
                             arity: Required,
                             native_type: Some(
-                                Object({
-                                    "Time": Number(
-                                        0,
-                                    ),
-                                }),
+                                Object {
+                                    "Time": Number(0),
+                                },
                             ),
                         },
                         default: None,
@@ -2193,11 +2163,9 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             family: DateTime,
                             arity: Required,
                             native_type: Some(
-                                Object({
-                                    "DateTime": Number(
-                                        0,
-                                    ),
-                                }),
+                                Object {
+                                    "DateTime": Number(0),
+                                },
                             ),
                         },
                         default: None,
@@ -2215,11 +2183,9 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             family: DateTime,
                             arity: Required,
                             native_type: Some(
-                                Object({
-                                    "Timestamp": Number(
-                                        0,
-                                    ),
-                                }),
+                                Object {
+                                    "Timestamp": Number(0),
+                                },
                             ),
                         },
                         default: None,
@@ -2237,9 +2203,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             family: Int,
                             arity: Required,
                             native_type: Some(
-                                String(
-                                    "Year",
-                                ),
+                                String("Year"),
                             ),
                         },
                         default: None,
@@ -2257,11 +2221,9 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             family: String,
                             arity: Required,
                             native_type: Some(
-                                Object({
-                                    "Char": Number(
-                                        1,
-                                    ),
-                                }),
+                                Object {
+                                    "Char": Number(1),
+                                },
                             ),
                         },
                         default: None,
@@ -2279,11 +2241,9 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             family: String,
                             arity: Required,
                             native_type: Some(
-                                Object({
-                                    "VarChar": Number(
-                                        255,
-                                    ),
-                                }),
+                                Object {
+                                    "VarChar": Number(255),
+                                },
                             ),
                         },
                         default: None,
@@ -2301,9 +2261,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             family: String,
                             arity: Required,
                             native_type: Some(
-                                String(
-                                    "Text",
-                                ),
+                                String("Text"),
                             ),
                         },
                         default: None,
@@ -2321,9 +2279,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             family: String,
                             arity: Required,
                             native_type: Some(
-                                String(
-                                    "TinyText",
-                                ),
+                                String("TinyText"),
                             ),
                         },
                         default: None,
@@ -2341,9 +2297,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             family: String,
                             arity: Required,
                             native_type: Some(
-                                String(
-                                    "MediumText",
-                                ),
+                                String("MediumText"),
                             ),
                         },
                         default: None,
@@ -2361,9 +2315,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             family: String,
                             arity: Required,
                             native_type: Some(
-                                String(
-                                    "LongText",
-                                ),
+                                String("LongText"),
                             ),
                         },
                         default: None,
@@ -2415,11 +2367,9 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             family: Binary,
                             arity: Required,
                             native_type: Some(
-                                Object({
-                                    "Binary": Number(
-                                        1,
-                                    ),
-                                }),
+                                Object {
+                                    "Binary": Number(1),
+                                },
                             ),
                         },
                         default: None,
@@ -2437,11 +2387,9 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             family: Binary,
                             arity: Required,
                             native_type: Some(
-                                Object({
-                                    "VarBinary": Number(
-                                        255,
-                                    ),
-                                }),
+                                Object {
+                                    "VarBinary": Number(255),
+                                },
                             ),
                         },
                         default: None,
@@ -2459,9 +2407,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             family: Binary,
                             arity: Required,
                             native_type: Some(
-                                String(
-                                    "Blob",
-                                ),
+                                String("Blob"),
                             ),
                         },
                         default: None,
@@ -2479,9 +2425,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             family: Binary,
                             arity: Required,
                             native_type: Some(
-                                String(
-                                    "TinyBlob",
-                                ),
+                                String("TinyBlob"),
                             ),
                         },
                         default: None,
@@ -2499,9 +2443,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             family: Binary,
                             arity: Required,
                             native_type: Some(
-                                String(
-                                    "MediumBlob",
-                                ),
+                                String("MediumBlob"),
                             ),
                         },
                         default: None,
@@ -2519,9 +2461,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             family: Binary,
                             arity: Required,
                             native_type: Some(
-                                String(
-                                    "LongBlob",
-                                ),
+                                String("LongBlob"),
                             ),
                         },
                         default: None,
@@ -2683,9 +2623,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             family: Json,
                             arity: Required,
                             native_type: Some(
-                                String(
-                                    "Json",
-                                ),
+                                String("Json"),
                             ),
                         },
                         default: None,
@@ -2870,11 +2808,9 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
                             family: String,
                             arity: Required,
                             native_type: Some(
-                                Object({
-                                    "VarChar": Number(
-                                        40,
-                                    ),
-                                }),
+                                Object {
+                                    "VarChar": Number(40),
+                                },
                             ),
                         },
                         default: None,
@@ -2892,11 +2828,9 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
                             family: String,
                             arity: Nullable,
                             native_type: Some(
-                                Object({
-                                    "VarChar": Number(
-                                        100,
-                                    ),
-                                }),
+                                Object {
+                                    "VarChar": Number(100),
+                                },
                             ),
                         },
                         default: None,
@@ -2914,11 +2848,9 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
                             family: String,
                             arity: Required,
                             native_type: Some(
-                                Object({
-                                    "VarChar": Number(
-                                        100,
-                                    ),
-                                }),
+                                Object {
+                                    "VarChar": Number(100),
+                                },
                             ),
                         },
                         default: None,
@@ -3057,11 +2989,9 @@ fn introspected_default_strings_should_be_unescaped(api: TestApi) {
                             family: String,
                             arity: Required,
                             native_type: Some(
-                                Object({
-                                    "VarChar": Number(
-                                        500,
-                                    ),
-                                }),
+                                Object {
+                                    "VarChar": Number(500),
+                                },
                             ),
                         },
                         default: Some(
@@ -3125,11 +3055,9 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                             family: String,
                             arity: Required,
                             native_type: Some(
-                                Object({
-                                    "VarChar": Number(
-                                        200,
-                                    ),
-                                }),
+                                Object {
+                                    "VarChar": Number(200),
+                                },
                             ),
                         },
                         default: Some(
@@ -3156,11 +3084,9 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                             family: String,
                             arity: Required,
                             native_type: Some(
-                                Object({
-                                    "VarChar": Number(
-                                        200,
-                                    ),
-                                }),
+                                Object {
+                                    "VarChar": Number(200),
+                                },
                             ),
                         },
                         default: Some(
@@ -3224,11 +3150,9 @@ fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
                             family: String,
                             arity: Required,
                             native_type: Some(
-                                Object({
-                                    "VarChar": Number(
-                                        255,
-                                    ),
-                                }),
+                                Object {
+                                    "VarChar": Number(255),
+                                },
                             ),
                         },
                         default: Some(
@@ -3313,9 +3237,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                             family: Int,
                             arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "Int",
-                                ),
+                                String("Int"),
                             ),
                         },
                         default: Some(
@@ -3342,9 +3264,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                             family: BigInt,
                             arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "BigInt",
-                                ),
+                                String("BigInt"),
                             ),
                         },
                         default: Some(
@@ -3371,9 +3291,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                             family: Float,
                             arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "Float",
-                                ),
+                                String("Float"),
                             ),
                         },
                         default: Some(
@@ -3400,16 +3318,12 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                             family: Decimal,
                             arity: Nullable,
                             native_type: Some(
-                                Object({
-                                    "Decimal": Array([
-                                        Number(
-                                            10,
-                                        ),
-                                        Number(
-                                            0,
-                                        ),
-                                    ]),
-                                }),
+                                Object {
+                                    "Decimal": Array [
+                                        Number(10),
+                                        Number(0),
+                                    ],
+                                },
                             ),
                         },
                         default: Some(
@@ -3436,9 +3350,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                             family: Boolean,
                             arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "TinyInt",
-                                ),
+                                String("TinyInt"),
                             ),
                         },
                         default: Some(
@@ -3465,11 +3377,9 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                             family: String,
                             arity: Nullable,
                             native_type: Some(
-                                Object({
-                                    "VarChar": Number(
-                                        8,
-                                    ),
-                                }),
+                                Object {
+                                    "VarChar": Number(8),
+                                },
                             ),
                         },
                         default: Some(
@@ -3496,11 +3406,9 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                             family: DateTime,
                             arity: Nullable,
                             native_type: Some(
-                                Object({
-                                    "DateTime": Number(
-                                        0,
-                                    ),
-                                }),
+                                Object {
+                                    "DateTime": Number(0),
+                                },
                             ),
                         },
                         default: Some(
@@ -3523,11 +3431,9 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                             family: DateTime,
                             arity: Nullable,
                             native_type: Some(
-                                Object({
-                                    "DateTime": Number(
-                                        0,
-                                    ),
-                                }),
+                                Object {
+                                    "DateTime": Number(0),
+                                },
                             ),
                         },
                         default: Some(
@@ -3554,11 +3460,9 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                             family: Binary,
                             arity: Required,
                             native_type: Some(
-                                Object({
-                                    "Binary": Number(
-                                        16,
-                                    ),
-                                }),
+                                Object {
+                                    "Binary": Number(16),
+                                },
                             ),
                         },
                         default: Some(
@@ -3585,9 +3489,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                             family: Json,
                             arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "Json",
-                                ),
+                                String("Json"),
                             ),
                         },
                         default: Some(
