@@ -371,3 +371,26 @@ mod json_create {
         Ok(())
     }
 }
+
+#[test_suite]
+mod mapped_create {
+
+    fn schema_map() -> String {
+        let schema = indoc! {
+            r#"model TestModel {
+              user_id  Int @id @map("user id") 
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(schema_map))]
+    async fn mapped_name_with_space(runner: Runner) -> TestResult<()> {
+        runner
+            .query("mutation {createOneTestModel(data: {user_id: 1}) {user_id }}")
+            .await?
+            .assert_success();
+        Ok(())
+    }
+}
