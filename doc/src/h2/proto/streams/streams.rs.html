@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/h2-0.3.13/src/proto/streams/streams.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>streams.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/h2-0.3.14/src/proto/streams/streams.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>streams.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
@@ -1569,6 +1569,17 @@
 <span id="1563">1563</span>
 <span id="1564">1564</span>
 <span id="1565">1565</span>
+<span id="1566">1566</span>
+<span id="1567">1567</span>
+<span id="1568">1568</span>
+<span id="1569">1569</span>
+<span id="1570">1570</span>
+<span id="1571">1571</span>
+<span id="1572">1572</span>
+<span id="1573">1573</span>
+<span id="1574">1574</span>
+<span id="1575">1575</span>
+<span id="1576">1576</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::recv::RecvHeaderBlockError</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::store</span>::{<span class="self">self</span>, <span class="ident">Entry</span>, <span class="ident">Resolve</span>, <span class="ident">Store</span>};
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Buffer</span>, <span class="ident">Config</span>, <span class="ident">Counts</span>, <span class="ident">Prioritized</span>, <span class="ident">Recv</span>, <span class="ident">Send</span>, <span class="ident">Stream</span>, <span class="ident">StreamId</span>};
@@ -1583,7 +1594,6 @@
 <span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>, <span class="ident">Waker</span>};
 <span class="kw">use</span> <span class="ident">tokio::io::AsyncWrite</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::PollExt</span>;
 <span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">Arc</span>, <span class="ident">Mutex</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">io</span>};
 
@@ -2853,7 +2863,7 @@
         <span class="ident">me</span>.<span class="ident">actions</span>
             .<span class="ident">recv</span>
             .<span class="ident">poll_pushed</span>(<span class="ident">cx</span>, <span class="kw-2">&amp;mut</span> <span class="ident">stream</span>)
-            .<span class="ident">map_ok_</span>(<span class="op">|</span>(<span class="ident">h</span>, <span class="ident">key</span>)<span class="op">|</span> {
+            .<span class="ident">map_ok</span>(<span class="op">|</span>(<span class="ident">h</span>, <span class="ident">key</span>)<span class="op">|</span> {
                 <span class="ident">me</span>.<span class="ident">refs</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 <span class="kw">let</span> <span class="ident">opaque_ref</span> <span class="op">=</span>
                     <span class="ident">OpaqueStreamRef::new</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">me</span>.<span class="ident">store</span>.<span class="ident">resolve</span>(<span class="ident">key</span>));
@@ -3033,9 +3043,21 @@
 
 <span class="kw">fn</span> <span class="ident">maybe_cancel</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">store::Ptr</span>, <span class="ident">actions</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Actions</span>, <span class="ident">counts</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Counts</span>) {
     <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">is_canceled_interest</span>() {
+        <span class="comment">// Server is allowed to early respond without fully consuming the client input stream</span>
+        <span class="comment">// But per the RFC, must send a RST_STREAM(NO_ERROR) in such cases. https://www.rfc-editor.org/rfc/rfc7540#section-8.1</span>
+        <span class="comment">// Some other http2 implementation may interpret other error code as fatal if not respected (i.e: nginx https://trac.nginx.org/nginx/ticket/2376)</span>
+        <span class="kw">let</span> <span class="ident">reason</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">counts</span>.<span class="ident">peer</span>().<span class="ident">is_server</span>()
+            <span class="op">&amp;&amp;</span> <span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">is_send_closed</span>()
+            <span class="op">&amp;&amp;</span> <span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">is_recv_streaming</span>()
+        {
+            <span class="ident">Reason::NO_ERROR</span>
+        } <span class="kw">else</span> {
+            <span class="ident">Reason::CANCEL</span>
+        };
+
         <span class="ident">actions</span>
             .<span class="ident">send</span>
-            .<span class="ident">schedule_implicit_reset</span>(<span class="ident">stream</span>, <span class="ident">Reason::CANCEL</span>, <span class="ident">counts</span>, <span class="kw-2">&amp;mut</span> <span class="ident">actions</span>.<span class="ident">task</span>);
+            .<span class="ident">schedule_implicit_reset</span>(<span class="ident">stream</span>, <span class="ident">reason</span>, <span class="ident">counts</span>, <span class="kw-2">&amp;mut</span> <span class="ident">actions</span>.<span class="ident">task</span>);
         <span class="ident">actions</span>.<span class="ident">recv</span>.<span class="ident">enqueue_reset_expiration</span>(<span class="ident">stream</span>, <span class="ident">counts</span>);
     }
 }

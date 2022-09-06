@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.2.2/src/cmap/conn/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/cmap/conn/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
@@ -530,6 +530,26 @@
 <span id="524">524</span>
 <span id="525">525</span>
 <span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">command</span>;
 <span class="kw">mod</span> <span class="ident">stream_description</span>;
 <span class="kw">mod</span> <span class="ident">wire</span>;
@@ -540,6 +560,7 @@
 };
 
 <span class="kw">use</span> <span class="ident">derivative::Derivative</span>;
+<span class="kw">use</span> <span class="ident">serde::Serialize</span>;
 <span class="kw">use</span> <span class="ident">tokio::sync</span>::{<span class="ident">mpsc</span>, <span class="ident">Mutex</span>};
 
 <span class="kw">use</span> <span class="ident"><span class="self">self</span>::wire::Message</span>;
@@ -569,10 +590,16 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">wire::next_request_id</span>;
 
 <span class="doccomment">/// User-facing information about a connection to the database.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConnectionInfo</span> {
     <span class="doccomment">/// A driver-generated identifier that uniquely identifies the connection.</span>
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">u32</span>,
+
+    <span class="doccomment">/// A server-generated identifier that uniquely identifies the connection. Available on server</span>
+    <span class="doccomment">/// versions 4.2+. This may be used to correlate driver connections with server logs.</span>
+    <span class="kw">pub</span> <span class="ident">server_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// The address that the connection is connected to.</span>
     <span class="kw">pub</span> <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
@@ -582,7 +609,11 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Derivative</span>)]</span>
 <span class="attribute">#[<span class="ident">derivative</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Connection</span> {
+    <span class="doccomment">/// Driver-generated ID for the connection.</span>
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">id</span>: <span class="ident">u32</span>,
+    <span class="doccomment">/// Server-generated ID for the connection.</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">server_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>,
+
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">generation</span>: <span class="ident">ConnectionGeneration</span>,
 
@@ -640,6 +671,7 @@
 
         <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="self">Self</span> {
             <span class="ident">id</span>,
+            <span class="ident">server_id</span>: <span class="prelude-val">None</span>,
             <span class="ident">generation</span>: <span class="ident">ConnectionGeneration::Normal</span>(<span class="ident">generation</span>),
             <span class="ident">pool_manager</span>: <span class="prelude-val">None</span>,
             <span class="ident">command_executing</span>: <span class="bool-val">false</span>,
@@ -705,6 +737,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectionInfo</span> {
         <span class="ident">ConnectionInfo</span> {
             <span class="ident">id</span>: <span class="self">self</span>.<span class="ident">id</span>,
+            <span class="ident">server_id</span>: <span class="self">self</span>.<span class="ident">server_id</span>,
             <span class="ident">address</span>: <span class="self">self</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
         }
     }
@@ -807,7 +840,13 @@
         <span class="self">self</span>.<span class="ident">error</span> <span class="op">=</span> <span class="ident">write_result</span>.<span class="ident">is_err</span>();
         <span class="ident">write_result</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">response_message_result</span> <span class="op">=</span> <span class="ident">Message::read_from</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">stream</span>).<span class="kw">await</span>;
+        <span class="kw">let</span> <span class="ident">response_message_result</span> <span class="op">=</span> <span class="ident">Message::read_from</span>(
+            <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">stream</span>,
+            <span class="self">self</span>.<span class="ident">stream_description</span>
+                .<span class="ident">as_ref</span>()
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">max_message_size_bytes</span>),
+        )
+        .<span class="kw">await</span>;
         <span class="self">self</span>.<span class="ident">command_executing</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="self">self</span>.<span class="ident">error</span> <span class="op">=</span> <span class="ident">response_message_result</span>.<span class="ident">is_err</span>();
 
@@ -895,6 +934,7 @@
     <span class="kw">fn</span> <span class="ident">take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Connection</span> {
         <span class="ident">Connection</span> {
             <span class="ident">id</span>: <span class="self">self</span>.<span class="ident">id</span>,
+            <span class="ident">server_id</span>: <span class="self">self</span>.<span class="ident">server_id</span>,
             <span class="ident">address</span>: <span class="self">self</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
             <span class="ident">generation</span>: <span class="self">self</span>.<span class="ident">generation</span>.<span class="ident">clone</span>(),
             <span class="ident">stream</span>: <span class="ident">std::mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">stream</span>, <span class="ident">AsyncStream::Null</span>),

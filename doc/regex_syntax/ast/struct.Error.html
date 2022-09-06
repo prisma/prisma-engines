@@ -7,7 +7,7 @@
                         </div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
     <h1 class="fqn"><span class="in-band">Struct <a href="../index.html">regex_syntax</a>::<wbr><a href="index.html">ast</a>::<wbr><a class="struct" href="#">Error</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../../src/regex_syntax/ast/mod.rs.html#23-31">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><div class="docblock item-decl"><pre class="rust struct"><code>pub struct Error { /* private fields */ }</code></pre></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>An error that occurred while parsing a regular expression into an abstract
 syntax tree.</p>
-<p>Note that note all ASTs represents a valid regular expression. For example,
+<p>Note that not all ASTs represents a valid regular expression. For example,
 an AST is constructed without error for <code>\p{Quux}</code>, but <code>Quux</code> is not a
 valid Unicode property name. That particular error is reported when
 translating an AST to the high-level intermediate representation (<code>HIR</code>).</p>

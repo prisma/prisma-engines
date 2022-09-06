@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.2.2/src/change_stream/options.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>options.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/change_stream/options.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>options.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
@@ -126,6 +126,37 @@
 <span id="120">120</span>
 <span id="121">121</span>
 <span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Contains options for ChangeStreams.</span>
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">serde_with::skip_serializing_none</span>;
@@ -149,19 +180,24 @@
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ChangeStreamOptions</span> {
     <span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-    <span class="doccomment">/// When set to [`FullDocumentType::UpdateLookup`], the</span>
+    <span class="doccomment">/// Configures how the</span>
     <span class="doccomment">/// [`ChangeStreamEvent::full_document`](crate::change_stream::event::ChangeStreamEvent::full_document)</span>
-    <span class="doccomment">/// field  will be populated with a copy of the entire document that was</span>
-    <span class="doccomment">/// updated from some time after the change occurred when an &quot;update&quot; event occurs. By</span>
-    <span class="doccomment">/// default, the `full_document` field will be empty for updates.</span>
+    <span class="doccomment">/// field will be populated. By default, the field will be empty for updates.</span>
     <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">full_document</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FullDocumentType</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// Configures how the</span>
+    <span class="doccomment">/// [`ChangeStreamEvent::full_document_before_change`](</span>
+    <span class="doccomment">/// crate::change_stream::event::ChangeStreamEvent::full_document_before_change) field will be</span>
+    <span class="doccomment">/// populated.  By default, the field will be empty for updates.</span>
+    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">full_document_before_change</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FullDocumentBeforeChangeType</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// Specifies the logical starting point for the new change stream. Note that if a watched</span>
     <span class="doccomment">/// collection is dropped and recreated or newly renamed, `start_after` should be set instead.</span>
     <span class="doccomment">/// `resume_after` and `start_after` cannot be set simultaneously.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// For more information on resuming a change stream see the documentation [here](https://docs.mongodb.com/manual/changeStreams/#change-stream-resume-after)</span>
+    <span class="doccomment">/// For more information on resuming a change stream see the documentation [here](https://www.mongodb.com/docs/manual/changeStreams/#change-stream-resume-after)</span>
     <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">resume_after</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResumeToken</span><span class="op">&gt;</span>,
 
@@ -177,7 +213,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This feature is only available on MongoDB 4.2+.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// See the documentation [here](https://docs.mongodb.com/master/changeStreams/#change-stream-start-after) for more</span>
+    <span class="doccomment">/// See the documentation [here](https://www.mongodb.com/docs/master/changeStreams/#change-stream-start-after) for more</span>
     <span class="doccomment">/// information.</span>
     <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">start_after</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResumeToken</span><span class="op">&gt;</span>,
@@ -231,19 +267,45 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
 <span class="doccomment">/// Describes the modes for configuring the</span>
-<span class="doccomment">/// [`ChangeStreamEvent::full_document`](crate::change_stream::event::ChangeStreamEvent::full_document)</span>
-<span class="doccomment">/// field.</span>
+<span class="doccomment">/// [`ChangeStreamEvent::full_document`](</span>
+<span class="doccomment">/// crate::change_stream::event::ChangeStreamEvent::full_document) field.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FullDocumentType</span> {
-    <span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-    <span class="doccomment">/// The</span>
-    <span class="doccomment">/// [`ChangeStreamEvent::full_document`](crate::change_stream::event::ChangeStreamEvent::full_document)</span>
-    <span class="doccomment">/// field will be populated with a copy of the entire document that was updated.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;updateLookup&quot;</span>)]</span>
+    <span class="doccomment">/// The field will be populated with a copy of the entire document that was updated.</span>
     <span class="ident">UpdateLookup</span>,
+
+    <span class="doccomment">/// The field will be populated for replace and update change events if the post-image for this</span>
+    <span class="doccomment">/// event is available.</span>
+    <span class="ident">WhenAvailable</span>,
+
+    <span class="doccomment">/// The same behavior as `WhenAvailable` except that an error is raised if the post-image is</span>
+    <span class="doccomment">/// not available.</span>
+    <span class="ident">Required</span>,
+
+    <span class="doccomment">/// User-defined other types for forward compatibility.</span>
+    <span class="ident">Other</span>(<span class="ident">String</span>),
+}
+
+<span class="doccomment">/// Describes the modes for configuring the</span>
+<span class="doccomment">/// [`ChangeStreamEvent::full_document_before_change`](</span>
+<span class="doccomment">/// crate::change_stream::event::ChangeStreamEvent::full_document_before_change) field.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FullDocumentBeforeChangeType</span> {
+    <span class="doccomment">/// The field will be populated for replace, update, and delete change events if the pre-image</span>
+    <span class="doccomment">/// for this event is available.</span>
+    <span class="ident">WhenAvailable</span>,
+
+    <span class="doccomment">/// The same behavior as `WhenAvailable` except that an error is raised if the pre-image is</span>
+    <span class="doccomment">/// not available.</span>
+    <span class="ident">Required</span>,
+
+    <span class="doccomment">/// Do not send a value.</span>
+    <span class="ident">Off</span>,
 
     <span class="doccomment">/// User-defined other types for forward compatibility.</span>
     <span class="ident">Other</span>(<span class="ident">String</span>),

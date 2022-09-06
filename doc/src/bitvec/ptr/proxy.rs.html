@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bitvec-0.22.3/src/ptr/proxy.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>proxy.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bitvec-1.0.1/src/ptr/proxy.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>proxy.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
@@ -479,120 +479,10 @@
 <span id="473">473</span>
 <span id="474">474</span>
 <span id="475">475</span>
-<span id="476">476</span>
-<span id="477">477</span>
-<span id="478">478</span>
-<span id="479">479</span>
-<span id="480">480</span>
-<span id="481">481</span>
-<span id="482">482</span>
-<span id="483">483</span>
-<span id="484">484</span>
-<span id="485">485</span>
-<span id="486">486</span>
-<span id="487">487</span>
-<span id="488">488</span>
-<span id="489">489</span>
-<span id="490">490</span>
-<span id="491">491</span>
-<span id="492">492</span>
-<span id="493">493</span>
-<span id="494">494</span>
-<span id="495">495</span>
-<span id="496">496</span>
-<span id="497">497</span>
-<span id="498">498</span>
-<span id="499">499</span>
-<span id="500">500</span>
-<span id="501">501</span>
-<span id="502">502</span>
-<span id="503">503</span>
-<span id="504">504</span>
-<span id="505">505</span>
-<span id="506">506</span>
-<span id="507">507</span>
-<span id="508">508</span>
-<span id="509">509</span>
-<span id="510">510</span>
-<span id="511">511</span>
-<span id="512">512</span>
-<span id="513">513</span>
-<span id="514">514</span>
-<span id="515">515</span>
-<span id="516">516</span>
-<span id="517">517</span>
-<span id="518">518</span>
-<span id="519">519</span>
-<span id="520">520</span>
-<span id="521">521</span>
-<span id="522">522</span>
-<span id="523">523</span>
-<span id="524">524</span>
-<span id="525">525</span>
-<span id="526">526</span>
-<span id="527">527</span>
-<span id="528">528</span>
-<span id="529">529</span>
-<span id="530">530</span>
-<span id="531">531</span>
-<span id="532">532</span>
-<span id="533">533</span>
-<span id="534">534</span>
-<span id="535">535</span>
-<span id="536">536</span>
-<span id="537">537</span>
-<span id="538">538</span>
-<span id="539">539</span>
-<span id="540">540</span>
-<span id="541">541</span>
-<span id="542">542</span>
-<span id="543">543</span>
-<span id="544">544</span>
-<span id="545">545</span>
-<span id="546">546</span>
-<span id="547">547</span>
-<span id="548">548</span>
-<span id="549">549</span>
-<span id="550">550</span>
-<span id="551">551</span>
-<span id="552">552</span>
-<span id="553">553</span>
-<span id="554">554</span>
-<span id="555">555</span>
-<span id="556">556</span>
-<span id="557">557</span>
-<span id="558">558</span>
-<span id="559">559</span>
-<span id="560">560</span>
-<span id="561">561</span>
-<span id="562">562</span>
-<span id="563">563</span>
-<span id="564">564</span>
-<span id="565">565</span>
-<span id="566">566</span>
-<span id="567">567</span>
-<span id="568">568</span>
-<span id="569">569</span>
-<span id="570">570</span>
-<span id="571">571</span>
-<span id="572">572</span>
-<span id="573">573</span>
-<span id="574">574</span>
-<span id="575">575</span>
-<span id="576">576</span>
-</pre><pre class="rust"><code><span class="doccomment">/*! Proxy reference for `&amp;mut bool`.
-
-Rust does not allow assignment through a reference type to be anything other
-than a direct load from or store to memory, using the value in the reference as
-the memory address. As such, this module provides a proxy type which contains a
-pointer to a single bit, and acts as a referential façade, similar to the C++
-type [`std::bitset&lt;N&gt;::reference`].
-
-[`std::bitset&lt;N&gt;::reference`]: https://en.cppreference.com/w/cpp/utility/bitset/reference
-!*/</span>
+</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../../doc/ptr/proxy.md&quot;</span>)]</span>
 
 <span class="kw">use</span> <span class="ident">core</span>::{
-	<span class="ident">cell::Cell</span>,
+	<span class="ident">cell::UnsafeCell</span>,
 	<span class="ident">cmp</span>,
 	<span class="ident">fmt</span>::{
 		<span class="self">self</span>,
@@ -614,12 +504,13 @@ type [`std::bitset&lt;N&gt;::reference`].
 	},
 };
 
-<span class="kw">use</span> <span class="kw">super</span>::{
-	<span class="ident">BitPtr</span>,
+<span class="kw">use</span> <span class="ident">wyz::comu</span>::{
 	<span class="ident">Const</span>,
 	<span class="ident">Mut</span>,
 	<span class="ident">Mutability</span>,
 };
+
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::BitPtr</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
 	<span class="ident">order</span>::{
 		<span class="ident">BitOrder</span>,
@@ -628,279 +519,193 @@ type [`std::bitset&lt;N&gt;::reference`].
 	<span class="ident">store::BitStore</span>,
 };
 
-<span class="doccomment">/** A proxy reference, equivalent to C++ [`std::bitset&lt;N&gt;::reference`].
-
-This type wraps a `BitPtr` and caches a `bool` in a padding byte. It is then
-able to freely produce references to the cached bool, and commits the cache back
-to the referent bit location on `drop`.
-
-# Lifetimes
-
-- `&#39;a`: The lifetime of the source `&amp;&#39;a mut BitSlice` that created the `BitRef`.
-
-# Type Parameters
-
-- `M`: The write permission of the reference. When this is `Const`, the
-  `DerefMut` implementation is removed, forbidding the proxy from writing back
-  to memory.
-- `O`: The ordering used to address a bit in memory.
-- `T`: The storage type containing the referent bit.
-
-# Quirks
-
-Because this type has both a lifetime and a destructor, it can introduce an
-uncommon error condition in Rust. When an expression that produces this type is
-in the final expression of a block, including if that expression is used as a
-condition in a `match`, `if let`, or `if`, then the compiler will attempt to
-extend the drop scope of this type to the outside of the block. This causes a
-lifetime mismatch error if the source region from which this proxy is produced
-goes out of scope at the end of the block.
-
-If you get a compiler error that this type causes something to be dropped while
-borrowed, you can end the borrow by putting any expression-ending syntax element
-after the offending expression that produces this type, including a semicolon or
-an item definition.
-
-# Examples
-
-```rust
-use bitvec::prelude::*;
-
-let bits = bits![mut 0; 2];
-
-let (left, right) = bits.split_at_mut(1);
-let mut first = left.get_mut(0).unwrap();
-let second = right.get_mut(0).unwrap();
-
-// Referential behavior
-*first = true;
-// Direct write
-second.set(true);
-
-drop(first); // it’s not a reference!
-assert_eq!(bits, bits![1; 2]);
-```
-
-[`std::bitset&lt;N&gt;::reference`]: https://en.cppreference.com/w/cpp/utility/bitset/reference
-**/</span>
-<span class="comment">// Restore alignemnt properties, since `BitPtr` does not have them.</span>
+<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../../doc/ptr/BitRef.md&quot;</span>)]</span>
+<span class="comment">//  Restore alignment and sizing properties, as `BitPtr` lacks them.</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;32&quot;</span>, <span class="ident">repr</span>(<span class="ident">C</span>, <span class="ident">align</span>(<span class="number">4</span>)))]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>, <span class="ident">repr</span>(<span class="ident">C</span>, <span class="ident">align</span>(<span class="number">8</span>)))]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(
 	<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;32&quot;</span>, <span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>)),
 	<span class="ident">repr</span>(<span class="ident">C</span>)
 )]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">M</span>, <span class="ident">O</span> <span class="op">=</span> <span class="ident">Lsb0</span>, <span class="ident">T</span> <span class="op">=</span> <span class="ident">usize</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">M</span> <span class="op">=</span> <span class="ident">Const</span>, <span class="ident">T</span> <span class="op">=</span> <span class="ident">usize</span>, <span class="ident">O</span> <span class="op">=</span> <span class="ident">Lsb0</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 {
-	<span class="doccomment">/// The proxied address.</span>
-	<span class="ident">bitptr</span>: <span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>,
-	<span class="doccomment">/// A local, dereferencable, cache of the proxied bit.</span>
-	<span class="ident">data</span>: <span class="ident">bool</span>,
-	<span class="doccomment">/// Pad the structure out to be two words wide.</span>
-	<span class="ident">_pad</span>: [<span class="ident">u8</span>; <span class="ident">PADDING</span>],
-	<span class="doccomment">/// Attach the lifetime and possibility of mutation.</span>
-	<span class="ident">_ref</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+	<span class="doccomment">/// The proxied bit-address.</span>
+	<span class="ident">bitptr</span>: <span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>,
+	<span class="doccomment">/// A local cache of the proxied bit that can be referenced.</span>
+	<span class="ident">data</span>:   <span class="ident">bool</span>,
+	<span class="doccomment">/// Attach the lifetime and reflect the possibility of mutation.</span>
+	<span class="ident">_ref</span>:   <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">UnsafeCell</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 {
 	<span class="doccomment">/// Converts a bit-pointer into a proxy bit-reference.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// The conversion reads from the pointer, then stores the `bool` in a</span>
-	<span class="doccomment">/// padding byte.</span>
+	<span class="doccomment">/// This reads through the pointer in order to cache the current bit value</span>
+	<span class="doccomment">/// in the proxy.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Parameters</span>
+	<span class="doccomment">/// ## Original</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `bitptr`: A bit-pointer to turn into a bit-reference.</span>
+	<span class="doccomment">/// The syntax `unsafe { &amp;* ptr }`.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Returns</span>
+	<span class="doccomment">/// ## Safety</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// A bit-reference pointing at `bitptr`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Safety</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The `bitptr` must address a location that is valid for reads and, if `M`</span>
-	<span class="doccomment">/// is `Mut`, writes.</span>
+	<span class="doccomment">/// This is equivalent to (and is!) dereferencing a raw pointer. The pointer</span>
+	<span class="doccomment">/// must be well-constructed, refer to a live memory location in the program</span>
+	<span class="doccomment">/// context, and not be aliased beyond its typing indicators.</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_bitptr</span>(<span class="ident">bitptr</span>: <span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+	<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_bitptr</span>(<span class="ident">bitptr</span>: <span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
 		<span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">bitptr</span>.<span class="ident">read</span>();
 		<span class="self">Self</span> {
 			<span class="ident">bitptr</span>,
 			<span class="ident">data</span>,
-			<span class="ident">_pad</span>: [<span class="number">0</span>; <span class="ident">PADDING</span>],
-			<span class="ident">_ref</span>: <span class="ident">PhantomData</span>,
-		}
-	}
-
-	<span class="doccomment">/// Removes an alias marking.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This is only safe when the proxy is known to be the only handle to its</span>
-	<span class="doccomment">/// referent element during its lifetime.</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">remove_alias</span>(<span class="ident">this</span>: <span class="ident">BitRef</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T::Alias</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> {
-			<span class="ident">bitptr</span>: <span class="ident">this</span>.<span class="ident">bitptr</span>.<span class="ident">cast</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(),
-			<span class="ident">data</span>: <span class="ident">this</span>.<span class="ident">data</span>,
-			<span class="ident">_pad</span>: [<span class="number">0</span>; <span class="ident">PADDING</span>],
 			<span class="ident">_ref</span>: <span class="ident">PhantomData</span>,
 		}
 	}
 
 	<span class="doccomment">/// Decays the bit-reference to an ordinary bit-pointer.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Parameters</span>
+	<span class="doccomment">/// ## Original</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `self`</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Returns</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The interior bit-pointer, without the associated cache. If this was a</span>
-	<span class="doccomment">/// write-capable pointer, then the cached bit is committed to memory before</span>
-	<span class="doccomment">/// this method returns.</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+	<span class="doccomment">/// The syntax `&amp;val as *T`.</span>
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_bitptr</span>(<span class="self">self</span>) -&gt; <span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_bitptr</span>(<span class="self">self</span>) -&gt; <span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> {
 		<span class="self">self</span>.<span class="ident">bitptr</span>
 	}
-}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Mut</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-{
-	<span class="doccomment">/// Moves `src` into the referenced bit, returning the previous value.</span>
+	<span class="doccomment">/// Removes a layer of `::Alias` marking from a bit-reference.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Original</span>
+	<span class="doccomment">/// ## Safety</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`mem::replace`](core::mem::replace)</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+	<span class="doccomment">/// The caller must ensure that no element-level aliasing *by `bitvec`*</span>
+	<span class="doccomment">/// occurs in the scope for which the produced de-aliased proxy is alive.</span>
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">replace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">src</span>: <span class="ident">bool</span>) -&gt; <span class="ident">bool</span> {
-		<span class="ident">mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>, <span class="ident">src</span>)
-	}
-
-	<span class="doccomment">/// Swaps the values at two mutable locations, without deïnitializing either</span>
-	<span class="doccomment">/// one.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Original</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`mem::swap`](core::mem::swap)</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">swap</span><span class="op">&lt;</span><span class="ident">O2</span>, <span class="ident">T2</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="ident">Mut</span>, <span class="ident">O2</span>, <span class="ident">T2</span><span class="op">&gt;</span>)
-	<span class="kw">where</span>
-		<span class="ident">O2</span>: <span class="ident">BitOrder</span>,
-		<span class="ident">T2</span>: <span class="ident">BitStore</span>,
-	{
-		<span class="ident">mem::swap</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>, <span class="kw-2">&amp;mut</span> <span class="ident">other</span>.<span class="ident">data</span>)
-	}
-
-	<span class="doccomment">/// Writes a bit into the proxied location without an intermediate copy.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This function writes `value` directly into the proxied location, and</span>
-	<span class="doccomment">/// does not store `value` in the proxy’s internal cache. This should be</span>
-	<span class="doccomment">/// equivalent to the behavior seen when using ordinary [`DerefMut`]</span>
-	<span class="doccomment">/// proxying, but the latter depends on compiler optimization.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Parameters</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `self`: This destroys the proxy, as it becomes invalid when writing</span>
-	<span class="doccomment">///   directly to the location without updating the cache.</span>
-	<span class="doccomment">/// - `value`: The new bit to write into the proxied slot.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`DerefMut`]: core::ops::DerefMut</span>
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">bool</span>) {
-		<span class="self">self</span>.<span class="ident">write</span>(<span class="ident">value</span>);
-		<span class="ident">mem::forget</span>(<span class="self">self</span>);
-	}
-
-	<span class="doccomment">/// Commits a bit into memory.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This is the internal function used to drive `.set()` and `.drop()`.</span>
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">bool</span>) {
-		<span class="self">self</span>.<span class="ident">data</span> <span class="op">=</span> <span class="ident">value</span>;
-		<span class="kw">unsafe</span> {
-			<span class="self">self</span>.<span class="ident">bitptr</span>.<span class="ident">write</span>(<span class="ident">value</span>);
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">remove_alias</span>(<span class="ident">this</span>: <span class="ident">BitRef</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T::Alias</span>, <span class="ident">O</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+		<span class="self">Self</span> {
+			<span class="ident">bitptr</span>: <span class="ident">this</span>.<span class="ident">bitptr</span>.<span class="ident">cast</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(),
+			<span class="ident">data</span>:   <span class="ident">this</span>.<span class="ident">data</span>,
+			<span class="ident">_ref</span>:   <span class="ident">PhantomData</span>,
 		}
 	}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Const</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Mut</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 {
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+	<span class="doccomment">/// Moves `src` into the referenced bit, returning the previous value.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// ## Original</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// [`mem::replace`](core::mem::replace)</span>
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">replace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">src</span>: <span class="ident">bool</span>) -&gt; <span class="ident">bool</span> {
+		<span class="ident">mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>, <span class="ident">src</span>)
+	}
+
+	<span class="doccomment">/// Swaps the bit values of two proxies.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// ## Original</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// [`mem::swap`](core::mem::swap)</span>
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">swap</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="ident">Mut</span>, <span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span>)
+	<span class="kw">where</span>
+		<span class="ident">T2</span>: <span class="ident">BitStore</span>,
+		<span class="ident">O2</span>: <span class="ident">BitOrder</span>,
+	{
+		<span class="ident">mem::swap</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>, <span class="kw-2">&amp;mut</span> <span class="ident">other</span>.<span class="ident">data</span>)
+	}
+
+	<span class="doccomment">/// Commits a bit into the proxied location.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// This function writes `value` directly into the proxied location,</span>
+	<span class="doccomment">/// bypassing the cache and destroying the proxy. This eliminates the second</span>
+	<span class="doccomment">/// write done in the destructor, and allows code to be slightly faster.</span>
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">commit</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">bool</span>) {
+		<span class="kw">unsafe</span> {
+			<span class="self">self</span>.<span class="ident">bitptr</span>.<span class="ident">write</span>(<span class="ident">value</span>);
+		}
+		<span class="ident">mem::forget</span>(<span class="self">self</span>);
+	}
+
+	<span class="doccomment">/// Writes `value` into the proxy.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// This does not write into the proxied location; that is deferred until</span>
+	<span class="doccomment">/// the proxy destructor runs.</span>
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">bool</span>) {
+		<span class="self">self</span>.<span class="ident">data</span> <span class="op">=</span> <span class="ident">value</span>;
+	}
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Const</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+{
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
 		<span class="self">Self</span> { ..<span class="kw-2">*</span><span class="self">self</span> }
 	}
 }
 
-<span class="doccomment">/// Implement equality by comparing the proxied `bool` values.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 {
 }
 
-<span class="doccomment">/// Implement ordering by comparing the proxied `bool` values.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 {
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">cmp::Ordering</span> {
 		<span class="self">self</span>.<span class="ident">data</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">data</span>)
 	}
 }
 
-<span class="doccomment">/// Test equality of proxy references by the value of their proxied bit.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// To test equality by address, decay to a [`BitPtr`] with [`into_bitptr`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`BitPtr`]: crate::ptr::BitPtr</span>
-<span class="doccomment">/// [`into_bitptr`]: Self::into_bitptr</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M1</span>, <span class="ident">M2</span>, <span class="ident">O1</span>, <span class="ident">O2</span>, <span class="ident">T1</span>, <span class="ident">T2</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M2</span>, <span class="ident">O2</span>, <span class="ident">T2</span><span class="op">&gt;</span><span class="op">&gt;</span>
-	<span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M1</span>, <span class="ident">O1</span>, <span class="ident">T1</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M1</span>, <span class="ident">M2</span>, <span class="ident">O1</span>, <span class="ident">O2</span>, <span class="ident">T1</span>, <span class="ident">T2</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M2</span>, <span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span><span class="op">&gt;</span>
+	<span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M1</span>, <span class="ident">T1</span>, <span class="ident">O1</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">M1</span>: <span class="ident">Mutability</span>,
 	<span class="ident">M2</span>: <span class="ident">Mutability</span>,
-	<span class="ident">O1</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">O2</span>: <span class="ident">BitOrder</span>,
 	<span class="ident">T1</span>: <span class="ident">BitStore</span>,
 	<span class="ident">T2</span>: <span class="ident">BitStore</span>,
+	<span class="ident">O1</span>: <span class="ident">BitOrder</span>,
+	<span class="ident">O2</span>: <span class="ident">BitOrder</span>,
 {
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M2</span>, <span class="ident">O2</span>, <span class="ident">T2</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
+	<span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M2</span>, <span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
 		<span class="self">self</span>.<span class="ident">data</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">data</span>
 	}
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 {
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">bool</span>) -&gt; <span class="ident">bool</span> {
@@ -909,11 +714,24 @@ assert_eq!(bits, bits![1; 2]);
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">bool</span>
 <span class="kw">where</span>
 	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+{
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
+	<span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
+		<span class="ident">other</span> <span class="op">==</span> <span class="self">self</span>
+	}
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+	<span class="ident">M</span>: <span class="ident">Mutability</span>,
+	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 {
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="op">&amp;&amp;</span><span class="ident">bool</span>) -&gt; <span class="ident">bool</span> {
@@ -921,63 +739,95 @@ assert_eq!(bits, bits![1; 2]);
 	}
 }
 
-<span class="doccomment">/// Order proxy references by the value of their proxied bit.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// To order by address, decay to a [`BitPtr`] with [`into_bitptr`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`BitPtr`]: crate::ptr::BitPtr</span>
-<span class="doccomment">/// [`into_bitptr`]: Self::into_bitptr</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M1</span>, <span class="ident">M2</span>, <span class="ident">O1</span>, <span class="ident">O2</span>, <span class="ident">T1</span>, <span class="ident">T2</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M2</span>, <span class="ident">O2</span>, <span class="ident">T2</span><span class="op">&gt;</span><span class="op">&gt;</span>
-	<span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M1</span>, <span class="ident">O1</span>, <span class="ident">T1</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">bool</span>
+<span class="kw">where</span>
+	<span class="ident">M</span>: <span class="ident">Mutability</span>,
+	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+{
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
+	<span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
+		<span class="ident">other</span> <span class="op">==</span> <span class="kw-2">*</span><span class="self">self</span>
+	}
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M1</span>, <span class="ident">M2</span>, <span class="ident">O1</span>, <span class="ident">O2</span>, <span class="ident">T1</span>, <span class="ident">T2</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M2</span>, <span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span><span class="op">&gt;</span>
+	<span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M1</span>, <span class="ident">T1</span>, <span class="ident">O1</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">M1</span>: <span class="ident">Mutability</span>,
 	<span class="ident">M2</span>: <span class="ident">Mutability</span>,
-	<span class="ident">O1</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">O2</span>: <span class="ident">BitOrder</span>,
 	<span class="ident">T1</span>: <span class="ident">BitStore</span>,
 	<span class="ident">T2</span>: <span class="ident">BitStore</span>,
+	<span class="ident">O1</span>: <span class="ident">BitOrder</span>,
+	<span class="ident">O2</span>: <span class="ident">BitOrder</span>,
 {
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">fn</span> <span class="ident">partial_cmp</span>(
 		<span class="kw-2">&amp;</span><span class="self">self</span>,
-		<span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M2</span>, <span class="ident">O2</span>, <span class="ident">T2</span><span class="op">&gt;</span>,
+		<span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M2</span>, <span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span>,
 	) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
 		<span class="self">self</span>.<span class="ident">data</span>.<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">data</span>)
 	}
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 {
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">bool</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
 		<span class="self">self</span>.<span class="ident">data</span>.<span class="ident">partial_cmp</span>(<span class="ident">other</span>)
 	}
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 {
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="op">&amp;&amp;</span><span class="ident">bool</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
 		<span class="self">self</span>.<span class="ident">data</span>.<span class="ident">partial_cmp</span>(<span class="kw-2">*</span><span class="ident">other</span>)
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+{
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
+	<span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">bool</span> {
+		<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>
+	}
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">AsMut</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Mut</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+{
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
+	<span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">bool</span> {
+		<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>
+	}
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+	<span class="ident">M</span>: <span class="ident">Mutability</span>,
+	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 {
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
@@ -987,173 +837,121 @@ assert_eq!(bits, bits![1; 2]);
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 {
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
 		<span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>, <span class="ident">fmt</span>)
 	}
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Pointer</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Pointer</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 {
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
 		<span class="ident">Pointer::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bitptr</span>, <span class="ident">fmt</span>)
 	}
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Hash</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Hash</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 {
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">H</span>)
 	<span class="kw">where</span> <span class="ident">H</span>: <span class="ident">Hasher</span> {
 		<span class="self">self</span>.<span class="ident">bitptr</span>.<span class="ident">hash</span>(<span class="ident">state</span>);
 	}
 }
 
-<span class="comment">// This cannot be implemented until `Drop` is specialized to only</span>
-<span class="comment">// `&lt;Mut, O, T&gt;`.</span>
-<span class="comment">// impl&lt;O, T&gt; Copy for BitRef&lt;&#39;_, Const, O, T&gt;</span>
-<span class="comment">// where O: BitOrder, T: BitStore {}</span>
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="comment">// #[allow(clippy::non_send_fields_in_send_ty)] // I know what I’m doing</span>
+<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">M</span>: <span class="ident">Mutability</span>,
+	<span class="ident">T</span>: <span class="ident">BitStore</span> <span class="op">+</span> <span class="ident">Sync</span>,
 	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+{
+}
+
+<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+	<span class="ident">M</span>: <span class="ident">Mutability</span>,
+	<span class="ident">T</span>: <span class="ident">BitStore</span> <span class="op">+</span> <span class="ident">Sync</span>,
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+{
+}
+
+<span class="comment">// This cannot be implemented until `Drop` is specialized to only</span>
+<span class="comment">// `&lt;Mut, T, O&gt;`.</span>
+<span class="comment">// impl&lt;T, O&gt; Copy for BitRef&lt;&#39;_, Const, T, O&gt;</span>
+<span class="comment">// where O: BitOrder, T: BitStore {}</span>
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+	<span class="ident">M</span>: <span class="ident">Mutability</span>,
 	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 {
 	<span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">bool</span>;
 
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
 		<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>
 	}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">DerefMut</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Mut</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">DerefMut</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Mut</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 {
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Target</span> {
 		<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 {
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-		<span class="comment">//  `Drop` cannot specialize, but only mutable proxies can commit to</span>
-		<span class="comment">//  memory.</span>
+		<span class="comment">//  `Drop` cannot specialize on type parameters, but only mutable</span>
+		<span class="comment">//  proxies can commit to memory.</span>
 		<span class="kw">if</span> <span class="ident">M::CONTAINS_MUTABILITY</span> {
 			<span class="kw">unsafe</span> {
-				<span class="self">self</span>.<span class="ident">bitptr</span>.<span class="ident">assert_mut</span>().<span class="ident">write</span>(<span class="self">self</span>.<span class="ident">data</span>);
+				<span class="self">self</span>.<span class="ident">bitptr</span>.<span class="ident">to_mut</span>().<span class="ident">write</span>(<span class="self">self</span>.<span class="ident">data</span>);
 			}
 		}
 	}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Not</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Not</span> <span class="kw">for</span> <span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 {
 	<span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">bool</span>;
 
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">fn</span> <span class="ident">not</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
 		<span class="op">!</span><span class="self">self</span>.<span class="ident">data</span>
-	}
-}
-
-<span class="doccomment">/// Compute the padding needed to make a packed `(BitPtr, bool)` tuple as wide</span>
-<span class="doccomment">/// as a `(*const _, usize)` tuple.</span>
-<span class="kw">const</span> <span class="ident">PADDING</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="kw-2">*const</span> <span class="ident">u8</span><span class="op">&gt;</span>() <span class="op">+</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>()
-	<span class="op">-</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">Const</span>, <span class="ident">Lsb0</span>, <span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-	<span class="op">-</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>();
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-	<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">proxy_ref</span>() {
-		<span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="macro">bits!</span>[<span class="kw-2">mut</span> <span class="number">0</span>; <span class="number">2</span>];
-		<span class="macro">assert!</span>(<span class="ident">bits</span>.<span class="ident">not_any</span>());
-
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">proxy</span> <span class="op">=</span> <span class="ident">bits</span>.<span class="ident">first_mut</span>().<span class="ident">unwrap</span>();
-		<span class="kw-2">*</span><span class="ident">proxy</span> <span class="op">=</span> <span class="bool-val">true</span>;
-
-		<span class="comment">//  We can inspect the cache, but `proxy` locks the entire `bits` for</span>
-		<span class="comment">//  the duration of its binding, so we cannot observe that the cache is</span>
-		<span class="comment">//  not written into the main buffer.</span>
-		<span class="macro">assert!</span>(<span class="kw-2">*</span><span class="ident">proxy</span>);
-		<span class="ident">drop</span>(<span class="ident">proxy</span>);
-
-		<span class="comment">//  The proxy commits the cache on drop, releasing its lock on the main</span>
-		<span class="comment">//  buffer, permitting us to see that the writeback occurred.</span>
-		<span class="macro">assert!</span>(<span class="ident">bits</span>[<span class="number">0</span>]);
-
-		<span class="kw">let</span> <span class="ident">proxy</span> <span class="op">=</span> <span class="ident">bits</span>.<span class="ident">get_mut</span>(<span class="number">1</span>).<span class="ident">unwrap</span>();
-		<span class="ident">proxy</span>.<span class="ident">set</span>(<span class="bool-val">true</span>);
-		<span class="macro">assert!</span>(<span class="ident">bits</span>[<span class="number">1</span>]);
-	}
-
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">format</span>() {
-		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-		<span class="kw">use</span> <span class="ident">alloc::format</span>;
-
-		<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::order::Msb0</span>;
-
-		<span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="macro">bits!</span>[<span class="kw-2">mut</span> <span class="ident">Msb0</span>, <span class="ident">u8</span>; <span class="number">0</span>];
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bit</span> <span class="op">=</span> <span class="ident">bits</span>.<span class="ident">get_mut</span>(<span class="number">0</span>).<span class="ident">unwrap</span>();
-
-		<span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">bit</span>);
-		<span class="macro">assert!</span>(<span class="ident">text</span>.<span class="ident">starts_with</span>(<span class="string">&quot;BitRef&lt;bitvec::order::Msb0, u8&gt; { addr: 0x&quot;</span>));
-		<span class="macro">assert!</span>(<span class="ident">text</span>.<span class="ident">ends_with</span>(<span class="string">&quot;, head: 000, bits: 1, bit: false }&quot;</span>));
-		<span class="kw-2">*</span><span class="ident">bit</span> <span class="op">=</span> <span class="bool-val">true</span>;
-		<span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">bit</span>);
-		<span class="macro">assert!</span>(<span class="ident">text</span>.<span class="ident">starts_with</span>(<span class="string">&quot;BitRef&lt;bitvec::order::Msb0, u8&gt; { addr: 0x&quot;</span>));
-		<span class="macro">assert!</span>(<span class="ident">text</span>.<span class="ident">ends_with</span>(<span class="string">&quot;, head: 000, bits: 1, bit: true }&quot;</span>));
-	}
-
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">assert_size</span>() {
-		<span class="macro">assert_eq!</span>(
-			<span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">Const</span>, <span class="ident">Lsb0</span>, <span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
-			<span class="number">2</span> <span class="op">*</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>(),
-		);
-
-		<span class="macro">assert_eq!</span>(
-			<span class="ident">mem::align_of</span>::<span class="op">&lt;</span><span class="ident">BitRef</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">Const</span>, <span class="ident">Lsb0</span>, <span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
-			<span class="ident">mem::align_of</span>::<span class="op">&lt;</span><span class="kw-2">*const</span> <span class="ident">u8</span><span class="op">&gt;</span>(),
-		);
 	}
 }
 </code></pre></div>

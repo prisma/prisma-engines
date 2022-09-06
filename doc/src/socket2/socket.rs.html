@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/socket2-0.4.4/src/socket.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>socket.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../socket2/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/socket2-0.4.7/src/socket.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>socket.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../socket2/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../socket2/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
@@ -1785,11 +1785,133 @@
 <span id="1779">1779</span>
 <span id="1780">1780</span>
 <span id="1781">1781</span>
+<span id="1782">1782</span>
+<span id="1783">1783</span>
+<span id="1784">1784</span>
+<span id="1785">1785</span>
+<span id="1786">1786</span>
+<span id="1787">1787</span>
+<span id="1788">1788</span>
+<span id="1789">1789</span>
+<span id="1790">1790</span>
+<span id="1791">1791</span>
+<span id="1792">1792</span>
+<span id="1793">1793</span>
+<span id="1794">1794</span>
+<span id="1795">1795</span>
+<span id="1796">1796</span>
+<span id="1797">1797</span>
+<span id="1798">1798</span>
+<span id="1799">1799</span>
+<span id="1800">1800</span>
+<span id="1801">1801</span>
+<span id="1802">1802</span>
+<span id="1803">1803</span>
+<span id="1804">1804</span>
+<span id="1805">1805</span>
+<span id="1806">1806</span>
+<span id="1807">1807</span>
+<span id="1808">1808</span>
+<span id="1809">1809</span>
+<span id="1810">1810</span>
+<span id="1811">1811</span>
+<span id="1812">1812</span>
+<span id="1813">1813</span>
+<span id="1814">1814</span>
+<span id="1815">1815</span>
+<span id="1816">1816</span>
+<span id="1817">1817</span>
+<span id="1818">1818</span>
+<span id="1819">1819</span>
+<span id="1820">1820</span>
+<span id="1821">1821</span>
+<span id="1822">1822</span>
+<span id="1823">1823</span>
+<span id="1824">1824</span>
+<span id="1825">1825</span>
+<span id="1826">1826</span>
+<span id="1827">1827</span>
+<span id="1828">1828</span>
+<span id="1829">1829</span>
+<span id="1830">1830</span>
+<span id="1831">1831</span>
+<span id="1832">1832</span>
+<span id="1833">1833</span>
+<span id="1834">1834</span>
+<span id="1835">1835</span>
+<span id="1836">1836</span>
+<span id="1837">1837</span>
+<span id="1838">1838</span>
+<span id="1839">1839</span>
+<span id="1840">1840</span>
+<span id="1841">1841</span>
+<span id="1842">1842</span>
+<span id="1843">1843</span>
+<span id="1844">1844</span>
+<span id="1845">1845</span>
+<span id="1846">1846</span>
+<span id="1847">1847</span>
+<span id="1848">1848</span>
+<span id="1849">1849</span>
+<span id="1850">1850</span>
+<span id="1851">1851</span>
+<span id="1852">1852</span>
+<span id="1853">1853</span>
+<span id="1854">1854</span>
+<span id="1855">1855</span>
+<span id="1856">1856</span>
+<span id="1857">1857</span>
+<span id="1858">1858</span>
+<span id="1859">1859</span>
+<span id="1860">1860</span>
+<span id="1861">1861</span>
+<span id="1862">1862</span>
+<span id="1863">1863</span>
+<span id="1864">1864</span>
+<span id="1865">1865</span>
+<span id="1866">1866</span>
+<span id="1867">1867</span>
+<span id="1868">1868</span>
+<span id="1869">1869</span>
+<span id="1870">1870</span>
+<span id="1871">1871</span>
+<span id="1872">1872</span>
+<span id="1873">1873</span>
+<span id="1874">1874</span>
+<span id="1875">1875</span>
+<span id="1876">1876</span>
+<span id="1877">1877</span>
+<span id="1878">1878</span>
+<span id="1879">1879</span>
+<span id="1880">1880</span>
+<span id="1881">1881</span>
+<span id="1882">1882</span>
+<span id="1883">1883</span>
+<span id="1884">1884</span>
+<span id="1885">1885</span>
+<span id="1886">1886</span>
+<span id="1887">1887</span>
+<span id="1888">1888</span>
+<span id="1889">1889</span>
+<span id="1890">1890</span>
+<span id="1891">1891</span>
+<span id="1892">1892</span>
+<span id="1893">1893</span>
+<span id="1894">1894</span>
+<span id="1895">1895</span>
+<span id="1896">1896</span>
+<span id="1897">1897</span>
+<span id="1898">1898</span>
+<span id="1899">1899</span>
+<span id="1900">1900</span>
+<span id="1901">1901</span>
+<span id="1902">1902</span>
+<span id="1903">1903</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2015 The Rust Project Developers.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
-<span class="comment">// &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
+<span class="comment">// https://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
+<span class="comment">// &lt;LICENSE-MIT or https://opensource.org/licenses/MIT&gt;, at your</span>
 <span class="comment">// option. This file may not be copied, modified, or distributed</span>
 <span class="comment">// except according to those terms.</span>
 
@@ -2922,6 +3044,7 @@
         <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;haiku&quot;</span>,
         <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;illumos&quot;</span>,
         <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;netbsd&quot;</span>,
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;openbsd&quot;</span>,
         <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;redox&quot;</span>,
         <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;solaris&quot;</span>,
     )))]</span>
@@ -2950,6 +3073,7 @@
         <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;haiku&quot;</span>,
         <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;illumos&quot;</span>,
         <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;netbsd&quot;</span>,
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;openbsd&quot;</span>,
         <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;redox&quot;</span>,
         <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;solaris&quot;</span>,
     )))]</span>
@@ -2965,6 +3089,76 @@
                 <span class="ident">sys::IPPROTO_IP</span>,
                 <span class="ident">sys::IP_DROP_MEMBERSHIP</span>,
                 <span class="ident">mreqn</span>,
+            )
+        }
+    }
+
+    <span class="doccomment">/// Join a multicast SSM channel using `IP_ADD_SOURCE_MEMBERSHIP` option on this socket.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This function specifies a new multicast channel for this socket to join.</span>
+    <span class="doccomment">/// The group must be a valid SSM group address, the source must be the address of the sender</span>
+    <span class="doccomment">/// and `interface` is the address of the local interface with which the system should join the</span>
+    <span class="doccomment">/// multicast group. If it&#39;s [`Ipv4Addr::UNSPECIFIED`] (`INADDR_ANY`) then</span>
+    <span class="doccomment">/// an appropriate interface is chosen by the system.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;dragonfly&quot;</span>,
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;haiku&quot;</span>,
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;netbsd&quot;</span>,
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;openbsd&quot;</span>,
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;redox&quot;</span>,
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;fuchsia&quot;</span>,
+    )))]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">join_ssm_v4</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">Ipv4Addr</span>,
+        <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="ident">Ipv4Addr</span>,
+        <span class="ident">interface</span>: <span class="kw-2">&amp;</span><span class="ident">Ipv4Addr</span>,
+    ) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">mreqs</span> <span class="op">=</span> <span class="ident">sys::IpMreqSource</span> {
+            <span class="ident">imr_multiaddr</span>: <span class="ident">sys::to_in_addr</span>(<span class="ident">group</span>),
+            <span class="ident">imr_interface</span>: <span class="ident">sys::to_in_addr</span>(<span class="ident">interface</span>),
+            <span class="ident">imr_sourceaddr</span>: <span class="ident">sys::to_in_addr</span>(<span class="ident">source</span>),
+        };
+        <span class="kw">unsafe</span> {
+            <span class="ident">setsockopt</span>(
+                <span class="self">self</span>.<span class="ident">as_raw</span>(),
+                <span class="ident">sys::IPPROTO_IP</span>,
+                <span class="ident">sys::IP_ADD_SOURCE_MEMBERSHIP</span>,
+                <span class="ident">mreqs</span>,
+            )
+        }
+    }
+
+    <span class="doccomment">/// Leave a multicast group using `IP_DROP_SOURCE_MEMBERSHIP` option on this socket.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// For more information about this option, see [`join_ssm_v4`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`join_ssm_v4`]: Socket::join_ssm_v4</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;dragonfly&quot;</span>,
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;haiku&quot;</span>,
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;netbsd&quot;</span>,
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;openbsd&quot;</span>,
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;redox&quot;</span>,
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;fuchsia&quot;</span>,
+    )))]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">leave_ssm_v4</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">Ipv4Addr</span>,
+        <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="ident">Ipv4Addr</span>,
+        <span class="ident">interface</span>: <span class="kw-2">&amp;</span><span class="ident">Ipv4Addr</span>,
+    ) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">mreqs</span> <span class="op">=</span> <span class="ident">sys::IpMreqSource</span> {
+            <span class="ident">imr_multiaddr</span>: <span class="ident">sys::to_in_addr</span>(<span class="ident">group</span>),
+            <span class="ident">imr_interface</span>: <span class="ident">sys::to_in_addr</span>(<span class="ident">interface</span>),
+            <span class="ident">imr_sourceaddr</span>: <span class="ident">sys::to_in_addr</span>(<span class="ident">source</span>),
+        };
+        <span class="kw">unsafe</span> {
+            <span class="ident">setsockopt</span>(
+                <span class="self">self</span>.<span class="ident">as_raw</span>(),
+                <span class="ident">sys::IPPROTO_IP</span>,
+                <span class="ident">sys::IP_DROP_SOURCE_MEMBERSHIP</span>,
+                <span class="ident">mreqs</span>,
             )
         }
     }
@@ -3079,7 +3273,7 @@
     <span class="doccomment">/// NOTE: &lt;https://docs.microsoft.com/en-us/windows/win32/winsock/ipproto-ip-socket-options&gt;</span>
     <span class="doccomment">/// documents that not all versions of windows support `IP_TOS`.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(
-        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;fuschia&quot;</span>,
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;fuchsia&quot;</span>,
         <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;redox&quot;</span>,
         <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;solaris&quot;</span>,
         <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;illumos&quot;</span>,
@@ -3097,7 +3291,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`set_tos`]: Socket::set_tos</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(
-        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;fuschia&quot;</span>,
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;fuchsia&quot;</span>,
         <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;redox&quot;</span>,
         <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;solaris&quot;</span>,
         <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;illumos&quot;</span>,
@@ -3105,6 +3299,56 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tos</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">getsockopt</span>::<span class="op">&lt;</span><span class="ident">c_int</span><span class="op">&gt;</span>(<span class="self">self</span>.<span class="ident">as_raw</span>(), <span class="ident">sys::IPPROTO_IP</span>, <span class="ident">sys::IP_TOS</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">tos</span><span class="op">|</span> <span class="ident">tos</span> <span class="kw">as</span> <span class="ident">u32</span>)
+        }
+    }
+
+    <span class="doccomment">/// Set the value of the `IP_RECVTOS` option for this socket.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If enabled, the IP_TOS ancillary message is passed with</span>
+    <span class="doccomment">/// incoming packets. It contains a byte which specifies the</span>
+    <span class="doccomment">/// Type of Service/Precedence field of the packet header.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;dragonfly&quot;</span>,
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;fuchsia&quot;</span>,
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;illumos&quot;</span>,
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;netbsd&quot;</span>,
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;openbsd&quot;</span>,
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;redox&quot;</span>,
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;solaris&quot;</span>,
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>,
+    )))]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_recv_tos</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">recv_tos</span>: <span class="ident">bool</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">recv_tos</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">recv_tos</span> { <span class="number">1</span> } <span class="kw">else</span> { <span class="number">0</span> };
+
+        <span class="kw">unsafe</span> {
+            <span class="ident">setsockopt</span>(
+                <span class="self">self</span>.<span class="ident">as_raw</span>(),
+                <span class="ident">sys::IPPROTO_IP</span>,
+                <span class="ident">sys::IP_RECVTOS</span>,
+                <span class="ident">recv_tos</span> <span class="kw">as</span> <span class="ident">c_int</span>,
+            )
+        }
+    }
+
+    <span class="doccomment">/// Get the value of the `IP_RECVTOS` option for this socket.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// For more information about this option, see [`set_recv_tos`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`set_recv_tos`]: Socket::set_recv_tos</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;dragonfly&quot;</span>,
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;fuchsia&quot;</span>,
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;illumos&quot;</span>,
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;netbsd&quot;</span>,
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;openbsd&quot;</span>,
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;redox&quot;</span>,
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;solaris&quot;</span>,
+        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>,
+    )))]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recv_tos</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="ident">getsockopt</span>::<span class="op">&lt;</span><span class="ident">c_int</span><span class="op">&gt;</span>(<span class="self">self</span>.<span class="ident">as_raw</span>(), <span class="ident">sys::IPPROTO_IP</span>, <span class="ident">sys::IP_RECVTOS</span>)
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">recv_tos</span><span class="op">|</span> <span class="ident">recv_tos</span> <span class="op">&gt;</span> <span class="number">0</span>)
         }
     }
 }

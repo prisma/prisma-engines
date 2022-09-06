@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/object-0.28.4/src/elf.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>elf.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../object/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/object-0.29.0/src/elf.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>elf.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../object/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../object/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
@@ -6396,6 +6396,18 @@
 <span id="6390">6390</span>
 <span id="6391">6391</span>
 <span id="6392">6392</span>
+<span id="6393">6393</span>
+<span id="6394">6394</span>
+<span id="6395">6395</span>
+<span id="6396">6396</span>
+<span id="6397">6397</span>
+<span id="6398">6398</span>
+<span id="6399">6399</span>
+<span id="6400">6400</span>
+<span id="6401">6401</span>
+<span id="6402">6402</span>
+<span id="6403">6403</span>
+<span id="6404">6404</span>
 </pre><pre class="rust"><code><span class="doccomment">//! ELF definitions.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! These definitions are independent of read/write support, although we do implement</span>
@@ -6560,6 +6572,8 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Compatibility alias.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ELFOSABI_LINUX</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="ident">ELFOSABI_GNU</span>;
+<span class="doccomment">/// GNU/Hurd.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ELFOSABI_HURD</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">4</span>;
 <span class="doccomment">/// Sun Solaris.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ELFOSABI_SOLARIS</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">6</span>;
 <span class="doccomment">/// IBM AIX.</span>
@@ -6574,6 +6588,16 @@
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ELFOSABI_MODESTO</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">11</span>;
 <span class="doccomment">/// OpenBSD.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ELFOSABI_OPENBSD</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">12</span>;
+<span class="doccomment">/// OpenVMS.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ELFOSABI_OPENVMS</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">13</span>;
+<span class="doccomment">/// Hewlett-Packard Non-Stop Kernel.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ELFOSABI_NSK</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">14</span>;
+<span class="doccomment">/// AROS</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ELFOSABI_AROS</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">15</span>;
+<span class="doccomment">/// FenixOS</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ELFOSABI_FENIXOS</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">16</span>;
+<span class="doccomment">/// Nuxi CloudABI</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ELFOSABI_CLOUDABI</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">17</span>;
 <span class="doccomment">/// ARM EABI.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ELFOSABI_ARM_AEABI</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">64</span>;
 <span class="doccomment">/// ARM.</span>

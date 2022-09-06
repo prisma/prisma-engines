@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"trait":[["BitStore","Common interface for memory regions."]]};
+window.SIDEBAR_ITEMS = {"trait":[["BitStore","Bit Storage"]]};

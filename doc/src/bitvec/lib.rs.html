@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bitvec-0.22.3/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bitvec-1.0.1/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
@@ -81,543 +81,83 @@
 <span id="75">75</span>
 <span id="76">76</span>
 <span id="77">77</span>
-<span id="78">78</span>
-<span id="79">79</span>
-<span id="80">80</span>
-<span id="81">81</span>
-<span id="82">82</span>
-<span id="83">83</span>
-<span id="84">84</span>
-<span id="85">85</span>
-<span id="86">86</span>
-<span id="87">87</span>
-<span id="88">88</span>
-<span id="89">89</span>
-<span id="90">90</span>
-<span id="91">91</span>
-<span id="92">92</span>
-<span id="93">93</span>
-<span id="94">94</span>
-<span id="95">95</span>
-<span id="96">96</span>
-<span id="97">97</span>
-<span id="98">98</span>
-<span id="99">99</span>
-<span id="100">100</span>
-<span id="101">101</span>
-<span id="102">102</span>
-<span id="103">103</span>
-<span id="104">104</span>
-<span id="105">105</span>
-<span id="106">106</span>
-<span id="107">107</span>
-<span id="108">108</span>
-<span id="109">109</span>
-<span id="110">110</span>
-<span id="111">111</span>
-<span id="112">112</span>
-<span id="113">113</span>
-<span id="114">114</span>
-<span id="115">115</span>
-<span id="116">116</span>
-<span id="117">117</span>
-<span id="118">118</span>
-<span id="119">119</span>
-<span id="120">120</span>
-<span id="121">121</span>
-<span id="122">122</span>
-<span id="123">123</span>
-<span id="124">124</span>
-<span id="125">125</span>
-<span id="126">126</span>
-<span id="127">127</span>
-<span id="128">128</span>
-<span id="129">129</span>
-<span id="130">130</span>
-<span id="131">131</span>
-<span id="132">132</span>
-<span id="133">133</span>
-<span id="134">134</span>
-<span id="135">135</span>
-<span id="136">136</span>
-<span id="137">137</span>
-<span id="138">138</span>
-<span id="139">139</span>
-<span id="140">140</span>
-<span id="141">141</span>
-<span id="142">142</span>
-<span id="143">143</span>
-<span id="144">144</span>
-<span id="145">145</span>
-<span id="146">146</span>
-<span id="147">147</span>
-<span id="148">148</span>
-<span id="149">149</span>
-<span id="150">150</span>
-<span id="151">151</span>
-<span id="152">152</span>
-<span id="153">153</span>
-<span id="154">154</span>
-<span id="155">155</span>
-<span id="156">156</span>
-<span id="157">157</span>
-<span id="158">158</span>
-<span id="159">159</span>
-<span id="160">160</span>
-<span id="161">161</span>
-<span id="162">162</span>
-<span id="163">163</span>
-<span id="164">164</span>
-<span id="165">165</span>
-<span id="166">166</span>
-<span id="167">167</span>
-<span id="168">168</span>
-<span id="169">169</span>
-<span id="170">170</span>
-<span id="171">171</span>
-<span id="172">172</span>
-<span id="173">173</span>
-<span id="174">174</span>
-<span id="175">175</span>
-<span id="176">176</span>
-<span id="177">177</span>
-<span id="178">178</span>
-<span id="179">179</span>
-<span id="180">180</span>
-<span id="181">181</span>
-<span id="182">182</span>
-<span id="183">183</span>
-<span id="184">184</span>
-<span id="185">185</span>
-<span id="186">186</span>
-<span id="187">187</span>
-<span id="188">188</span>
-<span id="189">189</span>
-<span id="190">190</span>
-<span id="191">191</span>
-<span id="192">192</span>
-<span id="193">193</span>
-<span id="194">194</span>
-<span id="195">195</span>
-<span id="196">196</span>
-<span id="197">197</span>
-<span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
-<span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
-<span id="204">204</span>
-<span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
-<span id="208">208</span>
-<span id="209">209</span>
-<span id="210">210</span>
-<span id="211">211</span>
-<span id="212">212</span>
-<span id="213">213</span>
-<span id="214">214</span>
-<span id="215">215</span>
-<span id="216">216</span>
-<span id="217">217</span>
-<span id="218">218</span>
-<span id="219">219</span>
-<span id="220">220</span>
-<span id="221">221</span>
-<span id="222">222</span>
-<span id="223">223</span>
-<span id="224">224</span>
-<span id="225">225</span>
-<span id="226">226</span>
-<span id="227">227</span>
-<span id="228">228</span>
-<span id="229">229</span>
-<span id="230">230</span>
-<span id="231">231</span>
-<span id="232">232</span>
-<span id="233">233</span>
-<span id="234">234</span>
-<span id="235">235</span>
-<span id="236">236</span>
-<span id="237">237</span>
-<span id="238">238</span>
-<span id="239">239</span>
-<span id="240">240</span>
-<span id="241">241</span>
-<span id="242">242</span>
-<span id="243">243</span>
-<span id="244">244</span>
-<span id="245">245</span>
-<span id="246">246</span>
-<span id="247">247</span>
-<span id="248">248</span>
-<span id="249">249</span>
-<span id="250">250</span>
-<span id="251">251</span>
-<span id="252">252</span>
-<span id="253">253</span>
-<span id="254">254</span>
-<span id="255">255</span>
-<span id="256">256</span>
-<span id="257">257</span>
-<span id="258">258</span>
-<span id="259">259</span>
-<span id="260">260</span>
-<span id="261">261</span>
-<span id="262">262</span>
-<span id="263">263</span>
-<span id="264">264</span>
-<span id="265">265</span>
-<span id="266">266</span>
-<span id="267">267</span>
-<span id="268">268</span>
-<span id="269">269</span>
-<span id="270">270</span>
-<span id="271">271</span>
-<span id="272">272</span>
-<span id="273">273</span>
-<span id="274">274</span>
-<span id="275">275</span>
-<span id="276">276</span>
-<span id="277">277</span>
-<span id="278">278</span>
-<span id="279">279</span>
-<span id="280">280</span>
-<span id="281">281</span>
-<span id="282">282</span>
-<span id="283">283</span>
-<span id="284">284</span>
-<span id="285">285</span>
-<span id="286">286</span>
-<span id="287">287</span>
-<span id="288">288</span>
-<span id="289">289</span>
-<span id="290">290</span>
-<span id="291">291</span>
-<span id="292">292</span>
-<span id="293">293</span>
-<span id="294">294</span>
-<span id="295">295</span>
-<span id="296">296</span>
-<span id="297">297</span>
-<span id="298">298</span>
-<span id="299">299</span>
-<span id="300">300</span>
-<span id="301">301</span>
-<span id="302">302</span>
-<span id="303">303</span>
-<span id="304">304</span>
-<span id="305">305</span>
-<span id="306">306</span>
-<span id="307">307</span>
-</pre><pre class="rust"><code><span class="doccomment">/*! # `bitvec` — Addressable Bits
-
-`bitvec` provides the foundation tools needed to implement truly single-bit
-`bool` collections and arbitrary bit-precision addressing. It builds compact
-collections and performant [bitfield] regions with a high-level, expressive, API
-that compiles down to the simple machine instructions you would expect.
-
-# Examples
-
-The [`examples/`] directory of the project repository contains some programs
-that showcase different `bitvec` features and use cases. In addition, each data
-structure’s API documentation contains more focused samples.
-
-To begin using `bitvec`, you need only import its [prelude]. Once in scope,
-`bitvec` can take over existing memory buffers or create entirely new values:
-
-```rust
-use bitvec::prelude::*;
-
-let data = &amp;[0u8, 1, 2, 3];
-let data_bits = data.view_bits::&lt;Msb0&gt;();
-
-let literal_bits = bits![Lsb0, u16; 1, 0, 1, 1];
-assert_eq!(literal_bits.as_raw_slice()[0], 0b1101);
-
-let array_bool = bitarr![1; 40];
-# #[cfg(feature = &quot;alloc&quot;)] {
-let boxed_bool = bitbox![Lsb0, u32; 1; 50];
-let vec_bool = bitvec![Msb0, usize; 1; 60];
-# }
-```
-
-The two easiest entry points into `bitvec` are through the [`BitView`] trait,
-which provides extension methods on ordinary memory to view it as a
-[`BitSlice`], and the [macro] constructors, which convert token strings into
-appropriate buffers at compile time. Each data structure also has its own
-constructor functions that create new buffers or borrow existing values.
-
-Once in use, `bitvec`’s types obey all the same patterns and APIs that you have
-come to expect from their analogues in the [`core`], [`alloc`], and [`std`]
-libraries.
-
-# Usage
-
-`bitvec` provides data structures that specialize the major sequence types in
-the standard libraries:
-
-- `[bool]` becomes [`BitSlice`]
-- `[bool; N]` becomes [`BitArray`]
-- `Box&lt;[bool]&gt;` becomes [`BitBox`]
-- `Vec&lt;bool&gt;` becomes [`BitVec`]
-
-You can start using the crate in an existing codebase by replacing types and
-chasing compiler errors from there.
-
-As an example,
-
-```rust
-# #[cfg(feature = &quot;alloc&quot;)] {
-let mut io_buf: Vec&lt;u8&gt; = Vec::new();
-io_buf.extend(&amp;[0x47, 0xA5]);
-
-let stats: Vec&lt;bool&gt; = vec![
-  true, false, true, true,
-  false, false, true, false,
-];
-# }
-```
-
-would become
-
-```rust
-# #[cfg(feature = &quot;alloc&quot;)] {
-use bitvec::prelude::*;
-
-let mut io_buf: BitVec&lt;Msb0, u8&gt; = BitVec::new();
-io_buf.resize(16, false);
-io_buf[.. 4].store(4u8);
-io_buf[4 .. 8].store(7u8);
-io_buf[8 .. 16].store(0xA5u8);
-
-let stats: BitVec = bitvec![
-  1, 0, 1, 1,
-  0, 0, 1, 0,
-];
-# }
-```
-
-## Type Arguments
-
-The `bitvec` data structures are all generic over two type parameters which
-control how they view and manage the memory they use. These type parameters
-allow users to precisely control the memory layout, value bit-patterns, and
-generated instructions, but most users of the library will not need to be
-generic over them. Instead, you probably either do not care about the details of
-the underlying memory, or you have a specific and fixed layout requirement. In
-either case, you will likely select a specific combination of type arguments and
-use it consistently throughout your project.
-
-You *can* write your project to be generic over these type arguments, and this
-is certainly useful when writing code that is not coupled directly to memory,
-increases complexity with little practical gain.
-
-The default type arguments are chosen for optimal behavior in memory use and
-instruction selection. The unadorned types [`BitArray`], [`BitSlice`],
-[`BitBox`], and [`BitVec`] can all be used in type-annotation position (`let`
-bindings, `struct` fields, and function arguments). Users who need to specify
-their type arguments should prefer to do so in a `type` alias, and use that
-alias throughout their project instead of the much longer fully-qualified
-`bitvec` type names:
-
-```rust
-use bitvec::prelude::*;
-
-pub type MySlice = BitSlice&lt;Msb0, u8&gt;;
-pub type MyArray20 = BitArr!(for 20, in Msb0, u8);
-# #[cfg(feature = &quot;alloc&quot;)]
-pub type MyVec = BitVec&lt;Msb0, u8&gt;;
-
-fn make_buffer() -&gt; MyVec {
-  MyVec::new()
-}
-```
-
-In general, you will probably work with [`BitSlice`] borrows and [`BitVec`]
-owned buffers. The [`BitArray`] and [`BitBox`] types are provided for
-completeness and have their uses, but the additional constraints and frozen size
-render them less commonly useful.
-
-## Additional Details
-
-As a replacement for `bool` sequences, you should be able to replace old type
-definition and value construction sites with their corresponding items from this
-project, and the rest of your project should just work with the new types.
-
-To use `bitvec` for structural [bitfields] or specialized I/O protocol buffers,
-you should use [`BitArray`] or [`BitVec`] to manage your data buffers (for
-compile-time statically-sized and run-time dynamically-sized, respectively), and
-the [`BitField`] trait to manage transferring values into and out of them.
-
-The [`BitSlice`] type contains most of the behavior that interacts with the
-*contents* of a memory buffer. [`BitVec`] adds behavior that operates on
-allocations, and specializes [`BitSlice`] behaviors that can take advantage of
-owned buffers.
-
-The [`domain`] module, whose types are accessed by the `.{bit_,}domain{,_mut}`
-methods on [`BitSlice`], allows users to split their views of memory at aliasing
-boundaries. This removes synchronization guards where `bitvec` can prove that
-doing so is legal and correct.
-
-There are many ways to construct a bit-level view of data. The [`BitArray`],
-[`BitBox`], and [`BitVec`] types all own a buffer of memory and dereference it
-to [`BitSlice`] in order to view it. In addition, you can borrow any piece of
-ordinary Rust memory as a `BitSlice` view by using its borrowing constructor
-functions or the [`BitView`] trait’s extension methods.
-
-# Capabilities
-
-`bitvec` stands out from other bit-sequence libraries, both in Rust and in other
-languages, in a few significant ways.
-
-Unlike other Rust libraries, `bitvec` stores its region information in
-specially-encoded pointers *to* memory regions, rather than in the region
-itself. By using its own pointer encoding scheme, `bitvec` can use references
-(`&amp;BitSlice&lt;_, _&gt;` and `&amp;mut BitSlice&lt;_, _&gt;`) to manage memory accesses and fit
-seamlessly into the Rust language rules and API signatures.
-
-Unlike *any* other bit-sequence system, `bitvec` enables users to specify both
-the register element type used to store data and also the ordering of bits
-within each register element. This sidesteps the problems found in C
-[bitfields], C++ [`std::bitset`] and [`std::vector&lt;bool&gt;`], Python’s
-[`bitstring`], Erlang’s [`bitstream`], and other Rust libraries such as
-[`bit-vec`].
-
-By permitting the in-memory layout to be specified by the user, rather than
-hard-coding it within the library, `bitvec` enables users to select the behavior
-characteristics they want or need without significant effort on their part.
-
-This works by supplying two type parameters: an `O` [`BitOrder`] ordering of
-bits within a register element, and a `T` [`BitStore`] register element used for
-storage and memory description. `T` is restricted to be only the raw unsigned
-integers, and [`bitvec`-provided wrappers][`BitSafe`] over [atomic] and [`Cell`]
-synchronization guards, that fit within processor registers on your target.
-
-These parameters permit the `bitvec` type system to track memory access rules
-and bit addressing, thus enabling a nearly seamless use of [`BitSlice`]s as if
-they were ordinary Rust slices.
-
-`bitvec` correctly handles memory aliasing by leveraging the type system to mark
-regions that have become subject to shared mutability. This mark can, depending
-on your build settings, either forbid moving such slices across threads, or
-issue lock instructions to the memory bus when accessing memory. You will never
-need to add your own guards to prevent race conditions, and [`BitSlice`]
-provides interfaces to separate any bit-slice into its aliased and unaliased
-subslices.
-
-Where possible, `bitvec` uses its knowledge of bit ordering and memory
-availability to accelerate memory operations from individual bit-by-bit walks to
-batched operations within a register. This is an area of ongoing development,
-and is an implementation detail rather than an aspect of public API.
-
-`bitvec`’s performance even when working with individual bits is as close to
-ideal as a general-purpose library can be, but the width of processor registers
-means that no amount of performance improvement at the individual bit level can
-compete with instructions operating on 32 or 64 bits at once. If you encounter
-performance bottlenecks, you can escape `bitvec`’s views to operate on the
-memory directly, or submit an issue for future work on specialized batch
-parallelization.
-
-# Project Structure
-
-You should generally import the library [prelude], with
-
-```rust
-use bitvec::prelude::*;
-```
-
-The prelude contains the basic symbols you will need to make use of the crate:
-the names of data structures, ordering parameters, useful traits, and
-constructor macros. Almost all symbols begin with the prefix `Bit`; only the
-orderings [`Lsb0`], [`Msb0`], and [`LocalBits`] do not. This will reduce the
-likelihood of name collisions.
-
-Each major component in the library is divided into its own module. This
-includes each data structure and trait, as well as utility objects used for
-implementation. The data structures that mirror the language distribution have
-submodules for each part of their mirroring: `api` ports inherent methods,
-`iter` contains iteration logic, `ops` overrides operator sigils, and `traits`
-holds all other trait implementations. The data structure’s own module typically
-only contains its own definition and its inherent methods that are not ports of
-the standard libraries.
-
-[atomic]: core::sync::atomic
-[bitfield]: https://en.cppreference.com/w/c/language/bit_field
-[bitfields]: https://en.cppreference.com/w/c/language/bit_field
-[macro]: #macros
-[prelude]: crate::prelude
-
-[`BitArray`]: crate::array::BitArray
-[`BitBox`]: crate::boxed::BitBox
-[`BitField`]: crate::field::BitField
-[`BitOrder`]: crate::order::BitOrder
-[`BitSafe`]: crate::access::BitSafe
-[`BitSlice`]: crate::slice::BitSlice
-[`BitStore`]: crate::store::BitStore
-[`BitVec`]: crate::vec::BitVec
-[`BitView`]: crate::view::BitView
-[`Cell`]: core::cell::Cell
-[`LocalBits`]: crate::order::LocalBits
-[`Lsb0`]: crate::order::Lsb0
-[`Msb0`]: crate::order::Msb0
-
-[`alloc`]: alloc
-[`bitstream`]: https://erlang.org/doc/programming_examples/bit_syntax.html
-[`bitstring`]: https://pypi.org/project/bitstring/
-[`bit-vec`]: https://crates.io/crates/bit-vec
-[`core`]: core
-[`domain`]: crate::domain
-[`examples/`]: https://github.com/myrrlyn/bitvec/tree/HEAD/examples
-[`std`]: std
-[`std::bitset`]: https://en.cppreference.com/w/cpp/utility/bitset
-[`std::vector&lt;bool&gt;`]: https://en.cppreference.com/w/cpp/container/vector_bool
-!*/</span>
-
+</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../README.md&quot;</span>)]</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>), <span class="ident">no_std</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">debug_assertions</span>, <span class="ident">warn</span>(<span class="ident">missing_docs</span>))]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">debug_assertions</span>), <span class="ident">deny</span>(<span class="ident">missing_docs</span>))]</span>
-<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">unconditional_recursion</span>)]</span>
-<span class="comment">//  Clippy controls applicable in ordinary code.</span>
-<span class="attribute">#![<span class="ident">allow</span>(
-	<span class="ident">clippy::single_char_add_str</span>, <span class="comment">// Bypass UTF-8 encoding.</span>
+<span class="attribute">#![<span class="ident">cfg_attr</span>(
+	<span class="ident">debug_assertions</span>,
+	<span class="ident">warn</span>(<span class="ident">missing_docs</span>, <span class="ident">clippy::missing_docs_in_private_items</span>)
 )]</span>
-<span class="comment">//  Clippy controls only applicable in #[cfg(test)] testing modules.</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">test</span>, <span class="ident">allow</span>(
-	<span class="ident">clippy::many_single_char_names</span>, <span class="comment">// Tests do not need descriptive bind names.</span>
-	<span class="ident">clippy::redundant_clone</span>, <span class="comment">// Does not matter in tests.</span>
-	<span class="ident">clippy::unusual_byte_groupings</span>, <span class="comment">// Literals are for region patterns.</span>
-))]</span>
+<span class="attribute">#![<span class="ident">cfg_attr</span>(
+	<span class="ident">not</span>(<span class="ident">debug_assertions</span>),
+	<span class="ident">deny</span>(<span class="ident">missing_docs</span>, <span class="ident">clippy::missing_docs_in_private_items</span>)
+)]</span>
+<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">unconditional_recursion</span>)]</span>
+<span class="attribute">#![<span class="ident">allow</span>(
+	<span class="ident">clippy::declare_interior_mutable_const</span>,
+	<span class="ident">clippy::type_complexity</span>,
+	<span class="ident">unknown_lints</span>
+)]</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">alloc</span>;
+
+<span class="attribute">#[<span class="ident">macro_use</span>]</span>
+<span class="kw">mod</span> <span class="ident">devel</span>;
 
 <span class="attribute">#[<span class="ident">macro_use</span>]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">macros</span>;
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">access</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">array</span>;
-<span class="kw">mod</span> <span class="ident">devel</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">boxed</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">domain</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">field</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">index</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">mem</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">order</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">prelude</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">ptr</span>;
+<span class="kw">mod</span> <span class="ident">serdes</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">slice</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">store</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">vec</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">view</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">boxed</span>;
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">vec</span>;
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">serdes</span>;
+<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../doc/prelude.md&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">prelude</span> {
+	<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::{
+		<span class="ident">array::BitArray</span>,
+		<span class="ident">bitarr</span>,
+		<span class="ident">bits</span>,
+		<span class="ident">field::BitField</span> <span class="kw">as</span> <span class="kw">_</span>,
+		<span class="ident">order</span>::{
+			<span class="ident">BitOrder</span>,
+			<span class="ident">LocalBits</span>,
+			<span class="ident">Lsb0</span>,
+			<span class="ident">Msb0</span>,
+		},
+		<span class="ident">ptr</span>::{
+			<span class="ident">BitPtr</span>,
+			<span class="ident">BitPtrRange</span>,
+			<span class="ident">BitRef</span>,
+		},
+		<span class="ident">slice::BitSlice</span>,
+		<span class="ident">store::BitStore</span>,
+		<span class="ident">view</span>::{
+			<span class="ident">AsBits</span>,
+			<span class="ident">AsMutBits</span>,
+			<span class="ident">BitView</span> <span class="kw">as</span> <span class="kw">_</span>,
+			<span class="ident">BitViewSized</span> <span class="kw">as</span> <span class="kw">_</span>,
+		},
+		<span class="ident">BitArr</span>,
+	};
+	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
+	<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::{
+		<span class="ident">bitbox</span>,
+		<span class="ident">bitvec</span>,
+		<span class="ident">boxed::BitBox</span>,
+		<span class="ident">vec::BitVec</span>,
+	};
+}
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bitvec" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0 (4b91a6ea7 2022-08-08)" ></div>
 </body></html>

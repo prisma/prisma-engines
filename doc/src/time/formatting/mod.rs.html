@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.9/src/formatting/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.14/src/formatting/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../time/index.html"><div class="logo-container">
@@ -463,10 +463,61 @@
 <span id="455">455</span>
 <span id="456">456</span>
 <span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Formatting for various types.</span>
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">formattable</span>;
+<span class="kw">mod</span> <span class="ident">iso8601</span>;
 
+<span class="kw">use</span> <span class="ident">core::num::NonZeroU8</span>;
 <span class="kw">use</span> <span class="ident">std::io</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::formattable::Formattable</span>;
@@ -581,22 +632,69 @@
 <span class="comment">// endregion extension trait</span>
 
 <span class="doccomment">/// Write all bytes to the output, returning the number of bytes written.</span>
-<span class="kw">fn</span> <span class="ident">write</span>(<span class="ident">output</span>: <span class="kw-2">&amp;mut</span> <span class="kw">impl</span> <span class="ident">io::Write</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">write</span>(<span class="ident">output</span>: <span class="kw-2">&amp;mut</span> <span class="kw">impl</span> <span class="ident">io::Write</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
     <span class="ident">output</span>.<span class="ident">write_all</span>(<span class="ident">bytes</span>)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(<span class="ident">bytes</span>.<span class="ident">len</span>())
+}
+
+<span class="doccomment">/// If `pred` is true, write all bytes to the output, returning the number of bytes written.</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">write_if</span>(<span class="ident">output</span>: <span class="kw-2">&amp;mut</span> <span class="kw">impl</span> <span class="ident">io::Write</span>, <span class="ident">pred</span>: <span class="ident">bool</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">if</span> <span class="ident">pred</span> { <span class="ident">write</span>(<span class="ident">output</span>, <span class="ident">bytes</span>) } <span class="kw">else</span> { <span class="prelude-val">Ok</span>(<span class="number">0</span>) }
+}
+
+<span class="doccomment">/// If `pred` is true, write `true_bytes` to the output. Otherwise, write `false_bytes`.</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">write_if_else</span>(
+    <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> <span class="kw">impl</span> <span class="ident">io::Write</span>,
+    <span class="ident">pred</span>: <span class="ident">bool</span>,
+    <span class="ident">true_bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
+    <span class="ident">false_bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
+) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="ident">write</span>(<span class="ident">output</span>, <span class="kw">if</span> <span class="ident">pred</span> { <span class="ident">true_bytes</span> } <span class="kw">else</span> { <span class="ident">false_bytes</span> })
+}
+
+<span class="doccomment">/// Write the floating point number to the output, returning the number of bytes written.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This method accepts the number of digits before and after the decimal. The value will be padded</span>
+<span class="doccomment">/// with zeroes to the left if necessary.</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">format_float</span>(
+    <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> <span class="kw">impl</span> <span class="ident">io::Write</span>,
+    <span class="ident">value</span>: <span class="ident">f64</span>,
+    <span class="ident">digits_before_decimal</span>: <span class="ident">u8</span>,
+    <span class="ident">digits_after_decimal</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroU8</span><span class="op">&gt;</span>,
+) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">match</span> <span class="ident">digits_after_decimal</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">digits_after_decimal</span>) =&gt; {
+            <span class="kw">let</span> <span class="ident">digits_after_decimal</span> <span class="op">=</span> <span class="ident">digits_after_decimal</span>.<span class="ident">get</span>() <span class="kw">as</span> <span class="ident">usize</span>;
+            <span class="kw">let</span> <span class="ident">width</span> <span class="op">=</span> <span class="ident">digits_before_decimal</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="number">1</span> <span class="op">+</span> <span class="ident">digits_after_decimal</span>;
+            <span class="macro">write!</span>(
+                <span class="ident">output</span>,
+                <span class="string">&quot;{value:0&gt;width$.digits_after_decimal$}&quot;</span>,
+                <span class="ident">value</span> <span class="op">=</span> <span class="ident">value</span>,
+                <span class="ident">width</span> <span class="op">=</span> <span class="ident">width</span>,
+                <span class="ident">digits_after_decimal</span> <span class="op">=</span> <span class="ident">digits_after_decimal</span>,
+            )<span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(<span class="ident">width</span>)
+        }
+        <span class="prelude-val">None</span> =&gt; {
+            <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">trunc</span>() <span class="kw">as</span> <span class="ident">u64</span>;
+            <span class="kw">let</span> <span class="ident">width</span> <span class="op">=</span> <span class="ident">digits_before_decimal</span> <span class="kw">as</span> <span class="ident">usize</span>;
+            <span class="macro">write!</span>(<span class="ident">output</span>, <span class="string">&quot;{value:0&gt;width$?}&quot;</span>, <span class="ident">value</span> <span class="op">=</span> <span class="ident">value</span>, <span class="ident">width</span> <span class="op">=</span> <span class="ident">width</span>)<span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(<span class="ident">width</span>)
+        }
+    }
 }
 
 <span class="doccomment">/// Format a number with the provided padding and width.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// The sign must be written by the caller.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">format_number</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">io::Write</span>, <span class="ident">V</span>: <span class="ident">itoa::Integer</span> <span class="op">+</span> <span class="ident">DigitCount</span> <span class="op">+</span> <span class="ident">Copy</span>, <span class="kw">const</span> <span class="ident">WIDTH</span>: <span class="ident">u8</span><span class="op">&gt;</span>(
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">format_number</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">WIDTH</span>: <span class="ident">u8</span>, <span class="ident">W</span>: <span class="ident">io::Write</span>, <span class="ident">V</span>: <span class="ident">itoa::Integer</span> <span class="op">+</span> <span class="ident">DigitCount</span> <span class="op">+</span> <span class="ident">Copy</span><span class="op">&gt;</span>(
     <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>,
     <span class="ident">value</span>: <span class="ident">V</span>,
     <span class="ident">padding</span>: <span class="ident">modifier::Padding</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">padding</span> {
-        <span class="ident">modifier::Padding::Space</span> =&gt; <span class="ident">format_number_pad_space</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">WIDTH</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">value</span>),
-        <span class="ident">modifier::Padding::Zero</span> =&gt; <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">WIDTH</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">value</span>),
+        <span class="ident">modifier::Padding::Space</span> =&gt; <span class="ident">format_number_pad_space</span>::<span class="op">&lt;</span><span class="ident">WIDTH</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">value</span>),
+        <span class="ident">modifier::Padding::Zero</span> =&gt; <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="ident">WIDTH</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">value</span>),
         <span class="ident">modifier::Padding::None</span> =&gt; <span class="ident">write</span>(<span class="ident">output</span>, <span class="ident">itoa::Buffer::new</span>().<span class="ident">format</span>(<span class="ident">value</span>).<span class="ident">as_bytes</span>()),
     }
 }
@@ -605,16 +703,16 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The sign must be written by the caller.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">format_number_pad_space</span><span class="op">&lt;</span>
+    <span class="kw">const</span> <span class="ident">WIDTH</span>: <span class="ident">u8</span>,
     <span class="ident">W</span>: <span class="ident">io::Write</span>,
     <span class="ident">V</span>: <span class="ident">itoa::Integer</span> <span class="op">+</span> <span class="ident">DigitCount</span> <span class="op">+</span> <span class="ident">Copy</span>,
-    <span class="kw">const</span> <span class="ident">WIDTH</span>: <span class="ident">u8</span>,
 <span class="op">&gt;</span>(
     <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>,
     <span class="ident">value</span>: <span class="ident">V</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="number">0</span>;
     <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..(<span class="ident">WIDTH</span>.<span class="ident">saturating_sub</span>(<span class="ident">value</span>.<span class="ident">num_digits</span>())) {
-        <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">write</span>(<span class="ident">output</span>, <span class="kw-2">&amp;</span>[<span class="string">b&#39; &#39;</span>])<span class="question-mark">?</span>;
+        <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">write</span>(<span class="ident">output</span>, <span class="string">b&quot; &quot;</span>)<span class="question-mark">?</span>;
     }
     <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">write</span>(<span class="ident">output</span>, <span class="ident">itoa::Buffer::new</span>().<span class="ident">format</span>(<span class="ident">value</span>).<span class="ident">as_bytes</span>())<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(<span class="ident">bytes</span>)
@@ -624,16 +722,16 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The sign must be written by the caller.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">format_number_pad_zero</span><span class="op">&lt;</span>
+    <span class="kw">const</span> <span class="ident">WIDTH</span>: <span class="ident">u8</span>,
     <span class="ident">W</span>: <span class="ident">io::Write</span>,
     <span class="ident">V</span>: <span class="ident">itoa::Integer</span> <span class="op">+</span> <span class="ident">DigitCount</span> <span class="op">+</span> <span class="ident">Copy</span>,
-    <span class="kw">const</span> <span class="ident">WIDTH</span>: <span class="ident">u8</span>,
 <span class="op">&gt;</span>(
     <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>,
     <span class="ident">value</span>: <span class="ident">V</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="number">0</span>;
     <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..(<span class="ident">WIDTH</span>.<span class="ident">saturating_sub</span>(<span class="ident">value</span>.<span class="ident">num_digits</span>())) {
-        <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">write</span>(<span class="ident">output</span>, <span class="kw-2">&amp;</span>[<span class="string">b&#39;0&#39;</span>])<span class="question-mark">?</span>;
+        <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">write</span>(<span class="ident">output</span>, <span class="string">b&quot;0&quot;</span>)<span class="question-mark">?</span>;
     }
     <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">write</span>(<span class="ident">output</span>, <span class="ident">itoa::Buffer::new</span>().<span class="ident">format</span>(<span class="ident">value</span>).<span class="ident">as_bytes</span>())<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(<span class="ident">bytes</span>)
@@ -676,7 +774,7 @@
     <span class="ident">date</span>: <span class="ident">Date</span>,
     <span class="ident">modifier::Day</span> { <span class="ident">padding</span> }: <span class="ident">modifier::Day</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
-    <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="number">2</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">date</span>.<span class="ident">day</span>(), <span class="ident">padding</span>)
+    <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="number">2</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">date</span>.<span class="ident">day</span>(), <span class="ident">padding</span>)
 }
 
 <span class="doccomment">/// Format the month into the designated output.</span>
@@ -691,7 +789,7 @@
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">repr</span> {
         <span class="ident">modifier::MonthRepr::Numerical</span> =&gt; {
-            <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="number">2</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">date</span>.<span class="ident">month</span>() <span class="kw">as</span> <span class="ident">u8</span>, <span class="ident">padding</span>)
+            <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="number">2</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">date</span>.<span class="ident">month</span>() <span class="kw">as</span> <span class="ident">u8</span>, <span class="ident">padding</span>)
         }
         <span class="ident">modifier::MonthRepr::Long</span> =&gt; <span class="ident">write</span>(<span class="ident">output</span>, <span class="ident">MONTH_NAMES</span>[<span class="ident">date</span>.<span class="ident">month</span>() <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">1</span>]),
         <span class="ident">modifier::MonthRepr::Short</span> =&gt; <span class="ident">write</span>(<span class="ident">output</span>, <span class="kw-2">&amp;</span><span class="ident">MONTH_NAMES</span>[<span class="ident">date</span>.<span class="ident">month</span>() <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">1</span>][..<span class="number">3</span>]),
@@ -704,7 +802,7 @@
     <span class="ident">date</span>: <span class="ident">Date</span>,
     <span class="ident">modifier::Ordinal</span> { <span class="ident">padding</span> }: <span class="ident">modifier::Ordinal</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
-    <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="number">3</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">date</span>.<span class="ident">ordinal</span>(), <span class="ident">padding</span>)
+    <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="number">3</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">date</span>.<span class="ident">ordinal</span>(), <span class="ident">padding</span>)
 }
 
 <span class="doccomment">/// Format the weekday into the designated output.</span>
@@ -726,12 +824,12 @@
             <span class="ident">output</span>,
             <span class="ident">WEEKDAY_NAMES</span>[<span class="ident">date</span>.<span class="ident">weekday</span>().<span class="ident">number_days_from_monday</span>() <span class="kw">as</span> <span class="ident">usize</span>],
         ),
-        <span class="ident">modifier::WeekdayRepr::Sunday</span> =&gt; <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="number">1</span><span class="op">&gt;</span>(
+        <span class="ident">modifier::WeekdayRepr::Sunday</span> =&gt; <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="number">1</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(
             <span class="ident">output</span>,
             <span class="ident">date</span>.<span class="ident">weekday</span>().<span class="ident">number_days_from_sunday</span>() <span class="op">+</span> <span class="ident">one_indexed</span> <span class="kw">as</span> <span class="ident">u8</span>,
             <span class="ident">modifier::Padding::None</span>,
         ),
-        <span class="ident">modifier::WeekdayRepr::Monday</span> =&gt; <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="number">1</span><span class="op">&gt;</span>(
+        <span class="ident">modifier::WeekdayRepr::Monday</span> =&gt; <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="number">1</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(
             <span class="ident">output</span>,
             <span class="ident">date</span>.<span class="ident">weekday</span>().<span class="ident">number_days_from_monday</span>() <span class="op">+</span> <span class="ident">one_indexed</span> <span class="kw">as</span> <span class="ident">u8</span>,
             <span class="ident">modifier::Padding::None</span>,
@@ -745,7 +843,7 @@
     <span class="ident">date</span>: <span class="ident">Date</span>,
     <span class="ident">modifier::WeekNumber</span> { <span class="ident">padding</span>, <span class="ident">repr</span> }: <span class="ident">modifier::WeekNumber</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
-    <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="number">2</span><span class="op">&gt;</span>(
+    <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="number">2</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(
         <span class="ident">output</span>,
         <span class="kw">match</span> <span class="ident">repr</span> {
             <span class="ident">modifier::WeekNumberRepr::Iso</span> =&gt; <span class="ident">date</span>.<span class="ident">iso_week</span>(),
@@ -778,18 +876,18 @@
     };
     <span class="kw">let</span> <span class="ident">format_number</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">repr</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;large-dates&quot;</span>)]</span>
-        <span class="ident">modifier::YearRepr::Full</span> <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">abs</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">100_000</span> =&gt; <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="number">6</span><span class="op">&gt;</span>,
+        <span class="ident">modifier::YearRepr::Full</span> <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">abs</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">100_000</span> =&gt; <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="number">6</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>,
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;large-dates&quot;</span>)]</span>
-        <span class="ident">modifier::YearRepr::Full</span> <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">abs</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">10_000</span> =&gt; <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="number">5</span><span class="op">&gt;</span>,
-        <span class="ident">modifier::YearRepr::Full</span> =&gt; <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="number">4</span><span class="op">&gt;</span>,
-        <span class="ident">modifier::YearRepr::LastTwo</span> =&gt; <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="number">2</span><span class="op">&gt;</span>,
+        <span class="ident">modifier::YearRepr::Full</span> <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">abs</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">10_000</span> =&gt; <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="number">5</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>,
+        <span class="ident">modifier::YearRepr::Full</span> =&gt; <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="number">4</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>,
+        <span class="ident">modifier::YearRepr::LastTwo</span> =&gt; <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="number">2</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>,
     };
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="number">0</span>;
     <span class="kw">if</span> <span class="ident">repr</span> <span class="op">!</span><span class="op">=</span> <span class="ident">modifier::YearRepr::LastTwo</span> {
         <span class="kw">if</span> <span class="ident">full_year</span> <span class="op">&lt;</span> <span class="number">0</span> {
-            <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">write</span>(<span class="ident">output</span>, <span class="kw-2">&amp;</span>[<span class="string">b&#39;-&#39;</span>])<span class="question-mark">?</span>;
+            <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">write</span>(<span class="ident">output</span>, <span class="string">b&quot;-&quot;</span>)<span class="question-mark">?</span>;
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">sign_is_mandatory</span> <span class="op">|</span><span class="op">|</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;large-dates&quot;</span>) <span class="op">&amp;&amp;</span> <span class="ident">full_year</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">10_000</span> {
-            <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">write</span>(<span class="ident">output</span>, <span class="kw-2">&amp;</span>[<span class="string">b&#39;+&#39;</span>])<span class="question-mark">?</span>;
+            <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">write</span>(<span class="ident">output</span>, <span class="string">b&quot;+&quot;</span>)<span class="question-mark">?</span>;
         }
     }
     <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">format_number</span>(<span class="ident">output</span>, <span class="ident">value</span>.<span class="ident">unsigned_abs</span>(), <span class="ident">padding</span>)<span class="question-mark">?</span>;
@@ -813,7 +911,7 @@
         (<span class="ident">hour</span>, <span class="bool-val">true</span>) <span class="kw">if</span> <span class="ident">hour</span> <span class="op">&lt;</span> <span class="number">12</span> =&gt; <span class="ident">hour</span>,
         (<span class="ident">hour</span>, <span class="bool-val">true</span>) =&gt; <span class="ident">hour</span> <span class="op">-</span> <span class="number">12</span>,
     };
-    <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="number">2</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">value</span>, <span class="ident">padding</span>)
+    <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="number">2</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">value</span>, <span class="ident">padding</span>)
 }
 
 <span class="doccomment">/// Format the minute into the designated output.</span>
@@ -822,7 +920,7 @@
     <span class="ident">time</span>: <span class="ident">Time</span>,
     <span class="ident">modifier::Minute</span> { <span class="ident">padding</span> }: <span class="ident">modifier::Minute</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
-    <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="number">2</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">time</span>.<span class="ident">minute</span>(), <span class="ident">padding</span>)
+    <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="number">2</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">time</span>.<span class="ident">minute</span>(), <span class="ident">padding</span>)
 }
 
 <span class="doccomment">/// Format the period into the designated output.</span>
@@ -848,7 +946,7 @@
     <span class="ident">time</span>: <span class="ident">Time</span>,
     <span class="ident">modifier::Second</span> { <span class="ident">padding</span> }: <span class="ident">modifier::Second</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
-    <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="number">2</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">time</span>.<span class="ident">second</span>(), <span class="ident">padding</span>)
+    <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="number">2</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">time</span>.<span class="ident">second</span>(), <span class="ident">padding</span>)
 }
 
 <span class="doccomment">/// Format the subsecond into the designated output.</span>
@@ -861,23 +959,23 @@
     <span class="kw">let</span> <span class="ident">nanos</span> <span class="op">=</span> <span class="ident">time</span>.<span class="ident">nanosecond</span>();
 
     <span class="kw">if</span> <span class="ident">digits</span> <span class="op">==</span> <span class="ident">Nine</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">digits</span> <span class="op">==</span> <span class="ident">OneOrMore</span> <span class="op">&amp;&amp;</span> <span class="ident">nanos</span> <span class="op">%</span> <span class="number">10</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) {
-        <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="number">9</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">nanos</span>)
+        <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="number">9</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">nanos</span>)
     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">digits</span> <span class="op">==</span> <span class="ident">Eight</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">digits</span> <span class="op">==</span> <span class="ident">OneOrMore</span> <span class="op">&amp;&amp;</span> (<span class="ident">nanos</span> <span class="op">/</span> <span class="number">10</span>) <span class="op">%</span> <span class="number">10</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) {
-        <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="number">8</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">nanos</span> <span class="op">/</span> <span class="number">10</span>)
+        <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="number">8</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">nanos</span> <span class="op">/</span> <span class="number">10</span>)
     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">digits</span> <span class="op">==</span> <span class="ident">Seven</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">digits</span> <span class="op">==</span> <span class="ident">OneOrMore</span> <span class="op">&amp;&amp;</span> (<span class="ident">nanos</span> <span class="op">/</span> <span class="number">100</span>) <span class="op">%</span> <span class="number">10</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) {
-        <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="number">7</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">nanos</span> <span class="op">/</span> <span class="number">100</span>)
+        <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="number">7</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">nanos</span> <span class="op">/</span> <span class="number">100</span>)
     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">digits</span> <span class="op">==</span> <span class="ident">Six</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">digits</span> <span class="op">==</span> <span class="ident">OneOrMore</span> <span class="op">&amp;&amp;</span> (<span class="ident">nanos</span> <span class="op">/</span> <span class="number">1_000</span>) <span class="op">%</span> <span class="number">10</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) {
-        <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="number">6</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">nanos</span> <span class="op">/</span> <span class="number">1_000</span>)
+        <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="number">6</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">nanos</span> <span class="op">/</span> <span class="number">1_000</span>)
     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">digits</span> <span class="op">==</span> <span class="ident">Five</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">digits</span> <span class="op">==</span> <span class="ident">OneOrMore</span> <span class="op">&amp;&amp;</span> (<span class="ident">nanos</span> <span class="op">/</span> <span class="number">10_000</span>) <span class="op">%</span> <span class="number">10</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) {
-        <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="number">5</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">nanos</span> <span class="op">/</span> <span class="number">10_000</span>)
+        <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="number">5</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">nanos</span> <span class="op">/</span> <span class="number">10_000</span>)
     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">digits</span> <span class="op">==</span> <span class="ident">Four</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">digits</span> <span class="op">==</span> <span class="ident">OneOrMore</span> <span class="op">&amp;&amp;</span> (<span class="ident">nanos</span> <span class="op">/</span> <span class="number">100_000</span>) <span class="op">%</span> <span class="number">10</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) {
-        <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="number">4</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">nanos</span> <span class="op">/</span> <span class="number">100_000</span>)
+        <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="number">4</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">nanos</span> <span class="op">/</span> <span class="number">100_000</span>)
     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">digits</span> <span class="op">==</span> <span class="ident">Three</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">digits</span> <span class="op">==</span> <span class="ident">OneOrMore</span> <span class="op">&amp;&amp;</span> (<span class="ident">nanos</span> <span class="op">/</span> <span class="number">1_000_000</span>) <span class="op">%</span> <span class="number">10</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) {
-        <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="number">3</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">nanos</span> <span class="op">/</span> <span class="number">1_000_000</span>)
+        <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="number">3</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">nanos</span> <span class="op">/</span> <span class="number">1_000_000</span>)
     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">digits</span> <span class="op">==</span> <span class="ident">Two</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">digits</span> <span class="op">==</span> <span class="ident">OneOrMore</span> <span class="op">&amp;&amp;</span> (<span class="ident">nanos</span> <span class="op">/</span> <span class="number">10_000_000</span>) <span class="op">%</span> <span class="number">10</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) {
-        <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="number">2</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">nanos</span> <span class="op">/</span> <span class="number">10_000_000</span>)
+        <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="number">2</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">nanos</span> <span class="op">/</span> <span class="number">10_000_000</span>)
     } <span class="kw">else</span> {
-        <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="number">1</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">nanos</span> <span class="op">/</span> <span class="number">100_000_000</span>)
+        <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="number">1</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">nanos</span> <span class="op">/</span> <span class="number">100_000_000</span>)
     }
 }
 <span class="comment">// endregion time formatters</span>
@@ -894,11 +992,11 @@
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="number">0</span>;
     <span class="kw">if</span> <span class="ident">offset</span>.<span class="ident">is_negative</span>() {
-        <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">write</span>(<span class="ident">output</span>, <span class="kw-2">&amp;</span>[<span class="string">b&#39;-&#39;</span>])<span class="question-mark">?</span>;
+        <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">write</span>(<span class="ident">output</span>, <span class="string">b&quot;-&quot;</span>)<span class="question-mark">?</span>;
     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">sign_is_mandatory</span> {
-        <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">write</span>(<span class="ident">output</span>, <span class="kw-2">&amp;</span>[<span class="string">b&#39;+&#39;</span>])<span class="question-mark">?</span>;
+        <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">write</span>(<span class="ident">output</span>, <span class="string">b&quot;+&quot;</span>)<span class="question-mark">?</span>;
     }
-    <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="number">2</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">offset</span>.<span class="ident">whole_hours</span>().<span class="ident">unsigned_abs</span>(), <span class="ident">padding</span>)<span class="question-mark">?</span>;
+    <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="number">2</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">offset</span>.<span class="ident">whole_hours</span>().<span class="ident">unsigned_abs</span>(), <span class="ident">padding</span>)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(<span class="ident">bytes</span>)
 }
 
@@ -908,7 +1006,7 @@
     <span class="ident">offset</span>: <span class="ident">UtcOffset</span>,
     <span class="ident">modifier::OffsetMinute</span> { <span class="ident">padding</span> }: <span class="ident">modifier::OffsetMinute</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
-    <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="number">2</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">offset</span>.<span class="ident">minutes_past_hour</span>().<span class="ident">unsigned_abs</span>(), <span class="ident">padding</span>)
+    <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="number">2</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">offset</span>.<span class="ident">minutes_past_hour</span>().<span class="ident">unsigned_abs</span>(), <span class="ident">padding</span>)
 }
 
 <span class="doccomment">/// Format the offset second into the designated output.</span>
@@ -917,7 +1015,7 @@
     <span class="ident">offset</span>: <span class="ident">UtcOffset</span>,
     <span class="ident">modifier::OffsetSecond</span> { <span class="ident">padding</span> }: <span class="ident">modifier::OffsetSecond</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
-    <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="number">2</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">offset</span>.<span class="ident">seconds_past_minute</span>().<span class="ident">unsigned_abs</span>(), <span class="ident">padding</span>)
+    <span class="ident">format_number</span>::<span class="op">&lt;</span><span class="number">2</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">offset</span>.<span class="ident">seconds_past_minute</span>().<span class="ident">unsigned_abs</span>(), <span class="ident">padding</span>)
 }
 <span class="comment">// endregion offset formatters</span>
 </code></pre></div>

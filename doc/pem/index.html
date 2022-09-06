@@ -2,10 +2,10 @@
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../pem/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"><a href="#">Crate pem</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 1.0.2</li><li><a id="all-types" href="all.html">All Items</a></li></ul></div><section><div class="block"><ul><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#functions">Functions</a></li><li><a href="#types">Type Definitions</a></li></ul></div></section></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../pem/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
+        </a><h2 class="location"><a href="#">Crate pem</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 1.1.0</li><li><a id="all-types" href="all.html">All Items</a></li></ul></div><section><div class="block"><ul><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#functions">Functions</a></li><li><a href="#types">Type Definitions</a></li></ul></div></section></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../pem/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
                                 <a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div>
                         </div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
-    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">pem</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/pem/lib.rs.html#7-616">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>This crate provides a parser and encoder for PEM-encoded binary data.
+    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">pem</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/pem/lib.rs.html#7-676">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>This crate provides a parser and encoder for PEM-encoded binary data.
 PEM-encoded binary data is essentially a beginning and matching end
 tag that encloses base64-encoded binary data (see:
 https://en.wikipedia.org/wiki/Privacy-enhanced_Electronic_Mail).</p>
@@ -15,10 +15,12 @@ documentation on the public methods for the crate.</p>
 <p>This crate is <a href="https://crates.io/crates/pem">on crates.io</a> and can be used
 by adding <code>pem</code> to your dependencies in your project’s <code>Cargo.toml</code>.</p>
 <div class="example-wrap"><pre class="language-toml"><code>[dependencies]
-pem = &quot;0.8&quot;</code></pre></div>
+pem = &quot;1&quot;</code></pre></div>
 <p>and this to your crate root:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">pem</span>;</code></pre></div>
+<p>Using the <code>serde</code> feature will implement the serde traits for 
+the <code>Pem</code> struct.</p>
 <h2 id="example-parse-a-single-chunk-of-pem-encoded-text"><a href="#example-parse-a-single-chunk-of-pem-encoded-text">Example: parse a single chunk of PEM-encoded text</a></h2>
 <p>Generally, PEM-encoded files contain a single chunk of PEM-encoded
 text. Commonly, this is in some sort of a key file or an x.509

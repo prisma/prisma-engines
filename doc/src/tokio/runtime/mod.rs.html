@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.19.2/src/runtime/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/runtime/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
@@ -632,6 +632,16 @@
 <span id="626">626</span>
 <span id="627">627</span>
 <span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
+<span id="631">631</span>
+<span id="632">632</span>
+<span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The Tokio runtime.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Unlike other Rust programs, asynchronous applications require runtime</span>
@@ -771,7 +781,7 @@
 <span class="doccomment">//! use tokio::runtime;</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-<span class="doccomment">//! let basic_rt = runtime::Builder::new_current_thread()</span>
+<span class="doccomment">//! let rt = runtime::Builder::new_current_thread()</span>
 <span class="doccomment">//!     .build()?;</span>
 <span class="doccomment">//! # Ok(()) }</span>
 <span class="doccomment">//! ```</span>
@@ -800,7 +810,6 @@
 <span class="doccomment">//! [`tokio::main`]: ../attr.main.html</span>
 <span class="doccomment">//! [runtime builder]: crate::runtime::Builder</span>
 <span class="doccomment">//! [`Runtime::new`]: crate::runtime::Runtime::new</span>
-<span class="doccomment">//! [`Builder::basic_scheduler`]: crate::runtime::Builder::basic_scheduler</span>
 <span class="doccomment">//! [`Builder::threaded_scheduler`]: crate::runtime::Builder::threaded_scheduler</span>
 <span class="doccomment">//! [`Builder::enable_io`]: crate::runtime::Builder::enable_io</span>
 <span class="doccomment">//! [`Builder::enable_time`]: crate::runtime::Builder::enable_time</span>
@@ -808,36 +817,28 @@
 
 <span class="comment">// At the top due to macros</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tokio_wasm</span>))]</span>
 <span class="attribute">#[<span class="ident">macro_use</span>]</span>
 <span class="kw">mod</span> <span class="ident">tests</span>;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">enter</span>;
-
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">task</span>;
-
-<span class="macro">cfg_metrics!</span> {
-    <span class="kw">mod</span> <span class="ident">metrics</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">metrics::RuntimeMetrics</span>;
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">metrics</span>::{<span class="ident">MetricsBatch</span>, <span class="ident">SchedulerMetrics</span>, <span class="ident">WorkerMetrics</span>};
-
-    <span class="macro">cfg_net!</span> {
-       <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">metrics::IoDriverMetrics</span>;
-    }
-}
-
-<span class="macro">cfg_not_metrics!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">metrics</span>;
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">metrics</span>::{<span class="ident">SchedulerMetrics</span>, <span class="ident">WorkerMetrics</span>, <span class="ident">MetricsBatch</span>};
+<span class="macro">cfg_io_driver_impl!</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">io</span>;
 }
 
 <span class="macro">cfg_rt!</span> {
-    <span class="kw">mod</span> <span class="ident">basic_scheduler</span>;
-    <span class="kw">use</span> <span class="ident">basic_scheduler::BasicScheduler</span>;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">enter</span>;
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">task</span>;
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">scheduler</span>;
+    <span class="kw">use</span> <span class="ident">scheduler::CurrentThread</span>;
+
+    <span class="kw">mod</span> <span class="ident">config</span>;
+    <span class="kw">use</span> <span class="ident">config::Config</span>;
 
     <span class="kw">mod</span> <span class="ident">blocking</span>;
     <span class="kw">use</span> <span class="ident">blocking::BlockingPool</span>;
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">tokio_wasi</span>, <span class="ident">allow</span>(<span class="ident">unused_imports</span>))]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">blocking::spawn_blocking</span>;
 
     <span class="macro">cfg_trace!</span> {
@@ -850,6 +851,9 @@
 
     <span class="kw">mod</span> <span class="ident">builder</span>;
     <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::builder::Builder</span>;
+    <span class="macro">cfg_unstable!</span> {
+        <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::builder::UnhandledPanic</span>;
+    }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">context</span>;
     <span class="kw">mod</span> <span class="ident">driver</span>;
@@ -862,13 +866,28 @@
 
     <span class="kw">mod</span> <span class="ident">spawner</span>;
     <span class="kw">use</span> <span class="ident"><span class="self">self</span>::spawner::Spawner</span>;
+
+    <span class="macro">cfg_metrics!</span> {
+        <span class="kw">mod</span> <span class="ident">metrics</span>;
+        <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">metrics::RuntimeMetrics</span>;
+
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">metrics</span>::{<span class="ident">MetricsBatch</span>, <span class="ident">SchedulerMetrics</span>, <span class="ident">WorkerMetrics</span>};
+
+        <span class="macro">cfg_net!</span> {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">metrics::IoDriverMetrics</span>;
+        }
+    }
+
+    <span class="macro">cfg_not_metrics!</span> {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">metrics</span>;
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">metrics</span>::{<span class="ident">SchedulerMetrics</span>, <span class="ident">WorkerMetrics</span>, <span class="ident">MetricsBatch</span>};
+    }
 }
 
 <span class="macro">cfg_rt_multi_thread!</span> {
     <span class="kw">use</span> <span class="ident">driver::Driver</span>;
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">thread_pool</span>;
-    <span class="kw">use</span> <span class="ident"><span class="self">self</span>::thread_pool::ThreadPool</span>;
+    <span class="kw">use</span> <span class="ident">scheduler::MultiThread</span>;
 }
 
 <span class="macro">cfg_rt!</span> {
@@ -927,54 +946,55 @@
         <span class="ident">blocking_pool</span>: <span class="ident">BlockingPool</span>,
     }
 
-    <span class="doccomment">/// The runtime executor is either a thread-pool or a current-thread executor.</span>
+    <span class="doccomment">/// The runtime executor is either a multi-thread or a current-thread executor.</span>
     <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
     <span class="kw">enum</span> <span class="ident">Kind</span> {
         <span class="doccomment">/// Execute all tasks on the current-thread.</span>
-        <span class="ident">CurrentThread</span>(<span class="ident">BasicScheduler</span>),
+        <span class="ident">CurrentThread</span>(<span class="ident">CurrentThread</span>),
 
         <span class="doccomment">/// Execute tasks across multiple threads.</span>
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-multi-thread&quot;</span>)]</span>
-        <span class="ident">ThreadPool</span>(<span class="ident">ThreadPool</span>),
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-multi-thread&quot;</span>, <span class="ident">not</span>(<span class="ident">tokio_wasi</span>)))]</span>
+        <span class="ident">MultiThread</span>(<span class="ident">MultiThread</span>),
     }
 
     <span class="doccomment">/// After thread starts / before thread stops</span>
     <span class="kw">type</span> <span class="ident">Callback</span> <span class="op">=</span> <span class="ident">std::sync::Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>() <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>;
 
     <span class="kw">impl</span> <span class="ident">Runtime</span> {
-        <span class="doccomment">/// Creates a new runtime instance with default configuration values.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This results in the multi threaded scheduler, I/O driver, and time driver being</span>
-        <span class="doccomment">/// initialized.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// Most applications will not need to call this function directly. Instead,</span>
-        <span class="doccomment">/// they will use the  [`#[tokio::main]` attribute][main]. When a more complex</span>
-        <span class="doccomment">/// configuration is necessary, the [runtime builder] may be used.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// See [module level][mod] documentation for more details.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// # Examples</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// Creating a new `Runtime` with default configuration values.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// ```</span>
-        <span class="doccomment">/// use tokio::runtime::Runtime;</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// let rt = Runtime::new()</span>
-        <span class="doccomment">///     .unwrap();</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// // Use the runtime...</span>
-        <span class="doccomment">/// ```</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [mod]: index.html</span>
-        <span class="doccomment">/// [main]: ../attr.main.html</span>
-        <span class="doccomment">/// [threaded scheduler]: index.html#threaded-scheduler</span>
-        <span class="doccomment">/// [basic scheduler]: index.html#basic-scheduler</span>
-        <span class="doccomment">/// [runtime builder]: crate::runtime::Builder</span>
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-multi-thread&quot;</span>)]</span>
-        <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-multi-thread&quot;</span>)))]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span> {
-            <span class="ident">Builder::new_multi_thread</span>().<span class="ident">enable_all</span>().<span class="ident">build</span>()
+        <span class="macro">cfg_not_wasi!</span> {
+            <span class="doccomment">/// Creates a new runtime instance with default configuration values.</span>
+            <span class="doccomment">///</span>
+            <span class="doccomment">/// This results in the multi threaded scheduler, I/O driver, and time driver being</span>
+            <span class="doccomment">/// initialized.</span>
+            <span class="doccomment">///</span>
+            <span class="doccomment">/// Most applications will not need to call this function directly. Instead,</span>
+            <span class="doccomment">/// they will use the  [`#[tokio::main]` attribute][main]. When a more complex</span>
+            <span class="doccomment">/// configuration is necessary, the [runtime builder] may be used.</span>
+            <span class="doccomment">///</span>
+            <span class="doccomment">/// See [module level][mod] documentation for more details.</span>
+            <span class="doccomment">///</span>
+            <span class="doccomment">/// # Examples</span>
+            <span class="doccomment">///</span>
+            <span class="doccomment">/// Creating a new `Runtime` with default configuration values.</span>
+            <span class="doccomment">///</span>
+            <span class="doccomment">/// ```</span>
+            <span class="doccomment">/// use tokio::runtime::Runtime;</span>
+            <span class="doccomment">///</span>
+            <span class="doccomment">/// let rt = Runtime::new()</span>
+            <span class="doccomment">///     .unwrap();</span>
+            <span class="doccomment">///</span>
+            <span class="doccomment">/// // Use the runtime...</span>
+            <span class="doccomment">/// ```</span>
+            <span class="doccomment">///</span>
+            <span class="doccomment">/// [mod]: index.html</span>
+            <span class="doccomment">/// [main]: ../attr.main.html</span>
+            <span class="doccomment">/// [threaded scheduler]: index.html#threaded-scheduler</span>
+            <span class="doccomment">/// [runtime builder]: crate::runtime::Builder</span>
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-multi-thread&quot;</span>)]</span>
+            <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-multi-thread&quot;</span>)))]</span>
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span> {
+                <span class="ident">Builder::new_multi_thread</span>().<span class="ident">enable_all</span>().<span class="ident">build</span>()
+            }
         }
 
         <span class="doccomment">/// Returns a handle to the runtime&#39;s spawner.</span>
@@ -1112,8 +1132,8 @@
 
             <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">kind</span> {
                 <span class="ident">Kind::CurrentThread</span>(<span class="ident">exec</span>) =&gt; <span class="ident">exec</span>.<span class="ident">block_on</span>(<span class="ident">future</span>),
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-multi-thread&quot;</span>)]</span>
-                <span class="ident">Kind::ThreadPool</span>(<span class="ident">exec</span>) =&gt; <span class="ident">exec</span>.<span class="ident">block_on</span>(<span class="ident">future</span>),
+                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-multi-thread&quot;</span>, <span class="ident">not</span>(<span class="ident">tokio_wasi</span>)))]</span>
+                <span class="ident">Kind::MultiThread</span>(<span class="ident">exec</span>) =&gt; <span class="ident">exec</span>.<span class="ident">block_on</span>(<span class="ident">future</span>),
             }
         }
 
@@ -1205,7 +1225,7 @@
         <span class="doccomment">/// may result in a resource leak (in that any blocking tasks are still running until they</span>
         <span class="doccomment">/// return.</span>
         <span class="doccomment">///</span>
-        <span class="doccomment">/// This function is equivalent to calling `shutdown_timeout(Duration::of_nanos(0))`.</span>
+        <span class="doccomment">/// This function is equivalent to calling `shutdown_timeout(Duration::from_nanos(0))`.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// ```</span>
         <span class="doccomment">/// use tokio::runtime::Runtime;</span>
@@ -1229,11 +1249,11 @@
     <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
         <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
             <span class="kw">match</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">kind</span> {
-                <span class="ident">Kind::CurrentThread</span>(<span class="ident">basic</span>) =&gt; {
-                    <span class="comment">// This ensures that tasks spawned on the basic runtime are dropped inside the</span>
-                    <span class="comment">// runtime&#39;s context.</span>
+                <span class="ident">Kind::CurrentThread</span>(<span class="ident">current_thread</span>) =&gt; {
+                    <span class="comment">// This ensures that tasks spawned on the current-thread</span>
+                    <span class="comment">// runtime are dropped inside the runtime&#39;s context.</span>
                     <span class="kw">match</span> <span class="ident"><span class="self">self</span>::context::try_enter</span>(<span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">clone</span>()) {
-                        <span class="prelude-val">Some</span>(<span class="ident">guard</span>) =&gt; <span class="ident">basic</span>.<span class="ident">set_context_guard</span>(<span class="ident">guard</span>),
+                        <span class="prelude-val">Some</span>(<span class="ident">guard</span>) =&gt; <span class="ident">current_thread</span>.<span class="ident">set_context_guard</span>(<span class="ident">guard</span>),
                         <span class="prelude-val">None</span> =&gt; {
                             <span class="comment">// The context thread-local has already been destroyed.</span>
                             <span class="comment">//</span>
@@ -1242,8 +1262,8 @@
                         },
                     }
                 },
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-multi-thread&quot;</span>)]</span>
-                <span class="ident">Kind::ThreadPool</span>(<span class="kw">_</span>) =&gt; {
+                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-multi-thread&quot;</span>, <span class="ident">not</span>(<span class="ident">tokio_wasi</span>)))]</span>
+                <span class="ident">Kind::MultiThread</span>(<span class="kw">_</span>) =&gt; {
                     <span class="comment">// The threaded scheduler drops its tasks on its worker threads, which is</span>
                     <span class="comment">// already in the runtime&#39;s context.</span>
                 },

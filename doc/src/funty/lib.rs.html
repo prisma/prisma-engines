@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/funty-1.2.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../funty/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/funty-2.0.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../funty/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../funty/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
@@ -1569,9 +1569,184 @@
 <span id="1563">1563</span>
 <span id="1564">1564</span>
 <span id="1565">1565</span>
+<span id="1566">1566</span>
+<span id="1567">1567</span>
+<span id="1568">1568</span>
+<span id="1569">1569</span>
+<span id="1570">1570</span>
+<span id="1571">1571</span>
+<span id="1572">1572</span>
+<span id="1573">1573</span>
+<span id="1574">1574</span>
+<span id="1575">1575</span>
+<span id="1576">1576</span>
+<span id="1577">1577</span>
+<span id="1578">1578</span>
+<span id="1579">1579</span>
+<span id="1580">1580</span>
+<span id="1581">1581</span>
+<span id="1582">1582</span>
+<span id="1583">1583</span>
+<span id="1584">1584</span>
+<span id="1585">1585</span>
+<span id="1586">1586</span>
+<span id="1587">1587</span>
+<span id="1588">1588</span>
+<span id="1589">1589</span>
+<span id="1590">1590</span>
+<span id="1591">1591</span>
+<span id="1592">1592</span>
+<span id="1593">1593</span>
+<span id="1594">1594</span>
+<span id="1595">1595</span>
+<span id="1596">1596</span>
+<span id="1597">1597</span>
+<span id="1598">1598</span>
+<span id="1599">1599</span>
+<span id="1600">1600</span>
+<span id="1601">1601</span>
+<span id="1602">1602</span>
+<span id="1603">1603</span>
+<span id="1604">1604</span>
+<span id="1605">1605</span>
+<span id="1606">1606</span>
+<span id="1607">1607</span>
+<span id="1608">1608</span>
+<span id="1609">1609</span>
+<span id="1610">1610</span>
+<span id="1611">1611</span>
+<span id="1612">1612</span>
+<span id="1613">1613</span>
+<span id="1614">1614</span>
+<span id="1615">1615</span>
+<span id="1616">1616</span>
+<span id="1617">1617</span>
+<span id="1618">1618</span>
+<span id="1619">1619</span>
+<span id="1620">1620</span>
+<span id="1621">1621</span>
+<span id="1622">1622</span>
+<span id="1623">1623</span>
+<span id="1624">1624</span>
+<span id="1625">1625</span>
+<span id="1626">1626</span>
+<span id="1627">1627</span>
+<span id="1628">1628</span>
+<span id="1629">1629</span>
+<span id="1630">1630</span>
+<span id="1631">1631</span>
+<span id="1632">1632</span>
+<span id="1633">1633</span>
+<span id="1634">1634</span>
+<span id="1635">1635</span>
+<span id="1636">1636</span>
+<span id="1637">1637</span>
+<span id="1638">1638</span>
+<span id="1639">1639</span>
+<span id="1640">1640</span>
+<span id="1641">1641</span>
+<span id="1642">1642</span>
+<span id="1643">1643</span>
+<span id="1644">1644</span>
+<span id="1645">1645</span>
+<span id="1646">1646</span>
+<span id="1647">1647</span>
+<span id="1648">1648</span>
+<span id="1649">1649</span>
+<span id="1650">1650</span>
+<span id="1651">1651</span>
+<span id="1652">1652</span>
+<span id="1653">1653</span>
+<span id="1654">1654</span>
+<span id="1655">1655</span>
+<span id="1656">1656</span>
+<span id="1657">1657</span>
+<span id="1658">1658</span>
+<span id="1659">1659</span>
+<span id="1660">1660</span>
+<span id="1661">1661</span>
+<span id="1662">1662</span>
+<span id="1663">1663</span>
+<span id="1664">1664</span>
+<span id="1665">1665</span>
+<span id="1666">1666</span>
+<span id="1667">1667</span>
+<span id="1668">1668</span>
+<span id="1669">1669</span>
+<span id="1670">1670</span>
+<span id="1671">1671</span>
+<span id="1672">1672</span>
+<span id="1673">1673</span>
+<span id="1674">1674</span>
+<span id="1675">1675</span>
+<span id="1676">1676</span>
+<span id="1677">1677</span>
+<span id="1678">1678</span>
+<span id="1679">1679</span>
+<span id="1680">1680</span>
+<span id="1681">1681</span>
+<span id="1682">1682</span>
+<span id="1683">1683</span>
+<span id="1684">1684</span>
+<span id="1685">1685</span>
+<span id="1686">1686</span>
+<span id="1687">1687</span>
+<span id="1688">1688</span>
+<span id="1689">1689</span>
+<span id="1690">1690</span>
+<span id="1691">1691</span>
+<span id="1692">1692</span>
+<span id="1693">1693</span>
+<span id="1694">1694</span>
+<span id="1695">1695</span>
+<span id="1696">1696</span>
+<span id="1697">1697</span>
+<span id="1698">1698</span>
+<span id="1699">1699</span>
+<span id="1700">1700</span>
+<span id="1701">1701</span>
+<span id="1702">1702</span>
+<span id="1703">1703</span>
+<span id="1704">1704</span>
+<span id="1705">1705</span>
+<span id="1706">1706</span>
+<span id="1707">1707</span>
+<span id="1708">1708</span>
+<span id="1709">1709</span>
+<span id="1710">1710</span>
+<span id="1711">1711</span>
+<span id="1712">1712</span>
+<span id="1713">1713</span>
+<span id="1714">1714</span>
+<span id="1715">1715</span>
+<span id="1716">1716</span>
+<span id="1717">1717</span>
+<span id="1718">1718</span>
+<span id="1719">1719</span>
+<span id="1720">1720</span>
+<span id="1721">1721</span>
+<span id="1722">1722</span>
+<span id="1723">1723</span>
+<span id="1724">1724</span>
+<span id="1725">1725</span>
+<span id="1726">1726</span>
+<span id="1727">1727</span>
+<span id="1728">1728</span>
+<span id="1729">1729</span>
+<span id="1730">1730</span>
+<span id="1731">1731</span>
+<span id="1732">1732</span>
+<span id="1733">1733</span>
+<span id="1734">1734</span>
+<span id="1735">1735</span>
+<span id="1736">1736</span>
+<span id="1737">1737</span>
+<span id="1738">1738</span>
+<span id="1739">1739</span>
+<span id="1740">1740</span>
 </pre><pre class="rust"><code><span class="doccomment">/*! `fun`damental `ty`pes
 
-This crate provides trait unification of the Rust fundamental numbers, allowing
+This crate provides trait unification of the Rust fundamental items, allowing
 users to declare the behavior they want from a number without committing to a
 single particular numeric type.
 
@@ -1580,18 +1755,18 @@ for each axis and group on that axis are provided:
 
 ## Numeric Categories
 
-The most general category is represented by the trait [`IsNumber`]. It is
+The most general category is represented by the trait [`Numeric`]. It is
 implemented by all the numeric fundamentals, and includes only the traits that
 they all implement. This is an already-large amount: basic memory management,
 comparison, rendering, and numeric arithmetic.
 
-The numbers are then split into [`IsInteger`] and [`IsFloat`]. The former fills
+The numbers are then split into [`Floating`] and [`Integral`]. The former fills
 out the API of `f32` and `f64`, while the latter covers all of the `iN` and `uN`
 numbers.
 
-Lastly, [`IsInteger`] splits further, into [`IsSigned`] and [`IsUnsigned`].
-These provide the last specializations unique to the differences between `iN`
-and `uN`.
+Lastly, [`Integral`] splits further, into [`Signed`] and [`Unsigned`]. These
+provide the last specializations unique to the differences between `iN` and
+`uN`.
 
 ## Width Categories
 
@@ -1602,11 +1777,11 @@ In addition, the trait groups `AtLeastN` and `AtMostN` enable clamping the range
 of acceptable widths to lower or upper bounds. These traits are equivalent to
 `mem::size_of::&lt;T&gt;() &gt;= N` and `mem::size_of::&lt;T&gt;() &lt;= N`, respectively.
 
-[`IsFloat`]: trait.IsFloat.html
-[`IsInteger`]: trait.IsInteger.html
-[`IsNumber`]: trait.IsNumber.html
-[`IsSigned`]: trait.IsSigned.html
-[`IsUnsigned`]: trait.IsUnsigned.html
+[`Floating`]: trait.Floating.html
+[`Integral`]: trait.Integral.html
+[`Numeric`]: trait.Numeric.html
+[`Signed`]: trait.Signed.html
+[`Unsigned`]: trait.Unsigned.html
 !*/</span>
 
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>), <span class="ident">no_std</span>)]</span>
@@ -1663,11 +1838,10 @@ of acceptable widths to lower or upper bounds. These traits are equivalent to
 	<span class="ident">str::FromStr</span>,
 };
 
-<span class="doccomment">/// Declare that a type is an abstract number.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This unifies all of the signed-integer, unsigned-integer, and floating-point</span>
-<span class="doccomment">/// types.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IsNumber</span>: <span class="ident">Sized</span>
+<span class="doccomment">/// Declare that a type is one of the language fundamental types.</span>
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Fundamental</span>:
+	<span class="lifetime">&#39;static</span>
+	<span class="op">+</span> <span class="ident">Sized</span>
 	<span class="op">+</span> <span class="ident">Send</span>
 	<span class="op">+</span> <span class="ident">Sync</span>
 	<span class="op">+</span> <span class="ident">Unpin</span>
@@ -1681,6 +1855,62 @@ of acceptable widths to lower or upper bounds. These traits are equivalent to
 	<span class="comment">//  fmt</span>
 	<span class="op">+</span> <span class="ident">Debug</span>
 	<span class="op">+</span> <span class="ident">Display</span>
+	{
+		<span class="doccomment">/// Tests `self != 0`.</span>
+		<span class="kw">fn</span> <span class="ident">as_bool</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+
+		<span class="doccomment">/// Represents `self` as a Unicode Scalar Value, if possible.</span>
+		<span class="kw">fn</span> <span class="ident">as_char</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span>;
+
+		<span class="doccomment">/// Performs `self as i8`.</span>
+		<span class="kw">fn</span> <span class="ident">as_i8</span>(<span class="self">self</span>) -&gt; <span class="ident">i8</span>;
+
+		<span class="doccomment">/// Performs `self as i16`.</span>
+		<span class="kw">fn</span> <span class="ident">as_i16</span>(<span class="self">self</span>) -&gt; <span class="ident">i16</span>;
+
+		<span class="doccomment">/// Performs `self as i32`.</span>
+		<span class="kw">fn</span> <span class="ident">as_i32</span>(<span class="self">self</span>) -&gt; <span class="ident">i32</span>;
+
+		<span class="doccomment">/// Performs `self as i64`.</span>
+		<span class="kw">fn</span> <span class="ident">as_i64</span>(<span class="self">self</span>) -&gt; <span class="ident">i64</span>;
+
+		<span class="doccomment">/// Performs `self as i128`.</span>
+		<span class="kw">fn</span> <span class="ident">as_i128</span>(<span class="self">self</span>) -&gt; <span class="ident">i128</span>;
+
+		<span class="doccomment">/// Performs `self as isize`.</span>
+		<span class="kw">fn</span> <span class="ident">as_isize</span>(<span class="self">self</span>) -&gt; <span class="ident">isize</span>;
+
+		<span class="doccomment">/// Performs `self as u8`.</span>
+		<span class="kw">fn</span> <span class="ident">as_u8</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span>;
+
+		<span class="doccomment">/// Performs `self as u16`.</span>
+		<span class="kw">fn</span> <span class="ident">as_u16</span>(<span class="self">self</span>) -&gt; <span class="ident">u16</span>;
+
+		<span class="doccomment">/// Performs `self as u32`.</span>
+		<span class="kw">fn</span> <span class="ident">as_u32</span>(<span class="self">self</span>) -&gt; <span class="ident">u32</span>;
+
+		<span class="doccomment">/// Performs `self as u64`.</span>
+		<span class="kw">fn</span> <span class="ident">as_u64</span>(<span class="self">self</span>) -&gt; <span class="ident">u64</span>;
+
+		<span class="doccomment">/// Performs `self as u128`.</span>
+		<span class="kw">fn</span> <span class="ident">as_u128</span>(<span class="self">self</span>) -&gt; <span class="ident">u128</span>;
+
+		<span class="doccomment">/// Performs `self as usize`.</span>
+		<span class="kw">fn</span> <span class="ident">as_usize</span>(<span class="self">self</span>) -&gt; <span class="ident">usize</span>;
+
+		<span class="doccomment">/// Performs `self as f32`.</span>
+		<span class="kw">fn</span> <span class="ident">as_f32</span>(<span class="self">self</span>) -&gt; <span class="ident">f32</span>;
+
+		<span class="doccomment">/// Performs `self as f64`.</span>
+		<span class="kw">fn</span> <span class="ident">as_f64</span>(<span class="self">self</span>) -&gt; <span class="ident">f64</span>;
+	}
+
+<span class="doccomment">/// Declare that a type is an abstract number.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This unifies all of the signed-integer, unsigned-integer, and floating-point</span>
+<span class="doccomment">/// types.</span>
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Numeric</span>:
+	<span class="ident">Fundamental</span>
 	<span class="comment">//  iter</span>
 	<span class="op">+</span> <span class="ident">Product</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
 	<span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Product</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span><span class="op">&gt;</span>
@@ -1711,9 +1941,6 @@ of acceptable widths to lower or upper bounds. These traits are equivalent to
 	<span class="doccomment">/// The `[u8; N]` byte array that stores values of `Self`.</span>
 	<span class="kw">type</span> <span class="ident">Bytes</span>;
 
-	<span class="doccomment">/// The size of this numeric type in bits.</span>
-	<span class="kw">const</span> <span class="ident">BITS</span>: <span class="ident">u32</span>;
-
 	<span class="doccomment">/// Return the memory representation of this number as a byte array in</span>
 	<span class="doccomment">/// big-endian (network) byte order.</span>
 	<span class="kw">fn</span> <span class="ident">to_be_bytes</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Bytes</span>;
@@ -1742,8 +1969,8 @@ of acceptable widths to lower or upper bounds. These traits are equivalent to
 <span class="doccomment">/// Declare that a type is a fixed-point integer.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This unifies all of the signed and unsigned integral types.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IsInteger</span>:
-	<span class="ident">IsNumber</span>
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Integral</span>:
+	<span class="ident">Numeric</span>
 	<span class="op">+</span> <span class="ident">Hash</span>
 	<span class="op">+</span> <span class="ident">Eq</span>
 	<span class="op">+</span> <span class="ident">Ord</span>
@@ -1788,6 +2015,14 @@ of acceptable widths to lower or upper bounds. These traits are equivalent to
 	<span class="op">+</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span>
 	<span class="op">+</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span>
 	<span class="op">+</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>
+	<span class="op">+</span> <span class="ident">Shl</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span><span class="op">&gt;</span>
+	<span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Shl</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span><span class="op">&gt;</span>
+	<span class="op">+</span> <span class="ident">ShlAssign</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
+	<span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ShlAssign</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span><span class="op">&gt;</span>
+	<span class="op">+</span> <span class="ident">Shr</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span><span class="op">&gt;</span>
+	<span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Shr</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span><span class="op">&gt;</span>
+	<span class="op">+</span> <span class="ident">ShrAssign</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
+	<span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ShrAssign</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span><span class="op">&gt;</span>
 	<span class="op">+</span> <span class="ident">Shl</span><span class="op">&lt;</span><span class="ident">i8</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span><span class="op">&gt;</span>
 	<span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Shl</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">i8</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span><span class="op">&gt;</span>
 	<span class="op">+</span> <span class="ident">ShlAssign</span><span class="op">&lt;</span><span class="ident">i8</span><span class="op">&gt;</span>
@@ -1888,11 +2123,17 @@ of acceptable widths to lower or upper bounds. These traits are equivalent to
 	<span class="doccomment">/// The type’s zero value.</span>
 	<span class="kw">const</span> <span class="ident">ZERO</span>: <span class="self">Self</span>;
 
+	<span class="doccomment">/// The type’s step value.</span>
+	<span class="kw">const</span> <span class="ident">ONE</span>: <span class="self">Self</span>;
+
 	<span class="doccomment">/// The type’s minimum value. This is zero for unsigned integers.</span>
 	<span class="kw">const</span> <span class="ident">MIN</span>: <span class="self">Self</span>;
 
 	<span class="doccomment">/// The type’s maximum value.</span>
 	<span class="kw">const</span> <span class="ident">MAX</span>: <span class="self">Self</span>;
+
+	<span class="doccomment">/// The size of this type in bits.</span>
+	<span class="kw">const</span> <span class="ident">BITS</span>: <span class="ident">u32</span>;
 
 	<span class="doccomment">/// Returns the smallest value that can be represented by this integer type.</span>
 	<span class="kw">fn</span> <span class="ident">min_value</span>() -&gt; <span class="self">Self</span>;
@@ -1958,11 +2199,13 @@ of acceptable widths to lower or upper bounds. These traits are equivalent to
 	<span class="doccomment">/// Converts an integer from big endian to the target’s endianness.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// On big endian this is a no-op. On little endian the bytes are swapped.</span>
+	<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::wrong_self_convention</span>)]</span>
 	<span class="kw">fn</span> <span class="ident">from_be</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
 
 	<span class="doccomment">/// Converts an integer frm little endian to the target’s endianness.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// On little endian this is a no-op. On big endian the bytes are swapped.</span>
+	<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::wrong_self_convention</span>)]</span>
 	<span class="kw">fn</span> <span class="ident">from_le</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
 
 	<span class="doccomment">/// Converts `self` to big endian from the target’s endianness.</span>
@@ -2071,7 +2314,7 @@ of acceptable widths to lower or upper bounds. These traits are equivalent to
 	<span class="doccomment">/// This function will panic if `rhs` is 0.</span>
 	<span class="kw">fn</span> <span class="ident">wrapping_div</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>;
 
-	<span class="doccomment">/// Wrapping Eulidean division. Computes `self.div_euclid(rhs)`, wrapping</span>
+	<span class="doccomment">/// Wrapping Euclidean division. Computes `self.div_euclid(rhs)`, wrapping</span>
 	<span class="doccomment">/// around at the boundary of the type.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Signed Types</span>
@@ -2161,7 +2404,7 @@ of acceptable widths to lower or upper bounds. These traits are equivalent to
 
 	<span class="doccomment">/// Panic-free bitwise shift-left; yields `self &lt;&lt; mask(rhs)`, where `mask`</span>
 	<span class="doccomment">/// removes any high-order bits of `rhs` that would cause the shift to</span>
-	<span class="doccomment">/// exceed the bitwidth of the type.</span>
+	<span class="doccomment">/// exceed the bit-width of the type.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// Note that this is not the same as a rotate-left; the RHS of a wrapping</span>
 	<span class="doccomment">/// shift-left is restricted to the range of the type, rather than the bits</span>
@@ -2172,7 +2415,7 @@ of acceptable widths to lower or upper bounds. These traits are equivalent to
 
 	<span class="doccomment">/// Panic-free bitwise shift-right; yields `self &gt;&gt; mask(rhs)`, where `mask`</span>
 	<span class="doccomment">/// removes any high-order bits of `rhs` that would cause the shift to</span>
-	<span class="doccomment">/// exceed the bitwidth of the type.</span>
+	<span class="doccomment">/// exceed the bit-width of the type.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// Note that this is not the same as a rotate-right; the RHS of a wrapping</span>
 	<span class="doccomment">/// shift-right is restricted to the range of the type, rather than the bits</span>
@@ -2316,7 +2559,7 @@ of acceptable widths to lower or upper bounds. These traits are equivalent to
 }
 
 <span class="doccomment">/// Declare that a type is a signed integer.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IsSigned</span>: <span class="ident">IsInteger</span> <span class="op">+</span> <span class="ident">Neg</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Signed</span>: <span class="ident">Integral</span> <span class="op">+</span> <span class="ident">Neg</span> {
 	<span class="doccomment">/// Checked absolute value. Computes `self.abs()`, returning `None` if</span>
 	<span class="doccomment">/// `self == MIN`.</span>
 	<span class="kw">fn</span> <span class="ident">checked_abs</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
@@ -2365,7 +2608,7 @@ of acceptable widths to lower or upper bounds. These traits are equivalent to
 }
 
 <span class="doccomment">/// Declare that a type is an unsigned integer.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IsUnsigned</span>: <span class="ident">IsInteger</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Unsigned</span>: <span class="ident">Integral</span> {
 	<span class="doccomment">/// Returns `true` if and only if `self == 2^k` for some `k`.</span>
 	<span class="kw">fn</span> <span class="ident">is_power_of_two</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
 
@@ -2383,8 +2626,8 @@ of acceptable widths to lower or upper bounds. These traits are equivalent to
 }
 
 <span class="doccomment">/// Declare that a type is a floating-point number.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IsFloat</span>:
-	<span class="ident">IsNumber</span>
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Floating</span>:
+	<span class="ident">Numeric</span>
 	<span class="op">+</span> <span class="ident">LowerExp</span>
 	<span class="op">+</span> <span class="ident">UpperExp</span>
 	<span class="op">+</span> <span class="ident">Neg</span>
@@ -2395,7 +2638,7 @@ of acceptable widths to lower or upper bounds. These traits are equivalent to
 	<span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>
 {
 	<span class="doccomment">/// The unsigned integer type of the same width as `Self`.</span>
-	<span class="kw">type</span> <span class="ident">Raw</span>: <span class="ident">IsUnsigned</span>;
+	<span class="kw">type</span> <span class="ident">Raw</span>: <span class="ident">Unsigned</span>;
 
 	<span class="doccomment">/// The radix or base of the internal representation of `f32`.</span>
 	<span class="kw">const</span> <span class="ident">RADIX</span>: <span class="ident">u32</span>;
@@ -2492,8 +2735,8 @@ of acceptable widths to lower or upper bounds. These traits are equivalent to
 	<span class="doccomment">/// ln(10)</span>
 	<span class="kw">const</span> <span class="ident">LN_10</span>: <span class="self">Self</span>;
 
-	<span class="comment">//  These functions are only available in `libstd`, because they rely on the</span>
-	<span class="comment">//  system math library `libm` which is not provided by `libcore`.</span>
+	<span class="comment">//  These functions are only available in `std`, because they rely on the</span>
+	<span class="comment">//  system math library `libm` which is not provided by `core`.</span>
 
 	<span class="doccomment">/// Returns the largest integer less than or equal to a number.</span>
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
@@ -2539,9 +2782,9 @@ of acceptable widths to lower or upper bounds. These traits are equivalent to
 	<span class="kw">fn</span> <span class="ident">copysign</span>(<span class="self">self</span>, <span class="ident">sign</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>;
 
 	<span class="doccomment">/// Fused multiply-add. Computes `(self * a) + b` with only one rounding</span>
-	<span class="doccomment">/// error, yielding a more accurate result than an unfused multiply-add.</span>
+	<span class="doccomment">/// error, yielding a more accurate result than an un-fused multiply-add.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// Using `mul_add` can be more performant than an unfused multiply-add if</span>
+	<span class="doccomment">/// Using `mul_add` can be more performant than an un-fused multiply-add if</span>
 	<span class="doccomment">/// the target architecture has a dedicated `fma` CPU instruction.</span>
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
 	<span class="kw">fn</span> <span class="ident">mul_add</span>(<span class="self">self</span>, <span class="ident">a</span>: <span class="self">Self</span>, <span class="ident">b</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>;
@@ -2786,186 +3029,271 @@ of acceptable widths to lower or upper bounds. These traits are equivalent to
 }
 
 <span class="doccomment">/// Declare that a type is exactly eight bits wide.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Is8</span>: <span class="ident">IsNumber</span> {}
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Is8</span>: <span class="ident">Numeric</span> {}
 
 <span class="doccomment">/// Declare that a type is exactly sixteen bits wide.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Is16</span>: <span class="ident">IsNumber</span> {}
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Is16</span>: <span class="ident">Numeric</span> {}
 
 <span class="doccomment">/// Declare that a type is exactly thirty-two bits wide.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Is32</span>: <span class="ident">IsNumber</span> {}
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Is32</span>: <span class="ident">Numeric</span> {}
 
 <span class="doccomment">/// Declare that a type is exactly sixty-four bits wide.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Is64</span>: <span class="ident">IsNumber</span> {}
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Is64</span>: <span class="ident">Numeric</span> {}
 
 <span class="doccomment">/// Declare that a type is exactly one hundred twenty-eight bits wide.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Is128</span>: <span class="ident">IsNumber</span> {}
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Is128</span>: <span class="ident">Numeric</span> {}
 
 <span class="doccomment">/// Declare that a type is eight or more bits wide.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AtLeast8</span>: <span class="ident">IsNumber</span> {}
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AtLeast8</span>: <span class="ident">Numeric</span> {}
 
 <span class="doccomment">/// Declare that a type is sixteen or more bits wide.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AtLeast16</span>: <span class="ident">IsNumber</span> {}
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AtLeast16</span>: <span class="ident">Numeric</span> {}
 
 <span class="doccomment">/// Declare that a type is thirty-two or more bits wide.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AtLeast32</span>: <span class="ident">IsNumber</span> {}
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AtLeast32</span>: <span class="ident">Numeric</span> {}
 
 <span class="doccomment">/// Declare that a type is sixty-four or more bits wide.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AtLeast64</span>: <span class="ident">IsNumber</span> {}
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AtLeast64</span>: <span class="ident">Numeric</span> {}
 
 <span class="doccomment">/// Declare that a type is one hundred twenty-eight or more bits wide.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AtLeast128</span>: <span class="ident">IsNumber</span> {}
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AtLeast128</span>: <span class="ident">Numeric</span> {}
 
 <span class="doccomment">/// Declare that a type is eight or fewer bits wide.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AtMost8</span>: <span class="ident">IsNumber</span> {}
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AtMost8</span>: <span class="ident">Numeric</span> {}
 
 <span class="doccomment">/// Declare that a type is sixteen or fewer bits wide.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AtMost16</span>: <span class="ident">IsNumber</span> {}
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AtMost16</span>: <span class="ident">Numeric</span> {}
 
 <span class="doccomment">/// Declare that a type is thirty-two or fewer bits wide.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AtMost32</span>: <span class="ident">IsNumber</span> {}
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AtMost32</span>: <span class="ident">Numeric</span> {}
 
 <span class="doccomment">/// Declare that a type is sixty-four or fewer bits wide.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AtMost64</span>: <span class="ident">IsNumber</span> {}
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AtMost64</span>: <span class="ident">Numeric</span> {}
 
 <span class="doccomment">/// Declare that a type is one hundred twenty-eight or fewer bits wide.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AtMost128</span>: <span class="ident">IsNumber</span> {}
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AtMost128</span>: <span class="ident">Numeric</span> {}
 
+<span class="doccomment">/// Creates new wrapper functions that forward to inherent items of the same</span>
+<span class="doccomment">/// name and signature.</span>
 <span class="macro">macro_rules!</span> <span class="ident">func</span> {
-	( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span> ( <span class="self">self</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>)<span class="op">*</span> ) $( -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span>:<span class="ident">ty</span> )<span class="question-mark">?</span> ) =&gt; {
-		<span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> ( <span class="self">self</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> )<span class="op">*</span> ) $( -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span> )<span class="question-mark">?</span> { <span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>:: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> ( <span class="self">self</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> )<span class="op">*</span> )}
-	};
-	( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span> ( <span class="kw-2">&amp;</span><span class="self">self</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>)<span class="op">*</span> ) $( -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span>:<span class="ident">ty</span> )<span class="question-mark">?</span> ) =&gt; {
-		<span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> ( <span class="kw-2">&amp;</span><span class="self">self</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> )<span class="op">*</span> ) $( -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span> )<span class="question-mark">?</span> { <span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>:: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> ( <span class="kw-2">&amp;</span><span class="self">self</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> )<span class="op">*</span> )}
-	};
-	( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span> ( <span class="kw-2">&amp;mut</span> <span class="self">self</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>)<span class="op">*</span> ) $( -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span>:<span class="ident">ty</span> )<span class="question-mark">?</span> ) =&gt; {
-		<span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> ( <span class="kw-2">&amp;mut</span> <span class="self">self</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> )<span class="op">*</span> ) $( -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span> )<span class="question-mark">?</span> { <span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>:: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> ( <span class="kw-2">&amp;mut</span> <span class="self">self</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> )<span class="op">*</span> )}
-	};
-	( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span> ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">*</span> ) $( -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span>:<span class="ident">ty</span> )<span class="question-mark">?</span> ) =&gt; {
-		<span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> ),<span class="op">*</span> ) $( -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span> )<span class="question-mark">?</span> { <span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>:: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> ( $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> ),<span class="op">*</span> )}
-	};
-}
+	(
+		$(@<span class="macro-nonterminal">$</span><span class="macro-nonterminal">std</span>:<span class="ident">literal</span>)<span class="question-mark">?</span>
+		<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span> (<span class="self">self</span>$(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span>:<span class="ident">ty</span>)<span class="question-mark">?</span>;
+		$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>:<span class="ident">tt</span>)<span class="op">*</span>
+	) =&gt; {
+		$(<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">std</span>)]</span>)<span class="question-mark">?</span>
+		<span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="self">self</span>$(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span>)<span class="question-mark">?</span>
+		{
+			<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="self">self</span>$(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>)<span class="kw-2">*</span>)
+		}
 
-<span class="macro">macro_rules!</span> <span class="ident">stdfunc</span> {
-	( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span> ( <span class="self">self</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>)<span class="op">*</span> ) $( -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span>:<span class="ident">ty</span> )<span class="question-mark">?</span> ) =&gt; {
-		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-		<span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> ( <span class="self">self</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> )<span class="op">*</span> ) $( -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span> )<span class="question-mark">?</span> { <span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>:: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> ( <span class="self">self</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> )<span class="op">*</span> )}
+		<span class="macro">func!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="kw-2">*</span>);
 	};
-	( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span> ( <span class="kw-2">&amp;</span><span class="self">self</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>)<span class="op">*</span> ) $( -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span>:<span class="ident">ty</span> )<span class="question-mark">?</span> ) =&gt; {
-		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-		<span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> ( <span class="kw-2">&amp;</span><span class="self">self</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> )<span class="op">*</span> ) $( -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span> )<span class="question-mark">?</span> { <span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>:: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> ( <span class="kw-2">&amp;</span><span class="self">self</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> )<span class="op">*</span> )}
+	(
+		$(@<span class="macro-nonterminal">$</span><span class="macro-nonterminal">std</span>:<span class="ident">literal</span>)<span class="question-mark">?</span>
+		<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>(<span class="kw-2">&amp;</span><span class="self">self</span>$(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span>:<span class="ident">ty</span>)<span class="question-mark">?</span>;
+		$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>:<span class="ident">tt</span>)<span class="op">*</span>
+	) =&gt; {
+		$(<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">std</span>)]</span>)<span class="question-mark">?</span>
+		<span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>$(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span>)<span class="question-mark">?</span>
+		{
+			<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>$(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> )<span class="kw-2">*</span>)
+		}
+
+		<span class="macro">func!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="kw-2">*</span>);
 	};
-	( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span> ( <span class="kw-2">&amp;mut</span> <span class="self">self</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>)<span class="op">*</span> ) $( -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span>:<span class="ident">ty</span> )<span class="question-mark">?</span> ) =&gt; {
-		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-		<span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> ( <span class="kw-2">&amp;mut</span> <span class="self">self</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> )<span class="op">*</span> ) $( -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span> )<span class="question-mark">?</span> { <span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>:: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> ( <span class="kw-2">&amp;mut</span> <span class="self">self</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> )<span class="op">*</span> )}
+	(
+		$(@<span class="macro-nonterminal">$</span><span class="macro-nonterminal">std</span>:<span class="ident">literal</span>)<span class="question-mark">?</span>
+		<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>$(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span>:<span class="ident">ty</span>)<span class="question-mark">?</span>;
+		$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>:<span class="ident">tt</span>)<span class="op">*</span>
+	) =&gt; {
+		$(<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">std</span>)]</span>)<span class="question-mark">?</span>
+		<span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>$(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span>)<span class="question-mark">?</span>
+		{
+			<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>$(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>)<span class="kw-2">*</span>)
+		}
+
+		<span class="macro">func!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="kw-2">*</span>);
 	};
-	( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span> ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">*</span> ) $( -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span>:<span class="ident">ty</span> )<span class="question-mark">?</span> ) =&gt; {
-		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-		<span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> ),<span class="op">*</span> ) $( -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span> )<span class="question-mark">?</span> { <span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>:: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> ( $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> ),<span class="op">*</span> )}
+	(
+		$(@<span class="macro-nonterminal">$</span><span class="macro-nonterminal">std</span>:<span class="ident">literal</span>)<span class="question-mark">?</span>
+		<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">*</span> $(,)<span class="question-mark">?</span>) $(-&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span>:<span class="ident">ty</span>)<span class="question-mark">?</span>;
+		$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>:<span class="ident">tt</span>)<span class="op">*</span>
+	) =&gt; {
+		$(<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">std</span>)]</span>)<span class="question-mark">?</span>
+		<span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>),<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span>)<span class="question-mark">?</span>
+		{
+			<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>),<span class="kw-2">*</span>)
+		}
+
+		<span class="macro">func!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="kw-2">*</span>);
 	};
+	() =&gt; {};
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">impl_for</span> {
-	( <span class="ident">IsNumber</span> =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span> ) =&gt; { $(
-		<span class="kw">impl</span> <span class="ident">IsNumber</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
-			<span class="kw">type</span> <span class="ident">Bytes</span> <span class="op">=</span> [<span class="ident">u8</span>; <span class="ident">core::mem::size_of</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>()];
+	( <span class="ident">Fundamental</span> =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">is_zero</span>:<span class="ident">expr</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span> ) =&gt; { $(
+		<span class="kw">impl</span> <span class="ident">Fundamental</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
+			<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+			<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::redundant_closure_call</span>)]</span>
+			<span class="kw">fn</span> <span class="ident">as_bool</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> { (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">is_zero</span>)(<span class="self">self</span>) }
 
-			<span class="comment">//  This can be replaced with the `::BITS` inherent once it</span>
-			<span class="comment">//  stabilizes in the standard library.</span>
-			<span class="kw">const</span> <span class="ident">BITS</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="ident">core::mem::size_of</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">u32</span> <span class="op">*</span> <span class="number">8</span>;
+			<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+			<span class="kw">fn</span> <span class="ident">as_char</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span> {
+				<span class="ident">core::char::from_u32</span>(<span class="self">self</span> <span class="kw">as</span> <span class="ident">u32</span>)
+			}
 
-			<span class="macro">func!</span>(<span class="ident">to_be_bytes</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Bytes</span>);
-			<span class="macro">func!</span>(<span class="ident">to_le_bytes</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Bytes</span>);
-			<span class="macro">func!</span>(<span class="ident">to_ne_bytes</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Bytes</span>);
-			<span class="macro">func!</span>(<span class="ident">from_be_bytes</span>(<span class="ident">bytes</span>: <span class="ident"><span class="self">Self</span>::Bytes</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">from_le_bytes</span>(<span class="ident">bytes</span>: <span class="ident"><span class="self">Self</span>::Bytes</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">from_ne_bytes</span>(<span class="ident">bytes</span>: <span class="ident"><span class="self">Self</span>::Bytes</span>) -&gt; <span class="self">Self</span>);
+			<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+			<span class="kw">fn</span> <span class="ident">as_i8</span>(<span class="self">self</span>) -&gt; <span class="ident">i8</span> { <span class="self">self</span> <span class="kw">as</span> <span class="ident">i8</span> }
+
+			<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+			<span class="kw">fn</span> <span class="ident">as_i16</span>(<span class="self">self</span>) -&gt; <span class="ident">i16</span> { <span class="self">self</span> <span class="kw">as</span> <span class="ident">i16</span> }
+
+			<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+			<span class="kw">fn</span> <span class="ident">as_i32</span>(<span class="self">self</span>) -&gt; <span class="ident">i32</span> { <span class="self">self</span> <span class="kw">as</span> <span class="ident">i32</span> }
+
+			<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+			<span class="kw">fn</span> <span class="ident">as_i64</span>(<span class="self">self</span>) -&gt; <span class="ident">i64</span> { <span class="self">self</span> <span class="kw">as</span> <span class="ident">i64</span> }
+
+			<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+			<span class="kw">fn</span> <span class="ident">as_i128</span>(<span class="self">self</span>) -&gt; <span class="ident">i128</span> { <span class="self">self</span> <span class="kw">as</span> <span class="ident">i128</span> }
+
+			<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+			<span class="kw">fn</span> <span class="ident">as_isize</span>(<span class="self">self</span>) -&gt; <span class="ident">isize</span> { <span class="self">self</span> <span class="kw">as</span> <span class="ident">isize</span> }
+
+			<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+			<span class="kw">fn</span> <span class="ident">as_u8</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> { <span class="self">self</span> <span class="kw">as</span> <span class="ident">u8</span> }
+
+			<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+			<span class="kw">fn</span> <span class="ident">as_u16</span>(<span class="self">self</span>) -&gt; <span class="ident">u16</span> { <span class="self">self</span> <span class="kw">as</span> <span class="ident">u16</span> }
+
+			<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+			<span class="kw">fn</span> <span class="ident">as_u32</span>(<span class="self">self</span>) -&gt; <span class="ident">u32</span> { <span class="self">self</span> <span class="kw">as</span> <span class="ident">u32</span> }
+
+			<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+			<span class="kw">fn</span> <span class="ident">as_u64</span>(<span class="self">self</span>) -&gt; <span class="ident">u64</span> { <span class="self">self</span> <span class="kw">as</span> <span class="ident">u64</span> }
+
+			<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+			<span class="kw">fn</span> <span class="ident">as_u128</span>(<span class="self">self</span>) -&gt;<span class="ident">u128</span> { <span class="self">self</span> <span class="kw">as</span> <span class="ident">u128</span> }
+
+			<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+			<span class="kw">fn</span> <span class="ident">as_usize</span>(<span class="self">self</span>) -&gt; <span class="ident">usize</span> { <span class="self">self</span> <span class="kw">as</span> <span class="ident">usize</span> }
+
+			<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+			<span class="kw">fn</span> <span class="ident">as_f32</span>(<span class="self">self</span>) -&gt; <span class="ident">f32</span> { <span class="self">self</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="kw">as</span> <span class="ident">f32</span> }
+
+			<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+			<span class="kw">fn</span> <span class="ident">as_f64</span>(<span class="self">self</span>) -&gt; <span class="ident">f64</span> { <span class="self">self</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="kw">as</span> <span class="ident">f64</span> }
 		}
 	)<span class="op">+</span> };
-	( <span class="ident">IsInteger</span> =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span> ) =&gt; { $(
-		<span class="kw">impl</span> <span class="ident">IsInteger</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
+	( <span class="ident">Numeric</span> =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span> ) =&gt; { $(
+		<span class="kw">impl</span> <span class="ident">Numeric</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
+			<span class="kw">type</span> <span class="ident">Bytes</span> <span class="op">=</span> [<span class="ident">u8</span>; <span class="ident">core::mem::size_of</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>()];
+
+			<span class="macro">func!</span> {
+				<span class="ident">to_be_bytes</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Bytes</span>;
+				<span class="ident">to_le_bytes</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Bytes</span>;
+				<span class="ident">to_ne_bytes</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Bytes</span>;
+				<span class="ident">from_be_bytes</span>(<span class="ident">bytes</span>: <span class="ident"><span class="self">Self</span>::Bytes</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">from_le_bytes</span>(<span class="ident">bytes</span>: <span class="ident"><span class="self">Self</span>::Bytes</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">from_ne_bytes</span>(<span class="ident">bytes</span>: <span class="ident"><span class="self">Self</span>::Bytes</span>) -&gt; <span class="self">Self</span>;
+			}
+		}
+	)<span class="op">+</span> };
+	( <span class="ident">Integral</span> =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span> ) =&gt; { $(
+		<span class="kw">impl</span> <span class="ident">Integral</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
 			<span class="kw">const</span> <span class="ident">ZERO</span>: <span class="self">Self</span> <span class="op">=</span> <span class="number">0</span>;
+			<span class="kw">const</span> <span class="ident">ONE</span>: <span class="self">Self</span> <span class="op">=</span> <span class="number">1</span>;
 			<span class="kw">const</span> <span class="ident">MIN</span>: <span class="self">Self</span> <span class="op">=</span> <span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="ident">::min_value</span>();
 			<span class="kw">const</span> <span class="ident">MAX</span>: <span class="self">Self</span> <span class="op">=</span> <span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="ident">::max_value</span>();
 
-			<span class="macro">func!</span>(<span class="ident">min_value</span>() -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">max_value</span>() -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">from_str_radix</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ParseIntError</span><span class="op">&gt;</span>);
-			<span class="macro">func!</span>(<span class="ident">count_ones</span>(<span class="self">self</span>) -&gt; <span class="ident">u32</span>);
-			<span class="macro">func!</span>(<span class="ident">count_zeros</span>(<span class="self">self</span>) -&gt; <span class="ident">u32</span>);
-			<span class="macro">func!</span>(<span class="ident">leading_zeros</span>(<span class="self">self</span>) -&gt; <span class="ident">u32</span>);
-			<span class="macro">func!</span>(<span class="ident">trailing_zeros</span>(<span class="self">self</span>) -&gt; <span class="ident">u32</span>);
-			<span class="macro">func!</span>(<span class="ident">leading_ones</span>(<span class="self">self</span>) -&gt; <span class="ident">u32</span>);
-			<span class="macro">func!</span>(<span class="ident">trailing_ones</span>(<span class="self">self</span>) -&gt; <span class="ident">u32</span>);
-			<span class="macro">func!</span>(<span class="ident">rotate_left</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">rotate_right</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">swap_bytes</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">reverse_bits</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">from_be</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">from_le</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">to_be</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">to_le</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">checked_add</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>);
-			<span class="macro">func!</span>(<span class="ident">checked_sub</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>);
-			<span class="macro">func!</span>(<span class="ident">checked_mul</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>);
-			<span class="macro">func!</span>(<span class="ident">checked_div</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>);
-			<span class="macro">func!</span>(<span class="ident">checked_div_euclid</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>);
-			<span class="macro">func!</span>(<span class="ident">checked_rem</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>);
-			<span class="macro">func!</span>(<span class="ident">checked_rem_euclid</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>);
-			<span class="macro">func!</span>(<span class="ident">checked_neg</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>);
-			<span class="macro">func!</span>(<span class="ident">checked_shl</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>);
-			<span class="macro">func!</span>(<span class="ident">checked_shr</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>);
-			<span class="macro">func!</span>(<span class="ident">checked_pow</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>);
-			<span class="macro">func!</span>(<span class="ident">saturating_add</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">saturating_sub</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">saturating_mul</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">saturating_pow</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">wrapping_add</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">wrapping_sub</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">wrapping_mul</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">wrapping_div</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">wrapping_div_euclid</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">wrapping_rem</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">wrapping_rem_euclid</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">wrapping_neg</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">wrapping_shl</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">wrapping_shr</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">wrapping_pow</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">overflowing_add</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; (<span class="self">Self</span>, <span class="ident">bool</span>));
-			<span class="macro">func!</span>(<span class="ident">overflowing_sub</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; (<span class="self">Self</span>, <span class="ident">bool</span>));
-			<span class="macro">func!</span>(<span class="ident">overflowing_mul</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; (<span class="self">Self</span>, <span class="ident">bool</span>));
-			<span class="macro">func!</span>(<span class="ident">overflowing_div</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; (<span class="self">Self</span>, <span class="ident">bool</span>));
-			<span class="macro">func!</span>(<span class="ident">overflowing_div_euclid</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; (<span class="self">Self</span>, <span class="ident">bool</span>));
-			<span class="macro">func!</span>(<span class="ident">overflowing_rem</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; (<span class="self">Self</span>, <span class="ident">bool</span>));
-			<span class="macro">func!</span>(<span class="ident">overflowing_rem_euclid</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; (<span class="self">Self</span>, <span class="ident">bool</span>));
-			<span class="macro">func!</span>(<span class="ident">overflowing_neg</span>(<span class="self">self</span>) -&gt; (<span class="self">Self</span>, <span class="ident">bool</span>));
-			<span class="macro">func!</span>(<span class="ident">overflowing_shl</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">u32</span>) -&gt; (<span class="self">Self</span>, <span class="ident">bool</span>));
-			<span class="macro">func!</span>(<span class="ident">overflowing_shr</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">u32</span>) -&gt; (<span class="self">Self</span>, <span class="ident">bool</span>));
-			<span class="macro">func!</span>(<span class="ident">overflowing_pow</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">u32</span>) -&gt; (<span class="self">Self</span>, <span class="ident">bool</span>));
-			<span class="macro">func!</span>(<span class="ident">pow</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">div_euclid</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">rem_euclid</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>);
+			<span class="kw">const</span> <span class="ident">BITS</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="ident">::BITS</span>;
+
+			<span class="macro">func!</span> {
+				<span class="ident">min_value</span>() -&gt; <span class="self">Self</span>;
+				<span class="ident">max_value</span>() -&gt; <span class="self">Self</span>;
+				<span class="ident">from_str_radix</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ParseIntError</span><span class="op">&gt;</span>;
+				<span class="ident">count_ones</span>(<span class="self">self</span>) -&gt; <span class="ident">u32</span>;
+				<span class="ident">count_zeros</span>(<span class="self">self</span>) -&gt; <span class="ident">u32</span>;
+				<span class="ident">leading_zeros</span>(<span class="self">self</span>) -&gt; <span class="ident">u32</span>;
+				<span class="ident">trailing_zeros</span>(<span class="self">self</span>) -&gt; <span class="ident">u32</span>;
+				<span class="ident">leading_ones</span>(<span class="self">self</span>) -&gt; <span class="ident">u32</span>;
+				<span class="ident">trailing_ones</span>(<span class="self">self</span>) -&gt; <span class="ident">u32</span>;
+				<span class="ident">rotate_left</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">rotate_right</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">swap_bytes</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">reverse_bits</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">from_be</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">from_le</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">to_be</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">to_le</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">checked_add</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+				<span class="ident">checked_sub</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+				<span class="ident">checked_mul</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+				<span class="ident">checked_div</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+				<span class="ident">checked_div_euclid</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+				<span class="ident">checked_rem</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+				<span class="ident">checked_rem_euclid</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+				<span class="ident">checked_neg</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+				<span class="ident">checked_shl</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+				<span class="ident">checked_shr</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+				<span class="ident">checked_pow</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+				<span class="ident">saturating_add</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">saturating_sub</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">saturating_mul</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">saturating_pow</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">wrapping_add</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">wrapping_sub</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">wrapping_mul</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">wrapping_div</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">wrapping_div_euclid</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">wrapping_rem</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">wrapping_rem_euclid</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">wrapping_neg</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">wrapping_shl</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">wrapping_shr</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">wrapping_pow</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">overflowing_add</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; (<span class="self">Self</span>, <span class="ident">bool</span>);
+				<span class="ident">overflowing_sub</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; (<span class="self">Self</span>, <span class="ident">bool</span>);
+				<span class="ident">overflowing_mul</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; (<span class="self">Self</span>, <span class="ident">bool</span>);
+				<span class="ident">overflowing_div</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; (<span class="self">Self</span>, <span class="ident">bool</span>);
+				<span class="ident">overflowing_div_euclid</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; (<span class="self">Self</span>, <span class="ident">bool</span>);
+				<span class="ident">overflowing_rem</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; (<span class="self">Self</span>, <span class="ident">bool</span>);
+				<span class="ident">overflowing_rem_euclid</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; (<span class="self">Self</span>, <span class="ident">bool</span>);
+				<span class="ident">overflowing_neg</span>(<span class="self">self</span>) -&gt; (<span class="self">Self</span>, <span class="ident">bool</span>);
+				<span class="ident">overflowing_shl</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">u32</span>) -&gt; (<span class="self">Self</span>, <span class="ident">bool</span>);
+				<span class="ident">overflowing_shr</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">u32</span>) -&gt; (<span class="self">Self</span>, <span class="ident">bool</span>);
+				<span class="ident">overflowing_pow</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">u32</span>) -&gt; (<span class="self">Self</span>, <span class="ident">bool</span>);
+				<span class="ident">pow</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">div_euclid</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">rem_euclid</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>;
+			}
 		}
 	)<span class="op">+</span> };
-	( <span class="ident">IsSigned</span> =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span> ) =&gt; { $(
-		<span class="kw">impl</span> <span class="ident">IsSigned</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
-			<span class="macro">func!</span>(<span class="ident">checked_abs</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>);
-			<span class="macro">func!</span>(<span class="ident">wrapping_abs</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">overflowing_abs</span>(<span class="self">self</span>) -&gt; (<span class="self">Self</span>, <span class="ident">bool</span>));
-			<span class="macro">func!</span>(<span class="ident">abs</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">signum</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">is_positive</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>);
-			<span class="macro">func!</span>(<span class="ident">is_negative</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>);
+	( <span class="ident">Signed</span> =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span> ) =&gt; { $(
+		<span class="kw">impl</span> <span class="ident">Signed</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
+			<span class="macro">func!</span> {
+				<span class="ident">checked_abs</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+				<span class="ident">wrapping_abs</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">overflowing_abs</span>(<span class="self">self</span>) -&gt; (<span class="self">Self</span>, <span class="ident">bool</span>);
+				<span class="ident">abs</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">signum</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">is_positive</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+				<span class="ident">is_negative</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+			}
 		}
 	)<span class="op">+</span> };
-	( <span class="ident">IsUnsigned</span> =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span> ) =&gt; { $(
-		<span class="kw">impl</span> <span class="ident">IsUnsigned</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
-			<span class="macro">func!</span>(<span class="ident">is_power_of_two</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>);
-			<span class="macro">func!</span>(<span class="ident">next_power_of_two</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">checked_next_power_of_two</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>);
+	( <span class="ident">Unsigned</span> =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span> ) =&gt; { $(
+		<span class="kw">impl</span> <span class="ident">Unsigned</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
+			<span class="macro">func!</span> {
+				<span class="ident">is_power_of_two</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+				<span class="ident">next_power_of_two</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">checked_next_power_of_two</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+			}
 		}
 	)<span class="op">+</span> };
-	( <span class="ident">IsFloat</span> =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ident</span> <span class="op">|</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span>:<span class="ident">ty</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span> ) =&gt; { $(
-		<span class="kw">impl</span> <span class="ident">IsFloat</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
+	( <span class="ident">Floating</span> =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ident</span> <span class="op">|</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span>:<span class="ident">ty</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span> ) =&gt; { $(
+		<span class="kw">impl</span> <span class="ident">Floating</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
 			<span class="kw">type</span> <span class="ident">Raw</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span>;
 
 			<span class="kw">const</span> <span class="ident">RADIX</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="ident">core</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t::RADIX</span>;
@@ -3000,59 +3328,60 @@ of acceptable widths to lower or upper bounds. These traits are equivalent to
 			<span class="kw">const</span> <span class="ident">LN_2</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident">core</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t::consts::LN_2</span>;
 			<span class="kw">const</span> <span class="ident">LN_10</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident">core</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t::consts::LN_10</span>;
 
-			<span class="macro">stdfunc!</span>(<span class="ident">floor</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">ceil</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">round</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">trunc</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">fract</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">abs</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">signum</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">copysign</span>(<span class="self">self</span>, <span class="ident">sign</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">mul_add</span>(<span class="self">self</span>, <span class="ident">a</span>: <span class="self">Self</span>, <span class="ident">b</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">div_euclid</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">rem_euclid</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">powi</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i32</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">powf</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">sqrt</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">exp</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">exp2</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">ln</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">log</span>(<span class="self">self</span>, <span class="ident">base</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">log2</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">log10</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">cbrt</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">hypot</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">sin</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">cos</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">tan</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">asin</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">acos</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">atan</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">atan2</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">sin_cos</span>(<span class="self">self</span>) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>));
-			<span class="macro">stdfunc!</span>(<span class="ident">exp_m1</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">ln_1p</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">sinh</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">cosh</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">tanh</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">asinh</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">acosh</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">stdfunc!</span>(<span class="ident">atanh</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-
-			<span class="macro">func!</span>(<span class="ident">is_nan</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>);
-			<span class="macro">func!</span>(<span class="ident">is_infinite</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>);
-			<span class="macro">func!</span>(<span class="ident">is_finite</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>);
-			<span class="macro">func!</span>(<span class="ident">is_normal</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>);
-			<span class="macro">func!</span>(<span class="ident">classify</span>(<span class="self">self</span>) -&gt; <span class="ident">FpCategory</span>);
-			<span class="macro">func!</span>(<span class="ident">is_sign_positive</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>);
-			<span class="macro">func!</span>(<span class="ident">is_sign_negative</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>);
-			<span class="macro">func!</span>(<span class="ident">recip</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">to_degrees</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">to_radians</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">max</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">min</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>);
-			<span class="macro">func!</span>(<span class="ident">to_bits</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Raw</span>);
-			<span class="macro">func!</span>(<span class="ident">from_bits</span>(<span class="ident">bits</span>: <span class="ident"><span class="self">Self</span>::Raw</span>) -&gt; <span class="self">Self</span>);
+			<span class="macro">func!</span> {
+				@<span class="string">&quot;std&quot;</span> <span class="ident">floor</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">ceil</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">round</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">trunc</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">fract</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">abs</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">signum</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">copysign</span>(<span class="self">self</span>, <span class="ident">sign</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">mul_add</span>(<span class="self">self</span>, <span class="ident">a</span>: <span class="self">Self</span>, <span class="ident">b</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">div_euclid</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">rem_euclid</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">powi</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i32</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">powf</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">sqrt</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">exp</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">exp2</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">ln</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">log</span>(<span class="self">self</span>, <span class="ident">base</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">log2</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">log10</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">cbrt</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">hypot</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">sin</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">cos</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">tan</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">asin</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">acos</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">atan</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">atan2</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">sin_cos</span>(<span class="self">self</span>) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>);
+				@<span class="string">&quot;std&quot;</span> <span class="ident">exp_m1</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">ln_1p</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">sinh</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">cosh</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">tanh</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">asinh</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">acosh</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				@<span class="string">&quot;std&quot;</span> <span class="ident">atanh</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">is_nan</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+				<span class="ident">is_infinite</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+				<span class="ident">is_finite</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+				<span class="ident">is_normal</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+				<span class="ident">classify</span>(<span class="self">self</span>) -&gt; <span class="ident">FpCategory</span>;
+				<span class="ident">is_sign_positive</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+				<span class="ident">is_sign_negative</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+				<span class="ident">recip</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">to_degrees</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">to_radians</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">max</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">min</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>;
+				<span class="ident">to_bits</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Raw</span>;
+				<span class="ident">from_bits</span>(<span class="ident">bits</span>: <span class="ident"><span class="self">Self</span>::Raw</span>) -&gt; <span class="self">Self</span>;
+			}
 		}
 	)<span class="op">+</span> };
 	( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">which</span>:<span class="ident">ty</span> =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span> ) =&gt; { $(
@@ -3060,11 +3389,29 @@ of acceptable widths to lower or upper bounds. These traits are equivalent to
 	)<span class="op">+</span> };
 }
 
-<span class="macro">impl_for!</span>(<span class="ident">IsNumber</span> =&gt; <span class="ident">i8</span>, <span class="ident">i16</span>, <span class="ident">i32</span>, <span class="ident">i64</span>, <span class="ident">i128</span>, <span class="ident">isize</span>, <span class="ident">u8</span>, <span class="ident">u16</span>, <span class="ident">u32</span>, <span class="ident">u64</span>, <span class="ident">u128</span>, <span class="ident">usize</span>, <span class="ident">f32</span>, <span class="ident">f64</span>);
-<span class="macro">impl_for!</span>(<span class="ident">IsInteger</span> =&gt; <span class="ident">i8</span>, <span class="ident">i16</span>, <span class="ident">i32</span>, <span class="ident">i64</span>, <span class="ident">i128</span>, <span class="ident">isize</span>, <span class="ident">u8</span>, <span class="ident">u16</span>, <span class="ident">u32</span>, <span class="ident">u64</span>, <span class="ident">u128</span>, <span class="ident">usize</span>);
-<span class="macro">impl_for!</span>(<span class="ident">IsSigned</span> =&gt; <span class="ident">i8</span>, <span class="ident">i16</span>, <span class="ident">i32</span>, <span class="ident">i64</span>, <span class="ident">i128</span>, <span class="ident">isize</span>);
-<span class="macro">impl_for!</span>(<span class="ident">IsUnsigned</span> =&gt; <span class="ident">u8</span>, <span class="ident">u16</span>, <span class="ident">u32</span>, <span class="ident">u64</span>, <span class="ident">u128</span>, <span class="ident">usize</span>);
-<span class="macro">impl_for!</span>(<span class="ident">IsFloat</span> =&gt; <span class="ident">f32</span> <span class="op">|</span> <span class="ident">u32</span>, <span class="ident">f64</span> <span class="op">|</span> <span class="ident">u64</span>);
+<span class="macro">impl_for!</span>(<span class="ident">Fundamental</span> =&gt;
+	<span class="ident">bool</span> =&gt; <span class="op">|</span><span class="ident">this</span>: <span class="ident">bool</span><span class="op">|</span> <span class="op">!</span><span class="ident">this</span>,
+	<span class="ident">char</span> =&gt; <span class="op">|</span><span class="ident">this</span><span class="op">|</span> <span class="ident">this</span> <span class="op">!</span><span class="op">=</span> <span class="string">&#39;\0&#39;</span>,
+	<span class="ident">i8</span> =&gt; <span class="op">|</span><span class="ident">this</span><span class="op">|</span> <span class="ident">this</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
+	<span class="ident">i16</span> =&gt; <span class="op">|</span><span class="ident">this</span><span class="op">|</span> <span class="ident">this</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
+	<span class="ident">i32</span> =&gt; <span class="op">|</span><span class="ident">this</span><span class="op">|</span> <span class="ident">this</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
+	<span class="ident">i64</span> =&gt; <span class="op">|</span><span class="ident">this</span><span class="op">|</span> <span class="ident">this</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
+	<span class="ident">i128</span> =&gt; <span class="op">|</span><span class="ident">this</span><span class="op">|</span> <span class="ident">this</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
+	<span class="ident">isize</span> =&gt; <span class="op">|</span><span class="ident">this</span><span class="op">|</span> <span class="ident">this</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
+	<span class="ident">u8</span> =&gt; <span class="op">|</span><span class="ident">this</span><span class="op">|</span> <span class="ident">this</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
+	<span class="ident">u16</span> =&gt; <span class="op">|</span><span class="ident">this</span><span class="op">|</span> <span class="ident">this</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
+	<span class="ident">u32</span> =&gt; <span class="op">|</span><span class="ident">this</span><span class="op">|</span> <span class="ident">this</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
+	<span class="ident">u64</span> =&gt; <span class="op">|</span><span class="ident">this</span><span class="op">|</span> <span class="ident">this</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
+	<span class="ident">u128</span> =&gt; <span class="op">|</span><span class="ident">this</span><span class="op">|</span> <span class="ident">this</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
+	<span class="ident">usize</span> =&gt; <span class="op">|</span><span class="ident">this</span><span class="op">|</span> <span class="ident">this</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
+	<span class="ident">f32</span> =&gt; <span class="op">|</span><span class="ident">this</span>: <span class="ident">f32</span><span class="op">|</span> (<span class="op">-</span><span class="ident"><span class="self">Self</span>::EPSILON</span> ..<span class="op">=</span> <span class="ident"><span class="self">Self</span>::EPSILON</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">this</span>),
+	<span class="ident">f64</span> =&gt; <span class="op">|</span><span class="ident">this</span>: <span class="ident">f64</span><span class="op">|</span> (<span class="op">-</span><span class="ident"><span class="self">Self</span>::EPSILON</span> ..<span class="op">=</span> <span class="ident"><span class="self">Self</span>::EPSILON</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">this</span>),
+);
+<span class="macro">impl_for!</span>(<span class="ident">Numeric</span> =&gt; <span class="ident">i8</span>, <span class="ident">i16</span>, <span class="ident">i32</span>, <span class="ident">i64</span>, <span class="ident">i128</span>, <span class="ident">isize</span>, <span class="ident">u8</span>, <span class="ident">u16</span>, <span class="ident">u32</span>, <span class="ident">u64</span>, <span class="ident">u128</span>, <span class="ident">usize</span>, <span class="ident">f32</span>, <span class="ident">f64</span>);
+<span class="macro">impl_for!</span>(<span class="ident">Integral</span> =&gt; <span class="ident">i8</span>, <span class="ident">i16</span>, <span class="ident">i32</span>, <span class="ident">i64</span>, <span class="ident">i128</span>, <span class="ident">isize</span>, <span class="ident">u8</span>, <span class="ident">u16</span>, <span class="ident">u32</span>, <span class="ident">u64</span>, <span class="ident">u128</span>, <span class="ident">usize</span>);
+<span class="macro">impl_for!</span>(<span class="ident">Signed</span> =&gt; <span class="ident">i8</span>, <span class="ident">i16</span>, <span class="ident">i32</span>, <span class="ident">i64</span>, <span class="ident">i128</span>, <span class="ident">isize</span>);
+<span class="macro">impl_for!</span>(<span class="ident">Unsigned</span> =&gt; <span class="ident">u8</span>, <span class="ident">u16</span>, <span class="ident">u32</span>, <span class="ident">u64</span>, <span class="ident">u128</span>, <span class="ident">usize</span>);
+<span class="macro">impl_for!</span>(<span class="ident">Floating</span> =&gt; <span class="ident">f32</span> <span class="op">|</span> <span class="ident">u32</span>, <span class="ident">f64</span> <span class="op">|</span> <span class="ident">u64</span>);
 
 <span class="macro">impl_for!</span>(<span class="ident">Is8</span> =&gt; <span class="ident">i8</span>, <span class="ident">u8</span>);
 <span class="macro">impl_for!</span>(<span class="ident">Is16</span> =&gt; <span class="ident">i16</span>, <span class="ident">u16</span>);
@@ -3117,22 +3464,25 @@ of acceptable widths to lower or upper bounds. These traits are equivalent to
 	<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 	<span class="kw">use</span> <span class="ident">static_assertions</span>::<span class="kw-2">*</span>;
 
-	<span class="macro">assert_impl_all!</span>(<span class="ident">i8</span>: <span class="ident">IsInteger</span>, <span class="ident">IsSigned</span>, <span class="ident">Is8</span>);
-	<span class="macro">assert_impl_all!</span>(<span class="ident">i16</span>: <span class="ident">IsInteger</span>, <span class="ident">IsSigned</span>, <span class="ident">Is16</span>);
-	<span class="macro">assert_impl_all!</span>(<span class="ident">i32</span>: <span class="ident">IsInteger</span>, <span class="ident">IsSigned</span>, <span class="ident">Is32</span>);
-	<span class="macro">assert_impl_all!</span>(<span class="ident">i64</span>: <span class="ident">IsInteger</span>, <span class="ident">IsSigned</span>, <span class="ident">Is64</span>);
-	<span class="macro">assert_impl_all!</span>(<span class="ident">i128</span>: <span class="ident">IsInteger</span>, <span class="ident">IsSigned</span>, <span class="ident">Is128</span>);
-	<span class="macro">assert_impl_all!</span>(<span class="ident">isize</span>: <span class="ident">IsInteger</span>, <span class="ident">IsSigned</span>);
+	<span class="macro">assert_impl_all!</span>(<span class="ident">bool</span>: <span class="ident">Fundamental</span>);
+	<span class="macro">assert_impl_all!</span>(<span class="ident">char</span>: <span class="ident">Fundamental</span>);
 
-	<span class="macro">assert_impl_all!</span>(<span class="ident">u8</span>: <span class="ident">IsInteger</span>, <span class="ident">IsUnsigned</span>, <span class="ident">Is8</span>);
-	<span class="macro">assert_impl_all!</span>(<span class="ident">u16</span>: <span class="ident">IsInteger</span>, <span class="ident">IsUnsigned</span>, <span class="ident">Is16</span>);
-	<span class="macro">assert_impl_all!</span>(<span class="ident">u32</span>: <span class="ident">IsInteger</span>, <span class="ident">IsUnsigned</span>, <span class="ident">Is32</span>);
-	<span class="macro">assert_impl_all!</span>(<span class="ident">u64</span>: <span class="ident">IsInteger</span>, <span class="ident">IsUnsigned</span>, <span class="ident">Is64</span>);
-	<span class="macro">assert_impl_all!</span>(<span class="ident">u128</span>: <span class="ident">IsInteger</span>, <span class="ident">IsUnsigned</span>, <span class="ident">Is128</span>);
-	<span class="macro">assert_impl_all!</span>(<span class="ident">usize</span>: <span class="ident">IsInteger</span>, <span class="ident">IsUnsigned</span>);
+	<span class="macro">assert_impl_all!</span>(<span class="ident">i8</span>: <span class="ident">Integral</span>, <span class="ident">Signed</span>, <span class="ident">Is8</span>);
+	<span class="macro">assert_impl_all!</span>(<span class="ident">i16</span>: <span class="ident">Integral</span>, <span class="ident">Signed</span>, <span class="ident">Is16</span>);
+	<span class="macro">assert_impl_all!</span>(<span class="ident">i32</span>: <span class="ident">Integral</span>, <span class="ident">Signed</span>, <span class="ident">Is32</span>);
+	<span class="macro">assert_impl_all!</span>(<span class="ident">i64</span>: <span class="ident">Integral</span>, <span class="ident">Signed</span>, <span class="ident">Is64</span>);
+	<span class="macro">assert_impl_all!</span>(<span class="ident">i128</span>: <span class="ident">Integral</span>, <span class="ident">Signed</span>, <span class="ident">Is128</span>);
+	<span class="macro">assert_impl_all!</span>(<span class="ident">isize</span>: <span class="ident">Integral</span>, <span class="ident">Signed</span>);
 
-	<span class="macro">assert_impl_all!</span>(<span class="ident">f32</span>: <span class="ident">IsFloat</span>, <span class="ident">Is32</span>);
-	<span class="macro">assert_impl_all!</span>(<span class="ident">f64</span>: <span class="ident">IsFloat</span>, <span class="ident">Is64</span>);
+	<span class="macro">assert_impl_all!</span>(<span class="ident">u8</span>: <span class="ident">Integral</span>, <span class="ident">Unsigned</span>, <span class="ident">Is8</span>);
+	<span class="macro">assert_impl_all!</span>(<span class="ident">u16</span>: <span class="ident">Integral</span>, <span class="ident">Unsigned</span>, <span class="ident">Is16</span>);
+	<span class="macro">assert_impl_all!</span>(<span class="ident">u32</span>: <span class="ident">Integral</span>, <span class="ident">Unsigned</span>, <span class="ident">Is32</span>);
+	<span class="macro">assert_impl_all!</span>(<span class="ident">u64</span>: <span class="ident">Integral</span>, <span class="ident">Unsigned</span>, <span class="ident">Is64</span>);
+	<span class="macro">assert_impl_all!</span>(<span class="ident">u128</span>: <span class="ident">Integral</span>, <span class="ident">Unsigned</span>, <span class="ident">Is128</span>);
+	<span class="macro">assert_impl_all!</span>(<span class="ident">usize</span>: <span class="ident">Integral</span>, <span class="ident">Unsigned</span>);
+
+	<span class="macro">assert_impl_all!</span>(<span class="ident">f32</span>: <span class="ident">Floating</span>, <span class="ident">Is32</span>);
+	<span class="macro">assert_impl_all!</span>(<span class="ident">f64</span>: <span class="ident">Floating</span>, <span class="ident">Is64</span>);
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="funty" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0 (4b91a6ea7 2022-08-08)" ></div>

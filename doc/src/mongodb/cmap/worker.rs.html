@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.2.2/src/cmap/worker.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>worker.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/cmap/worker.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>worker.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
@@ -730,41 +730,6 @@
 <span id="724">724</span>
 <span id="725">725</span>
 <span id="726">726</span>
-<span id="727">727</span>
-<span id="728">728</span>
-<span id="729">729</span>
-<span id="730">730</span>
-<span id="731">731</span>
-<span id="732">732</span>
-<span id="733">733</span>
-<span id="734">734</span>
-<span id="735">735</span>
-<span id="736">736</span>
-<span id="737">737</span>
-<span id="738">738</span>
-<span id="739">739</span>
-<span id="740">740</span>
-<span id="741">741</span>
-<span id="742">742</span>
-<span id="743">743</span>
-<span id="744">744</span>
-<span id="745">745</span>
-<span id="746">746</span>
-<span id="747">747</span>
-<span id="748">748</span>
-<span id="749">749</span>
-<span id="750">750</span>
-<span id="751">751</span>
-<span id="752">752</span>
-<span id="753">753</span>
-<span id="754">754</span>
-<span id="755">755</span>
-<span id="756">756</span>
-<span id="757">757</span>
-<span id="758">758</span>
-<span id="759">759</span>
-<span id="760">760</span>
-<span id="761">761</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">derivative::Derivative</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
@@ -799,8 +764,8 @@
         <span class="ident">PoolReadyEvent</span>,
     },
     <span class="ident">options::ServerAddress</span>,
-    <span class="ident">runtime</span>,
-    <span class="ident">sdam::ServerUpdateSender</span>,
+    <span class="ident">runtime</span>::{<span class="self">self</span>, <span class="ident">WorkerHandleListener</span>},
+    <span class="ident">sdam::TopologyUpdater</span>,
 };
 
 <span class="kw">use</span> <span class="ident">std</span>::{
@@ -808,7 +773,6 @@
     <span class="ident">sync::Arc</span>,
     <span class="ident">time::Duration</span>,
 };
-<span class="kw">use</span> <span class="ident">tokio::sync::mpsc</span>;
 
 <span class="kw">const</span> <span class="ident">MAX_CONNECTING</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">2</span>;
 <span class="kw">const</span> <span class="ident">MAINTENACE_FREQUENCY</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">Duration::from_millis</span>(<span class="number">500</span>);
@@ -880,7 +844,7 @@
 
     <span class="doccomment">/// Receiver used to determine if any threads hold references to this pool. If all the</span>
     <span class="doccomment">/// sender ends of this receiver drop, this worker will be notified and drop too.</span>
-    <span class="ident">handle_listener</span>: <span class="ident">HandleListener</span>,
+    <span class="ident">handle_listener</span>: <span class="ident">WorkerHandleListener</span>,
 
     <span class="doccomment">/// Receiver for incoming connection check out requests.</span>
     <span class="ident">request_receiver</span>: <span class="ident">ConnectionRequestReceiver</span>,
@@ -900,7 +864,7 @@
 
     <span class="doccomment">/// A handle used to notify SDAM that a connection establishment error happened. This will</span>
     <span class="doccomment">/// allow the server to transition to Unknown and clear the pool as necessary.</span>
-    <span class="ident">server_updater</span>: <span class="ident">ServerUpdateSender</span>,
+    <span class="ident">server_updater</span>: <span class="ident">TopologyUpdater</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">ConnectionPoolWorker</span> {
@@ -910,7 +874,7 @@
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">start</span>(
         <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
         <span class="ident">http_client</span>: <span class="ident">runtime::HttpClient</span>,
-        <span class="ident">server_updater</span>: <span class="ident">ServerUpdateSender</span>,
+        <span class="ident">server_updater</span>: <span class="ident">TopologyUpdater</span>,
         <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ConnectionPoolOptions</span><span class="op">&gt;</span>,
     ) -&gt; (<span class="ident">PoolManager</span>, <span class="ident">ConnectionRequester</span>, <span class="ident">PoolGenerationSubscriber</span>) {
         <span class="kw">let</span> <span class="ident">establisher</span> <span class="op">=</span> <span class="ident">ConnectionEstablisher::new</span>(<span class="ident">http_client</span>, <span class="ident">options</span>.<span class="ident">as_ref</span>());
@@ -936,7 +900,7 @@
             .<span class="ident">as_ref</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">pool_options</span><span class="op">|</span> <span class="ident">ConnectionOptions::from</span>(<span class="ident">pool_options</span>.<span class="ident">clone</span>()));
 
-        <span class="kw">let</span> (<span class="ident">handle</span>, <span class="ident">handle_listener</span>) <span class="op">=</span> <span class="ident">handle_channel</span>();
+        <span class="kw">let</span> (<span class="ident">handle</span>, <span class="ident">handle_listener</span>) <span class="op">=</span> <span class="ident">WorkerHandleListener::channel</span>();
         <span class="kw">let</span> (<span class="ident">connection_requester</span>, <span class="ident">request_receiver</span>) <span class="op">=</span> <span class="ident">connection_requester::channel</span>(<span class="ident">handle</span>);
         <span class="kw">let</span> (<span class="ident">manager</span>, <span class="ident">management_receiver</span>) <span class="op">=</span> <span class="ident">manager::channel</span>();
 
@@ -1396,7 +1360,7 @@
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">establish_connection</span>(
     <span class="ident">establisher</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectionEstablisher</span>,
     <span class="ident">pending_connection</span>: <span class="ident">PendingConnection</span>,
-    <span class="ident">server_updater</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ServerUpdateSender</span>,
+    <span class="ident">server_updater</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TopologyUpdater</span>,
     <span class="ident">manager</span>: <span class="kw-2">&amp;</span><span class="ident">PoolManager</span>,
     <span class="ident">event_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CmapEventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
@@ -1407,7 +1371,13 @@
 
     <span class="kw">match</span> <span class="ident">establish_result</span> {
         <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; {
-            <span class="ident">server_updater</span>.<span class="ident">handle_error</span>(<span class="ident">e</span>.<span class="ident">clone</span>()).<span class="kw">await</span>;
+            <span class="ident">server_updater</span>
+                .<span class="ident">handle_application_error</span>(
+                    <span class="ident">address</span>.<span class="ident">clone</span>(),
+                    <span class="ident">e</span>.<span class="ident">cause</span>.<span class="ident">clone</span>(),
+                    <span class="ident">e</span>.<span class="ident">handshake_phase</span>.<span class="ident">clone</span>(),
+                )
+                .<span class="kw">await</span>;
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">handler</span>) <span class="op">=</span> <span class="ident">event_handler</span> {
                 <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">ConnectionClosedEvent</span> {
                     <span class="ident">address</span>,
@@ -1460,46 +1430,6 @@
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">PoolManagementRequest</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PoolTask</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">request</span>: <span class="ident">PoolManagementRequest</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">PoolTask::HandleManagementRequest</span>(<span class="ident">Box::new</span>(<span class="ident">request</span>))
-    }
-}
-
-<span class="doccomment">/// Constructs a new channel for for monitoring whether this pool still has references</span>
-<span class="doccomment">/// to it.</span>
-<span class="kw">fn</span> <span class="ident">handle_channel</span>() -&gt; (<span class="ident">PoolWorkerHandle</span>, <span class="ident">HandleListener</span>) {
-    <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">mpsc::channel</span>(<span class="number">1</span>);
-    (
-        <span class="ident">PoolWorkerHandle</span> { <span class="ident">_sender</span>: <span class="ident">sender</span> },
-        <span class="ident">HandleListener</span> { <span class="ident">receiver</span> },
-    )
-}
-
-<span class="doccomment">/// Handle to the worker. Once all handles have been dropped, the worker</span>
-<span class="doccomment">/// will stop waiting for new requests and drop the pool itself.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">PoolWorkerHandle</span> {
-    <span class="ident">_sender</span>: <span class="ident">mpsc::Sender</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">PoolWorkerHandle</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new_mocked</span>() -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> (<span class="ident">s</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">handle_channel</span>();
-        <span class="ident">s</span>
-    }
-}
-
-<span class="doccomment">/// Listener used to determine when all handles have been dropped.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">HandleListener</span> {
-    <span class="ident">receiver</span>: <span class="ident">mpsc::Receiver</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">HandleListener</span> {
-    <span class="doccomment">/// Listen until all handles are dropped.</span>
-    <span class="doccomment">/// This will not return until all handles are dropped, so make sure to only poll this via</span>
-    <span class="doccomment">/// select or with a timeout.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">wait_for_all_handle_drops</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">receiver</span>.<span class="ident">recv</span>().<span class="kw">await</span>;
     }
 }
 

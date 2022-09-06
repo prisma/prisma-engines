@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.19.2/src/net/tcp/listener.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>listener.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/net/tcp/listener.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>listener.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
@@ -401,9 +401,44 @@
 <span id="395">395</span>
 <span id="396">396</span>
 <span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::io</span>::{<span class="ident">Interest</span>, <span class="ident">PollEvented</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::net::tcp::TcpStream</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::net</span>::{<span class="ident">to_socket_addrs</span>, <span class="ident">ToSocketAddrs</span>};
+
+<span class="macro">cfg_not_wasi!</span> {
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::net</span>::{<span class="ident">to_socket_addrs</span>, <span class="ident">ToSocketAddrs</span>};
+}
 
 <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -458,68 +493,70 @@
 }
 
 <span class="kw">impl</span> <span class="ident">TcpListener</span> {
-    <span class="doccomment">/// Creates a new TcpListener, which will be bound to the specified address.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The returned listener is ready for accepting connections.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Binding with a port number of 0 will request that the OS assigns a port</span>
-    <span class="doccomment">/// to this listener. The port allocated can be queried via the `local_addr`</span>
-    <span class="doccomment">/// method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The address type can be any implementor of the [`ToSocketAddrs`] trait.</span>
-    <span class="doccomment">/// If `addr` yields multiple addresses, bind will be attempted with each of</span>
-    <span class="doccomment">/// the addresses until one succeeds and returns the listener. If none of</span>
-    <span class="doccomment">/// the addresses succeed in creating a listener, the error returned from</span>
-    <span class="doccomment">/// the last attempt (the last address) is returned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function sets the `SO_REUSEADDR` option on the socket.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// To configure the socket before binding, you can use the [`TcpSocket`]</span>
-    <span class="doccomment">/// type.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ToSocketAddrs`]: trait@crate::net::ToSocketAddrs</span>
-    <span class="doccomment">/// [`TcpSocket`]: struct@crate::net::TcpSocket</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// use tokio::net::TcpListener;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// use std::io;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[tokio::main]</span>
-    <span class="doccomment">/// async fn main() -&gt; io::Result&lt;()&gt; {</span>
-    <span class="doccomment">///     let listener = TcpListener::bind(&quot;127.0.0.1:2345&quot;).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     // use the listener</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     # let _ = listener;</span>
-    <span class="doccomment">///     Ok(())</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">bind</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">ToSocketAddrs</span><span class="op">&gt;</span>(<span class="ident">addr</span>: <span class="ident">A</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">TcpListener</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">addrs</span> <span class="op">=</span> <span class="ident">to_socket_addrs</span>(<span class="ident">addr</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="macro">cfg_not_wasi!</span> {
+        <span class="doccomment">/// Creates a new TcpListener, which will be bound to the specified address.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// The returned listener is ready for accepting connections.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// Binding with a port number of 0 will request that the OS assigns a port</span>
+        <span class="doccomment">/// to this listener. The port allocated can be queried via the `local_addr`</span>
+        <span class="doccomment">/// method.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// The address type can be any implementor of the [`ToSocketAddrs`] trait.</span>
+        <span class="doccomment">/// If `addr` yields multiple addresses, bind will be attempted with each of</span>
+        <span class="doccomment">/// the addresses until one succeeds and returns the listener. If none of</span>
+        <span class="doccomment">/// the addresses succeed in creating a listener, the error returned from</span>
+        <span class="doccomment">/// the last attempt (the last address) is returned.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// This function sets the `SO_REUSEADDR` option on the socket.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// To configure the socket before binding, you can use the [`TcpSocket`]</span>
+        <span class="doccomment">/// type.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// [`ToSocketAddrs`]: trait@crate::net::ToSocketAddrs</span>
+        <span class="doccomment">/// [`TcpSocket`]: struct@crate::net::TcpSocket</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// # Examples</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// ```no_run</span>
+        <span class="doccomment">/// use tokio::net::TcpListener;</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// use std::io;</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// #[tokio::main]</span>
+        <span class="doccomment">/// async fn main() -&gt; io::Result&lt;()&gt; {</span>
+        <span class="doccomment">///     let listener = TcpListener::bind(&quot;127.0.0.1:2345&quot;).await?;</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">///     // use the listener</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">///     # let _ = listener;</span>
+        <span class="doccomment">///     Ok(())</span>
+        <span class="doccomment">/// }</span>
+        <span class="doccomment">/// ```</span>
+        <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">bind</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">ToSocketAddrs</span><span class="op">&gt;</span>(<span class="ident">addr</span>: <span class="ident">A</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">TcpListener</span><span class="op">&gt;</span> {
+            <span class="kw">let</span> <span class="ident">addrs</span> <span class="op">=</span> <span class="ident">to_socket_addrs</span>(<span class="ident">addr</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last_err</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last_err</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
-        <span class="kw">for</span> <span class="ident">addr</span> <span class="kw">in</span> <span class="ident">addrs</span> {
-            <span class="kw">match</span> <span class="ident">TcpListener::bind_addr</span>(<span class="ident">addr</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">listener</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">listener</span>),
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="ident">last_err</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">e</span>),
+            <span class="kw">for</span> <span class="ident">addr</span> <span class="kw">in</span> <span class="ident">addrs</span> {
+                <span class="kw">match</span> <span class="ident">TcpListener::bind_addr</span>(<span class="ident">addr</span>) {
+                    <span class="prelude-val">Ok</span>(<span class="ident">listener</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">listener</span>),
+                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="ident">last_err</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">e</span>),
+                }
             }
+
+            <span class="prelude-val">Err</span>(<span class="ident">last_err</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
+                <span class="ident">io::Error::new</span>(
+                    <span class="ident">io::ErrorKind::InvalidInput</span>,
+                    <span class="string">&quot;could not resolve to any address&quot;</span>,
+                )
+            }))
         }
 
-        <span class="prelude-val">Err</span>(<span class="ident">last_err</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">io::Error::new</span>(
-                <span class="ident">io::ErrorKind::InvalidInput</span>,
-                <span class="string">&quot;could not resolve to any address&quot;</span>,
-            )
-        }))
-    }
-
-    <span class="kw">fn</span> <span class="ident">bind_addr</span>(<span class="ident">addr</span>: <span class="ident">SocketAddr</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">TcpListener</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">listener</span> <span class="op">=</span> <span class="ident">mio::net::TcpListener::bind</span>(<span class="ident">addr</span>)<span class="question-mark">?</span>;
-        <span class="ident">TcpListener::new</span>(<span class="ident">listener</span>)
+        <span class="kw">fn</span> <span class="ident">bind_addr</span>(<span class="ident">addr</span>: <span class="ident">SocketAddr</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">TcpListener</span><span class="op">&gt;</span> {
+            <span class="kw">let</span> <span class="ident">listener</span> <span class="op">=</span> <span class="ident">mio::net::TcpListener::bind</span>(<span class="ident">addr</span>)<span class="question-mark">?</span>;
+            <span class="ident">TcpListener::new</span>(<span class="ident">listener</span>)
+        }
     }
 
     <span class="doccomment">/// Accepts a new incoming connection from this listener.</span>
@@ -619,11 +656,13 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Panics</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This function panics if thread-local runtime is not set.</span>
+    <span class="doccomment">/// This function panics if it is not called from within a runtime with</span>
+    <span class="doccomment">/// IO enabled.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The runtime is usually set implicitly when this function is called</span>
     <span class="doccomment">/// from a future driven by a tokio runtime, otherwise runtime can be set</span>
     <span class="doccomment">/// explicitly with [`Runtime::enter`](crate::runtime::Runtime::enter) function.</span>
+    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_std</span>(<span class="ident">listener</span>: <span class="ident">net::TcpListener</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">TcpListener</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">io</span> <span class="op">=</span> <span class="ident">mio::net::TcpListener::from_std</span>(<span class="ident">listener</span>);
         <span class="kw">let</span> <span class="ident">io</span> <span class="op">=</span> <span class="ident">PollEvented::new</span>(<span class="ident">io</span>)<span class="question-mark">?</span>;
@@ -670,11 +709,22 @@
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">io</span><span class="op">|</span> <span class="ident">io</span>.<span class="ident">into_raw_socket</span>())
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">raw_socket</span><span class="op">|</span> <span class="kw">unsafe</span> { <span class="ident">std::net::TcpListener::from_raw_socket</span>(<span class="ident">raw_socket</span>) })
         }
+
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">tokio_wasi</span>)]</span>
+        {
+            <span class="kw">use</span> <span class="ident">std::os::wasi::io</span>::{<span class="ident">FromRawFd</span>, <span class="ident">IntoRawFd</span>};
+            <span class="self">self</span>.<span class="ident">io</span>
+                .<span class="ident">into_inner</span>()
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">io</span><span class="op">|</span> <span class="ident">io</span>.<span class="ident">into_raw_fd</span>())
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">raw_fd</span><span class="op">|</span> <span class="kw">unsafe</span> { <span class="ident">std::net::TcpListener::from_raw_fd</span>(<span class="ident">raw_fd</span>) })
+        }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">listener</span>: <span class="ident">mio::net::TcpListener</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">TcpListener</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">io</span> <span class="op">=</span> <span class="ident">PollEvented::new</span>(<span class="ident">listener</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">TcpListener</span> { <span class="ident">io</span> })
+    <span class="macro">cfg_not_wasi!</span> {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">listener</span>: <span class="ident">mio::net::TcpListener</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">TcpListener</span><span class="op">&gt;</span> {
+            <span class="kw">let</span> <span class="ident">io</span> <span class="op">=</span> <span class="ident">PollEvented::new</span>(<span class="ident">listener</span>)<span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(<span class="ident">TcpListener</span> { <span class="ident">io</span> })
+        }
     }
 
     <span class="doccomment">/// Returns the local address that this listener is bound to.</span>
@@ -783,6 +833,20 @@
     <span class="kw">impl</span> <span class="ident">AsRawFd</span> <span class="kw">for</span> <span class="ident">TcpListener</span> {
         <span class="kw">fn</span> <span class="ident">as_raw_fd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RawFd</span> {
             <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">as_raw_fd</span>()
+        }
+    }
+}
+
+<span class="macro">cfg_unstable!</span> {
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">tokio_wasi</span>)]</span>
+    <span class="kw">mod</span> <span class="ident">sys</span> {
+        <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::TcpListener</span>;
+        <span class="kw">use</span> <span class="ident">std::os::wasi::prelude</span>::<span class="kw-2">*</span>;
+
+        <span class="kw">impl</span> <span class="ident">AsRawFd</span> <span class="kw">for</span> <span class="ident">TcpListener</span> {
+            <span class="kw">fn</span> <span class="ident">as_raw_fd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RawFd</span> {
+                <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">as_raw_fd</span>()
+            }
         }
     }
 }

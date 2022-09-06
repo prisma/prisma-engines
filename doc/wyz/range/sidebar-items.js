@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"trait":[["RangeExt","Extension methods for working with various range types."]]};

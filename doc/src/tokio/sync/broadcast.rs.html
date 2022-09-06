@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.19.2/src/sync/broadcast.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>broadcast.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/sync/broadcast.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>broadcast.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
@@ -1164,24 +1164,6 @@
 <span id="1158">1158</span>
 <span id="1159">1159</span>
 <span id="1160">1160</span>
-<span id="1161">1161</span>
-<span id="1162">1162</span>
-<span id="1163">1163</span>
-<span id="1164">1164</span>
-<span id="1165">1165</span>
-<span id="1166">1166</span>
-<span id="1167">1167</span>
-<span id="1168">1168</span>
-<span id="1169">1169</span>
-<span id="1170">1170</span>
-<span id="1171">1171</span>
-<span id="1172">1172</span>
-<span id="1173">1173</span>
-<span id="1174">1174</span>
-<span id="1175">1175</span>
-<span id="1176">1176</span>
-<span id="1177">1177</span>
-<span id="1178">1178</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A multi-producer, multi-consumer broadcast queue. Each sent value is seen by</span>
 <span class="doccomment">//! all consumers.</span>
 <span class="doccomment">//!</span>
@@ -1520,9 +1502,6 @@
     <span class="doccomment">/// Uniquely identifies the `send` stored in the slot.</span>
     <span class="ident">pos</span>: <span class="ident">u64</span>,
 
-    <span class="doccomment">/// True signals the channel is closed.</span>
-    <span class="ident">closed</span>: <span class="ident">bool</span>,
-
     <span class="doccomment">/// The value being broadcast.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The value is set by `send` when the write lock is held. When a reader</span>
@@ -1543,6 +1522,14 @@
 
     <span class="doccomment">/// Should not be `Unpin`.</span>
     <span class="ident">_p</span>: <span class="ident">PhantomPinned</span>,
+}
+
+<span class="macro">generate_addr_of_methods!</span> {
+    <span class="kw">impl</span><span class="op">&lt;</span><span class="op">&gt;</span> <span class="ident">Waiter</span> {
+        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">addr_of_pointers</span>(<span class="self">self</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">linked_list::Pointers</span><span class="op">&lt;</span><span class="ident">Waiter</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pointers</span>
+        }
+    }
 }
 
 <span class="kw">struct</span> <span class="ident">RecvGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
@@ -1614,6 +1601,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// This will panic if `capacity` is equal to `0` or larger</span>
 <span class="doccomment">/// than `usize::MAX / 2`.</span>
+<span class="attribute">#[<span class="ident">track_caller</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Clone</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">capacity</span>: <span class="ident">usize</span>) -&gt; (<span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) {
     <span class="macro">assert!</span>(<span class="ident">capacity</span> <span class="op">&gt;</span> <span class="number">0</span>, <span class="string">&quot;capacity is empty&quot;</span>);
     <span class="macro">assert!</span>(<span class="ident">capacity</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">usize::MAX</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">1</span>, <span class="string">&quot;requested capacity too large&quot;</span>);
@@ -1627,7 +1615,6 @@
         <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">RwLock::new</span>(<span class="ident">Slot</span> {
             <span class="ident">rem</span>: <span class="ident">AtomicUsize::new</span>(<span class="number">0</span>),
             <span class="ident">pos</span>: (<span class="ident">i</span> <span class="kw">as</span> <span class="ident">u64</span>).<span class="ident">wrapping_sub</span>(<span class="ident">capacity</span> <span class="kw">as</span> <span class="ident">u64</span>),
-            <span class="ident">closed</span>: <span class="bool-val">false</span>,
             <span class="ident">val</span>: <span class="ident">UnsafeCell::new</span>(<span class="prelude-val">None</span>),
         }));
     }
@@ -1712,8 +1699,43 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">SendError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">send2</span>(<span class="prelude-val">Some</span>(<span class="ident">value</span>))
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">SendError</span>(<span class="ident">maybe_v</span>)<span class="op">|</span> <span class="ident">SendError</span>(<span class="ident">maybe_v</span>.<span class="ident">unwrap</span>()))
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">tail</span>.<span class="ident">lock</span>();
+
+        <span class="kw">if</span> <span class="ident">tail</span>.<span class="ident">rx_cnt</span> <span class="op">==</span> <span class="number">0</span> {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SendError</span>(<span class="ident">value</span>));
+        }
+
+        <span class="comment">// Position to write into</span>
+        <span class="kw">let</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">tail</span>.<span class="ident">pos</span>;
+        <span class="kw">let</span> <span class="ident">rem</span> <span class="op">=</span> <span class="ident">tail</span>.<span class="ident">rx_cnt</span>;
+        <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> (<span class="ident">pos</span> <span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">mask</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="kw">as</span> <span class="ident">usize</span>;
+
+        <span class="comment">// Update the tail position</span>
+        <span class="ident">tail</span>.<span class="ident">pos</span> <span class="op">=</span> <span class="ident">tail</span>.<span class="ident">pos</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span>);
+
+        <span class="comment">// Get the slot</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">slot</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">buffer</span>[<span class="ident">idx</span>].<span class="ident">write</span>().<span class="ident">unwrap</span>();
+
+        <span class="comment">// Track the position</span>
+        <span class="ident">slot</span>.<span class="ident">pos</span> <span class="op">=</span> <span class="ident">pos</span>;
+
+        <span class="comment">// Set remaining receivers</span>
+        <span class="ident">slot</span>.<span class="ident">rem</span>.<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">v</span> <span class="op">=</span> <span class="ident">rem</span>);
+
+        <span class="comment">// Write the value</span>
+        <span class="ident">slot</span>.<span class="ident">val</span> <span class="op">=</span> <span class="ident">UnsafeCell::new</span>(<span class="prelude-val">Some</span>(<span class="ident">value</span>));
+
+        <span class="comment">// Release the slot lock before notifying the receivers.</span>
+        <span class="ident">drop</span>(<span class="ident">slot</span>);
+
+        <span class="ident">tail</span>.<span class="ident">notify_rx</span>();
+
+        <span class="comment">// Release the mutex. This must happen after the slot lock is released,</span>
+        <span class="comment">// otherwise the writer lock bit could be cleared while another thread</span>
+        <span class="comment">// is in the critical section.</span>
+        <span class="ident">drop</span>(<span class="ident">tail</span>);
+
+        <span class="prelude-val">Ok</span>(<span class="ident">rem</span>)
     }
 
     <span class="doccomment">/// Creates a new [`Receiver`] handle that will receive values sent **after**</span>
@@ -1785,49 +1807,11 @@
         <span class="ident">tail</span>.<span class="ident">rx_cnt</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">send2</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">SendError</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">close_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">tail</span>.<span class="ident">lock</span>();
-
-        <span class="kw">if</span> <span class="ident">tail</span>.<span class="ident">rx_cnt</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SendError</span>(<span class="ident">value</span>));
-        }
-
-        <span class="comment">// Position to write into</span>
-        <span class="kw">let</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">tail</span>.<span class="ident">pos</span>;
-        <span class="kw">let</span> <span class="ident">rem</span> <span class="op">=</span> <span class="ident">tail</span>.<span class="ident">rx_cnt</span>;
-        <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> (<span class="ident">pos</span> <span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">mask</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="kw">as</span> <span class="ident">usize</span>;
-
-        <span class="comment">// Update the tail position</span>
-        <span class="ident">tail</span>.<span class="ident">pos</span> <span class="op">=</span> <span class="ident">tail</span>.<span class="ident">pos</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span>);
-
-        <span class="comment">// Get the slot</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">slot</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">buffer</span>[<span class="ident">idx</span>].<span class="ident">write</span>().<span class="ident">unwrap</span>();
-
-        <span class="comment">// Track the position</span>
-        <span class="ident">slot</span>.<span class="ident">pos</span> <span class="op">=</span> <span class="ident">pos</span>;
-
-        <span class="comment">// Set remaining receivers</span>
-        <span class="ident">slot</span>.<span class="ident">rem</span>.<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">v</span> <span class="op">=</span> <span class="ident">rem</span>);
-
-        <span class="comment">// Set the closed bit if the value is `None`; otherwise write the value</span>
-        <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">is_none</span>() {
-            <span class="ident">tail</span>.<span class="ident">closed</span> <span class="op">=</span> <span class="bool-val">true</span>;
-            <span class="ident">slot</span>.<span class="ident">closed</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        } <span class="kw">else</span> {
-            <span class="ident">slot</span>.<span class="ident">val</span>.<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="kw">unsafe</span> { <span class="kw-2">*</span><span class="ident">ptr</span> <span class="op">=</span> <span class="ident">value</span> });
-        }
-
-        <span class="comment">// Release the slot lock before notifying the receivers.</span>
-        <span class="ident">drop</span>(<span class="ident">slot</span>);
+        <span class="ident">tail</span>.<span class="ident">closed</span> <span class="op">=</span> <span class="bool-val">true</span>;
 
         <span class="ident">tail</span>.<span class="ident">notify_rx</span>();
-
-        <span class="comment">// Release the mutex. This must happen after the slot lock is released,</span>
-        <span class="comment">// otherwise the writer lock bit could be cleared while another thread</span>
-        <span class="comment">// is in the critical section.</span>
-        <span class="ident">drop</span>(<span class="ident">tail</span>);
-
-        <span class="prelude-val">Ok</span>(<span class="ident">rem</span>)
     }
 }
 
@@ -1875,7 +1859,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw">if</span> <span class="number">1</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">num_tx</span>.<span class="ident">fetch_sub</span>(<span class="number">1</span>, <span class="ident">SeqCst</span>) {
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send2</span>(<span class="prelude-val">None</span>);
+            <span class="self">self</span>.<span class="ident">close_channel</span>();
         }
     }
 }
@@ -1959,14 +1943,6 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">slot</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">buffer</span>[<span class="ident">idx</span>].<span class="ident">read</span>().<span class="ident">unwrap</span>();
 
         <span class="kw">if</span> <span class="ident">slot</span>.<span class="ident">pos</span> <span class="op">!</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">next</span> {
-            <span class="kw">let</span> <span class="ident">next_pos</span> <span class="op">=</span> <span class="ident">slot</span>.<span class="ident">pos</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">buffer</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>);
-
-            <span class="comment">// The receiver has read all current values in the channel and there</span>
-            <span class="comment">// is no waiter to register</span>
-            <span class="kw">if</span> <span class="ident">waiter</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="ident">next_pos</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">next</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TryRecvError::Empty</span>);
-            }
-
             <span class="comment">// Release the `slot` lock before attempting to acquire the `tail`</span>
             <span class="comment">// lock. This is required because `send2` acquires the tail lock</span>
             <span class="comment">// first followed by the slot lock. Acquiring the locks in reverse</span>
@@ -1988,6 +1964,13 @@
                 <span class="kw">let</span> <span class="ident">next_pos</span> <span class="op">=</span> <span class="ident">slot</span>.<span class="ident">pos</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">buffer</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>);
 
                 <span class="kw">if</span> <span class="ident">next_pos</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">next</span> {
+                    <span class="comment">// At this point the channel is empty for *this* receiver. If</span>
+                    <span class="comment">// it&#39;s been closed, then that&#39;s what we return, otherwise we</span>
+                    <span class="comment">// set a waker and return empty.</span>
+                    <span class="kw">if</span> <span class="ident">tail</span>.<span class="ident">closed</span> {
+                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TryRecvError::Closed</span>);
+                    }
+
                     <span class="comment">// Store the waker</span>
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">waiter</span>, <span class="ident">waker</span>)) <span class="op">=</span> <span class="ident">waiter</span> {
                         <span class="comment">// Safety: called while locked.</span>
@@ -2021,22 +2004,7 @@
                 <span class="comment">// catch up by skipping dropped messages and setting the</span>
                 <span class="comment">// internal cursor to the **oldest** message stored by the</span>
                 <span class="comment">// channel.</span>
-                <span class="comment">//</span>
-                <span class="comment">// However, finding the oldest position is a bit more</span>
-                <span class="comment">// complicated than `tail-position - buffer-size`. When</span>
-                <span class="comment">// the channel is closed, the tail position is incremented to</span>
-                <span class="comment">// signal a new `None` message, but `None` is not stored in the</span>
-                <span class="comment">// channel itself (see issue #2425 for why).</span>
-                <span class="comment">//</span>
-                <span class="comment">// To account for this, if the channel is closed, the tail</span>
-                <span class="comment">// position is decremented by `buffer-size + 1`.</span>
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">adjust</span> <span class="op">=</span> <span class="number">0</span>;
-                <span class="kw">if</span> <span class="ident">tail</span>.<span class="ident">closed</span> {
-                    <span class="ident">adjust</span> <span class="op">=</span> <span class="number">1</span>
-                }
-                <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="ident">tail</span>
-                    .<span class="ident">pos</span>
-                    .<span class="ident">wrapping_sub</span>(<span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">buffer</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span> <span class="op">+</span> <span class="ident">adjust</span>);
+                <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="ident">tail</span>.<span class="ident">pos</span>.<span class="ident">wrapping_sub</span>(<span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">buffer</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>);
 
                 <span class="kw">let</span> <span class="ident">missed</span> <span class="op">=</span> <span class="ident">next</span>.<span class="ident">wrapping_sub</span>(<span class="self">self</span>.<span class="ident">next</span>);
 
@@ -2056,10 +2024,6 @@
         }
 
         <span class="self">self</span>.<span class="ident">next</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">next</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span>);
-
-        <span class="kw">if</span> <span class="ident">slot</span>.<span class="ident">closed</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TryRecvError::Closed</span>);
-        }
 
         <span class="prelude-val">Ok</span>(<span class="ident">RecvGuard</span> { <span class="ident">slot</span> })
     }
@@ -2323,8 +2287,8 @@
         <span class="ident">ptr</span>
     }
 
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">pointers</span>(<span class="kw-2">mut</span> <span class="ident">target</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">Waiter</span><span class="op">&gt;</span>) -&gt; <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">linked_list::Pointers</span><span class="op">&lt;</span><span class="ident">Waiter</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">NonNull::from</span>(<span class="kw-2">&amp;mut</span> <span class="ident">target</span>.<span class="ident">as_mut</span>().<span class="ident">pointers</span>)
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">pointers</span>(<span class="ident">target</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">Waiter</span><span class="op">&gt;</span>) -&gt; <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">linked_list::Pointers</span><span class="op">&lt;</span><span class="ident">Waiter</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">Waiter::addr_of_pointers</span>(<span class="ident">target</span>)
     }
 }
 

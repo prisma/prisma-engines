@@ -387,7 +387,7 @@ one).</p>
 given <code>name</code>, if one exists,</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.has_field" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../src/tracing/span.rs.html#1117-1122">source</a></span><a href="#method.has_field" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.has_field" class="fnname">has_field</a>&lt;Q:&nbsp;?<a class="trait" href="https://doc.rust-lang.org/1.63.0/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>&gt;(&amp;self, field: <a class="primitive" href="https://doc.rust-lang.org/1.63.0/std/primitive.reference.html">&amp;</a>Q) -&gt; <a class="primitive" href="https://doc.rust-lang.org/1.63.0/std/primitive.bool.html">bool</a> <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;Q: <a class="trait" href="../field/trait.AsField.html" title="trait tracing::field::AsField">AsField</a>,&nbsp;</span></h4></section></summary><div class="docblock"><p>Returns true if this <code>Span</code> has a field for the given
 <a href="../field/struct.Field.html" title="super::field::Field"><code>Field</code></a> or field name.</p>
-</div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.record" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../src/tracing/span.rs.html#1194-1210">source</a></span><a href="#method.record" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.record" class="fnname">record</a>&lt;Q:&nbsp;?<a class="trait" href="https://doc.rust-lang.org/1.63.0/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>, V&gt;(&amp;self, field: <a class="primitive" href="https://doc.rust-lang.org/1.63.0/std/primitive.reference.html">&amp;</a>Q, value: <a class="primitive" href="https://doc.rust-lang.org/1.63.0/std/primitive.reference.html">&amp;</a>V) -&gt; <a class="primitive" href="https://doc.rust-lang.org/1.63.0/std/primitive.reference.html">&amp;</a>Self <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;Q: <a class="trait" href="../field/trait.AsField.html" title="trait tracing::field::AsField">AsField</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;V: <a class="trait" href="../trait.Value.html" title="trait tracing::Value">Value</a>,&nbsp;</span></h4></section></summary><div class="docblock"><p>Records that the field described by <code>field</code> has the value <code>value</code>.</p>
+</div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.record" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../src/tracing/span.rs.html#1194-1210">source</a></span><a href="#method.record" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.record" class="fnname">record</a>&lt;Q:&nbsp;?<a class="trait" href="https://doc.rust-lang.org/1.63.0/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>, V&gt;(&amp;self, field: <a class="primitive" href="https://doc.rust-lang.org/1.63.0/std/primitive.reference.html">&amp;</a>Q, value: V) -&gt; <a class="primitive" href="https://doc.rust-lang.org/1.63.0/std/primitive.reference.html">&amp;</a>Self <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;Q: <a class="trait" href="../field/trait.AsField.html" title="trait tracing::field::AsField">AsField</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;V: <a class="trait" href="../trait.Value.html" title="trait tracing::Value">Value</a>,&nbsp;</span></h4></section></summary><div class="docblock"><p>Records that the field described by <code>field</code> has the value <code>value</code>.</p>
 <p>This may be used with <a href="../field/struct.Empty.html"><code>field::Empty</code></a> to declare fields whose values
 are not known when the span is created, and record them later:</p>
 
@@ -401,7 +401,7 @@ are not known when the span is created, and record them later:</p>
 
 <span class="comment">// Now, record a value for parting as well.</span>
 <span class="comment">// (note that the field name is passed as a string slice)</span>
-<span class="ident">span</span>.<span class="ident">record</span>(<span class="string">&quot;parting&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;goodbye world!&quot;</span>);</code></pre></div>
+<span class="ident">span</span>.<span class="ident">record</span>(<span class="string">&quot;parting&quot;</span>, <span class="string">&quot;goodbye world!&quot;</span>);</code></pre></div>
 <p>However, it may also be used to record a <em>new</em> value for a field whose
 value was already recorded:</p>
 
@@ -417,7 +417,7 @@ value was already recorded:</p>
     }
     <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
         <span class="comment">// Things are no longer okay!</span>
-        <span class="ident">span</span>.<span class="ident">record</span>(<span class="string">&quot;is_okay&quot;</span>, <span class="kw-2">&amp;</span><span class="bool-val">false</span>);
+        <span class="ident">span</span>.<span class="ident">record</span>(<span class="string">&quot;is_okay&quot;</span>, <span class="bool-val">false</span>);
     }
 }</code></pre></div>
 <pre class="ignore" style="white-space:normal;font:inherit;">
@@ -441,12 +441,12 @@ value was already recorded:</p>
 <span class="comment">// Now, you try to record a value for a new field, `new_field`, which was not</span>
 <span class="comment">// declared as `Empty` or populated when you created `span`.</span>
 <span class="comment">// You won&#39;t get any error, but the assignment will have no effect!</span>
-<span class="ident">span</span>.<span class="ident">record</span>(<span class="string">&quot;new_field&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;interesting_value_you_really_need&quot;</span>);
+<span class="ident">span</span>.<span class="ident">record</span>(<span class="string">&quot;new_field&quot;</span>, <span class="string">&quot;interesting_value_you_really_need&quot;</span>);
 
 <span class="comment">// Instead, all fields that may be recorded after span creation should be declared up front,</span>
 <span class="comment">// using field::Empty when a value is not known, as we did for `parting`.</span>
 <span class="comment">// This `record` call will indeed replace field::Empty with &quot;you will be remembered&quot;.</span>
-<span class="ident">span</span>.<span class="ident">record</span>(<span class="string">&quot;parting&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;you will be remembered&quot;</span>);</code></pre></div>
+<span class="ident">span</span>.<span class="ident">record</span>(<span class="string">&quot;parting&quot;</span>, <span class="string">&quot;you will be remembered&quot;</span>);</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.record_all" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../src/tracing/span.rs.html#1213-1235">source</a></span><a href="#method.record_all" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.record_all" class="fnname">record_all</a>(&amp;self, values: &amp;<a class="struct" href="../field/struct.ValueSet.html" title="struct tracing::field::ValueSet">ValueSet</a>&lt;'_&gt;) -&gt; <a class="primitive" href="https://doc.rust-lang.org/1.63.0/std/primitive.reference.html">&amp;</a>Self</h4></section></summary><div class="docblock"><p>Records all the fields in the provided <code>ValueSet</code>.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.is_disabled" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../src/tracing/span.rs.html#1244-1246">source</a></span><a href="#method.is_disabled" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.is_disabled" class="fnname">is_disabled</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/1.63.0/std/primitive.bool.html">bool</a></h4></section></summary><div class="docblock"><p>Returns <code>true</code> if this span was disabled by the subscriber and does not
 exist.</p>

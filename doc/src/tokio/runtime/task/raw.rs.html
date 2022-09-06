@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.19.2/src/runtime/task/raw.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>raw.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/runtime/task/raw.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>raw.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
@@ -190,7 +190,58 @@
 <span id="184">184</span>
 <span id="185">185</span>
 <span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::future::Future</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime::task::core</span>::{<span class="ident">Core</span>, <span class="ident">Trailer</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime::task</span>::{<span class="ident">Cell</span>, <span class="ident">Harness</span>, <span class="ident">Header</span>, <span class="ident">Id</span>, <span class="ident">Schedule</span>, <span class="ident">State</span>};
 
 <span class="kw">use</span> <span class="ident">std::ptr::NonNull</span>;
@@ -227,6 +278,9 @@
 
     <span class="doccomment">/// Scheduler is being shutdown.</span>
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">shutdown</span>: <span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">Header</span><span class="op">&gt;</span>),
+
+    <span class="doccomment">/// The number of bytes that the `trailer` field is offset from the header.</span>
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">trailer_offset</span>: <span class="ident">usize</span>,
 }
 
 <span class="doccomment">/// Get the vtable for the requested `T` and `S` generics.</span>
@@ -240,7 +294,53 @@
         <span class="ident">drop_abort_handle</span>: <span class="ident">drop_abort_handle</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>,
         <span class="ident">remote_abort</span>: <span class="ident">remote_abort</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>,
         <span class="ident">shutdown</span>: <span class="ident">shutdown</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>,
+        <span class="ident">trailer_offset</span>: <span class="ident">TrailerOffsetHelper</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span><span class="ident">::OFFSET</span>,
     }
+}
+
+<span class="doccomment">/// Calling `get_trailer_offset` directly in vtable doesn&#39;t work because it</span>
+<span class="doccomment">/// prevents the vtable from being promoted to a static reference.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// See this thread for more info:</span>
+<span class="doccomment">/// &lt;https://users.rust-lang.org/t/custom-vtables-with-integers/78508&gt;</span>
+<span class="kw">struct</span> <span class="ident">TrailerOffsetHelper</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">T</span>, <span class="ident">S</span>);
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Future</span>, <span class="ident">S</span>: <span class="ident">Schedule</span><span class="op">&gt;</span> <span class="ident">TrailerOffsetHelper</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
+    <span class="comment">// Pass `size_of`/`align_of` as arguments rather than calling them directly</span>
+    <span class="comment">// inside `get_trailer_offset` because trait bounds on generic parameters</span>
+    <span class="comment">// of const fn are unstable on our MSRV.</span>
+    <span class="kw">const</span> <span class="ident">OFFSET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">get_trailer_offset</span>(
+        <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">Header</span><span class="op">&gt;</span>(),
+        <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">Core</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
+        <span class="ident">std::mem::align_of</span>::<span class="op">&lt;</span><span class="ident">Core</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
+        <span class="ident">std::mem::align_of</span>::<span class="op">&lt;</span><span class="ident">Trailer</span><span class="op">&gt;</span>(),
+    );
+}
+
+<span class="doccomment">/// Compute the offset of the `Trailer` field in `Cell&lt;T, S&gt;` using the</span>
+<span class="doccomment">/// `#[repr(C)]` algorithm.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Pseudo-code for the `#[repr(C)]` algorithm can be found here:</span>
+<span class="doccomment">/// &lt;https://doc.rust-lang.org/reference/type-layout.html#reprc-structs&gt;</span>
+<span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_trailer_offset</span>(
+    <span class="ident">header_size</span>: <span class="ident">usize</span>,
+    <span class="ident">core_size</span>: <span class="ident">usize</span>,
+    <span class="ident">core_align</span>: <span class="ident">usize</span>,
+    <span class="ident">trailer_align</span>: <span class="ident">usize</span>,
+) -&gt; <span class="ident">usize</span> {
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">header_size</span>;
+
+    <span class="kw">let</span> <span class="ident">core_misalign</span> <span class="op">=</span> <span class="ident">offset</span> <span class="op">%</span> <span class="ident">core_align</span>;
+    <span class="kw">if</span> <span class="ident">core_misalign</span> <span class="op">&gt;</span> <span class="number">0</span> {
+        <span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="ident">core_align</span> <span class="op">-</span> <span class="ident">core_misalign</span>;
+    }
+    <span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="ident">core_size</span>;
+
+    <span class="kw">let</span> <span class="ident">trailer_misalign</span> <span class="op">=</span> <span class="ident">offset</span> <span class="op">%</span> <span class="ident">trailer_align</span>;
+    <span class="kw">if</span> <span class="ident">trailer_misalign</span> <span class="op">&gt;</span> <span class="number">0</span> {
+        <span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="ident">trailer_align</span> <span class="op">-</span> <span class="ident">trailer_misalign</span>;
+    }
+
+    <span class="ident">offset</span>
 }
 
 <span class="kw">impl</span> <span class="ident">RawTask</span> {

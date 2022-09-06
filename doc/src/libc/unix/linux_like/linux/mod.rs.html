@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/libc-0.2.126/src/unix/linux_like/linux/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../libc/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/libc-0.2.132/src/unix/linux_like/linux/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../libc/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../../../libc/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div>
@@ -4134,6 +4134,20 @@
 <span id="4128">4128</span>
 <span id="4129">4129</span>
 <span id="4130">4130</span>
+<span id="4131">4131</span>
+<span id="4132">4132</span>
+<span id="4133">4133</span>
+<span id="4134">4134</span>
+<span id="4135">4135</span>
+<span id="4136">4136</span>
+<span id="4137">4137</span>
+<span id="4138">4138</span>
+<span id="4139">4139</span>
+<span id="4140">4140</span>
+<span id="4141">4141</span>
+<span id="4142">4142</span>
+<span id="4143">4143</span>
+<span id="4144">4144</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Linux-specific definitions for linux-like values</span>
 
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">useconds_t</span> <span class="op">=</span> <span class="ident">u32</span>;
@@ -5701,6 +5715,7 @@
 
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MSG_NOERROR</span>: <span class="ident">::c_int</span> <span class="op">=</span> <span class="number">0o10000</span>;
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MSG_EXCEPT</span>: <span class="ident">::c_int</span> <span class="op">=</span> <span class="number">0o20000</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MSG_ZEROCOPY</span>: <span class="ident">::c_int</span> <span class="op">=</span> <span class="number">0x4000000</span>;
 
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SHM_R</span>: <span class="ident">::c_int</span> <span class="op">=</span> <span class="number">0o400</span>;
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SHM_W</span>: <span class="ident">::c_int</span> <span class="op">=</span> <span class="number">0o200</span>;
@@ -5946,6 +5961,7 @@
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TFD_CLOEXEC</span>: <span class="ident">::c_int</span> <span class="op">=</span> <span class="ident">O_CLOEXEC</span>;
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TFD_NONBLOCK</span>: <span class="ident">::c_int</span> <span class="op">=</span> <span class="ident">O_NONBLOCK</span>;
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TFD_TIMER_ABSTIME</span>: <span class="ident">::c_int</span> <span class="op">=</span> <span class="number">1</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TFD_TIMER_CANCEL_ON_SET</span>: <span class="ident">::c_int</span> <span class="op">=</span> <span class="number">2</span>;
 
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">_POSIX_VDISABLE</span>: <span class="ident">::cc_t</span> <span class="op">=</span> <span class="number">0</span>;
 
@@ -5976,6 +5992,17 @@
 
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">IPV6_RTHDR_LOOSE</span>: <span class="ident">::c_int</span> <span class="op">=</span> <span class="number">0</span>;
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">IPV6_RTHDR_STRICT</span>: <span class="ident">::c_int</span> <span class="op">=</span> <span class="number">1</span>;
+
+<span class="comment">// SO_MEMINFO offsets</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SK_MEMINFO_RMEM_ALLOC</span>: <span class="ident">::c_int</span> <span class="op">=</span> <span class="number">0</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SK_MEMINFO_RCVBUF</span>: <span class="ident">::c_int</span> <span class="op">=</span> <span class="number">1</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SK_MEMINFO_WMEM_ALLOC</span>: <span class="ident">::c_int</span> <span class="op">=</span> <span class="number">2</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SK_MEMINFO_SNDBUF</span>: <span class="ident">::c_int</span> <span class="op">=</span> <span class="number">3</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SK_MEMINFO_FWD_ALLOC</span>: <span class="ident">::c_int</span> <span class="op">=</span> <span class="number">4</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SK_MEMINFO_WMEM_QUEUED</span>: <span class="ident">::c_int</span> <span class="op">=</span> <span class="number">5</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SK_MEMINFO_OPTMEM</span>: <span class="ident">::c_int</span> <span class="op">=</span> <span class="number">6</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SK_MEMINFO_BACKLOG</span>: <span class="ident">::c_int</span> <span class="op">=</span> <span class="number">7</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SK_MEMINFO_DROPS</span>: <span class="ident">::c_int</span> <span class="op">=</span> <span class="number">8</span>;
 
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">IUTF8</span>: <span class="ident">::tcflag_t</span> <span class="op">=</span> <span class="number">0x00004000</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">all</span>(<span class="ident">target_env</span> <span class="op">=</span> <span class="string">&quot;uclibc&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;mips&quot;</span>)))]</span>
@@ -7197,6 +7224,7 @@ pub const NFQA_VLAN_TCI: ::c_int = 2;
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">FUTEX_WAKE_BITSET</span>: <span class="ident">::c_int</span> <span class="op">=</span> <span class="number">10</span>;
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">FUTEX_WAIT_REQUEUE_PI</span>: <span class="ident">::c_int</span> <span class="op">=</span> <span class="number">11</span>;
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">FUTEX_CMP_REQUEUE_PI</span>: <span class="ident">::c_int</span> <span class="op">=</span> <span class="number">12</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">FUTEX_LOCK_PI2</span>: <span class="ident">::c_int</span> <span class="op">=</span> <span class="number">13</span>;
 
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">FUTEX_PRIVATE_FLAG</span>: <span class="ident">::c_int</span> <span class="op">=</span> <span class="number">128</span>;
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">FUTEX_CLOCK_REALTIME</span>: <span class="ident">::c_int</span> <span class="op">=</span> <span class="number">256</span>;

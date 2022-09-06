@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/os_info-3.4.0/src/os_type.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>os_type.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../os_info/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/os_info-3.5.0/src/os_type.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>os_type.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../os_info/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../os_info/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
@@ -162,6 +162,10 @@
 <span id="156">156</span>
 <span id="157">157</span>
 <span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="self">self</span>, <span class="ident">Display</span>, <span class="ident">Formatter</span>};
 
 <span class="doccomment">/// A list of supported operating system types.</span>
@@ -192,13 +196,15 @@
     <span class="ident">Fedora</span>,
     <span class="doccomment">/// FreeBSD (&lt;https://en.wikipedia.org/wiki/FreeBSD&gt;).</span>
     <span class="ident">FreeBSD</span>,
+    <span class="doccomment">/// Garuda Linux (&lt;https://en.wikipedia.org/wiki/Garuda_Linux&gt;)</span>
+    <span class="ident">Garuda</span>,
     <span class="doccomment">/// Gentoo Linux (&lt;https://en.wikipedia.org/wiki/Gentoo_Linux&gt;).</span>
     <span class="ident">Gentoo</span>,
-    <span class="doccomment">/// Linux based operating system (&lt;https://en.wikipedia.org/wiki/Linux&gt;).</span>
+    <span class="doccomment">/// HardenedBSD (https://hardenedbsd.org/).</span>
     <span class="ident">HardenedBSD</span>,
-    <span class="doccomment">/// HardenedBSD (https://hardenedbsd.org/)</span>
+    <span class="doccomment">/// Illumos (https://en.wikipedia.org/wiki/Illumos).</span>
     <span class="ident">Illumos</span>,
-    <span class="doccomment">/// Illumos (https://en.wikipedia.org/wiki/Illumos)</span>
+    <span class="doccomment">/// Linux based operating system (&lt;https://en.wikipedia.org/wiki/Linux&gt;).</span>
     <span class="ident">Linux</span>,
     <span class="doccomment">/// Mac OS X/OS X/macOS (&lt;https://en.wikipedia.org/wiki/MacOS&gt;).</span>
     <span class="ident">Macos</span>,
@@ -206,9 +212,9 @@
     <span class="ident">Manjaro</span>,
     <span class="doccomment">/// Mariner (&lt;https://en.wikipedia.org/wiki/CBL-Mariner&gt;).</span>
     <span class="ident">Mariner</span>,
-    <span class="doccomment">/// Mint (&lt;https://en.wikipedia.org/wiki/Linux_Mint&gt;).</span>
+    <span class="doccomment">/// MidnightBSD (&lt;https://en.wikipedia.org/wiki/MidnightBSD&gt;).</span>
     <span class="ident">MidnightBSD</span>,
-    <span class="doccomment">/// MidnightBSD(&lt;https://en.wikipedia.org/wiki/MidnightBSD&gt;).</span>
+    <span class="doccomment">/// Mint (&lt;https://en.wikipedia.org/wiki/Linux_Mint&gt;).</span>
     <span class="ident">Mint</span>,
     <span class="doccomment">/// NetBSD (&lt;https://en.wikipedia.org/wiki/NetBSD&gt;).</span>
     <span class="ident">NetBSD</span>,
@@ -255,6 +261,7 @@
             <span class="ident">Type::Amazon</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Amazon Linux AMI&quot;</span>),
             <span class="ident">Type::Arch</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Arch Linux&quot;</span>),
             <span class="ident">Type::DragonFly</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;DragonFly BSD&quot;</span>),
+            <span class="ident">Type::Garuda</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Garuda Linux&quot;</span>),
             <span class="ident">Type::Gentoo</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Gentoo Linux&quot;</span>),
             <span class="ident">Type::Illumos</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;illumos&quot;</span>),
             <span class="ident">Type::Macos</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Mac OS&quot;</span>),
@@ -292,6 +299,7 @@
             (<span class="ident">Type::Emscripten</span>, <span class="string">&quot;Emscripten&quot;</span>),
             (<span class="ident">Type::EndeavourOS</span>, <span class="string">&quot;EndeavourOS&quot;</span>),
             (<span class="ident">Type::Fedora</span>, <span class="string">&quot;Fedora&quot;</span>),
+            (<span class="ident">Type::Garuda</span>, <span class="string">&quot;Garuda Linux&quot;</span>),
             (<span class="ident">Type::Gentoo</span>, <span class="string">&quot;Gentoo Linux&quot;</span>),
             (<span class="ident">Type::FreeBSD</span>, <span class="string">&quot;FreeBSD&quot;</span>),
             (<span class="ident">Type::Linux</span>, <span class="string">&quot;Linux&quot;</span>),

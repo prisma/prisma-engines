@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/650f071/src/conn/routines/helpers.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>helpers.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/e3f8bdb/src/conn/routines/helpers.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>helpers.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
@@ -127,19 +127,31 @@
 <span id="121">121</span>
 <span id="122">122</span>
 <span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Private routine helpers.</span>
 
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
+<span class="kw">use</span> <span class="ident">futures_util::StreamExt</span>;
 <span class="kw">use</span> <span class="ident">mysql_common</span>::{
     <span class="ident">constants::MAX_PAYLOAD_LEN</span>,
     <span class="ident">io</span>::{<span class="ident">ParseBuf</span>, <span class="ident">ReadMysqlExt</span>},
     <span class="ident">packets</span>::{<span class="ident">ComStmtSendLongData</span>, <span class="ident">LocalInfilePacket</span>},
     <span class="ident">value::Value</span>,
 };
-<span class="kw">use</span> <span class="ident">tokio::io::AsyncReadExt</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">queryable::Protocol</span>, <span class="ident">Conn</span>, <span class="ident">DriverError</span>, <span class="ident">Error</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::LocalInfileError</span>, <span class="ident">queryable::Protocol</span>, <span class="ident">Conn</span>, <span class="ident">Error</span>};
 
 <span class="kw">impl</span> <span class="ident">Conn</span> {
     <span class="doccomment">/// Helper, that sends all `Value::Bytes` in the given list of paramenters as long data.</span>
@@ -213,27 +225,39 @@
         <span class="ident">P</span>: <span class="ident">Protocol</span>,
     {
         <span class="kw">let</span> <span class="ident">local_infile</span> <span class="op">=</span> <span class="ident">ParseBuf</span>(<span class="ident">packet</span>).<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">LocalInfilePacket</span><span class="op">&gt;</span>(())<span class="question-mark">?</span>;
-        <span class="kw">let</span> (<span class="ident">local_infile</span>, <span class="ident">handler</span>) <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">opts</span>().<span class="ident">local_infile_handler</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">handler</span>) =&gt; ((<span class="ident">local_infile</span>.<span class="ident">into_owned</span>(), <span class="ident">handler</span>)),
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DriverError::NoLocalInfileHandler</span>.<span class="ident">into</span>()),
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">infile_data</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">handler</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">infile_handler</span>.<span class="ident">take</span>() {
+            <span class="ident">handler</span>.<span class="kw">await</span><span class="question-mark">?</span>
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">handler</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">opts</span>().<span class="ident">local_infile_handler</span>() {
+            <span class="ident">handler</span>.<span class="ident">handle</span>(<span class="ident">local_infile</span>.<span class="ident">file_name_ref</span>()).<span class="kw">await</span><span class="question-mark">?</span>
+        } <span class="kw">else</span> {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">LocalInfileError::NoHandler</span>.<span class="ident">into</span>());
         };
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reader</span> <span class="op">=</span> <span class="ident">handler</span>.<span class="ident">handle</span>(<span class="ident">local_infile</span>.<span class="ident">file_name_ref</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">4096</span>];
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">read</span> <span class="op">=</span> <span class="ident">reader</span>.<span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>[..]).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="self">self</span>.<span class="ident">write_bytes</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>[..<span class="ident">read</span>]).<span class="kw">await</span><span class="question-mark">?</span>;
-
-            <span class="kw">if</span> <span class="ident">read</span> <span class="op">==</span> <span class="number">0</span> {
-                <span class="kw">break</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="prelude-val">Ok</span>(());
+        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">bytes</span>) <span class="op">=</span> <span class="ident">infile_data</span>.<span class="ident">next</span>().<span class="kw">await</span> {
+            <span class="kw">match</span> <span class="ident">bytes</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">bytes</span>) =&gt; {
+                    <span class="comment">// We&#39;ll skip empty chunks to stay compliant with the protocol.</span>
+                    <span class="kw">if</span> <span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span> {
+                        <span class="self">self</span>.<span class="ident">write_bytes</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                    }
+                }
+                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
+                    <span class="comment">// Abort the stream in case of an error.</span>
+                    <span class="ident">result</span> <span class="op">=</span> <span class="prelude-val">Err</span>(<span class="ident">LocalInfileError::from</span>(<span class="ident">err</span>));
+                    <span class="kw">break</span>;
+                }
             }
         }
+        <span class="self">self</span>.<span class="ident">write_bytes</span>(<span class="kw-2">&amp;</span>[]).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="self">self</span>.<span class="ident">read_packet</span>().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">set_pending_result</span>(<span class="prelude-val">Some</span>(<span class="ident">P::result_set_meta</span>(<span class="ident">Arc::from</span>(
             <span class="ident">Vec::new</span>().<span class="ident">into_boxed_slice</span>(),
         ))))<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(())
+
+        <span class="ident">result</span>.<span class="ident">map_err</span>(<span class="ident">Into::into</span>)
     }
 
     <span class="doccomment">/// Helper that handles result set packet.</span>

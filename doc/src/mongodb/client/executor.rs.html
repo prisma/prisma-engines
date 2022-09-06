@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.2.2/src/client/executor.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>executor.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/client/executor.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>executor.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
@@ -1016,6 +1016,10 @@
 <span id="1010">1010</span>
 <span id="1011">1011</span>
 <span id="1012">1012</span>
+<span id="1013">1013</span>
+<span id="1014">1014</span>
+<span id="1015">1015</span>
+<span id="1016">1016</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">bson</span>::{<span class="ident">doc</span>, <span class="ident">RawBsonRef</span>, <span class="ident">RawDocument</span>, <span class="ident">Timestamp</span>};
 <span class="kw">use</span> <span class="ident">lazy_static::lazy_static</span>;
 <span class="kw">use</span> <span class="ident">serde::de::DeserializeOwned</span>;
@@ -1404,9 +1408,9 @@
                 <span class="self">self</span>.<span class="ident">inner</span>
                     .<span class="ident">topology</span>
                     .<span class="ident">handle_application_error</span>(
+                        <span class="ident">server</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
                         <span class="ident">err</span>.<span class="ident">clone</span>(),
                         <span class="ident">HandshakePhase::after_completion</span>(<span class="kw-2">&amp;</span><span class="ident">conn</span>),
-                        <span class="kw-2">&amp;</span><span class="ident">server</span>,
                     )
                     .<span class="kw">await</span>;
                 <span class="comment">// release the connection to be processed by the connection pool</span>
@@ -1466,9 +1470,9 @@
                 <span class="self">self</span>.<span class="ident">inner</span>
                     .<span class="ident">topology</span>
                     .<span class="ident">handle_application_error</span>(
+                        <span class="ident">server</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
                         <span class="ident">err</span>.<span class="ident">clone</span>(),
                         <span class="ident">HandshakePhase::after_completion</span>(<span class="kw-2">&amp;</span><span class="ident">conn</span>),
-                        <span class="kw-2">&amp;</span><span class="ident">server</span>,
                     )
                     .<span class="kw">await</span>;
                 <span class="ident">drop</span>(<span class="ident">server</span>);
@@ -1498,10 +1502,11 @@
         <span class="kw">let</span> <span class="ident">stream_description</span> <span class="op">=</span> <span class="ident">connection</span>.<span class="ident">stream_description</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">is_sharded</span> <span class="op">=</span> <span class="ident">stream_description</span>.<span class="ident">initial_server_type</span> <span class="op">==</span> <span class="ident">ServerType::Mongos</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cmd</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">build</span>(<span class="ident">stream_description</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">inner</span>
-            .<span class="ident">topology</span>
-            .<span class="ident">update_command_with_read_pref</span>(<span class="ident">connection</span>.<span class="ident">address</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">cmd</span>, <span class="ident">op</span>.<span class="ident">selection_criteria</span>())
-            .<span class="kw">await</span>;
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">update_command_with_read_pref</span>(
+            <span class="ident">connection</span>.<span class="ident">address</span>(),
+            <span class="kw-2">&amp;mut</span> <span class="ident">cmd</span>,
+            <span class="ident">op</span>.<span class="ident">selection_criteria</span>(),
+        );
 
         <span class="kw">match</span> <span class="ident">session</span> {
             <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">session</span>) <span class="kw">if</span> <span class="ident">op</span>.<span class="ident">supports_sessions</span>() <span class="op">&amp;&amp;</span> <span class="ident">op</span>.<span class="ident">is_acknowledged</span>() =&gt; {
@@ -1595,7 +1600,7 @@
         }
 
         <span class="kw">let</span> <span class="ident">session_cluster_time</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">session</span><span class="op">|</span> <span class="ident">session</span>.<span class="ident">cluster_time</span>());
-        <span class="kw">let</span> <span class="ident">client_cluster_time</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">cluster_time</span>().<span class="kw">await</span>;
+        <span class="kw">let</span> <span class="ident">client_cluster_time</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">cluster_time</span>();
         <span class="kw">let</span> <span class="ident">max_cluster_time</span> <span class="op">=</span> <span class="ident">std::cmp::max</span>(<span class="ident">session_cluster_time</span>, <span class="ident">client_cluster_time</span>.<span class="ident">as_ref</span>());
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cluster_time</span>) <span class="op">=</span> <span class="ident">max_cluster_time</span> {
             <span class="ident">cmd</span>.<span class="ident">set_cluster_time</span>(<span class="ident">cluster_time</span>);
@@ -1796,7 +1801,7 @@
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">select_data_bearing_server</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">topology_type</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">topology_type</span>().<span class="kw">await</span>;
+        <span class="kw">let</span> <span class="ident">topology_type</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">topology_type</span>();
         <span class="kw">let</span> <span class="ident">criteria</span> <span class="op">=</span> <span class="ident">SelectionCriteria::Predicate</span>(<span class="ident">Arc::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">server_info</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">server_type</span> <span class="op">=</span> <span class="ident">server_info</span>.<span class="ident">server_type</span>();
             (<span class="macro">matches!</span>(<span class="ident">topology_type</span>, <span class="ident">TopologyType::Single</span>) <span class="op">&amp;&amp;</span> <span class="ident">server_type</span>.<span class="ident">is_available</span>())
@@ -1810,14 +1815,14 @@
     <span class="doccomment">/// session timeout. If it has yet to be determined if the topology supports sessions, this</span>
     <span class="doccomment">/// method will perform a server selection that will force that determination to be made.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_session_support_status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SessionSupportStatus</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">initial_status</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">session_support_status</span>().<span class="kw">await</span>;
+        <span class="kw">let</span> <span class="ident">initial_status</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">session_support_status</span>();
 
         <span class="comment">// Need to guarantee that we&#39;re connected to at least one server that can determine if</span>
         <span class="comment">// sessions are supported or not.</span>
         <span class="kw">match</span> <span class="ident">initial_status</span> {
             <span class="ident">SessionSupportStatus::Undetermined</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">select_data_bearing_server</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">session_support_status</span>().<span class="kw">await</span>)
+                <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">session_support_status</span>())
             }
             <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">initial_status</span>),
         }
@@ -1827,14 +1832,14 @@
     <span class="doccomment">/// topology supports transactions, this method will perform a server selection that will force</span>
     <span class="doccomment">/// that determination to be made.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">transaction_support_status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TransactionSupportStatus</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">initial_status</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">transaction_support_status</span>().<span class="kw">await</span>;
+        <span class="kw">let</span> <span class="ident">initial_status</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">transaction_support_status</span>();
 
         <span class="comment">// Need to guarantee that we&#39;re connected to at least one server that can determine if</span>
         <span class="comment">// sessions are supported or not.</span>
         <span class="kw">match</span> <span class="ident">initial_status</span> {
             <span class="ident">TransactionSupportStatus::Undetermined</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">select_data_bearing_server</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">transaction_support_status</span>().<span class="kw">await</span>)
+                <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">transaction_support_status</span>())
             }
             <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">initial_status</span>),
         }
@@ -1893,7 +1898,10 @@
         <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span>,
     ) {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">cluster_time</span>) <span class="op">=</span> <span class="ident">cluster_time</span> {
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">advance_cluster_time</span>(<span class="ident">cluster_time</span>).<span class="kw">await</span>;
+            <span class="self">self</span>.<span class="ident">inner</span>
+                .<span class="ident">topology</span>
+                .<span class="ident">advance_cluster_time</span>(<span class="ident">cluster_time</span>.<span class="ident">clone</span>())
+                .<span class="kw">await</span>;
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">session</span>) <span class="op">=</span> <span class="ident">session</span> {
                 <span class="ident">session</span>.<span class="ident">advance_cluster_time</span>(<span class="ident">cluster_time</span>)
             }

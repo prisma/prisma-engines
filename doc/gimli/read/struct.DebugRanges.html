@@ -10,7 +10,7 @@
 section.</p>
 <p>It is the caller’s responsibility to read the <code>.debug_ranges</code> section and
 present it as a <code>&amp;[u8]</code> slice. That means using some ELF loader on
-Linux, a Mach-O loader on OSX, etc.</p>
+Linux, a Mach-O loader on macOS, etc.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">gimli</span>::{<span class="ident">DebugRanges</span>, <span class="ident">LittleEndian</span>};
 

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.9/src/date.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>date.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.14/src/date.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>date.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../time/index.html"><div class="logo-container">
@@ -1038,6 +1038,10 @@
 <span id="1030">1030</span>
 <span id="1031">1031</span>
 <span id="1032">1032</span>
+<span id="1033">1033</span>
+<span id="1034">1034</span>
+<span id="1035">1035</span>
+<span id="1036">1036</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The [`Date`] struct and its associated `impl`s.</span>
 
 <span class="kw">use</span> <span class="ident">core::fmt</span>;
@@ -1054,18 +1058,17 @@
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error</span>, <span class="ident">Duration</span>, <span class="ident">Month</span>, <span class="ident">PrimitiveDateTime</span>, <span class="ident">Time</span>, <span class="ident">Weekday</span>};
 
 <span class="doccomment">/// The minimum valid year.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;large-dates&quot;</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">MIN_YEAR</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="op">-</span><span class="number">999_999</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">MIN_YEAR</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;large-dates&quot;</span>) {
+    <span class="op">-</span><span class="number">999_999</span>
+} <span class="kw">else</span> {
+    <span class="op">-</span><span class="number">9999</span>
+};
 <span class="doccomment">/// The maximum valid year.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;large-dates&quot;</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">MAX_YEAR</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">999_999</span>;
-
-<span class="doccomment">/// The minimum valid year.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;large-dates&quot;</span>))]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">MIN_YEAR</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="op">-</span><span class="number">9999</span>;
-<span class="doccomment">/// The maximum valid year.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;large-dates&quot;</span>))]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">MAX_YEAR</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">9999</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">MAX_YEAR</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;large-dates&quot;</span>) {
+    <span class="number">999_999</span>
+} <span class="kw">else</span> {
+    <span class="number">9999</span>
+};
 
 <span class="doccomment">/// Date in the proleptic Gregorian calendar.</span>
 <span class="doccomment">///</span>
@@ -1079,7 +1082,7 @@
     <span class="comment">// |   2 bits   |        21 bits        |  9 bits   |</span>
     <span class="comment">// | unassigned |         year          |  ordinal  |</span>
     <span class="comment">// The year is 15 bits when `large-dates` is not enabled.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">value</span>: <span class="ident">i32</span>,
+    <span class="ident">value</span>: <span class="ident">i32</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Date</span> {
@@ -1107,6 +1110,11 @@
     <span class="doccomment">/// guaranteed by the caller.</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">__from_ordinal_date_unchecked</span>(<span class="ident">year</span>: <span class="ident">i32</span>, <span class="ident">ordinal</span>: <span class="ident">u16</span>) -&gt; <span class="self">Self</span> {
+        <span class="macro">debug_assert!</span>(<span class="ident">year</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">MIN_YEAR</span>);
+        <span class="macro">debug_assert!</span>(<span class="ident">year</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">MAX_YEAR</span>);
+        <span class="macro">debug_assert!</span>(<span class="ident">ordinal</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>);
+        <span class="macro">debug_assert!</span>(<span class="ident">ordinal</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">days_in_year</span>(<span class="ident">year</span>));
+
         <span class="self">Self</span> {
             <span class="ident">value</span>: (<span class="ident">year</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">9</span>) <span class="op">|</span> <span class="ident">ordinal</span> <span class="kw">as</span> <span class="ident">i32</span>,
         }
@@ -1236,24 +1244,27 @@
     <span class="doccomment">/// internally invalid value.</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;from_julian_date_unchecked&quot;</span>)]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_julian_day_unchecked</span>(<span class="ident">julian_day</span>: <span class="ident">i32</span>) -&gt; <span class="self">Self</span> {
-        <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">trivial_numeric_casts</span>)]</span> <span class="comment">// cast depends on type alias</span>
-
-        <span class="doccomment">/// A type that is either `i32` or `i64`. This subtle difference allows for optimization</span>
-        <span class="doccomment">/// based on the valid values.</span>
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;large-dates&quot;</span>)]</span>
-        <span class="kw">type</span> <span class="ident">MaybeWidened</span> <span class="op">=</span> <span class="ident">i64</span>;
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_docs_in_private_items</span>)]</span>
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;large-dates&quot;</span>))]</span>
-        <span class="kw">type</span> <span class="ident">MaybeWidened</span> <span class="op">=</span> <span class="ident">i32</span>;
+        <span class="macro">debug_assert!</span>(<span class="ident">julian_day</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::MIN</span>.<span class="ident">to_julian_day</span>());
+        <span class="macro">debug_assert!</span>(<span class="ident">julian_day</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::MAX</span>.<span class="ident">to_julian_day</span>());
 
         <span class="comment">// To avoid a potential overflow, the value may need to be widened for some arithmetic.</span>
 
         <span class="kw">let</span> <span class="ident">z</span> <span class="op">=</span> <span class="ident">julian_day</span> <span class="op">-</span> <span class="number">1_721_119</span>;
-        <span class="kw">let</span> <span class="ident">g</span> <span class="op">=</span> <span class="number">100</span> <span class="op">*</span> <span class="ident">z</span> <span class="kw">as</span> <span class="ident">MaybeWidened</span> <span class="op">-</span> <span class="number">25</span>;
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> (<span class="ident">g</span> <span class="op">/</span> <span class="number">3_652_425</span>) <span class="kw">as</span> <span class="ident">i32</span>;
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">a</span> <span class="op">-</span> <span class="ident">a</span> <span class="op">/</span> <span class="number">4</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">year</span> <span class="op">=</span> <span class="macro">div_floor!</span>(<span class="number">100</span> <span class="op">*</span> <span class="ident">b</span> <span class="kw">as</span> <span class="ident">MaybeWidened</span> <span class="op">+</span> <span class="ident">g</span>, <span class="number">36525</span>) <span class="kw">as</span> <span class="ident">i32</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ordinal</span> <span class="op">=</span> (<span class="ident">b</span> <span class="op">+</span> <span class="ident">z</span> <span class="op">-</span> <span class="macro">div_floor!</span>(<span class="number">36525</span> <span class="op">*</span> <span class="ident">year</span> <span class="kw">as</span> <span class="ident">MaybeWidened</span>, <span class="number">100</span>) <span class="kw">as</span> <span class="ident">i32</span>) <span class="kw">as</span> <span class="kw">_</span>;
+        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">year</span>, <span class="kw-2">mut</span> <span class="ident">ordinal</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">julian_day</span> <span class="op">&lt;</span> <span class="op">-</span><span class="number">19_752_948</span> <span class="op">|</span><span class="op">|</span> <span class="ident">julian_day</span> <span class="op">&gt;</span> <span class="number">23_195_514</span> {
+            <span class="kw">let</span> <span class="ident">g</span> <span class="op">=</span> <span class="number">100</span> <span class="op">*</span> <span class="ident">z</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">-</span> <span class="number">25</span>;
+            <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> (<span class="ident">g</span> <span class="op">/</span> <span class="number">3_652_425</span>) <span class="kw">as</span> <span class="ident">i32</span>;
+            <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">a</span> <span class="op">-</span> <span class="ident">a</span> <span class="op">/</span> <span class="number">4</span>;
+            <span class="kw">let</span> <span class="ident">year</span> <span class="op">=</span> <span class="macro">div_floor!</span>(<span class="number">100</span> <span class="op">*</span> <span class="ident">b</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">+</span> <span class="ident">g</span>, <span class="number">36525</span>) <span class="kw">as</span> <span class="ident">i32</span>;
+            <span class="kw">let</span> <span class="ident">ordinal</span> <span class="op">=</span> (<span class="ident">b</span> <span class="op">+</span> <span class="ident">z</span> <span class="op">-</span> <span class="macro">div_floor!</span>(<span class="number">36525</span> <span class="op">*</span> <span class="ident">year</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">100</span>) <span class="kw">as</span> <span class="ident">i32</span>) <span class="kw">as</span> <span class="kw">_</span>;
+            (<span class="ident">year</span>, <span class="ident">ordinal</span>)
+        } <span class="kw">else</span> {
+            <span class="kw">let</span> <span class="ident">g</span> <span class="op">=</span> <span class="number">100</span> <span class="op">*</span> <span class="ident">z</span> <span class="op">-</span> <span class="number">25</span>;
+            <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">g</span> <span class="op">/</span> <span class="number">3_652_425</span>;
+            <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">a</span> <span class="op">-</span> <span class="ident">a</span> <span class="op">/</span> <span class="number">4</span>;
+            <span class="kw">let</span> <span class="ident">year</span> <span class="op">=</span> <span class="macro">div_floor!</span>(<span class="number">100</span> <span class="op">*</span> <span class="ident">b</span> <span class="op">+</span> <span class="ident">g</span>, <span class="number">36525</span>);
+            <span class="kw">let</span> <span class="ident">ordinal</span> <span class="op">=</span> (<span class="ident">b</span> <span class="op">+</span> <span class="ident">z</span> <span class="op">-</span> <span class="macro">div_floor!</span>(<span class="number">36525</span> <span class="op">*</span> <span class="ident">year</span>, <span class="number">100</span>)) <span class="kw">as</span> <span class="kw">_</span>;
+            (<span class="ident">year</span>, <span class="ident">ordinal</span>)
+        };
 
         <span class="kw">if</span> <span class="ident">is_leap_year</span>(<span class="ident">year</span>) {
             <span class="ident">ordinal</span> <span class="op">+</span><span class="op">=</span> <span class="number">60</span>;
@@ -1491,7 +1502,10 @@
             <span class="op">-</span><span class="number">3</span> <span class="op">|</span> <span class="number">4</span> =&gt; <span class="ident">Weekday::Friday</span>,
             <span class="op">-</span><span class="number">2</span> <span class="op">|</span> <span class="number">5</span> =&gt; <span class="ident">Weekday::Saturday</span>,
             <span class="op">-</span><span class="number">1</span> <span class="op">|</span> <span class="number">6</span> =&gt; <span class="ident">Weekday::Sunday</span>,
-            <span class="kw">_</span> =&gt; <span class="ident">Weekday::Monday</span>,
+            <span class="ident">val</span> =&gt; {
+                <span class="macro">debug_assert!</span>(<span class="ident">val</span> <span class="op">==</span> <span class="number">0</span>);
+                <span class="ident">Weekday::Monday</span>
+            }
         }
     }
 
@@ -1704,6 +1718,7 @@
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">duration</span>.<span class="ident">is_negative</span>() {
             <span class="ident"><span class="self">Self</span>::MIN</span>
         } <span class="kw">else</span> {
+            <span class="macro">debug_assert!</span>(<span class="ident">duration</span>.<span class="ident">is_positive</span>());
             <span class="ident"><span class="self">Self</span>::MAX</span>
         }
     }
@@ -1741,6 +1756,7 @@
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">duration</span>.<span class="ident">is_negative</span>() {
             <span class="ident"><span class="self">Self</span>::MAX</span>
         } <span class="kw">else</span> {
+            <span class="macro">debug_assert!</span>(<span class="ident">duration</span>.<span class="ident">is_positive</span>());
             <span class="ident"><span class="self">Self</span>::MIN</span>
         }
     }
@@ -1766,15 +1782,11 @@
 
         <span class="comment">// Dates in January and February are unaffected by leap years.</span>
         <span class="kw">if</span> <span class="ident">ordinal</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">59</span> {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-                <span class="ident">value</span>: <span class="ident">year</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">9</span> <span class="op">|</span> <span class="ident">ordinal</span> <span class="kw">as</span> <span class="ident">i32</span>,
-            });
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::__from_ordinal_date_unchecked</span>(<span class="ident">year</span>, <span class="ident">ordinal</span>));
         }
 
         <span class="kw">match</span> (<span class="ident">is_leap_year</span>(<span class="self">self</span>.<span class="ident">year</span>()), <span class="ident">is_leap_year</span>(<span class="ident">year</span>)) {
-            (<span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">|</span> (<span class="bool-val">true</span>, <span class="bool-val">true</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-                <span class="ident">value</span>: <span class="ident">year</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">9</span> <span class="op">|</span> <span class="ident">ordinal</span> <span class="kw">as</span> <span class="ident">i32</span>,
-            }),
+            (<span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">|</span> (<span class="bool-val">true</span>, <span class="bool-val">true</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::__from_ordinal_date_unchecked</span>(<span class="ident">year</span>, <span class="ident">ordinal</span>)),
             <span class="comment">// February 29 does not exist in common years.</span>
             (<span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="kw">if</span> <span class="ident">ordinal</span> <span class="op">==</span> <span class="number">60</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">error::ComponentRange</span> {
                 <span class="ident">name</span>: <span class="string">&quot;day&quot;</span>,
@@ -1785,14 +1797,10 @@
             }),
             <span class="comment">// We&#39;re going from a common year to a leap year. Shift dates in March and later by</span>
             <span class="comment">// one day.</span>
-            (<span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-                <span class="ident">value</span>: <span class="ident">year</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">9</span> <span class="op">|</span> (<span class="ident">ordinal</span> <span class="op">+</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">i32</span>,
-            }),
+            (<span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::__from_ordinal_date_unchecked</span>(<span class="ident">year</span>, <span class="ident">ordinal</span> <span class="op">+</span> <span class="number">1</span>)),
             <span class="comment">// We&#39;re going from a leap year to a common year. Shift dates in January and</span>
             <span class="comment">// February by one day.</span>
-            (<span class="bool-val">true</span>, <span class="bool-val">false</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-                <span class="ident">value</span>: <span class="ident">year</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">9</span> <span class="op">|</span> (<span class="ident">ordinal</span> <span class="op">-</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">i32</span>,
-            }),
+            (<span class="bool-val">true</span>, <span class="bool-val">false</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::__from_ordinal_date_unchecked</span>(<span class="ident">year</span>, <span class="ident">ordinal</span> <span class="op">-</span> <span class="number">1</span>)),
         }
     }
 

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/650f071/src/conn/pool/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/e3f8bdb/src/conn/pool/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
@@ -855,13 +855,6 @@
 <span id="849">849</span>
 <span id="850">850</span>
 <span id="851">851</span>
-<span id="852">852</span>
-<span id="853">853</span>
-<span id="854">854</span>
-<span id="855">855</span>
-<span id="856">856</span>
-<span id="857">857</span>
-<span id="858">858</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) 2016 Anatoly Ikorsky</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0</span>
@@ -1026,15 +1019,6 @@
     <span class="doccomment">/// **Note:** This Future won&#39;t resolve until all active connections, taken from it,</span>
     <span class="doccomment">/// are dropped or disonnected. Also all pending and new `GetConn`&#39;s will resolve to error.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disconnect</span>(<span class="self">self</span>) -&gt; <span class="ident">DisconnectPool</span> {
-        <span class="kw">let</span> <span class="ident">was_closed</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">close</span>.<span class="ident">swap</span>(<span class="bool-val">true</span>, <span class="ident">atomic::Ordering::AcqRel</span>);
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">was_closed</span> {
-            <span class="comment">// make sure we wake up the Recycler.</span>
-            <span class="comment">//</span>
-            <span class="comment">// note the lack of an .expect() here, because the Recycler may decide that there are</span>
-            <span class="comment">// no connections to wait for and exit quickly!</span>
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">drop</span>.<span class="ident">send</span>(<span class="prelude-val">None</span>).<span class="ident">is_ok</span>();
-        }
-
         <span class="ident">DisconnectPool::new</span>(<span class="self">self</span>)
     }
 
@@ -1148,6 +1132,8 @@
 
 <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Conn</span> {
     <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">infile_handler</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+
         <span class="kw">if</span> <span class="ident">std::thread::panicking</span>() {
             <span class="comment">// Try to decrease the number of existing connections.</span>
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pool</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">pool</span>.<span class="ident">take</span>() {
@@ -1259,7 +1245,7 @@
 
             <span class="comment">// now we&#39;ll kill connections..</span>
             <span class="kw">for</span> <span class="ident">id</span> <span class="kw">in</span> <span class="ident">ids</span> {
-                <span class="ident">master</span>.<span class="ident">query_drop</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;KILL {}&quot;</span>, <span class="ident">id</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="ident">master</span>.<span class="ident">query_drop</span>(<span class="macro">format!</span>(<span class="string">&quot;KILL {}&quot;</span>, <span class="ident">id</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
             }
 
             <span class="comment">// now check, that they&#39;re still in the pool..</span>

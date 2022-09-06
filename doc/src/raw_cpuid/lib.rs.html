@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/raw-cpuid-10.4.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../raw_cpuid/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/raw-cpuid-10.5.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../raw_cpuid/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../raw_cpuid/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
@@ -5409,6 +5409,68 @@
 <span id="5403">5403</span>
 <span id="5404">5404</span>
 <span id="5405">5405</span>
+<span id="5406">5406</span>
+<span id="5407">5407</span>
+<span id="5408">5408</span>
+<span id="5409">5409</span>
+<span id="5410">5410</span>
+<span id="5411">5411</span>
+<span id="5412">5412</span>
+<span id="5413">5413</span>
+<span id="5414">5414</span>
+<span id="5415">5415</span>
+<span id="5416">5416</span>
+<span id="5417">5417</span>
+<span id="5418">5418</span>
+<span id="5419">5419</span>
+<span id="5420">5420</span>
+<span id="5421">5421</span>
+<span id="5422">5422</span>
+<span id="5423">5423</span>
+<span id="5424">5424</span>
+<span id="5425">5425</span>
+<span id="5426">5426</span>
+<span id="5427">5427</span>
+<span id="5428">5428</span>
+<span id="5429">5429</span>
+<span id="5430">5430</span>
+<span id="5431">5431</span>
+<span id="5432">5432</span>
+<span id="5433">5433</span>
+<span id="5434">5434</span>
+<span id="5435">5435</span>
+<span id="5436">5436</span>
+<span id="5437">5437</span>
+<span id="5438">5438</span>
+<span id="5439">5439</span>
+<span id="5440">5440</span>
+<span id="5441">5441</span>
+<span id="5442">5442</span>
+<span id="5443">5443</span>
+<span id="5444">5444</span>
+<span id="5445">5445</span>
+<span id="5446">5446</span>
+<span id="5447">5447</span>
+<span id="5448">5448</span>
+<span id="5449">5449</span>
+<span id="5450">5450</span>
+<span id="5451">5451</span>
+<span id="5452">5452</span>
+<span id="5453">5453</span>
+<span id="5454">5454</span>
+<span id="5455">5455</span>
+<span id="5456">5456</span>
+<span id="5457">5457</span>
+<span id="5458">5458</span>
+<span id="5459">5459</span>
+<span id="5460">5460</span>
+<span id="5461">5461</span>
+<span id="5462">5462</span>
+<span id="5463">5463</span>
+<span id="5464">5464</span>
+<span id="5465">5465</span>
+<span id="5466">5466</span>
+<span id="5467">5467</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A library to parse the x86 CPUID instruction, written in rust with no</span>
 <span class="doccomment">//! external dependencies. The implementation closely resembles the Intel CPUID</span>
 <span class="doccomment">//! manual description. The library works with no_std.</span>
@@ -5728,7 +5790,6 @@
 <span class="comment">//</span>
 <span class="comment">// Extended leafs:</span>
 <span class="comment">//</span>
-
 <span class="kw">const</span> <span class="ident">EAX_EXTENDED_FUNCTION_INFO</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x8000_0000</span>;
 <span class="kw">const</span> <span class="ident">EAX_EXTENDED_PROCESSOR_AND_FEATURE_IDENTIFIERS</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x8000_0001</span>;
 <span class="kw">const</span> <span class="ident">EAX_EXTENDED_BRAND_STRING</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x8000_0002</span>;
@@ -5736,6 +5797,8 @@
 <span class="kw">const</span> <span class="ident">EAX_L2_L3_CACHE_INFO</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x8000_0006</span>;
 <span class="kw">const</span> <span class="ident">EAX_ADVANCED_POWER_MGMT_INFO</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x8000_0007</span>;
 <span class="kw">const</span> <span class="ident">EAX_PROCESSOR_CAPACITY_INFO</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x8000_0008</span>;
+<span class="kw">const</span> <span class="ident">EAX_PERFORMANCE_OPTIMIZATION_INFO</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x8000_001A</span>;
+<span class="kw">const</span> <span class="ident">EAX_CACHE_PARAMETERS_AMD</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x8000_001D</span>;
 <span class="kw">const</span> <span class="ident">EAX_MEMORY_ENCRYPTION_INFO</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x8000_001F</span>;
 <span class="kw">const</span> <span class="ident">EAX_SVM_FEATURES</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x8000_000A</span>;
 
@@ -5858,18 +5921,25 @@
         }
     }
 
-    <span class="doccomment">/// Retrieve more elaborate information about caches (LEAF=0x04).</span>
+    <span class="doccomment">/// Retrieve more elaborate information about caches (LEAF=0x04 or 0x8000_001D).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// As opposed to [get_cache_info](CpuId::get_cache_info), this will tell us</span>
     <span class="doccomment">/// about associativity, set size, line size of each level in the cache</span>
     <span class="doccomment">/// hierarchy.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
-    <span class="doccomment">/// ❌ AMD ✅ Intel</span>
+    <span class="doccomment">/// 🟡 AMD ✅ Intel</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_cache_parameters</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CacheParametersIter</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">leaf_is_supported</span>(<span class="ident">EAX_CACHE_PARAMETERS</span>) {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">leaf_is_supported</span>(<span class="ident">EAX_CACHE_PARAMETERS</span>)
+            <span class="op">|</span><span class="op">|</span> (<span class="self">self</span>.<span class="ident">vendor</span> <span class="op">==</span> <span class="ident">Vendor::Amd</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">leaf_is_supported</span>(<span class="ident">EAX_CACHE_PARAMETERS_AMD</span>))
+        {
             <span class="prelude-val">Some</span>(<span class="ident">CacheParametersIter</span> {
                 <span class="ident">read</span>: <span class="self">self</span>.<span class="ident">read</span>,
+                <span class="ident">leaf</span>: <span class="kw">if</span> <span class="self">self</span>.<span class="ident">vendor</span> <span class="op">==</span> <span class="ident">Vendor::Amd</span> {
+                    <span class="ident">EAX_CACHE_PARAMETERS_AMD</span>
+                } <span class="kw">else</span> {
+                    <span class="ident">EAX_CACHE_PARAMETERS</span>
+                },
                 <span class="ident">current</span>: <span class="number">0</span>,
             })
         } <span class="kw">else</span> {
@@ -5964,8 +6034,9 @@
 
     <span class="doccomment">/// Information about topology (LEAF=0x0B).</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Intel SDM suggests software should check support for leaf 0x1F ([`get_extended_topology_info_v2()`]), and</span>
-    <span class="doccomment">/// if supported, enumerate that leaf instead.</span>
+    <span class="doccomment">/// Intel SDM suggests software should check support for leaf 0x1F</span>
+    <span class="doccomment">/// ([`CpuId::get_extended_topology_info_v2`]), and if supported, enumerate</span>
+    <span class="doccomment">/// that leaf instead.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ✅ AMD ✅ Intel</span>
@@ -6255,7 +6326,7 @@
 
     <span class="doccomment">/// L2/L3 Cache and TLB Information (LEAF=0x8000_0006).</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// # Availability</span>
+    <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ✅ AMD 🟡 Intel</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_l2_l3_cache_and_tlb_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">L2And3CacheTlbInfo</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">leaf_is_supported</span>(<span class="ident">EAX_L2_L3_CACHE_INFO</span>) {
@@ -6269,7 +6340,7 @@
 
     <span class="doccomment">/// Advanced Power Management Information (LEAF=0x8000_0007).</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// # Availability</span>
+    <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ✅ AMD 🟡 Intel</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_advanced_power_mgmt_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ApmInfo</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">leaf_is_supported</span>(<span class="ident">EAX_ADVANCED_POWER_MGMT_INFO</span>) {
@@ -6281,7 +6352,7 @@
 
     <span class="doccomment">/// Processor Capacity Parameters and Extended Feature Identification (LEAF=0x8000_0008).</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// # Availability</span>
+    <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ✅ AMD 🟡 Intel</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_processor_capacity_feature_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ProcessorCapacityAndFeatureInfo</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">leaf_is_supported</span>(<span class="ident">EAX_PROCESSOR_CAPACITY_INFO</span>) {
@@ -6299,7 +6370,7 @@
     <span class="doccomment">/// If SVM is not supported if [ExtendedProcessorFeatureIdentifiers::has_svm] is</span>
     <span class="doccomment">/// false, this function is reserved then.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// # Availability</span>
+    <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ✅ AMD ❌ Intel</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_svm_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SvmFeatures</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">has_svm</span> <span class="op">=</span> <span class="self">self</span>
@@ -6320,6 +6391,19 @@
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">leaf_is_supported</span>(<span class="ident">EAX_MEMORY_ENCRYPTION_INFO</span>) {
             <span class="prelude-val">Some</span>(<span class="ident">MemoryEncryptionInfo::new</span>(
                 <span class="self">self</span>.<span class="ident">read</span>.<span class="ident">cpuid1</span>(<span class="ident">EAX_MEMORY_ENCRYPTION_INFO</span>),
+            ))
+        } <span class="kw">else</span> {
+            <span class="prelude-val">None</span>
+        }
+    }
+    <span class="doccomment">/// Informations about performance optimization (LEAF=0x8000_001A)</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Platforms</span>
+    <span class="doccomment">/// ✅ AMD ❌ Intel (reserved)</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_performance_optimization_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PerformanceOptimizationInfo</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">leaf_is_supported</span>(<span class="ident">EAX_PERFORMANCE_OPTIMIZATION_INFO</span>) {
+            <span class="prelude-val">Some</span>(<span class="ident">PerformanceOptimizationInfo::new</span>(
+                <span class="self">self</span>.<span class="ident">read</span>.<span class="ident">cpuid1</span>(<span class="ident">EAX_PERFORMANCE_OPTIMIZATION_INFO</span>),
             ))
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
@@ -7910,12 +7994,13 @@
 <span class="doccomment">/// Yields a [CacheParameter] for each cache.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Platforms</span>
-<span class="doccomment">/// ❌ AMD ✅ Intel</span>
+<span class="doccomment">/// 🟡 AMD ✅ Intel</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CacheParametersIter</span> {
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">serde</span>(<span class="ident">skip</span>))]</span>
     <span class="ident">read</span>: <span class="ident">CpuIdReader</span>,
+    <span class="ident">leaf</span>: <span class="ident">u32</span>,
     <span class="ident">current</span>: <span class="ident">u32</span>,
 }
 
@@ -7928,7 +8013,7 @@
     <span class="doccomment">/// cpuid is called every-time we advance the iterator to get information</span>
     <span class="doccomment">/// about the next cache.</span>
     <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CacheParameter</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">read</span>.<span class="ident">cpuid2</span>(<span class="ident">EAX_CACHE_PARAMETERS</span>, <span class="self">self</span>.<span class="ident">current</span>);
+        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">read</span>.<span class="ident">cpuid2</span>(<span class="self">self</span>.<span class="ident">leaf</span>, <span class="self">self</span>.<span class="ident">current</span>);
         <span class="kw">let</span> <span class="ident">cp</span> <span class="op">=</span> <span class="ident">CacheParameter</span> {
             <span class="ident">eax</span>: <span class="ident">res</span>.<span class="ident">eax</span>,
             <span class="ident">ebx</span>: <span class="ident">res</span>.<span class="ident">ebx</span>,
@@ -7960,7 +8045,7 @@
 <span class="doccomment">/// Information about an individual cache in the hierarchy.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Platforms</span>
-<span class="doccomment">/// ❌ AMD ✅ Intel</span>
+<span class="doccomment">/// 🟡 AMD ✅ Intel</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CacheParameter</span> {
@@ -8002,6 +8087,9 @@
 
 <span class="kw">impl</span> <span class="ident">CacheParameter</span> {
     <span class="doccomment">/// Cache Type</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Platforms</span>
+    <span class="doccomment">/// ✅ AMD ✅ Intel</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cache_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CacheType</span> {
         <span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="ident">get_bits</span>(<span class="self">self</span>.<span class="ident">eax</span>, <span class="number">0</span>, <span class="number">4</span>) <span class="kw">as</span> <span class="ident">u8</span>;
         <span class="kw">match</span> <span class="ident">typ</span> {
@@ -8014,46 +8102,73 @@
     }
 
     <span class="doccomment">/// Cache Level (starts at 1)</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Platforms</span>
+    <span class="doccomment">/// ✅ AMD ✅ Intel</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">level</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="ident">get_bits</span>(<span class="self">self</span>.<span class="ident">eax</span>, <span class="number">5</span>, <span class="number">7</span>) <span class="kw">as</span> <span class="ident">u8</span>
     }
 
     <span class="doccomment">/// Self Initializing cache level (does not need SW initialization).</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Platforms</span>
+    <span class="doccomment">/// ✅ AMD ✅ Intel</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_self_initializing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">get_bits</span>(<span class="self">self</span>.<span class="ident">eax</span>, <span class="number">8</span>, <span class="number">8</span>) <span class="op">==</span> <span class="number">1</span>
     }
 
     <span class="doccomment">/// Fully Associative cache</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Platforms</span>
+    <span class="doccomment">/// ✅ AMD ✅ Intel</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_fully_associative</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">get_bits</span>(<span class="self">self</span>.<span class="ident">eax</span>, <span class="number">9</span>, <span class="number">9</span>) <span class="op">==</span> <span class="number">1</span>
     }
 
     <span class="doccomment">/// Maximum number of addressable IDs for logical processors sharing this cache</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Platforms</span>
+    <span class="doccomment">/// ✅ AMD ✅ Intel</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_cores_for_cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         (<span class="ident">get_bits</span>(<span class="self">self</span>.<span class="ident">eax</span>, <span class="number">14</span>, <span class="number">25</span>) <span class="op">+</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">usize</span>
     }
 
     <span class="doccomment">/// Maximum number of addressable IDs for processor cores in the physical package</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Platforms</span>
+    <span class="doccomment">/// ❌ AMD ✅ Intel</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_cores_for_package</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         (<span class="ident">get_bits</span>(<span class="self">self</span>.<span class="ident">eax</span>, <span class="number">26</span>, <span class="number">31</span>) <span class="op">+</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">usize</span>
     }
 
     <span class="doccomment">/// System Coherency Line Size (Bits 11-00)</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Platforms</span>
+    <span class="doccomment">/// ✅ AMD ✅ Intel</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">coherency_line_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         (<span class="ident">get_bits</span>(<span class="self">self</span>.<span class="ident">ebx</span>, <span class="number">0</span>, <span class="number">11</span>) <span class="op">+</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">usize</span>
     }
 
     <span class="doccomment">/// Physical Line partitions (Bits 21-12)</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Platforms</span>
+    <span class="doccomment">/// ✅ AMD ✅ Intel</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">physical_line_partitions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         (<span class="ident">get_bits</span>(<span class="self">self</span>.<span class="ident">ebx</span>, <span class="number">12</span>, <span class="number">21</span>) <span class="op">+</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">usize</span>
     }
 
     <span class="doccomment">/// Ways of associativity (Bits 31-22)</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Platforms</span>
+    <span class="doccomment">/// ✅ AMD ✅ Intel</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">associativity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         (<span class="ident">get_bits</span>(<span class="self">self</span>.<span class="ident">ebx</span>, <span class="number">22</span>, <span class="number">31</span>) <span class="op">+</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">usize</span>
     }
 
     <span class="doccomment">/// Number of Sets (Bits 31-00)</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Platforms</span>
+    <span class="doccomment">/// ✅ AMD ✅ Intel</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sets</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         (<span class="self">self</span>.<span class="ident">ecx</span> <span class="op">+</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">usize</span>
     }
@@ -8061,6 +8176,9 @@
     <span class="doccomment">/// Write-Back Invalidate/Invalidate (Bit 0)</span>
     <span class="doccomment">/// False: WBINVD/INVD from threads sharing this cache acts upon lower level caches for threads sharing this cache.</span>
     <span class="doccomment">/// True: WBINVD/INVD is not guaranteed to act upon lower level caches of non-originating threads sharing this cache.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Platforms</span>
+    <span class="doccomment">/// ✅ AMD ✅ Intel</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_write_back_invalidate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">get_bits</span>(<span class="self">self</span>.<span class="ident">edx</span>, <span class="number">0</span>, <span class="number">0</span>) <span class="op">==</span> <span class="number">1</span>
     }
@@ -8068,6 +8186,9 @@
     <span class="doccomment">/// Cache Inclusiveness (Bit 1)</span>
     <span class="doccomment">/// False: Cache is not inclusive of lower cache levels.</span>
     <span class="doccomment">/// True: Cache is inclusive of lower cache levels.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Platforms</span>
+    <span class="doccomment">/// ✅ AMD ✅ Intel</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_inclusive</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">get_bits</span>(<span class="self">self</span>.<span class="ident">edx</span>, <span class="number">1</span>, <span class="number">1</span>) <span class="op">==</span> <span class="number">1</span>
     }
@@ -8075,6 +8196,9 @@
     <span class="doccomment">/// Complex Cache Indexing (Bit 2)</span>
     <span class="doccomment">/// False: Direct mapped cache.</span>
     <span class="doccomment">/// True: A complex function is used to index the cache, potentially using all address bits.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Platforms</span>
+    <span class="doccomment">/// ❌ AMD ✅ Intel</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_complex_indexing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">get_bits</span>(<span class="self">self</span>.<span class="ident">edx</span>, <span class="number">2</span>, <span class="number">2</span>) <span class="op">==</span> <span class="number">1</span>
     }

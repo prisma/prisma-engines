@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.2.2/src/index/options.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>options.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/index/options.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>options.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
@@ -254,6 +254,20 @@
 <span id="248">248</span>
 <span id="249">249</span>
 <span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::time::Duration</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -266,7 +280,7 @@
 <span class="kw">use</span> <span class="ident">typed_builder::TypedBuilder</span>;
 
 <span class="doccomment">/// These are the valid options for specifying an [`IndexModel`](../struct.IndexModel.html).</span>
-<span class="doccomment">/// For more information on these properties, see the [documentation](https://docs.mongodb.com/manual/reference/command/createIndexes/#definition).</span>
+<span class="doccomment">/// For more information on these properties, see the [documentation](https://www.mongodb.com/docs/manual/reference/command/createIndexes/#definition).</span>
 <span class="attribute">#[<span class="ident">serde_with::skip_serializing_none</span>]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>, <span class="ident">TypedBuilder</span>)]</span>
 <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">field_defaults</span>(<span class="ident">default</span>, <span class="ident">setter</span>(<span class="ident">into</span>)))]</span>
@@ -280,7 +294,7 @@
     <span class="doccomment">/// Specifies a TTL to control how long MongoDB retains</span>
     <span class="doccomment">/// documents in this collection.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// See the [documentation](https://docs.mongodb.com/manual/core/index-ttl/)</span>
+    <span class="doccomment">/// See the [documentation](https://www.mongodb.com/docs/manual/core/index-ttl/)</span>
     <span class="doccomment">/// for more information on how to use this option.</span>
     <span class="attribute">#[<span class="ident">serde</span>(
         <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;expireAfterSeconds&quot;</span>,
@@ -296,7 +310,7 @@
     <span class="doccomment">/// If true, the index only references documents with the specified field. The</span>
     <span class="doccomment">/// default value is false.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// See the [documentation](https://docs.mongodb.com/manual/core/index-sparse/)</span>
+    <span class="doccomment">/// See the [documentation](https://www.mongodb.com/docs/manual/core/index-sparse/)</span>
     <span class="doccomment">/// for more information on how to use this option.</span>
     <span class="kw">pub</span> <span class="ident">sparse</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
 
@@ -367,11 +381,25 @@
     <span class="doccomment">/// A flag that determines whether the index is hidden from the query planner. A</span>
     <span class="doccomment">/// hidden index is not evaluated as part of the query plan selection.</span>
     <span class="kw">pub</span> <span class="ident">hidden</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+
+    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>, <span class="ident">setter</span>(<span class="ident">skip</span>))]</span>
+    <span class="ident">clustered</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">IndexOptions</span> {
+    <span class="doccomment">/// Optionally specifies that this index is clustered.  This is not a valid option to provide to</span>
+    <span class="doccomment">/// &#39;create_indexes&#39;, but can appear in the options returned for an index via &#39;list_indexes&#39;.</span>
+    <span class="doccomment">/// To create a clustered index, create a new collection using the &#39;clustered_index&#39; option.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This options is only supported by servers &gt;= 6.0.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clustered</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">clustered</span>
+    }
 }
 
 <span class="doccomment">/// The version of the index. Version 0 Indexes are disallowed as of MongoDB 3.2.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// See [Version 0 Indexes](https://docs.mongodb.com/manual/release-notes/3.2-compatibility/#std-label-3.2-version-0-indexes) for more information.</span>
+<span class="doccomment">/// See [Version 0 Indexes](https://www.mongodb.com/docs/manual/release-notes/3.2-compatibility/#std-label-3.2-version-0-indexes) for more information.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IndexVersion</span> {
@@ -420,7 +448,7 @@
     }
 }
 
-<span class="doccomment">/// Specify the version for a `text` index. For more information, see [Versions](https://docs.mongodb.com/manual/core/index-text/#versions).</span>
+<span class="doccomment">/// Specify the version for a `text` index. For more information, see [Versions](https://www.mongodb.com/docs/manual/core/index-text/#versions).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TextIndexVersion</span> {
     <span class="doccomment">/// Version 1.</span>
@@ -465,7 +493,7 @@
     }
 }
 
-<span class="doccomment">/// Specify the version for a `2dsphere` index. For more information, see [Versions](https://docs.mongodb.com/manual/core/2dsphere/#versions).</span>
+<span class="doccomment">/// Specify the version for a `2dsphere` index. For more information, see [Versions](https://www.mongodb.com/docs/manual/core/2dsphere/#versions).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Sphere2DIndexVersion</span> {
     <span class="doccomment">/// Version 2.</span>

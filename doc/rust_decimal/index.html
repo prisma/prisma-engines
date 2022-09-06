@@ -2,16 +2,16 @@
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../rust_decimal/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"><a href="#">Crate rust_decimal</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 1.24.0</li><li><a id="all-types" href="all.html">All Items</a></li></ul></div><section><div class="block"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#types">Type Definitions</a></li></ul></div></section></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../rust_decimal/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
+        </a><h2 class="location"><a href="#">Crate rust_decimal</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 1.26.1</li><li><a id="all-types" href="all.html">All Items</a></li></ul></div><section><div class="block"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#types">Type Definitions</a></li></ul></div></section></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../rust_decimal/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
                                 <a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div>
                         </div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
-    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">rust_decimal</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/rust_decimal/lib.rs.html#1-70">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>A Decimal number implementation written in pure Rust suitable for financial calculations that require significant integral and fractional digits with no round-off errors.</p>
+    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">rust_decimal</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/rust_decimal/lib.rs.html#1-75">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>A Decimal number implementation written in pure Rust suitable for financial calculations that require significant integral and fractional digits with no round-off errors.</p>
 <p>The binary representation consists of a 96 bit integer number, a scaling factor used to specify the decimal fraction and a 1 bit sign. Because of this representation, trailing zeros are preserved and may be exposed when in string form. These can be truncated using the <code>normalize</code> or <code>round_dp</code> functions.</p>
 <h3 id="getting-started"><a href="#getting-started">Getting started</a></h3>
 <p>To get started, add <code>rust_decimal</code> and optionally <code>rust_decimal_macros</code> to your <code>Cargo.toml</code>:</p>
 <div class="example-wrap"><pre class="language-toml"><code>[dependencies]
-rust_decimal = &quot;1.24&quot;
-rust_decimal_macros = &quot;1.24&quot;</code></pre></div><h3 id="usage"><a href="#usage">Usage</a></h3>
+rust_decimal = &quot;1.26&quot;
+rust_decimal_macros = &quot;1.26&quot;</code></pre></div><h3 id="usage"><a href="#usage">Usage</a></h3>
 <p>Decimal numbers can be created in a few distinct ways. The easiest and most efficient method of creating a Decimal is to use the procedural macro within the <code>rust_decimal_macros</code> crate:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="comment">// Procedural macros need importing directly</span>
@@ -58,6 +58,7 @@ rust_decimal_macros = &quot;1.24&quot;</code></pre></div><h3 id="usage"><a href=
 <li><a href="#c-repr">c-repr</a></li>
 <li><a href="#legacy-ops">legacy-ops</a></li>
 <li><a href="#maths">maths</a></li>
+<li><a href="#rkyv">rkyv</a></li>
 <li><a href="#rocket-traits">rocket-traits</a></li>
 <li><a href="#rust-fuzz">rust-fuzz</a></li>
 <li><a href="#std">std</a></li>
@@ -88,9 +89,13 @@ type by transparently serializing/deserializing into the <code>NUMERIC</code> da
 <h4 id="db-tokio-postgres"><a href="#db-tokio-postgres"><code>db-tokio-postgres</code></a></h4>
 <p>Enables the tokio postgres module allowing for async communication with PostgreSQL.</p>
 <h4 id="db-diesel-postgres"><a href="#db-diesel-postgres"><code>db-diesel-postgres</code></a></h4>
-<p>Enable <code>diesel</code> PostgreSQL support.</p>
+<p>Enable <code>diesel</code> PostgreSQL support. By default, this enables version <code>1.4</code> of <code>diesel</code>. If you wish to use the <code>diesel</code>
+release candidates then you can do so by using <code>db-diesel2-postgres</code>. Please note, the <code>db-diesel2-*</code> features are considered
+unstable and will be upgraded as and when new <code>diesel 2.x</code> features are released.</p>
 <h4 id="db-diesel-mysql"><a href="#db-diesel-mysql"><code>db-diesel-mysql</code></a></h4>
-<p>Enable <code>diesel</code> MySQL support.</p>
+<p>Enable <code>diesel</code> MySQL support. By default, this enables version <code>1.4</code> of <code>diesel</code>. If you wish to use the <code>diesel</code>
+release candidates then you can do so by using <code>db-diesel2-mysql</code>. Please note, the <code>db-diesel2-*</code> features are considered
+unstable and will be upgraded as and when new <code>diesel 2.x</code> features are released.</p>
 <h4 id="legacy-ops"><a href="#legacy-ops"><code>legacy-ops</code></a></h4>
 <p><strong>Warning:</strong> This is deprecated and will be removed from a future versions.</p>
 <p>As of <code>1.10</code> the algorithms used to perform basic operations have changed which has benefits of significant speed improvements.
@@ -104,6 +109,11 @@ to curb against this. When the <code>maths</code> feature was first developed th
 non-panicking behavior, please use the feature: <code>maths-nopanic</code>.</p>
 <h4 id="rand"><a href="#rand"><code>rand</code></a></h4>
 <p>Implements <code>rand::distributions::Distribution&lt;Decimal&gt;</code> to allow the creation of random instances.</p>
+<p>Note: When using <code>rand::Rng</code> trait to generate a decimal between a range of two other decimals, the scale of the randomly-generated
+decimal will be the same as the scale of the input decimals (or, if the inputs have different scales, the higher of the two).</p>
+<h4 id="rkyv"><a href="#rkyv"><code>rkyv</code></a></h4>
+<p>Enables <a href="https://github.com/rkyv/rkyv">rkyv</a> serialization for <code>Decimal</code>.
+Supports rkyv’s safe API when the <code>rkyv-safe</code> feature is enabled as well.</p>
 <h4 id="rocket-traits"><a href="#rocket-traits"><code>rocket-traits</code></a></h4>
 <p>Enable support for Rocket forms by implementing the <code>FromFormField</code> trait.</p>
 <h4 id="rust-fuzz"><a href="#rust-fuzz"><code>rust-fuzz</code></a></h4>
@@ -139,6 +149,12 @@ level.</p>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;rust_decimal::serde::float&quot;</span>)]</span>
     <span class="ident">value</span>: <span class="ident">Decimal</span>,
 }</code></pre></div>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OptionFloatExample</span> {
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;rust_decimal::serde::float_option&quot;</span>)]</span>
+    <span class="ident">value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Decimal</span><span class="op">&gt;</span>,
+}</code></pre></div>
 <h4 id="serde-with-str"><a href="#serde-with-str"><code>serde-with-str</code></a></h4>
 <p>Enable this to access the module for serializing <code>Decimal</code> types to a <code>String</code>. This can be use in <code>struct</code> definitions like so:</p>
 
@@ -147,6 +163,12 @@ level.</p>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;rust_decimal::serde::str&quot;</span>)]</span>
     <span class="ident">value</span>: <span class="ident">Decimal</span>,
 }</code></pre></div>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OptionStrExample</span> {
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;rust_decimal::serde::str_option&quot;</span>)]</span>
+    <span class="ident">value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Decimal</span><span class="op">&gt;</span>,
+}</code></pre></div>
 <h4 id="serde-with-arbitrary-precision"><a href="#serde-with-arbitrary-precision"><code>serde-with-arbitrary-precision</code></a></h4>
 <p>Enable this to access the module for serializing <code>Decimal</code> types to a <code>String</code>. This can be use in <code>struct</code> definitions like so:</p>
 
@@ -154,6 +176,12 @@ level.</p>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ArbitraryExample</span> {
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;rust_decimal::serde::arbitrary_precision&quot;</span>)]</span>
     <span class="ident">value</span>: <span class="ident">Decimal</span>,
+}</code></pre></div>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OptionArbitraryExample</span> {
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;rust_decimal::serde::arbitrary_precision_option&quot;</span>)]</span>
+    <span class="ident">value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Decimal</span><span class="op">&gt;</span>,
 }</code></pre></div>
 <h4 id="std"><a href="#std"><code>std</code></a></h4>
 <p>Enable <code>std</code> library support. This is enabled by default, however in the future will be opt in. For now, to support <code>no_std</code>

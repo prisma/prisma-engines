@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/layer/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.15/src/layer/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../tracing_subscriber/index.html"><div class="logo-container">
@@ -1734,6 +1734,76 @@
 <span id="1726">1726</span>
 <span id="1727">1727</span>
 <span id="1728">1728</span>
+<span id="1729">1729</span>
+<span id="1730">1730</span>
+<span id="1731">1731</span>
+<span id="1732">1732</span>
+<span id="1733">1733</span>
+<span id="1734">1734</span>
+<span id="1735">1735</span>
+<span id="1736">1736</span>
+<span id="1737">1737</span>
+<span id="1738">1738</span>
+<span id="1739">1739</span>
+<span id="1740">1740</span>
+<span id="1741">1741</span>
+<span id="1742">1742</span>
+<span id="1743">1743</span>
+<span id="1744">1744</span>
+<span id="1745">1745</span>
+<span id="1746">1746</span>
+<span id="1747">1747</span>
+<span id="1748">1748</span>
+<span id="1749">1749</span>
+<span id="1750">1750</span>
+<span id="1751">1751</span>
+<span id="1752">1752</span>
+<span id="1753">1753</span>
+<span id="1754">1754</span>
+<span id="1755">1755</span>
+<span id="1756">1756</span>
+<span id="1757">1757</span>
+<span id="1758">1758</span>
+<span id="1759">1759</span>
+<span id="1760">1760</span>
+<span id="1761">1761</span>
+<span id="1762">1762</span>
+<span id="1763">1763</span>
+<span id="1764">1764</span>
+<span id="1765">1765</span>
+<span id="1766">1766</span>
+<span id="1767">1767</span>
+<span id="1768">1768</span>
+<span id="1769">1769</span>
+<span id="1770">1770</span>
+<span id="1771">1771</span>
+<span id="1772">1772</span>
+<span id="1773">1773</span>
+<span id="1774">1774</span>
+<span id="1775">1775</span>
+<span id="1776">1776</span>
+<span id="1777">1777</span>
+<span id="1778">1778</span>
+<span id="1779">1779</span>
+<span id="1780">1780</span>
+<span id="1781">1781</span>
+<span id="1782">1782</span>
+<span id="1783">1783</span>
+<span id="1784">1784</span>
+<span id="1785">1785</span>
+<span id="1786">1786</span>
+<span id="1787">1787</span>
+<span id="1788">1788</span>
+<span id="1789">1789</span>
+<span id="1790">1790</span>
+<span id="1791">1791</span>
+<span id="1792">1792</span>
+<span id="1793">1793</span>
+<span id="1794">1794</span>
+<span id="1795">1795</span>
+<span id="1796">1796</span>
+<span id="1797">1797</span>
+<span id="1798">1798</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The [`Layer`] trait, a composable abstraction for building [`Subscriber`]s.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The [`Subscriber`] trait in `tracing-core` represents the _complete_ set of</span>
@@ -2004,7 +2074,7 @@
 <span class="doccomment">//! more convenient, but [`Box::new`] may be used as well.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! When the number of `Layer`s varies at runtime, note that a</span>
-<span class="doccomment">//! [`Vec&lt;L&gt; where L: `Layer`` also implements `Layer`][vec-impl]. This</span>
+<span class="doccomment">//! [`Vec&lt;L&gt; where L: Layer` also implements `Layer`][vec-impl]. This</span>
 <span class="doccomment">//! can be used to add a variable number of `Layer`s to a `Subscriber`:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```</span>
@@ -2106,6 +2176,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [option-impl]: Layer#impl-Layer&lt;S&gt;-for-Option&lt;L&gt;</span>
 <span class="doccomment">//! [box-impl]: Layer#impl-Layer%3CS%3E-for-Box%3Cdyn%20Layer%3CS%3E%20+%20Send%20+%20Sync%3E</span>
+<span class="doccomment">//! [vec-impl]: Layer#impl-Layer&lt;S&gt;-for-Vec&lt;L&gt;</span>
 <span class="doccomment">//! [prelude]: crate::prelude</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Recording Traces</span>
@@ -2149,6 +2220,28 @@
 <span class="doccomment">//! [`Subscriber`]. If any layer returns `false` from its [`enabled`] method, or</span>
 <span class="doccomment">//! [`Interest::never()`] from its [`register_callsite`] method, filter</span>
 <span class="doccomment">//! evaluation will short-circuit and the span or event will be disabled.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ### Enabling Interest</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Whenever an tracing event (or span) is emitted, it goes through a number of</span>
+<span class="doccomment">//! steps to determine how and how much it should be processed. The earlier an</span>
+<span class="doccomment">//! event is disabled, the less work has to be done to process the event, so</span>
+<span class="doccomment">//! `Layer`s that implement filtering should attempt to disable unwanted</span>
+<span class="doccomment">//! events as early as possible. In order, each event checks:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - [`register_callsite`], once per callsite (roughly: once per time that</span>
+<span class="doccomment">//!   `event!` or `span!` is written in the source code; this is cached at the</span>
+<span class="doccomment">//!   callsite). See [`Subscriber::register_callsite`] and</span>
+<span class="doccomment">//!   [`tracing_core::callsite`] for a summary of how this behaves.</span>
+<span class="doccomment">//! - [`enabled`], once per emitted event (roughly: once per time that `event!`</span>
+<span class="doccomment">//!   or `span!` is *executed*), and only if `register_callsite` regesters an</span>
+<span class="doccomment">//!   [`Interest::sometimes`]. This is the main customization point to globally</span>
+<span class="doccomment">//!   filter events based on their [`Metadata`]. If an event can be disabled</span>
+<span class="doccomment">//!   based only on [`Metadata`], it should be, as this allows the construction</span>
+<span class="doccomment">//!   of the actual `Event`/`Span` to be skipped.</span>
+<span class="doccomment">//! - For events only (and not spans), [`event_enabled`] is called just before</span>
+<span class="doccomment">//!   processing the event. This gives layers one last chance to say that</span>
+<span class="doccomment">//!   an event should be filtered out, now that the event&#39;s fields are known.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ## Per-Layer Filtering</span>
 <span class="doccomment">//!</span>
@@ -2364,15 +2457,16 @@
 <span class="doccomment">//! # Ok(()) }</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! [`Subscriber`]: https://docs.rs/tracing-core/latest/tracing_core/subscriber/trait.Subscriber.html</span>
-<span class="doccomment">//! [span IDs]: https://docs.rs/tracing-core/latest/tracing_core/span/struct.Id.html</span>
+<span class="doccomment">//! [`Subscriber`]: tracing_core::subscriber::Subscriber</span>
+<span class="doccomment">//! [span IDs]: tracing_core::span::Id</span>
 <span class="doccomment">//! [the current span]: Context::current_span</span>
 <span class="doccomment">//! [`register_callsite`]: Layer::register_callsite</span>
 <span class="doccomment">//! [`enabled`]: Layer::enabled</span>
+<span class="doccomment">//! [`event_enabled`]: Layer::event_enabled</span>
 <span class="doccomment">//! [`on_enter`]: Layer::on_enter</span>
 <span class="doccomment">//! [`Layer::register_callsite`]: Layer::register_callsite</span>
 <span class="doccomment">//! [`Layer::enabled`]: Layer::enabled</span>
-<span class="doccomment">//! [`Interest::never()`]: https://docs.rs/tracing-core/latest/tracing_core/subscriber/struct.Interest.html#method.never</span>
+<span class="doccomment">//! [`Interest::never()`]: tracing_core::subscriber::Interest::never()</span>
 <span class="doccomment">//! [`Filtered`]: crate::filter::Filtered</span>
 <span class="doccomment">//! [`filter`]: crate::filter</span>
 <span class="doccomment">//! [`Targets`]: crate::filter::Targets</span>
@@ -2484,15 +2578,15 @@
     <span class="doccomment">/// globally enable or disable those callsites, it should always return</span>
     <span class="doccomment">/// [`Interest::always()`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Interest`]: https://docs.rs/tracing-core/latest/tracing_core/struct.Interest.html</span>
-    <span class="doccomment">/// [`Subscriber::register_callsite`]: https://docs.rs/tracing-core/latest/tracing_core/trait.Subscriber.html#method.register_callsite</span>
-    <span class="doccomment">/// [`Interest::never()`]: https://docs.rs/tracing-core/latest/tracing_core/subscriber/struct.Interest.html#method.never</span>
-    <span class="doccomment">/// [`Interest::always()`]: https://docs.rs/tracing-core/latest/tracing_core/subscriber/struct.Interest.html#method.always</span>
-    <span class="doccomment">/// [`self.enabled`]: #method.enabled</span>
-    <span class="doccomment">/// [`Layer::enabled`]: #method.enabled</span>
-    <span class="doccomment">/// [`on_event`]: #method.on_event</span>
-    <span class="doccomment">/// [`on_enter`]: #method.on_enter</span>
-    <span class="doccomment">/// [`on_exit`]: #method.on_exit</span>
+    <span class="doccomment">/// [`Interest`]: tracing_core::Interest</span>
+    <span class="doccomment">/// [`Subscriber::register_callsite`]: tracing_core::Subscriber::register_callsite()</span>
+    <span class="doccomment">/// [`Interest::never()`]: tracing_core::subscriber::Interest::never()</span>
+    <span class="doccomment">/// [`Interest::always()`]: tracing_core::subscriber::Interest::always()</span>
+    <span class="doccomment">/// [`self.enabled`]: Layer::enabled()</span>
+    <span class="doccomment">/// [`Layer::enabled`]: Layer::enabled()</span>
+    <span class="doccomment">/// [`on_event`]: Layer::on_event()</span>
+    <span class="doccomment">/// [`on_enter`]: Layer::on_enter()</span>
+    <span class="doccomment">/// [`on_exit`]: Layer::on_exit()</span>
     <span class="doccomment">/// [the trait-level documentation]: #filtering-with-layers</span>
     <span class="kw">fn</span> <span class="ident">register_callsite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="ident">Interest</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">enabled</span>(<span class="ident">metadata</span>, <span class="ident">Context::none</span>()) {
@@ -2527,13 +2621,12 @@
     <span class="doccomment">/// See [the trait-level documentation] for more information on filtering</span>
     <span class="doccomment">/// with `Layer`s.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Interest`]: https://docs.rs/tracing-core/latest/tracing_core/struct.Interest.html</span>
-    <span class="doccomment">/// [`Context`]: ../struct.Context.html</span>
-    <span class="doccomment">/// [`Subscriber::enabled`]: https://docs.rs/tracing-core/latest/tracing_core/trait.Subscriber.html#method.enabled</span>
-    <span class="doccomment">/// [`Layer::register_callsite`]: #method.register_callsite</span>
-    <span class="doccomment">/// [`on_event`]: #method.on_event</span>
-    <span class="doccomment">/// [`on_enter`]: #method.on_enter</span>
-    <span class="doccomment">/// [`on_exit`]: #method.on_exit</span>
+    <span class="doccomment">/// [`Interest`]: tracing_core::Interest</span>
+    <span class="doccomment">/// [`Subscriber::enabled`]: tracing_core::Subscriber::enabled()</span>
+    <span class="doccomment">/// [`Layer::register_callsite`]: Layer::register_callsite()</span>
+    <span class="doccomment">/// [`on_event`]: Layer::on_event()</span>
+    <span class="doccomment">/// [`on_enter`]: Layer::on_enter()</span>
+    <span class="doccomment">/// [`on_exit`]: Layer::on_exit()</span>
     <span class="doccomment">/// [the trait-level documentation]: #filtering-with-layers</span>
     <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> (<span class="ident">metadata</span>, <span class="ident">ctx</span>);
@@ -2567,6 +2660,31 @@
     <span class="comment">// only thing the `Context` type currently provides), but passing it in anyway</span>
     <span class="comment">// seems like a good future-proofing measure as it may grow other methods later...</span>
     <span class="kw">fn</span> <span class="ident">on_follows_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_span</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">_follows</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {}
+
+    <span class="doccomment">/// Called before [`on_event`], to determine if `on_event` should be called.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// &lt;div class=&quot;example-wrap&quot; style=&quot;display:inline-block&quot;&gt;</span>
+    <span class="doccomment">/// &lt;pre class=&quot;ignore&quot; style=&quot;white-space:normal;font:inherit;&quot;&gt;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: This method determines whether an event is globally enabled,</span>
+    <span class="doccomment">/// *not* whether the individual `Layer` will be notified about the</span>
+    <span class="doccomment">/// event. This is intended to be used by `Layer`s that implement</span>
+    <span class="doccomment">/// filtering for the entire stack. `Layer`s which do not wish to be</span>
+    <span class="doccomment">/// notified about certain events but do not wish to globally disable them</span>
+    <span class="doccomment">/// should ignore those events in their [on_event][Self::on_event].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// &lt;/pre&gt;&lt;/div&gt;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// See [the trait-level documentation] for more information on filtering</span>
+    <span class="doccomment">/// with `Layer`s.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`on_event`]: Self::on_event</span>
+    <span class="doccomment">/// [`Interest`]: tracing_core::Interest</span>
+    <span class="doccomment">/// [the trait-level documentation]: #filtering-with-layers</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span> <span class="comment">// collapse this to a constant please mrs optimizer</span>
+    <span class="kw">fn</span> <span class="ident">event_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_event</span>: <span class="kw-2">&amp;</span><span class="ident">Event</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
+        <span class="bool-val">true</span>
+    }
 
     <span class="doccomment">/// Notifies this layer that an event has occurred.</span>
     <span class="kw">fn</span> <span class="ident">on_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_event</span>: <span class="kw-2">&amp;</span><span class="ident">Event</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {}
@@ -2732,7 +2850,7 @@
     <span class="doccomment">///     .with_subscriber(MySubscriber::new());</span>
     <span class="doccomment">///```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Subscriber`]: https://docs.rs/tracing-core/latest/tracing_core/trait.Subscriber.html</span>
+    <span class="doccomment">/// [`Subscriber`]: tracing_core::Subscriber</span>
     <span class="kw">fn</span> <span class="ident">with_subscriber</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">inner</span>: <span class="ident">S</span>) -&gt; <span class="ident">Layered</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">S</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Sized</span>,
@@ -3178,7 +3296,11 @@
     <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">inner</span>) =&gt; <span class="ident">inner</span>.<span class="ident">max_level_hint</span>(),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="prelude-val">None</span> =&gt; {
+                <span class="comment">// There is no inner layer, so this layer will</span>
+                <span class="comment">// never enable anything.</span>
+                <span class="prelude-val">Some</span>(<span class="ident">LevelFilter::OFF</span>)
+            }
         }
     }
 
@@ -3193,6 +3315,14 @@
     <span class="kw">fn</span> <span class="ident">on_follows_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">span</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">follows</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">inner</span>) <span class="op">=</span> <span class="self">self</span> {
             <span class="ident">inner</span>.<span class="ident">on_follows_from</span>(<span class="ident">span</span>, <span class="ident">follows</span>, <span class="ident">ctx</span>);
+        }
+    }
+
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">event_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">Event</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">inner</span>) =&gt; <span class="ident">inner</span>.<span class="ident">event_enabled</span>(<span class="ident">event</span>, <span class="ident">ctx</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="bool-val">true</span>,
         }
     }
 
@@ -3285,6 +3415,11 @@
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
+            <span class="kw">fn</span> <span class="ident">event_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">Event</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
+                <span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">event_enabled</span>(<span class="ident">event</span>, <span class="ident">ctx</span>)
+            }
+
+            <span class="attribute">#[<span class="ident">inline</span>]</span>
             <span class="kw">fn</span> <span class="ident">on_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">Event</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
                 <span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">on_event</span>(<span class="ident">event</span>, <span class="ident">ctx</span>)
             }
@@ -3365,6 +3500,10 @@
             <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">l</span><span class="op">|</span> <span class="ident">l</span>.<span class="ident">enabled</span>(<span class="ident">metadata</span>, <span class="ident">ctx</span>.<span class="ident">clone</span>()))
         }
 
+        <span class="kw">fn</span> <span class="ident">event_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">Event</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
+            <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">l</span><span class="op">|</span> <span class="ident">l</span>.<span class="ident">event_enabled</span>(<span class="ident">event</span>, <span class="ident">ctx</span>.<span class="ident">clone</span>()))
+        }
+
         <span class="kw">fn</span> <span class="ident">on_new_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">span::Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
             <span class="kw">for</span> <span class="ident">l</span> <span class="kw">in</span> <span class="self">self</span> {
                 <span class="ident">l</span>.<span class="ident">on_new_span</span>(<span class="ident">attrs</span>, <span class="ident">id</span>, <span class="ident">ctx</span>.<span class="ident">clone</span>());
@@ -3372,7 +3511,8 @@
         }
 
         <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">max_level</span> <span class="op">=</span> <span class="ident">LevelFilter::ERROR</span>;
+            <span class="comment">// Default to `OFF` if there are no inner layers.</span>
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">max_level</span> <span class="op">=</span> <span class="ident">LevelFilter::OFF</span>;
             <span class="kw">for</span> <span class="ident">l</span> <span class="kw">in</span> <span class="self">self</span> {
                 <span class="comment">// NOTE(eliza): this is slightly subtle: if *any* layer</span>
                 <span class="comment">// returns `None`, we have to return `None`, assuming there is</span>

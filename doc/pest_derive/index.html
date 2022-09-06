@@ -2,10 +2,10 @@
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../pest_derive/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"><a href="#">Crate pest_derive</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 2.1.0</li><li><a id="all-types" href="all.html">All Items</a></li></ul></div><section><div class="block"><ul><li><a href="#derives">Derive Macros</a></li></ul></div></section></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../pest_derive/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
+        </a><h2 class="location"><a href="#">Crate pest_derive</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 2.3.0</li><li><a id="all-types" href="all.html">All Items</a></li></ul></div><section><div class="block"><ul><li><a href="#derives">Derive Macros</a></li></ul></div></section></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../pest_derive/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
                                 <a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div>
                         </div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
-    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">pest_derive</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/pest_derive/lib.rs.html#10-302">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="pest-the-elegant-parser"><a href="#pest-the-elegant-parser">pest. The Elegant Parser</a></h2>
+    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">pest_derive</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/pest_derive/lib.rs.html#10-301">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="pest-the-elegant-parser"><a href="#pest-the-elegant-parser">pest. The Elegant Parser</a></h2>
 <p>pest is a general purpose parser written in Rust with a focus on accessibility, correctness,
 and performance. It uses parsing expression grammars (or <a href="https://en.wikipedia.org/wiki/Parsing_expression_grammar">PEG</a>) as input, which are similar in
 spirit to regular expressions, but which offer the enhanced expressivity needed to parse
@@ -32,9 +32,7 @@ relative to <code>src</code> and is specified between the <code>derive</code> at
 <p>A grammar is a series of rules separated by whitespace, possibly containing comments.</p>
 <h4 id="comments"><a href="#comments">Comments</a></h4>
 <p>Comments start with <code>//</code> and end at the end of the line.</p>
-
-<div class='information'><div class='tooltip ignore'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore"><code><span class="comment">// a comment</span></code></pre></div>
-<h4 id="rules"><a href="#rules">Rules</a></h4>
+<div class="example-wrap"><pre class="language-text"><code>// a comment</code></pre></div><h4 id="rules"><a href="#rules">Rules</a></h4>
 <p>Rules have the following form:</p>
 
 <div class='information'><div class='tooltip ignore'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore"><code><span class="ident">name</span> <span class="op">=</span> <span class="ident">optional_modifier</span> { <span class="ident">expression</span> }</code></pre></div>
@@ -108,7 +106,7 @@ of atomic and compound-atomic rules.</p>
 </ol>
 <p>Strings and characters follow
 <a href="https://doc.rust-lang.org/reference/tokens.html#byte-escapes">Rust’s escape mechanisms</a>, while
-identifiers can contain alpha-numeric characters and underscores (<code>_</code>), as long as they do not
+identifiers can contain alphanumeric characters and underscores (<code>_</code>), as long as they do not
 start with a digit.</p>
 <ol start="2">
 <li>
@@ -196,7 +194,7 @@ a <code>PEEK_ALL</code> on an empty stack). With the stack <code>[&quot;c&quot;,
 <span class="ident">z</span> <span class="op">=</span> { <span class="ident">PEEK</span>[<span class="number">1</span>..] } <span class="op">=</span> { <span class="ident">PEEK</span>[<span class="op">-</span><span class="number">2</span>..<span class="number">3</span>] } <span class="op">=</span> { <span class="string">&quot;c&quot;</span> ~ <span class="string">&quot;b&quot;</span> }
 <span class="ident">n</span> <span class="op">=</span> { <span class="ident">PEEK</span>[<span class="number">2</span>..<span class="op">-</span><span class="number">2</span>] } <span class="op">=</span> { <span class="ident">PEEK</span>[<span class="number">2</span>..<span class="number">1</span>] } <span class="op">=</span> { <span class="string">&quot;&quot;</span> }</code></pre></div>
 <p>For historical reasons, <code>PEEK_ALL</code> matches from top to bottom, while <code>PEEK[start..end]</code> matches
-from bottom to top. There is currectly no syntax to match a slice of the stack top to bottom.</p>
+from bottom to top. There is currently no syntax to match a slice of the stack top to bottom.</p>
 <h3 id="rule"><a href="#rule"><code>Rule</code></a></h3>
 <p>All rules defined or used in the grammar populate a generated <code>enum</code> called <code>Rule</code>. This
 implements <code>pest</code>’s <code>RuleType</code> and can be used throughout the API.</p>

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":[["codec","Adaptors from AsyncRead/AsyncWrite to Stream/Sink"],["either","Module defining an Either type."],["io","Helpers for IO related tasks."],["sync","Synchronization primitives"]]};
+window.SIDEBAR_ITEMS = {"mod":[["codec","Adaptors from AsyncRead/AsyncWrite to Stream/Sink"],["compat","Compatibility between the `tokio::io` and `futures-io` versions of the `AsyncRead` and `AsyncWrite` traits."],["either","Module defining an Either type."],["io","Helpers for IO related tasks."],["sync","Synchronization primitives"]]};

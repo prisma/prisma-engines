@@ -12,5 +12,19 @@
 <p>The syntax accepted by this macro is the same as <a href="macro.date.html" title="date!"><code>date!</code></a> and <a href="macro.time.html" title="time!"><code>time!</code></a>, with an optional
 <a href="macro.offset.html" title="offset!"><code>offset!</code></a>, all space-separated. If an <a href="macro.offset.html" title="offset!"><code>offset!</code></a> is provided, the resulting value will
 be an <a href="../struct.OffsetDateTime.html"><code>OffsetDateTime</code></a>; otherwise it will be a <a href="../struct.PrimitiveDateTime.html"><code>PrimitiveDateTime</code></a>.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="macro">assert_eq!</span>(
+    <span class="macro">datetime!</span>(<span class="number">2020</span><span class="op">-</span><span class="number">01</span><span class="op">-</span><span class="number">01</span> <span class="number">0</span>:<span class="number">00</span>),
+    <span class="ident">Date::from_calendar_date</span>(<span class="number">2020</span>, <span class="ident">Month::January</span>, <span class="number">1</span>)<span class="question-mark">?</span>.<span class="ident">midnight</span>()
+);
+<span class="macro">assert_eq!</span>(
+    <span class="macro">datetime!</span>(<span class="number">2020</span><span class="op">-</span><span class="number">01</span><span class="op">-</span><span class="number">01</span> <span class="number">0</span>:<span class="number">00</span> <span class="ident">UTC</span>),
+    <span class="ident">Date::from_calendar_date</span>(<span class="number">2020</span>, <span class="ident">Month::January</span>, <span class="number">1</span>)<span class="question-mark">?</span>.<span class="ident">midnight</span>().<span class="ident">assume_utc</span>()
+);
+<span class="macro">assert_eq!</span>(
+    <span class="macro">datetime!</span>(<span class="number">2020</span><span class="op">-</span><span class="number">01</span><span class="op">-</span><span class="number">01</span> <span class="number">0</span>:<span class="number">00</span> <span class="op">-</span><span class="number">1</span>),
+    <span class="ident">Date::from_calendar_date</span>(<span class="number">2020</span>, <span class="ident">Month::January</span>, <span class="number">1</span>)<span class="question-mark">?</span>.<span class="ident">midnight</span>()
+        .<span class="ident">assume_offset</span>(<span class="ident">UtcOffset::from_hms</span>(<span class="op">-</span><span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>)<span class="question-mark">?</span>)
+);</code></pre><a class="test-arrow" target="_blank" href="https://play.rust-lang.org?code=%23!%5Ballow(unused)%5D%0Aextern%20crate%20r%23time%3B%0Afn%20main()%20%7B%20fn%20_inner()%20-%3E%20Result%3C()%2C%20impl%20core%3A%3Afmt%3A%3ADebug%3E%20%7B%0Ause%20time%3A%3A%7BDate%2C%20Month%2C%20macros%3A%3Adatetime%2C%20UtcOffset%7D%3B%0Aassert_eq!(%0A%20%20%20%20datetime!(2020-01-01%200%3A00)%2C%0A%20%20%20%20Date%3A%3Afrom_calendar_date(2020%2C%20Month%3A%3AJanuary%2C%201)%3F.midnight()%0A)%3B%0Aassert_eq!(%0A%20%20%20%20datetime!(2020-01-01%200%3A00%20UTC)%2C%0A%20%20%20%20Date%3A%3Afrom_calendar_date(2020%2C%20Month%3A%3AJanuary%2C%201)%3F.midnight().assume_utc()%0A)%3B%0Aassert_eq!(%0A%20%20%20%20datetime!(2020-01-01%200%3A00%20-1)%2C%0A%20%20%20%20Date%3A%3Afrom_calendar_date(2020%2C%20Month%3A%3AJanuary%2C%201)%3F.midnight()%0A%20%20%20%20%20%20%20%20.assume_offset(UtcOffset%3A%3Afrom_hms(-1%2C%200%2C%200)%3F)%0A)%3B%0AOk%3A%3A%3C_%2C%20time%3A%3AError%3E(())%0A%7D%20_inner().unwrap()%20%7D&amp;edition=2021">Run</a></div>
 </div></details></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="time" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0 (4b91a6ea7 2022-08-08)" ></div>
 </body></html>

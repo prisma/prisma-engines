@@ -5,7 +5,7 @@
         </a><h2 class="location"><a href="#">Module uuid</a></h2><div class="sidebar-elems"><section><div class="block"><ul><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#types">Type Definitions</a></li></ul></div></section></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../bson/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
                                 <a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div>
                         </div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
-    <h1 class="fqn"><span class="in-band">Module <a href="../index.html">bson</a>::<wbr><a class="mod" href="#">uuid</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../../src/bson/uuid/mod.rs.html#1-535">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>UUID support for BSON.</p>
+    <h1 class="fqn"><span class="in-band">Module <a href="../index.html">bson</a>::<wbr><a class="mod" href="#">uuid</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../../src/bson/uuid/mod.rs.html#1-578">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>UUID support for BSON.</p>
 <h3 id="the-crateuuid-type"><a href="#the-crateuuid-type">The <code>crate::Uuid</code> type</a></h3>
 <p>The BSON format supports UUIDs via the “binary” type with the UUID subtype (4).
 To facilitate working with these UUID-subtyped binary values, this crate provides a
@@ -34,14 +34,14 @@ values via either serialization function.</p>
     <span class="ident">bson_uuid</span>: <span class="ident">bson::Uuid</span>,
 
     <span class="doccomment">/// serializes as a BSON binary with subtype 4 when either is used.</span>
-    <span class="doccomment">/// this requires the &quot;uuid-0_8&quot; feature flag</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;bson::serde_helpers::uuid_as_binary&quot;</span>)]</span>
+    <span class="doccomment">/// this requires the &quot;uuid-1&quot; feature flag</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;bson::serde_helpers::uuid_1_as_binary&quot;</span>)]</span>
     <span class="ident">uuid_as_bson</span>: <span class="ident">uuid::Uuid</span>,
 }</code></pre></div>
-<h3 id="the-uuid-0_8-feature-flag"><a href="#the-uuid-0_8-feature-flag">The <code>uuid-0_8</code> feature flag</a></h3>
+<h3 id="the-uuid-1-feature-flag"><a href="#the-uuid-1-feature-flag">The <code>uuid-1</code> feature flag</a></h3>
 <p>To facilitate the conversion between <a href="../struct.Uuid.html" title="crate::Uuid"><code>crate::Uuid</code></a> values and the <code>uuid</code> crate’s <code>Uuid</code>
-values, the <code>uuid-0_8</code> feature flag can be enabled. This flag exposes a number of convenient
-conversions, including the <a href="../struct.Uuid.html#method.to_uuid_0_8" title="crate::Uuid::to_uuid_0_8"><code>crate::Uuid::to_uuid_0_8</code></a> method and the <code>From&lt;uuid::Uuid&gt;</code>
+values, the <code>uuid-1</code> feature flag can be enabled. This flag exposes a number of convenient
+conversions, including the <code>crate::Uuid::to_uuid_1</code> method and the <code>From&lt;uuid::Uuid&gt;</code>
 implementation for <code>Bson</code>, which allows the <code>uuid</code> crate’s <code>Uuid</code> values to be used in the
 <code>doc!</code> and <code>bson!</code> macros.</p>
 
@@ -52,13 +52,15 @@ implementation for <code>Bson</code>, which allows the <code>uuid</code> crate�
     <span class="string">&quot;uuid&quot;</span>: <span class="ident">bson::Uuid::new</span>(),
 };
 
-<span class="comment">// but this automatic conversion requires the &quot;uuid-0_8&quot; feature flag</span>
+<span class="comment">// but this automatic conversion requires the &quot;uuid-1&quot; feature flag</span>
 <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="macro">doc!</span> {
     <span class="string">&quot;uuid&quot;</span>: <span class="ident">uuid::Uuid::new_v4</span>(),
 };
 
-<span class="comment">// this also requires the &quot;uuid-0_8&quot; feature flag.</span>
-<span class="kw">let</span> <span class="ident">uuid</span> <span class="op">=</span> <span class="ident">bson::Uuid::new</span>().<span class="ident">to_uuid_0_8</span>();</code></pre></div>
+<span class="comment">// this also requires the &quot;uuid-1&quot; feature flag.</span>
+<span class="kw">let</span> <span class="ident">uuid</span> <span class="op">=</span> <span class="ident">bson::Uuid::new</span>().<span class="ident">to_uuid_1</span>();</code></pre></div>
+<p>For backwards compatibility, a <code>uuid-0_8</code> feature flag can be enabled, which provides the same
+API for interoperation with version 0.8 of the <code>uuid</code> crate.</p>
 <h3 id="the-serde_with-feature-flag"><a href="#the-serde_with-feature-flag">The <code>serde_with</code> feature flag</a></h3>
 <p>The <code>serde_with</code> feature can be enabled to support more ergonomic serde attributes for
 (de)serializing <code>uuid::Uuid</code> from/to BSON via the <a href="https://docs.rs/serde_with/1.11.0/serde_with/"><code>serde_with</code></a>

@@ -2,26 +2,26 @@
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../funty/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"><a href="#">Crate funty</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 1.2.0</li><li><a id="all-types" href="all.html">All Items</a></li></ul></div><section><div class="block"><ul><li><a href="#traits">Traits</a></li></ul></div></section></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../funty/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
+        </a><h2 class="location"><a href="#">Crate funty</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 2.0.0</li><li><a id="all-types" href="all.html">All Items</a></li></ul></div><section><div class="block"><ul><li><a href="#traits">Traits</a></li></ul></div></section></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../funty/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
                                 <a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div>
                         </div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
-    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">funty</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/funty/lib.rs.html#1-1565">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p><code>fun</code>damental <code>ty</code>pes</p>
-<p>This crate provides trait unification of the Rust fundamental numbers, allowing
+    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">funty</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/funty/lib.rs.html#1-1740">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p><code>fun</code>damental <code>ty</code>pes</p>
+<p>This crate provides trait unification of the Rust fundamental items, allowing
 users to declare the behavior they want from a number without committing to a
 single particular numeric type.</p>
 <p>The number types can be categorized along two axes: behavior and width. Traits
 for each axis and group on that axis are provided:</p>
 <h3 id="numeric-categories"><a href="#numeric-categories">Numeric Categories</a></h3>
-<p>The most general category is represented by the trait <a href="trait.IsNumber.html"><code>IsNumber</code></a>. It is
+<p>The most general category is represented by the trait <a href="trait.Numeric.html"><code>Numeric</code></a>. It is
 implemented by all the numeric fundamentals, and includes only the traits that
 they all implement. This is an already-large amount: basic memory management,
 comparison, rendering, and numeric arithmetic.</p>
-<p>The numbers are then split into <a href="trait.IsInteger.html"><code>IsInteger</code></a> and <a href="trait.IsFloat.html"><code>IsFloat</code></a>. The former fills
+<p>The numbers are then split into <a href="trait.Floating.html"><code>Floating</code></a> and <a href="trait.Integral.html"><code>Integral</code></a>. The former fills
 out the API of <code>f32</code> and <code>f64</code>, while the latter covers all of the <code>iN</code> and <code>uN</code>
 numbers.</p>
-<p>Lastly, <a href="trait.IsInteger.html"><code>IsInteger</code></a> splits further, into <a href="trait.IsSigned.html"><code>IsSigned</code></a> and <a href="trait.IsUnsigned.html"><code>IsUnsigned</code></a>.
-These provide the last specializations unique to the differences between <code>iN</code>
-and <code>uN</code>.</p>
+<p>Lastly, <a href="trait.Integral.html"><code>Integral</code></a> splits further, into <a href="trait.Signed.html"><code>Signed</code></a> and <a href="trait.Unsigned.html"><code>Unsigned</code></a>. These
+provide the last specializations unique to the differences between <code>iN</code> and
+<code>uN</code>.</p>
 <h3 id="width-categories"><a href="#width-categories">Width Categories</a></h3>
 <p>Every number implements the trait <code>IsN</code> for the <code>N</code> of its bit width. <code>isize</code>
 and <code>usize</code> implement the trait that matches their width on the target platform.</p>
@@ -40,15 +40,16 @@ of acceptable widths to lower or upper bounds. These traits are equivalent to
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.AtMost32.html" title="funty::AtMost32 trait">AtMost32</a></div><div class="item-right docblock-short"><p>Declare that a type is thirty-two or fewer bits wide.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.AtMost64.html" title="funty::AtMost64 trait">AtMost64</a></div><div class="item-right docblock-short"><p>Declare that a type is sixty-four or fewer bits wide.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.AtMost128.html" title="funty::AtMost128 trait">AtMost128</a></div><div class="item-right docblock-short"><p>Declare that a type is one hundred twenty-eight or fewer bits wide.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Floating.html" title="funty::Floating trait">Floating</a></div><div class="item-right docblock-short"><p>Declare that a type is a floating-point number.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Fundamental.html" title="funty::Fundamental trait">Fundamental</a></div><div class="item-right docblock-short"><p>Declare that a type is one of the language fundamental types.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Integral.html" title="funty::Integral trait">Integral</a></div><div class="item-right docblock-short"><p>Declare that a type is a fixed-point integer.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Is8.html" title="funty::Is8 trait">Is8</a></div><div class="item-right docblock-short"><p>Declare that a type is exactly eight bits wide.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Is16.html" title="funty::Is16 trait">Is16</a></div><div class="item-right docblock-short"><p>Declare that a type is exactly sixteen bits wide.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Is32.html" title="funty::Is32 trait">Is32</a></div><div class="item-right docblock-short"><p>Declare that a type is exactly thirty-two bits wide.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Is64.html" title="funty::Is64 trait">Is64</a></div><div class="item-right docblock-short"><p>Declare that a type is exactly sixty-four bits wide.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Is128.html" title="funty::Is128 trait">Is128</a></div><div class="item-right docblock-short"><p>Declare that a type is exactly one hundred twenty-eight bits wide.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.IsFloat.html" title="funty::IsFloat trait">IsFloat</a></div><div class="item-right docblock-short"><p>Declare that a type is a floating-point number.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.IsInteger.html" title="funty::IsInteger trait">IsInteger</a></div><div class="item-right docblock-short"><p>Declare that a type is a fixed-point integer.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.IsNumber.html" title="funty::IsNumber trait">IsNumber</a></div><div class="item-right docblock-short"><p>Declare that a type is an abstract number.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.IsSigned.html" title="funty::IsSigned trait">IsSigned</a></div><div class="item-right docblock-short"><p>Declare that a type is a signed integer.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.IsUnsigned.html" title="funty::IsUnsigned trait">IsUnsigned</a></div><div class="item-right docblock-short"><p>Declare that a type is an unsigned integer.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Numeric.html" title="funty::Numeric trait">Numeric</a></div><div class="item-right docblock-short"><p>Declare that a type is an abstract number.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Signed.html" title="funty::Signed trait">Signed</a></div><div class="item-right docblock-short"><p>Declare that a type is a signed integer.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Unsigned.html" title="funty::Unsigned trait">Unsigned</a></div><div class="item-right docblock-short"><p>Declare that a type is an unsigned integer.</p>
 </div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="funty" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0 (4b91a6ea7 2022-08-08)" ></div>
 </body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.14.19/src/proto/h1/role.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>role.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.14.20/src/proto/h1/role.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>role.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
@@ -2848,10 +2848,12 @@
 <span id="2842">2842</span>
 <span id="2843">2843</span>
 <span id="2844">2844</span>
+<span id="2845">2845</span>
+<span id="2846">2846</span>
+<span id="2847">2847</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="self">self</span>, <span class="ident">Write</span>};
 <span class="kw">use</span> <span class="ident">std::mem::MaybeUninit</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident">bytes::Bytes</span>;
 <span class="kw">use</span> <span class="ident">bytes::BytesMut</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>)]</span>
@@ -2930,7 +2932,7 @@
     <span class="kw">if</span> <span class="op">!</span><span class="kw-2">*</span><span class="ident">ctx</span>.<span class="ident">h1_header_read_timeout_running</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">h1_header_read_timeout</span>) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">h1_header_read_timeout</span> {
             <span class="kw">let</span> <span class="ident">deadline</span> <span class="op">=</span> <span class="ident">Instant::now</span>() <span class="op">+</span> <span class="ident">h1_header_read_timeout</span>;
-
+            <span class="kw-2">*</span><span class="ident">ctx</span>.<span class="ident">h1_header_read_timeout_running</span> <span class="op">=</span> <span class="bool-val">true</span>;
             <span class="kw">match</span> <span class="ident">ctx</span>.<span class="ident">h1_header_read_timeout_fut</span> {
                 <span class="prelude-val">Some</span>(<span class="ident">h1_header_read_timeout_fut</span>) =&gt; {
                     <span class="macro">debug!</span>(<span class="string">&quot;resetting h1 header read timeout timer&quot;</span>);
@@ -3227,7 +3229,13 @@
 
         <span class="kw">let</span> <span class="ident">init_cap</span> <span class="op">=</span> <span class="number">30</span> <span class="op">+</span> <span class="ident">msg</span>.<span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="ident">AVERAGE_HEADER_SIZE</span>;
         <span class="ident">dst</span>.<span class="ident">reserve</span>(<span class="ident">init_cap</span>);
-        <span class="kw">if</span> <span class="ident">msg</span>.<span class="ident">head</span>.<span class="ident">version</span> <span class="op">==</span> <span class="ident">Version::HTTP_11</span> <span class="op">&amp;&amp;</span> <span class="ident">msg</span>.<span class="ident">head</span>.<span class="ident">subject</span> <span class="op">==</span> <span class="ident">StatusCode::OK</span> {
+
+        <span class="kw">let</span> <span class="ident">custom_reason_phrase</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">head</span>.<span class="ident">extensions</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::ext::ReasonPhrase</span><span class="op">&gt;</span>();
+
+        <span class="kw">if</span> <span class="ident">msg</span>.<span class="ident">head</span>.<span class="ident">version</span> <span class="op">==</span> <span class="ident">Version::HTTP_11</span>
+            <span class="op">&amp;&amp;</span> <span class="ident">msg</span>.<span class="ident">head</span>.<span class="ident">subject</span> <span class="op">==</span> <span class="ident">StatusCode::OK</span>
+            <span class="op">&amp;&amp;</span> <span class="ident">custom_reason_phrase</span>.<span class="ident">is_none</span>()
+        {
             <span class="ident">extend</span>(<span class="ident">dst</span>, <span class="string">b&quot;HTTP/1.1 200 OK\r\n&quot;</span>);
         } <span class="kw">else</span> {
             <span class="kw">match</span> <span class="ident">msg</span>.<span class="ident">head</span>.<span class="ident">version</span> {
@@ -3242,15 +3250,21 @@
 
             <span class="ident">extend</span>(<span class="ident">dst</span>, <span class="ident">msg</span>.<span class="ident">head</span>.<span class="ident">subject</span>.<span class="ident">as_str</span>().<span class="ident">as_bytes</span>());
             <span class="ident">extend</span>(<span class="ident">dst</span>, <span class="string">b&quot; &quot;</span>);
-            <span class="comment">// a reason MUST be written, as many parsers will expect it.</span>
-            <span class="ident">extend</span>(
-                <span class="ident">dst</span>,
-                <span class="ident">msg</span>.<span class="ident">head</span>
-                    .<span class="ident">subject</span>
-                    .<span class="ident">canonical_reason</span>()
-                    .<span class="ident">unwrap_or</span>(<span class="string">&quot;&lt;none&gt;&quot;</span>)
-                    .<span class="ident">as_bytes</span>(),
-            );
+
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">reason</span>) <span class="op">=</span> <span class="ident">custom_reason_phrase</span> {
+                <span class="ident">extend</span>(<span class="ident">dst</span>, <span class="ident">reason</span>.<span class="ident">as_bytes</span>());
+            } <span class="kw">else</span> {
+                <span class="comment">// a reason MUST be written, as many parsers will expect it.</span>
+                <span class="ident">extend</span>(
+                    <span class="ident">dst</span>,
+                    <span class="ident">msg</span>.<span class="ident">head</span>
+                        .<span class="ident">subject</span>
+                        .<span class="ident">canonical_reason</span>()
+                        .<span class="ident">unwrap_or</span>(<span class="string">&quot;&lt;none&gt;&quot;</span>)
+                        .<span class="ident">as_bytes</span>(),
+                );
+            }
+
             <span class="ident">extend</span>(<span class="ident">dst</span>, <span class="string">b&quot;\r\n&quot;</span>);
         }
 
@@ -3794,12 +3808,9 @@
                         <span class="macro">trace!</span>(<span class="string">&quot;Response.parse Complete({})&quot;</span>, <span class="ident">len</span>);
                         <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">StatusCode::from_u16</span>(<span class="ident">res</span>.<span class="ident">code</span>.<span class="ident">unwrap</span>())<span class="question-mark">?</span>;
 
-                        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>))]</span>
-                        <span class="kw">let</span> <span class="ident">reason</span> <span class="op">=</span> ();
-                        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
                         <span class="kw">let</span> <span class="ident">reason</span> <span class="op">=</span> {
                             <span class="kw">let</span> <span class="ident">reason</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">reason</span>.<span class="ident">unwrap</span>();
-                            <span class="comment">// Only save the reason phrase if it isnt the canonical reason</span>
+                            <span class="comment">// Only save the reason phrase if it isn&#39;t the canonical reason</span>
                             <span class="kw">if</span> <span class="prelude-val">Some</span>(<span class="ident">reason</span>) <span class="op">!</span><span class="op">=</span> <span class="ident">status</span>.<span class="ident">canonical_reason</span>() {
                                 <span class="prelude-val">Some</span>(<span class="ident">Bytes::copy_from_slice</span>(<span class="ident">reason</span>.<span class="ident">as_bytes</span>()))
                             } <span class="kw">else</span> {
@@ -3820,12 +3831,7 @@
                     <span class="prelude-val">Err</span>(<span class="ident">httparse::Error::Version</span>) <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">h09_responses</span> =&gt; {
                         <span class="macro">trace!</span>(<span class="string">&quot;Response.parse accepted HTTP/0.9 response&quot;</span>);
 
-                        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>))]</span>
-                        <span class="kw">let</span> <span class="ident">reason</span> <span class="op">=</span> ();
-                        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
-                        <span class="kw">let</span> <span class="ident">reason</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-
-                        (<span class="number">0</span>, <span class="ident">StatusCode::OK</span>, <span class="ident">reason</span>, <span class="ident">Version::HTTP_09</span>, <span class="number">0</span>)
+                        (<span class="number">0</span>, <span class="ident">StatusCode::OK</span>, <span class="prelude-val">None</span>, <span class="ident">Version::HTTP_09</span>, <span class="number">0</span>)
                     }
                     <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>.<span class="ident">into</span>()),
                 }
@@ -3908,12 +3914,12 @@
                 <span class="ident">extensions</span>.<span class="ident">insert</span>(<span class="ident">header_order</span>);
             }
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">reason</span>) <span class="op">=</span> <span class="ident">reason</span> {
-                <span class="ident">extensions</span>.<span class="ident">insert</span>(<span class="ident"><span class="kw">crate</span>::ffi::ReasonPhrase</span>(<span class="ident">reason</span>));
+                <span class="comment">// Safety: httparse ensures that only valid reason phrase bytes are present in this</span>
+                <span class="comment">// field.</span>
+                <span class="kw">let</span> <span class="ident">reason</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident"><span class="kw">crate</span>::ext::ReasonPhrase::from_bytes_unchecked</span>(<span class="ident">reason</span>) };
+                <span class="ident">extensions</span>.<span class="ident">insert</span>(<span class="ident">reason</span>);
             }
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>))]</span>
-            <span class="ident">drop</span>(<span class="ident">reason</span>);
 
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
             <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">raw_headers</span> {

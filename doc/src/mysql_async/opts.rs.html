@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/650f071/src/opts.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>opts.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/e3f8bdb/src/opts.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>opts.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
@@ -1423,7 +1423,7 @@
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">consts::CapabilityFlags</span>,
     <span class="ident">error</span>::<span class="kw-2">*</span>,
-    <span class="ident">local_infile_handler</span>::{<span class="ident">LocalInfileHandler</span>, <span class="ident">LocalInfileHandlerObject</span>},
+    <span class="ident">local_infile_handler</span>::{<span class="ident">GlobalHandler</span>, <span class="ident">GlobalHandlerObject</span>},
 };
 
 <span class="doccomment">/// Default pool constraints.</span>
@@ -1729,7 +1729,7 @@
     <span class="ident">tcp_nodelay</span>: <span class="ident">bool</span>,
 
     <span class="doccomment">/// Local infile handler</span>
-    <span class="ident">local_infile_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LocalInfileHandlerObject</span><span class="op">&gt;</span>,
+    <span class="ident">local_infile_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GlobalHandlerObject</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// Connection pool options (defaults to [`PoolOpts::default`]).</span>
     <span class="ident">pool_opts</span>: <span class="ident">PoolOpts</span>,
@@ -1938,7 +1938,7 @@
     }
 
     <span class="doccomment">/// Handler for local infile requests (defaults to `None`).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">local_infile_handler</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">LocalInfileHandler</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">local_infile_handler</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">GlobalHandler</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>
             .<span class="ident">mysql_opts</span>
             .<span class="ident">local_infile_handler</span>
@@ -2297,12 +2297,12 @@
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Defines local infile handler. See [`Opts::local_infile_handler`].</span>
+    <span class="doccomment">/// Defines _global_ LOCAL INFILE handler (see crate-level docs).</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">local_infile_handler</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">LocalInfileHandler</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+        <span class="ident">T</span>: <span class="ident">GlobalHandler</span>,
     {
-        <span class="self">self</span>.<span class="ident">opts</span>.<span class="ident">local_infile_handler</span> <span class="op">=</span> <span class="ident">handler</span>.<span class="ident">map</span>(<span class="ident">LocalInfileHandlerObject::new</span>);
+        <span class="self">self</span>.<span class="ident">opts</span>.<span class="ident">local_infile_handler</span> <span class="op">=</span> <span class="ident">handler</span>.<span class="ident">map</span>(<span class="ident">GlobalHandlerObject::new</span>);
         <span class="self">self</span>
     }
 

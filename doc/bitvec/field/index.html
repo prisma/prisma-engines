@@ -1,160 +1,110 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Batched load/store access to bitfields."><meta name="keywords" content="rust, rustlang, rust-lang, field"><title>bitvec::field - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="sidebar-items.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Bit-Field Memory Slots"><meta name="keywords" content="rust, rustlang, rust-lang, field"><title>bitvec::field - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="sidebar-items.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"><a href="#">Module field</a></h2><div class="sidebar-elems"><section><div class="block"><ul><li><a href="#traits">Traits</a></li></ul></div></section></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../bitvec/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
                                 <a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div>
                         </div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
-    <h1 class="fqn"><span class="in-band">Module <a href="../index.html">bitvec</a>::<wbr><a class="mod" href="#">field</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../../src/bitvec/field.rs.html#1-1692">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Batched load/store access to bitfields.</p>
-<p>This module provides load/store access to bitfield regions that emulates the
-ordinary memory bus. This functionality enables any <a href="../slice/struct.BitSlice.html"><code>BitSlice</code></a> span to be used
-as a memory region, and provides the basis of a library-level analogue to the
-bitfield language feature found in C and C++. Additionally, orderings that have
-contiguous positions can transfer more than one bit in an operation, allowing a
-performance acceleration over sequential bit-by-bit traversal.</p>
-<p>The <a href="trait.BitField.html"><code>BitField</code></a> trait is open for implementation. Rust’s implementation rules
-currently disallow a crate to implement a foreign trait on a foreign type, even
-when parameterized over a local type. If you need such a <code>BitField</code>
-implementation with a new <code>BitOrder</code> type, please file an issue.</p>
-<h2 id="batched-behavior"><a href="#batched-behavior">Batched Behavior</a></h2>
-<p>The first purpose of <a href="trait.BitField.html"><code>BitField</code></a> is to provide access to <a href="../slice/struct.BitSlice.html"><code>BitSlice</code></a> regions
-as if they were an ordinary memory location. However, this can be done through
-the <code>BitSlice</code> sequential API. The second purpose of this trait is to accelerate
-such access by using the parallel memory bus to transfer more than one bit at a
-time when the region permits it. As such, implementors should provide a transfer
-behavior based on shift/mask operations wherever possible, for as wide a span in
-a memory element as possible.</p>
-<h2 id="register-bit-order-preservation"><a href="#register-bit-order-preservation">Register Bit Order Preservation</a></h2>
-<p>As a default assumption, each element of the underlying memory region used to
-store part of a value should not reörder the bit-pattern of that value. While
-the <a href="../order/trait.BitOrder.html"><code>BitOrder</code></a> argument is used to determine which segments of the memory
-register are live for the purposes of this transfer, it should not be used to
-map each individual bit of the transferred value to a corresponding bit of the
-storage element. As an example, the <a href="../order/struct.Lsb0.html"><code>Lsb0</code></a> and <a href="../order/struct.Msb0.html"><code>Msb0</code></a> implementations both
-store the value <code>12u8</code> in memory as a four-bit span with its two
-more-significant bits set and its two less-significant bits cleared; the
-difference is only in <em>which</em> bits of an element are used to store the span.</p>
-<h2 id="endianness"><a href="#endianness">Endianness</a></h2>
-<p>The <code>_le</code> and <code>_be</code> methods of <a href="trait.BitField.html"><code>BitField</code></a> refer to the order in which
-successive <code>T</code> elements of a storage region are assigned numeric significance
-during a transfer. Within any particular <code>T</code> element, the ordering of its memory
-is not governed by the <code>BitField</code> trait.</p>
-<p>The provided <a href="../order/trait.BitOrder.html"><code>BitOrder</code></a> implementors <a href="../order/struct.Lsb0.html"><code>Lsb0</code></a> and <a href="../order/struct.Msb0.html"><code>Msb0</code></a> use the local
-machine’s byte ordering, and do not reörder bytes during transfer.</p>
-<h3 id="_le-methods"><a href="#_le-methods"><code>_le</code> Methods</a></h3>
-<p>When storing a value <code>M</code> into a sequence of memory elements <code>T</code>, <a href="trait.BitField.html#tymethod.store_le"><code>store_le</code></a>
-breaks <code>M</code> into chunks from the least significant edge. The least significant
-chunk is placed in the lowest-addressed element <code>T</code>, then the next more
-significant chunk is placed in the successive address, until the most
-significant chunk of the value <code>M</code> is placed in the highest address of a
-location <code>T</code>.</p>
-<p>When loading a value <code>M</code> out of a sequence of memory elements <code>T</code>, <a href="trait.BitField.html#tymethod.load_le"><code>load_le</code></a>
-uses the same chunking behavior: the lowest-addressed <code>T</code> contains the least
-significant chunk of the returned <code>M</code>, then each successive address contains a
-more significant chunk, until the highest address contains the most significant.</p>
-<p>The <a href="../order/trait.BitOrder.html"><code>BitOrder</code></a> implementation governs <em>where</em> in each <code>T</code> location a fragment
-of <code>M</code> is stored.</p>
-<p>Let us store 8 bits into memory, over an element boundary, using both <a href="../order/struct.Lsb0.html"><code>Lsb0</code></a>
-and <a href="../order/struct.Msb0.html"><code>Msb0</code></a> orderings:</p>
-
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">bitvec::prelude</span>::<span class="kw-2">*</span>;
-
-<span class="kw">let</span> <span class="ident">val</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0b11010_011</span>;
-<span class="comment">//              STUVW XYZ</span>
-<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">store</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">2</span>];
-
-<span class="ident">store</span>.<span class="ident">view_bits_mut</span>::<span class="op">&lt;</span><span class="ident">Lsb0</span><span class="op">&gt;</span>()
-  [<span class="number">5</span> .. <span class="number">13</span>]
-  .<span class="ident">store_le</span>(<span class="ident">val</span>);
-<span class="macro">assert_eq!</span>(
-  <span class="ident">store</span>,
-  [<span class="number">0b011_00000</span>, <span class="number">0b000_11010</span>],
-<span class="comment">//   XYZ               STUVW</span>
-);
-<span class="ident">store</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">2</span>];
-
-<span class="ident">store</span>.<span class="ident">view_bits_mut</span>::<span class="op">&lt;</span><span class="ident">Msb0</span><span class="op">&gt;</span>()
-  [<span class="number">5</span> .. <span class="number">13</span>]
-  .<span class="ident">store_le</span>(<span class="ident">val</span>);
-<span class="macro">assert_eq!</span>(
-  <span class="ident">store</span>,
-  [<span class="number">0b00000_011</span>, <span class="number">0b11010_000</span>],
-<span class="comment">//         XYZ    STUVW</span>
-);</code></pre></div>
-<p>In both cases, the lower three bits of <code>val</code> were placed into the element at the
-lower memory address. The choice of <a href="../order/struct.Lsb0.html"><code>Lsb0</code></a> vs <a href="../order/struct.Msb0.html"><code>Msb0</code></a> changed <em>which</em> three
-bits in the element were considered to be indexed by <code>5 .. 8</code>, but <a href="trait.BitField.html#tymethod.store_le"><code>store_le</code></a>
-always placed the least three bits of <code>val</code>, <em>in ordinary register order</em>, into
-element <code>[0]</code>. Similarly, the higher five bits of <code>val</code> were placed into element
-<code>[1]</code>; <code>Lsb0</code> and <code>Msb0</code> selected <em>which</em> five bits in the element were indexed
-by <code>8 .. 13</code>, and the bits retained their register order.</p>
-<h3 id="_be-methods"><a href="#_be-methods"><code>_be</code> Methods</a></h3>
-<p>When storing a value <code>M</code> into a sequence of memory elements <code>T</code>, <a href="trait.BitField.html#tymethod.store_be"><code>store_be</code></a>
-breaks <code>M</code> into chunks from the most significant edge. The most significant
-chunk is placed in the lowest-addressed element <code>T</code>, then the next less
-significant chunk is placed in the successive address, until the least
-significant chunk of the value <code>M</code> is placed in the highest address of a
-location <code>T</code>.</p>
-<p>When loading a value <code>M</code> out of a sequence of memory elements <code>T</code>, <a href="trait.BitField.html#tymethod.load_be"><code>load_be</code></a>
-uses the same chunking behavior: the lowest-addressed <code>T</code> contains the most
-significant chunk of the returned <code>M</code>, then each successive address contains a
-less significant chunk, until the highest address contains the least
-significant.</p>
-<p>The <a href="../order/trait.BitOrder.html"><code>BitOrder</code></a> implementation governs <em>where</em> in each <code>T</code> location a fragment
-of <code>M</code> is stored.</p>
-<p>Let us store 8 bits into memory, over an element boundary, using both <a href="../order/struct.Lsb0.html"><code>Lsb0</code></a>
-and <a href="../order/struct.Msb0.html"><code>Msb0</code></a> orderings:</p>
-
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">bitvec::prelude</span>::<span class="kw-2">*</span>;
-
-<span class="kw">let</span> <span class="ident">val</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0b110_10011</span>;
-<span class="comment">//              STU VWXYZ</span>
-<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">store</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">2</span>];
-
-<span class="ident">store</span>.<span class="ident">view_bits_mut</span>::<span class="op">&lt;</span><span class="ident">Lsb0</span><span class="op">&gt;</span>()
-  [<span class="number">5</span> .. <span class="number">13</span>]
-  .<span class="ident">store_be</span>(<span class="ident">val</span>);
-<span class="macro">assert_eq!</span>(
-  <span class="ident">store</span>,
-  [<span class="number">0b110_00000</span>, <span class="number">0b000_10011</span>],
-<span class="comment">//   STU              VWXYZ</span>
-);
-<span class="ident">store</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">2</span>];
-
-<span class="ident">store</span>.<span class="ident">view_bits_mut</span>::<span class="op">&lt;</span><span class="ident">Msb0</span><span class="op">&gt;</span>()
-  [<span class="number">5</span> .. <span class="number">13</span>]
-  .<span class="ident">store_be</span>(<span class="ident">val</span>);
-<span class="macro">assert_eq!</span>(
-  <span class="ident">store</span>,
-  [<span class="number">0b00000_110</span>, <span class="number">0b10011_000</span>],
-<span class="comment">//         STU    VWXYZ</span>
-);</code></pre></div>
-<p>In both cases, the higher three bits of <code>val</code> were placed into the element at
-the lower memory address. The choice of <a href="../order/struct.Lsb0.html"><code>Lsb0</code></a> vs <a href="../order/struct.Msb0.html"><code>Msb0</code></a> changed <em>which</em>
-three bits in the element were considered to be indexed by <code>5 .. 8</code>, but
-<a href="trait.BitField.html#tymethod.store_be"><code>store_be</code></a> always placed the greatest three bits of <code>val</code>, <em>in ordinary</em>
-<em>register order</em>, into element <code>[0]</code>. Similarly, the lower five bits of <code>val</code>
-were placed into element <code>[1]</code>; <code>Lsb0</code> and <code>Msb0</code> selected <em>which</em> five bits in
-the element were indexed by <code>8 .. 13</code>, and the bits retained their register
-order.</p>
-<h2 id="m-and-t-relationships"><a href="#m-and-t-relationships"><code>M</code> and <code>T</code> Relationships</a></h2>
-<p><code>BitField</code> permits any type of (unsigned) integer <code>M</code> to be stored into or
-loaded from a bit-slice region with any storage type <code>T</code>. While the examples
-used <code>u8</code> for both, for brevity of writing out values, <code>BitField</code> will still
-operate correctly for any other combination of types.</p>
-<p><code>Bitfield</code> implementations use the processor’s own concept of integer registers
-to operate. As such, the byte-wise memory access patterns for types wider than
-<code>u8</code> depends on your processor’s byte-endianness, as well as which <code>BitField</code>
-method and which <code>BitOrder</code> implementation you are using.</p>
+    <h1 class="fqn"><span class="in-band">Module <a href="../index.html">bitvec</a>::<wbr><a class="mod" href="#">field</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../../src/bitvec/field.rs.html#1-638">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="bit-field-memory-slots"><a href="#bit-field-memory-slots">Bit-Field Memory Slots</a></h2>
+<p>This module implements a load/store protocol for <a href="../slice/struct.BitSlice.html"><code>BitSlice</code></a> regions that
+enables them to act as if they were a storage slot for integers. Implementations
+of the <a href="trait.BitField.html"><code>BitField</code></a> trait provide behavior similar to C and C++ language
+bit-fields. While any <code>BitSlice&lt;T, O&gt;</code> instantiation is able to provide this
+behavior, the lack of specialization in the language means that it is instead
+only implemented for <code>BitSlice&lt;T, Lsb0&gt;</code> and <code>BitSlice&lt;T, Msb0&gt;</code> in order to
+gain a performance advantage.</p>
+<h3 id="batched-behavior"><a href="#batched-behavior">Batched Behavior</a></h3>
+<p>Bit-field behavior can be simulated using <code>BitSlice</code>’s existing APIs; however,
+the inherent methods are all required to operate on each bit individually in
+sequence. In addition to the semantic load/store behavior this module describes,
+it also implements it in a way that takes advantage of the contiguity properties
+of the <code>Lsb0</code> and <code>Msb0</code> orderings in order to maximize how many bits are
+transferred in each cycle of the overall operation.</p>
+<p>This is most efficient when using <code>BitSlice&lt;usize, O&gt;</code> as the storage bit-slice,
+or using <code>.load::&lt;usize&gt;()</code> or <code>.store::&lt;usize&gt;()</code> as the transfer type.</p>
+<h3 id="bit-slice-storage-and-integer-value-relationships"><a href="#bit-slice-storage-and-integer-value-relationships">Bit-Slice Storage and Integer Value Relationships</a></h3>
+<p><code>BitField</code> permits any type of integer, <em>including signed integers</em>, to be
+stored into or loaded out of a <code>BitSlice&lt;T, _&gt;</code> with any storage type <code>T</code>. While
+the examples in this module will largely use <code>u8</code>, just to keep the text
+concise, <code>BitField</code> is tested, and will work correctly, for any combination of
+types.</p>
+<p><code>BitField</code> implementations use the processor’s own concept of integer registers
+to operate. As such, the byte-wise memory access patters for types wider than
+<code>u8</code> depends on your processor’s byte endianness, as well as which <code>BitField</code>
+method, and which <a href="../order/trait.BitOrder.html"><code>BitOrder</code></a> type parameter, you are using.</p>
 <p><code>BitField</code> only operates within processor registers; traffic of <code>T</code> elements
 between the memory bank and the processor register is controlled entirely by the
 processor.</p>
-<p>If you do not want to introduce the processor’s byte-endianness as a variable
-that affects the in-memory representation of stored integers, stick to
-<code>BitSlice&lt;_, u8&gt;</code> as the bit-field driver. <code>BitSlice&lt;Msb0, u8&gt;</code> will fill memory
-in a way that matches a debugger or other memory inspections.</p>
-<p>!</p>
+<p>If you do not want to introduce the processor’s byte endianness as a variable
+that affects the in-memory representation of stored integers, use
+<code>BitSlice&lt;u8, _&gt;</code> as the bit-field storage type. In particular,
+<code>BitSlice&lt;u8, Msb0&gt;</code> will fill memory in a way that intuitively matches what
+most debuggers show when inspecting memory.</p>
+<p>On the other hand, if you do not care about memory representation and just need
+fast storage of less than an entire integer, <code>BitSlice&lt;Lsb0, usize&gt;</code> is likely
+your best bet. As always, the choice of type parameters is a trade-off with
+different advantages for each combination, which is why <code>bitvec</code> refuses to make
+the choice for you.</p>
+<h4 id="signed-behavior"><a href="#signed-behavior">Signed Behavior</a></h4>
+<p>The length of the <code>BitSlice</code> that stores a value is considered to be the width
+of that value when it is loaded back out. As such, storing an <code>i16</code> into a
+bit-slice of length <code>12</code> means that the stored value has type <code>i12</code>.</p>
+<p>When calling <code>.load::&lt;i16&gt;()</code> on a 12-bit slice, the load will detect the sign
+bit of the <code>i12</code> value and sign-extend it to <code>i16</code>. This means that storing
+<code>2048i16</code> into a 12-bit slice and then loading it back out into an <code>i16</code> will
+produce <code>-2048i16</code> (negative), not <code>2048i16</code> (positive), because <code>1 &lt;&lt; 11</code> is
+the sign bit.</p>
+<p><code>BitField</code> <strong>does not</strong> record the true sign bit of an integer being stored, and
+will not attempt to set the sign bit of the narrowed value in storage. Storing
+<code>-127i8</code> (<code>0b1000_0001</code>) into a 7-bit slice will load <code>1i8</code>.</p>
+<h3 id="register-bit-order-preservation"><a href="#register-bit-order-preservation">Register Bit Order Preservation</a></h3>
+<p>The implementations in this module assume that the bits within a <em>value</em> being
+transferred into or out of a bit-slice should not be re-ordered. While the
+implementations will segment a value in order to make it fit into bit-slice
+storage, and will order those <em>segments</em> in memory according to their type
+parameter and specific trait method called, each segment will remain
+individually unmodified.</p>
+<p>If we consider the value <code>0b100_1011</code>, segmented at the underscore, then the
+segments <code>0b100</code> and <code>0b1011</code> will be present somewhere in the bit-slice that
+stores them. They may be shifted within an element or re-ordered across
+elements, but each segment will not be changed.</p>
+<h3 id="endianness"><a href="#endianness">Endianness</a></h3>
+<p><code>bitvec</code> uses the <code>BitOrder</code> trait to describe the order of bits within a single
+memory element. This ordering is independent of, and does not consider, the
+ordering of memory elements in a sequence; <code>bitvec</code> is always “little-endian” in
+this regard: lower indices are in lower memory addresses, higher indices are in
+higher memory addresses.</p>
+<p>However, <code>BitField</code> is <em>explicitly</em> aware of multiple storage elements in
+sequence. It is by design able to allow combinations such as
+<code>&lt;BitSlice&lt;u8, Lsb0&gt; as BitField&gt;::store_be::&lt;u32&gt;</code>. Even where the storage and
+value types are the same, or the value is narrower, the bit-slice may be spread
+across multiple elements and must segment the value across them.</p>
+<p>The <code>_be</code> and <code>_le</code> orderings on <code>BitField</code> method names refer to the numeric
+significance of <em>bit-slice storage elements</em>.</p>
+<p>In <code>_be</code> methods, lower-address storage elements will hold more-significant
+segments of the value, and higher-address storage will hold less-significant.</p>
+<p>In <code>_le</code> methods, lower-address storage elements will hold <em>less</em>-significant
+segments of the value, and higher-address storage will hold <em>more</em>-significant.</p>
+<p>Consider again the value <code>0b100_1011</code>, segmented at the underscore. When used
+with <code>.store_be()</code>, it will be placed into memory as <code>[0b…100…, 0b…1011…]</code>; when
+used with <code>.store_le()</code>, it will be placed into memory as <code>[0b…1011…, 0b…100…]</code>.</p>
+<h3 id="bit-ordering-behaviors"><a href="#bit-ordering-behaviors">Bit-Ordering Behaviors</a></h3>
+<p>The <code>_be</code> and <code>_le</code> suffices select the ordering of storage elements in memory.
+The other critical aspect of the <code>BitField</code> memory behavior is selecting
+<em>which bits</em> in a storage element are used when a bit-slice has partial
+elements.</p>
+<p>When <code>BitSlice&lt;_, Lsb0&gt;</code> produces a <a href="../domain/enum.Domain.html#variant.Region"><code>Domain::Region</code></a>, its <code>head</code> is in the
+most-significant bits of its element and its <code>tail</code> is in the least-significant
+bits. When <code>BitSlice&lt;_, Msb0&gt;</code> produces a <code>Region</code>, its <code>head</code> is in the
+<em>least</em>-significant bits, and its <code>tail</code> is in the <em>most</em>-significant bits.</p>
+<p>You can therefore use these combinations of <code>BitOrder</code> type parameter and
+<code>BitField</code> method suffix to select exactly the memory behavior you want for a
+storage region.</p>
+<p>Each implementation of <code>BitField</code> has documentation showing exactly what its
+memory layout looks like, with code examples and visual inspections of memory.
+This documentation is likely collapsed by default when viewing the trait docs;
+be sure to use the <code>[+]</code> button to expand it!</p>
 </div></details><h2 id="traits" class="small-section-header"><a href="#traits">Traits</a></h2>
-<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.BitField.html" title="bitvec::field::BitField trait">BitField</a></div><div class="item-right docblock-short"><p>Performs C-style bitfield access through a <a href="../slice/struct.BitSlice.html"><code>BitSlice</code></a>.</p>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.BitField.html" title="bitvec::field::BitField trait">BitField</a></div><div class="item-right docblock-short"><p>C-Style Bit-Field Access</p>
 </div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bitvec" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0 (4b91a6ea7 2022-08-08)" ></div>
 </body></html>

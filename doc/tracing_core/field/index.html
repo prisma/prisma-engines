@@ -7,7 +7,7 @@
                         <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
                                 <a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div>
                         </div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
-    <h1 class="fqn"><span class="in-band">Module <a href="../index.html">tracing_core</a>::<wbr><a class="mod" href="#">field</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../../src/tracing_core/field.rs.html#1-1199">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p><code>Span</code> and <code>Event</code> key-value data.</p>
+    <h1 class="fqn"><span class="in-band">Module <a href="../index.html">tracing_core</a>::<wbr><a class="mod" href="#">field</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../../src/tracing_core/field.rs.html#1-1263">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p><code>Span</code> and <code>Event</code> key-value data.</p>
 <p>Spans and events may be annotated with key-value data, referred to as known
 as <em>fields</em>. These fields consist of a mapping from a key (corresponding to
 a <code>&amp;str</code> but represented internally as an array index) to a <a href="trait.Value.html" title="Value"><code>Value</code></a>.</p>
@@ -21,9 +21,9 @@ with additional <a href="../span/struct.Record.html"><code>Record</code></a>s if
 Similarly, the <a href="../struct.Event.html"><code>Event</code></a> type passed to the subscriber’s <a href="../struct.Event.html"><code>event</code></a> method
 will contain any fields attached to each event.</p>
 <p><code>tracing</code> represents values as either one of a set of Rust primitives
-(<code>i64</code>, <code>u64</code>, <code>f64</code>, <code>bool</code>, and <code>&amp;str</code>) or using a <code>fmt::Display</code> or
-<code>fmt::Debug</code> implementation. <code>Subscriber</code>s are provided these primitive
-value types as <code>dyn Value</code> trait objects.</p>
+(<code>i64</code>, <code>u64</code>, <code>f64</code>, <code>i128</code>, <code>u128</code>, <code>bool</code>, and <code>&amp;str</code>) or using a
+<code>fmt::Display</code> or <code>fmt::Debug</code> implementation. <code>Subscriber</code>s are provided
+these primitive value types as <code>dyn Value</code> trait objects.</p>
 <p>These trait objects can be formatted using <code>fmt::Debug</code>, but may also be
 recorded as typed data by calling the <a href="trait.Value.html#tymethod.record"><code>Value::record</code></a> method on these
 trait objects with a <em>visitor</em> implementing the <a href="trait.Visit.html" title="Visit"><code>Visit</code></a> trait. This trait

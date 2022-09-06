@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["BitPtr","Pointer to an individual bit in a memory element. Analagous to `*bool`."],["BitPtrRange","Equivalent to `Range<BitPtr<M, O, T>>`."],["BitRef","A proxy reference, equivalent to C++ `std::bitset<N>::reference`."]]};
+window.SIDEBAR_ITEMS = {"struct":[["BitPtr","Single-Bit Pointer"],["BitPtrRange","Bit-Pointer Range"],["BitRef","Proxy Bit-Reference"]]};

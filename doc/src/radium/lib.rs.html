@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/radium-0.6.2/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../radium/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/radium-0.7.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../radium/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../radium/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
@@ -867,6 +867,57 @@
 <span id="861">861</span>
 <span id="862">862</span>
 <span id="863">863</span>
+<span id="864">864</span>
+<span id="865">865</span>
+<span id="866">866</span>
+<span id="867">867</span>
+<span id="868">868</span>
+<span id="869">869</span>
+<span id="870">870</span>
+<span id="871">871</span>
+<span id="872">872</span>
+<span id="873">873</span>
+<span id="874">874</span>
+<span id="875">875</span>
+<span id="876">876</span>
+<span id="877">877</span>
+<span id="878">878</span>
+<span id="879">879</span>
+<span id="880">880</span>
+<span id="881">881</span>
+<span id="882">882</span>
+<span id="883">883</span>
+<span id="884">884</span>
+<span id="885">885</span>
+<span id="886">886</span>
+<span id="887">887</span>
+<span id="888">888</span>
+<span id="889">889</span>
+<span id="890">890</span>
+<span id="891">891</span>
+<span id="892">892</span>
+<span id="893">893</span>
+<span id="894">894</span>
+<span id="895">895</span>
+<span id="896">896</span>
+<span id="897">897</span>
+<span id="898">898</span>
+<span id="899">899</span>
+<span id="900">900</span>
+<span id="901">901</span>
+<span id="902">902</span>
+<span id="903">903</span>
+<span id="904">904</span>
+<span id="905">905</span>
+<span id="906">906</span>
+<span id="907">907</span>
+<span id="908">908</span>
+<span id="909">909</span>
+<span id="910">910</span>
+<span id="911">911</span>
+<span id="912">912</span>
+<span id="913">913</span>
+<span id="914">914</span>
 </pre><pre class="rust"><code><span class="doccomment">//! `radium` provides a series of helpers for a uniform API over both atomic</span>
 <span class="doccomment">//! types like [`AtomicUsize`], and non-atomic types like [`Cell&lt;T&gt;`].</span>
 <span class="doccomment">//!</span>
@@ -1002,6 +1053,7 @@
     <span class="doccomment">/// See also: [`AtomicUsize::compare_and_swap`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`AtomicUsize::compare_and_swap`]: core::sync::atomic::AtomicUsize::compare_and_swap</span>
+    <span class="attribute">#[<span class="ident">deprecated</span> <span class="op">=</span> <span class="string">&quot;Use `compare_exchange` or `compare_exchange_weak` instead&quot;</span>]</span>
     <span class="kw">fn</span> <span class="ident">compare_and_swap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">current</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">new</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>)
         -&gt; <span class="ident"><span class="self">Self</span>::Item</span>;
 
@@ -1130,6 +1182,31 @@
     <span class="kw">fn</span> <span class="ident">fetch_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="ident"><span class="self">Self</span>::Item</span>
     <span class="kw">where</span>
         <span class="ident"><span class="self">Self</span>::Item</span>: <span class="ident">marker::NumericOps</span>;
+
+    <span class="doccomment">/// Fetches the value, and applies a function to it that returns an</span>
+    <span class="doccomment">/// optional new value.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Note: This may call the function multiple times if the value has been</span>
+    <span class="doccomment">/// changed from other threads in the meantime, as long as the function</span>
+    <span class="doccomment">/// returns `Some(_)`, but the function will have been applied only once to</span>
+    <span class="doccomment">/// the stored value.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns a `Result` of `Ok(previous_value)` if the function returned</span>
+    <span class="doccomment">/// `Some(_)`, else `Err(previous_value)`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Ordering arguments are ignored by non-atomic types.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// See also: [`AtomicUsize::fetch_update`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`AtomicUsize::fetch_update`]: core::sync::atomic::AtomicUsize::fetch_update</span>
+    <span class="kw">fn</span> <span class="ident">fetch_update</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">set_order</span>: <span class="ident">Ordering</span>,
+        <span class="ident">fetch_order</span>: <span class="ident">Ordering</span>,
+        <span class="ident">f</span>: <span class="ident">F</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>;
 }
 
 <span class="doccomment">/// Marker traits used by [`Radium`].</span>
@@ -1231,6 +1308,7 @@
         }
 
         <span class="attribute">#[<span class="ident">inline</span>]</span>
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
         <span class="kw">fn</span> <span class="ident">compare_and_swap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">current</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="ident">new</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
             <span class="self">self</span>.<span class="ident">compare_and_swap</span>(<span class="ident">current</span>, <span class="ident">new</span>, <span class="ident">order</span>)
         }
@@ -1255,6 +1333,19 @@
             <span class="ident">failure</span>: <span class="ident">Ordering</span>,
         ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span> {
             <span class="self">self</span>.<span class="ident">compare_exchange_weak</span>(<span class="ident">current</span>, <span class="ident">new</span>, <span class="ident">success</span>, <span class="ident">failure</span>)
+        }
+
+        <span class="attribute">#[<span class="ident">inline</span>]</span>
+        <span class="kw">fn</span> <span class="ident">fetch_update</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+            <span class="kw-2">&amp;</span><span class="self">self</span>,
+            <span class="ident">set_order</span>: <span class="ident">Ordering</span>,
+            <span class="ident">fetch_order</span>: <span class="ident">Ordering</span>,
+            <span class="ident">f</span>: <span class="ident">F</span>,
+        ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span>
+        <span class="kw">where</span>
+            <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span>,
+        {
+            <span class="self">self</span>.<span class="ident">fetch_update</span>(<span class="ident">set_order</span>, <span class="ident">fetch_order</span>, <span class="ident">f</span>)
         }
     };
 
@@ -1362,6 +1453,17 @@
             <span class="ident">failure</span>: <span class="ident">Ordering</span>,
         ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span> {
             <span class="ident">Radium::compare_exchange</span>(<span class="self">self</span>, <span class="ident">current</span>, <span class="ident">new</span>, <span class="ident">success</span>, <span class="ident">failure</span>)
+        }
+
+        <span class="attribute">#[<span class="ident">inline</span>]</span>
+        <span class="kw">fn</span> <span class="ident">fetch_update</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span>
+        <span class="kw">where</span>
+            <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span>,
+        {
+            <span class="kw">match</span> <span class="ident">f</span>(<span class="self">self</span>.<span class="ident">get</span>()) {
+                <span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">replace</span>(<span class="ident">x</span>)),
+                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">get</span>()),
+            }
         }
     };
 

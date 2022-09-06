@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/650f071/src/local_infile_handler/builtin.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>builtin.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/e3f8bdb/src/local_infile_handler/builtin.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>builtin.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
@@ -67,6 +67,14 @@
 <span id="61">61</span>
 <span id="62">62</span>
 <span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) 2016 Anatoly Ikorsky</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0</span>
@@ -75,32 +83,40 @@
 <span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
 <span class="comment">// modified, or distributed except according to those terms.</span>
 
+<span class="kw">use</span> <span class="ident">futures_util::FutureExt</span>;
 <span class="kw">use</span> <span class="ident">tokio::fs::File</span>;
+<span class="kw">use</span> <span class="ident">tokio_util::io::ReaderStream</span>;
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashSet</span>, <span class="ident">path::PathBuf</span>, <span class="ident">str::from_utf8</span>};
+<span class="kw">use</span> <span class="ident">std</span>::{
+    <span class="ident">collections::HashSet</span>,
+    <span class="ident">path</span>::{<span class="ident">Path</span>, <span class="ident">PathBuf</span>},
+};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::local_infile_handler::LocalInfileHandler</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">error::LocalInfileError</span>,
+    <span class="ident">local_infile_handler</span>::{<span class="ident">BoxFuture</span>, <span class="ident">GlobalHandler</span>},
+};
 
-<span class="doccomment">/// Handles local infile requests from filesystem using explicit whitelist of paths.</span>
+<span class="doccomment">/// Handles `LOCAL INFILE` requests from filesystem using an explicit whitelist of paths.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Example usage:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use mysql_async::{OptsBuilder, WhiteListFsLocalInfileHandler};</span>
+<span class="doccomment">/// use mysql_async::{OptsBuilder, WhiteListFsHandler};</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # let database_url = &quot;mysql://root:password@127.0.0.1:3307/mysql&quot;;</span>
 <span class="doccomment">/// let mut opts = OptsBuilder::from_opts(database_url);</span>
-<span class="doccomment">/// opts.local_infile_handler(Some(WhiteListFsLocalInfileHandler::new(</span>
+<span class="doccomment">/// opts.local_infile_handler(Some(WhiteListFsHandler::new(</span>
 <span class="doccomment">///     &amp;[&quot;path/to/local_infile.txt&quot;][..],</span>
 <span class="doccomment">/// )));</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WhiteListFsLocalInfileHandler</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WhiteListFsHandler</span> {
     <span class="ident">white_list</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">WhiteListFsLocalInfileHandler</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">white_list</span>: <span class="ident">B</span>) -&gt; <span class="ident">WhiteListFsLocalInfileHandler</span>
+<span class="kw">impl</span> <span class="ident">WhiteListFsHandler</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">white_list</span>: <span class="ident">B</span>) -&gt; <span class="ident">WhiteListFsHandler</span>
     <span class="kw">where</span>
         <span class="ident">A</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span>,
         <span class="ident">B</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">A</span><span class="op">&gt;</span>,
@@ -109,25 +125,25 @@
         <span class="kw">for</span> <span class="ident">path</span> <span class="kw">in</span> <span class="ident">white_list</span>.<span class="ident">into_iter</span>() {
             <span class="ident">white_list_set</span>.<span class="ident">insert</span>(<span class="ident">Into</span>::<span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span><span class="ident">::into</span>(<span class="ident">path</span>));
         }
-        <span class="ident">WhiteListFsLocalInfileHandler</span> {
+        <span class="ident">WhiteListFsHandler</span> {
             <span class="ident">white_list</span>: <span class="ident">white_list_set</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">LocalInfileHandler</span> <span class="kw">for</span> <span class="ident">WhiteListFsLocalInfileHandler</span> {
-    <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">file_name</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident"><span class="kw">super</span>::InfileHandlerFuture</span> {
-        <span class="kw">let</span> <span class="ident">path</span>: <span class="ident">PathBuf</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">from_utf8</span>(<span class="ident">file_name</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">path_str</span>) =&gt; <span class="ident">path_str</span>.<span class="ident">into</span>(),
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="ident">Box::pin</span>(<span class="ident">futures_util::future::err</span>(<span class="string">&quot;Invalid file name&quot;</span>.<span class="ident">into</span>())),
-        };
-
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">white_list</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>) {
-            <span class="kw">let</span> <span class="ident">err_msg</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;Path `{}&#39; is not in white list&quot;</span>, <span class="ident">path</span>.<span class="ident">display</span>());
-            <span class="kw">return</span> <span class="ident">Box::pin</span>(<span class="ident">futures_util::future::err</span>(<span class="ident">err_msg</span>.<span class="ident">into</span>()));
+<span class="kw">impl</span> <span class="ident">GlobalHandler</span> <span class="kw">for</span> <span class="ident">WhiteListFsHandler</span> {
+    <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">file_name</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident"><span class="kw">super</span>::InfileData</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">String::from_utf8_lossy</span>(<span class="ident">file_name</span>);
+        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">white_list</span>
+            .<span class="ident">get</span>(<span class="ident">Path::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">path</span>))
+            .<span class="ident">cloned</span>()
+            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">LocalInfileError::PathIsNotInTheWhiteList</span>(<span class="ident">path</span>.<span class="ident">into_owned</span>()));
+        <span class="kw">async</span> <span class="kw">move</span> {
+            <span class="kw">let</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">File::open</span>(<span class="ident">path</span><span class="question-mark">?</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(<span class="ident">Box::pin</span>(<span class="ident">ReaderStream::new</span>(<span class="ident">file</span>)) <span class="kw">as</span> <span class="ident"><span class="kw">super</span>::InfileData</span>)
         }
-
-        <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> { <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">File::open</span>(<span class="ident">path</span>.<span class="ident">to_owned</span>()).<span class="kw">await</span><span class="question-mark">?</span>) <span class="kw">as</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>) })
+        .<span class="ident">boxed</span>()
     }
 }
 </code></pre></div>

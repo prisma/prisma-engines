@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.2.2/src/client/options/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/client/options/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
@@ -2366,12 +2366,295 @@
 <span id="2360">2360</span>
 <span id="2361">2361</span>
 <span id="2362">2362</span>
+<span id="2363">2363</span>
+<span id="2364">2364</span>
+<span id="2365">2365</span>
+<span id="2366">2366</span>
+<span id="2367">2367</span>
+<span id="2368">2368</span>
+<span id="2369">2369</span>
+<span id="2370">2370</span>
+<span id="2371">2371</span>
+<span id="2372">2372</span>
+<span id="2373">2373</span>
+<span id="2374">2374</span>
+<span id="2375">2375</span>
+<span id="2376">2376</span>
+<span id="2377">2377</span>
+<span id="2378">2378</span>
+<span id="2379">2379</span>
+<span id="2380">2380</span>
+<span id="2381">2381</span>
+<span id="2382">2382</span>
+<span id="2383">2383</span>
+<span id="2384">2384</span>
+<span id="2385">2385</span>
+<span id="2386">2386</span>
+<span id="2387">2387</span>
+<span id="2388">2388</span>
+<span id="2389">2389</span>
+<span id="2390">2390</span>
+<span id="2391">2391</span>
+<span id="2392">2392</span>
+<span id="2393">2393</span>
+<span id="2394">2394</span>
+<span id="2395">2395</span>
+<span id="2396">2396</span>
+<span id="2397">2397</span>
+<span id="2398">2398</span>
+<span id="2399">2399</span>
+<span id="2400">2400</span>
+<span id="2401">2401</span>
+<span id="2402">2402</span>
+<span id="2403">2403</span>
+<span id="2404">2404</span>
+<span id="2405">2405</span>
+<span id="2406">2406</span>
+<span id="2407">2407</span>
+<span id="2408">2408</span>
+<span id="2409">2409</span>
+<span id="2410">2410</span>
+<span id="2411">2411</span>
+<span id="2412">2412</span>
+<span id="2413">2413</span>
+<span id="2414">2414</span>
+<span id="2415">2415</span>
+<span id="2416">2416</span>
+<span id="2417">2417</span>
+<span id="2418">2418</span>
+<span id="2419">2419</span>
+<span id="2420">2420</span>
+<span id="2421">2421</span>
+<span id="2422">2422</span>
+<span id="2423">2423</span>
+<span id="2424">2424</span>
+<span id="2425">2425</span>
+<span id="2426">2426</span>
+<span id="2427">2427</span>
+<span id="2428">2428</span>
+<span id="2429">2429</span>
+<span id="2430">2430</span>
+<span id="2431">2431</span>
+<span id="2432">2432</span>
+<span id="2433">2433</span>
+<span id="2434">2434</span>
+<span id="2435">2435</span>
+<span id="2436">2436</span>
+<span id="2437">2437</span>
+<span id="2438">2438</span>
+<span id="2439">2439</span>
+<span id="2440">2440</span>
+<span id="2441">2441</span>
+<span id="2442">2442</span>
+<span id="2443">2443</span>
+<span id="2444">2444</span>
+<span id="2445">2445</span>
+<span id="2446">2446</span>
+<span id="2447">2447</span>
+<span id="2448">2448</span>
+<span id="2449">2449</span>
+<span id="2450">2450</span>
+<span id="2451">2451</span>
+<span id="2452">2452</span>
+<span id="2453">2453</span>
+<span id="2454">2454</span>
+<span id="2455">2455</span>
+<span id="2456">2456</span>
+<span id="2457">2457</span>
+<span id="2458">2458</span>
+<span id="2459">2459</span>
+<span id="2460">2460</span>
+<span id="2461">2461</span>
+<span id="2462">2462</span>
+<span id="2463">2463</span>
+<span id="2464">2464</span>
+<span id="2465">2465</span>
+<span id="2466">2466</span>
+<span id="2467">2467</span>
+<span id="2468">2468</span>
+<span id="2469">2469</span>
+<span id="2470">2470</span>
+<span id="2471">2471</span>
+<span id="2472">2472</span>
+<span id="2473">2473</span>
+<span id="2474">2474</span>
+<span id="2475">2475</span>
+<span id="2476">2476</span>
+<span id="2477">2477</span>
+<span id="2478">2478</span>
+<span id="2479">2479</span>
+<span id="2480">2480</span>
+<span id="2481">2481</span>
+<span id="2482">2482</span>
+<span id="2483">2483</span>
+<span id="2484">2484</span>
+<span id="2485">2485</span>
+<span id="2486">2486</span>
+<span id="2487">2487</span>
+<span id="2488">2488</span>
+<span id="2489">2489</span>
+<span id="2490">2490</span>
+<span id="2491">2491</span>
+<span id="2492">2492</span>
+<span id="2493">2493</span>
+<span id="2494">2494</span>
+<span id="2495">2495</span>
+<span id="2496">2496</span>
+<span id="2497">2497</span>
+<span id="2498">2498</span>
+<span id="2499">2499</span>
+<span id="2500">2500</span>
+<span id="2501">2501</span>
+<span id="2502">2502</span>
+<span id="2503">2503</span>
+<span id="2504">2504</span>
+<span id="2505">2505</span>
+<span id="2506">2506</span>
+<span id="2507">2507</span>
+<span id="2508">2508</span>
+<span id="2509">2509</span>
+<span id="2510">2510</span>
+<span id="2511">2511</span>
+<span id="2512">2512</span>
+<span id="2513">2513</span>
+<span id="2514">2514</span>
+<span id="2515">2515</span>
+<span id="2516">2516</span>
+<span id="2517">2517</span>
+<span id="2518">2518</span>
+<span id="2519">2519</span>
+<span id="2520">2520</span>
+<span id="2521">2521</span>
+<span id="2522">2522</span>
+<span id="2523">2523</span>
+<span id="2524">2524</span>
+<span id="2525">2525</span>
+<span id="2526">2526</span>
+<span id="2527">2527</span>
+<span id="2528">2528</span>
+<span id="2529">2529</span>
+<span id="2530">2530</span>
+<span id="2531">2531</span>
+<span id="2532">2532</span>
+<span id="2533">2533</span>
+<span id="2534">2534</span>
+<span id="2535">2535</span>
+<span id="2536">2536</span>
+<span id="2537">2537</span>
+<span id="2538">2538</span>
+<span id="2539">2539</span>
+<span id="2540">2540</span>
+<span id="2541">2541</span>
+<span id="2542">2542</span>
+<span id="2543">2543</span>
+<span id="2544">2544</span>
+<span id="2545">2545</span>
+<span id="2546">2546</span>
+<span id="2547">2547</span>
+<span id="2548">2548</span>
+<span id="2549">2549</span>
+<span id="2550">2550</span>
+<span id="2551">2551</span>
+<span id="2552">2552</span>
+<span id="2553">2553</span>
+<span id="2554">2554</span>
+<span id="2555">2555</span>
+<span id="2556">2556</span>
+<span id="2557">2557</span>
+<span id="2558">2558</span>
+<span id="2559">2559</span>
+<span id="2560">2560</span>
+<span id="2561">2561</span>
+<span id="2562">2562</span>
+<span id="2563">2563</span>
+<span id="2564">2564</span>
+<span id="2565">2565</span>
+<span id="2566">2566</span>
+<span id="2567">2567</span>
+<span id="2568">2568</span>
+<span id="2569">2569</span>
+<span id="2570">2570</span>
+<span id="2571">2571</span>
+<span id="2572">2572</span>
+<span id="2573">2573</span>
+<span id="2574">2574</span>
+<span id="2575">2575</span>
+<span id="2576">2576</span>
+<span id="2577">2577</span>
+<span id="2578">2578</span>
+<span id="2579">2579</span>
+<span id="2580">2580</span>
+<span id="2581">2581</span>
+<span id="2582">2582</span>
+<span id="2583">2583</span>
+<span id="2584">2584</span>
+<span id="2585">2585</span>
+<span id="2586">2586</span>
+<span id="2587">2587</span>
+<span id="2588">2588</span>
+<span id="2589">2589</span>
+<span id="2590">2590</span>
+<span id="2591">2591</span>
+<span id="2592">2592</span>
+<span id="2593">2593</span>
+<span id="2594">2594</span>
+<span id="2595">2595</span>
+<span id="2596">2596</span>
+<span id="2597">2597</span>
+<span id="2598">2598</span>
+<span id="2599">2599</span>
+<span id="2600">2600</span>
+<span id="2601">2601</span>
+<span id="2602">2602</span>
+<span id="2603">2603</span>
+<span id="2604">2604</span>
+<span id="2605">2605</span>
+<span id="2606">2606</span>
+<span id="2607">2607</span>
+<span id="2608">2608</span>
+<span id="2609">2609</span>
+<span id="2610">2610</span>
+<span id="2611">2611</span>
+<span id="2612">2612</span>
+<span id="2613">2613</span>
+<span id="2614">2614</span>
+<span id="2615">2615</span>
+<span id="2616">2616</span>
+<span id="2617">2617</span>
+<span id="2618">2618</span>
+<span id="2619">2619</span>
+<span id="2620">2620</span>
+<span id="2621">2621</span>
+<span id="2622">2622</span>
+<span id="2623">2623</span>
+<span id="2624">2624</span>
+<span id="2625">2625</span>
+<span id="2626">2626</span>
+<span id="2627">2627</span>
+<span id="2628">2628</span>
+<span id="2629">2629</span>
+<span id="2630">2630</span>
+<span id="2631">2631</span>
+<span id="2632">2632</span>
+<span id="2633">2633</span>
+<span id="2634">2634</span>
+<span id="2635">2635</span>
+<span id="2636">2636</span>
+<span id="2637">2637</span>
+<span id="2638">2638</span>
+<span id="2639">2639</span>
+<span id="2640">2640</span>
+<span id="2641">2641</span>
+<span id="2642">2642</span>
+<span id="2643">2643</span>
+<span id="2644">2644</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>), <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-sync&quot;</span>)))]</span>
 <span class="kw">mod</span> <span class="ident">test</span>;
 
 <span class="kw">mod</span> <span class="ident">resolver_config</span>;
 
 <span class="kw">use</span> <span class="ident">std</span>::{
+    <span class="ident">cmp::Ordering</span>,
     <span class="ident">collections::HashSet</span>,
     <span class="ident">convert::TryFrom</span>,
     <span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Display</span>, <span class="ident">Formatter</span>},
@@ -2384,12 +2667,7 @@
 
 <span class="kw">use</span> <span class="ident">derivative::Derivative</span>;
 <span class="kw">use</span> <span class="ident">lazy_static::lazy_static</span>;
-<span class="kw">use</span> <span class="ident">serde</span>::{
-    <span class="ident">de</span>::{<span class="ident">Error</span>, <span class="ident">Unexpected</span>},
-    <span class="ident">Deserialize</span>,
-    <span class="ident">Deserializer</span>,
-    <span class="ident">Serialize</span>,
-};
+<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">de::Unexpected</span>, <span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">serde_with::skip_serializing_none</span>;
 <span class="kw">use</span> <span class="ident">strsim::jaro_winkler</span>;
 <span class="kw">use</span> <span class="ident">typed_builder::TypedBuilder</span>;
@@ -2402,10 +2680,10 @@
     <span class="ident">client::auth</span>::{<span class="ident">AuthMechanism</span>, <span class="ident">Credential</span>},
     <span class="ident">compression::Compressor</span>,
     <span class="ident">concern</span>::{<span class="ident">Acknowledgment</span>, <span class="ident">ReadConcern</span>, <span class="ident">WriteConcern</span>},
-    <span class="ident">error</span>::{<span class="ident">ErrorKind</span>, <span class="prelude-ty">Result</span>},
+    <span class="ident">error</span>::{<span class="ident">Error</span>, <span class="ident">ErrorKind</span>, <span class="prelude-ty">Result</span>},
     <span class="ident">event</span>::{<span class="ident">cmap::CmapEventHandler</span>, <span class="ident">command::CommandEventHandler</span>, <span class="ident">sdam::SdamEventHandler</span>},
     <span class="ident">options::ReadConcernLevel</span>,
-    <span class="ident">sdam::MIN_HEARTBEAT_FREQUENCY</span>,
+    <span class="ident">sdam</span>::{<span class="ident">DEFAULT_HEARTBEAT_FREQUENCY</span>, <span class="ident">IDLE_WRITE_PERIOD</span>, <span class="ident">MIN_HEARTBEAT_FREQUENCY</span>},
     <span class="ident">selection_criteria</span>::{<span class="ident">ReadPreference</span>, <span class="ident">SelectionCriteria</span>, <span class="ident">TagSet</span>},
     <span class="ident">srv</span>::{<span class="ident">OriginalSrvInfo</span>, <span class="ident">SrvResolver</span>},
 };
@@ -2490,7 +2768,8 @@
         <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
         <span class="kw">let</span> <span class="ident">s</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">Deserialize::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-        <span class="ident"><span class="self">Self</span>::parse</span>(<span class="ident">s</span>.<span class="ident">as_str</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">D::Error::custom</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">e</span>)))
+        <span class="ident"><span class="self">Self</span>::parse</span>(<span class="ident">s</span>.<span class="ident">as_str</span>())
+            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="op">&lt;</span><span class="ident">D::Error</span> <span class="kw">as</span> <span class="ident">serde::de::Error</span><span class="op">&gt;</span><span class="ident">::custom</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">e</span>)))
     }
 }
 
@@ -2532,7 +2811,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">ServerAddress</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::error::Error</span>;
+    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">Error</span>;
     <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">address</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident">ServerAddress::parse</span>(<span class="ident">address</span>)
     }
@@ -2648,7 +2927,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">ServerApiVersion</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::error::Error</span>;
+    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">Error</span>;
 
     <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">str</span> {
@@ -2676,13 +2955,14 @@
     {
         <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">String::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
 
-        <span class="ident">ServerApiVersion::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::invalid_value</span>(<span class="ident">Unexpected::Str</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>), <span class="kw-2">&amp;</span><span class="string">&quot;a valid version number&quot;</span>))
+        <span class="ident">ServerApiVersion::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
+            <span class="ident">serde::de::Error::invalid_value</span>(<span class="ident">Unexpected::Str</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>), <span class="kw-2">&amp;</span><span class="string">&quot;a valid version number&quot;</span>)
+        })
     }
 }
 
 <span class="doccomment">/// Options used to declare a stable server API.  For more information, see the [Stable API](</span>
-<span class="doccomment">/// https://docs.mongodb.com/v5.0/reference/stable-api/) manual page.</span>
+<span class="doccomment">/// https://www.mongodb.com/docs/v5.0/reference/stable-api/) manual page.</span>
 <span class="attribute">#[<span class="ident">serde_with::skip_serializing_none</span>]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>, <span class="ident">PartialEq</span>, <span class="ident">TypedBuilder</span>)]</span>
 <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">field_defaults</span>(<span class="ident">setter</span>(<span class="ident">into</span>)))]</span>
@@ -2870,7 +3150,7 @@
     <span class="doccomment">/// a separate client that declares the appropriate API version.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// For more information, see the [Stable API](</span>
-    <span class="doccomment">/// https://docs.mongodb.com/v5.0/reference/stable-api/) manual page.</span>
+    <span class="doccomment">/// https://www.mongodb.com/docs/v5.0/reference/stable-api/) manual page.</span>
     <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">server_api</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ServerApi</span><span class="op">&gt;</span>,
 
@@ -2908,6 +3188,7 @@
     <span class="attribute">#[<span class="ident">derivative</span>(<span class="ident">Debug</span> <span class="op">=</span> <span class="string">&quot;ignore&quot;</span>)]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">original_srv_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OriginalSrvInfo</span><span class="op">&gt;</span>,
 
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
     <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>, <span class="ident">setter</span>(<span class="ident">skip</span>))]</span>
     <span class="attribute">#[<span class="ident">derivative</span>(<span class="ident">Debug</span> <span class="op">=</span> <span class="string">&quot;ignore&quot;</span>)]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">original_uri</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
@@ -3043,41 +3324,186 @@
     }
 }
 
+<span class="doccomment">/// Contains the options that can be set via a MongoDB connection string.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The format of a MongoDB connection string is described [here](https://www.mongodb.com/docs/manual/reference/connection-string/#connection-string-formats).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">struct</span> <span class="ident">ClientOptionsParser</span> {
-    <span class="kw">pub</span> <span class="ident">hosts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ServerAddress</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">srv</span>: <span class="ident">bool</span>,
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConnectionString</span> {
+    <span class="doccomment">/// The initial list of seeds that the Client should connect to, or a DNS name used for SRV</span>
+    <span class="doccomment">/// lookup of the initial seed list.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Note that by default, the driver will autodiscover other nodes in the cluster. To connect</span>
+    <span class="doccomment">/// directly to a single server (rather than autodiscovering the rest of the cluster), set the</span>
+    <span class="doccomment">/// `direct_connection` field to `true`.</span>
+    <span class="kw">pub</span> <span class="ident">host_info</span>: <span class="ident">HostInfo</span>,
+
+    <span class="doccomment">/// The application name that the Client will send to the server as part of the handshake. This</span>
+    <span class="doccomment">/// can be used in combination with the server logs to determine which Client is connected to a</span>
+    <span class="doccomment">/// server.</span>
     <span class="kw">pub</span> <span class="ident">app_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// The TLS configuration for the Client to use in its connections with the server.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// By default, TLS is disabled.</span>
     <span class="kw">pub</span> <span class="ident">tls</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Tls</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">heartbeat_freq</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// The amount of time each monitoring thread should wait between performing server checks.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The default value is 10 seconds.</span>
+    <span class="kw">pub</span> <span class="ident">heartbeat_frequency</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// When running a read operation with a ReadPreference that allows selecting secondaries,</span>
+    <span class="doccomment">/// `local_threshold` is used to determine how much longer the average round trip time between</span>
+    <span class="doccomment">/// the driver and server is allowed compared to the least round trip time of all the suitable</span>
+    <span class="doccomment">/// servers. For example, if the average round trip times of the suitable servers are 5 ms, 10</span>
+    <span class="doccomment">/// ms, and 15 ms, and the local threshold is 8 ms, then the first two servers are within the</span>
+    <span class="doccomment">/// latency window and could be chosen for the operation, but the last one is not.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// A value of zero indicates that there is no latency window, so only the server with the</span>
+    <span class="doccomment">/// lowest average round trip time is eligible.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The default value is 15 ms.</span>
     <span class="kw">pub</span> <span class="ident">local_threshold</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// Specifies the default read concern for operations performed on the Client. See the</span>
+    <span class="doccomment">/// ReadConcern type documentation for more details.</span>
     <span class="kw">pub</span> <span class="ident">read_concern</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadConcern</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">selection_criteria</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectionCriteria</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">repl_set_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// The name of the replica set that the Client should connect to.</span>
+    <span class="kw">pub</span> <span class="ident">replica_set</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// Specifies the default write concern for operations performed on the Client. See the</span>
+    <span class="doccomment">/// WriteConcern type documentation for more details.</span>
     <span class="kw">pub</span> <span class="ident">write_concern</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">WriteConcern</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// The amount of time the Client should attempt to select a server for an operation before</span>
+    <span class="doccomment">/// timing outs</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The default value is 30 seconds.</span>
     <span class="kw">pub</span> <span class="ident">server_selection_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// The maximum amount of connections that the Client should allow to be created in a</span>
+    <span class="doccomment">/// connection pool for a given server. If an operation is attempted on a server while</span>
+    <span class="doccomment">/// `max_pool_size` connections are checked out, the operation will block until an in-progress</span>
+    <span class="doccomment">/// operation finishes and its connection is checked back into the pool.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The default value is 100.</span>
     <span class="kw">pub</span> <span class="ident">max_pool_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// The minimum number of connections that should be available in a server&#39;s connection pool at</span>
+    <span class="doccomment">/// a given time. If fewer than `min_pool_size` connections are in the pool, connections will</span>
+    <span class="doccomment">/// be added to the pool in the background until `min_pool_size` is reached.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The default value is 0.</span>
     <span class="kw">pub</span> <span class="ident">min_pool_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// The amount of time that a connection can remain idle in a connection pool before being</span>
+    <span class="doccomment">/// closed. A value of zero indicates that connections should not be closed due to being idle.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// By default, connections will not be closed due to being idle.</span>
     <span class="kw">pub</span> <span class="ident">max_idle_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">wait_queue_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// The compressors that the Client is willing to use in the order they are specified</span>
+    <span class="doccomment">/// in the configuration.  The Client sends this list of compressors to the server.</span>
+    <span class="doccomment">/// The server responds with the intersection of its supported list of compressors.</span>
+    <span class="doccomment">/// The order of compressors indicates preference of compressors.</span>
     <span class="kw">pub</span> <span class="ident">compressors</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Compressor</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// The connect timeout passed to each underlying TcpStream when attempting to connect to the</span>
+    <span class="doccomment">/// server.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The default value is 10 seconds.</span>
     <span class="kw">pub</span> <span class="ident">connect_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// Whether or not the client should retry a read operation if the operation fails.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The default value is true.</span>
     <span class="kw">pub</span> <span class="ident">retry_reads</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// Whether or not the client should retry a write operation if the operation fails.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The default value is true.</span>
     <span class="kw">pub</span> <span class="ident">retry_writes</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">socket_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">zlib_compression</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// Specifies whether the Client should directly connect to a single host rather than</span>
+    <span class="doccomment">/// autodiscover all servers in the cluster.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The default value is false.</span>
     <span class="kw">pub</span> <span class="ident">direct_connection</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// The credential to use for authenticating connections made by this client.</span>
     <span class="kw">pub</span> <span class="ident">credential</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Credential</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// Default database for this client.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// By default, no default database is specified.</span>
     <span class="kw">pub</span> <span class="ident">default_database</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">max_staleness</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// Whether or not the client is connecting to a MongoDB cluster through a load balancer.</span>
+    <span class="kw">pub</span> <span class="ident">load_balanced</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// Amount of time spent attempting to send or receive on a socket before timing out; note that</span>
+    <span class="doccomment">/// this only applies to application operations, not server discovery and monitoring.</span>
+    <span class="kw">pub</span> <span class="ident">socket_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// Default read preference for the client.</span>
+    <span class="kw">pub</span> <span class="ident">read_preference</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadPreference</span><span class="op">&gt;</span>,
+
+    <span class="ident">wait_queue_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
     <span class="ident">tls_insecure</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="ident">auth_mechanism</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AuthMechanism</span><span class="op">&gt;</span>,
-    <span class="ident">auth_source</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">auth_mechanism_properties</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>,
-    <span class="ident">read_preference</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadPreference</span><span class="op">&gt;</span>,
-    <span class="ident">read_preference_tags</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TagSet</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">load_balanced</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
     <span class="ident">original_uri</span>: <span class="ident">String</span>,
+}
+
+<span class="doccomment">/// Elements from the connection string that are not top-level fields in `ConnectionString`.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
+<span class="kw">struct</span> <span class="ident">ConnectionStringParts</span> {
+    <span class="ident">read_preference_tags</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TagSet</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">max_staleness</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
+    <span class="ident">auth_mechanism</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AuthMechanism</span><span class="op">&gt;</span>,
+    <span class="ident">auth_mechanism_properties</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>,
+    <span class="ident">zlib_compression</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>,
+    <span class="ident">auth_source</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+}
+
+<span class="doccomment">/// Specification for mongodb server connections.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">HostInfo</span> {
+    <span class="doccomment">/// A set of addresses.</span>
+    <span class="ident">HostIdentifiers</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ServerAddress</span><span class="op">&gt;</span>),
+    <span class="doccomment">/// A DNS record for SRV lookup.</span>
+    <span class="ident">DnsRecord</span>(<span class="ident">String</span>),
+}
+
+<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">HostInfo</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::HostIdentifiers</span>(<span class="macro">vec!</span>[])
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">HostInfo</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">resolve</span>(<span class="self">self</span>, <span class="ident">resolver_config</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResolverConfig</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ResolvedHostInfo</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident"><span class="self">Self</span>::HostIdentifiers</span>(<span class="ident">hosts</span>) =&gt; <span class="ident">ResolvedHostInfo::HostIdentifiers</span>(<span class="ident">hosts</span>),
+            <span class="ident"><span class="self">Self</span>::DnsRecord</span>(<span class="ident">hostname</span>) =&gt; {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">resolver</span> <span class="op">=</span>
+                    <span class="ident">SrvResolver::new</span>(<span class="ident">resolver_config</span>.<span class="ident">clone</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> <span class="ident">config</span>.<span class="ident">inner</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">resolver</span>.<span class="ident">resolve_client_options</span>(<span class="kw-2">&amp;</span><span class="ident">hostname</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="ident">ResolvedHostInfo::DnsRecord</span> { <span class="ident">hostname</span>, <span class="ident">config</span> }
+            }
+        })
+    }
+}
+
+<span class="kw">enum</span> <span class="ident">ResolvedHostInfo</span> {
+    <span class="ident">HostIdentifiers</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ServerAddress</span><span class="op">&gt;</span>),
+    <span class="ident">DnsRecord</span> {
+        <span class="ident">hostname</span>: <span class="ident">String</span>,
+        <span class="ident">config</span>: <span class="ident"><span class="kw">crate</span>::srv::ResolvedConfig</span>,
+    },
 }
 
 <span class="doccomment">/// Specifies whether TLS configuration should be used with the operations that the</span>
@@ -3204,45 +3630,6 @@
     <span class="kw">pub</span> <span class="ident">platform</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ClientOptionsParser</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ClientOptions</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">parser</span>: <span class="ident">ClientOptionsParser</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">hosts</span>: <span class="ident">parser</span>.<span class="ident">hosts</span>,
-            <span class="ident">app_name</span>: <span class="ident">parser</span>.<span class="ident">app_name</span>,
-            <span class="ident">tls</span>: <span class="ident">parser</span>.<span class="ident">tls</span>,
-            <span class="ident">heartbeat_freq</span>: <span class="ident">parser</span>.<span class="ident">heartbeat_freq</span>,
-            <span class="ident">local_threshold</span>: <span class="ident">parser</span>.<span class="ident">local_threshold</span>,
-            <span class="ident">read_concern</span>: <span class="ident">parser</span>.<span class="ident">read_concern</span>,
-            <span class="ident">selection_criteria</span>: <span class="ident">parser</span>.<span class="ident">selection_criteria</span>,
-            <span class="ident">repl_set_name</span>: <span class="ident">parser</span>.<span class="ident">repl_set_name</span>,
-            <span class="ident">write_concern</span>: <span class="ident">parser</span>.<span class="ident">write_concern</span>,
-            <span class="ident">max_pool_size</span>: <span class="ident">parser</span>.<span class="ident">max_pool_size</span>,
-            <span class="ident">min_pool_size</span>: <span class="ident">parser</span>.<span class="ident">min_pool_size</span>,
-            <span class="ident">max_idle_time</span>: <span class="ident">parser</span>.<span class="ident">max_idle_time</span>,
-            <span class="ident">server_selection_timeout</span>: <span class="ident">parser</span>.<span class="ident">server_selection_timeout</span>,
-            <span class="ident">compressors</span>: <span class="ident">parser</span>.<span class="ident">compressors</span>,
-            <span class="ident">connect_timeout</span>: <span class="ident">parser</span>.<span class="ident">connect_timeout</span>,
-            <span class="ident">retry_reads</span>: <span class="ident">parser</span>.<span class="ident">retry_reads</span>,
-            <span class="ident">retry_writes</span>: <span class="ident">parser</span>.<span class="ident">retry_writes</span>,
-            <span class="ident">socket_timeout</span>: <span class="ident">parser</span>.<span class="ident">socket_timeout</span>,
-            <span class="ident">direct_connection</span>: <span class="ident">parser</span>.<span class="ident">direct_connection</span>,
-            <span class="ident">default_database</span>: <span class="ident">parser</span>.<span class="ident">default_database</span>,
-            <span class="ident">driver_info</span>: <span class="prelude-val">None</span>,
-            <span class="ident">credential</span>: <span class="ident">parser</span>.<span class="ident">credential</span>,
-            <span class="ident">cmap_event_handler</span>: <span class="prelude-val">None</span>,
-            <span class="ident">command_event_handler</span>: <span class="prelude-val">None</span>,
-            <span class="ident">original_srv_info</span>: <span class="prelude-val">None</span>,
-            <span class="ident">original_uri</span>: <span class="prelude-val">Some</span>(<span class="ident">parser</span>.<span class="ident">original_uri</span>),
-            <span class="ident">resolver_config</span>: <span class="prelude-val">None</span>,
-            <span class="ident">server_api</span>: <span class="prelude-val">None</span>,
-            <span class="ident">load_balanced</span>: <span class="ident">parser</span>.<span class="ident">load_balanced</span>,
-            <span class="ident">sdam_event_handler</span>: <span class="prelude-val">None</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-            <span class="ident">test_options</span>: <span class="prelude-val">None</span>,
-        }
-    }
-}
-
 <span class="kw">impl</span> <span class="ident">ClientOptions</span> {
     <span class="doccomment">/// Creates a new ClientOptions with the `original_srv_hostname` field set to the testing value</span>
     <span class="doccomment">/// used in the SRV tests.</span>
@@ -3263,7 +3650,7 @@
     <span class="doccomment">/// In the case that &quot;mongodb+srv&quot; is used, SRV and TXT record lookups will be done as</span>
     <span class="doccomment">/// part of this method.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The format of a MongoDB connection string is described [here](https://docs.mongodb.com/manual/reference/connection-string/#connection-string-formats).</span>
+    <span class="doccomment">/// The format of a MongoDB connection string is described [here](https://www.mongodb.com/docs/manual/reference/connection-string/#connection-string-formats).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Note that [default_database](ClientOptions::default_database) will be set from</span>
     <span class="doccomment">/// `/defaultauthdb` in connection string.</span>
@@ -3334,7 +3721,7 @@
     <span class="doccomment">/// In the case that &quot;mongodb+srv&quot; is used, SRV and TXT record lookups will be done using the</span>
     <span class="doccomment">/// provided `ResolverConfig` as part of this method.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The format of a MongoDB connection string is described [here](https://docs.mongodb.com/manual/reference/connection-string/#connection-string-formats).</span>
+    <span class="doccomment">/// The format of a MongoDB connection string is described [here](https://www.mongodb.com/docs/manual/reference/connection-string/#connection-string-formats).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// See the docstring on `ClientOptions::parse` for information on how the various URI options</span>
     <span class="doccomment">/// map to fields on `ClientOptions`.</span>
@@ -3363,59 +3750,163 @@
         <span class="ident">uri</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
         <span class="ident">resolver_config</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResolverConfig</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">ClientOptionsParser::parse</span>(<span class="ident">uri</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">srv</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">srv</span>;
-        <span class="kw">let</span> <span class="ident">auth_source_present</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">auth_source</span>.<span class="ident">is_some</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">into</span>();
+        <span class="ident"><span class="self">Self</span>::parse_connection_string_internal</span>(<span class="ident">ConnectionString::parse</span>(<span class="ident">uri</span>)<span class="question-mark">?</span>, <span class="ident">resolver_config</span>).<span class="kw">await</span>
+    }
+
+    <span class="doccomment">/// Creates a `ClientOptions` from the given `ConnectionString`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// In the case that &quot;mongodb+srv&quot; is used, SRV and TXT record lookups will be done using the</span>
+    <span class="doccomment">/// provided `ResolverConfig` as part of this method.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">parse_connection_string_with_resolver_config</span>(
+        <span class="ident">conn_str</span>: <span class="ident">ConnectionString</span>,
+        <span class="ident">resolver_config</span>: <span class="ident">ResolverConfig</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+        <span class="ident"><span class="self">Self</span>::parse_connection_string_internal</span>(<span class="ident">conn_str</span>, <span class="prelude-val">Some</span>(<span class="ident">resolver_config</span>)).<span class="kw">await</span>
+    }
+
+    <span class="doccomment">/// Creates a `ClientOptions` from the given `ConnectionString`.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">parse_connection_string</span>(<span class="ident">conn_str</span>: <span class="ident">ConnectionString</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+        <span class="ident"><span class="self">Self</span>::parse_connection_string_internal</span>(<span class="ident">conn_str</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
+    }
+
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">parse_connection_string_internal</span>(
+        <span class="kw-2">mut</span> <span class="ident">conn_str</span>: <span class="ident">ConnectionString</span>,
+        <span class="ident">resolver_config</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResolverConfig</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">auth_source_present</span> <span class="op">=</span> <span class="ident">conn_str</span>
+            .<span class="ident">credential</span>
+            .<span class="ident">as_ref</span>()
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">cred</span><span class="op">|</span> <span class="ident">cred</span>.<span class="ident">source</span>.<span class="ident">as_ref</span>())
+            .<span class="ident">is_some</span>();
+        <span class="kw">let</span> <span class="ident">host_info</span> <span class="op">=</span> <span class="ident">std::mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="ident">conn_str</span>.<span class="ident">host_info</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::from_connection_string</span>(<span class="ident">conn_str</span>);
         <span class="ident">options</span>.<span class="ident">resolver_config</span> <span class="op">=</span> <span class="ident">resolver_config</span>.<span class="ident">clone</span>();
 
-        <span class="kw">if</span> <span class="ident">srv</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">resolver</span> <span class="op">=</span> <span class="ident">SrvResolver::new</span>(<span class="ident">resolver_config</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> <span class="ident">config</span>.<span class="ident">inner</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">resolver</span>
-                .<span class="ident">resolve_client_options</span>(<span class="ident">options</span>.<span class="ident">hosts</span>[<span class="number">0</span>].<span class="ident">host</span>())
-                .<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">resolved</span> <span class="op">=</span> <span class="ident">host_info</span>.<span class="ident">resolve</span>(<span class="ident">resolver_config</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="ident">options</span>.<span class="ident">hosts</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">resolved</span> {
+            <span class="ident">ResolvedHostInfo::HostIdentifiers</span>(<span class="ident">hosts</span>) =&gt; <span class="ident">hosts</span>,
+            <span class="ident">ResolvedHostInfo::DnsRecord</span> {
+                <span class="ident">hostname</span>,
+                <span class="kw-2">mut</span> <span class="ident">config</span>,
+            } =&gt; {
+                <span class="comment">// Save the original SRV info to allow mongos polling.</span>
+                <span class="ident">options</span>.<span class="ident">original_srv_info</span> <span class="op">=</span> <span class="ident">OriginalSrvInfo</span> {
+                    <span class="ident">hostname</span>,
+                    <span class="ident">min_ttl</span>: <span class="ident">config</span>.<span class="ident">min_ttl</span>,
+                }
+                .<span class="ident">into</span>();
 
-            <span class="comment">// Save the original SRV info to allow mongos polling.</span>
-            <span class="ident">options</span>.<span class="ident">original_srv_info</span> <span class="op">=</span> <span class="ident">OriginalSrvInfo</span> {
-                <span class="ident">hostname</span>: <span class="ident">options</span>.<span class="ident">hosts</span>[<span class="number">0</span>].<span class="ident">host</span>().<span class="ident">to_string</span>(),
-                <span class="ident">min_ttl</span>: <span class="ident">config</span>.<span class="ident">min_ttl</span>,
-            }
-            .<span class="ident">into</span>();
+                <span class="comment">// Enable TLS unless the user explicitly disabled it.</span>
+                <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">tls</span>.<span class="ident">is_none</span>() {
+                    <span class="ident">options</span>.<span class="ident">tls</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Tls::Enabled</span>(<span class="ident">Default::default</span>()));
+                }
 
-            <span class="comment">// Set the ClientOptions hosts to those found during the SRV lookup.</span>
-            <span class="ident">options</span>.<span class="ident">hosts</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">hosts</span>;
-
-            <span class="comment">// Enable TLS unless the user explicitly disabled it.</span>
-            <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">tls</span>.<span class="ident">is_none</span>() {
-                <span class="ident">options</span>.<span class="ident">tls</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Tls::Enabled</span>(<span class="ident">Default::default</span>()));
-            }
-
-            <span class="comment">// Set the authSource TXT option found during SRV lookup unless the user already set it.</span>
-            <span class="comment">// Note that this _does_ override the default database specified in the URI, since it is</span>
-            <span class="comment">// supposed to be overriden by authSource.</span>
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">auth_source_present</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">auth_source</span>) <span class="op">=</span> <span class="ident">config</span>.<span class="ident">auth_source</span>.<span class="ident">take</span>() {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">credential</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">credential</span> {
-                        <span class="ident">credential</span>.<span class="ident">source</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">auth_source</span>);
+                <span class="comment">// Set the authSource TXT option found during SRV lookup unless the user already set</span>
+                <span class="comment">// it. Note that this _does_ override the default database specified</span>
+                <span class="comment">// in the URI, since it is supposed to be overriden by authSource.</span>
+                <span class="kw">if</span> <span class="op">!</span><span class="ident">auth_source_present</span> {
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">auth_source</span>) <span class="op">=</span> <span class="ident">config</span>.<span class="ident">auth_source</span>.<span class="ident">take</span>() {
+                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">credential</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">credential</span> {
+                            <span class="ident">credential</span>.<span class="ident">source</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">auth_source</span>);
+                        }
                     }
                 }
-            }
 
-            <span class="comment">// Set the replica set name TXT option found during SRV lookup unless the user already</span>
-            <span class="comment">// set it.</span>
-            <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">repl_set_name</span>.<span class="ident">is_none</span>() {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">replica_set</span>) <span class="op">=</span> <span class="ident">config</span>.<span class="ident">replica_set</span>.<span class="ident">take</span>() {
-                    <span class="ident">options</span>.<span class="ident">repl_set_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">replica_set</span>);
+                <span class="comment">// Set the replica set name TXT option found during SRV lookup unless the user</span>
+                <span class="comment">// already set it.</span>
+                <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">repl_set_name</span>.<span class="ident">is_none</span>() {
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">replica_set</span>) <span class="op">=</span> <span class="ident">config</span>.<span class="ident">replica_set</span>.<span class="ident">take</span>() {
+                        <span class="ident">options</span>.<span class="ident">repl_set_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">replica_set</span>);
+                    }
                 }
-            }
 
-            <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">load_balanced</span>.<span class="ident">is_none</span>() {
-                <span class="ident">options</span>.<span class="ident">load_balanced</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">load_balanced</span>;
+                <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">load_balanced</span>.<span class="ident">is_none</span>() {
+                    <span class="ident">options</span>.<span class="ident">load_balanced</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">load_balanced</span>;
+                }
+
+                <span class="comment">// Set the ClientOptions hosts to those found during the SRV lookup.</span>
+                <span class="ident">config</span>.<span class="ident">hosts</span>
             }
-        }
+        };
 
         <span class="ident">options</span>.<span class="ident">validate</span>()<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">options</span>)
+    }
+
+    <span class="doccomment">/// Creates a `ClientOptions` from the given `ConnectionString`.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-sync&quot;</span>))]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_connection_string_sync</span>(<span class="ident">conn_str</span>: <span class="ident">ConnectionString</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+        <span class="ident"><span class="kw">crate</span>::runtime::block_on</span>(<span class="ident"><span class="self">Self</span>::parse_connection_string_internal</span>(<span class="ident">conn_str</span>, <span class="prelude-val">None</span>))
+    }
+
+    <span class="doccomment">/// Creates a `ClientOptions` from the given `ConnectionString`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// In the case that &quot;mongodb+srv&quot; is used, SRV and TXT record lookups will be done using the</span>
+    <span class="doccomment">/// provided `ResolverConfig` as part of this method.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-sync&quot;</span>))]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_connection_string_with_resolver_config_sync</span>(
+        <span class="ident">conn_str</span>: <span class="ident">ConnectionString</span>,
+        <span class="ident">resolver_config</span>: <span class="ident">ResolverConfig</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+        <span class="ident"><span class="kw">crate</span>::runtime::block_on</span>(<span class="ident"><span class="self">Self</span>::parse_connection_string_internal</span>(
+            <span class="ident">conn_str</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">resolver_config</span>),
+        ))
+    }
+
+    <span class="kw">fn</span> <span class="ident">from_connection_string</span>(<span class="ident">conn_str</span>: <span class="ident">ConnectionString</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">credential</span> <span class="op">=</span> <span class="ident">conn_str</span>.<span class="ident">credential</span>;
+        <span class="comment">// Populate default auth source, if needed.</span>
+        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">conn_str</span>.<span class="ident">default_database</span>;
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">credential</span>) <span class="op">=</span> <span class="ident">credential</span>.<span class="ident">as_mut</span>() {
+            <span class="kw">if</span> <span class="ident">credential</span>.<span class="ident">source</span>.<span class="ident">is_none</span>() {
+                <span class="ident">credential</span>.<span class="ident">source</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">credential</span>.<span class="ident">mechanism</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">mechanism</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">mechanism</span>.<span class="ident">default_source</span>(<span class="ident">db</span>.<span class="ident">as_deref</span>()).<span class="ident">into</span>()),
+                    <span class="prelude-val">None</span> =&gt; {
+                        <span class="comment">// If credentials exist (i.e. username is specified) but no mechanism, the</span>
+                        <span class="comment">// default source is chosen from the following list in</span>
+                        <span class="comment">// order (skipping null ones): authSource option, connection string db,</span>
+                        <span class="comment">// SCRAM default (i.e. &quot;admin&quot;).</span>
+                        <span class="ident">db</span>.<span class="ident">clone</span>().<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;admin&quot;</span>.<span class="ident">into</span>()))
+                    }
+                };
+            }
+        }
+        <span class="self">Self</span> {
+            <span class="ident">hosts</span>: <span class="macro">vec!</span>[],
+            <span class="ident">app_name</span>: <span class="ident">conn_str</span>.<span class="ident">app_name</span>,
+            <span class="ident">tls</span>: <span class="ident">conn_str</span>.<span class="ident">tls</span>,
+            <span class="ident">heartbeat_freq</span>: <span class="ident">conn_str</span>.<span class="ident">heartbeat_frequency</span>,
+            <span class="ident">local_threshold</span>: <span class="ident">conn_str</span>.<span class="ident">local_threshold</span>,
+            <span class="ident">read_concern</span>: <span class="ident">conn_str</span>.<span class="ident">read_concern</span>,
+            <span class="ident">selection_criteria</span>: <span class="ident">conn_str</span>.<span class="ident">read_preference</span>.<span class="ident">map</span>(<span class="ident">Into::into</span>),
+            <span class="ident">repl_set_name</span>: <span class="ident">conn_str</span>.<span class="ident">replica_set</span>,
+            <span class="ident">write_concern</span>: <span class="ident">conn_str</span>.<span class="ident">write_concern</span>,
+            <span class="ident">max_pool_size</span>: <span class="ident">conn_str</span>.<span class="ident">max_pool_size</span>,
+            <span class="ident">min_pool_size</span>: <span class="ident">conn_str</span>.<span class="ident">min_pool_size</span>,
+            <span class="ident">max_idle_time</span>: <span class="ident">conn_str</span>.<span class="ident">max_idle_time</span>,
+            <span class="ident">server_selection_timeout</span>: <span class="ident">conn_str</span>.<span class="ident">server_selection_timeout</span>,
+            <span class="ident">compressors</span>: <span class="ident">conn_str</span>.<span class="ident">compressors</span>,
+            <span class="ident">connect_timeout</span>: <span class="ident">conn_str</span>.<span class="ident">connect_timeout</span>,
+            <span class="ident">retry_reads</span>: <span class="ident">conn_str</span>.<span class="ident">retry_reads</span>,
+            <span class="ident">retry_writes</span>: <span class="ident">conn_str</span>.<span class="ident">retry_writes</span>,
+            <span class="ident">socket_timeout</span>: <span class="ident">conn_str</span>.<span class="ident">socket_timeout</span>,
+            <span class="ident">direct_connection</span>: <span class="ident">conn_str</span>.<span class="ident">direct_connection</span>,
+            <span class="ident">default_database</span>: <span class="ident">conn_str</span>.<span class="ident">default_database</span>,
+            <span class="ident">driver_info</span>: <span class="prelude-val">None</span>,
+            <span class="ident">credential</span>,
+            <span class="ident">cmap_event_handler</span>: <span class="prelude-val">None</span>,
+            <span class="ident">command_event_handler</span>: <span class="prelude-val">None</span>,
+            <span class="ident">original_srv_info</span>: <span class="prelude-val">None</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+            <span class="ident">original_uri</span>: <span class="prelude-val">Some</span>(<span class="ident">conn_str</span>.<span class="ident">original_uri</span>),
+            <span class="ident">resolver_config</span>: <span class="prelude-val">None</span>,
+            <span class="ident">server_api</span>: <span class="prelude-val">None</span>,
+            <span class="ident">load_balanced</span>: <span class="ident">conn_str</span>.<span class="ident">load_balanced</span>,
+            <span class="ident">sdam_event_handler</span>: <span class="prelude-val">None</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+            <span class="ident">test_options</span>: <span class="prelude-val">None</span>,
+        }
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">tls_options</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TlsOptions</span><span class="op">&gt;</span> {
@@ -3469,9 +3960,23 @@
         }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="number">0</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">max_pool_size</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::error::Error::invalid_argument</span>(
-                <span class="string">&quot;cannot specify maxPoolSize=0&quot;</span>,
-            ));
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::invalid_argument</span>(<span class="string">&quot;cannot specify maxPoolSize=0&quot;</span>));
+        }
+
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">SelectionCriteria::ReadPreference</span>(<span class="kw-2">ref</span> <span class="ident">rp</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">selection_criteria</span> {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">max_staleness</span>) <span class="op">=</span> <span class="ident">rp</span>.<span class="ident">max_staleness</span>() {
+                <span class="kw">let</span> <span class="ident">smallest_max_staleness</span> <span class="op">=</span> <span class="ident">std::cmp::max</span>(
+                    <span class="ident">Duration::from_secs</span>(<span class="number">90</span>),
+                    <span class="self">self</span>.<span class="ident">heartbeat_freq</span>.<span class="ident">unwrap_or</span>(<span class="ident">DEFAULT_HEARTBEAT_FREQUENCY</span>) <span class="op">+</span> <span class="ident">IDLE_WRITE_PERIOD</span>,
+                );
+
+                <span class="kw">if</span> <span class="ident">max_staleness</span> <span class="op">&lt;</span> <span class="ident">smallest_max_staleness</span> {
+                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::invalid_argument</span>(<span class="macro">format!</span>(
+                        <span class="string">&quot;invalid maxStaleness value: must be at least {} seconds&quot;</span>,
+                        <span class="ident">smallest_max_staleness</span>.<span class="ident">as_secs</span>()
+                    )));
+                }
+            }
         }
 
         <span class="prelude-val">Ok</span>(())
@@ -3568,8 +4073,11 @@
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">impl</span> <span class="ident">ClientOptionsParser</span> {
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+<span class="kw">impl</span> <span class="ident">ConnectionString</span> {
+    <span class="doccomment">/// Parses a MongoDB connection string into a [`ConnectionString`] struct. If the string is</span>
+    <span class="doccomment">/// malformed or one of the options has an invalid value, an error will be returned.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">s</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">as_ref</span>();
         <span class="kw">let</span> <span class="ident">end_of_scheme</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">find</span>(<span class="string">&quot;://&quot;</span>) {
             <span class="prelude-val">Some</span>(<span class="ident">index</span>) =&gt; <span class="ident">index</span>,
             <span class="prelude-val">None</span> =&gt; {
@@ -3668,40 +4176,48 @@
             <span class="prelude-val">None</span> =&gt; (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
         };
 
-        <span class="kw">let</span> <span class="ident">hosts</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">hosts_section</span>.<span class="ident">split</span>(<span class="string">&#39;,&#39;</span>).<span class="ident">map</span>(<span class="ident">ServerAddress::parse</span>).<span class="ident">collect</span>();
+        <span class="kw">let</span> <span class="ident">host_list</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span>
+            <span class="ident">hosts_section</span>.<span class="ident">split</span>(<span class="string">&#39;,&#39;</span>).<span class="ident">map</span>(<span class="ident">ServerAddress::parse</span>).<span class="ident">collect</span>();
 
-        <span class="kw">let</span> <span class="ident">hosts</span> <span class="op">=</span> <span class="ident">hosts</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">host_list</span> <span class="op">=</span> <span class="ident">host_list</span><span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">srv</span> {
-            <span class="kw">if</span> <span class="ident">hosts</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
+        <span class="kw">let</span> <span class="ident">hosts</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">srv</span> {
+            <span class="kw">if</span> <span class="ident">host_list</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                     <span class="ident">message</span>: <span class="string">&quot;exactly one host must be specified with &#39;mongodb+srv&#39;&quot;</span>.<span class="ident">into</span>(),
                 }
                 .<span class="ident">into</span>());
             }
+            <span class="comment">// Unwrap safety: the `len` check above guarantees this can&#39;t fail.</span>
+            <span class="kw">let</span> <span class="ident">ServerAddress::Tcp</span> { <span class="ident">host</span>, <span class="ident">port</span> } <span class="op">=</span> <span class="ident">host_list</span>.<span class="ident">into_iter</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>();
 
-            <span class="kw">if</span> <span class="ident">hosts</span>[<span class="number">0</span>].<span class="ident">port</span>().<span class="ident">is_some</span>() {
+            <span class="kw">if</span> <span class="ident">port</span>.<span class="ident">is_some</span>() {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                     <span class="ident">message</span>: <span class="string">&quot;a port cannot be specified with &#39;mongodb+srv&#39;&quot;</span>.<span class="ident">into</span>(),
                 }
                 .<span class="ident">into</span>());
             }
-        }
+            <span class="ident">HostInfo::DnsRecord</span>(<span class="ident">host</span>)
+        } <span class="kw">else</span> {
+            <span class="ident">HostInfo::HostIdentifiers</span>(<span class="ident">host_list</span>)
+        };
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">ClientOptionsParser</span> {
-            <span class="ident">hosts</span>,
-            <span class="ident">srv</span>,
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn_str</span> <span class="op">=</span> <span class="ident">ConnectionString</span> {
+            <span class="ident">host_info</span>: <span class="ident">hosts</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
             <span class="ident">original_uri</span>: <span class="ident">s</span>.<span class="ident">into</span>(),
             ..<span class="ident">Default::default</span>()
         };
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">opts</span>) <span class="op">=</span> <span class="ident">options_section</span> {
-            <span class="ident">options</span>.<span class="ident">parse_options</span>(<span class="ident">opts</span>)<span class="question-mark">?</span>;
-        }
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parts</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">opts</span>) <span class="op">=</span> <span class="ident">options_section</span> {
+            <span class="ident">conn_str</span>.<span class="ident">parse_options</span>(<span class="ident">opts</span>)<span class="question-mark">?</span>
+        } <span class="kw">else</span> {
+            <span class="ident">ConnectionStringParts::default</span>()
+        };
 
         <span class="comment">// Set username and password.</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">u</span>) <span class="op">=</span> <span class="ident">username</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">credential</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">credential</span>.<span class="ident">get_or_insert_with</span>(<span class="ident">Default::default</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">credential</span> <span class="op">=</span> <span class="ident">conn_str</span>.<span class="ident">credential</span>.<span class="ident">get_or_insert_with</span>(<span class="ident">Default::default</span>);
             <span class="ident">validate_userinfo</span>(<span class="ident">u</span>, <span class="string">&quot;username&quot;</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">decoded_u</span> <span class="op">=</span> <span class="ident">percent_decode</span>(<span class="ident">u</span>, <span class="string">&quot;username must be URL encoded&quot;</span>)<span class="question-mark">?</span>;
 
@@ -3714,25 +4230,19 @@
             }
         }
 
-        <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">auth_source</span>.<span class="ident">as_deref</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) {
+        <span class="kw">if</span> <span class="ident">parts</span>.<span class="ident">auth_source</span>.<span class="ident">as_deref</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                 <span class="ident">message</span>: <span class="string">&quot;empty authSource provided&quot;</span>.<span class="ident">to_string</span>(),
             }
             .<span class="ident">into</span>());
         }
 
-        <span class="kw">let</span> <span class="ident">db_str</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">as_deref</span>();
-
-        <span class="kw">match</span> <span class="ident">options</span>.<span class="ident">auth_mechanism</span> {
+        <span class="kw">match</span> <span class="ident">parts</span>.<span class="ident">auth_mechanism</span> {
             <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">mechanism</span>) =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">credential</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">credential</span>.<span class="ident">get_or_insert_with</span>(<span class="ident">Default::default</span>);
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">credential</span> <span class="op">=</span> <span class="ident">conn_str</span>.<span class="ident">credential</span>.<span class="ident">get_or_insert_with</span>(<span class="ident">Default::default</span>);
+                <span class="ident">credential</span>.<span class="ident">source</span> <span class="op">=</span> <span class="ident">parts</span>.<span class="ident">auth_source</span>;
 
-                <span class="ident">credential</span>.<span class="ident">source</span> <span class="op">=</span> <span class="ident">options</span>
-                    .<span class="ident">auth_source</span>
-                    .<span class="ident">clone</span>()
-                    .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">mechanism</span>.<span class="ident">default_source</span>(<span class="ident">db_str</span>).<span class="ident">into</span>()));
-
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">doc</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">auth_mechanism_properties</span>.<span class="ident">take</span>() {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">doc</span>) <span class="op">=</span> <span class="ident">parts</span>.<span class="ident">auth_mechanism_properties</span>.<span class="ident">take</span>() {
                     <span class="kw">match</span> <span class="ident">doc</span>.<span class="ident">remove</span>(<span class="string">&quot;CANONICALIZE_HOST_NAME&quot;</span>) {
                         <span class="prelude-val">Some</span>(<span class="ident">Bson::String</span>(<span class="ident">s</span>)) =&gt; {
                             <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">s</span>.<span class="ident">to_lowercase</span>()[..] {
@@ -3752,19 +4262,11 @@
                 }
 
                 <span class="ident">mechanism</span>.<span class="ident">validate_credential</span>(<span class="ident">credential</span>)<span class="question-mark">?</span>;
-                <span class="ident">credential</span>.<span class="ident">mechanism</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">auth_mechanism</span>.<span class="ident">take</span>();
+                <span class="ident">credential</span>.<span class="ident">mechanism</span> <span class="op">=</span> <span class="ident">parts</span>.<span class="ident">auth_mechanism</span>.<span class="ident">take</span>();
             }
             <span class="prelude-val">None</span> =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">credential</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">credential</span> {
-                    <span class="comment">// If credentials exist (i.e. username is specified) but no mechanism, the</span>
-                    <span class="comment">// default source is chosen from the following list in</span>
-                    <span class="comment">// order (skipping null ones): authSource option, connection string db,</span>
-                    <span class="comment">// SCRAM default (i.e. &quot;admin&quot;).</span>
-                    <span class="ident">credential</span>.<span class="ident">source</span> <span class="op">=</span> <span class="ident">options</span>
-                        .<span class="ident">auth_source</span>
-                        .<span class="ident">clone</span>()
-                        .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">db</span>.<span class="ident">clone</span>())
-                        .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;admin&quot;</span>.<span class="ident">into</span>()));
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">credential</span>) <span class="op">=</span> <span class="ident">conn_str</span>.<span class="ident">credential</span> {
+                    <span class="ident">credential</span>.<span class="ident">source</span> <span class="op">=</span> <span class="ident">parts</span>.<span class="ident">auth_source</span>;
                 } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">authentication_requested</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                         <span class="ident">message</span>: <span class="string">&quot;username and mechanism both not provided, but authentication \
@@ -3777,18 +4279,35 @@
         };
 
         <span class="comment">// set default database.</span>
-        <span class="ident">options</span>.<span class="ident">default_database</span> <span class="op">=</span> <span class="ident">db</span>;
+        <span class="ident">conn_str</span>.<span class="ident">default_database</span> <span class="op">=</span> <span class="ident">db</span>;
 
-        <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">tls</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="ident">options</span>.<span class="ident">srv</span> {
-            <span class="ident">options</span>.<span class="ident">tls</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Tls::Enabled</span>(<span class="ident">Default::default</span>()));
+        <span class="kw">if</span> <span class="ident">conn_str</span>.<span class="ident">tls</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="ident">conn_str</span>.<span class="ident">is_srv</span>() {
+            <span class="ident">conn_str</span>.<span class="ident">tls</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Tls::Enabled</span>(<span class="ident">Default::default</span>()));
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">options</span>)
+        <span class="prelude-val">Ok</span>(<span class="ident">conn_str</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_options</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="doccomment">/// Amount of time spent attempting to check out a connection from a server&#39;s connection pool</span>
+    <span class="doccomment">/// before timing out.  Not supported by the Rust driver.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wait_queue_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">wait_queue_timeout</span>
+    }
+
+    <span class="doccomment">/// Relax TLS constraints as much as possible (e.g. allowing invalid certificates or hostname</span>
+    <span class="doccomment">/// mismatches).  Not supported by the Rust driver.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tls_insecure</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">tls_insecure</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">is_srv</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">host_info</span>, <span class="ident">HostInfo::DnsRecord</span>(<span class="kw">_</span>))
+    }
+
+    <span class="kw">fn</span> <span class="ident">parse_options</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ConnectionStringParts</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parts</span> <span class="op">=</span> <span class="ident">ConnectionStringParts::default</span>();
         <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">parts</span>);
         }
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">keys</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
@@ -3819,6 +4338,7 @@
 
             <span class="comment">// Skip leading &#39;=&#39; in value.</span>
             <span class="self">self</span>.<span class="ident">parse_option_pair</span>(
+                <span class="kw-2">&amp;mut</span> <span class="ident">parts</span>,
                 <span class="kw-2">&amp;</span><span class="ident">key</span>.<span class="ident">to_lowercase</span>(),
                 <span class="ident">percent_encoding::percent_decode</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>.<span class="ident">as_bytes</span>()[<span class="number">1</span>..])
                     .<span class="ident">decode_utf8_lossy</span>()
@@ -3826,7 +4346,7 @@
             )<span class="question-mark">?</span>;
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">tags</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_preference_tags</span>.<span class="ident">take</span>() {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">tags</span>) <span class="op">=</span> <span class="ident">parts</span>.<span class="ident">read_preference_tags</span>.<span class="ident">take</span>() {
             <span class="self">self</span>.<span class="ident">read_preference</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">read_preference</span>.<span class="ident">take</span>() {
                 <span class="prelude-val">Some</span>(<span class="ident">read_pref</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">read_pref</span>.<span class="ident">with_tags</span>(<span class="ident">tags</span>)<span class="question-mark">?</span>),
                 <span class="prelude-val">None</span> =&gt; {
@@ -3840,7 +4360,7 @@
             };
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">max_staleness</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">max_staleness</span>.<span class="ident">take</span>() {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">max_staleness</span>) <span class="op">=</span> <span class="ident">parts</span>.<span class="ident">max_staleness</span>.<span class="ident">take</span>() {
             <span class="self">self</span>.<span class="ident">read_preference</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">read_preference</span>.<span class="ident">take</span>() {
                 <span class="prelude-val">Some</span>(<span class="ident">read_pref</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">read_pref</span>.<span class="ident">with_max_staleness</span>(<span class="ident">max_staleness</span>)<span class="question-mark">?</span>),
                 <span class="prelude-val">None</span> =&gt; {
@@ -3854,10 +4374,8 @@
             };
         }
 
-        <span class="self">self</span>.<span class="ident">selection_criteria</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_preference</span>.<span class="ident">take</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>);
-
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">direct_connection</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">srv</span> {
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_srv</span>() {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                     <span class="ident">message</span>: <span class="string">&quot;cannot use SRV-style URI with directConnection=true&quot;</span>.<span class="ident">to_string</span>(),
                 }
@@ -3868,17 +4386,22 @@
         <span class="comment">// If zlib and zlib_compression_level are specified then write zlib_compression_level into</span>
         <span class="comment">// zlib enum</span>
         <span class="kw">if</span> <span class="kw">let</span> (<span class="prelude-val">Some</span>(<span class="ident">compressors</span>), <span class="prelude-val">Some</span>(<span class="ident">zlib_compression_level</span>)) <span class="op">=</span>
-            (<span class="self">self</span>.<span class="ident">compressors</span>.<span class="ident">as_mut</span>(), <span class="self">self</span>.<span class="ident">zlib_compression</span>)
+            (<span class="self">self</span>.<span class="ident">compressors</span>.<span class="ident">as_mut</span>(), <span class="ident">parts</span>.<span class="ident">zlib_compression</span>)
         {
             <span class="kw">for</span> <span class="ident">compressor</span> <span class="kw">in</span> <span class="ident">compressors</span> {
                 <span class="ident">compressor</span>.<span class="ident">write_zlib_level</span>(<span class="ident">zlib_compression_level</span>)
             }
         }
 
-        <span class="prelude-val">Ok</span>(())
+        <span class="prelude-val">Ok</span>(<span class="ident">parts</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_option_pair</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse_option_pair</span>(
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">parts</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ConnectionStringParts</span>,
+        <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">macro_rules!</span> <span class="ident">get_bool</span> {
             (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">option</span>:<span class="ident">expr</span>) =&gt; {
                 <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span> {
@@ -3953,9 +4476,9 @@
                 <span class="self">self</span>.<span class="ident">app_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>.<span class="ident">into</span>());
             }
             <span class="string">&quot;authmechanism&quot;</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">auth_mechanism</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">AuthMechanism::from_str</span>(<span class="ident">value</span>)<span class="question-mark">?</span>);
+                <span class="ident">parts</span>.<span class="ident">auth_mechanism</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">AuthMechanism::from_str</span>(<span class="ident">value</span>)<span class="question-mark">?</span>);
             }
-            <span class="string">&quot;authsource&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">auth_source</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>.<span class="ident">to_string</span>()),
+            <span class="string">&quot;authsource&quot;</span> =&gt; <span class="ident">parts</span>.<span class="ident">auth_source</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>.<span class="ident">to_string</span>()),
             <span class="string">&quot;authmechanismproperties&quot;</span> =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">doc</span> <span class="op">=</span> <span class="ident">Document::new</span>();
                 <span class="kw">let</span> <span class="ident">err_func</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
@@ -3976,7 +4499,7 @@
                         <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err_func</span>()),
                     };
                 }
-                <span class="self">self</span>.<span class="ident">auth_mechanism_properties</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">doc</span>);
+                <span class="ident">parts</span>.<span class="ident">auth_mechanism_properties</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">doc</span>);
             }
             <span class="string">&quot;compressors&quot;</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">compressors</span> <span class="op">=</span> <span class="ident">value</span>
@@ -4008,7 +4531,7 @@
                     .<span class="ident">into</span>());
                 }
 
-                <span class="self">self</span>.<span class="ident">heartbeat_freq</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Duration::from_millis</span>(<span class="ident">duration</span>));
+                <span class="self">self</span>.<span class="ident">heartbeat_frequency</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Duration::from_millis</span>(<span class="ident">duration</span>));
             }
             <span class="ident">k</span> @ <span class="string">&quot;journal&quot;</span> =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">write_concern</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">write_concern</span>.<span class="ident">get_or_insert_with</span>(<span class="ident">Default::default</span>);
@@ -4023,19 +4546,26 @@
             <span class="ident">k</span> @ <span class="string">&quot;maxidletimems&quot;</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">max_idle_time</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Duration::from_millis</span>(<span class="macro">get_duration!</span>(<span class="ident">value</span>, <span class="ident">k</span>)));
             }
-            <span class="ident">k</span> @ <span class="string">&quot;maxstalenessseconds&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">max_staleness</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="macro">get_duration!</span>(<span class="ident">value</span>, <span class="ident">k</span>));
+            <span class="string">&quot;maxstalenessseconds&quot;</span> =&gt; {
+                <span class="kw">let</span> <span class="ident">max_staleness_seconds</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
+                    <span class="ident">Error::invalid_argument</span>(<span class="macro">format!</span>(<span class="string">&quot;invalid maxStalenessSeconds value: {}&quot;</span>, <span class="ident">e</span>))
+                })<span class="question-mark">?</span>;
 
-                <span class="kw">if</span> <span class="ident">max_staleness</span> <span class="op">&gt;</span> <span class="ident">Duration::from_secs</span>(<span class="number">0</span>) <span class="op">&amp;&amp;</span> <span class="ident">max_staleness</span> <span class="op">&lt;</span> <span class="ident">Duration::from_secs</span>(<span class="number">90</span>)
-                {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
-                        <span class="ident">message</span>: <span class="string">&quot;&#39;maxStalenessSeconds&#39; cannot be both positive and below 90&quot;</span>
-                            .<span class="ident">into</span>(),
+                <span class="kw">let</span> <span class="ident">max_staleness</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">max_staleness_seconds</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="op">-</span><span class="number">1</span>) {
+                    <span class="ident">Ordering::Less</span> =&gt; {
+                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::invalid_argument</span>(<span class="macro">format!</span>(
+                            <span class="string">&quot;maxStalenessSeconds must be -1 or positive, instead got {}&quot;</span>,
+                            <span class="ident">max_staleness_seconds</span>
+                        )));
                     }
-                    .<span class="ident">into</span>());
-                }
+                    <span class="ident">Ordering::Equal</span> =&gt; {
+                        <span class="comment">// -1 maxStaleness means no maxStaleness, which is the default</span>
+                        <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+                    }
+                    <span class="ident">Ordering::Greater</span> =&gt; <span class="ident">Duration::from_secs</span>(<span class="ident">max_staleness_seconds</span> <span class="kw">as</span> <span class="ident">u64</span>),
+                };
 
-                <span class="self">self</span>.<span class="ident">max_staleness</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">max_staleness</span>);
+                <span class="ident">parts</span>.<span class="ident">max_staleness</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">max_staleness</span>);
             }
             <span class="ident">k</span> @ <span class="string">&quot;maxpoolsize&quot;</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">max_pool_size</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">get_u32!</span>(<span class="ident">value</span>, <span class="ident">k</span>));
@@ -4095,12 +4625,13 @@
                         .<span class="ident">collect</span>()
                 };
 
-                <span class="self">self</span>.<span class="ident">read_preference_tags</span>
+                <span class="ident">parts</span>
+                    .<span class="ident">read_preference_tags</span>
                     .<span class="ident">get_or_insert_with</span>(<span class="ident">Vec::new</span>)
                     .<span class="ident">push</span>(<span class="ident">tags</span><span class="question-mark">?</span>);
             }
             <span class="string">&quot;replicaset&quot;</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">repl_set_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>.<span class="ident">to_string</span>());
+                <span class="self">self</span>.<span class="ident">replica_set</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>.<span class="ident">to_string</span>());
             }
             <span class="ident">k</span> @ <span class="string">&quot;retrywrites&quot;</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">retry_writes</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">get_bool!</span>(<span class="ident">value</span>, <span class="ident">k</span>));
@@ -4256,7 +4787,7 @@
                     .<span class="ident">into</span>());
                 }
 
-                <span class="self">self</span>.<span class="ident">zlib_compression</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>);
+                <span class="ident">parts</span>.<span class="ident">zlib_compression</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>);
             }
 
             <span class="ident">other</span> =&gt; {
@@ -4279,6 +4810,39 @@
         }
 
         <span class="prelude-val">Ok</span>(())
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">ConnectionString</span> {
+    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">Error</span>;
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+        <span class="ident">ConnectionString::parse</span>(<span class="ident">s</span>)
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ConnectionString</span> {
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    {
+        <span class="ident">deserializer</span>.<span class="ident">deserialize_str</span>(<span class="ident">ConnectionStringVisitor</span>)
+    }
+}
+
+<span class="kw">struct</span> <span class="ident">ConnectionStringVisitor</span>;
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">serde::de::Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ConnectionStringVisitor</span> {
+    <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">ConnectionString</span>;
+
+    <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
+        <span class="macro">write!</span>(<span class="ident">formatter</span>, <span class="string">&quot;a MongoDB connection string&quot;</span>)
+    }
+
+    <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
+    {
+        <span class="ident">ConnectionString::parse</span>(<span class="ident">v</span>).<span class="ident">map_err</span>(<span class="ident">serde::de::Error::custom</span>)
     }
 }
 
@@ -4672,7 +5236,7 @@
     <span class="kw">pub</span> <span class="ident">default_transaction_options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TransactionOptions</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// If true, all operations performed in the context of this session</span>
-    <span class="doccomment">/// will be [causally consistent](https://docs.mongodb.com/manual/core/causal-consistency-read-write-concerns/).</span>
+    <span class="doccomment">/// will be [causally consistent](https://www.mongodb.com/docs/manual/core/causal-consistency-read-write-concerns/).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Defaults to true if [`SessionOptions::snapshot`] is unspecified.</span>
     <span class="kw">pub</span> <span class="ident">causal_consistency</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,

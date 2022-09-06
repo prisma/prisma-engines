@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bitvec-0.22.3/src/slice/ops.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ops.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bitvec-1.0.1/src/slice/ops.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ops.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
@@ -181,11 +181,76 @@
 <span id="175">175</span>
 <span id="176">176</span>
 <span id="177">177</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Port of the `[T]` operator implementations.</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../../doc/slice/ops.md&quot;</span>)]</span>
 
 <span class="kw">use</span> <span class="ident">core::ops</span>::{
+	<span class="ident">BitAnd</span>,
 	<span class="ident">BitAndAssign</span>,
+	<span class="ident">BitOr</span>,
 	<span class="ident">BitOrAssign</span>,
+	<span class="ident">BitXor</span>,
 	<span class="ident">BitXorAssign</span>,
 	<span class="ident">Index</span>,
 	<span class="ident">IndexMut</span>,
@@ -203,66 +268,120 @@
 	<span class="ident">BitSliceIndex</span>,
 };
 <span class="kw">use</span> <span class="kw">crate</span>::{
-	<span class="ident">access::BitAccess</span>,
-	<span class="ident">domain::DomainMut</span>,
-	<span class="ident">order::BitOrder</span>,
+	<span class="ident">domain::Domain</span>,
+	<span class="ident">order</span>::{
+		<span class="ident">BitOrder</span>,
+		<span class="ident">Lsb0</span>,
+		<span class="ident">Msb0</span>,
+	},
 	<span class="ident">store::BitStore</span>,
 };
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span>, <span class="ident">Rhs</span><span class="op">&gt;</span> <span class="ident">BitAndAssign</span><span class="op">&lt;</span><span class="ident">Rhs</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">O1</span>, <span class="ident">O2</span><span class="op">&gt;</span> <span class="ident">BitAndAssign</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">O1</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">Rhs</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">bool</span><span class="op">&gt;</span>,
+	<span class="ident">T1</span>: <span class="ident">BitStore</span>,
+	<span class="ident">T2</span>: <span class="ident">BitStore</span>,
+	<span class="ident">O1</span>: <span class="ident">BitOrder</span>,
+	<span class="ident">O2</span>: <span class="ident">BitOrder</span>,
 {
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">bitand_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Rhs</span>) {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">rhs</span>.<span class="ident">into_iter</span>();
-		<span class="self">self</span>.<span class="ident">for_each</span>(<span class="op">|</span><span class="kw">_</span>, <span class="ident">bit</span><span class="op">|</span> <span class="ident">bit</span> <span class="op">&amp;</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>));
+	<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../../doc/slice/bitop_assign.md&quot;</span>)]</span>
+	<span class="kw">fn</span> <span class="ident">bitand_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span>) {
+		<span class="kw">if</span> <span class="kw">let</span> (<span class="prelude-val">Some</span>(<span class="ident">this</span>), <span class="prelude-val">Some</span>(<span class="ident">that</span>)) <span class="op">=</span>
+			(<span class="self">self</span>.<span class="ident">coerce_mut</span>::<span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">Lsb0</span><span class="op">&gt;</span>(), <span class="ident">rhs</span>.<span class="ident">coerce</span>::<span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">Lsb0</span><span class="op">&gt;</span>())
+		{
+			<span class="kw">return</span> <span class="ident">this</span>.<span class="ident">sp_bitop_assign</span>(<span class="ident">that</span>, <span class="ident">BitAnd::bitand</span>, <span class="ident">BitAnd::bitand</span>);
+		}
+		<span class="kw">if</span> <span class="kw">let</span> (<span class="prelude-val">Some</span>(<span class="ident">this</span>), <span class="prelude-val">Some</span>(<span class="ident">that</span>)) <span class="op">=</span>
+			(<span class="self">self</span>.<span class="ident">coerce_mut</span>::<span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">Msb0</span><span class="op">&gt;</span>(), <span class="ident">rhs</span>.<span class="ident">coerce</span>::<span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">Msb0</span><span class="op">&gt;</span>())
+		{
+			<span class="kw">return</span> <span class="ident">this</span>.<span class="ident">sp_bitop_assign</span>(<span class="ident">that</span>, <span class="ident">BitAnd::bitand</span>, <span class="ident">BitAnd::bitand</span>);
+		}
+		<span class="kw">for</span> (<span class="ident">this</span>, <span class="ident">that</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">as_mut_bitptr_range</span>().<span class="ident">zip</span>(<span class="ident">rhs</span>.<span class="ident">as_bitptr_range</span>())
+		{
+			<span class="kw">unsafe</span> {
+				<span class="ident">this</span>.<span class="ident">write</span>(<span class="ident">this</span>.<span class="ident">read</span>() <span class="op">&amp;</span> <span class="ident">that</span>.<span class="ident">read</span>());
+			}
+		}
+		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">rem</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_mut</span>(<span class="ident">rhs</span>.<span class="ident">len</span>() ..) {
+			<span class="ident">rem</span>.<span class="ident">fill</span>(<span class="bool-val">false</span>);
+		}
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span>, <span class="ident">Rhs</span><span class="op">&gt;</span> <span class="ident">BitOrAssign</span><span class="op">&lt;</span><span class="ident">Rhs</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">O1</span>, <span class="ident">O2</span><span class="op">&gt;</span> <span class="ident">BitOrAssign</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">O1</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">Rhs</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">bool</span><span class="op">&gt;</span>,
+	<span class="ident">T1</span>: <span class="ident">BitStore</span>,
+	<span class="ident">T2</span>: <span class="ident">BitStore</span>,
+	<span class="ident">O1</span>: <span class="ident">BitOrder</span>,
+	<span class="ident">O2</span>: <span class="ident">BitOrder</span>,
 {
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">bitor_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Rhs</span>) {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">rhs</span>.<span class="ident">into_iter</span>();
-		<span class="self">self</span>.<span class="ident">for_each</span>(<span class="op">|</span><span class="kw">_</span>, <span class="ident">bit</span><span class="op">|</span> <span class="ident">bit</span> <span class="op">|</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>));
+	<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../../doc/slice/bitop_assign.md&quot;</span>)]</span>
+	<span class="kw">fn</span> <span class="ident">bitor_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span>) {
+		<span class="kw">if</span> <span class="kw">let</span> (<span class="prelude-val">Some</span>(<span class="ident">this</span>), <span class="prelude-val">Some</span>(<span class="ident">that</span>)) <span class="op">=</span>
+			(<span class="self">self</span>.<span class="ident">coerce_mut</span>::<span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">Lsb0</span><span class="op">&gt;</span>(), <span class="ident">rhs</span>.<span class="ident">coerce</span>::<span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">Lsb0</span><span class="op">&gt;</span>())
+		{
+			<span class="kw">return</span> <span class="ident">this</span>.<span class="ident">sp_bitop_assign</span>(<span class="ident">that</span>, <span class="ident">BitOr::bitor</span>, <span class="ident">BitOr::bitor</span>);
+		}
+		<span class="kw">if</span> <span class="kw">let</span> (<span class="prelude-val">Some</span>(<span class="ident">this</span>), <span class="prelude-val">Some</span>(<span class="ident">that</span>)) <span class="op">=</span>
+			(<span class="self">self</span>.<span class="ident">coerce_mut</span>::<span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">Msb0</span><span class="op">&gt;</span>(), <span class="ident">rhs</span>.<span class="ident">coerce</span>::<span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">Msb0</span><span class="op">&gt;</span>())
+		{
+			<span class="kw">return</span> <span class="ident">this</span>.<span class="ident">sp_bitop_assign</span>(<span class="ident">that</span>, <span class="ident">BitOr::bitor</span>, <span class="ident">BitOr::bitor</span>);
+		}
+		<span class="kw">for</span> (<span class="ident">this</span>, <span class="ident">that</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">as_mut_bitptr_range</span>().<span class="ident">zip</span>(<span class="ident">rhs</span>.<span class="ident">as_bitptr_range</span>())
+		{
+			<span class="kw">unsafe</span> {
+				<span class="ident">this</span>.<span class="ident">write</span>(<span class="ident">this</span>.<span class="ident">read</span>() <span class="op">|</span> <span class="ident">that</span>.<span class="ident">read</span>());
+			}
+		}
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span>, <span class="ident">Rhs</span><span class="op">&gt;</span> <span class="ident">BitXorAssign</span><span class="op">&lt;</span><span class="ident">Rhs</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">O1</span>, <span class="ident">O2</span><span class="op">&gt;</span> <span class="ident">BitXorAssign</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">O1</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">Rhs</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">bool</span><span class="op">&gt;</span>,
+	<span class="ident">T1</span>: <span class="ident">BitStore</span>,
+	<span class="ident">T2</span>: <span class="ident">BitStore</span>,
+	<span class="ident">O1</span>: <span class="ident">BitOrder</span>,
+	<span class="ident">O2</span>: <span class="ident">BitOrder</span>,
 {
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">bitxor_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Rhs</span>) {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">rhs</span>.<span class="ident">into_iter</span>();
-		<span class="self">self</span>.<span class="ident">for_each</span>(<span class="op">|</span><span class="kw">_</span>, <span class="ident">bit</span><span class="op">|</span> <span class="ident">bit</span> <span class="op">^</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>));
+	<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../../doc/slice/bitop_assign.md&quot;</span>)]</span>
+	<span class="kw">fn</span> <span class="ident">bitxor_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span>) {
+		<span class="kw">if</span> <span class="kw">let</span> (<span class="prelude-val">Some</span>(<span class="ident">this</span>), <span class="prelude-val">Some</span>(<span class="ident">that</span>)) <span class="op">=</span>
+			(<span class="self">self</span>.<span class="ident">coerce_mut</span>::<span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">Lsb0</span><span class="op">&gt;</span>(), <span class="ident">rhs</span>.<span class="ident">coerce</span>::<span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">Lsb0</span><span class="op">&gt;</span>())
+		{
+			<span class="kw">return</span> <span class="ident">this</span>.<span class="ident">sp_bitop_assign</span>(<span class="ident">that</span>, <span class="ident">BitXor::bitxor</span>, <span class="ident">BitXor::bitxor</span>);
+		}
+		<span class="kw">if</span> <span class="kw">let</span> (<span class="prelude-val">Some</span>(<span class="ident">this</span>), <span class="prelude-val">Some</span>(<span class="ident">that</span>)) <span class="op">=</span>
+			(<span class="self">self</span>.<span class="ident">coerce_mut</span>::<span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">Msb0</span><span class="op">&gt;</span>(), <span class="ident">rhs</span>.<span class="ident">coerce</span>::<span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">Msb0</span><span class="op">&gt;</span>())
+		{
+			<span class="kw">return</span> <span class="ident">this</span>.<span class="ident">sp_bitop_assign</span>(<span class="ident">that</span>, <span class="ident">BitXor::bitxor</span>, <span class="ident">BitXor::bitxor</span>);
+		}
+		<span class="kw">for</span> (<span class="ident">this</span>, <span class="ident">that</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">as_mut_bitptr_range</span>().<span class="ident">zip</span>(<span class="ident">rhs</span>.<span class="ident">as_bitptr_range</span>())
+		{
+			<span class="kw">unsafe</span> {
+				<span class="ident">this</span>.<span class="ident">write</span>(<span class="ident">this</span>.<span class="ident">read</span>() <span class="op">^</span> <span class="ident">that</span>.<span class="ident">read</span>());
+			}
+		}
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Index</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Index</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 {
 	<span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">bool</span>;
 
-	<span class="doccomment">/// Looks up a single bit by semantic index.</span>
+	<span class="doccomment">/// Looks up a single bit by its semantic index.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
+	<span class="doccomment">/// ## Examples</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// ```rust</span>
 	<span class="doccomment">/// use bitvec::prelude::*;</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// let bits = bits![Msb0, u8; 0, 1, 0];</span>
+	<span class="doccomment">/// let bits = bits![u8, Msb0; 0, 1, 0];</span>
 	<span class="doccomment">/// assert!(!bits[0]); // -----^  |  |</span>
 	<span class="doccomment">/// assert!( bits[1]); // --------^  |</span>
 	<span class="doccomment">/// assert!(!bits[2]); // -----------^</span>
@@ -282,7 +401,6 @@
 	<span class="doccomment">/// ```</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Output</span> {
-		<span class="comment">//  Convert the `BitRef` to `&amp;&#39;static bool`</span>
 		<span class="kw">match</span> <span class="kw-2">*</span><span class="ident">index</span>.<span class="ident">index</span>(<span class="self">self</span>) {
 			<span class="bool-val">true</span> =&gt; <span class="kw-2">&amp;</span><span class="bool-val">true</span>,
 			<span class="bool-val">false</span> =&gt; <span class="kw-2">&amp;</span><span class="bool-val">false</span>,
@@ -290,30 +408,30 @@
 	}
 }
 
-<span class="doccomment">/// Generate `Index`/`Mut` implementations for subslicing.</span>
+<span class="doccomment">/// Implements `Index` and `IndexMut` with the given type.</span>
 <span class="macro">macro_rules!</span> <span class="ident">index</span> {
 	($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) =&gt; { $(
-		<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Index</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+		<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Index</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
 		<span class="kw">where</span>
 			<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 			<span class="ident">T</span>: <span class="ident">BitStore</span>,
 		{
 			<span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
 
-			<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-			<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
+			<span class="attribute">#[<span class="ident">inline</span>]</span>
+			<span class="attribute">#[<span class="ident">track_caller</span>]</span>
 			<span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Output</span> {
 				<span class="ident">index</span>.<span class="ident">index</span>(<span class="self">self</span>)
 			}
 		}
 
-		<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">IndexMut</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+		<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">IndexMut</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
 		<span class="kw">where</span>
 			<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 			<span class="ident">T</span>: <span class="ident">BitStore</span>,
 		{
-			<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-			<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
+			<span class="attribute">#[<span class="ident">inline</span>]</span>
+			<span class="attribute">#[<span class="ident">track_caller</span>]</span>
 			<span class="kw">fn</span> <span class="ident">index_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Output</span> {
 				<span class="ident">index</span>.<span class="ident">index_mut</span>(<span class="self">self</span>)
 			}
@@ -321,37 +439,43 @@
 	)<span class="op">+</span> };
 }
 
-<span class="comment">//  Implement `Index`/`Mut` subslicing with all the ranges.</span>
-<span class="macro">index!</span>(
+<span class="macro">index!</span> {
 	<span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
 	<span class="ident">RangeFrom</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
 	<span class="ident">RangeFull</span>,
 	<span class="ident">RangeInclusive</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
 	<span class="ident">RangeTo</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
 	<span class="ident">RangeToInclusive</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-);
+}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Not</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="doccomment">/** Inverts each bit in the bit-slice.
+
+Unlike the `&amp;`, `|`, and `^` operators, this implementation is guaranteed to
+update each memory element only once, and is not required to traverse every live
+bit in the underlying region.
+**/</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Not</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 {
 	<span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
 
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">fn</span> <span class="ident">not</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
 		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">domain_mut</span>() {
-			<span class="ident">DomainMut::Enclave</span> { <span class="ident">head</span>, <span class="ident">elem</span>, <span class="ident">tail</span> } =&gt; {
-				<span class="ident">elem</span>.<span class="ident">invert_bits</span>(<span class="ident">O::mask</span>(<span class="ident">head</span>, <span class="ident">tail</span>));
+			<span class="ident">Domain::Enclave</span>(<span class="kw-2">mut</span> <span class="ident">elem</span>) =&gt; {
+				<span class="ident">elem</span>.<span class="ident">invert</span>();
 			},
-			<span class="ident">DomainMut::Region</span> { <span class="ident">head</span>, <span class="ident">body</span>, <span class="ident">tail</span> } =&gt; {
-				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">head</span>, <span class="ident">elem</span>)) <span class="op">=</span> <span class="ident">head</span> {
-					<span class="ident">elem</span>.<span class="ident">invert_bits</span>(<span class="ident">O::mask</span>(<span class="ident">head</span>, <span class="prelude-val">None</span>));
+			<span class="ident">Domain::Region</span> { <span class="ident">head</span>, <span class="ident">body</span>, <span class="ident">tail</span> } =&gt; {
+				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">elem</span>) <span class="op">=</span> <span class="ident">head</span> {
+					<span class="ident">elem</span>.<span class="ident">invert</span>();
 				}
 				<span class="kw">for</span> <span class="ident">elem</span> <span class="kw">in</span> <span class="ident">body</span> {
 					<span class="ident">elem</span>.<span class="ident">store_value</span>(<span class="op">!</span><span class="ident">elem</span>.<span class="ident">load_value</span>());
 				}
-				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">elem</span>, <span class="ident">tail</span>)) <span class="op">=</span> <span class="ident">tail</span> {
-					<span class="ident">elem</span>.<span class="ident">invert_bits</span>(<span class="ident">O::mask</span>(<span class="prelude-val">None</span>, <span class="ident">tail</span>));
+				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">elem</span>) <span class="op">=</span> <span class="ident">tail</span> {
+					<span class="ident">elem</span>.<span class="ident">invert</span>();
 				}
 			},
 		}

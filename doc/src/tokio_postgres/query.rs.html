@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/5ec2a4f/tokio-postgres/src/query.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>query.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/064a6a5/tokio-postgres/src/query.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>query.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
@@ -224,13 +224,21 @@
 <span id="218">218</span>
 <span id="219">219</span>
 <span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client</span>::{<span class="ident">InnerClient</span>, <span class="ident">Responses</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::codec::FrontendMessage</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::connection::RequestMessages</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::types</span>::{<span class="ident">BorrowToSql</span>, <span class="ident">IsNull</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Error</span>, <span class="ident">Portal</span>, <span class="ident">Row</span>, <span class="ident">Statement</span>};
 <span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">Bytes</span>, <span class="ident">BytesMut</span>};
-<span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">ready</span>, <span class="ident">Stream</span>};
+<span class="kw">use</span> <span class="ident">futures_util</span>::{<span class="ident">ready</span>, <span class="ident">Stream</span>};
 <span class="kw">use</span> <span class="ident">log</span>::{<span class="ident">debug</span>, <span class="ident">log_enabled</span>, <span class="ident">Level</span>};
 <span class="kw">use</span> <span class="ident">pin_project_lite::pin_project</span>;
 <span class="kw">use</span> <span class="ident">postgres_protocol::message::backend::Message</span>;
@@ -382,21 +390,29 @@
     <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">P</span><span class="op">&gt;</span>,
     <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
 {
+    <span class="kw">let</span> <span class="ident">param_types</span> <span class="op">=</span> <span class="ident">statement</span>.<span class="ident">params</span>();
     <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">into_iter</span>();
 
     <span class="macro">assert!</span>(
-        <span class="ident">statement</span>.<span class="ident">params</span>().<span class="ident">len</span>() <span class="op">==</span> <span class="ident">params</span>.<span class="ident">len</span>(),
+        <span class="ident">param_types</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">params</span>.<span class="ident">len</span>(),
         <span class="string">&quot;expected {} parameters but got {}&quot;</span>,
-        <span class="ident">statement</span>.<span class="ident">params</span>().<span class="ident">len</span>(),
+        <span class="ident">param_types</span>.<span class="ident">len</span>(),
         <span class="ident">params</span>.<span class="ident">len</span>()
     );
+
+    <span class="kw">let</span> (<span class="ident">param_formats</span>, <span class="ident">params</span>): (<span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>) <span class="op">=</span> <span class="ident">params</span>
+        .<span class="ident">zip</span>(<span class="ident">param_types</span>.<span class="ident">iter</span>())
+        .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">p</span>, <span class="ident">ty</span>)<span class="op">|</span> (<span class="ident">p</span>.<span class="ident">borrow_to_sql</span>().<span class="ident">encode_format</span>(<span class="ident">ty</span>) <span class="kw">as</span> <span class="ident">i16</span>, <span class="ident">p</span>))
+        .<span class="ident">unzip</span>();
+
+    <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">into_iter</span>();
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">error_idx</span> <span class="op">=</span> <span class="number">0</span>;
     <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">frontend::bind</span>(
         <span class="ident">portal</span>,
         <span class="ident">statement</span>.<span class="ident">name</span>(),
-        <span class="prelude-val">Some</span>(<span class="number">1</span>),
-        <span class="ident">params</span>.<span class="ident">zip</span>(<span class="ident">statement</span>.<span class="ident">params</span>()).<span class="ident">enumerate</span>(),
+        <span class="ident">param_formats</span>,
+        <span class="ident">params</span>.<span class="ident">zip</span>(<span class="ident">param_types</span>).<span class="ident">enumerate</span>(),
         <span class="op">|</span>(<span class="ident">idx</span>, (<span class="ident">param</span>, <span class="ident">ty</span>)), <span class="ident">buf</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">param</span>.<span class="ident">borrow_to_sql</span>().<span class="ident">to_sql_checked</span>(<span class="ident">ty</span>, <span class="ident">buf</span>) {
             <span class="prelude-val">Ok</span>(<span class="ident">IsNull::No</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">postgres_protocol::IsNull::No</span>),
             <span class="prelude-val">Ok</span>(<span class="ident">IsNull::Yes</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">postgres_protocol::IsNull::Yes</span>),

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pest-2.1.3/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../pest/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pest-2.3.0/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../pest/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../pest/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
@@ -811,6 +811,94 @@
 <span id="805">805</span>
 <span id="806">806</span>
 <span id="807">807</span>
+<span id="808">808</span>
+<span id="809">809</span>
+<span id="810">810</span>
+<span id="811">811</span>
+<span id="812">812</span>
+<span id="813">813</span>
+<span id="814">814</span>
+<span id="815">815</span>
+<span id="816">816</span>
+<span id="817">817</span>
+<span id="818">818</span>
+<span id="819">819</span>
+<span id="820">820</span>
+<span id="821">821</span>
+<span id="822">822</span>
+<span id="823">823</span>
+<span id="824">824</span>
+<span id="825">825</span>
+<span id="826">826</span>
+<span id="827">827</span>
+<span id="828">828</span>
+<span id="829">829</span>
+<span id="830">830</span>
+<span id="831">831</span>
+<span id="832">832</span>
+<span id="833">833</span>
+<span id="834">834</span>
+<span id="835">835</span>
+<span id="836">836</span>
+<span id="837">837</span>
+<span id="838">838</span>
+<span id="839">839</span>
+<span id="840">840</span>
+<span id="841">841</span>
+<span id="842">842</span>
+<span id="843">843</span>
+<span id="844">844</span>
+<span id="845">845</span>
+<span id="846">846</span>
+<span id="847">847</span>
+<span id="848">848</span>
+<span id="849">849</span>
+<span id="850">850</span>
+<span id="851">851</span>
+<span id="852">852</span>
+<span id="853">853</span>
+<span id="854">854</span>
+<span id="855">855</span>
+<span id="856">856</span>
+<span id="857">857</span>
+<span id="858">858</span>
+<span id="859">859</span>
+<span id="860">860</span>
+<span id="861">861</span>
+<span id="862">862</span>
+<span id="863">863</span>
+<span id="864">864</span>
+<span id="865">865</span>
+<span id="866">866</span>
+<span id="867">867</span>
+<span id="868">868</span>
+<span id="869">869</span>
+<span id="870">870</span>
+<span id="871">871</span>
+<span id="872">872</span>
+<span id="873">873</span>
+<span id="874">874</span>
+<span id="875">875</span>
+<span id="876">876</span>
+<span id="877">877</span>
+<span id="878">878</span>
+<span id="879">879</span>
+<span id="880">880</span>
+<span id="881">881</span>
+<span id="882">882</span>
+<span id="883">883</span>
+<span id="884">884</span>
+<span id="885">885</span>
+<span id="886">886</span>
+<span id="887">887</span>
+<span id="888">888</span>
+<span id="889">889</span>
+<span id="890">890</span>
+<span id="891">891</span>
+<span id="892">892</span>
+<span id="893">893</span>
+<span id="894">894</span>
+<span id="895">895</span>
 </pre><pre class="rust"><code><span class="comment">// pest. The Elegant Parser</span>
 <span class="comment">// Copyright (c) 2018 Dragoș Tiselice</span>
 <span class="comment">//</span>
@@ -822,17 +910,23 @@
 
 <span class="doccomment">//! Types for different kinds of parsing failures.</span>
 
-<span class="kw">use</span> <span class="ident">std::cmp</span>;
-<span class="kw">use</span> <span class="ident">std::error</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::mem</span>;
+<span class="kw">use</span> <span class="ident">alloc::borrow::Cow</span>;
+<span class="kw">use</span> <span class="ident">alloc::borrow::ToOwned</span>;
+<span class="kw">use</span> <span class="ident">alloc::format</span>;
+<span class="kw">use</span> <span class="ident">alloc::string::String</span>;
+<span class="kw">use</span> <span class="ident">alloc::string::ToString</span>;
+<span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
+<span class="kw">use</span> <span class="ident">core::cmp</span>;
+<span class="kw">use</span> <span class="ident">core::fmt</span>;
+<span class="kw">use</span> <span class="ident">core::mem</span>;
 
-<span class="kw">use</span> <span class="ident">position::Position</span>;
-<span class="kw">use</span> <span class="ident">span::Span</span>;
-<span class="kw">use</span> <span class="ident">RuleType</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::position::Position</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::span::Span</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::RuleType</span>;
 
 <span class="doccomment">/// Parse-related error type.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">thiserror::Error</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Variant of the error</span>
     <span class="kw">pub</span> <span class="ident">variant</span>: <span class="ident">ErrorVariant</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
@@ -847,6 +941,7 @@
 
 <span class="doccomment">/// Different kinds of parsing errors.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">thiserror::Error</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ErrorVariant</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Generated parsing error with expected and unexpected `Rule`s</span>
     <span class="ident">ParsingError</span> {
@@ -907,13 +1002,19 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// println!(&quot;{}&quot;, error);</span>
     <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::needless_pass_by_value</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_from_pos</span>(<span class="ident">variant</span>: <span class="ident">ErrorVariant</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>, <span class="ident">pos</span>: <span class="ident">Position</span>) -&gt; <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">visualize_ws</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">match_char</span>(<span class="string">&#39;\n&#39;</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">pos</span>.<span class="ident">match_char</span>(<span class="string">&#39;\r&#39;</span>);
+        <span class="kw">let</span> <span class="ident">line_of</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">line_of</span>();
+        <span class="kw">let</span> <span class="ident">line</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">visualize_ws</span> {
+            <span class="ident">visualize_whitespace</span>(<span class="ident">line_of</span>)
+        } <span class="kw">else</span> {
+            <span class="ident">line_of</span>.<span class="ident">replace</span>(<span class="kw-2">&amp;</span>[<span class="string">&#39;\r&#39;</span>, <span class="string">&#39;\n&#39;</span>][..], <span class="string">&quot;&quot;</span>)
+        };
         <span class="ident">Error</span> {
             <span class="ident">variant</span>,
             <span class="ident">location</span>: <span class="ident">InputLocation::Pos</span>(<span class="ident">pos</span>.<span class="ident">pos</span>()),
             <span class="ident">path</span>: <span class="prelude-val">None</span>,
-            <span class="ident">line</span>: <span class="ident">visualize_whitespace</span>(<span class="ident">pos</span>.<span class="ident">line_of</span>()),
+            <span class="ident">line</span>,
             <span class="ident">continued_line</span>: <span class="prelude-val">None</span>,
             <span class="ident">line_col</span>: <span class="ident">LineColLocation::Pos</span>(<span class="ident">pos</span>.<span class="ident">line_col</span>()),
         }
@@ -947,22 +1048,33 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// println!(&quot;{}&quot;, error);</span>
     <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::needless_pass_by_value</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_from_span</span>(<span class="ident">variant</span>: <span class="ident">ErrorVariant</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>, <span class="ident">span</span>: <span class="ident">Span</span>) -&gt; <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">end_pos</span>();
-
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">end_line_col</span> <span class="op">=</span> <span class="ident">end</span>.<span class="ident">line_col</span>();
         <span class="comment">// end position is after a \n, so we want to point to the visual lf symbol</span>
         <span class="kw">if</span> <span class="ident">end_line_col</span>.<span class="number">1</span> <span class="op">==</span> <span class="number">1</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">visual_end</span> <span class="op">=</span> <span class="ident">end</span>.<span class="ident">clone</span>();
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">visual_end</span> <span class="op">=</span> <span class="ident">end</span>;
             <span class="ident">visual_end</span>.<span class="ident">skip_back</span>(<span class="number">1</span>);
             <span class="kw">let</span> <span class="ident">lc</span> <span class="op">=</span> <span class="ident">visual_end</span>.<span class="ident">line_col</span>();
             <span class="ident">end_line_col</span> <span class="op">=</span> (<span class="ident">lc</span>.<span class="number">0</span>, <span class="ident">lc</span>.<span class="number">1</span> <span class="op">+</span> <span class="number">1</span>);
         };
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">line_iter</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">lines</span>();
-        <span class="kw">let</span> <span class="ident">start_line</span> <span class="op">=</span> <span class="ident">visualize_whitespace</span>(<span class="ident">line_iter</span>.<span class="ident">next</span>().<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>));
-        <span class="kw">let</span> <span class="ident">continued_line</span> <span class="op">=</span> <span class="ident">line_iter</span>.<span class="ident">last</span>().<span class="ident">map</span>(<span class="ident">visualize_whitespace</span>);
+        <span class="kw">let</span> <span class="ident">sl</span> <span class="op">=</span> <span class="ident">line_iter</span>.<span class="ident">next</span>().<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chars</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">as_str</span>().<span class="ident">chars</span>();
+        <span class="kw">let</span> <span class="ident">visualize_ws</span> <span class="op">=</span> <span class="macro">matches!</span>(<span class="ident">chars</span>.<span class="ident">next</span>(), <span class="prelude-val">Some</span>(<span class="string">&#39;\n&#39;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&#39;\r&#39;</span>))
+            <span class="op">|</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">chars</span>.<span class="ident">last</span>(), <span class="prelude-val">Some</span>(<span class="string">&#39;\n&#39;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&#39;\r&#39;</span>));
+        <span class="kw">let</span> <span class="ident">start_line</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">visualize_ws</span> {
+            <span class="ident">visualize_whitespace</span>(<span class="ident">sl</span>)
+        } <span class="kw">else</span> {
+            <span class="ident">sl</span>.<span class="ident">to_owned</span>().<span class="ident">replace</span>(<span class="kw-2">&amp;</span>[<span class="string">&#39;\r&#39;</span>, <span class="string">&#39;\n&#39;</span>][..], <span class="string">&quot;&quot;</span>)
+        };
+        <span class="kw">let</span> <span class="ident">ll</span> <span class="op">=</span> <span class="ident">line_iter</span>.<span class="ident">last</span>();
+        <span class="kw">let</span> <span class="ident">continued_line</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">visualize_ws</span> {
+            <span class="ident">ll</span>.<span class="ident">map</span>(<span class="kw-2">&amp;</span><span class="ident">str::to_owned</span>)
+        } <span class="kw">else</span> {
+            <span class="ident">ll</span>.<span class="ident">map</span>(<span class="ident">visualize_whitespace</span>)
+        };
 
         <span class="ident">Error</span> {
             <span class="ident">variant</span>,
@@ -1002,6 +1114,40 @@
         <span class="self">self</span>.<span class="ident">path</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">path</span>.<span class="ident">to_owned</span>());
 
         <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Returns the path set using [`Error::with_path()`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use pest::error::{Error, ErrorVariant};</span>
+    <span class="doccomment">/// # use pest::Position;</span>
+    <span class="doccomment">/// # #[allow(non_camel_case_types)]</span>
+    <span class="doccomment">/// # #[allow(dead_code)]</span>
+    <span class="doccomment">/// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]</span>
+    <span class="doccomment">/// # enum Rule {</span>
+    <span class="doccomment">/// #     open_paren,</span>
+    <span class="doccomment">/// #     closed_paren</span>
+    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// # let input = &quot;&quot;;</span>
+    <span class="doccomment">/// # let pos = Position::from_start(input);</span>
+    <span class="doccomment">/// # let error = Error::new_from_pos(</span>
+    <span class="doccomment">/// #     ErrorVariant::ParsingError {</span>
+    <span class="doccomment">/// #         positives: vec![Rule::open_paren],</span>
+    <span class="doccomment">/// #         negatives: vec![Rule::closed_paren]</span>
+    <span class="doccomment">/// #     },</span>
+    <span class="doccomment">/// #     pos);</span>
+    <span class="doccomment">/// let error = error.with_path(&quot;file.rs&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Some(&quot;file.rs&quot;), error.path());</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">as_deref</span>()
+    }
+
+    <span class="doccomment">/// Returns the line that the error is on.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">line</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
+        <span class="self">self</span>.<span class="ident">line</span>.<span class="ident">as_str</span>()
     }
 
     <span class="doccomment">/// Renames all `Rule`s if this is a [`ParsingError`]. It does nothing when called on a</span>
@@ -1110,13 +1256,11 @@
         }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">end</span>) <span class="op">=</span> <span class="ident">end</span> {
+            <span class="ident">underline</span>.<span class="ident">push</span>(<span class="string">&#39;^&#39;</span>);
             <span class="kw">if</span> <span class="ident">end</span> <span class="op">-</span> <span class="ident">start</span> <span class="op">&gt;</span> <span class="number">1</span> {
-                <span class="ident">underline</span>.<span class="ident">push</span>(<span class="string">&#39;^&#39;</span>);
                 <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">2</span>..(<span class="ident">end</span> <span class="op">-</span> <span class="ident">start</span>) {
                     <span class="ident">underline</span>.<span class="ident">push</span>(<span class="string">&#39;-&#39;</span>);
                 }
-                <span class="ident">underline</span>.<span class="ident">push</span>(<span class="string">&#39;^&#39;</span>);
-            } <span class="kw">else</span> {
                 <span class="ident">underline</span>.<span class="ident">push</span>(<span class="string">&#39;^&#39;</span>);
             }
         } <span class="kw">else</span> {
@@ -1127,13 +1271,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">variant</span> {
-            <span class="ident">ErrorVariant::ParsingError</span> {
-                <span class="kw-2">ref</span> <span class="ident">positives</span>,
-                <span class="kw-2">ref</span> <span class="ident">negatives</span>,
-            } =&gt; <span class="ident">Error::parsing_error_message</span>(<span class="ident">positives</span>, <span class="ident">negatives</span>, <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">r</span>)),
-            <span class="ident">ErrorVariant::CustomError</span> { <span class="kw-2">ref</span> <span class="ident">message</span> } =&gt; <span class="ident">message</span>.<span class="ident">clone</span>(),
-        }
+        <span class="self">self</span>.<span class="ident">variant</span>.<span class="ident">message</span>().<span class="ident">to_string</span>()
     }
 
     <span class="kw">fn</span> <span class="ident">parsing_error_message</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">positives</span>: <span class="kw-2">&amp;</span>[<span class="ident">R</span>], <span class="ident">negatives</span>: <span class="kw-2">&amp;</span>[<span class="ident">R</span>], <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">String</span>
@@ -1160,13 +1298,14 @@
             <span class="number">1</span> =&gt; <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="ident">rules</span>[<span class="number">0</span>]),
             <span class="number">2</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{} or {}&quot;</span>, <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="ident">rules</span>[<span class="number">0</span>]), <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="ident">rules</span>[<span class="number">1</span>])),
             <span class="ident">l</span> =&gt; {
+                <span class="kw">let</span> <span class="ident">non_separated</span> <span class="op">=</span> <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="ident">rules</span>[<span class="ident">l</span> <span class="op">-</span> <span class="number">1</span>]);
                 <span class="kw">let</span> <span class="ident">separated</span> <span class="op">=</span> <span class="ident">rules</span>
                     .<span class="ident">iter</span>()
                     .<span class="ident">take</span>(<span class="ident">l</span> <span class="op">-</span> <span class="number">1</span>)
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">f</span>(<span class="ident">r</span>))
+                    .<span class="ident">map</span>(<span class="ident">f</span>)
                     .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
                     .<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>);
-                <span class="macro">format!</span>(<span class="string">&quot;{}, or {}&quot;</span>, <span class="ident">separated</span>, <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="ident">rules</span>[<span class="ident">l</span> <span class="op">-</span> <span class="number">1</span>]))
+                <span class="macro">format!</span>(<span class="string">&quot;{}, or {}&quot;</span>, <span class="ident">separated</span>, <span class="ident">non_separated</span>)
             }
         }
     }
@@ -1244,17 +1383,53 @@
     }
 }
 
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">RuleType</span><span class="op">&gt;</span> <span class="ident">ErrorVariant</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns the error message for [`ErrorVariant`]</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If [`ErrorVariant`] is [`CustomError`], it returns a</span>
+    <span class="doccomment">/// [`Cow::Borrowed`] reference to [`message`]. If [`ErrorVariant`] is [`ParsingError`], a</span>
+    <span class="doccomment">/// [`Cow::Owned`] containing &quot;expected [ErrorVariant::ParsingError::positives] [ErrorVariant::ParsingError::negatives]&quot; is returned.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`ErrorVariant`]: enum.ErrorVariant.html</span>
+    <span class="doccomment">/// [`CustomError`]: enum.ErrorVariant.html#variant.CustomError</span>
+    <span class="doccomment">/// [`ParsingError`]: enum.ErrorVariant.html#variant.ParsingError</span>
+    <span class="doccomment">/// [`Cow::Owned`]: https://doc.rust-lang.org/std/borrow/enum.Cow.html#variant.Owned</span>
+    <span class="doccomment">/// [`Cow::Borrowed`]: https://doc.rust-lang.org/std/borrow/enum.Cow.html#variant.Borrowed</span>
+    <span class="doccomment">/// [`message`]: enum.ErrorVariant.html#variant.CustomError.field.message</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use pest::error::ErrorVariant;</span>
+    <span class="doccomment">/// let variant = ErrorVariant::&lt;()&gt;::CustomError {</span>
+    <span class="doccomment">///     message: String::from(&quot;unexpected error&quot;)</span>
+    <span class="doccomment">/// };</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// println!(&quot;{}&quot;, variant.message());</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">ErrorVariant::ParsingError</span> {
+                <span class="kw-2">ref</span> <span class="ident">positives</span>,
+                <span class="kw-2">ref</span> <span class="ident">negatives</span>,
+            } =&gt; <span class="ident">Cow::Owned</span>(<span class="ident">Error::parsing_error_message</span>(<span class="ident">positives</span>, <span class="ident">negatives</span>, <span class="op">|</span><span class="ident">r</span><span class="op">|</span> {
+                <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">r</span>)
+            })),
+            <span class="ident">ErrorVariant::CustomError</span> { <span class="kw-2">ref</span> <span class="ident">message</span> } =&gt; <span class="ident">Cow::Borrowed</span>(<span class="ident">message</span>),
+        }
+    }
+}
+
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">RuleType</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">format</span>())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span>, <span class="ident">R</span>: <span class="ident">RuleType</span><span class="op">&gt;</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">variant</span> {
-            <span class="ident">ErrorVariant::ParsingError</span> { .. } =&gt; <span class="string">&quot;parsing error&quot;</span>,
-            <span class="ident">ErrorVariant::CustomError</span> { <span class="kw-2">ref</span> <span class="ident">message</span> } =&gt; <span class="ident">message</span>,
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">RuleType</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ErrorVariant</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">ErrorVariant::ParsingError</span> { .. } =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;parsing error: {}&quot;</span>, <span class="self">self</span>.<span class="ident">message</span>()),
+            <span class="ident">ErrorVariant::CustomError</span> { .. } =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">message</span>()),
         }
     }
 }
@@ -1267,6 +1442,7 @@
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::position</span>;
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use</span> <span class="ident">alloc::vec</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">display_parsing_error_mixed</span>() {
@@ -1285,7 +1461,7 @@
             <span class="macro">vec!</span>[
                 <span class="string">&quot; --&gt; 2:2&quot;</span>,
                 <span class="string">&quot;  |&quot;</span>,
-                <span class="string">&quot;2 | cd␊&quot;</span>,
+                <span class="string">&quot;2 | cd&quot;</span>,
                 <span class="string">&quot;  |  ^---&quot;</span>,
                 <span class="string">&quot;  |&quot;</span>,
                 <span class="string">&quot;  = unexpected 4, 5, or 6; expected 1, 2, or 3&quot;</span>,
@@ -1311,7 +1487,7 @@
             <span class="macro">vec!</span>[
                 <span class="string">&quot; --&gt; 2:2&quot;</span>,
                 <span class="string">&quot;  |&quot;</span>,
-                <span class="string">&quot;2 | cd␊&quot;</span>,
+                <span class="string">&quot;2 | cd&quot;</span>,
                 <span class="string">&quot;  |  ^---&quot;</span>,
                 <span class="string">&quot;  |&quot;</span>,
                 <span class="string">&quot;  = expected 1 or 2&quot;</span>,
@@ -1337,7 +1513,7 @@
             <span class="macro">vec!</span>[
                 <span class="string">&quot; --&gt; 2:2&quot;</span>,
                 <span class="string">&quot;  |&quot;</span>,
-                <span class="string">&quot;2 | cd␊&quot;</span>,
+                <span class="string">&quot;2 | cd&quot;</span>,
                 <span class="string">&quot;  |  ^---&quot;</span>,
                 <span class="string">&quot;  |&quot;</span>,
                 <span class="string">&quot;  = unexpected 4, 5, or 6&quot;</span>,
@@ -1363,7 +1539,7 @@
             <span class="macro">vec!</span>[
                 <span class="string">&quot; --&gt; 2:2&quot;</span>,
                 <span class="string">&quot;  |&quot;</span>,
-                <span class="string">&quot;2 | cd␊&quot;</span>,
+                <span class="string">&quot;2 | cd&quot;</span>,
                 <span class="string">&quot;  |  ^---&quot;</span>,
                 <span class="string">&quot;  |&quot;</span>,
                 <span class="string">&quot;  = unknown parsing error&quot;</span>,
@@ -1388,7 +1564,7 @@
             <span class="macro">vec!</span>[
                 <span class="string">&quot; --&gt; 2:2&quot;</span>,
                 <span class="string">&quot;  |&quot;</span>,
-                <span class="string">&quot;2 | cd␊&quot;</span>,
+                <span class="string">&quot;2 | cd&quot;</span>,
                 <span class="string">&quot;  |  ^---&quot;</span>,
                 <span class="string">&quot;  |&quot;</span>,
                 <span class="string">&quot;  = error: big one&quot;</span>,
@@ -1414,7 +1590,7 @@
             <span class="macro">vec!</span>[
                 <span class="string">&quot; --&gt; 2:2&quot;</span>,
                 <span class="string">&quot;  |&quot;</span>,
-                <span class="string">&quot;2 | cd␊&quot;</span>,
+                <span class="string">&quot;2 | cd&quot;</span>,
                 <span class="string">&quot;3 | efgh&quot;</span>,
                 <span class="string">&quot;  |  ^^&quot;</span>,
                 <span class="string">&quot;  |&quot;</span>,
@@ -1441,7 +1617,7 @@
             <span class="macro">vec!</span>[
                 <span class="string">&quot; --&gt; 1:2&quot;</span>,
                 <span class="string">&quot;  |&quot;</span>,
-                <span class="string">&quot;1 | ab␊&quot;</span>,
+                <span class="string">&quot;1 | ab&quot;</span>,
                 <span class="string">&quot;  | ...&quot;</span>,
                 <span class="string">&quot;3 | efgh&quot;</span>,
                 <span class="string">&quot;  |  ^^&quot;</span>,
@@ -1469,7 +1645,7 @@
             <span class="macro">vec!</span>[
                 <span class="string">&quot; --&gt; 1:6&quot;</span>,
                 <span class="string">&quot;  |&quot;</span>,
-                <span class="string">&quot;1 | abcdef␊&quot;</span>,
+                <span class="string">&quot;1 | abcdef&quot;</span>,
                 <span class="string">&quot;2 | gh&quot;</span>,
                 <span class="string">&quot;  | ^----^&quot;</span>,
                 <span class="string">&quot;  |&quot;</span>,
@@ -1555,7 +1731,7 @@
             <span class="macro">vec!</span>[
                 <span class="string">&quot; --&gt; 2:2&quot;</span>,
                 <span class="string">&quot;  |&quot;</span>,
-                <span class="string">&quot;2 | cd␊&quot;</span>,
+                <span class="string">&quot;2 | cd&quot;</span>,
                 <span class="string">&quot;  |  ^---&quot;</span>,
                 <span class="string">&quot;  |&quot;</span>,
                 <span class="string">&quot;  = unexpected 5, 6, or 7; expected 2, 3, or 4&quot;</span>,
@@ -1582,7 +1758,7 @@
             <span class="macro">vec!</span>[
                 <span class="string">&quot; --&gt; file.rs:2:2&quot;</span>,
                 <span class="string">&quot;  |&quot;</span>,
-                <span class="string">&quot;2 | cd␊&quot;</span>,
+                <span class="string">&quot;2 | cd&quot;</span>,
                 <span class="string">&quot;  |  ^---&quot;</span>,
                 <span class="string">&quot;  |&quot;</span>,
                 <span class="string">&quot;  = unexpected 4, 5, or 6; expected 1, 2, or 3&quot;</span>,

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/openssl-0.10.40/src/ssl/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../openssl/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/openssl-0.10.41/src/ssl/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../openssl/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../openssl/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
@@ -3797,7 +3797,6 @@
 <span id="3791">3791</span>
 <span id="3792">3792</span>
 <span id="3793">3793</span>
-<span id="3794">3794</span>
 </pre><pre class="rust"><code><span class="doccomment">//! SSL/TLS support.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! `SslConnector` and `SslAcceptor` should be used in most cases - they handle</span>
@@ -3865,7 +3864,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ex_data::Index</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">ossl111</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::hash::MessageDigest</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">ossl110</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl110</span>, <span class="ident">libressl270</span>))]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::nid::Nid</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::pkey</span>::{<span class="ident">HasPrivate</span>, <span class="ident">PKeyRef</span>, <span class="ident">Params</span>, <span class="ident">Private</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::srtp</span>::{<span class="ident">SrtpProtectionProfile</span>, <span class="ident">SrtpProtectionProfileRef</span>};
@@ -4010,8 +4009,8 @@
 
         <span class="doccomment">/// Disables the use of TLSv1.3.</span>
         <span class="doccomment">///</span>
-        <span class="doccomment">/// Requires OpenSSL 1.1.1 or newer.</span>
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">ossl111</span>)]</span>
+        <span class="doccomment">/// Requires OpenSSL 1.1.1 or LibreSSL 3.4.0 or newer.</span>
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl111</span>, <span class="ident">libressl340</span>))]</span>
         <span class="kw">const</span> <span class="ident">NO_TLSV1_3</span> <span class="op">=</span> <span class="ident">ffi::SSL_OP_NO_TLSv1_3</span>;
 
         <span class="doccomment">/// Disables the use of DTLSv1.0</span>
@@ -4411,8 +4410,8 @@
 
     <span class="doccomment">/// TLSv1.3</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires OpenSSL 1.1.1 or newer.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">ossl111</span>)]</span>
+    <span class="doccomment">/// Requires OpenSSL 1.1.1 or LibreSSL 3.4.0 or newer.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl111</span>, <span class="ident">libressl340</span>))]</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TLS1_3</span>: <span class="ident">SslVersion</span> <span class="op">=</span> <span class="ident">SslVersion</span>(<span class="ident">ffi::TLS1_3_VERSION</span>);
 }
 
@@ -4676,7 +4675,6 @@
     <span class="doccomment">/// Add the provided CA certificate to the list sent by the server to the client when</span>
     <span class="doccomment">/// requesting client-side TLS authentication.</span>
     <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SSL_CTX_add_client_CA</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">libressl</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_client_ca</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cacert</span>: <span class="kw-2">&amp;</span><span class="ident">X509Ref</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> { <span class="ident">cvt</span>(<span class="ident">ffi::SSL_CTX_add_client_CA</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">cacert</span>.<span class="ident">as_ptr</span>())).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ()) }
     }
@@ -4818,9 +4816,9 @@
     <span class="doccomment">/// The format consists of TLSv1.3 cipher suite names separated by `:` characters in order of</span>
     <span class="doccomment">/// preference.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires OpenSSL 1.1.1 or newer.</span>
+    <span class="doccomment">/// Requires OpenSSL 1.1.1 or LibreSSL 3.4.0 or newer.</span>
     <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SSL_CTX_set_ciphersuites</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">ossl111</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl111</span>, <span class="ident">libressl340</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_ciphersuites</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cipher_list</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">cipher_list</span> <span class="op">=</span> <span class="ident">CString::new</span>(<span class="ident">cipher_list</span>).<span class="ident">unwrap</span>();
         <span class="kw">unsafe</span> {
@@ -5365,9 +5363,9 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Defaults to 0.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires OpenSSL 1.1.1 or newer.</span>
+    <span class="doccomment">/// Requires OpenSSL 1.1.1 or LibreSSL 3.4.0 or newer.</span>
     <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SSL_CTX_set_max_early_data</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">ossl111</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl111</span>, <span class="ident">libressl340</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_max_early_data</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">bytes</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">unsafe</span> { <span class="ident">ffi::SSL_CTX_set_max_early_data</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">bytes</span>) } <span class="op">==</span> <span class="number">1</span> {
             <span class="prelude-val">Ok</span>(())
@@ -5422,9 +5420,9 @@
 
     <span class="doccomment">/// Sets the context&#39;s supported elliptic curve groups.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires OpenSSL 1.1.1 or newer.</span>
+    <span class="doccomment">/// Requires OpenSSL 1.1.1 or LibreSSL 2.5.1 or newer.</span>
     <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SSL_CTX_set1_groups_list</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">ossl111</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl111</span>, <span class="ident">libressl251</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_groups_list</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">groups</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">groups</span> <span class="op">=</span> <span class="ident">CString::new</span>(<span class="ident">groups</span>).<span class="ident">unwrap</span>();
         <span class="kw">unsafe</span> {
@@ -5519,9 +5517,9 @@
 <span class="kw">impl</span> <span class="ident">SslContextRef</span> {
     <span class="doccomment">/// Returns the certificate associated with this `SslContext`, if present.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires OpenSSL 1.0.2 or newer.</span>
+    <span class="doccomment">/// Requires OpenSSL 1.0.2 or LibreSSL 2.7.0 or newer.</span>
     <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SSL_CTX_get0_certificate</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl102</span>, <span class="ident">ossl110</span>))]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl102</span>, <span class="ident">libressl270</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">certificate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">X509Ref</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">ffi::SSL_CTX_get0_certificate</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>());
@@ -5531,9 +5529,9 @@
 
     <span class="doccomment">/// Returns the private key associated with this `SslContext`, if present.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires OpenSSL 1.0.2 or newer.</span>
+    <span class="doccomment">/// Requires OpenSSL 1.0.2 or LibreSSL 3.4.0 or newer.</span>
     <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SSL_CTX_get0_privatekey</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl102</span>, <span class="ident">ossl110</span>))]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl102</span>, <span class="ident">libressl340</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">private_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PKeyRef</span><span class="op">&lt;</span><span class="ident">Private</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">ffi::SSL_CTX_get0_privatekey</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>());
@@ -5572,9 +5570,9 @@
 
     <span class="doccomment">/// Gets the maximum amount of early data that will be accepted on incoming connections.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires OpenSSL 1.1.1 or newer.</span>
+    <span class="doccomment">/// Requires OpenSSL 1.1.1 or LibreSSL 3.4.0 or newer.</span>
     <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SSL_CTX_get_max_early_data</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">ossl111</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl111</span>, <span class="ident">libressl340</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_early_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
         <span class="kw">unsafe</span> { <span class="ident">ffi::SSL_CTX_get_max_early_data</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) }
     }
@@ -5754,9 +5752,9 @@
 
     <span class="doccomment">/// Returns the NID corresponding to the cipher.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires OpenSSL 1.1.0 or newer.</span>
+    <span class="doccomment">/// Requires OpenSSL 1.1.0 or LibreSSL 2.7.0 or newer.</span>
     <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SSL_CIPHER_get_cipher_nid</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl110</span>))]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl110</span>, <span class="ident">libressl270</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cipher_nid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Nid</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">ffi::SSL_CIPHER_get_cipher_nid</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) };
         <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="number">0</span> {
@@ -5836,9 +5834,9 @@
 
     <span class="doccomment">/// Gets the maximum amount of early data that can be sent on this session.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires OpenSSL 1.1.1 or newer.</span>
+    <span class="doccomment">/// Requires OpenSSL 1.1.1 or LibreSSL 3.4.0 or newer.</span>
     <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SSL_SESSION_get_max_early_data</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">ossl111</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl111</span>, <span class="ident">libressl340</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_early_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
         <span class="kw">unsafe</span> { <span class="ident">ffi::SSL_SESSION_get_max_early_data</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) }
     }
@@ -5861,9 +5859,9 @@
 
     <span class="doccomment">/// Returns the session&#39;s TLS protocol version.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires OpenSSL 1.1.0 or newer.</span>
+    <span class="doccomment">/// Requires OpenSSL 1.1.0 or LibreSSL 2.7.0 or newer.</span>
     <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SSL_SESSION_get_protocol_version</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">ossl110</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl110</span>, <span class="ident">libressl270</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">protocol_version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SslVersion</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">ffi::SSL_SESSION_get_protocol_version</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>());
@@ -6116,11 +6114,11 @@
 
     <span class="doccomment">/// Like [`SslContextBuilder::set_ecdh_auto`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires OpenSSL 1.0.2.</span>
+    <span class="doccomment">/// Requires OpenSSL 1.0.2 or LibreSSL.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`SslContextBuilder::set_tmp_ecdh`]: struct.SslContextBuilder.html#method.set_tmp_ecdh</span>
     <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SSL_set_ecdh_auto</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">ossl102</span>, <span class="ident">not</span>(<span class="ident">ossl110</span>)))]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">all</span>(<span class="ident">ossl102</span>, <span class="ident">not</span>(<span class="ident">ossl110</span>)), <span class="ident">libressl</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_ecdh_auto</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">onoff</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> { <span class="ident">cvt</span>(<span class="ident">ffi::SSL_set_ecdh_auto</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">onoff</span> <span class="kw">as</span> <span class="ident">c_int</span>)).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ()) }
     }
@@ -6448,9 +6446,9 @@
     <span class="doccomment">/// Returns the number of bytes copied, or if the buffer is empty, the size of the `client_random`</span>
     <span class="doccomment">/// value.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires OpenSSL 1.1.0 or newer.</span>
+    <span class="doccomment">/// Requires OpenSSL 1.1.0 or LibreSSL 2.7.0 or newer.</span>
     <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SSL_get_client_random</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl110</span>))]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl110</span>, <span class="ident">libressl270</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">client_random</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">usize</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">ffi::SSL_get_client_random</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">buf</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">c_uchar</span>, <span class="ident">buf</span>.<span class="ident">len</span>())
@@ -6462,9 +6460,9 @@
     <span class="doccomment">/// Returns the number of bytes copied, or if the buffer is empty, the size of the `server_random`</span>
     <span class="doccomment">/// value.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires OpenSSL 1.1.0 or newer.</span>
+    <span class="doccomment">/// Requires OpenSSL 1.1.0 or LibreSSL 2.7.0 or newer.</span>
     <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SSL_get_server_random</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl110</span>))]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl110</span>, <span class="ident">libressl270</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">server_random</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">usize</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">ffi::SSL_get_server_random</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">buf</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">c_uchar</span>, <span class="ident">buf</span>.<span class="ident">len</span>())
@@ -6650,9 +6648,9 @@
 
     <span class="doccomment">/// Sets the maximum amount of early data that will be accepted on this connection.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires OpenSSL 1.1.1 or newer.</span>
+    <span class="doccomment">/// Requires OpenSSL 1.1.1 or LibreSSL 3.4.0 or newer.</span>
     <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SSL_set_max_early_data</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">ossl111</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl111</span>, <span class="ident">libressl340</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_max_early_data</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">bytes</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">unsafe</span> { <span class="ident">ffi::SSL_set_max_early_data</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">bytes</span>) } <span class="op">==</span> <span class="number">1</span> {
             <span class="prelude-val">Ok</span>(())
@@ -6663,9 +6661,9 @@
 
     <span class="doccomment">/// Gets the maximum amount of early data that can be sent on this connection.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires OpenSSL 1.1.1 or newer.</span>
+    <span class="doccomment">/// Requires OpenSSL 1.1.1 or LibreSSL 3.4.0 or newer.</span>
     <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SSL_get_max_early_data</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">ossl111</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl111</span>, <span class="ident">libressl340</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_early_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
         <span class="kw">unsafe</span> { <span class="ident">ffi::SSL_get_max_early_data</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) }
     }
@@ -6943,9 +6941,9 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns `Ok(0)` if all early data has been read.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires OpenSSL 1.1.1 or newer.</span>
+    <span class="doccomment">/// Requires OpenSSL 1.1.1 or LibreSSL 3.4.0 or newer.</span>
     <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SSL_read_early_data</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">ossl111</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl111</span>, <span class="ident">libressl340</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_early_data</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">read</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">unsafe</span> {
@@ -6969,9 +6967,9 @@
     <span class="doccomment">/// Useful for reducing latency, but vulnerable to replay attacks. Call</span>
     <span class="doccomment">/// [`SslRef::set_connect_state`] first.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires OpenSSL 1.1.1 or newer.</span>
+    <span class="doccomment">/// Requires OpenSSL 1.1.1 or LibreSSL 3.4.0 or newer.</span>
     <span class="attribute">#[<span class="ident">corresponds</span>(<span class="ident">SSL_write_early_data</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">ossl111</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl111</span>, <span class="ident">libressl340</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_early_data</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">written</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">unsafe</span> {
@@ -7387,12 +7385,12 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns `Ok(0)` if all early data has been read.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires OpenSSL 1.1.1 or newer.</span>
+    <span class="doccomment">/// Requires OpenSSL 1.1.1 or LibreSSL 3.4.0 or newer.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This corresponds to [`SSL_read_early_data`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`SSL_read_early_data`]: https://www.openssl.org/docs/manmaster/man3/SSL_read_early_data.html</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">ossl111</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl111</span>, <span class="ident">libressl340</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_early_data</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read_early_data</span>(<span class="ident">buf</span>)
     }
@@ -7402,12 +7400,12 @@
     <span class="doccomment">/// Useful for reducing latency, but vulnerable to replay attacks. Call</span>
     <span class="doccomment">/// `set_connect_state` first.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires OpenSSL 1.1.1 or newer.</span>
+    <span class="doccomment">/// Requires OpenSSL 1.1.1 or LibreSSL 3.4.0 or newer.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This corresponds to [`SSL_write_early_data`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`SSL_write_early_data`]: https://www.openssl.org/docs/manmaster/man3/SSL_write_early_data.html</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">ossl111</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl111</span>, <span class="ident">libressl340</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_early_data</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">write_early_data</span>(<span class="ident">buf</span>)
     }

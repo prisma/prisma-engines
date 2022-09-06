@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/gimli-0.26.1/src/read/op.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>op.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../gimli/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/gimli-0.26.2/src/read/op.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>op.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../gimli/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../gimli/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
@@ -4099,6 +4099,25 @@
 <span id="4093">4093</span>
 <span id="4094">4094</span>
 <span id="4095">4095</span>
+<span id="4096">4096</span>
+<span id="4097">4097</span>
+<span id="4098">4098</span>
+<span id="4099">4099</span>
+<span id="4100">4100</span>
+<span id="4101">4101</span>
+<span id="4102">4102</span>
+<span id="4103">4103</span>
+<span id="4104">4104</span>
+<span id="4105">4105</span>
+<span id="4106">4106</span>
+<span id="4107">4107</span>
+<span id="4108">4108</span>
+<span id="4109">4109</span>
+<span id="4110">4110</span>
+<span id="4111">4111</span>
+<span id="4112">4112</span>
+<span id="4113">4113</span>
+<span id="4114">4114</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Functions for parsing and evaluating DWARF expressions.</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;read&quot;</span>)]</span>
@@ -4808,7 +4827,13 @@
             }
             <span class="ident">constants::DW_OP_stack_value</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Operation::StackValue</span>),
             <span class="ident">constants::DW_OP_implicit_pointer</span> <span class="op">|</span> <span class="ident">constants::DW_OP_GNU_implicit_pointer</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">read_offset</span>(<span class="ident">encoding</span>.<span class="ident">format</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">encoding</span>.<span class="ident">version</span> <span class="op">==</span> <span class="number">2</span> {
+                    <span class="ident">bytes</span>
+                        .<span class="ident">read_address</span>(<span class="ident">encoding</span>.<span class="ident">address_size</span>)
+                        .<span class="ident">and_then</span>(<span class="ident">Offset::from_u64</span>)<span class="question-mark">?</span>
+                } <span class="kw">else</span> {
+                    <span class="ident">bytes</span>.<span class="ident">read_offset</span>(<span class="ident">encoding</span>.<span class="ident">format</span>)<span class="question-mark">?</span>
+                };
                 <span class="kw">let</span> <span class="ident">byte_offset</span> <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">read_sleb128</span>()<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class="ident">Operation::ImplicitPointer</span> {
                     <span class="ident">value</span>: <span class="ident">DebugInfoOffset</span>(<span class="ident">value</span>),
@@ -6839,6 +6864,19 @@ on the heap using [`Vec`]. This is the default storage type parameter for [`Eval
                 },
                 <span class="ident">encoding8</span>(),
             );
+
+            <span class="ident">check_op_parse</span>(
+                <span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">D8</span>(<span class="ident">op</span>.<span class="number">0</span>).<span class="ident">D64</span>(<span class="number">0x1234_5678</span>).<span class="ident">sleb</span>(<span class="number">0x123</span>),
+                <span class="kw-2">&amp;</span><span class="ident">Operation::ImplicitPointer</span> {
+                    <span class="ident">value</span>: <span class="ident">DebugInfoOffset</span>(<span class="number">0x1234_5678</span>),
+                    <span class="ident">byte_offset</span>: <span class="number">0x123</span>,
+                },
+                <span class="ident">Encoding</span> {
+                    <span class="ident">format</span>: <span class="ident">Format::Dwarf32</span>,
+                    <span class="ident">version</span>: <span class="number">2</span>,
+                    <span class="ident">address_size</span>: <span class="number">8</span>,
+                },
+            )
         }
     }
 

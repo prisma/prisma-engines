@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.2.2/src/client/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/client/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
@@ -447,15 +447,6 @@
 <span id="441">441</span>
 <span id="442">442</span>
 <span id="443">443</span>
-<span id="444">444</span>
-<span id="445">445</span>
-<span id="446">446</span>
-<span id="447">447</span>
-<span id="448">448</span>
-<span id="449">449</span>
-<span id="450">450</span>
-<span id="451">451</span>
-<span id="452">452</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">auth</span>;
 <span class="kw">mod</span> <span class="ident">executor</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">options</span>;
@@ -492,7 +483,7 @@
         <span class="ident">SessionOptions</span>,
     },
     <span class="ident">results::DatabaseSpecification</span>,
-    <span class="ident">sdam</span>::{<span class="ident">SelectedServer</span>, <span class="ident">SessionSupportStatus</span>, <span class="ident">Topology</span>},
+    <span class="ident">sdam</span>::{<span class="ident">server_selection</span>, <span class="ident">SelectedServer</span>, <span class="ident">SessionSupportStatus</span>, <span class="ident">Topology</span>},
     <span class="ident">ClientSession</span>,
 };
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">executor</span>::{<span class="ident">HELLO_COMMAND_NAMES</span>, <span class="ident">REDACTED_COMMANDS</span>};
@@ -546,7 +537,7 @@
 <span class="doccomment">/// ## TCP Keepalive</span>
 <span class="doccomment">/// TCP keepalive is enabled by default with ``tcp_keepalive_time`` set to 120 seconds. The</span>
 <span class="doccomment">/// driver does not set ``tcp_keepalive_intvl``. See the</span>
-<span class="doccomment">/// [MongoDB Diagnostics FAQ keepalive section](https://docs.mongodb.com/manual/faq/diagnostics/#does-tcp-keepalive-time-affect-mongodb-deployments)</span>
+<span class="doccomment">/// [MongoDB Diagnostics FAQ keepalive section](https://www.mongodb.com/docs/manual/faq/diagnostics/#does-tcp-keepalive-time-affect-mongodb-deployments)</span>
 <span class="doccomment">/// for instructions on setting these values at the system level.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Client</span> {
@@ -559,12 +550,6 @@
     <span class="ident">topology</span>: <span class="ident">Topology</span>,
     <span class="ident">options</span>: <span class="ident">ClientOptions</span>,
     <span class="ident">session_pool</span>: <span class="ident">ServerSessionPool</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">ClientInner</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">topology</span>.<span class="ident">close</span>()
-    }
 }
 
 <span class="kw">impl</span> <span class="ident">Client</span> {
@@ -731,7 +716,7 @@
     <span class="doccomment">/// &quot;admin&quot; databases. Note that this method (`watch` on a cluster) is only supported in</span>
     <span class="doccomment">/// MongoDB 4.0 or greater.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// See the documentation [here](https://docs.mongodb.com/manual/changeStreams/) on change</span>
+    <span class="doccomment">/// See the documentation [here](https://www.mongodb.com/docs/manual/changeStreams/) on change</span>
     <span class="doccomment">/// streams.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Change streams require either a &quot;majority&quot; read concern or no read</span>
@@ -781,7 +766,7 @@
     <span class="doccomment">/// If the session is expired or dirty, or the topology no longer supports sessions, the session</span>
     <span class="doccomment">/// will be discarded.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">check_in_server_session</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">session</span>: <span class="ident">ServerSession</span>) {
-        <span class="kw">let</span> <span class="ident">session_support_status</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">session_support_status</span>().<span class="kw">await</span>;
+        <span class="kw">let</span> <span class="ident">session_support_status</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">session_support_status</span>();
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">SessionSupportStatus::Supported</span> {
             <span class="ident">logical_session_timeout</span>,
         } <span class="op">=</span> <span class="ident">session_support_status</span>
@@ -849,40 +834,30 @@
             .<span class="ident">server_selection_timeout</span>
             .<span class="ident">unwrap_or</span>(<span class="ident">DEFAULT_SERVER_SELECTION_TIMEOUT</span>);
 
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">watcher</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">watch</span>();
         <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">topology_change_subscriber</span> <span class="op">=</span>
-                <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">subscribe_to_topology_changes</span>();
+            <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">watcher</span>.<span class="ident">observe_latest</span>();
 
-            <span class="kw">let</span> <span class="ident">selected_server</span> <span class="op">=</span> <span class="self">self</span>
-                .<span class="ident">inner</span>
-                .<span class="ident">topology</span>
-                .<span class="ident">attempt_to_select_server</span>(<span class="ident">criteria</span>)
-                .<span class="kw">await</span><span class="question-mark">?</span>;
-
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">server</span>) <span class="op">=</span> <span class="ident">selected_server</span> {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">server</span>) <span class="op">=</span> <span class="ident">server_selection::attempt_to_select_server</span>(
+                <span class="ident">criteria</span>,
+                <span class="kw-2">&amp;</span><span class="ident">state</span>.<span class="ident">description</span>,
+                <span class="kw-2">&amp;</span><span class="ident">state</span>.<span class="ident">servers</span>,
+            )<span class="question-mark">?</span> {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">server</span>);
             }
 
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">request_topology_check</span>();
+            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">request_update</span>();
 
-            <span class="comment">// If the time that has passed since the start of the loop is greater than the timeout,</span>
-            <span class="comment">// then `time_remaining` will be 0, so no change will be found.</span>
-            <span class="kw">let</span> <span class="ident">time_passed</span> <span class="op">=</span> <span class="ident">start_time</span>.<span class="ident">elapsed</span>();
-            <span class="kw">let</span> <span class="ident">time_remaining</span> <span class="op">=</span> <span class="ident">timeout</span>
-                .<span class="ident">checked_sub</span>(<span class="ident">time_passed</span>)
-                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Duration::from_millis</span>(<span class="number">0</span>));
-
-            <span class="kw">let</span> <span class="ident">change_occurred</span> <span class="op">=</span> <span class="ident">topology_change_subscriber</span>
-                .<span class="ident">wait_for_message</span>(<span class="ident">time_remaining</span>)
-                .<span class="kw">await</span>;
-
+            <span class="kw">let</span> <span class="ident">change_occurred</span> <span class="op">=</span> <span class="ident">start_time</span>.<span class="ident">elapsed</span>() <span class="op">&lt;</span> <span class="ident">timeout</span>
+                <span class="op">&amp;&amp;</span> <span class="ident">watcher</span>
+                    .<span class="ident">wait_for_update</span>(<span class="ident">timeout</span> <span class="op">-</span> <span class="ident">start_time</span>.<span class="ident">elapsed</span>())
+                    .<span class="kw">await</span>;
             <span class="kw">if</span> <span class="op">!</span><span class="ident">change_occurred</span> {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::ServerSelection</span> {
                     <span class="ident">message</span>: <span class="self">self</span>
                         .<span class="ident">inner</span>
                         .<span class="ident">topology</span>
-                        .<span class="ident">server_selection_timeout_error_message</span>(<span class="ident">criteria</span>)
-                        .<span class="kw">await</span>,
+                        .<span class="ident">server_selection_timeout_error_message</span>(<span class="ident">criteria</span>),
                 }
                 .<span class="ident">into</span>());
             }
@@ -891,9 +866,11 @@
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>), <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-sync&quot;</span>)))]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_hosts</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">servers</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">servers</span>().<span class="kw">await</span>;
+        <span class="kw">let</span> <span class="ident">watcher</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">watch</span>();
+        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">watcher</span>.<span class="ident">peek_latest</span>();
+
+        <span class="kw">let</span> <span class="ident">servers</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">servers</span>.<span class="ident">keys</span>();
         <span class="ident">servers</span>
-            .<span class="ident">iter</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">stream_address</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">stream_address</span>))
             .<span class="ident">collect</span>()
     }
@@ -904,8 +881,13 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">topology_description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::sdam::TopologyDescription</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">description</span>().<span class="kw">await</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">topology_description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::sdam::TopologyDescription</span> {
+        <span class="self">self</span>.<span class="ident">inner</span>
+            .<span class="ident">topology</span>
+            .<span class="ident">watch</span>()
+            .<span class="ident">peek_latest</span>()
+            .<span class="ident">description</span>
+            .<span class="ident">clone</span>()
     }
 }
 </code></pre></div>

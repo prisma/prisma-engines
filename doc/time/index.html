@@ -3,11 +3,11 @@
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../time/index.html"><div class="logo-container">
                     <img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div>
-        </a><h2 class="location"><a href="#">Crate time</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 0.3.9</li><li><a id="all-types" href="all.html">All Items</a></li></ul></div><section><div class="block"><ul><li><a href="#reexports">Re-exports</a></li><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#types">Type Definitions</a></li></ul></div></section></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../time/index.html">
+        </a><h2 class="location"><a href="#">Crate time</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 0.3.14</li><li><a id="all-types" href="all.html">All Items</a></li></ul></div><section><div class="block"><ul><li><a href="#reexports">Re-exports</a></li><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#types">Type Definitions</a></li></ul></div></section></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../time/index.html">
                         <img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
                                 <a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div>
                         </div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
-    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">time</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/time/lib.rs.html#1-330">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="feature-flags"><a href="#feature-flags">Feature flags</a></h2>
+    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">time</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/time/lib.rs.html#1-332">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="feature-flags"><a href="#feature-flags">Feature flags</a></h2>
 <p>This crate exposes a number of features. These can be enabled or disabled as shown
 <a href="https://doc.rust-lang.org/cargo/reference/features.html">in Cargo’s documentation</a>. Features
 are <em>disabled</em> by default unless otherwise noted.</p>
@@ -44,9 +44,6 @@ for years outside this range, consider enabling this feature; the supported rang
 increased to ±999,999.</p>
 <p>Note that enabling this feature has some costs, as it means forgoing some optimizations.
 Ambiguities may be introduced when parsing that would not otherwise exist.</p>
-<p>If you are using this feature, <strong>please leave a comment</strong>
-<a href="https://github.com/time-rs/time/discussions/306">on this discussion</a> with your use case. If
-there is not sufficient demand for this feature, it will be dropped in a future release.</p>
 </li>
 <li>
 <p><code>serde</code></p>
@@ -73,6 +70,12 @@ to the user.</p>
 <p><code>quickcheck</code> (<em>implicitly enables <code>alloc</code></em>)</p>
 <p>Enables <a href="https://docs.rs/quickcheck">quickcheck</a> support for all types except <a href="struct.Instant.html" title="Instant"><code>Instant</code></a>.</p>
 </li>
+<li>
+<p><code>wasm-bindgen</code></p>
+<p>Enables <a href="https://github.com/rustwasm/wasm-bindgen">wasm-bindgen</a> support for converting
+<a href="https://rustwasm.github.io/wasm-bindgen/api/js_sys/struct.Date.html">JavaScript dates</a>, as
+well as obtaining the UTC offset from JavaScript.</p>
+</li>
 </ul>
 <p>One pseudo-feature flag that is only available to end users is the <code>unsound_local_offset</code> cfg.
 As the name indicates, using the feature is unsound, and <a href="https://github.com/time-rs/time/issues/293">may cause unexpected segmentation
@@ -80,7 +83,7 @@ faults</a>. Unlike other flags, this is deliberately
 only available to end users; this is to ensure that a user doesn’t have unsound behavior without
 knowing it. To enable this behavior, you must use <code>RUSTFLAGS=&quot;--cfg unsound_local_offset&quot; cargo build</code> or similar. Note: This flag is <em>not tested anywhere</em>, including in the regular test of
 the powerset of all feature flags. Use at your own risk. Without this flag, any method that
-requires the local offset will return the <code>Err</code> variant.</p>
+requires the local offset will return the <code>Err</code> variant when otherwise unsound.</p>
 </div></details><h2 id="reexports" class="small-section-header"><a href="#reexports">Re-exports</a></h2>
 <div class="item-table"><div class="item-row"><div class="item-left import-item" id="reexport.Error"><code>pub use crate::error::<a class="enum" href="error/enum.Error.html" title="enum time::error::Error">Error</a>;</code></div><div class="item-right docblock-short"></div></div></div><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2>
 <div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="error/index.html" title="time::error mod">error</a></div><div class="item-right docblock-short"><p>Various error types returned by methods in the time crate.</p>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.2.2/src/cmap/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/cmap/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
@@ -206,7 +206,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::conn::ConnectionInfo</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="self">self</span>::{
     <span class="ident">conn</span>::{<span class="ident">Command</span>, <span class="ident">Connection</span>, <span class="ident">RawCommand</span>, <span class="ident">RawCommandResponse</span>, <span class="ident">StreamDescription</span>},
-    <span class="ident">establish</span>::{<span class="ident">handshake::Handshaker</span>, <span class="ident">EstablishError</span>},
+    <span class="ident">establish::handshake::Handshaker</span>,
     <span class="ident">status::PoolGenerationSubscriber</span>,
     <span class="ident">worker::PoolGeneration</span>,
 };
@@ -223,14 +223,14 @@
     },
     <span class="ident">options::ServerAddress</span>,
     <span class="ident">runtime::HttpClient</span>,
-    <span class="ident">sdam::ServerUpdateSender</span>,
+    <span class="ident">sdam::TopologyUpdater</span>,
 };
 <span class="kw">use</span> <span class="ident">connection_requester::ConnectionRequester</span>;
 <span class="kw">use</span> <span class="ident">manager::PoolManager</span>;
 <span class="kw">use</span> <span class="ident">worker::ConnectionPoolWorker</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::worker::PoolWorkerHandle</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime::WorkerHandle</span>;
 
 <span class="kw">const</span> <span class="ident">DEFAULT_MAX_POOL_SIZE</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">10</span>;
 
@@ -252,7 +252,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(
         <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
         <span class="ident">http_client</span>: <span class="ident">HttpClient</span>,
-        <span class="ident">server_updater</span>: <span class="ident">ServerUpdateSender</span>,
+        <span class="ident">server_updater</span>: <span class="ident">TopologyUpdater</span>,
         <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ConnectionPoolOptions</span><span class="op">&gt;</span>,
     ) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> (<span class="ident">manager</span>, <span class="ident">connection_requester</span>, <span class="ident">generation_subscriber</span>) <span class="op">=</span> <span class="ident">ConnectionPoolWorker::start</span>(
@@ -285,7 +285,7 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_mocked</span>(<span class="ident">address</span>: <span class="ident">ServerAddress</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> (<span class="ident">manager</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">manager::channel</span>();
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">PoolWorkerHandle::new_mocked</span>();
+        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">WorkerHandle::new_mocked</span>();
         <span class="kw">let</span> (<span class="ident">connection_requester</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">connection_requester::channel</span>(<span class="ident">handle</span>);
         <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">generation_subscriber</span>) <span class="op">=</span> <span class="ident">status::channel</span>(<span class="ident">PoolGeneration::normal</span>());
 

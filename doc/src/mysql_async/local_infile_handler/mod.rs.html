@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/650f071/src/local_infile_handler/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/e3f8bdb/src/local_infile_handler/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
@@ -94,32 +94,7 @@
 <span id="88">88</span>
 <span id="89">89</span>
 <span id="90">90</span>
-<span id="91">91</span>
-<span id="92">92</span>
-<span id="93">93</span>
-<span id="94">94</span>
-<span id="95">95</span>
-<span id="96">96</span>
-<span id="97">97</span>
-<span id="98">98</span>
-<span id="99">99</span>
-<span id="100">100</span>
-<span id="101">101</span>
-<span id="102">102</span>
-<span id="103">103</span>
-<span id="104">104</span>
-<span id="105">105</span>
-<span id="106">106</span>
-<span id="107">107</span>
-<span id="108">108</span>
-<span id="109">109</span>
-<span id="110">110</span>
-<span id="111">111</span>
-<span id="112">112</span>
-<span id="113">113</span>
-<span id="114">114</span>
-<span id="115">115</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2017 Anatoly Ikorsky</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2017-2022 mysql_async Contributors.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0</span>
 <span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
@@ -127,111 +102,86 @@
 <span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
 <span class="comment">// modified, or distributed except according to those terms.</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>;
-<span class="kw">use</span> <span class="ident">mysql_common::uuid::Uuid</span>;
+<span class="kw">use</span> <span class="ident">bytes::Bytes</span>;
+<span class="kw">use</span> <span class="ident">futures_core::stream::BoxStream</span>;
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">future::Future</span>, <span class="ident">marker::Unpin</span>, <span class="ident">pin::Pin</span>, <span class="ident">sync::Arc</span>};
-<span class="kw">use</span> <span class="ident">tokio::io::AsyncRead</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{
+    <span class="ident">fmt</span>,
+    <span class="ident">sync</span>::{
+        <span class="ident">atomic</span>::{<span class="ident">AtomicUsize</span>, <span class="ident">Ordering</span>},
+        <span class="ident">Arc</span>,
+    },
+};
+
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::LocalInfileError</span>;
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">builtin</span>;
 
-<span class="doccomment">/// Trait used to handle local infile requests.</span>
+<span class="kw">type</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">futures_core::future::BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">LocalInfileError</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+
+<span class="doccomment">/// LOCAL INFILE data is a stream of `std::io::Result&lt;Bytes&gt;`.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Be aware of security issues with [LOAD DATA LOCAL][1].</span>
-<span class="doccomment">/// Using [`crate::WhiteListFsLocalInfileHandler`] is advised.</span>
+<span class="doccomment">/// The driver will send this data to the server in response to a LOCAL INFILE request.</span>
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">InfileData</span> <span class="op">=</span> <span class="ident">BoxStream</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+
+<span class="doccomment">/// Global, `Opts`-level `LOCAL INFILE` handler (see [&quot;LOCAL INFILE Handlers&quot;][2] section</span>
+<span class="doccomment">/// of the `README.md`).</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Simple handler example:</span>
+<span class="doccomment">/// **Warning:** You should be aware of [Security Considerations for LOAD DATA LOCAL][1].</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use mysql_async::{prelude::*, test_misc::get_opts, OptsBuilder, Result, Error};</span>
-<span class="doccomment">/// # use std::env;</span>
-<span class="doccomment">/// # #[tokio::main]</span>
-<span class="doccomment">/// # async fn main() -&gt; Result&lt;()&gt; {</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// /// This example hanlder will return contained bytes in response to a local infile request.</span>
-<span class="doccomment">/// struct ExampleHandler(&amp;&#39;static [u8]);</span>
+<span class="doccomment">/// The purpose of the handler is to emit infile data in response to a file name.</span>
+<span class="doccomment">/// This handler will be called if there is no [`LocalHandler`] installed for the connection.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// impl LocalInfileHandler for ExampleHandler {</span>
-<span class="doccomment">///     fn handle(&amp;self, _: &amp;[u8]) -&gt; mysql_async::InfileHandlerFuture {</span>
-<span class="doccomment">///         let handler = Box::new(self.0) as Box&lt;_&gt;;</span>
-<span class="doccomment">///         Box::pin(async move { Ok(handler) })</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
+<span class="doccomment">/// The library will call this handler in response to a LOCAL INFILE request from the server.</span>
+<span class="doccomment">/// The server, in its turn, will emit LOCAL INFILE requests in response to a `LOAD DATA LOCAL`</span>
+<span class="doccomment">/// queries:</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// # let database_url = get_opts();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let opts = OptsBuilder::from_opts(database_url)</span>
-<span class="doccomment">///     .local_infile_handler(Some(ExampleHandler(b&quot;foobar&quot;)));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let pool = mysql_async::Pool::new(opts);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut conn = pool.get_conn().await?;</span>
-<span class="doccomment">/// conn.query_drop(&quot;CREATE TEMPORARY TABLE tmp (a TEXT);&quot;).await?;</span>
-<span class="doccomment">/// match conn.query_drop(&quot;LOAD DATA LOCAL INFILE &#39;baz&#39; INTO TABLE tmp;&quot;).await {</span>
-<span class="doccomment">///     Ok(()) =&gt; (),</span>
-<span class="doccomment">///     Err(Error::Server(ref err)) if err.code == 1148 =&gt; {</span>
-<span class="doccomment">///         // The used command is not allowed with this MySQL version</span>
-<span class="doccomment">///         return Ok(());</span>
-<span class="doccomment">///     },</span>
-<span class="doccomment">///     Err(Error::Server(ref err)) if err.code == 3948 =&gt; {</span>
-<span class="doccomment">///         // Loading local data is disabled;</span>
-<span class="doccomment">///         // this must be enabled on both the client and server sides</span>
-<span class="doccomment">///         return Ok(());</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">///     e @ Err(_) =&gt; e.unwrap(),</span>
-<span class="doccomment">/// };</span>
-<span class="doccomment">/// let result: Vec&lt;String&gt; = conn.exec(&quot;SELECT * FROM tmp&quot;, ()).await?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(result.len(), 1);</span>
-<span class="doccomment">/// assert_eq!(result[0], &quot;foobar&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// drop(conn); // dropped connection will go to the pool</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// pool.disconnect().await?;</span>
-<span class="doccomment">/// # Ok(())</span>
-<span class="doccomment">/// # }</span>
+<span class="doccomment">/// ```sql</span>
+<span class="doccomment">/// LOAD DATA LOCAL INFILE &#39;&lt;file name&gt;&#39; INTO TABLE &lt;table&gt;;</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [1]: https://dev.mysql.com/doc/refman/8.0/en/load-data-local.html</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">LocalInfileHandler</span>: <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span> {
-    <span class="doccomment">/// `file_name` is the file name in `LOAD DATA LOCAL INFILE &#39;&lt;file name&gt;&#39; INTO TABLE ...;`</span>
-    <span class="doccomment">/// query.</span>
-    <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">file_name</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">InfileHandlerFuture</span>;
+<span class="doccomment">/// [1]: https://dev.mysql.com/doc/refman/8.0/en/load-data-local-security.html</span>
+<span class="doccomment">/// [2]: ../#local-infile-handlers</span>
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">GlobalHandler</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> {
+    <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">file_name</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">InfileData</span><span class="op">&gt;</span>;
 }
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">InfileHandlerFuture</span> <span class="op">=</span> <span class="ident">Pin</span><span class="op">&lt;</span>
-    <span class="ident">Box</span><span class="op">&lt;</span>
-        <span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>, <span class="ident">error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span>
-            <span class="op">+</span> <span class="ident">Send</span>
-            <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="op">&gt;</span>,
-<span class="op">&gt;</span>;
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">GlobalHandler</span> <span class="kw">for</span> <span class="ident">T</span>
+<span class="kw">where</span>
+    <span class="ident">T</span>: <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">InfileData</span><span class="op">&gt;</span>,
+    <span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+{
+    <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">file_name</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">InfileData</span><span class="op">&gt;</span> {
+        (<span class="self">self</span>)(<span class="ident">file_name</span>)
+    }
+}
 
-<span class="doccomment">/// Object used to wrap `T: LocalInfileHandler` inside of Opts.</span>
+<span class="kw">static</span> <span class="ident">HANDLER_ID</span>: <span class="ident">AtomicUsize</span> <span class="op">=</span> <span class="ident">AtomicUsize::new</span>(<span class="number">0</span>);
+
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LocalInfileHandlerObject</span>(<span class="ident">Uuid</span>, <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">LocalInfileHandler</span><span class="op">&gt;</span>);
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GlobalHandlerObject</span>(<span class="ident">usize</span>, <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">GlobalHandler</span><span class="op">&gt;</span>);
 
-<span class="kw">impl</span> <span class="ident">LocalInfileHandlerObject</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">LocalInfileHandler</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="ident">handler</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">LocalInfileHandlerObject</span>(<span class="ident">Uuid::new_v4</span>(), <span class="ident">Arc::new</span>(<span class="ident">handler</span>))
+<span class="kw">impl</span> <span class="ident">GlobalHandlerObject</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">GlobalHandler</span><span class="op">&gt;</span>(<span class="ident">handler</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span>(<span class="ident">HANDLER_ID</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::SeqCst</span>), <span class="ident">Arc::new</span>(<span class="ident">handler</span>))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clone_inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">LocalInfileHandler</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">clone_inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">GlobalHandler</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="number">1</span>.<span class="ident">clone</span>()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">LocalInfileHandlerObject</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">LocalInfileHandlerObject</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="number">0</span>)
+<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">GlobalHandlerObject</span> {
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="number">0</span> <span class="op">==</span> <span class="ident">other</span>.<span class="number">0</span>
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">LocalInfileHandlerObject</span> {}
+<span class="kw">impl</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">GlobalHandlerObject</span> {}
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">LocalInfileHandlerObject</span> {
+<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">GlobalHandlerObject</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Local infile handler object&quot;</span>)
+        <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;GlobalHandlerObject&quot;</span>).<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="string">&quot;..&quot;</span>).<span class="ident">finish</span>()
     }
 }
 </code></pre></div>

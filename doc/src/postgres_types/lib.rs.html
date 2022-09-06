@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/5ec2a4f/postgres-types/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../postgres_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/064a6a5/postgres-types/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../postgres_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../postgres_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
@@ -1160,6 +1160,77 @@
 <span id="1154">1154</span>
 <span id="1155">1155</span>
 <span id="1156">1156</span>
+<span id="1157">1157</span>
+<span id="1158">1158</span>
+<span id="1159">1159</span>
+<span id="1160">1160</span>
+<span id="1161">1161</span>
+<span id="1162">1162</span>
+<span id="1163">1163</span>
+<span id="1164">1164</span>
+<span id="1165">1165</span>
+<span id="1166">1166</span>
+<span id="1167">1167</span>
+<span id="1168">1168</span>
+<span id="1169">1169</span>
+<span id="1170">1170</span>
+<span id="1171">1171</span>
+<span id="1172">1172</span>
+<span id="1173">1173</span>
+<span id="1174">1174</span>
+<span id="1175">1175</span>
+<span id="1176">1176</span>
+<span id="1177">1177</span>
+<span id="1178">1178</span>
+<span id="1179">1179</span>
+<span id="1180">1180</span>
+<span id="1181">1181</span>
+<span id="1182">1182</span>
+<span id="1183">1183</span>
+<span id="1184">1184</span>
+<span id="1185">1185</span>
+<span id="1186">1186</span>
+<span id="1187">1187</span>
+<span id="1188">1188</span>
+<span id="1189">1189</span>
+<span id="1190">1190</span>
+<span id="1191">1191</span>
+<span id="1192">1192</span>
+<span id="1193">1193</span>
+<span id="1194">1194</span>
+<span id="1195">1195</span>
+<span id="1196">1196</span>
+<span id="1197">1197</span>
+<span id="1198">1198</span>
+<span id="1199">1199</span>
+<span id="1200">1200</span>
+<span id="1201">1201</span>
+<span id="1202">1202</span>
+<span id="1203">1203</span>
+<span id="1204">1204</span>
+<span id="1205">1205</span>
+<span id="1206">1206</span>
+<span id="1207">1207</span>
+<span id="1208">1208</span>
+<span id="1209">1209</span>
+<span id="1210">1210</span>
+<span id="1211">1211</span>
+<span id="1212">1212</span>
+<span id="1213">1213</span>
+<span id="1214">1214</span>
+<span id="1215">1215</span>
+<span id="1216">1216</span>
+<span id="1217">1217</span>
+<span id="1218">1218</span>
+<span id="1219">1219</span>
+<span id="1220">1220</span>
+<span id="1221">1221</span>
+<span id="1222">1222</span>
+<span id="1223">1223</span>
+<span id="1224">1224</span>
+<span id="1225">1225</span>
+<span id="1226">1226</span>
+<span id="1227">1227</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Conversions to and from Postgres types.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! This crate is used by the `tokio-postgres` and `postgres` crates. You normally don&#39;t need to depend directly on it</span>
@@ -1386,12 +1457,16 @@
 <span class="kw">mod</span> <span class="ident">geo_types_07</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;with-serde_json-1&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">serde_json_1</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;with-smol_str-01&quot;</span>)]</span>
+<span class="kw">mod</span> <span class="ident">smol_str_01</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;with-time-0_2&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">time_02</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;with-time-0_3&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">time_03</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;with-uuid-0_8&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">uuid_08</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;with-uuid-1&quot;</span>)]</span>
+<span class="kw">mod</span> <span class="ident">uuid_1</span>;
 
 <span class="comment">// The time::{date, time} macros produce compile errors if the crate package is renamed.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;with-time-0_2&quot;</span>)]</span>
@@ -1603,6 +1678,9 @@
 <span class="doccomment">/// | `eui48::MacAddress`             | MACADDR                             |</span>
 <span class="doccomment">/// | `cidr::InetCidr`                | CIDR                                |</span>
 <span class="doccomment">/// | `cidr::InetAddr`                | INET                                |</span>
+<span class="doccomment">/// | `smol_str::SmolStr`             | VARCHAR, CHAR(n), TEXT, CITEXT,     |</span>
+<span class="doccomment">/// |                                 | NAME, UNKNOWN, LTREE, LQUERY,       |</span>
+<span class="doccomment">/// |                                 | LTXTQUERY                           |</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Nullability</span>
 <span class="doccomment">///</span>
@@ -1612,10 +1690,11 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Arrays</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// `FromSql` is implemented for `Vec&lt;T&gt;` and `[T; N]` where `T` implements</span>
-<span class="doccomment">/// `FromSql`, and corresponds to one-dimensional Postgres arrays. **Note:**</span>
-<span class="doccomment">/// the impl for arrays only exist when the Cargo feature `array-impls` is</span>
-<span class="doccomment">/// enabled.</span>
+<span class="doccomment">/// `FromSql` is implemented for `Vec&lt;T&gt;`, `Box&lt;[T]&gt;` and `[T; N]` where `T`</span>
+<span class="doccomment">/// implements `FromSql`, and corresponds to one-dimensional Postgres arrays.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// **Note:** the impl for arrays only exist when the Cargo feature `array-impls`</span>
+<span class="doccomment">/// is enabled.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">FromSql</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>: <span class="ident">Sized</span> {
     <span class="doccomment">/// Creates a new value of this type from a buffer of data of the specified</span>
     <span class="doccomment">/// Postgres `Type` in its binary format.</span>
@@ -1740,6 +1819,16 @@
     }
 }
 
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">FromSql</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">FromSql</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_sql</span>(<span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="ident">raw</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::from_sql</span>(<span class="ident">ty</span>, <span class="ident">raw</span>).<span class="ident">map</span>(<span class="ident">Vec::into_boxed_slice</span>)
+    }
+
+    <span class="kw">fn</span> <span class="ident">accepts</span>(<span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) -&gt; <span class="ident">bool</span> {
+        <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::accepts</span>(<span class="ident">ty</span>)
+    }
+}
+
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FromSql</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">from_sql</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="ident">raw</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">types::bytea_from_sql</span>(<span class="ident">raw</span>).<span class="ident">to_owned</span>())
@@ -1849,7 +1938,7 @@
         <span class="kw">let</span> <span class="ident">epoch</span> <span class="op">=</span> <span class="ident">UNIX_EPOCH</span> <span class="op">+</span> <span class="ident">Duration::from_secs</span>(<span class="ident">TIME_SEC_CONVERSION</span>);
 
         <span class="kw">let</span> <span class="ident">negative</span> <span class="op">=</span> <span class="ident">time</span> <span class="op">&lt;</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="ident">time</span> <span class="op">=</span> <span class="ident">time</span>.<span class="ident">abs</span>() <span class="kw">as</span> <span class="ident">u64</span>;
+        <span class="kw">let</span> <span class="ident">time</span> <span class="op">=</span> <span class="ident">time</span>.<span class="ident">unsigned_abs</span>();
 
         <span class="kw">let</span> <span class="ident">secs</span> <span class="op">=</span> <span class="ident">time</span> <span class="op">/</span> <span class="ident">USEC_PER_SEC</span>;
         <span class="kw">let</span> <span class="ident">nsec</span> <span class="op">=</span> (<span class="ident">time</span> <span class="op">%</span> <span class="ident">USEC_PER_SEC</span>) <span class="op">*</span> <span class="ident">NSEC_PER_USEC</span>;
@@ -1903,7 +1992,7 @@
 <span class="doccomment">/// | `f64`                             | DOUBLE PRECISION                     |</span>
 <span class="doccomment">/// | `&amp;str`/`String`                   | VARCHAR, CHAR(n), TEXT, CITEXT, NAME |</span>
 <span class="doccomment">/// |                                   | LTREE, LQUERY, LTXTQUERY             |</span>
-<span class="doccomment">/// | `&amp;[u8]`/`Vec&lt;u8&gt;`                 | BYTEA                                |</span>
+<span class="doccomment">/// | `&amp;[u8]`/`Vec&lt;u8&gt;`/`[u8; N]`       | BYTEA                                |</span>
 <span class="doccomment">/// | `HashMap&lt;String, Option&lt;String&gt;&gt;` | HSTORE                               |</span>
 <span class="doccomment">/// | `SystemTime`                      | TIMESTAMP, TIMESTAMP WITH TIME ZONE  |</span>
 <span class="doccomment">/// | `IpAddr`                          | INET                                 |</span>
@@ -1943,10 +2032,12 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Arrays</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// `ToSql` is implemented for `Vec&lt;T&gt;`, `&amp;[T]` and `[T; N]` where `T`</span>
-<span class="doccomment">/// implements `ToSql`, and corresponds to one-dimensional Postgres arrays with</span>
-<span class="doccomment">/// an index offset of 1. **Note:** the impl for arrays only exist when the</span>
-<span class="doccomment">/// Cargo feature `array-impls` is enabled.</span>
+<span class="doccomment">/// `ToSql` is implemented for `[u8; N]`, `Vec&lt;T&gt;`, `&amp;[T]`, `Box&lt;[T]&gt;` and `[T; N]`</span>
+<span class="doccomment">/// where `T` implements `ToSql` and `N` is const usize, and corresponds to one-dimensional</span>
+<span class="doccomment">/// Postgres arrays with an index offset of 1.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// **Note:** the impl for arrays only exist when the Cargo feature `array-impls`</span>
+<span class="doccomment">/// is enabled.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ToSql</span>: <span class="ident">fmt::Debug</span> {
     <span class="doccomment">/// Converts the value of `self` into the binary format of the specified</span>
     <span class="doccomment">/// Postgres `Type`, appending it to `out`.</span>
@@ -1976,6 +2067,22 @@
         <span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>,
         <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IsNull</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+
+    <span class="doccomment">/// Specify the encode format</span>
+    <span class="kw">fn</span> <span class="ident">encode_format</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ty</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) -&gt; <span class="ident">Format</span> {
+        <span class="ident">Format::Binary</span>
+    }
+}
+
+<span class="doccomment">/// Supported Postgres message format types</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Using Text format in a message assumes a Postgres `SERVER_ENCODING` of `UTF8`</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Format</span> {
+    <span class="doccomment">/// Text format (UTF-8)</span>
+    <span class="ident">Text</span>,
+    <span class="doccomment">/// Compact, typed binary format</span>
+    <span class="ident">Binary</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>
@@ -1992,6 +2099,10 @@
 
     <span class="kw">fn</span> <span class="ident">accepts</span>(<span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">T::accepts</span>(<span class="ident">ty</span>)
+    }
+
+    <span class="kw">fn</span> <span class="ident">encode_format</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) -&gt; <span class="ident">Format</span> {
+        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">encode_format</span>(<span class="ident">ty</span>)
     }
 
     <span class="macro">to_sql_checked!</span>();
@@ -2011,6 +2122,13 @@
 
     <span class="kw">fn</span> <span class="ident">accepts</span>(<span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) -&gt; <span class="ident">bool</span> {
         <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">ToSql</span><span class="op">&gt;</span><span class="ident">::accepts</span>(<span class="ident">ty</span>)
+    }
+
+    <span class="kw">fn</span> <span class="ident">encode_format</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) -&gt; <span class="ident">Format</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">encode_format</span>(<span class="ident">ty</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="ident">Format::Binary</span>,
+        }
     }
 
     <span class="macro">to_sql_checked!</span>();
@@ -2063,6 +2181,18 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;array-impls&quot;</span>)]</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">N</span>: <span class="ident">usize</span><span class="op">&gt;</span> <span class="ident">ToSql</span> <span class="kw">for</span> [<span class="ident">u8</span>; <span class="ident">N</span>] {
+    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="ident">w</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IsNull</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">types::bytea_to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>[..], <span class="ident">w</span>);
+        <span class="prelude-val">Ok</span>(<span class="ident">IsNull::No</span>)
+    }
+
+    <span class="macro">accepts!</span>(<span class="ident">BYTEA</span>);
+
+    <span class="macro">to_sql_checked!</span>();
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;array-impls&quot;</span>)]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">ToSql</span>, <span class="kw">const</span> <span class="ident">N</span>: <span class="ident">usize</span><span class="op">&gt;</span> <span class="ident">ToSql</span> <span class="kw">for</span> [<span class="ident">T</span>; <span class="ident">N</span>] {
     <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="ident">w</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IsNull</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">T</span>] <span class="kw">as</span> <span class="ident">ToSql</span><span class="op">&gt;</span><span class="ident">::to_sql</span>(<span class="op">&amp;&amp;</span><span class="self">self</span>[..], <span class="ident">ty</span>, <span class="ident">w</span>)
@@ -2076,6 +2206,18 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">ToSql</span><span class="op">&gt;</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="ident">w</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IsNull</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">T</span>] <span class="kw">as</span> <span class="ident">ToSql</span><span class="op">&gt;</span><span class="ident">::to_sql</span>(<span class="op">&amp;&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>, <span class="ident">ty</span>, <span class="ident">w</span>)
+    }
+
+    <span class="kw">fn</span> <span class="ident">accepts</span>(<span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) -&gt; <span class="ident">bool</span> {
+        <span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">T</span>] <span class="kw">as</span> <span class="ident">ToSql</span><span class="op">&gt;</span><span class="ident">::accepts</span>(<span class="ident">ty</span>)
+    }
+
+    <span class="macro">to_sql_checked!</span>();
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">ToSql</span><span class="op">&gt;</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="ident">w</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IsNull</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">T</span>] <span class="kw">as</span> <span class="ident">ToSql</span><span class="op">&gt;</span><span class="ident">::to_sql</span>(<span class="op">&amp;&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>, <span class="ident">ty</span>, <span class="ident">w</span>)
     }

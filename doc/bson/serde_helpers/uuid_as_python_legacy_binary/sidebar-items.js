@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":[["deserialize","Deserializes a Uuid from a Binary in a Python Legacy UUID format."],["serialize","Serializes a Uuid as a Binary in a Python Legacy UUID format."]]};

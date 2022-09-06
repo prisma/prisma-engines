@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.2.2/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
@@ -371,31 +371,6 @@
 <span id="365">365</span>
 <span id="366">366</span>
 <span id="367">367</span>
-<span id="368">368</span>
-<span id="369">369</span>
-<span id="370">370</span>
-<span id="371">371</span>
-<span id="372">372</span>
-<span id="373">373</span>
-<span id="374">374</span>
-<span id="375">375</span>
-<span id="376">376</span>
-<span id="377">377</span>
-<span id="378">378</span>
-<span id="379">379</span>
-<span id="380">380</span>
-<span id="381">381</span>
-<span id="382">382</span>
-<span id="383">383</span>
-<span id="384">384</span>
-<span id="385">385</span>
-<span id="386">386</span>
-<span id="387">387</span>
-<span id="388">388</span>
-<span id="389">389</span>
-<span id="390">390</span>
-<span id="391">391</span>
-<span id="392">392</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This crate contains the officially supported MongoDB Rust driver, a</span>
 <span class="doccomment">//! client side library that can be used to interact with MongoDB deployments</span>
 <span class="doccomment">//! in Rust applications. It uses the [`bson`] crate for BSON support.</span>
@@ -406,7 +381,7 @@
 <span class="doccomment">//! # Installation</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ## Requirements</span>
-<span class="doccomment">//! - Rust 1.51+</span>
+<span class="doccomment">//! - Rust 1.53+</span>
 <span class="doccomment">//! - MongoDB 3.6+</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ## Importing</span>
@@ -414,7 +389,7 @@
 <span class="doccomment">//! your application, simply add it to your project&#39;s `Cargo.toml`.</span>
 <span class="doccomment">//! ```toml</span>
 <span class="doccomment">//! [dependencies]</span>
-<span class="doccomment">//! mongodb = &quot;2.2.2&quot;</span>
+<span class="doccomment">//! mongodb = &quot;2.3.0&quot;</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ### Configuring the async runtime</span>
@@ -428,22 +403,21 @@
 <span class="doccomment">//! add the following to your `Cargo.toml`:</span>
 <span class="doccomment">//! ```toml</span>
 <span class="doccomment">//! [dependencies.mongodb]</span>
-<span class="doccomment">//! version = &quot;2.2.2&quot;</span>
+<span class="doccomment">//! version = &quot;2.3.0&quot;</span>
 <span class="doccomment">//! default-features = false</span>
 <span class="doccomment">//! features = [&quot;async-std-runtime&quot;]</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ### Enabling the sync API</span>
-<span class="doccomment">//! The driver also provides a blocking sync API. To enable this, add the `&quot;sync&quot;` feature to your</span>
-<span class="doccomment">//! `Cargo.toml`:</span>
+<span class="doccomment">//! The driver also provides a blocking sync API. To enable this, add the `&quot;sync&quot;` or `&quot;tokio-sync&quot;`</span>
+<span class="doccomment">//! feature to your `Cargo.toml`:</span>
 <span class="doccomment">//! ```toml</span>
 <span class="doccomment">//! [dependencies.mongodb]</span>
-<span class="doccomment">//! version = &quot;2.2.2&quot;</span>
-<span class="doccomment">//! default-features = false</span>
-<span class="doccomment">//! features = [&quot;sync&quot;]</span>
+<span class="doccomment">//! version = &quot;2.3.0&quot;</span>
+<span class="doccomment">//! features = [&quot;tokio-sync&quot;]</span>
 <span class="doccomment">//! ```</span>
-<span class="doccomment">//! **Note:** if the sync API is enabled, the async-specific types will be privatized (e.g.</span>
-<span class="doccomment">//! `mongodb::Client`). The sync-specific types can be imported from `mongodb::sync` (e.g.</span>
+<span class="doccomment">//! Using the `&quot;sync&quot;` feature also requires using `default-features = false`.</span>
+<span class="doccomment">//! **Note:** The sync-specific types can be imported from `mongodb::sync` (e.g.</span>
 <span class="doccomment">//! `mongodb::sync::Client`).</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ### All Feature flags</span>
@@ -452,7 +426,8 @@
 <span class="doccomment">//! |:---------------------|:--------------------------------------------------------------------------------------------------------------------------------------|:------------------------------------|:--------|</span>
 <span class="doccomment">//! | `tokio-runtime`      | Enable support for the `tokio` async runtime                                                                                          | `tokio` 1.0 with the `full` feature | yes     |</span>
 <span class="doccomment">//! | `async-std-runtime`  | Enable support for the `async-std` runtime                                                                                            | `async-std` 1.0                     | no      |</span>
-<span class="doccomment">//! | `sync`               | Expose the synchronous API (`mongodb::sync`). This flag cannot be used in conjunction with either of the async runtime feature flags. | `async-std` 1.0                     | no      |</span>
+<span class="doccomment">//! | `sync`               | Expose the synchronous API (`mongodb::sync`), using an async-std backend. Cannot be used with the `tokio-runtime` feature flag.       | `async-std` 1.0                     | no      |</span>
+<span class="doccomment">//! | `tokio-sync`         | Expose the synchronous API (`mongodb::sync`), using a tokio backend. Cannot be used with the `async-std-runtime` feature flag.        | `tokio` 1.0 with the `full` feature | no      |</span>
 <span class="doccomment">//! | `aws-auth`           | Enable support for the MONGODB-AWS authentication mechanism.                                                                          | `reqwest` 0.11                      | no      |</span>
 <span class="doccomment">//! | `bson-uuid-0_8`      | Enable support for v0.8 of the [`uuid`](docs.rs/uuid/0.8) crate in the public API of the re-exported `bson` crate.                    | n/a                                 | no      |</span>
 <span class="doccomment">//! | `bson-chrono-0_4`    | Enable support for v0.4 of the [`chrono`](docs.rs/chrono/0.4) crate in the public API of the re-exported `bson` crate.                | n/a                                 | no      |</span>
@@ -681,7 +656,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ## Minimum supported Rust version (MSRV)</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! The MSRV for this crate is currently 1.51.0. This will be rarely be increased, and if it ever is,</span>
+<span class="doccomment">//! The MSRV for this crate is currently 1.53.0. This will be rarely be increased, and if it ever is,</span>
 <span class="doccomment">//! it will only happen in a minor or major version release.</span>
 
 <span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
@@ -699,7 +674,7 @@
 )]</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">feature</span>(<span class="ident">doc_cfg</span>))]</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">test</span>, <span class="ident">type_length_limit</span> <span class="op">=</span> <span class="string">&quot;80000000&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/mongodb/2.2.2&quot;</span>)]</span>
+<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/mongodb/2.3.0&quot;</span>)]</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;aws-auth&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>))]</span>
 <span class="macro">compile_error!</span>(<span class="string">&quot;The `aws-auth` feature flag is only supported on the tokio runtime.&quot;</span>);
@@ -739,16 +714,7 @@
 <span class="attribute">#[<span class="ident">macro_use</span>]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">derive_more</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>), <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-sync&quot;</span>)))]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">client</span>::{<span class="ident">Client</span>, <span class="ident">session::ClientSession</span>},
-    <span class="ident">coll::Collection</span>,
-    <span class="ident">cursor</span>::{<span class="ident">Cursor</span>, <span class="ident">session</span>::{<span class="ident">SessionCursor</span>, <span class="ident">SessionCursorStream</span>}},
-    <span class="ident">db::Database</span>,
-};
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-sync&quot;</span>))]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">client</span>::{<span class="ident">Client</span>, <span class="ident">session::ClientSession</span>},
     <span class="ident">coll::Collection</span>,
     <span class="ident">cursor</span>::{<span class="ident">Cursor</span>, <span class="ident">session</span>::{<span class="ident">SessionCursor</span>, <span class="ident">SessionCursorStream</span>}},
@@ -760,26 +726,10 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>,
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>,
-    <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>),
-    <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-sync&quot;</span>),
 ))]</span>
 <span class="macro">compile_error!</span>(
     <span class="string">&quot;`tokio-runtime` and `async-std-runtime` can&#39;t both be enabled; either disable \
      `async-std-runtime` or set `default-features = false` in your Cargo.toml&quot;</span>
-);
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>))]</span>
-<span class="macro">compile_error!</span>(
-    <span class="string">&quot;`tokio-runtime` and `sync` can&#39;t both be enabled; either disable `sync` and enable \
-     `tokio-sync` to use the sync API with tokio, or set `default-features = false` in \
-     your Cargo.toml to use the sync API with async-std&quot;</span>
-);
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-sync&quot;</span>))]</span>
-<span class="macro">compile_error!</span>(
-    <span class="string">&quot;`async-std-runtime` and `tokio-sync` can&#39;t both be enabled; either disable `tokio-sync` \
-     and enable `sync` to use the sync API with async-std, or disable `async-std-runtime` to \
-     use the sync API with tokio&quot;</span>
 );
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>), <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>)))]</span>

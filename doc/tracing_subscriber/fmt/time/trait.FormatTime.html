@@ -15,7 +15,7 @@
 current time as reported by <code>std::time::SystemTime</code>, and the latter does not print the current
 time at all. <code>FormatTime</code> is also automatically implemented for any function pointer with the
 appropriate signature.</p>
-<p>The full list of provided implementations can be found in <a href="./index.html"><code>time</code></a>.</p>
+<p>The full list of provided implementations can be found in <a href="index.html"><code>time</code></a>.</p>
 </div></details><h2 id="required-methods" class="small-section-header">Required Methods<a href="#required-methods" class="anchor"></a></h2><div class="methods"><details class="rustdoc-toggle" open><summary><div id="tymethod.format_time" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../../src/tracing_subscriber/fmt/time/mod.rs.html#40">source</a></div><h4 class="code-header">fn <a href="#tymethod.format_time" class="fnname">format_time</a>(&amp;self, w: &amp;mut <a class="struct" href="../format/struct.Writer.html" title="struct tracing_subscriber::fmt::format::Writer">Writer</a>&lt;'_&gt;) -&gt; <a class="type" href="https://doc.rust-lang.org/1.63.0/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></h4></div></summary><div class="docblock"><p>Measure and write out the current time.</p>
 <p>When <code>format_time</code> is called, implementors should get the current time using their desired
 mechanism, and write it out to the given <code>fmt::Write</code>. Implementors must insert a trailing

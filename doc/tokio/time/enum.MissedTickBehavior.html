@@ -106,7 +106,7 @@ Actual ticks:   | work -----|          delay          | work -----| work -----| 
 <span class="comment">// 50ms after the call to `tick` up above. That is, in `tick`, when we</span>
 <span class="comment">// recognize that we missed a tick, we schedule the next tick to happen</span>
 <span class="comment">// 50ms (or whatever the `period` is) from right then, not from when</span>
-<span class="comment">// were were *supposed* to tick</span>
+<span class="comment">// were *supposed* to tick</span>
 <span class="ident">interval</span>.<span class="ident">tick</span>().<span class="kw">await</span>;</code></pre></div>
 </div><h3 id="variant.Skip" class="variant small-section-header"><a href="#variant.Skip" class="anchor field"></a><code>Skip</code></h3><div class="docblock"><p>Skips missed ticks and tick on the next multiple of <code>period</code> from
 <code>start</code>.</p>

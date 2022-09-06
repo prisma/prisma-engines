@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pretty-hex-0.1.1/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../pretty_hex/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pretty-hex-0.3.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../pretty_hex/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../pretty_hex/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
@@ -70,108 +70,72 @@
 <span id="64">64</span>
 <span id="65">65</span>
 <span id="66">66</span>
-<span id="67">67</span>
-<span id="68">68</span>
-<span id="69">69</span>
-<span id="70">70</span>
-<span id="71">71</span>
-<span id="72">72</span>
-<span id="73">73</span>
-<span id="74">74</span>
-<span id="75">75</span>
-<span id="76">76</span>
-<span id="77">77</span>
-<span id="78">78</span>
-<span id="79">79</span>
-<span id="80">80</span>
-<span id="81">81</span>
-<span id="82">82</span>
-<span id="83">83</span>
-<span id="84">84</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">no_std</span>]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>, <span class="ident">feature</span>(<span class="ident">alloc</span>))]</span>
 
-<span class="doccomment">//! A Rust library prividing pretty hex dump.</span>
-<span class="doccomment">//! </span>
-<span class="doccomment">//! A `simple_*` way renders one-line hex dump, and a `pretty_*` wayrenders </span>
-<span class="doccomment">//! columned multy-line hex dump with addresing and ASCII representation.</span>
-<span class="doccomment">//! </span>
-<span class="doccomment">//! ## Example of `simple_hex*`</span>
+<span class="doccomment">//! A Rust library providing pretty hex dump.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! A `simple_hex()` way renders one-line hex dump, and a `pretty_hex()` way renders</span>
+<span class="doccomment">//! columned multi-line hex dump with addressing and ASCII representation.</span>
+<span class="doccomment">//! A `config_hex()` way renders hex dump in specified format.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Example of `simple_hex()`</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//! use pretty_hex::*;</span>
-<span class="doccomment">//! </span>
+<span class="doccomment">//!</span>
 <span class="doccomment">//! let v = vec![222, 173, 190, 239, 202, 254, 32, 24];</span>
+<span class="doccomment">//! # #[cfg(feature = &quot;alloc&quot;)]</span>
 <span class="doccomment">//! assert_eq!(simple_hex(&amp;v), format!(&quot;{}&quot;, v.hex_dump()));</span>
-<span class="doccomment">//! </span>
+<span class="doccomment">//!</span>
 <span class="doccomment">//! println!(&quot;{}&quot;, v.hex_dump());</span>
 <span class="doccomment">//! ```</span>
-<span class="doccomment">//! Output: </span>
-<span class="doccomment">//! </span>
+<span class="doccomment">//! Output:</span>
+<span class="doccomment">//!</span>
 <span class="doccomment">//! ```text</span>
 <span class="doccomment">//! de ad be ef  ca fe 20 18</span>
 <span class="doccomment">//! ```</span>
-<span class="doccomment">//! ## Example of `pretty_hex*</span>
+<span class="doccomment">//! ## Example of `pretty_hex()`</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//! use pretty_hex::*;</span>
-<span class="doccomment">//! </span>
-<span class="doccomment">//! let v: &amp;[u8] = &amp;random::&lt;[u8;30]&gt;();</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! let v = &amp;include_bytes!(&quot;../tests/data&quot;);</span>
+<span class="doccomment">//! # #[cfg(feature = &quot;alloc&quot;)]</span>
 <span class="doccomment">//! assert_eq!(pretty_hex(&amp;v), format!(&quot;{:?}&quot;, v.hex_dump()));</span>
-<span class="doccomment">//! </span>
+<span class="doccomment">//!</span>
 <span class="doccomment">//! println!(&quot;{:?}&quot;, v.hex_dump());</span>
 <span class="doccomment">//! ```</span>
-<span class="doccomment">//! Output: </span>
-<span class="doccomment">//! </span>
+<span class="doccomment">//! Output:</span>
+<span class="doccomment">//!</span>
 <span class="doccomment">//! ```text</span>
 <span class="doccomment">//! Length: 30 (0x1e) bytes</span>
 <span class="doccomment">//! 0000:   6b 4e 1a c3  af 03 d2 1e  7e 73 ba c8  bd 84 0f 83   kN......~s......</span>
 <span class="doccomment">//! 0010:   89 d5 cf 90  23 67 4b 48  db b1 bc 35  bf ee         ....#gKH...5..</span>
 <span class="doccomment">//! ```</span>
+<span class="doccomment">//! ## Example of `config_hex()`</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! use pretty_hex::*;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! let cfg = HexConfig {title: false, width: 8, group: 0, ..HexConfig::default() };</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! let v = &amp;include_bytes!(&quot;../tests/data&quot;);</span>
+<span class="doccomment">//! # #[cfg(feature = &quot;alloc&quot;)]</span>
+<span class="doccomment">//! assert_eq!(config_hex(&amp;v, cfg), format!(&quot;{:?}&quot;, v.hex_conf(cfg)));</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! println!(&quot;{:?}&quot;, v.hex_conf(cfg));</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! Output:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```text</span>
+<span class="doccomment">//! 0000:   6b 4e 1a c3 af 03 d2 1e   kN......</span>
+<span class="doccomment">//! 0008:   7e 73 ba c8 bd 84 0f 83   ~s......</span>
+<span class="doccomment">//! 0010:   89 d5 cf 90 23 67 4b 48   ....#gKH</span>
+<span class="doccomment">//! 0018:   db b1 bc 35 bf ee         ...5..</span>
+<span class="doccomment">//! ```</span>
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">alloc</span>;
 
 <span class="kw">mod</span> <span class="ident">pretty_hex</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pretty_hex</span>::<span class="kw-2">*</span>;
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">format</span>, <span class="ident">vec</span>, <span class="ident">vec::Vec</span>};
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_simple</span>() {
-        <span class="kw">let</span> <span class="ident">bytes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> (<span class="number">0</span>..<span class="number">16</span>).<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">simple</span> <span class="op">=</span> <span class="string">&quot;00 01 02 03  04 05 06 07  08 09 0a 0b  0c 0d 0e 0f&quot;</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">simple</span>, <span class="ident">simple_hex</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">simple</span>, <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">bytes</span>.<span class="ident">hex_dump</span>()));
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="string">&quot;string&quot;</span>;
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;73 74 72 69  6e 67&quot;</span>, <span class="ident">simple_hex</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>));
-        <span class="macro">assert!</span>(<span class="ident">simple_hex</span>(<span class="kw-2">&amp;</span><span class="macro">vec!</span>[]).<span class="ident">is_empty</span>());
-    }
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_pretty</span>() {
-        <span class="kw">let</span> <span class="ident">expected_dump</span> <span class="op">=</span> <span class="string">r##&quot;Length: 255 (0xff) bytes
-0000:   00 01 02 03  04 05 06 07  08 09 0a 0b  0c 0d 0e 0f   ................
-0010:   10 11 12 13  14 15 16 17  18 19 1a 1b  1c 1d 1e 1f   ................
-0020:   20 21 22 23  24 25 26 27  28 29 2a 2b  2c 2d 2e 2f    !&quot;#$%&amp;&#39;()*+,-./
-0030:   30 31 32 33  34 35 36 37  38 39 3a 3b  3c 3d 3e 3f   0123456789:;&lt;=&gt;?
-0040:   40 41 42 43  44 45 46 47  48 49 4a 4b  4c 4d 4e 4f   @ABCDEFGHIJKLMNO
-0050:   50 51 52 53  54 55 56 57  58 59 5a 5b  5c 5d 5e 5f   PQRSTUVWXYZ[\]^_
-0060:   60 61 62 63  64 65 66 67  68 69 6a 6b  6c 6d 6e 6f   `abcdefghijklmno
-0070:   70 71 72 73  74 75 76 77  78 79 7a 7b  7c 7d 7e 7f   pqrstuvwxyz{|}~.
-0080:   80 81 82 83  84 85 86 87  88 89 8a 8b  8c 8d 8e 8f   ................
-0090:   90 91 92 93  94 95 96 97  98 99 9a 9b  9c 9d 9e 9f   ................
-00a0:   a0 a1 a2 a3  a4 a5 a6 a7  a8 a9 aa ab  ac ad ae af   ................
-00b0:   b0 b1 b2 b3  b4 b5 b6 b7  b8 b9 ba bb  bc bd be bf   ................
-00c0:   c0 c1 c2 c3  c4 c5 c6 c7  c8 c9 ca cb  cc cd ce cf   ................
-00d0:   d0 d1 d2 d3  d4 d5 d6 d7  d8 d9 da db  dc dd de df   ................
-00e0:   e0 e1 e2 e3  e4 e5 e6 e7  e8 e9 ea eb  ec ed ee ef   ................
-00f0:   f0 f1 f2 f3  f4 f5 f6 f7  f8 f9 fa fb  fc fd fe      ...............&quot;##</span>;
-
-        <span class="kw">let</span> <span class="ident">bytes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> (<span class="number">0</span>..<span class="number">255</span>).<span class="ident">collect</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">expected_dump</span>, <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">bytes</span>.<span class="ident">hex_dump</span>()));
-    }
-}
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="pretty_hex" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0 (4b91a6ea7 2022-08-08)" ></div>
 </body></html>
