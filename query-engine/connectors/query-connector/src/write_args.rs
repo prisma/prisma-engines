@@ -405,24 +405,18 @@ impl WriteArgs {
 
     pub fn add_datetimes(&mut self, model: &ModelRef) {
         let now = PrismaValue::DateTime(Utc::now().into());
-        let updated_at_field = model.fields().updated_at();
+        let updated_at_fields = model.fields().updated_at();
 
-        if let Some(f) = updated_at_field {
+        for f in updated_at_fields {
             if self.args.get(f.db_name()).is_none() {
-                self.args.insert(f.into(), WriteOperation::scalar_set(now));
+                self.args.insert(f.into(), WriteOperation::scalar_set(now.clone()));
             }
         }
     }
 
     pub fn update_datetimes(&mut self, model: ModelRef) {
         if !self.args.is_empty() {
-            if let Some(field) = model.fields().updated_at() {
-                if self.args.get(field.db_name()).is_none() {
-                    let now = PrismaValue::DateTime(Utc::now().into());
-
-                    self.args.insert(field.into(), WriteOperation::scalar_set(now));
-                }
-            }
+            self.add_datetimes(&model)
         }
     }
 
