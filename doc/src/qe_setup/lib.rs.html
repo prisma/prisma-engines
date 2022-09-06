@@ -137,16 +137,6 @@
 <span id="131">131</span>
 <span id="132">132</span>
 <span id="133">133</span>
-<span id="134">134</span>
-<span id="135">135</span>
-<span id="136">136</span>
-<span id="137">137</span>
-<span id="138">138</span>
-<span id="139">139</span>
-<span id="140">140</span>
-<span id="141">141</span>
-<span id="142">142</span>
-<span id="143">143</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Query Engine test setup.</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::await_holding_lock</span>)]</span>
 <span class="kw">mod</span> <span class="ident">mongodb</span>;
@@ -199,17 +189,7 @@
             <span class="ident">diff_and_apply</span>(<span class="ident">prisma_schema</span>).<span class="kw">await</span>;
         }
         <span class="ident">provider</span> <span class="kw">if</span> <span class="ident">SQLITE</span>.<span class="ident">is_provider</span>(<span class="ident">provider</span>) =&gt; {
-            <span class="comment">// 1. creates schema &amp; database</span>
-            <span class="kw">let</span> <span class="ident">api</span> <span class="op">=</span> <span class="ident">migration_core::migration_api</span>(<span class="prelude-val">Some</span>(<span class="ident">prisma_schema</span>.<span class="ident">to_owned</span>()), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
-            <span class="ident">api</span>.<span class="ident">drop_database</span>(<span class="ident">url</span>).<span class="kw">await</span>.<span class="ident">ok</span>();
-            <span class="ident">api</span>.<span class="ident">create_database</span>(<span class="ident">CreateDatabaseParams</span> {
-                <span class="ident">datasource</span>: <span class="ident">DatasourceParam::SchemaString</span>(<span class="ident">SchemaContainer</span> {
-                    <span class="ident">schema</span>: <span class="ident">prisma_schema</span>.<span class="ident">to_owned</span>(),
-                }),
-            })
-            .<span class="kw">await</span><span class="question-mark">?</span>;
-
-            <span class="comment">// 2. create the database schema for given Prisma schema</span>
+            <span class="ident">std::fs::remove_file</span>(<span class="ident">source</span>.<span class="ident">url</span>.<span class="ident">as_literal</span>().<span class="ident">unwrap</span>().<span class="ident">trim_start_matches</span>(<span class="string">&quot;file:&quot;</span>)).<span class="ident">ok</span>();
             <span class="ident">diff_and_apply</span>(<span class="ident">prisma_schema</span>).<span class="kw">await</span>;
         }
 
