@@ -16,7 +16,7 @@ colored = "2"
 chrono = "0.4"
 datamodel-connector = { path = "../../../libs/datamodel/connectors/datamodel-connector" }
 base64 = "0.13"
-uuid = "0.8"
+uuid = "1"
 tokio = "1.8"
 prisma-value = { path = "../../../libs/prisma-value" }
 query-engine-metrics = { path = "../../metrics"}

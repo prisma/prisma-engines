@@ -23,7 +23,7 @@ tokio = { version = "1.0", default-features = false, features = ["time"] }
 tracing = "0.1"
 tracing-futures = "0.2"
 url = "2.1.1"
-uuid = { version = "0.8", features = ["v4"] }
+uuid = { version = "1", features = ["v4"] }
 either = "1.6"
 
 [dependencies.quaint]

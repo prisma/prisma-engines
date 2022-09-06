@@ -11,7 +11,7 @@ test-setup = { path = "../../libs/test-setup" }
 
 connection-string = "*"
 enumflags2 = "*"
-mongodb = "2.1.0"
+mongodb = { git = "https://github.com/mongodb/mongo-rust-driver" }
 tempfile = "3.3.0"
 url = "2"
 
