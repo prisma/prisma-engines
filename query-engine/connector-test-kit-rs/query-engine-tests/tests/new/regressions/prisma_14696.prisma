@@ -1,0 +1,67 @@
+model User {
+  id BigInt @id @default(autoincrement()) @unique
+  googleId String @unique
+  username String @unique
+  avatar String
+  description String
+  password String
+  followers Follow[] @relation("following")
+  followings Follow[] @relation("follower")
+  createdAt DateTime @default(now())
+  posts Post[] @relation("user")
+  comments Comment[] @relation("user")
+  commentLikes CommentLike[] @relation("user")
+  postLikes PostLike[] @relation("user")
+  refreshToken RefreshToken? @relation("user")
+}
+
+model Follow {
+  follower User @relation("follower",fields: [followerId], references: [id])
+  followerId BigInt
+  following User @relation("following", fields: [followingId], references: [id])
+  followingId BigInt
+  @@id([followerId, followingId])
+  createdAt DateTime @default(now())
+}
+
+model Post {
+  id BigInt @id @default(autoincrement()) @unique
+  user User @relation("user", fields: [userId], references: [id])
+  userId BigInt
+  comments Comment[] @relation("post")
+  likes PostLike[] @relation("post")
+  createdAt DateTime @default(now())
+}
+
+model PostLike {
+  id BigInt @id @default(autoincrement()) @unique
+  post Post @relation("post", fields: [postId], references: [id])
+  postId BigInt
+  user User @relation("user", fields: [userId], references: [id])
+  userId BigInt
+  createdAt DateTime @default(now())
+}
+
+model Comment {
+  id BigInt @id @default(autoincrement()) @unique
+  post Post @relation("post", fields: [postId], references: [id])
+  postId BigInt
+  user User @relation("user", fields: [userId], references: [id])
+  userId BigInt
+  likes CommentLike[] @relation("comment")
+  createdAt DateTime @default(now())
+}
+
+model CommentLike {
+  id BigInt @id @default(autoincrement()) @unique
+  comment Comment @relation("comment", fields: [commentId], references: [id])
+  commentId BigInt
+  user User @relation("user", fields: [userId], references: [id])
+  userId BigInt
+  createdAt DateTime @default(now())
+}
+
+model RefreshToken {
+  user User @relation("user", fields: [userId], references: [id]) 
+  userId BigInt @unique
+}

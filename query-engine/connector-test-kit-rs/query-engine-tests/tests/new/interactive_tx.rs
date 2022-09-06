@@ -444,7 +444,7 @@ mod itx_isolation {
 
         match tx_id {
             Ok(_) => panic!("Expected mongo to throw an unsupported error, but it succeeded instead."),
-            Err(err) => assert!(dbg!(err.to_string()).contains(
+            Err(err) => assert!(err.to_string().contains(
                 "Unsupported connector feature: Mongo does not support setting transaction isolation levels"
             )),
         };
