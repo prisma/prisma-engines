@@ -4,7 +4,7 @@ use async_trait::async_trait;
 use connector::{ConnectionLike, RelAggregationSelection};
 use connector_interface::{
     self as connector, filter::Filter, AggregationRow, AggregationSelection, Connection, QueryArguments,
-    ReadOperations, RecordFilter, Transaction, WriteArgs, WriteOperations,
+    ReadOperations, RecordFilter, Transaction, UpdateType, WriteArgs, WriteOperations,
 };
 use prisma_models::{prelude::*, SelectionResult};
 use prisma_value::PrismaValue;
@@ -209,7 +209,22 @@ where
         trace_id: Option<String>,
     ) -> connector::Result<Vec<SelectionResult>> {
         catch(self.connection_info.clone(), async move {
-            write::update_records(&self.inner, model, record_filter, args, trace_id).await
+            write::update_records(&self.inner, model, record_filter, args, UpdateType::Many, trace_id).await
+        })
+        .await
+    }
+
+    async fn update_record(
+        &mut self,
+        model: &ModelRef,
+        record_filter: RecordFilter,
+        args: WriteArgs,
+        trace_id: Option<String>,
+    ) -> connector::Result<Option<SelectionResult>> {
+        catch(self.connection_info.clone(), async move {
+            let mut res =
+                write::update_records(&self.inner, model, record_filter, args, UpdateType::One, trace_id).await?;
+            Ok(res.pop())
         })
         .await
     }

@@ -122,7 +122,7 @@ mod create {
     }
 
     // A Create Mutation should create and return item with explicit null values after previous mutation with explicit non-null values
-    #[connector_test]
+    #[connector_test(exclude(CockroachDb))]
     async fn return_item_non_null_attrs_then_explicit_null_attrs(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {

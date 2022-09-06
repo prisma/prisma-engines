@@ -57,13 +57,44 @@ impl Alias {
     }
 }
 
+#[derive(Clone)]
+pub struct ConditionState {
+    reverse: bool,
+    alias: Option<Alias>,
+}
+
+impl ConditionState {
+    fn new(alias: Option<Alias>, reverse: bool) -> Self {
+        Self { reverse, alias }
+    }
+
+    fn invert_reverse(self) -> Self {
+        Self::new(self.alias, !self.reverse)
+    }
+
+    fn alias(&self) -> Option<Alias> {
+        self.alias
+    }
+
+    fn reverse(&self) -> bool {
+        self.reverse
+    }
+}
+
 pub trait AliasedCondition {
     /// Conversion to a query condition tree. Columns will point to the given
     /// alias if provided, otherwise using the fully qualified path.
     ///
     /// Alias should be used only when nesting, making the top level queries
     /// more explicit.
-    fn aliased_cond(self, alias: Option<Alias>, reverse: bool) -> ConditionTree<'static>;
+    fn aliased_cond(self, state: ConditionState) -> ConditionTree<'static>;
+
+    fn aliased_condition_from(&self, alias: Option<Alias>, reverse: bool) -> ConditionTree<'static>
+    where
+        Self: Sized + Clone,
+    {
+        self.clone().aliased_cond(ConditionState::new(alias, reverse))
+    }
 }
 
 trait AliasedSelect {
@@ -100,15 +131,15 @@ impl AliasedColumn for Column<'static> {
 
 impl AliasedCondition for Filter {
     /// Conversion from a `Filter` to a query condition tree. Aliased when in a nested `SELECT`.
-    fn aliased_cond(self, alias: Option<Alias>, reverse: bool) -> ConditionTree<'static> {
+    fn aliased_cond(self, state: ConditionState) -> ConditionTree<'static> {
         match self {
             Filter::And(mut filters) => match filters.len() {
                 n if n == 0 => ConditionTree::NoCondition,
-                n if n == 1 => filters.pop().unwrap().aliased_cond(alias, reverse),
+                n if n == 1 => filters.pop().unwrap().aliased_cond(state),
                 _ => {
                     let exprs = filters
                         .into_iter()
-                        .map(|f| f.aliased_cond(alias, reverse))
+                        .map(|f| f.aliased_cond(state.clone()))
                         .map(Expression::from)
                         .collect();
 
@@ -117,11 +148,11 @@ impl AliasedCondition for Filter {
             },
             Filter::Or(mut filters) => match filters.len() {
                 n if n == 0 => ConditionTree::NegativeCondition,
-                n if n == 1 => filters.pop().unwrap().aliased_cond(alias, reverse),
+                n if n == 1 => filters.pop().unwrap().aliased_cond(state),
                 _ => {
                     let exprs = filters
                         .into_iter()
-                        .map(|f| f.aliased_cond(alias, reverse))
+                        .map(|f| f.aliased_cond(state.clone()))
                         .map(Expression::from)
                         .collect();
 
@@ -130,20 +161,20 @@ impl AliasedCondition for Filter {
             },
             Filter::Not(mut filters) => match filters.len() {
                 n if n == 0 => ConditionTree::NoCondition,
-                n if n == 1 => filters.pop().unwrap().aliased_cond(alias, !reverse).not(),
+                n if n == 1 => filters.pop().unwrap().aliased_cond(state.invert_reverse()).not(),
                 _ => {
                     let exprs = filters
                         .into_iter()
-                        .map(|f| f.aliased_cond(alias, !reverse).not())
+                        .map(|f| f.aliased_cond(state.clone().invert_reverse()).not())
                         .map(Expression::from)
                         .collect();
 
                     ConditionTree::And(exprs)
                 }
             },
-            Filter::Scalar(filter) => filter.aliased_cond(alias, reverse),
-            Filter::OneRelationIsNull(filter) => filter.aliased_cond(alias, reverse),
-            Filter::Relation(filter) => filter.aliased_cond(alias, reverse),
+            Filter::Scalar(filter) => filter.aliased_cond(state),
+            Filter::OneRelationIsNull(filter) => filter.aliased_cond(state),
+            Filter::Relation(filter) => filter.aliased_cond(state),
             Filter::BoolFilter(b) => {
                 if b {
                     ConditionTree::NoCondition
@@ -151,8 +182,8 @@ impl AliasedCondition for Filter {
                     ConditionTree::NegativeCondition
                 }
             }
-            Filter::Aggregation(filter) => filter.aliased_cond(alias, reverse),
-            Filter::ScalarList(filter) => filter.aliased_cond(alias, reverse),
+            Filter::Aggregation(filter) => filter.aliased_cond(state),
+            Filter::ScalarList(filter) => filter.aliased_cond(state),
             Filter::Empty => ConditionTree::NoCondition,
             Filter::Composite(_) => unimplemented!("SQL connectors do not support composites yet."),
         }
@@ -161,7 +192,7 @@ impl AliasedCondition for Filter {
 
 impl AliasedCondition for ScalarFilter {
     /// Conversion from a `ScalarFilter` to a query condition tree. Aliased when in a nested `SELECT`.
-    fn aliased_cond(self, alias: Option<Alias>, reverse: bool) -> ConditionTree<'static> {
+    fn aliased_cond(self, state: ConditionState) -> ConditionTree<'static> {
         match self.condition {
             ScalarCondition::Search(_, _) | ScalarCondition::NotSearch(_, _) => {
                 let mut projections = match self.condition.clone() {
@@ -175,7 +206,7 @@ impl AliasedCondition for ScalarFilter {
                 let columns: Vec<Column> = projections
                     .into_iter()
                     .map(|p| match p {
-                        ScalarProjection::Single(field) => field.aliased_col(alias),
+                        ScalarProjection::Single(field) => field.aliased_col(state.alias()),
                         ScalarProjection::Compound(_) => {
                             unreachable!("Full-text search does not support compound fields")
                         }
@@ -184,9 +215,17 @@ impl AliasedCondition for ScalarFilter {
 
                 let comparable: Expression = text_search(columns.as_slice()).into();
 
-                convert_scalar_filter(comparable, self.condition, reverse, self.mode, &[], alias, false)
+                convert_scalar_filter(
+                    comparable,
+                    self.condition,
+                    state.reverse(),
+                    self.mode,
+                    &[],
+                    state.alias(),
+                    false,
+                )
             }
-            _ => scalar_filter_aliased_cond(self, alias, reverse),
+            _ => scalar_filter_aliased_cond(self, state.alias(), state.reverse()),
         }
     }
 }
@@ -219,10 +258,10 @@ fn scalar_filter_aliased_cond(sf: ScalarFilter, alias: Option<Alias>, reverse: b
 }
 
 impl AliasedCondition for ScalarListFilter {
-    fn aliased_cond(self, alias: Option<Alias>, _reverse: bool) -> ConditionTree<'static> {
-        let comparable: Expression = self.field.aliased_col(alias).into();
+    fn aliased_cond(self, state: ConditionState) -> ConditionTree<'static> {
+        let comparable: Expression = self.field.aliased_col(state.alias()).into();
 
-        convert_scalar_list_filter(comparable, self.condition, &self.field, alias)
+        convert_scalar_list_filter(comparable, self.condition, &self.field, state.alias())
     }
 }
 
@@ -263,12 +302,12 @@ fn convert_scalar_list_filter(
 
 impl AliasedCondition for RelationFilter {
     /// Conversion from a `RelationFilter` to a query condition tree. Aliased when in a nested `SELECT`.
-    fn aliased_cond(self, alias: Option<Alias>, _reverse: bool) -> ConditionTree<'static> {
+    fn aliased_cond(self, state: ConditionState) -> ConditionTree<'static> {
         let ids = ModelProjection::from(self.field.model().primary_identifier()).as_columns();
-        let columns: Vec<Column<'static>> = ids.map(|col| col.aliased_col(alias)).collect();
+        let columns: Vec<Column<'static>> = ids.map(|col| col.aliased_col(state.alias())).collect();
 
         let condition = self.condition;
-        let sub_select = self.aliased_sel(alias.map(|a| a.inc(AliasMode::Table)));
+        let sub_select = self.aliased_sel(state.alias().map(|a| a.inc(AliasMode::Table)));
 
         let comparison = match condition {
             RelationCondition::AtLeastOneRelatedRecord => Row::from(columns).in_selection(sub_select),
@@ -304,7 +343,7 @@ impl AliasedSelect for RelationFilter {
 
         let nested_conditions = self
             .nested_filter
-            .aliased_cond(Some(alias.flip(AliasMode::Join)), false)
+            .aliased_condition_from(Some(alias.flip(AliasMode::Join)), false)
             .invert_if(condition.invert_of_subselect());
 
         let conditions = selected_identifier
@@ -325,8 +364,8 @@ impl AliasedSelect for RelationFilter {
 
 impl AliasedCondition for OneRelationIsNullFilter {
     /// Conversion from a `OneRelationIsNullFilter` to a query condition tree. Aliased when in a nested `SELECT`.
-    fn aliased_cond(self, alias: Option<Alias>, _reverse: bool) -> ConditionTree<'static> {
-        let alias = alias.map(|a| a.to_string(None));
+    fn aliased_cond(self, state: ConditionState) -> ConditionTree<'static> {
+        let alias = state.alias().map(|a| a.to_string(None));
 
         let condition = if self.field.relation_is_inlined_in_parent() {
             self.field.as_columns().fold(ConditionTree::NoCondition, |acc, column| {
@@ -386,7 +425,9 @@ impl AliasedCondition for OneRelationIsNullFilter {
 
 impl AliasedCondition for AggregationFilter {
     /// Conversion from an `AggregationFilter` to a query condition tree. Aliased when in a nested `SELECT`.
-    fn aliased_cond(self, alias: Option<Alias>, reverse: bool) -> ConditionTree<'static> {
+    fn aliased_cond(self, state: ConditionState) -> ConditionTree<'static> {
+        let alias = state.alias();
+        let reverse = state.reverse();
         match self {
             AggregationFilter::Count(filter) => aggregate_conditions(*filter, alias, reverse, |x| count(x).into()),
             AggregationFilter::Average(filter) => aggregate_conditions(*filter, alias, reverse, |x| avg(x).into()),

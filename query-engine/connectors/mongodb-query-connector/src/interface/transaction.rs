@@ -3,7 +3,9 @@ use crate::{
     error::MongoError,
     root_queries::{aggregate, read, write},
 };
-use connector_interface::{ConnectionLike, ReadOperations, RelAggregationSelection, Transaction, WriteOperations};
+use connector_interface::{
+    ConnectionLike, ReadOperations, RelAggregationSelection, Transaction, UpdateType, WriteOperations,
+};
 use mongodb::options::{Acknowledgment, ReadConcern, TransactionOptions, WriteConcern};
 use prisma_models::SelectionResult;
 use query_engine_metrics::{decrement_gauge, increment_gauge, metrics, PRISMA_CLIENT_QUERIES_ACTIVE};
@@ -113,8 +115,31 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
                 model,
                 record_filter,
                 args,
+                UpdateType::Many,
             )
             .await
+        })
+        .await
+    }
+
+    async fn update_record(
+        &mut self,
+        model: &ModelRef,
+        record_filter: connector_interface::RecordFilter,
+        args: connector_interface::WriteArgs,
+        _trace_id: Option<String>,
+    ) -> connector_interface::Result<Option<SelectionResult>> {
+        catch(async move {
+            let mut res = write::update_records(
+                &self.connection.database,
+                &mut self.connection.session,
+                model,
+                record_filter,
+                args,
+                UpdateType::One,
+            )
+            .await?;
+            Ok(res.pop())
         })
         .await
     }

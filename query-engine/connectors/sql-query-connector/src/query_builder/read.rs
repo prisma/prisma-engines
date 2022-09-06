@@ -67,7 +67,7 @@ impl SelectDefinition for QueryArguments {
 
         let filter: ConditionTree = self
             .filter
-            .map(|f| f.aliased_cond(None, false))
+            .map(|f| f.aliased_condition_from(None, false))
             .unwrap_or(ConditionTree::NoCondition);
 
         let conditions = match (filter, cursor_condition) {
@@ -253,7 +253,7 @@ pub fn group_by_aggregate(
     );
 
     match having {
-        Some(filter) => grouped.having(filter.aliased_cond(None, false)),
+        Some(filter) => grouped.having(filter.aliased_condition_from(None, false)),
         None => grouped,
     }
 }
