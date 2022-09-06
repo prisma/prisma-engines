@@ -7,6 +7,7 @@ edition = "2021"
 psl = { path = "../../psl/psl" }
 mongodb-client = { path = "../../libs/mongodb-client" }
 migration-core = { path = "../core" }
+test-setup = { path = "../../libs/test-setup" }
 
 connection-string = "*"
 enumflags2 = "*"

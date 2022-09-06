@@ -7,10 +7,10 @@ use url::Url;
 ///
 /// Source: https://dev.mysql.com/doc/mysql-reslimits-excerpt/5.5/en/identifier-length.html
 fn mysql_safe_identifier(identifier: &str) -> &str {
-    if identifier.len() < 64 {
+    if identifier.len() <= 64 {
         identifier
     } else {
-        identifier.get(0..63).expect("mysql identifier truncation")
+        identifier.get(0..64).expect("mysql identifier truncation")
     }
 }
 
@@ -78,10 +78,7 @@ pub(crate) fn get_mysql_tags(database_url: &str) -> Result<BitFlags<Tags>, Strin
 /// Returns a connection to the new database, as well as the corresponding
 /// complete connection string.
 #[allow(clippy::needless_lifetimes)] // clippy is wrong
-pub(crate) async fn create_mysql_database<'a>(
-    database_url: &str,
-    db_name: &'a str,
-) -> Result<(&'a str, String), AnyError> {
+pub async fn create_mysql_database<'a>(database_url: &str, db_name: &'a str) -> Result<(&'a str, String), AnyError> {
     let mut url: Url = database_url.parse()?;
     let mut mysql_db_url = url.clone();
     let db_name = mysql_safe_identifier(db_name);
@@ -91,8 +88,8 @@ pub(crate) async fn create_mysql_database<'a>(
 
     debug_assert!(!db_name.is_empty());
     debug_assert!(
-        db_name.len() < 64,
-        "db_name should be less than 64 characters, got {:?}",
+        db_name.len() <= 64,
+        "db_name should be at most 64 characters, got {:?}",
         db_name.len()
     );
 
