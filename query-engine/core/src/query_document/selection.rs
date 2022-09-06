@@ -56,6 +56,8 @@ impl SelectionBuilder {
     }
 }
 
+type SelectionArguments = (String, QueryValue);
+
 #[derive(Debug, Clone)]
 pub struct Selection {
     name: String,
@@ -85,6 +87,20 @@ impl Selection {
             alias: None,
             arguments: Vec::new(),
             nested_selections: Vec::new(),
+        }
+    }
+
+    pub fn new<T, A, N>(name: T, alias: Option<String>, arguments: A, nested_selections: N) -> Self
+    where
+        T: Into<String>,
+        A: Into<Vec<SelectionArguments>>,
+        N: Into<Vec<Selection>>,
+    {
+        Self {
+            name: name.into(),
+            alias,
+            arguments: arguments.into(),
+            nested_selections: nested_selections.into(),
         }
     }
 
