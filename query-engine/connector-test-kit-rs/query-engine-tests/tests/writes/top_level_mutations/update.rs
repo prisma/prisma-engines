@@ -148,18 +148,6 @@ mod update {
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"query {
-            findManyTestModel( where: {id: {gt: 0}}) {
-              id
-              createdAt
-              updatedAt_w_default
-              updatedAt_wo_default
-            }
-          }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
-        );
-
         Ok(())
     }
 
