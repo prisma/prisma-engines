@@ -120,12 +120,12 @@ impl From<Vec<Operation>> for CompactedDocument {
             // The name of the query should be findManyX if the first query
             // here is findUniqueX. We took care earlier the queries are all the
             // same. Otherwise we fail hard here.
-            let mut builder = Selection::builder(selections[0].name().replacen("findUnique", "findMany", 1));
+            let mut builder = Selection::with_name(selections[0].name().replacen("findUnique", "findMany", 1));
 
             // Take the nested selection set from the first query. We took care
             // earlier that all the nested selections are the same in every
             // query. Otherwise we fail hard here.
-            builder.nested_selections(selections[0].nested_selections().to_vec());
+            builder.set_nested_selections(selections[0].nested_selections().to_vec());
 
             // The query arguments are extracted here. Combine all query
             // arguments from the different queries into a one large argument.
@@ -153,7 +153,7 @@ impl From<Vec<Operation>> for CompactedDocument {
             // match the right response back to the right request later on.
             for key in selection_set.keys() {
                 if !builder.contains_nested_selection(key) {
-                    builder.push_nested_selection(Selection::builder(key).build());
+                    builder.push_nested_selection(Selection::with_name(key));
                 }
             }
 
@@ -161,11 +161,9 @@ impl From<Vec<Operation>> for CompactedDocument {
             // expression and with a compound id a combination of `AND` and `OR`.
             builder.push_argument(args::WHERE, In::new(selection_set));
 
-            if let Some(ref alias) = selections[0].alias() {
-                builder.alias(alias);
-            };
+            builder.set_alias(selections[0].alias().clone());
 
-            builder.build()
+            builder
         };
 
         // We want to store the original nested selections so we can filter out
