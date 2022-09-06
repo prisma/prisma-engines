@@ -113,10 +113,12 @@ mod update {
         schema.to_owned()
     }
 
-    // "UpdatedAt and createdAt" should "be mutable with an update"
+    // More than one "updateAt" is being updated by the QE
+    // a default value does not influence it being updated
     #[connector_test(schema(schema_8))]
     async fn updated_at_with_default(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1}"#).await?;
+        create_row(&runner, r#"{ id: 2}"#).await?;
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
@@ -127,13 +129,21 @@ mod update {
               }
             ) {
               id
-              test
-              updatedAt_w_default
-              updatedAt_wo_default
-              createdAt
             }
           }"#),
-          @r###"{"data":{"updateOneTestModel":{"createdAt":"2000-01-01T00:00:00.000Z","updatedAt":"2001-01-01T00:00:00.000Z"}}}"###
+          @r###"{"data":{"updateOneTestModel":{"id":1}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query {
+            findManyTestModel(
+              where: { AND: [{updatedAt_w_default: { gt: { _ref: "createdAt" } }},
+                             {updatedAt_wo_default: { gt: { _ref: "createdAt" } }}]}
+            ) {
+              id
+            }
+          }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         Ok(())
