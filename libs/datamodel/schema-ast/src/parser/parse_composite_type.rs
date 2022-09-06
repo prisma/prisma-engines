@@ -84,7 +84,7 @@ pub(crate) fn parse_composite_type(
                                     "Defining `@{name}` attribute for a field in a composite type is not allowed."
                                 );
 
-                                DatamodelError::new_validation_error(&msg, current_span.clone().into())
+                                DatamodelError::new_validation_error(&msg, current_span.into())
                             }
                             _ => continue,
                         };
