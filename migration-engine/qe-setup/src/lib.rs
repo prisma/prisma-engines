@@ -50,17 +50,7 @@ pub async fn setup(prisma_schema: &str, db_schemas: &[&str]) -> ConnectorResult<
             diff_and_apply(prisma_schema).await;
         }
         provider if SQLITE.is_provider(provider) => {
-            // 1. creates schema & database
-            let api = migration_core::migration_api(Some(prisma_schema.to_owned()), None)?;
-            api.drop_database(url).await.ok();
-            api.create_database(CreateDatabaseParams {
-                datasource: DatasourceParam::SchemaString(SchemaContainer {
-                    schema: prisma_schema.to_owned(),
-                }),
-            })
-            .await?;
-
-            // 2. create the database schema for given Prisma schema
+            std::fs::remove_file(source.url.as_literal().unwrap().trim_start_matches("file:")).ok();
             diff_and_apply(prisma_schema).await;
         }
 
