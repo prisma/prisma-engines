@@ -77,24 +77,7 @@
 <span id="71">71</span>
 <span id="72">72</span>
 <span id="73">73</span>
-<span id="74">74</span>
-<span id="75">75</span>
-<span id="76">76</span>
-<span id="77">77</span>
-<span id="78">78</span>
-<span id="79">79</span>
-<span id="80">80</span>
-<span id="81">81</span>
-<span id="82">82</span>
-<span id="83">83</span>
-<span id="84">84</span>
-<span id="85">85</span>
-<span id="86">86</span>
-<span id="87">87</span>
-<span id="88">88</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::GraphQLProtocolAdapter</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::HandlerError</span>;
-<span class="kw">use</span> <span class="ident">graphql_parser</span> <span class="kw">as</span> <span class="ident">gql</span>;
 <span class="kw">use</span> <span class="ident">query_core</span>::{<span class="ident">BatchDocument</span>, <span class="ident">Operation</span>, <span class="ident">QueryDocument</span>};
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
@@ -148,17 +131,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_doc</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">QueryDocument</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">GraphQlBody::Single</span>(<span class="ident">body</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">gql_doc</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">gql::parse_query</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>.<span class="ident">query</span>) {
-                    <span class="prelude-val">Ok</span>(<span class="ident">doc</span>) =&gt; <span class="ident">doc</span>,
-                    <span class="prelude-val">Err</span>(<span class="ident">err</span>)
-                        <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">to_string</span>().<span class="ident">contains</span>(<span class="string">&quot;number too large to fit in target type&quot;</span>)
-                            <span class="op">|</span> <span class="ident">err</span>.<span class="ident">to_string</span>().<span class="ident">contains</span>(<span class="string">&quot;number too small to fit in target type&quot;</span>) =&gt;
-                    {
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">HandlerError::ValueFitError</span>(<span class="string">&quot;Query parsing failure: A number used in the query does not fit into a 64 bit signed integer. Consider using `BigInt` as field type if you&#39;re trying to store large integers.&quot;</span>.<span class="ident">to_owned</span>()));
-                    }
-                    <span class="ident">err</span> @ <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="ident">err</span><span class="question-mark">?</span>,
-                };
-                <span class="kw">let</span> <span class="ident">operation</span> <span class="op">=</span> <span class="ident">GraphQLProtocolAdapter::convert</span>(<span class="ident">gql_doc</span>, <span class="ident">body</span>.<span class="ident">operation_name</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">operation</span> <span class="op">=</span> <span class="ident">GraphQLProtocolAdapter::convert_query_to_operation</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>.<span class="ident">query</span>, <span class="ident">body</span>.<span class="ident">operation_name</span>)<span class="question-mark">?</span>;
 
                 <span class="prelude-val">Ok</span>(<span class="ident">QueryDocument::Single</span>(<span class="ident">operation</span>))
             }
@@ -166,10 +139,7 @@
                 <span class="kw">let</span> <span class="ident">operations</span>: <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Operation</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">bodies</span>
                     .<span class="ident">batch</span>
                     .<span class="ident">into_iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">body</span><span class="op">|</span> {
-                        <span class="kw">let</span> <span class="ident">gql_doc</span> <span class="op">=</span> <span class="ident">gql::parse_query</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>.<span class="ident">query</span>)<span class="question-mark">?</span>;
-                        <span class="ident">GraphQLProtocolAdapter::convert</span>(<span class="ident">gql_doc</span>, <span class="ident">body</span>.<span class="ident">operation_name</span>)
-                    })
+                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">body</span><span class="op">|</span> <span class="ident">GraphQLProtocolAdapter::convert_query_to_operation</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>.<span class="ident">query</span>, <span class="ident">body</span>.<span class="ident">operation_name</span>))
                     .<span class="ident">collect</span>();
 
                 <span class="prelude-val">Ok</span>(<span class="ident">QueryDocument::Multi</span>(<span class="ident">BatchDocument::new</span>(

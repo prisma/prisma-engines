@@ -417,7 +417,7 @@
             .<span class="ident">get_or_init</span>(<span class="op">|</span><span class="op">|</span> {
                 <span class="self">self</span>.<span class="ident">model</span>()
                     .<span class="ident">internal_data_model</span>()
-                    .<span class="ident">find_relation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relation_name</span>)
+                    .<span class="ident">find_relation</span>((<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">model</span>().<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relation_info</span>.<span class="ident">to</span>), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relation_name</span>)
                     .<span class="ident">unwrap</span>()
             })
             .<span class="ident">upgrade</span>()
@@ -431,9 +431,9 @@
 
     <span class="doccomment">/// Inlined in self / model of self</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_is_inlined_in_parent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">relation</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">relation</span>();
+        <span class="kw">let</span> <span class="ident">relation</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relation</span>();
 
-        <span class="kw">match</span> <span class="ident">relation</span>.<span class="ident">manifestation</span> {
+        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">relation</span>.<span class="ident">manifestation</span> {
             <span class="ident">RelationLinkManifestation::Inline</span>(<span class="kw-2">ref</span> <span class="ident">m</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">is_self_rel</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">is_self_relation</span>();
 

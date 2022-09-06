@@ -226,8 +226,6 @@
 <span id="220">220</span>
 <span id="221">221</span>
 <span id="222">222</span>
-<span id="223">223</span>
-<span id="224">224</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Intermediate representation of the input document that is used by the query engine to build</span>
 <span class="doccomment">//! query ASTs and validate the incoming data.</span>
 <span class="doccomment">//!</span>
@@ -350,12 +348,12 @@
             <span class="comment">// The name of the query should be findManyX if the first query</span>
             <span class="comment">// here is findUniqueX. We took care earlier the queries are all the</span>
             <span class="comment">// same. Otherwise we fail hard here.</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Selection::builder</span>(<span class="ident">selections</span>[<span class="number">0</span>].<span class="ident">name</span>().<span class="ident">replacen</span>(<span class="string">&quot;findUnique&quot;</span>, <span class="string">&quot;findMany&quot;</span>, <span class="number">1</span>));
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Selection::with_name</span>(<span class="ident">selections</span>[<span class="number">0</span>].<span class="ident">name</span>().<span class="ident">replacen</span>(<span class="string">&quot;findUnique&quot;</span>, <span class="string">&quot;findMany&quot;</span>, <span class="number">1</span>));
 
             <span class="comment">// Take the nested selection set from the first query. We took care</span>
             <span class="comment">// earlier that all the nested selections are the same in every</span>
             <span class="comment">// query. Otherwise we fail hard here.</span>
-            <span class="ident">builder</span>.<span class="ident">nested_selections</span>(<span class="ident">selections</span>[<span class="number">0</span>].<span class="ident">nested_selections</span>().<span class="ident">to_vec</span>());
+            <span class="ident">builder</span>.<span class="ident">set_nested_selections</span>(<span class="ident">selections</span>[<span class="number">0</span>].<span class="ident">nested_selections</span>().<span class="ident">to_vec</span>());
 
             <span class="comment">// The query arguments are extracted here. Combine all query</span>
             <span class="comment">// arguments from the different queries into a one large argument.</span>
@@ -383,7 +381,7 @@
             <span class="comment">// match the right response back to the right request later on.</span>
             <span class="kw">for</span> <span class="ident">key</span> <span class="kw">in</span> <span class="ident">selection_set</span>.<span class="ident">keys</span>() {
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">builder</span>.<span class="ident">contains_nested_selection</span>(<span class="ident">key</span>) {
-                    <span class="ident">builder</span>.<span class="ident">push_nested_selection</span>(<span class="ident">Selection::builder</span>(<span class="ident">key</span>).<span class="ident">build</span>());
+                    <span class="ident">builder</span>.<span class="ident">push_nested_selection</span>(<span class="ident">Selection::with_name</span>(<span class="ident">key</span>));
                 }
             }
 
@@ -391,11 +389,9 @@
             <span class="comment">// expression and with a compound id a combination of `AND` and `OR`.</span>
             <span class="ident">builder</span>.<span class="ident">push_argument</span>(<span class="ident">args::WHERE</span>, <span class="ident">In::new</span>(<span class="ident">selection_set</span>));
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">alias</span>) <span class="op">=</span> <span class="ident">selections</span>[<span class="number">0</span>].<span class="ident">alias</span>() {
-                <span class="ident">builder</span>.<span class="ident">alias</span>(<span class="ident">alias</span>);
-            };
+            <span class="ident">builder</span>.<span class="ident">set_alias</span>(<span class="ident">selections</span>[<span class="number">0</span>].<span class="ident">alias</span>().<span class="ident">clone</span>());
 
-            <span class="ident">builder</span>.<span class="ident">build</span>()
+            <span class="ident">builder</span>
         };
 
         <span class="comment">// We want to store the original nested selections so we can filter out</span>
