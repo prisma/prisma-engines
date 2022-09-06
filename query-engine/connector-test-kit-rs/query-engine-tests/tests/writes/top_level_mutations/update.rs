@@ -102,7 +102,7 @@ mod update {
     fn schema_8() -> String {
         let schema = indoc! {
             r#"model TestModel {
-              id                    Int       @id
+              #id(id, Int, @id)
               test                  Int?
               updatedAt_w_default   DateTime  @default(now()) @updatedAt
               updatedAt_wo_default  DateTime? @updatedAt
@@ -138,9 +138,23 @@ mod update {
           run_query!(&runner, r#"query {
             findManyTestModel(
               where: { AND: [{updatedAt_w_default: { gt: { _ref: "createdAt" } }},
-                             {updatedAt_wo_default: { gt: { _ref: "createdAt" } }}]}
+                             {updatedAt_wo_default: { gt: { _ref: "createdAt" } }},
+                             {updatedAt_wo_default: { equals: { _ref: "updatedAt_w_default" } }}
+                     ]}
             ) {
               id
+            }
+          }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query {
+            findManyTestModel( where: {id: {gt: 0}}) {
+              id
+              createdAt
+              updatedAt_w_default
+              updatedAt_wo_default
             }
           }"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
