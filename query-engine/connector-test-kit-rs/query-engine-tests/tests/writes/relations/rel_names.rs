@@ -39,13 +39,8 @@ mod rel_names {
         let result = runner.query(r#"
             mutation { createOneparent(data: { id: "theparent", child_b_rel: { create: { id: "the_child_emphatically_b" } } }) { id } }
         "#).await?;
-        dbg!(result.to_string_pretty());
         result.assert_success();
 
-        dbg!(runner
-            .query(r#"query { findManychild_a { id } }"#)
-            .await?
-            .to_string_pretty());
         insta::assert_snapshot!(
           run_query!(runner, r#"query { findManychild_a { id } }"#),
           @r###"{"data":{"findManychild_a":[]}}"###

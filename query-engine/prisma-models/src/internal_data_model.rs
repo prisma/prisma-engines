@@ -65,16 +65,9 @@ impl InternalDataModel {
         self.relations
             .get()
             .and_then(|relations| {
-                // The scope for a relation name is only between two models. Every pair of models
-                // has its own scope for relation names.
-                relations.iter().find(|relation| {
-                    relation.name == relation_name
-                        && ((relation.is_self_relation()
-                            && model_names.0 == model_names.1
-                            && relation.model_a_name == model_names.0) // self relation
-                            || (model_names.0 == relation.model_a_name && model_names.1 == relation.model_b_name)
-                            || (model_names.0 == relation.model_b_name && model_names.1 == relation.model_a_name))
-                })
+                relations
+                    .iter()
+                    .find(|relation| relation_matches(relation, model_names, relation_name))
             })
             .map(Arc::downgrade)
             .ok_or_else(|| DomainError::RelationNotFound {
@@ -122,4 +115,29 @@ impl InternalDataModel {
             })
             .as_slice()
     }
+}
+
+/// A relation's "primary key" in a Prisma schema is the relation name (defaulting to an empty
+/// string) qualified by the one or two models involved in the relation.
+///
+/// In other words, the scope for a relation name is only between two models. Every pair of models
+/// has its own scope for relation names.
+fn relation_matches(relation: &Relation, model_names: (&str, &str), relation_name: &str) -> bool {
+    if relation.name != relation_name {
+        return false;
+    }
+
+    if relation.is_self_relation() && model_names.0 == model_names.1 && relation.model_a_name == model_names.0 {
+        return true;
+    }
+
+    if model_names.0 == relation.model_a_name && model_names.1 == relation.model_b_name {
+        return true;
+    }
+
+    if model_names.0 == relation.model_b_name && model_names.1 == relation.model_a_name {
+        return true;
+    }
+
+    false
 }
