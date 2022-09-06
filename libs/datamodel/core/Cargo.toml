@@ -12,7 +12,7 @@ sql-datamodel-connector = { path = "../connectors/sql-datamodel-connector" }
 diagnostics = { path = "../diagnostics" }
 parser-database = { path = "../parser-database" }
 
-bigdecimal = "0.2"
+bigdecimal = "0.3"
 chrono = { version = "0.4.6", default_features = false }
 itertools = "0.10"
 once_cell = "1.3.1"

@@ -12,7 +12,7 @@ sql = ["sql-connector"]
 [dependencies]
 async-trait = "0.1"
 base64 = "0.12"
-bigdecimal = "0.2"
+bigdecimal = "0.3"
 chrono = "0.4"
 connection-string = "0.1"
 connector = { path = "../connectors/query-connector", package = "query-connector" }
@@ -41,7 +41,7 @@ tracing-subscriber = "0.3.11"
 tracing-opentelemetry = "0.17.4"
 url = "2"
 user-facing-errors = { path = "../../libs/user-facing-errors" }
-uuid = "0.8"
+uuid = "1"
 cuid = { git = "https://github.com/prisma/cuid-rust" }
 pin-utils = "0.1"
 lazy_static = "1.4"

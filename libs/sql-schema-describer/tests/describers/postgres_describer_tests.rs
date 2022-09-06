@@ -97,9 +97,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Binary,
                             arity: List,
                             native_type: Some(
-                                String(
-                                    "ByteA",
-                                ),
+                                String("ByteA"),
                             ),
                         },
                         default: None,
@@ -117,9 +115,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Boolean,
                             arity: List,
                             native_type: Some(
-                                String(
-                                    "Boolean",
-                                ),
+                                String("Boolean"),
                             ),
                         },
                         default: None,
@@ -137,9 +133,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: DateTime,
                             arity: List,
                             native_type: Some(
-                                String(
-                                    "Date",
-                                ),
+                                String("Date"),
                             ),
                         },
                         default: None,
@@ -157,9 +151,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Float,
                             arity: List,
                             native_type: Some(
-                                String(
-                                    "DoublePrecision",
-                                ),
+                                String("DoublePrecision"),
                             ),
                         },
                         default: None,
@@ -177,9 +169,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Float,
                             arity: List,
                             native_type: Some(
-                                String(
-                                    "DoublePrecision",
-                                ),
+                                String("DoublePrecision"),
                             ),
                         },
                         default: None,
@@ -197,9 +187,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Int,
                             arity: List,
                             native_type: Some(
-                                String(
-                                    "Integer",
-                                ),
+                                String("Integer"),
                             ),
                         },
                         default: None,
@@ -217,9 +205,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: String,
                             arity: List,
                             native_type: Some(
-                                String(
-                                    "Text",
-                                ),
+                                String("Text"),
                             ),
                         },
                         default: None,
@@ -237,11 +223,9 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: String,
                             arity: List,
                             native_type: Some(
-                                Object({
-                                    "VarChar": Number(
-                                        255,
-                                    ),
-                                }),
+                                Object {
+                                    "VarChar": Number(255),
+                                },
                             ),
                         },
                         default: None,
@@ -259,9 +243,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: BigInt,
                             arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "BigInt",
-                                ),
+                                String("BigInt"),
                             ),
                         },
                         default: None,
@@ -279,9 +261,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: BigInt,
                             arity: Required,
                             native_type: Some(
-                                String(
-                                    "BigInt",
-                                ),
+                                String("BigInt"),
                             ),
                         },
                         default: Some(
@@ -306,11 +286,9 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: String,
                             arity: Nullable,
                             native_type: Some(
-                                Object({
-                                    "Bit": Number(
-                                        1,
-                                    ),
-                                }),
+                                Object {
+                                    "Bit": Number(1),
+                                },
                             ),
                         },
                         default: None,
@@ -328,11 +306,9 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: String,
                             arity: Nullable,
                             native_type: Some(
-                                Object({
-                                    "VarBit": Number(
-                                        1,
-                                    ),
-                                }),
+                                Object {
+                                    "VarBit": Number(1),
+                                },
                             ),
                         },
                         default: None,
@@ -350,9 +326,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Binary,
                             arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "ByteA",
-                                ),
+                                String("ByteA"),
                             ),
                         },
                         default: None,
@@ -370,9 +344,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Boolean,
                             arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "Boolean",
-                                ),
+                                String("Boolean"),
                             ),
                         },
                         default: None,
@@ -408,11 +380,9 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: String,
                             arity: Nullable,
                             native_type: Some(
-                                Object({
-                                    "Char": Number(
-                                        1,
-                                    ),
-                                }),
+                                Object {
+                                    "Char": Number(1),
+                                },
                             ),
                         },
                         default: None,
@@ -448,9 +418,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: DateTime,
                             arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "Date",
-                                ),
+                                String("Date"),
                             ),
                         },
                         default: None,
@@ -468,9 +436,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Float,
                             arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "DoublePrecision",
-                                ),
+                                String("DoublePrecision"),
                             ),
                         },
                         default: None,
@@ -488,9 +454,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Float,
                             arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "DoublePrecision",
-                                ),
+                                String("DoublePrecision"),
                             ),
                         },
                         default: None,
@@ -508,9 +472,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Int,
                             arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "Integer",
-                                ),
+                                String("Integer"),
                             ),
                         },
                         default: None,
@@ -564,9 +526,9 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Decimal,
                             arity: Nullable,
                             native_type: Some(
-                                Object({
+                                Object {
                                     "Decimal": Null,
-                                }),
+                                },
                             ),
                         },
                         default: None,
@@ -638,9 +600,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Int,
                             arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "SmallInt",
-                                ),
+                                String("SmallInt"),
                             ),
                         },
                         default: None,
@@ -658,9 +618,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Int,
                             arity: Required,
                             native_type: Some(
-                                String(
-                                    "SmallInt",
-                                ),
+                                String("SmallInt"),
                             ),
                         },
                         default: Some(
@@ -685,9 +643,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Int,
                             arity: Required,
                             native_type: Some(
-                                String(
-                                    "Integer",
-                                ),
+                                String("Integer"),
                             ),
                         },
                         default: Some(
@@ -712,9 +668,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Int,
                             arity: Required,
                             native_type: Some(
-                                String(
-                                    "Integer",
-                                ),
+                                String("Integer"),
                             ),
                         },
                         default: Some(
@@ -739,9 +693,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: String,
                             arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "Text",
-                                ),
+                                String("Text"),
                             ),
                         },
                         default: None,
@@ -759,11 +711,9 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: String,
                             arity: Nullable,
                             native_type: Some(
-                                Object({
-                                    "VarChar": Number(
-                                        1,
-                                    ),
-                                }),
+                                Object {
+                                    "VarChar": Number(1),
+                                },
                             ),
                         },
                         default: None,
@@ -781,11 +731,9 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: DateTime,
                             arity: Nullable,
                             native_type: Some(
-                                Object({
-                                    "Time": Number(
-                                        6,
-                                    ),
-                                }),
+                                Object {
+                                    "Time": Number(6),
+                                },
                             ),
                         },
                         default: None,
@@ -803,11 +751,9 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: DateTime,
                             arity: Nullable,
                             native_type: Some(
-                                Object({
-                                    "Timetz": Number(
-                                        6,
-                                    ),
-                                }),
+                                Object {
+                                    "Timetz": Number(6),
+                                },
                             ),
                         },
                         default: None,
@@ -825,11 +771,9 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: DateTime,
                             arity: Nullable,
                             native_type: Some(
-                                Object({
-                                    "Timestamp": Number(
-                                        6,
-                                    ),
-                                }),
+                                Object {
+                                    "Timestamp": Number(6),
+                                },
                             ),
                         },
                         default: None,
@@ -847,11 +791,9 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: DateTime,
                             arity: Nullable,
                             native_type: Some(
-                                Object({
-                                    "Timestamptz": Number(
-                                        6,
-                                    ),
-                                }),
+                                Object {
+                                    "Timestamptz": Number(6),
+                                },
                             ),
                         },
                         default: None,
@@ -923,9 +865,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Json,
                             arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "Json",
-                                ),
+                                String("Json"),
                             ),
                         },
                         default: None,
@@ -943,9 +883,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Json,
                             arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "JsonB",
-                                ),
+                                String("JsonB"),
                             ),
                         },
                         default: None,
@@ -963,9 +901,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Uuid,
                             arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "Uuid",
-                                ),
+                                String("Uuid"),
                             ),
                         },
                         default: None,
@@ -1278,9 +1214,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                             family: Int,
                             arity: Required,
                             native_type: Some(
-                                String(
-                                    "Integer",
-                                ),
+                                String("Integer"),
                             ),
                         },
                         default: None,
@@ -1298,9 +1232,9 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                             family: String,
                             arity: Required,
                             native_type: Some(
-                                Object({
+                                Object {
                                     "VarChar": Null,
-                                }),
+                                },
                             ),
                         },
                         default: Some(
@@ -1327,9 +1261,9 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                             family: String,
                             arity: Required,
                             native_type: Some(
-                                Object({
+                                Object {
                                     "VarChar": Null,
-                                }),
+                                },
                             ),
                         },
                         default: Some(
@@ -1356,9 +1290,9 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                             family: String,
                             arity: Required,
                             native_type: Some(
-                                Object({
+                                Object {
                                     "VarChar": Null,
-                                }),
+                                },
                             ),
                         },
                         default: Some(
@@ -1443,11 +1377,9 @@ fn seemingly_escaped_backslashes_in_string_literals_must_not_be_unescaped(api: T
                             family: String,
                             arity: Required,
                             native_type: Some(
-                                Object({
-                                    "VarChar": Number(
-                                        255,
-                                    ),
-                                }),
+                                Object {
+                                    "VarChar": Number(255),
+                                },
                             ),
                         },
                         default: Some(

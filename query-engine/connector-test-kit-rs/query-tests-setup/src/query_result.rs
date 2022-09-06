@@ -14,6 +14,10 @@ impl QueryResult {
 
     /// Asserts absence of errors in the result. Panics with assertion error.
     pub fn assert_success(&self) {
+        if self.failed() {
+            dbg!(self.errors());
+        }
+
         assert!(!self.failed())
     }
 

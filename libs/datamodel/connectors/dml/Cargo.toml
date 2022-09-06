@@ -6,7 +6,7 @@ edition = "2021"
 [dependencies]
 prisma-value = { path = "../../../prisma-value" }
 
-uuid = { version = "0.8", features = ["serde", "v4"], optional = true }
+uuid = { version = "1", features = ["serde", "v4"], optional = true }
 cuid = { git = "https://github.com/prisma/cuid-rust", optional = true }
 chrono = { version = "0.4.6", features = ["serde"] }
 serde = { version = "1.0.90", features = ["derive"] }
