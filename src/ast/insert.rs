@@ -29,7 +29,7 @@ pub struct MultiRowInsert<'a> {
 }
 
 /// `INSERT` conflict resolution strategies.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum OnConflict {
     /// When a row already exists, do nothing. Works with PostgreSQL, MySQL or
     /// SQLite without schema information.

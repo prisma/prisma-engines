@@ -102,7 +102,7 @@ paste = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 test-macros = { path = "test-macros" }
 test-setup = { path = "test-setup" }
-uuid = { version = "0.8", features = ["v4"] }
+uuid = { version = "1", features = ["v4"] }
 tokio = { version = "1.0", features = ["rt-multi-thread", "macros", "time"] }
 
 [dependencies.byteorder]
@@ -127,33 +127,33 @@ features = ["bundled"]
 optional = true
 
 [target.'cfg(not(any(target_os = "macos", target_os = "ios")))'.dependencies.tiberius]
-version = "0.9.3"
+version = "0.11.0"
 optional = true
 features = ["sql-browser-tokio", "chrono", "bigdecimal"]
 
 [target.'cfg(any(target_os = "macos", target_os = "ios"))'.dependencies.tiberius]
-version = "0.9.3"
+version = "0.11.0"
 optional = true
 default-features = false
 features = ["sql-browser-tokio", "vendored-openssl", "chrono", "bigdecimal", "tds73", "winauth"]
 
 [dependencies.bigdecimal_]
-version = "0.2.0"
+version = "0.3"
 optional = true
 package = "bigdecimal"
 
 [dependencies.uuid]
-version = "0.8"
+version = "1"
 optional = true
 
 [dependencies.tokio-postgres]
-features = ["with-uuid-0_8", "with-chrono-0_4", "with-serde_json-1", "with-bit-vec-0_6"]
+features = ["with-uuid-1", "with-chrono-0_4", "with-serde_json-1", "with-bit-vec-0_6"]
 git = "https://github.com/pimeys/rust-postgres"
 branch = "pgbouncer-mode"
 optional = true
 
 [dependencies.postgres-types]
-features = ["with-uuid-0_8", "with-chrono-0_4", "with-serde_json-1", "with-bit-vec-0_6"]
+features = ["with-uuid-1", "with-chrono-0_4", "with-serde_json-1", "with-bit-vec-0_6"]
 git = "https://github.com/pimeys/rust-postgres"
 branch = "pgbouncer-mode"
 optional = true

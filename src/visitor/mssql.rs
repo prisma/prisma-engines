@@ -345,7 +345,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
             Value::Numeric(r) => r.map(|r| self.write(r)),
             #[cfg(feature = "uuid")]
             Value::Uuid(uuid) => uuid.map(|uuid| {
-                let s = format!("CONVERT(uniqueidentifier, N'{}')", uuid.to_hyphenated().to_string());
+                let s = format!("CONVERT(uniqueidentifier, N'{}')", uuid.hyphenated());
                 self.write(s)
             }),
             #[cfg(feature = "chrono")]
@@ -1258,10 +1258,7 @@ mod tests {
         let (sql, params) = Mssql::build(Select::default().value(uuid.raw())).unwrap();
 
         assert_eq!(
-            format!(
-                "SELECT CONVERT(uniqueidentifier, N'{}')",
-                uuid.to_hyphenated().to_string()
-            ),
+            format!("SELECT CONVERT(uniqueidentifier, N'{}')", uuid.hyphenated()),
             sql
         );
 

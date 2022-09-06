@@ -233,7 +233,7 @@ impl ConnectionInfo {
 }
 
 /// One of the supported SQL variants.
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum SqlFamily {
     #[cfg(feature = "postgresql")]
     #[cfg_attr(feature = "docs", doc(cfg(feature = "postgresql")))]

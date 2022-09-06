@@ -61,7 +61,7 @@ pub struct PostgreSql {
     is_healthy: AtomicBool,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "docs", doc(cfg(feature = "postgresql")))]
 pub enum SslAcceptMode {
     Strict,

@@ -189,7 +189,7 @@ impl<'a> From<Value<'a>> for serde_json::Value {
             #[cfg(feature = "json")]
             Value::Json(v) => v,
             #[cfg(feature = "uuid")]
-            Value::Uuid(u) => u.map(|u| serde_json::Value::String(u.to_hyphenated().to_string())),
+            Value::Uuid(u) => u.map(|u| serde_json::Value::String(u.hyphenated().to_string())),
             #[cfg(feature = "chrono")]
             Value::DateTime(dt) => dt.map(|dt| serde_json::Value::String(dt.to_rfc3339())),
             #[cfg(feature = "chrono")]

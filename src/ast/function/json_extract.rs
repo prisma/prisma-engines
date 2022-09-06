@@ -9,7 +9,7 @@ pub struct JsonExtract<'a> {
     pub(crate) extract_as_string: bool,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum JsonPath<'a> {
     #[cfg(feature = "mysql")]
     String(Cow<'a, str>),

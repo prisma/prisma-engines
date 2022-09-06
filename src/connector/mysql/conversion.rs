@@ -53,7 +53,7 @@ pub fn conv_params(params: &[Value<'_>]) -> crate::Result<my::Params> {
                     None => None,
                 },
                 #[cfg(feature = "uuid")]
-                Value::Uuid(u) => u.map(|u| my::Value::Bytes(u.to_hyphenated().to_string().into_bytes())),
+                Value::Uuid(u) => u.map(|u| my::Value::Bytes(u.hyphenated().to_string().into_bytes())),
                 #[cfg(feature = "chrono")]
                 Value::Date(d) => {
                     d.map(|d| my::Value::Date(d.year() as u16, d.month() as u8, d.day() as u8, 0, 0, 0, 0))

@@ -191,7 +191,7 @@ impl MysqlUrl {
                     ssl_opts = ssl_opts.with_password(Some(v.to_string()));
                 }
                 "socket" => {
-                    socket = Some(v.replace("(", "").replace(")", ""));
+                    socket = Some(v.replace('(', "").replace(')', ""));
                 }
                 "socket_timeout" => {
                     let as_int = v

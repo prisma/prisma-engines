@@ -678,7 +678,7 @@ impl<'a> Select<'a> {
 
         self.columns
             .iter()
-            .map(|expr| match &expr.kind {
+            .filter_map(|expr| match &expr.kind {
                 ExpressionKind::Column(c) => c
                     .alias
                     .as_ref()
@@ -688,7 +688,6 @@ impl<'a> Select<'a> {
                 ExpressionKind::Parameterized(_) => expr.alias.as_ref().map(|a| a.to_string()),
                 _ => None,
             })
-            .flatten()
             .collect()
     }
 }

@@ -34,7 +34,7 @@ impl From<tokio_postgres::error::Error> for Error {
                 let constraint = detail
                     .as_ref()
                     .and_then(|d| d.split(")=(").next())
-                    .and_then(|d| d.split(" (").nth(1).map(|s| s.replace("\"", "")))
+                    .and_then(|d| d.split(" (").nth(1).map(|s| s.replace('\"', "")))
                     .map(|s| DatabaseConstraint::fields(s.split(", ")))
                     .unwrap_or(DatabaseConstraint::CannotParse);
 

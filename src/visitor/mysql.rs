@@ -158,7 +158,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
                 None => None,
             },
             #[cfg(feature = "uuid")]
-            Value::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.to_hyphenated().to_string()))),
+            Value::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.hyphenated()))),
             #[cfg(feature = "chrono")]
             Value::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
             #[cfg(feature = "chrono")]
@@ -830,7 +830,7 @@ mod tests {
         let uuid = uuid::Uuid::new_v4();
         let (sql, params) = Mysql::build(Select::default().value(uuid.raw())).unwrap();
 
-        assert_eq!(format!("SELECT '{}'", uuid.to_hyphenated().to_string()), sql);
+        assert_eq!(format!("SELECT '{}'", uuid.hyphenated()), sql);
 
         assert!(params.is_empty());
     }
