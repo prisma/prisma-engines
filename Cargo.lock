@@ -271,8 +271,9 @@ dependencies = [
 
 [[package]]
 name = "bson"
-version = "2.3.0"
-source = "git+https://github.com/mongodb/bson-rust?branch=main#bad146878902da3add29c5e656ddbde65927300e"
+version = "2.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "99d76085681585d39016f4d3841eb019201fc54d2dd0d92ad1e4fab3bfb32754"
 dependencies = [
  "ahash",
  "base64 0.13.0",
@@ -285,7 +286,7 @@ dependencies = [
  "serde_bytes",
  "serde_json",
  "time 0.3.14",
- "uuid",
+ "uuid 1.1.2",
 ]
 
 [[package]]
@@ -751,7 +752,7 @@ dependencies = [
  "prisma-value",
  "serde",
  "serde_json",
- "uuid",
+ "uuid 1.1.2",
 ]
 
 [[package]]
@@ -2074,8 +2075,9 @@ dependencies = [
 
 [[package]]
 name = "mongodb"
-version = "2.4.0"
-source = "git+https://github.com/mongodb/mongo-rust-driver#6be426274c643590f005cd5d12a29eda2f1193e8"
+version = "2.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b95afe97b0c799fdf69cd960272a2cb9662d077bd6efd84eb722bb9805d47554"
 dependencies = [
  "async-trait",
  "base64 0.13.0",
@@ -2113,7 +2115,7 @@ dependencies = [
  "trust-dns-proto",
  "trust-dns-resolver",
  "typed-builder",
- "uuid",
+ "uuid 0.8.2",
  "webpki-roots",
 ]
 
@@ -2192,6 +2194,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "bigdecimal",
+ "bson",
  "chrono",
  "cuid",
  "futures",
@@ -2214,7 +2217,7 @@ dependencies = [
  "tracing",
  "tracing-futures",
  "user-facing-errors",
- "uuid",
+ "uuid 1.1.2",
 ]
 
 [[package]]
@@ -2297,7 +2300,7 @@ dependencies = [
  "subprocess",
  "thiserror",
  "time 0.3.14",
- "uuid",
+ "uuid 1.1.2",
 ]
 
 [[package]]
@@ -2697,9 +2700,9 @@ dependencies = [
 
 [[package]]
 name = "pbkdf2"
-version = "0.11.0"
+version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "83a0692ec44e4cf1ef28ca317f14f8f07da2d95ec3fa01f86e4467b725e60917"
+checksum = "271779f35b581956db91a3e55737327a03aa051e90b1c47aeb189508533adfd7"
 dependencies = [
  "digest 0.10.3",
 ]
@@ -2885,7 +2888,7 @@ dependencies = [
  "postgres-protocol",
  "serde",
  "serde_json",
- "uuid",
+ "uuid 1.1.2",
 ]
 
 [[package]]
@@ -2955,7 +2958,7 @@ dependencies = [
  "regex",
  "serde",
  "serde_json",
- "uuid",
+ "uuid 1.1.2",
 ]
 
 [[package]]
@@ -3123,7 +3126,7 @@ dependencies = [
  "tracing",
  "tracing-core",
  "url",
- "uuid",
+ "uuid 1.1.2",
 ]
 
 [[package]]
@@ -3158,7 +3161,7 @@ dependencies = [
  "serde_json",
  "thiserror",
  "user-facing-errors",
- "uuid",
+ "uuid 1.1.2",
 ]
 
 [[package]]
@@ -3203,7 +3206,7 @@ dependencies = [
  "tracing-subscriber",
  "url",
  "user-facing-errors",
- "uuid",
+ "uuid 1.1.2",
 ]
 
 [[package]]
@@ -3318,7 +3321,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-futures",
- "uuid",
+ "uuid 1.1.2",
 ]
 
 [[package]]
@@ -3681,9 +3684,9 @@ dependencies = [
 
 [[package]]
 name = "rustls-pemfile"
-version = "1.0.1"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0864aeff53f8c05aa08d86e5ef839d3dfcf07aeba2db32f12db0ef716e87bd55"
+checksum = "1ee86d63972a7c661d1536fefe8c3c8407321c3df668891286de28abcd087360"
 dependencies = [
  "base64 0.13.0",
 ]
@@ -4093,7 +4096,7 @@ dependencies = [
  "tracing-futures",
  "url",
  "user-facing-errors",
- "uuid",
+ "uuid 1.1.2",
 ]
 
 [[package]]
@@ -4124,7 +4127,7 @@ dependencies = [
  "tracing-futures",
  "tracing-opentelemetry",
  "user-facing-errors",
- "uuid",
+ "uuid 1.1.2",
 ]
 
 [[package]]
@@ -4391,7 +4394,7 @@ dependencies = [
  "tokio",
  "tokio-util 0.7.3",
  "tracing",
- "uuid",
+ "uuid 1.1.2",
  "winauth",
 ]
 
@@ -4972,6 +4975,15 @@ name = "utf8-width"
 version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5190c9442dcdaf0ddd50f37420417d219ae5261bbf5db120d0f9bab996c9cba1"
+
+[[package]]
+name = "uuid"
+version = "0.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bc5cf98d8186244414c848017f0e2676b3fcb46807f6668a97dfe67359a3c4b7"
+dependencies = [
+ "getrandom 0.2.7",
+]
 
 [[package]]
 name = "uuid"

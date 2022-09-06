@@ -10,7 +10,8 @@ bigdecimal = "0.3"
 # bson = {version = "1.1.0", features = ["decimal128"]}
 futures = "0.3"
 itertools = "0.10"
-mongodb = { git = "https://github.com/mongodb/mongo-rust-driver", features = ["bson-chrono-0_4", "bson-uuid-1"] }
+mongodb = "2.3.0"
+bson = { version = "2.4.0", features = ["chrono-0_4", "uuid-1"] }
 rand = "0.7"
 regex = "1"
 serde_json = { version = "1.0", features = ["float_roundtrip"] }

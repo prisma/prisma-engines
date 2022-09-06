@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-mongodb = { git = "https://github.com/mongodb/mongo-rust-driver", features = ["bson-chrono-0_4", "bson-uuid-1"] }
+mongodb = "2.3.0"
 thiserror = "1.0"
 async-trait = "0.1"
 mongodb-client = { path = "../../../libs/mongodb-client" }
