@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.15/src/fmt/writer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>writer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/fmt/writer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>writer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../tracing_subscriber/index.html"><div class="logo-container">
@@ -1470,9 +1470,11 @@
 <span id="1462">1462</span>
 <span id="1463">1463</span>
 <span id="1464">1464</span>
+<span id="1465">1465</span>
+<span id="1466">1466</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Abstractions for creating [`io::Write`] instances.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! [`io::Write`]: std::io::Write</span>
+<span class="doccomment">//! [`io::Write`]: https://doc.rust-lang.org/std/io/trait.Write.html</span>
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">fmt</span>,
     <span class="ident">io</span>::{<span class="self">self</span>, <span class="ident">Write</span>},
@@ -1568,8 +1570,8 @@
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">MakeWriter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// The concrete [`io::Write`] implementation returned by [`make_writer`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`io::Write`]: std::io::Write</span>
-    <span class="doccomment">/// [`make_writer`]: MakeWriter::make_writer</span>
+    <span class="doccomment">/// [`io::Write`]: https://doc.rust-lang.org/std/io/trait.Write.html</span>
+    <span class="doccomment">/// [`make_writer`]: #tymethod.make_writer</span>
     <span class="kw">type</span> <span class="ident">Writer</span>: <span class="ident">io::Write</span>;
 
     <span class="doccomment">/// Returns an instance of [`Writer`].</span>
@@ -1581,7 +1583,7 @@
     <span class="doccomment">/// creating a [`io::Write`] instance is expensive, be sure to cache it when implementing</span>
     <span class="doccomment">/// [`MakeWriter`] to improve performance.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Writer`]: MakeWriter::Writer</span>
+    <span class="doccomment">/// [`Writer`]: #associatedtype.Writer</span>
     <span class="doccomment">/// [`fmt::Layer`]: crate::fmt::Layer</span>
     <span class="doccomment">/// [`fmt::Subscriber`]: crate::fmt::Subscriber</span>
     <span class="doccomment">/// [`io::Write`]: std::io::Write</span>
@@ -1973,13 +1975,13 @@
 <span class="doccomment">/// Writing to [`io::stdout`] and [`io::stderr`] produces the same results as using</span>
 <span class="doccomment">/// [`libtest`&#39;s `--nocapture` option][nocapture] which may make the results look unreadable.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`fmt::Subscriber`]: super::Subscriber</span>
-<span class="doccomment">/// [`fmt::Layer`]: super::Layer</span>
+<span class="doccomment">/// [`fmt::Subscriber`]: ../struct.Subscriber.html</span>
+<span class="doccomment">/// [`fmt::Layer`]: ../struct.Layer.html</span>
 <span class="doccomment">/// [capturing]: https://doc.rust-lang.org/book/ch11-02-running-tests.html#showing-function-output</span>
 <span class="doccomment">/// [nocapture]: https://doc.rust-lang.org/cargo/commands/cargo-test.html</span>
-<span class="doccomment">/// [`io::stdout`]: std::io::stdout</span>
-<span class="doccomment">/// [`io::stderr`]: std::io::stderr</span>
-<span class="doccomment">/// [`print!`]: std::print!</span>
+<span class="doccomment">/// [`io::stdout`]: https://doc.rust-lang.org/std/io/fn.stdout.html</span>
+<span class="doccomment">/// [`io::stderr`]: https://doc.rust-lang.org/std/io/fn.stderr.html</span>
+<span class="doccomment">/// [`print!`]: https://doc.rust-lang.org/std/macro.print.html</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestWriter</span> {
     <span class="ident">_p</span>: (),
@@ -2118,9 +2120,10 @@
 <span class="doccomment">/// requires the `Writer` type to implement [`io::Write`], it&#39;s necessary to add</span>
 <span class="doccomment">/// a newtype that forwards the trait implementation.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`io::Write`]: std::io::Write</span>
-<span class="doccomment">/// [`MutexGuard`]: std::sync::MutexGuard</span>
-<span class="doccomment">/// [`Mutex`]: std::sync::Mutex</span>
+<span class="doccomment">/// [`io::Write`]: https://doc.rust-lang.org/std/io/trait.Write.html</span>
+<span class="doccomment">/// [`MutexGuard`]: https://doc.rust-lang.org/std/sync/struct.MutexGuard.html</span>
+<span class="doccomment">/// [`Mutex`]: https://doc.rust-lang.org/std/sync/struct.Mutex.html</span>
+<span class="doccomment">/// [`MakeWriter`]: trait.MakeWriter.html</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MutexGuardWriter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">W</span><span class="op">&gt;</span>(<span class="ident">MutexGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">W</span><span class="op">&gt;</span>);
 
@@ -2205,6 +2208,7 @@
 <span class="kw">impl</span> <span class="ident">BoxMakeWriter</span> {
     <span class="doccomment">/// Constructs a `BoxMakeWriter` wrapping a type implementing [`MakeWriter`].</span>
     <span class="doccomment">///</span>
+    <span class="doccomment">/// [`MakeWriter`]: trait.MakeWriter.html</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(<span class="ident">make_writer</span>: <span class="ident">M</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">M</span>: <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">MakeWriter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,

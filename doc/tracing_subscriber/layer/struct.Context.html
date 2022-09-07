@@ -7,11 +7,11 @@
                         <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
                                 <a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div>
                         </div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
-    <h1 class="fqn"><span class="in-band">Struct <a href="../index.html">tracing_subscriber</a>::<wbr><a href="index.html">layer</a>::<wbr><a class="struct" href="#">Context</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../../src/tracing_subscriber/layer/context.rs.html#33-47">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><div class="docblock item-decl"><pre class="rust struct"><code>pub struct Context&lt;'a, S&gt; { /* private fields */ }</code></pre></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Represents information about the current context provided to <a href="trait.Layer.html"><code>Layer</code></a>s by the
-wrapped <a href="../../tracing_core/subscriber/trait.Subscriber.html"><code>Subscriber</code></a>.</p>
+    <h1 class="fqn"><span class="in-band">Struct <a href="../index.html">tracing_subscriber</a>::<wbr><a href="index.html">layer</a>::<wbr><a class="struct" href="#">Context</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../../src/tracing_subscriber/layer/context.rs.html#33-47">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><div class="docblock item-decl"><pre class="rust struct"><code>pub struct Context&lt;'a, S&gt; { /* private fields */ }</code></pre></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Represents information about the current context provided to <a href="../layer/trait.Layer.html"><code>Layer</code></a>s by the
+wrapped <a href="https://docs.rs/tracing-core/latest/tracing_core/trait.Subscriber.html"><code>Subscriber</code></a>.</p>
 <p>To access <a href="../registry/struct.SpanRef.html">stored data</a> keyed by a span ID, implementors of the <code>Layer</code>
 trait should ensure that the <code>Subscriber</code> type parameter is <em>also</em> bound by the
-<a href="../registry/trait.LookupSpan.html"><code>LookupSpan</code></a>:</p>
+<a href="%22../registry/trait.LookupSpan.html"><code>LookupSpan</code></a>:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tracing::Subscriber</span>;
 <span class="kw">use</span> <span class="ident">tracing_subscriber</span>::{<span class="ident">Layer</span>, <span class="ident">registry::LookupSpan</span>};
@@ -30,14 +30,14 @@ trait should ensure that the <code>Subscriber</code> type parameter is <em>also<
 <h5 id="notes"><a href="#notes">Notes</a></h5>
 <ul>
 <li>The subscriber is free to expect that the event’s callsite has been
-<a href="../../tracing_core/subscriber/trait.Subscriber.html#method.register_callsite">registered</a>, and may panic or fail to observe the event if this is
+<a href="https://docs.rs/tracing-core/latest/tracing_core/subscriber/trait.Subscriber.html#method.register_callsite">registered</a>, and may panic or fail to observe the event if this is
 not the case. The <code>tracing</code> crate’s macros ensure that all events are
 registered, but if the event is constructed through other means, the
-user is responsible for ensuring that <a href="../../tracing_core/subscriber/trait.Subscriber.html#method.register_callsite"><code>register_callsite</code></a>
+user is responsible for ensuring that <a href="https://docs.rs/tracing-core/latest/tracing_core/subscriber/trait.Subscriber.html#method.register_callsite"><code>register_callsite</code></a>
 has been called prior to calling this method.</li>
-<li>This does <em>not</em> call <a href="../../tracing_core/subscriber/trait.Subscriber.html#tymethod.enabled"><code>enabled</code></a> on the inner subscriber. If the
+<li>This does <em>not</em> call <a href="https://docs.rs/tracing-core/latest/tracing_core/subscriber/trait.Subscriber.html#method.enabled"><code>enabled</code></a> on the inner subscriber. If the
 caller wishes to apply the wrapped subscriber’s filter before choosing
-whether to record the event, it may first call <a href="struct.Context.html#method.enabled"><code>Context::enabled</code></a> to
+whether to record the event, it may first call <a href="#method.enabled"><code>Context::enabled</code></a> to
 check whether the event would be enabled. This allows <code>Layer</code>s to
 elide constructing the event if it would not be recorded.</li>
 </ul>

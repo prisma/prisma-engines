@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.15/src/reload.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>reload.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/reload.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>reload.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../tracing_subscriber/index.html"><div class="logo-container">
@@ -291,89 +291,13 @@
 <span id="283">283</span>
 <span id="284">284</span>
 <span id="285">285</span>
-<span id="286">286</span>
-<span id="287">287</span>
-<span id="288">288</span>
-<span id="289">289</span>
-<span id="290">290</span>
-<span id="291">291</span>
-<span id="292">292</span>
-<span id="293">293</span>
-<span id="294">294</span>
-<span id="295">295</span>
-<span id="296">296</span>
-<span id="297">297</span>
-<span id="298">298</span>
-<span id="299">299</span>
-<span id="300">300</span>
-<span id="301">301</span>
-<span id="302">302</span>
-<span id="303">303</span>
-<span id="304">304</span>
-<span id="305">305</span>
-<span id="306">306</span>
-<span id="307">307</span>
-<span id="308">308</span>
-<span id="309">309</span>
-<span id="310">310</span>
-<span id="311">311</span>
-<span id="312">312</span>
-<span id="313">313</span>
-<span id="314">314</span>
-<span id="315">315</span>
-<span id="316">316</span>
-<span id="317">317</span>
-<span id="318">318</span>
-<span id="319">319</span>
-<span id="320">320</span>
-<span id="321">321</span>
-<span id="322">322</span>
-<span id="323">323</span>
-<span id="324">324</span>
-<span id="325">325</span>
-<span id="326">326</span>
-<span id="327">327</span>
-<span id="328">328</span>
-<span id="329">329</span>
-<span id="330">330</span>
-<span id="331">331</span>
-<span id="332">332</span>
-<span id="333">333</span>
-<span id="334">334</span>
-<span id="335">335</span>
-<span id="336">336</span>
-<span id="337">337</span>
-<span id="338">338</span>
-<span id="339">339</span>
-<span id="340">340</span>
-<span id="341">341</span>
-<span id="342">342</span>
-<span id="343">343</span>
-<span id="344">344</span>
-<span id="345">345</span>
-<span id="346">346</span>
-<span id="347">347</span>
-<span id="348">348</span>
-<span id="349">349</span>
-<span id="350">350</span>
-<span id="351">351</span>
-<span id="352">352</span>
-<span id="353">353</span>
-<span id="354">354</span>
-<span id="355">355</span>
-<span id="356">356</span>
-<span id="357">357</span>
-<span id="358">358</span>
-<span id="359">359</span>
-<span id="360">360</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Wrapper for a `Layer` to allow it to be dynamically reloaded.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! This module provides a [`Layer` type] implementing the [`Layer` trait] or [`Filter` trait]</span>
-<span class="doccomment">//! which wraps another type implementing the corresponding trait. This</span>
-<span class="doccomment">//! allows the wrapped type to be replaced with another</span>
+<span class="doccomment">//! This module provides a [`Layer` type] which wraps another type implementing</span>
+<span class="doccomment">//! the [`Layer` trait], allowing the wrapped type to be replaced with another</span>
 <span class="doccomment">//! instance of that type at runtime.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! This can be used in cases where a subset of `Layer` or `Filter` functionality</span>
+<span class="doccomment">//! This can be used in cases where a subset of `Subscriber` functionality</span>
 <span class="doccomment">//! should be dynamically reconfigured, such as when filtering directives may</span>
 <span class="doccomment">//! change at runtime. Note that this layer introduces a (relatively small)</span>
 <span class="doccomment">//! amount of overhead, and should thus only be used as needed.</span>
@@ -421,17 +345,8 @@
 <span class="doccomment">//! info!(&quot;This will be logged&quot;);</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! ## Note</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The [`Layer`] implementation is unable to implement downcasting functionality,</span>
-<span class="doccomment">//! so certain [`Layer`] will fail to downcast if wrapped in a `reload::Layer`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! If you only want to be able to dynamically change the</span>
-<span class="doccomment">//! `Filter` on a layer, prefer wrapping that `Filter` in the `reload::Layer`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`Filter` trait]: crate::layer::Filter</span>
-<span class="doccomment">//! [`Layer` type]: Layer</span>
-<span class="doccomment">//! [`Layer` trait]: super::layer::Layer</span>
+<span class="doccomment">//! [`Layer` type]: struct.Layer.html</span>
+<span class="doccomment">//! [`Layer` trait]: ../layer/trait.Layer.html</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::layer</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::RwLock</span>;
 
@@ -443,10 +358,10 @@
 <span class="kw">use</span> <span class="ident">tracing_core</span>::{
     <span class="ident">callsite</span>, <span class="ident">span</span>,
     <span class="ident">subscriber</span>::{<span class="ident">Interest</span>, <span class="ident">Subscriber</span>},
-    <span class="ident">Event</span>, <span class="ident">LevelFilter</span>, <span class="ident">Metadata</span>,
+    <span class="ident">Event</span>, <span class="ident">Metadata</span>,
 };
 
-<span class="doccomment">/// Wraps a `Layer` or `Filter`, allowing it to be reloaded dynamically at runtime.</span>
+<span class="doccomment">/// Wraps a `Layer`, allowing it to be reloaded dynamically at runtime.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span> {
     <span class="comment">// TODO(eliza): this once used a `crossbeam_util::ShardedRwLock`. We may</span>
@@ -513,11 +428,6 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">event_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">Event</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="ident">layer::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">try_lock!</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>(), <span class="kw">else</span> <span class="kw">return</span> <span class="bool-val">false</span>).<span class="ident">event_enabled</span>(<span class="ident">event</span>, <span class="ident">ctx</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">on_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">Event</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="ident">layer::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
         <span class="macro">try_lock!</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>()).<span class="ident">on_event</span>(<span class="ident">event</span>, <span class="ident">ctx</span>)
     }
@@ -541,69 +451,15 @@
     <span class="kw">fn</span> <span class="ident">on_id_change</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">old</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">new</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">layer::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
         <span class="macro">try_lock!</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>()).<span class="ident">on_id_change</span>(<span class="ident">old</span>, <span class="ident">new</span>, <span class="ident">ctx</span>)
     }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
-        <span class="macro">try_lock!</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>(), <span class="kw">else</span> <span class="kw">return</span> <span class="prelude-val">None</span>).<span class="ident">max_level_hint</span>()
-    }
 }
 
-<span class="comment">// ===== impl Filter =====</span>
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">L</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::layer::Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">L</span>: <span class="ident"><span class="kw">crate</span>::layer::Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="ident">L</span>: <span class="ident"><span class="kw">crate</span>::Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     <span class="ident">S</span>: <span class="ident">Subscriber</span>,
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">callsite_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="ident">Interest</span> {
-        <span class="macro">try_lock!</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>(), <span class="kw">else</span> <span class="kw">return</span> <span class="ident">Interest::sometimes</span>()).<span class="ident">callsite_enabled</span>(<span class="ident">metadata</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">layer::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">try_lock!</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>(), <span class="kw">else</span> <span class="kw">return</span> <span class="bool-val">false</span>).<span class="ident">enabled</span>(<span class="ident">metadata</span>, <span class="ident">ctx</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_new_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">span::Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">layer::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="macro">try_lock!</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>()).<span class="ident">on_new_span</span>(<span class="ident">attrs</span>, <span class="ident">id</span>, <span class="ident">ctx</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">span</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span><span class="ident">span::Record</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="ident">layer::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="macro">try_lock!</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>()).<span class="ident">on_record</span>(<span class="ident">span</span>, <span class="ident">values</span>, <span class="ident">ctx</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_enter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">layer::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="macro">try_lock!</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>()).<span class="ident">on_enter</span>(<span class="ident">id</span>, <span class="ident">ctx</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_exit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">layer::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="macro">try_lock!</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>()).<span class="ident">on_exit</span>(<span class="ident">id</span>, <span class="ident">ctx</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">layer::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="macro">try_lock!</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>()).<span class="ident">on_close</span>(<span class="ident">id</span>, <span class="ident">ctx</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
-        <span class="macro">try_lock!</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>(), <span class="kw">else</span> <span class="kw">return</span> <span class="prelude-val">None</span>).<span class="ident">max_level_hint</span>()
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Wraps the given [`Layer`] or [`Filter`], returning a `reload::Layer`</span>
-    <span class="doccomment">/// and a `Handle` that allows the inner value to be modified at runtime.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Layer`]: crate::layer::Layer</span>
-    <span class="doccomment">/// [`Filter`]: crate::layer::Filter</span>
+    <span class="doccomment">/// Wraps the given `Layer`, returning a `Layer` and a `Handle` that allows</span>
+    <span class="doccomment">/// the inner type to be modified at runtime.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">L</span>) -&gt; (<span class="self">Self</span>, <span class="ident">Handle</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">Self</span> {
             <span class="ident">inner</span>: <span class="ident">Arc::new</span>(<span class="ident">RwLock::new</span>(<span class="ident">inner</span>)),
@@ -613,10 +469,7 @@
         (<span class="ident">this</span>, <span class="ident">handle</span>)
     }
 
-    <span class="doccomment">/// Returns a `Handle` that can be used to reload the wrapped [`Layer`] or [`Filter`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Layer`]: crate::layer::Layer</span>
-    <span class="doccomment">/// [`Filter`]: crate::filter::Filter</span>
+    <span class="doccomment">/// Returns a `Handle` that can be used to reload the wrapped `Layer`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Handle</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span> {
         <span class="ident">Handle</span> {
             <span class="ident">inner</span>: <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>),
@@ -627,27 +480,24 @@
 
 <span class="comment">// ===== impl Handle =====</span>
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Handle</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Replace the current [`Layer`] or [`Filter`] with the provided `new_value`.</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Handle</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">L</span>: <span class="ident"><span class="kw">crate</span>::Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="ident">S</span>: <span class="ident">Subscriber</span>,
+{
+    <span class="doccomment">/// Replace the current layer with the provided `new_layer`.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Handle::reload`] cannot be used with the [`Filtered`] layer; use</span>
-    <span class="doccomment">/// [`Handle::modify`] instead (see [this issue] for additional details).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// However, if the _only_ the [`Filter`]  needs to be modified, use</span>
-    <span class="doccomment">/// `reload::Layer` to wrap the `Filter` directly.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Layer`]: crate::layer::Layer</span>
-    <span class="doccomment">/// [`Filter`]: crate::layer::Filter</span>
-    <span class="doccomment">/// [`Filtered`]: crate::filter::Filtered</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [this issue]: https://github.com/tokio-rs/tracing/issues/1629</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reload</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">new_value</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// **Warning:** The [`Filtered`](crate::filter::Filtered) type currently can&#39;t be changed</span>
+    <span class="doccomment">/// at runtime via the [`Handle::reload`] method.</span>
+    <span class="doccomment">/// Use the [`Handle::modify`] method to change the filter instead.</span>
+    <span class="doccomment">/// (see &lt;https://github.com/tokio-rs/tracing/issues/1629&gt;)</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reload</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">new_layer</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">modify</span>(<span class="op">|</span><span class="ident">layer</span><span class="op">|</span> {
-            <span class="kw-2">*</span><span class="ident">layer</span> <span class="op">=</span> <span class="ident">new_value</span>.<span class="ident">into</span>();
+            <span class="kw-2">*</span><span class="ident">layer</span> <span class="op">=</span> <span class="ident">new_layer</span>.<span class="ident">into</span>();
         })
     }
 
-    <span class="doccomment">/// Invokes a closure with a mutable reference to the current layer or filter,</span>
+    <span class="doccomment">/// Invokes a closure with a mutable reference to the current layer,</span>
     <span class="doccomment">/// allowing it to be modified in place.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">modify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">L</span>)) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">upgrade</span>().<span class="ident">ok_or</span>(<span class="ident">Error</span> {
@@ -664,7 +514,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Returns a clone of the layer or filter&#39;s current value if it still exists.</span>
+    <span class="doccomment">/// Returns a clone of the layer&#39;s current value if it still exists.</span>
     <span class="doccomment">/// Otherwise, if the subscriber has been dropped, returns `None`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clone_current</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>
     <span class="kw">where</span>
@@ -673,7 +523,7 @@
         <span class="self">self</span>.<span class="ident">with_current</span>(<span class="ident">L::clone</span>).<span class="ident">ok</span>()
     }
 
-    <span class="doccomment">/// Invokes a closure with a borrowed reference to the current layer or filter,</span>
+    <span class="doccomment">/// Invokes a closure with a borrowed reference to the current layer,</span>
     <span class="doccomment">/// returning the result (or an error if the subscriber no longer exists).</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_current</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">L</span>) -&gt; <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">upgrade</span>().<span class="ident">ok_or</span>(<span class="ident">Error</span> {
