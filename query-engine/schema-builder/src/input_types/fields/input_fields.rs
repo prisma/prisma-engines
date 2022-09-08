@@ -2,7 +2,7 @@ use super::objects::*;
 use super::*;
 use crate::mutations::{create_many, create_one};
 use constants::{args, operations};
-use datamodel_connector::ConnectorCapability;
+use psl::datamodel_connector::ConnectorCapability;
 
 pub(crate) fn filter_input_field(ctx: &mut BuilderContext, field: &ModelField, include_aggregates: bool) -> InputField {
     let types = field_filter_types::get_field_filter_types(ctx, field, include_aggregates);
@@ -38,7 +38,7 @@ pub(crate) fn nested_create_many_input_field(
     ctx: &mut BuilderContext,
     parent_field: &RelationFieldRef,
 ) -> Option<InputField> {
-    if ctx.capabilities.contains(ConnectorCapability::CreateMany)
+    if ctx.has_capability(ConnectorCapability::CreateMany)
         && parent_field.is_list()
         && !parent_field.is_inlined_on_enclosing_model()
         && !parent_field.relation().is_many_to_many()
@@ -65,7 +65,7 @@ fn nested_create_many_envelope(ctx: &mut BuilderContext, parent_field: &Relation
     let create_many_type = InputType::object(create_type);
     let data_arg = input_field("data", InputType::list(create_many_type), None);
 
-    let fields = if ctx.capabilities.contains(ConnectorCapability::CreateSkipDuplicates) {
+    let fields = if ctx.has_capability(ConnectorCapability::CreateSkipDuplicates) {
         let skip_arg = input_field(args::SKIP_DUPLICATES, InputType::boolean(), None).optional();
 
         vec![data_arg, skip_arg]

@@ -4,7 +4,6 @@ use crate::{
     PrismaResult,
 };
 use prisma_models::InternalDataModelBuilder;
-use psl::datamodel_connector::ConnectorCapabilities;
 use query_core::{schema::QuerySchema, schema_builder};
 use serial_test::serial;
 use std::sync::Arc;
@@ -14,16 +13,16 @@ pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, psl::dml::Datam
     let dm = psl::parse_datamodel(datamodel_string).unwrap().subject;
     let datasource = config.subject.datasources.first();
 
-    let capabilities = datasource
-        .map(|ds| ds.capabilities())
-        .unwrap_or_else(ConnectorCapabilities::empty);
+    let connector = datasource
+        .map(|ds| ds.active_connector)
+        .unwrap_or(&psl::datamodel_connector::EmptyDatamodelConnector);
     let referential_integrity = datasource.map(|ds| ds.referential_integrity()).unwrap_or_default();
 
     let internal_ref = InternalDataModelBuilder::from(&dm).build("db".to_owned());
     let schema = schema_builder::build(
         internal_ref,
         false,
-        capabilities,
+        connector,
         config.subject.preview_features().iter().collect(),
         referential_integrity,
     );

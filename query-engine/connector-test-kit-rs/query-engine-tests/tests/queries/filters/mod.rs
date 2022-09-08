@@ -21,6 +21,7 @@ pub mod relation_null;
 pub mod search_filter;
 pub mod self_relation;
 pub mod self_relation_regression;
+pub mod uuid_filters;
 pub mod where_unique;
 
 /// Creates test data used by filter tests using the `common_nullable_types` schema.

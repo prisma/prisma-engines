@@ -26,7 +26,7 @@ pub fn dmmf_from_schema(schema: &str) -> DataModelMetaFormat {
     let query_schema = Arc::new(schema_builder::build(
         internal_data_model,
         true, // todo
-        data_source.capabilities(),
+        data_source.active_connector,
         preview_features,
         data_source.referential_integrity(),
     ));

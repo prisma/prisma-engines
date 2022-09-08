@@ -2,13 +2,9 @@ mod validations;
 
 use datamodel_connector::{
     helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
-    parser_database::{
-        ast,
-        walkers::{ModelWalker, ScalarFieldWalker},
-        IndexAlgorithm, OperatorClass, ParserDatabase,
-    },
+    parser_database::{ast, walkers, IndexAlgorithm, OperatorClass, ParserDatabase},
     Connector, ConnectorCapability, ConstraintScope, DatamodelError, Diagnostics, NativeTypeConstructor,
-    NativeTypeInstance, ReferentialAction, ReferentialIntegrity, ScalarType, Span,
+    NativeTypeInstance, ReferentialAction, ReferentialIntegrity, ScalarType, Span, StringFilter,
 };
 use enumflags2::BitFlags;
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList, InsertTextFormat};
@@ -16,6 +12,7 @@ use native_types::{
     NativeType,
     PostgresType::{self, *},
 };
+use std::borrow::Cow;
 
 const SMALL_INT_TYPE_NAME: &str = "SmallInt";
 const INTEGER_TYPE_NAME: &str = "Integer";
@@ -252,7 +249,7 @@ impl Connector for PostgresDatamodelConnector {
         }
     }
 
-    fn validate_model(&self, model: ModelWalker<'_>, errors: &mut Diagnostics) {
+    fn validate_model(&self, model: walkers::ModelWalker<'_>, errors: &mut Diagnostics) {
         for index in model.indexes() {
             validations::compatible_native_types(index, self, errors);
             validations::generalized_index_validations(index, self, errors);
@@ -357,6 +354,20 @@ impl Connector for PostgresDatamodelConnector {
         }
     }
 
+    fn scalar_filter_name(&self, scalar_type_name: String, native_type_name: Option<&str>) -> Cow<'_, str> {
+        match native_type_name {
+            Some(name) if name.eq_ignore_ascii_case("uuid") => "Uuid".into(),
+            _ => scalar_type_name.into(),
+        }
+    }
+
+    fn string_filters(&self, input_object_name: &str) -> BitFlags<StringFilter> {
+        match input_object_name {
+            "Uuid" => StringFilter::Equals.into(),
+            _ => BitFlags::all(),
+        }
+    }
+
     fn validate_url(&self, url: &str) -> Result<(), String> {
         if !url.starts_with("postgres://") && !url.starts_with("postgresql://") {
             return Err("must start with the protocol `postgresql://` or `postgres://`.".to_owned());
@@ -440,7 +451,7 @@ impl Connector for PostgresDatamodelConnector {
     }
 }
 
-fn allowed_index_operator_classes(algo: IndexAlgorithm, field: ScalarFieldWalker<'_>) -> Vec<OperatorClass> {
+fn allowed_index_operator_classes(algo: IndexAlgorithm, field: walkers::ScalarFieldWalker<'_>) -> Vec<OperatorClass> {
     let scalar_type = field.scalar_type();
     let native_type = field.raw_native_type().map(|t| t.1);
 

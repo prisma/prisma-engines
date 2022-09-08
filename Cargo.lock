@@ -3735,11 +3735,11 @@ dependencies = [
 name = "schema-builder"
 version = "0.1.0"
 dependencies = [
- "datamodel-connector",
  "itertools",
  "lazy_static",
  "once_cell",
  "prisma-models",
+ "psl",
  "schema",
 ]
 

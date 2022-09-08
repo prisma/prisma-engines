@@ -8,8 +8,8 @@ use crate::{
     output_types::objects,
     BuilderContext, ModelField,
 };
-use datamodel_connector::ConnectorCapability;
 use prisma_models::{ModelRef, RelationFieldRef};
+use psl::datamodel_connector::ConnectorCapability;
 use schema::{
     Identifier, InputField, InputObjectTypeWeakRef, InputType, OutputField, OutputType, QueryInfo, QueryTag,
     PRISMA_NAMESPACE,
