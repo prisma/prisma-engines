@@ -218,11 +218,9 @@
 <span id="212">212</span>
 <span id="213">213</span>
 <span id="214">214</span>
-<span id="215">215</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::fields::data_input_mapper</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">fields::data_input_mapper</span>::<span class="kw-2">*</span>, <span class="kw-2">*</span>};
 <span class="kw">use</span> <span class="ident">constants::args</span>;
-<span class="kw">use</span> <span class="ident">datamodel_connector::ConnectorCapability</span>;
+<span class="kw">use</span> <span class="ident">psl::datamodel_connector::ConnectorCapability</span>;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">update_one_input_types</span>(
     <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>,
@@ -318,7 +316,7 @@
                     <span class="kw">let</span> <span class="ident">model_id</span> <span class="op">=</span> <span class="ident">sf</span>.<span class="ident">container</span>.<span class="ident">as_model</span>().<span class="ident">unwrap</span>().<span class="ident">primary_identifier</span>();
                     <span class="kw">let</span> <span class="ident">is_not_disallowed_id</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">model_id</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">sf</span>.<span class="ident">name</span>) {
                         <span class="comment">// Is part of the id, connector must allow updating ID fields.</span>
-                        <span class="ident">ctx</span>.<span class="ident">capabilities</span>.<span class="ident">contains</span>(<span class="ident">ConnectorCapability::UpdateableId</span>)
+                        <span class="ident">ctx</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::UpdateableId</span>)
                     } <span class="kw">else</span> {
                         <span class="bool-val">true</span>
                     };
@@ -375,7 +373,7 @@
                     <span class="op">&amp;&amp;</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">id_fields</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">id_fields</span> {
                         <span class="comment">// Exclude @@id or @id fields if not updatable</span>
                         <span class="kw">if</span> <span class="ident">id_fields</span>.<span class="ident">contains</span>(<span class="ident">sf</span>) {
-                            <span class="ident">ctx</span>.<span class="ident">capabilities</span>.<span class="ident">contains</span>(<span class="ident">ConnectorCapability::UpdateableId</span>)
+                            <span class="ident">ctx</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::UpdateableId</span>)
                         } <span class="kw">else</span> {
                             <span class="bool-val">true</span>
                         }

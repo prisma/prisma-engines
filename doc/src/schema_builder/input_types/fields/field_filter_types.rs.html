@@ -634,26 +634,13 @@
 <span id="628">628</span>
 <span id="629">629</span>
 <span id="630">630</span>
-<span id="631">631</span>
-<span id="632">632</span>
-<span id="633">633</span>
-<span id="634">634</span>
-<span id="635">635</span>
-<span id="636">636</span>
-<span id="637">637</span>
-<span id="638">638</span>
-<span id="639">639</span>
-<span id="640">640</span>
-<span id="641">641</span>
-<span id="642">642</span>
-<span id="643">643</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::field_ref_type::WithFieldRefInputExt</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::objects</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">field_ref_type::WithFieldRefInputExt</span>, <span class="ident">objects</span>::<span class="kw-2">*</span>, <span class="kw-2">*</span>};
 <span class="kw">use</span> <span class="ident">constants</span>::{<span class="ident">aggregations</span>, <span class="ident">filters</span>};
-<span class="kw">use</span> <span class="ident">datamodel_connector::ConnectorCapability</span>;
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">dml::DefaultValue</span>, <span class="ident">CompositeFieldRef</span>, <span class="ident">PrismaValue</span>};
+<span class="kw">use</span> <span class="ident">prisma_models</span>::{
+    <span class="ident">dml</span>::{<span class="self">self</span>, <span class="ident">DefaultValue</span>},
+    <span class="ident">CompositeFieldRef</span>, <span class="ident">PrismaValue</span>,
+};
+<span class="kw">use</span> <span class="ident">psl::datamodel_connector::ConnectorCapability</span>;
 
 <span class="doccomment">/// Builds filter types for the given model field.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_field_filter_types</span>(
@@ -689,6 +676,7 @@
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">types</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">InputType::object</span>(<span class="ident">full_scalar_filter_type</span>(
                 <span class="ident">ctx</span>,
                 <span class="kw-2">&amp;</span><span class="ident">sf</span>.<span class="ident">type_identifier</span>,
+                <span class="ident">sf</span>.<span class="ident">native_type</span>.<span class="ident">as_ref</span>(),
                 <span class="ident">sf</span>.<span class="ident">is_list</span>(),
                 <span class="op">!</span><span class="ident">sf</span>.<span class="ident">is_required</span>(),
                 <span class="bool-val">false</span>,
@@ -854,7 +842,7 @@
 
 <span class="kw">fn</span> <span class="ident">scalar_list_filter_type</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">sf</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>) -&gt; <span class="ident">InputObjectTypeWeakRef</span> {
     <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(
-        <span class="ident">scalar_filter_name</span>(<span class="kw-2">&amp;</span><span class="ident">sf</span>.<span class="ident">type_identifier</span>, <span class="bool-val">true</span>, <span class="op">!</span><span class="ident">sf</span>.<span class="ident">is_required</span>(), <span class="bool-val">false</span>, <span class="bool-val">false</span>),
+        <span class="ident">scalar_filter_name</span>(<span class="kw-2">&amp;</span><span class="ident">sf</span>.<span class="ident">type_identifier</span>.<span class="ident">to_string</span>(), <span class="bool-val">true</span>, <span class="op">!</span><span class="ident">sf</span>.<span class="ident">is_required</span>(), <span class="bool-val">false</span>, <span class="bool-val">false</span>),
         <span class="ident">PRISMA_NAMESPACE</span>,
     );
     <span class="macro">return_cached_input!</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">ident</span>);
@@ -893,13 +881,16 @@
 <span class="kw">fn</span> <span class="ident">full_scalar_filter_type</span>(
     <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>,
     <span class="ident">typ</span>: <span class="kw-2">&amp;</span><span class="ident">TypeIdentifier</span>,
+    <span class="ident">native_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">dml::NativeTypeInstance</span><span class="op">&gt;</span>,
     <span class="ident">list</span>: <span class="ident">bool</span>,
     <span class="ident">nullable</span>: <span class="ident">bool</span>,
     <span class="ident">nested</span>: <span class="ident">bool</span>,
     <span class="ident">include_aggregates</span>: <span class="ident">bool</span>,
 ) -&gt; <span class="ident">InputObjectTypeWeakRef</span> {
+    <span class="kw">let</span> <span class="ident">native_type_name</span> <span class="op">=</span> <span class="ident">native_type</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">nt</span><span class="op">|</span> <span class="ident">nt</span>.<span class="ident">name</span>.<span class="ident">as_str</span>());
+    <span class="kw">let</span> <span class="ident">type_name</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">scalar_filter_name</span>(<span class="ident">typ</span>.<span class="ident">to_string</span>(), <span class="ident">native_type_name</span>);
     <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(
-        <span class="ident">scalar_filter_name</span>(<span class="ident">typ</span>, <span class="ident">list</span>, <span class="ident">nullable</span>, <span class="ident">nested</span>, <span class="ident">include_aggregates</span>),
+        <span class="ident">scalar_filter_name</span>(<span class="kw-2">&amp;</span><span class="ident">type_name</span>, <span class="ident">list</span>, <span class="ident">nullable</span>, <span class="ident">nested</span>, <span class="ident">include_aggregates</span>),
         <span class="ident">PRISMA_NAMESPACE</span>,
     );
 
@@ -914,7 +905,7 @@
         <span class="ident">TypeIdentifier::String</span> <span class="op">|</span> <span class="ident">TypeIdentifier::UUID</span> =&gt; <span class="ident">equality_filters</span>(<span class="ident">ctx</span>, <span class="ident">mapped_scalar_type</span>.<span class="ident">clone</span>(), <span class="ident">nullable</span>)
             .<span class="ident">chain</span>(<span class="ident">inclusion_filters</span>(<span class="ident">ctx</span>, <span class="ident">mapped_scalar_type</span>.<span class="ident">clone</span>(), <span class="ident">nullable</span>))
             .<span class="ident">chain</span>(<span class="ident">alphanumeric_filters</span>(<span class="ident">ctx</span>, <span class="ident">mapped_scalar_type</span>.<span class="ident">clone</span>()))
-            .<span class="ident">chain</span>(<span class="ident">string_filters</span>(<span class="ident">ctx</span>, <span class="ident">mapped_scalar_type</span>.<span class="ident">clone</span>()))
+            .<span class="ident">chain</span>(<span class="ident">string_filters</span>(<span class="ident">ctx</span>, <span class="ident">type_name</span>.<span class="ident">as_ref</span>(), <span class="ident">mapped_scalar_type</span>.<span class="ident">clone</span>()))
             .<span class="ident">chain</span>(<span class="ident">query_mode_field</span>(<span class="ident">ctx</span>, <span class="ident">nested</span>))
             .<span class="ident">collect</span>(),
 
@@ -931,16 +922,13 @@
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span> <span class="op">=</span>
                 <span class="ident">json_equality_filters</span>(<span class="ident">ctx</span>, <span class="ident">mapped_scalar_type</span>.<span class="ident">clone</span>(), <span class="ident">nullable</span>).<span class="ident">collect</span>();
 
-            <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">capabilities</span>.<span class="ident">supports_any</span>(<span class="kw-2">&amp;</span>[
+            <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">supports_any</span>(<span class="kw-2">&amp;</span>[
                 <span class="ident">ConnectorCapability::JsonFilteringJsonPath</span>,
                 <span class="ident">ConnectorCapability::JsonFilteringArrayPath</span>,
             ]) {
                 <span class="ident">filters</span>.<span class="ident">extend</span>(<span class="ident">json_filters</span>(<span class="ident">ctx</span>));
 
-                <span class="kw">if</span> <span class="ident">ctx</span>
-                    .<span class="ident">capabilities</span>
-                    .<span class="ident">contains</span>(<span class="ident">ConnectorCapability::JsonFilteringAlphanumeric</span>)
-                {
+                <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::JsonFilteringAlphanumeric</span>) {
                     <span class="ident">filters</span>.<span class="ident">extend</span>(<span class="ident">alphanumeric_filters</span>(<span class="ident">ctx</span>, <span class="ident">mapped_scalar_type</span>.<span class="ident">clone</span>()))
                 }
             }
@@ -962,6 +950,7 @@
     <span class="ident">fields</span>.<span class="ident">push</span>(<span class="ident">not_filter_field</span>(
         <span class="ident">ctx</span>,
         <span class="ident">typ</span>,
+        <span class="ident">native_type</span>,
         <span class="ident">mapped_scalar_type</span>,
         <span class="ident">nullable</span>,
         <span class="ident">include_aggregates</span>,
@@ -1104,14 +1093,18 @@
     .<span class="ident">into_iter</span>()
 }
 
-<span class="kw">fn</span> <span class="ident">string_filters</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">mapped_type</span>: <span class="ident">InputType</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">InputField</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">string_filters</span>(
+    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>,
+    <span class="ident">input_object_type_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+    <span class="ident">mapped_type</span>: <span class="ident">InputType</span>,
+) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">InputField</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">field_types</span> <span class="op">=</span> <span class="ident">mapped_type</span>.<span class="ident">clone</span>().<span class="ident">with_field_ref_input</span>(<span class="ident">ctx</span>);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">string_filters</span> <span class="op">=</span> <span class="macro">vec!</span>[
-        <span class="ident">input_field</span>(<span class="ident">filters::CONTAINS</span>, <span class="ident">field_types</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>(),
-        <span class="ident">input_field</span>(<span class="ident">filters::STARTS_WITH</span>, <span class="ident">field_types</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>(),
-        <span class="ident">input_field</span>(<span class="ident">filters::ENDS_WITH</span>, <span class="ident">field_types</span>, <span class="prelude-val">None</span>).<span class="ident">optional</span>(),
-    ];
+    <span class="kw">let</span> <span class="ident">string_filters</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">string_filters</span>(<span class="ident">input_object_type_name</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">string_filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">string_filters</span>
+        .<span class="ident">iter</span>()
+        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">filter</span><span class="op">|</span> <span class="ident">input_field</span>(<span class="ident">filter</span>.<span class="ident">name</span>(), <span class="ident">field_types</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>())
+        .<span class="ident">collect</span>();
 
     <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">can_full_text_search</span>() {
         <span class="ident">string_filters</span>.<span class="ident">push</span>(<span class="ident">input_field</span>(<span class="ident">filters::SEARCH</span>, <span class="ident">mapped_type</span>, <span class="prelude-val">None</span>).<span class="ident">optional</span>());
@@ -1123,9 +1116,9 @@
 <span class="kw">fn</span> <span class="ident">json_filters</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">InputField</span><span class="op">&gt;</span> {
     <span class="comment">// TODO: also add json-specific &quot;keys&quot; filters</span>
     <span class="comment">// TODO: add json_type filter</span>
-    <span class="kw">let</span> <span class="ident">path_type</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">capabilities</span>.<span class="ident">contains</span>(<span class="ident">ConnectorCapability::JsonFilteringJsonPath</span>) {
+    <span class="kw">let</span> <span class="ident">path_type</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::JsonFilteringJsonPath</span>) {
         <span class="ident">InputType::string</span>()
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">capabilities</span>.<span class="ident">contains</span>(<span class="ident">ConnectorCapability::JsonFilteringArrayPath</span>) {
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::JsonFilteringArrayPath</span>) {
         <span class="ident">InputType::list</span>(<span class="ident">InputType::string</span>())
     } <span class="kw">else</span> {
         <span class="macro">unreachable!</span>()
@@ -1179,7 +1172,7 @@
 <span class="kw">fn</span> <span class="ident">query_mode_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">nested</span>: <span class="ident">bool</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">InputField</span><span class="op">&gt;</span> {
     <span class="comment">// Limit query mode field to the topmost filter level.</span>
     <span class="comment">// Only build mode field for connectors with insensitive filter support.</span>
-    <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">nested</span> <span class="op">&amp;&amp;</span> <span class="ident">ctx</span>.<span class="ident">capabilities</span>.<span class="ident">contains</span>(<span class="ident">ConnectorCapability::InsensitiveFilters</span>) {
+    <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">nested</span> <span class="op">&amp;&amp;</span> <span class="ident">ctx</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::InsensitiveFilters</span>) {
         <span class="kw">let</span> <span class="ident">enum_type</span> <span class="op">=</span> <span class="ident">query_mode_enum</span>(<span class="ident">ctx</span>);
 
         <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">input_field</span>(
@@ -1197,33 +1190,12 @@
     <span class="ident">fields</span>.<span class="ident">into_iter</span>()
 }
 
-<span class="kw">fn</span> <span class="ident">scalar_filter_name</span>(
-    <span class="ident">typ</span>: <span class="kw-2">&amp;</span><span class="ident">TypeIdentifier</span>,
-    <span class="ident">list</span>: <span class="ident">bool</span>,
-    <span class="ident">nullable</span>: <span class="ident">bool</span>,
-    <span class="ident">nested</span>: <span class="ident">bool</span>,
-    <span class="ident">include_aggregates</span>: <span class="ident">bool</span>,
-) -&gt; <span class="ident">String</span> {
+<span class="kw">fn</span> <span class="ident">scalar_filter_name</span>(<span class="ident">typ</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">list</span>: <span class="ident">bool</span>, <span class="ident">nullable</span>: <span class="ident">bool</span>, <span class="ident">nested</span>: <span class="ident">bool</span>, <span class="ident">include_aggregates</span>: <span class="ident">bool</span>) -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">list</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">list</span> { <span class="string">&quot;List&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> };
     <span class="kw">let</span> <span class="ident">nullable</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">nullable</span> { <span class="string">&quot;Nullable&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> };
     <span class="kw">let</span> <span class="ident">nested</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">nested</span> { <span class="string">&quot;Nested&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> };
     <span class="kw">let</span> <span class="ident">aggregates</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">include_aggregates</span> { <span class="string">&quot;WithAggregates&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> };
-
-    <span class="kw">match</span> <span class="ident">typ</span> {
-        <span class="ident">TypeIdentifier::UUID</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}Uuid{}{}{}Filter&quot;</span>, <span class="ident">nested</span>, <span class="ident">nullable</span>, <span class="ident">list</span>, <span class="ident">aggregates</span>),
-        <span class="ident">TypeIdentifier::String</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}String{}{}{}Filter&quot;</span>, <span class="ident">nested</span>, <span class="ident">nullable</span>, <span class="ident">list</span>, <span class="ident">aggregates</span>),
-        <span class="ident">TypeIdentifier::Int</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}Int{}{}{}Filter&quot;</span>, <span class="ident">nested</span>, <span class="ident">nullable</span>, <span class="ident">list</span>, <span class="ident">aggregates</span>),
-        <span class="ident">TypeIdentifier::BigInt</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}BigInt{}{}{}Filter&quot;</span>, <span class="ident">nested</span>, <span class="ident">nullable</span>, <span class="ident">list</span>, <span class="ident">aggregates</span>),
-        <span class="ident">TypeIdentifier::Float</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}Float{}{}{}Filter&quot;</span>, <span class="ident">nested</span>, <span class="ident">nullable</span>, <span class="ident">list</span>, <span class="ident">aggregates</span>),
-        <span class="ident">TypeIdentifier::Decimal</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}Decimal{}{}{}Filter&quot;</span>, <span class="ident">nested</span>, <span class="ident">nullable</span>, <span class="ident">list</span>, <span class="ident">aggregates</span>),
-        <span class="ident">TypeIdentifier::Boolean</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}Bool{}{}{}Filter&quot;</span>, <span class="ident">nested</span>, <span class="ident">nullable</span>, <span class="ident">list</span>, <span class="ident">aggregates</span>),
-        <span class="ident">TypeIdentifier::DateTime</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}DateTime{}{}{}Filter&quot;</span>, <span class="ident">nested</span>, <span class="ident">nullable</span>, <span class="ident">list</span>, <span class="ident">aggregates</span>),
-        <span class="ident">TypeIdentifier::Json</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}Json{}{}{}Filter&quot;</span>, <span class="ident">nested</span>, <span class="ident">nullable</span>, <span class="ident">list</span>, <span class="ident">aggregates</span>),
-        <span class="ident">TypeIdentifier::Enum</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}Enum{}{}{}{}Filter&quot;</span>, <span class="ident">nested</span>, <span class="ident">e</span>, <span class="ident">nullable</span>, <span class="ident">list</span>, <span class="ident">aggregates</span>),
-        <span class="ident">TypeIdentifier::Xml</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}Xml{}{}{}Filter&quot;</span>, <span class="ident">nested</span>, <span class="ident">nullable</span>, <span class="ident">list</span>, <span class="ident">aggregates</span>),
-        <span class="ident">TypeIdentifier::Bytes</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}Bytes{}{}{}Filter&quot;</span>, <span class="ident">nested</span>, <span class="ident">nullable</span>, <span class="ident">list</span>, <span class="ident">aggregates</span>),
-        <span class="ident">TypeIdentifier::Unsupported</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;No unsupported field should reach that path&quot;</span>),
-    }
+    <span class="macro">format!</span>(<span class="string">&quot;{nested}{typ}{nullable}{list}{aggregates}Filter&quot;</span>)
 }
 
 <span class="kw">fn</span> <span class="ident">aggregate_filter_field</span>(
@@ -1233,7 +1205,7 @@
     <span class="ident">nullable</span>: <span class="ident">bool</span>,
     <span class="ident">list</span>: <span class="ident">bool</span>,
 ) -&gt; <span class="ident">InputField</span> {
-    <span class="kw">let</span> <span class="ident">filters</span> <span class="op">=</span> <span class="ident">full_scalar_filter_type</span>(<span class="ident">ctx</span>, <span class="ident">typ</span>, <span class="ident">list</span>, <span class="ident">nullable</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>);
+    <span class="kw">let</span> <span class="ident">filters</span> <span class="op">=</span> <span class="ident">full_scalar_filter_type</span>(<span class="ident">ctx</span>, <span class="ident">typ</span>, <span class="prelude-val">None</span>, <span class="ident">list</span>, <span class="ident">nullable</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>);
     <span class="ident">input_field</span>(<span class="ident">aggregation</span>, <span class="ident">InputType::object</span>(<span class="ident">filters</span>), <span class="prelude-val">None</span>).<span class="ident">optional</span>()
 }
 
@@ -1248,6 +1220,7 @@
 <span class="kw">fn</span> <span class="ident">not_filter_field</span>(
     <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>,
     <span class="ident">typ</span>: <span class="kw-2">&amp;</span><span class="ident">TypeIdentifier</span>,
+    <span class="ident">native_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">dml::NativeTypeInstance</span><span class="op">&gt;</span>,
     <span class="ident">mapped_scalar_type</span>: <span class="ident">InputType</span>,
     <span class="ident">is_nullable</span>: <span class="ident">bool</span>,
     <span class="ident">include_aggregates</span>: <span class="ident">bool</span>,
@@ -1278,6 +1251,7 @@
             <span class="kw">let</span> <span class="ident">shorthand</span> <span class="op">=</span> <span class="ident">InputType::object</span>(<span class="ident">full_scalar_filter_type</span>(
                 <span class="ident">ctx</span>,
                 <span class="ident">typ</span>,
+                <span class="ident">native_type</span>,
                 <span class="ident">is_list</span>,
                 <span class="ident">is_nullable</span>,
                 <span class="bool-val">true</span>,
