@@ -285,12 +285,8 @@ impl TestApi {
         let expected_with_source = self.dm_with_sources(expected_without_header);
         let expected_with_generator = self.dm_with_generator_and_preview_flags(&expected_with_source);
 
-        let parsed_expected = psl::parse_datamodel(&expected_with_generator)
-            .map_err(|err| err.to_pretty_string("schema.prisma", &expected_with_generator))
-            .unwrap()
-            .subject;
-
-        let parsed_result = psl::parse_datamodel(result_with_header).unwrap().subject;
+        let parsed_expected = parse_datamodel(&expected_with_generator);
+        let parsed_result = parse_datamodel(result_with_header);
 
         let reformatted_expected = psl::render_datamodel_and_config_to_string(&parsed_expected, &self.configuration());
         let reformatted_result = psl::render_datamodel_and_config_to_string(&parsed_result, &self.configuration());
@@ -347,8 +343,5 @@ impl TestApi {
 
 #[track_caller]
 fn parse_datamodel(dm: &str) -> Datamodel {
-    psl::parse_datamodel(dm)
-        .map_err(|diagnostics| diagnostics.to_pretty_string("schema.prisma", dm))
-        .unwrap()
-        .subject
+    psl::lift(&psl::parse_schema_parserdb(dm).unwrap())
 }

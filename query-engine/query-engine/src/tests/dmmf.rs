@@ -10,7 +10,7 @@ use std::sync::Arc;
 
 pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, psl::dml::Datamodel) {
     let config = psl::parse_configuration(datamodel_string).unwrap();
-    let dm = psl::parse_datamodel(datamodel_string).unwrap().subject;
+    let dm = psl::parse_schema_parserdb(datamodel_string).unwrap();
     let datasource = config.subject.datasources.first();
 
     let connector = datasource
@@ -18,7 +18,7 @@ pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, psl::dml::Datam
         .unwrap_or(&psl::datamodel_connector::EmptyDatamodelConnector);
     let referential_integrity = datasource.map(|ds| ds.referential_integrity()).unwrap_or_default();
 
-    let internal_ref = InternalDataModelBuilder::from(&dm).build("db".to_owned());
+    let internal_ref = InternalDataModelBuilder::from(&psl::lift(&dm)).build("db".to_owned());
     let schema = schema_builder::build(
         internal_ref,
         false,
@@ -27,7 +27,7 @@ pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, psl::dml::Datam
         referential_integrity,
     );
 
-    (schema, dm)
+    (schema, psl::lift(&dm))
 }
 
 // Tests in this file run serially because the function `get_query_schema` depends on setting an env var.

@@ -26,12 +26,14 @@ pub fn version() -> Version {
 
 #[napi]
 pub fn dmmf(datamodel_string: String) -> napi::Result<String> {
-    let datamodel =
-        psl::parse_datamodel(&datamodel_string).map_err(|errors| ApiError::conversion(errors, &datamodel_string))?;
+    let (mut diagnostics, schema) = psl::validate(datamodel_string.into());
 
-    let config = psl::parse_configuration(&datamodel_string)
-        .map_err(|errors| ApiError::conversion(errors, &datamodel_string))?;
-    let datasource = config.subject.datasources.first();
+    diagnostics
+        .to_result()
+        .map_err(|errors| ApiError::conversion(errors, schema.db.source()))?;
+
+    let datasource = schema.configuration.datasources.first();
+    let datamodel = psl::lift(&schema);
 
     let connector = datasource
         .map(|ds| ds.active_connector)
@@ -39,17 +41,17 @@ pub fn dmmf(datamodel_string: String) -> napi::Result<String> {
 
     let referential_integrity = datasource.map(|ds| ds.referential_integrity()).unwrap_or_default();
 
-    let internal_data_model = InternalDataModelBuilder::from(&datamodel.subject).build("".into());
+    let internal_data_model = InternalDataModelBuilder::from(&datamodel).build("".into());
 
     let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
         internal_data_model,
         true,
         connector,
-        config.subject.preview_features().iter().collect(),
+        schema.configuration.preview_features().iter().collect(),
         referential_integrity,
     ));
 
-    let dmmf = dmmf::render_dmmf(&datamodel.subject, query_schema);
+    let dmmf = dmmf::render_dmmf(&datamodel, query_schema);
 
     Ok(serde_json::to_string(&dmmf)?)
 }

@@ -21,10 +21,8 @@ pub struct InternalDataModelBuilder {
 }
 
 impl InternalDataModelBuilder {
-    pub fn new(datamodel: &str) -> Self {
-        let datamodel = psl::parse_datamodel(datamodel)
-            .expect("Expected valid datamodel.")
-            .subject;
+    pub fn new(datamodel: &psl::ValidatedSchema) -> Self {
+        let datamodel = psl::lift(datamodel);
 
         Self::from(&datamodel)
     }

@@ -103,11 +103,10 @@ where
         features,
     );
 
-    let mut config = psl::parse_configuration(&datamodel_string).unwrap();
-    let datamodel = psl::parse_datamodel(&datamodel_string).unwrap();
+    let validated_schema = psl::parse_schema_parserdb(datamodel_string).unwrap();
 
     let ctx = IntrospectionContext {
-        source: config.subject.datasources.pop().unwrap(),
+        source: validated_schema.configuration.clone().datasources.pop().unwrap(),
         composite_type_depth,
         preview_features,
     };
@@ -121,11 +120,11 @@ where
             database.drop(None).await.unwrap();
         }
 
-        let res = connector.introspect(&datamodel.subject, ctx).await;
+        let res = connector.introspect(&psl::lift(&validated_schema), ctx).await;
         database.drop(None).await.unwrap();
 
         let res = res.unwrap();
-        let config = psl::parse_configuration(&datamodel_string).unwrap().subject;
+        let config = validated_schema.configuration;
 
         TestResult {
             datamodel: psl::render_datamodel_to_string(&res.data_model, Some(&config)),

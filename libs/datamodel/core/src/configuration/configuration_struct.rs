@@ -6,7 +6,7 @@ use crate::{
 use datamodel_connector::ReferentialIntegrity;
 use enumflags2::BitFlags;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Configuration {
     pub generators: Vec<Generator>,
     pub datasources: Vec<Datasource>,

@@ -1,6 +1,6 @@
 pub use ::indoc::{formatdoc, indoc};
 pub use expect_test::expect;
-pub use psl::{dml, dml::*, parse_datamodel};
+pub use psl::{dml, dml::*};
 
 use psl::{diagnostics::*, Configuration, StringFromEnvVar, ValidatedConfiguration};
 
@@ -417,15 +417,8 @@ pub(crate) fn parse_unwrap_err(schema: &str) -> String {
 }
 
 pub(crate) fn parse(datamodel_string: &str) -> Datamodel {
-    match parse_datamodel(datamodel_string) {
-        Ok(s) => s.subject,
-        Err(errs) => {
-            panic!(
-                "Datamodel parsing failed\n\n{}",
-                errs.to_pretty_string("", datamodel_string)
-            )
-        }
-    }
+    let schema = psl::parse_schema_parserdb(datamodel_string).unwrap();
+    psl::lift(&schema)
 }
 
 pub(crate) fn parse_config(schema: &str) -> Result<ValidatedConfiguration, String> {
@@ -453,10 +446,7 @@ pub(crate) fn expect_error(schema: &str, expectation: &expect_test::Expect) {
 }
 
 pub(crate) fn parse_and_render_error(schema: &str) -> String {
-    match psl::parse_datamodel(schema) {
-        Ok(_) => panic!("Expected an error when parsing schema."),
-        Err(errs) => errs.to_pretty_string("schema.prisma", schema),
-    }
+    parse_unwrap_err(schema)
 }
 
 #[track_caller]

@@ -286,14 +286,9 @@ mod tests {
     use std::fs;
 
     pub(crate) fn parse(datamodel_string: &str) -> Datamodel {
-        match psl::parse_datamodel(datamodel_string) {
-            Ok(s) => s.subject,
-            Err(errs) => {
-                panic!(
-                    "Datamodel parsing failed\n\n{}",
-                    errs.to_pretty_string("", datamodel_string)
-                )
-            }
+        match psl::parse_schema_parserdb(datamodel_string) {
+            Ok(s) => psl::lift(&s),
+            Err(err) => panic!("Datamodel parsing failed\n\n{err}",),
         }
     }
 

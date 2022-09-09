@@ -134,13 +134,13 @@ impl PrismaOpt {
 
     pub fn datamodel(&self) -> PrismaResult<Datamodel> {
         let datamodel_str = self.datamodel_str()?;
+        let (mut diagnostics, schema) = psl::validate(datamodel_str.into());
 
-        let datamodel = psl::parse_datamodel(datamodel_str);
+        diagnostics
+            .to_result()
+            .map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))?;
 
-        match datamodel {
-            Err(errors) => Err(PrismaError::ConversionError(errors, datamodel_str.to_string())),
-            _ => Ok(datamodel.unwrap().subject),
-        }
+        Ok(psl::lift(&schema))
     }
 
     pub fn configuration(&self, ignore_env_errors: bool) -> PrismaResult<ValidatedConfiguration> {

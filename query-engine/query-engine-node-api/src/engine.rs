@@ -1,7 +1,7 @@
 use crate::{error::ApiError, log_callback::LogCallback, logger::Logger};
 use futures::FutureExt;
 use prisma_models::InternalDataModelBuilder;
-use psl::{common::preview_features::PreviewFeature, dml::Datamodel, ValidatedConfiguration};
+use psl::{common::preview_features::PreviewFeature, dml::Datamodel};
 use query_core::{
     executor,
     schema::{QuerySchema, QuerySchemaRenderer},
@@ -52,7 +52,7 @@ struct EngineDatamodel {
 /// Everything needed to connect to the database and have the core running.
 struct EngineBuilder {
     datamodel: EngineDatamodel,
-    config: ValidatedConfiguration,
+    config: psl::Configuration,
     config_dir: PathBuf,
     env: HashMap<String, String>,
 }
@@ -157,37 +157,36 @@ impl QueryEngine {
 
         let env = stringify_env_values(env)?; // we cannot trust anything JS sends us from process.env
         let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
+        let (mut diagnostics, mut schema) = psl::validate(datamodel.into());
+        let config = &mut schema.configuration;
 
-        let config = if ignore_env_var_errors {
-            psl::parse_configuration(&datamodel).map_err(|errors| ApiError::conversion(errors, &datamodel))?
-        } else {
-            psl::parse_configuration(&datamodel)
-                .and_then(|mut config| {
-                    config
-                        .subject
-                        .resolve_datasource_urls_from_env(&overrides, |key| env.get(key).map(ToString::to_string))?;
+        diagnostics
+            .to_result()
+            .map_err(|err| ApiError::conversion(err, schema.db.source()))?;
 
-                    Ok(config)
-                })
-                .map_err(|errors| ApiError::conversion(errors, &datamodel))?
-        };
+        if !ignore_env_var_errors {
+            config
+                .resolve_datasource_urls_from_env(&overrides, |key| env.get(key).map(ToString::to_string))
+                .map_err(|err| ApiError::conversion(err, schema.db.source()))?;
+        }
 
         config
-            .subject
             .validate_that_one_datasource_is_provided()
-            .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
+            .map_err(|errors| ApiError::conversion(errors, schema.db.source()))?;
 
-        let ast = psl::parse_datamodel(&datamodel)
-            .map_err(|errors| ApiError::conversion(errors, &datamodel))?
-            .subject;
+        let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics);
+        let enable_tracing = config.preview_features().contains(PreviewFeature::Tracing);
 
-        let datamodel = EngineDatamodel { ast, raw: datamodel };
-        let enable_metrics = config.subject.preview_features().contains(PreviewFeature::Metrics);
-        let enable_tracing = config.subject.preview_features().contains(PreviewFeature::Tracing);
+        let ast = psl::lift(&schema);
+
+        let datamodel = EngineDatamodel {
+            ast,
+            raw: schema.db.source().to_owned(),
+        };
 
         let builder = EngineBuilder {
             datamodel,
-            config,
+            config: schema.configuration,
             config_dir,
             env,
         };
@@ -232,12 +231,11 @@ impl QueryEngine {
                 // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
                 let data_source = builder
                     .config
-                    .subject
                     .datasources
                     .first()
                     .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
 
-                let preview_features: Vec<_> = builder.config.subject.preview_features().iter().collect();
+                let preview_features: Vec<_> = builder.config.preview_features().iter().collect();
                 let url = data_source
                     .load_url_with_config_dir(&builder.config_dir, |key| builder.env.get(key).map(ToString::to_string))
                     .map_err(|err| crate::error::ApiError::Conversion(err, builder.datamodel.raw.clone()))?;
@@ -293,7 +291,8 @@ impl QueryEngine {
                 let engine = inner.as_engine()?;
 
                 let config = psl::parse_configuration(&engine.datamodel.raw)
-                    .map_err(|errors| ApiError::conversion(errors, &engine.datamodel.raw))?;
+                    .map_err(|errors| ApiError::conversion(errors, &engine.datamodel.raw))?
+                    .subject;
 
                 let builder = EngineBuilder {
                     datamodel: engine.datamodel.clone(),

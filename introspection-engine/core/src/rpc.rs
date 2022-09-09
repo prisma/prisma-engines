@@ -142,11 +142,9 @@ impl RpcImpl {
 
     /// This function parses the provided schema and returns the contained Datamodel.
     pub fn parse_datamodel(schema: &str) -> RpcResult<Datamodel> {
-        let final_dm = psl::parse_datamodel(schema)
-            .map(|d| d.subject)
-            .map_err(|err| Error::DatamodelError(err.to_pretty_string("schema.prisma", schema)))?;
+        let final_dm = psl::parse_schema_parserdb(schema).map_err(Error::DatamodelError)?;
 
-        Ok(final_dm)
+        Ok(psl::lift(&final_dm))
     }
 
     pub async fn list_databases_internal(schema: String) -> RpcResult<Vec<String>> {

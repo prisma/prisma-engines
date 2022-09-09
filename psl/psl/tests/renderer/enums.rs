@@ -1,5 +1,4 @@
 use crate::common::*;
-use psl::*;
 
 #[test]
 fn enum_rendering_works() {
@@ -21,7 +20,6 @@ fn enum_rendering_works() {
         }
     "#]];
 
-    let dml = parse(dm);
-    let rendered = render_datamodel_to_string(&dml, None);
+    let rendered = rerender(dm);
     expected.assert_eq(&rendered)
 }

@@ -22,12 +22,13 @@ pub use diagnostics;
 pub use dml;
 pub use parser_database::{self, is_reserved_type_name};
 
-use self::validate::{validate, DatasourceLoader, GeneratorLoader};
-use crate::common::preview_features::PreviewFeature;
+use self::{
+    common::preview_features::PreviewFeature,
+    validate::{DatasourceLoader, GeneratorLoader},
+};
 use diagnostics::Diagnostics;
 use enumflags2::BitFlags;
 use parser_database::{ast, ParserDatabase, SourceFile};
-use std::sync::Arc;
 
 pub mod builtin_connectors {
     pub use mongodb_datamodel_connector::*;
@@ -57,25 +58,50 @@ impl ValidatedSchema {
 }
 
 pub fn parse_schema_parserdb(file: impl Into<SourceFile>) -> Result<ValidatedSchema, String> {
-    let file = file.into();
+    let (mut diagnostics, schema) = validate(file.into());
+    match diagnostics
+        .to_result()
+        .map_err(|err| err.to_pretty_string("schema.prisma", schema.db.source()))
+    {
+        Ok(()) => Ok(schema),
+        Err(e) => Err(e),
+    }
+}
 
+pub struct ValidateResult {
+    pub configuration: Configuration,
+    pub db: parser_database::ParserDatabase,
+    pub connector: &'static dyn datamodel_connector::Connector,
+    pub diagnostics: Diagnostics,
+    referential_integrity: datamodel_connector::ReferentialIntegrity,
+}
+
+impl ValidateResult {
+    pub fn split(self) -> (Diagnostics, ValidatedSchema) {
+        (
+            self.diagnostics,
+            ValidatedSchema {
+                configuration: self.configuration,
+                db: self.db,
+                connector: self.connector,
+                referential_integrity: self.referential_integrity,
+            },
+        )
+    }
+}
+
+/// The most general API for dealing with Prisma schemas. It accumulates what analysis and
+/// validation information it can, and returns it along with any error and warning diagnostics.
+pub fn validate(file: SourceFile) -> (Diagnostics, ValidatedSchema) {
     let mut diagnostics = Diagnostics::new();
     let db = ParserDatabase::new(file.clone(), &mut diagnostics);
-
-    diagnostics
-        .to_result()
-        .map_err(|err| err.to_pretty_string("schema.prisma", file.as_str()))?;
 
     let generators = GeneratorLoader::load_generators_from_ast(db.ast(), &mut diagnostics);
     let preview_features = preview_features(&generators);
     let datasources = load_sources(db.ast(), preview_features, &mut diagnostics);
 
-    let mut out = validate(db, &datasources, preview_features, diagnostics);
-    out.diagnostics
-        .to_result()
-        .map_err(|err| err.to_pretty_string("schema.prisma", file.as_str()))?;
-
-    Ok(ValidatedSchema {
+    let out = validate::validate(db, &datasources, preview_features, diagnostics);
+    let schema = ValidatedSchema {
         configuration: Configuration {
             generators,
             datasources,
@@ -83,51 +109,8 @@ pub fn parse_schema_parserdb(file: impl Into<SourceFile>) -> Result<ValidatedSch
         connector: out.connector,
         db: out.db,
         referential_integrity: out.referential_integrity,
-    })
-}
-
-/// Parses and validates a datamodel string, using core attributes only.
-pub fn parse_datamodel(datamodel_string: &str) -> Result<ValidatedDatamodel, diagnostics::Diagnostics> {
-    parse_datamodel_internal(datamodel_string).map(|validated| Validated {
-        subject: validated.subject.1,
-        warnings: validated.warnings,
-    })
-}
-
-fn parse_datamodel_internal(
-    datamodel_string: &str,
-) -> Result<Validated<(Configuration, dml::Datamodel)>, diagnostics::Diagnostics> {
-    let file = SourceFile::new_allocated(Arc::from(datamodel_string.to_owned().into_boxed_str()));
-
-    let mut diagnostics = diagnostics::Diagnostics::new();
-    let db = ParserDatabase::new(file, &mut diagnostics);
-
-    diagnostics.to_result()?;
-
-    let generators = GeneratorLoader::load_generators_from_ast(db.ast(), &mut diagnostics);
-    let preview_features = preview_features(&generators);
-    let datasources = load_sources(db.ast(), preview_features, &mut diagnostics);
-
-    diagnostics.to_result()?;
-
-    let out = validate(db, &datasources, preview_features, diagnostics);
-
-    if !out.diagnostics.errors().is_empty() {
-        return Err(out.diagnostics);
-    }
-
-    let datamodel = lift::LiftAstToDml::new(&out.db, out.connector, out.referential_integrity).lift();
-
-    Ok(Validated {
-        subject: (
-            Configuration {
-                generators,
-                datasources,
-            },
-            datamodel,
-        ),
-        warnings: out.diagnostics.into_warnings(),
-    })
+    };
+    (out.diagnostics, schema)
 }
 
 /// Loads all configuration blocks from a datamodel using the built-in source definitions.
