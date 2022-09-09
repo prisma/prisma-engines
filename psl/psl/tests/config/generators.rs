@@ -399,9 +399,8 @@ fn empty_preview_features_array_should_work() {
         }
     "#;
 
-    let (config, _) = psl::parse_schema(schema).unwrap();
-
-    assert!(config.preview_features().is_empty());
+    let schema = psl::parse_schema_parserdb(schema).unwrap();
+    assert!(schema.configuration.preview_features().is_empty());
 }
 
 #[test]
@@ -418,9 +417,8 @@ fn empty_preview_features_array_with_empty_space_should_work() {
         }
     "#;
 
-    let (config, _) = psl::parse_schema(schema).unwrap();
-
-    assert!(config.preview_features().is_empty());
+    let schema = psl::parse_schema_parserdb(schema).unwrap();
+    assert!(schema.configuration.preview_features().is_empty());
 }
 
 #[test]
@@ -474,7 +472,7 @@ fn engine_type_must_be_a_string() {
         }
     "#};
 
-    assert!(psl::parse_schema(with_string).is_ok());
+    assert_valid(with_string);
 
     let with_array = indoc! {r#"
         generator client {

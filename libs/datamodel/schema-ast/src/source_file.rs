@@ -27,9 +27,9 @@ impl SourceFile {
     }
 }
 
-impl From<&'static str> for SourceFile {
-    fn from(s: &'static str) -> Self {
-        Self::new_static(s)
+impl From<&str> for SourceFile {
+    fn from(s: &str) -> Self {
+        Self::new_allocated(Arc::from(s.to_owned().into_boxed_str()))
     }
 }
 

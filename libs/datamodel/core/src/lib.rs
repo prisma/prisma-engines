@@ -43,13 +43,6 @@ pub struct Validated<T> {
 pub type ValidatedDatamodel = Validated<dml::Datamodel>;
 pub type ValidatedConfiguration = Validated<Configuration>;
 
-/// Parse and validate the whole schema
-pub fn parse_schema(schema_str: &str) -> Result<(Configuration, dml::Datamodel), String> {
-    parse_datamodel_internal(schema_str)
-        .map_err(|err| err.to_pretty_string("schema.prisma", schema_str))
-        .map(|v| v.subject)
-}
-
 pub struct ValidatedSchema {
     pub configuration: Configuration,
     pub db: parser_database::ParserDatabase,

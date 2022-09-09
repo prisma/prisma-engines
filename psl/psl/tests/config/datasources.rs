@@ -169,7 +169,7 @@ fn escaped_windows_paths_should_work() {
         }
     "#};
 
-    assert!(parse_schema(schema).is_ok());
+    assert_valid(schema)
 }
 
 fn render_schema_json(schema: &str) -> String {

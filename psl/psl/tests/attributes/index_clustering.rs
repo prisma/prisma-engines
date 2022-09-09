@@ -157,8 +157,7 @@ fn render_id_non_default_clustering() {
     "#]];
 
     let schema = with_header(input, Provider::SqlServer, &[]);
-    let (config, dml) = parse_schema(&schema).unwrap();
-    let rendered = psl::render_datamodel_to_string(&dml, Some(&config));
+    let rendered = rerender(&schema);
 
     expected.assert_eq(&rendered);
 }
@@ -184,8 +183,7 @@ fn do_not_render_compound_id_default_clustering() {
     "#]];
 
     let schema = with_header(input, Provider::SqlServer, &[]);
-    let (config, dml) = parse_schema(&schema).unwrap();
-    let rendered = psl::render_datamodel_to_string(&dml, Some(&config));
+    let rendered = rerender(&schema);
 
     expected.assert_eq(&rendered);
 }
@@ -211,8 +209,7 @@ fn render_compound_id_default_clustering() {
     "#]];
 
     let schema = with_header(input, Provider::SqlServer, &[]);
-    let (config, dml) = parse_schema(&schema).unwrap();
-    let rendered = psl::render_datamodel_to_string(&dml, Some(&config));
+    let rendered = rerender(&schema);
 
     expected.assert_eq(&rendered);
 }
@@ -238,8 +235,7 @@ fn do_not_render_index_default_clustering() {
     "#]];
 
     let schema = with_header(input, Provider::SqlServer, &[]);
-    let (config, dml) = parse_schema(&schema).unwrap();
-    let rendered = psl::render_datamodel_to_string(&dml, Some(&config));
+    let rendered = rerender(&schema);
 
     expected.assert_eq(&rendered);
 }
@@ -265,8 +261,7 @@ fn render_index_non_default_clustering() {
     "#]];
 
     let schema = with_header(input, Provider::SqlServer, &[]);
-    let (config, dml) = parse_schema(&schema).unwrap();
-    let rendered = psl::render_datamodel_to_string(&dml, Some(&config));
+    let rendered = rerender(&schema);
 
     expected.assert_eq(&rendered);
 }
@@ -288,8 +283,7 @@ fn do_not_render_unique_default_clustering() {
     "#]];
 
     let schema = with_header(input, Provider::SqlServer, &[]);
-    let (config, dml) = parse_schema(&schema).unwrap();
-    let rendered = psl::render_datamodel_to_string(&dml, Some(&config));
+    let rendered = rerender(&schema);
 
     expected.assert_eq(&rendered);
 }
@@ -311,8 +305,7 @@ fn render_unique_non_default_clustering() {
     "#]];
 
     let schema = with_header(input, Provider::SqlServer, &[]);
-    let (config, dml) = parse_schema(&schema).unwrap();
-    let rendered = psl::render_datamodel_to_string(&dml, Some(&config));
+    let rendered = rerender(&schema);
 
     expected.assert_eq(&rendered);
 }
@@ -340,8 +333,7 @@ fn do_not_render_compound_unique_default_clustering() {
     "#]];
 
     let schema = with_header(input, Provider::SqlServer, &[]);
-    let (config, dml) = parse_schema(&schema).unwrap();
-    let rendered = psl::render_datamodel_to_string(&dml, Some(&config));
+    let rendered = rerender(&schema);
 
     expected.assert_eq(&rendered);
 }
@@ -369,8 +361,7 @@ fn render_compound_unique_non_default_clustering() {
     "#]];
 
     let schema = with_header(input, Provider::SqlServer, &[]);
-    let (config, dml) = parse_schema(&schema).unwrap();
-    let rendered = psl::render_datamodel_to_string(&dml, Some(&config));
+    let rendered = rerender(&schema);
 
     expected.assert_eq(&rendered);
 }
