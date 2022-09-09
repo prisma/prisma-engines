@@ -130,15 +130,6 @@ fn parse_datamodel_internal(
     })
 }
 
-pub fn parse_schema_ast(datamodel_string: &str) -> Result<ast::SchemaAst, diagnostics::Diagnostics> {
-    let mut diagnostics = Diagnostics::default();
-    let schema = schema_ast::parse_schema(datamodel_string, &mut diagnostics);
-
-    diagnostics.to_result()?;
-
-    Ok(schema)
-}
-
 /// Loads all configuration blocks from a datamodel using the built-in source definitions.
 pub fn parse_configuration(schema: &str) -> Result<ValidatedConfiguration, diagnostics::Diagnostics> {
     let mut diagnostics = Diagnostics::default();

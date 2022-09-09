@@ -2,10 +2,8 @@ mod relations;
 
 use datamodel::{
     datamodel_connector::Diagnostics,
-    parse_schema_ast,
     parser_database::{ast, walkers::RefinedRelationWalker, ParserDatabase, SourceFile},
 };
-use log::warn;
 use lsp_types::{CodeActionOrCommand, CodeActionParams, Diagnostic};
 use std::sync::Arc;
 
@@ -14,11 +12,6 @@ pub(crate) fn empty_code_actions() -> Vec<CodeActionOrCommand> {
 }
 
 pub(crate) fn available_actions(schema: String, params: CodeActionParams) -> Vec<CodeActionOrCommand> {
-    if parse_schema_ast(&schema).is_err() {
-        warn!("Failed to parse schema AST in code action request.");
-        return empty_code_actions();
-    };
-
     let mut actions = Vec::new();
 
     let file = SourceFile::new_allocated(Arc::from(schema.into_boxed_str()));
