@@ -9,7 +9,8 @@ pub struct MiniError {
 }
 
 pub(crate) fn run(schema: &str) -> String {
-    let (diagnostics, _) = datamodel::validate(schema.into());
+    let schema = datamodel::validate(schema.into());
+    let diagnostics = &schema.diagnostics;
 
     let mut mini_errors: Vec<MiniError> = diagnostics
         .errors()

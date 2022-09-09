@@ -157,10 +157,11 @@ impl QueryEngine {
 
         let env = stringify_env_values(env)?; // we cannot trust anything JS sends us from process.env
         let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
-        let (mut diagnostics, mut schema) = psl::validate(datamodel.into());
+        let mut schema = psl::validate(datamodel.into());
         let config = &mut schema.configuration;
 
-        diagnostics
+        schema
+            .diagnostics
             .to_result()
             .map_err(|err| ApiError::conversion(err, schema.db.source()))?;
 
@@ -291,8 +292,7 @@ impl QueryEngine {
                 let engine = inner.as_engine()?;
 
                 let config = psl::parse_configuration(&engine.datamodel.raw)
-                    .map_err(|errors| ApiError::conversion(errors, &engine.datamodel.raw))?
-                    .subject;
+                    .map_err(|errors| ApiError::conversion(errors, &engine.datamodel.raw))?;
 
                 let builder = EngineBuilder {
                     datamodel: engine.datamodel.clone(),

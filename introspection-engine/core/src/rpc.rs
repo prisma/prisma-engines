@@ -72,10 +72,9 @@ impl RpcImpl {
         let config = psl::parse_configuration(schema)
             .map_err(|diagnostics| Error::DatamodelError(diagnostics.to_pretty_string("schema.prisma", schema)))?;
 
-        let preview_features = config.subject.preview_features();
+        let preview_features = config.preview_features();
 
         let connection_string = config
-            .subject
             .datasources
             .first()
             .ok_or_else(|| Error::Generic("There is no datasource in the schema.".into()))?
@@ -88,7 +87,7 @@ impl RpcImpl {
             Box::new(SqlIntrospectionConnector::new(&connection_string, preview_features).await?)
         };
 
-        Ok((config.subject, connection_string.clone(), connector))
+        Ok((config, connection_string.clone(), connector))
     }
 
     pub async fn catch<O>(fut: impl std::future::Future<Output = ConnectorResult<O>>) -> RpcResult<O> {

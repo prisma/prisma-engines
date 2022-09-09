@@ -31,7 +31,6 @@ async fn introspecting_cockroach_db_with_postgres_provider(api: TestApi) {
         preview_features: Default::default(),
         source: parse_configuration(&schema)
             .unwrap()
-            .subject
             .datasources
             .into_iter()
             .next()

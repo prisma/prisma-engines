@@ -6,10 +6,11 @@ use crate::{
 use datamodel_connector::ReferentialIntegrity;
 use enumflags2::BitFlags;
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Configuration {
     pub generators: Vec<Generator>,
     pub datasources: Vec<Datasource>,
+    pub warnings: Vec<diagnostics::DatamodelWarning>,
 }
 
 impl Configuration {

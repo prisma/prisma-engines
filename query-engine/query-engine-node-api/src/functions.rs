@@ -26,9 +26,10 @@ pub fn version() -> Version {
 
 #[napi]
 pub fn dmmf(datamodel_string: String) -> napi::Result<String> {
-    let (mut diagnostics, schema) = psl::validate(datamodel_string.into());
+    let mut schema = psl::validate(datamodel_string.into());
 
-    diagnostics
+    schema
+        .diagnostics
         .to_result()
         .map_err(|errors| ApiError::conversion(errors, schema.db.source()))?;
 
@@ -84,7 +85,6 @@ pub fn get_config(js_env: Env, options: JsUnknown) -> napi::Result<JsUnknown> {
 
     if !ignore_env_var_errors {
         config
-            .subject
             .resolve_datasource_urls_from_env(&overrides, |key| env.get(key).map(ToString::to_string))
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
     }

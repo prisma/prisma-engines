@@ -11,7 +11,7 @@ use std::sync::Arc;
 pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, psl::dml::Datamodel) {
     let config = psl::parse_configuration(datamodel_string).unwrap();
     let dm = psl::parse_schema_parserdb(datamodel_string).unwrap();
-    let datasource = config.subject.datasources.first();
+    let datasource = config.datasources.first();
 
     let connector = datasource
         .map(|ds| ds.active_connector)
@@ -23,7 +23,7 @@ pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, psl::dml::Datam
         internal_ref,
         false,
         connector,
-        config.subject.preview_features().iter().collect(),
+        config.preview_features().iter().collect(),
         referential_integrity,
     );
 

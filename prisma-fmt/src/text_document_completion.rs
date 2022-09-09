@@ -27,7 +27,7 @@ pub(crate) fn completion(schema: String, params: CompletionParams) -> Completion
 
     let (connector, referential_integrity) = parse_configuration(source_file.as_str())
         .ok()
-        .and_then(|conf| conf.subject.datasources.into_iter().next())
+        .and_then(|conf| conf.datasources.into_iter().next())
         .map(|datasource| (datasource.active_connector, datasource.referential_integrity()))
         .unwrap_or_else(|| {
             (

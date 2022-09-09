@@ -6,11 +6,11 @@ pub(crate) fn run(schema: &str) -> String {
         Err(_) => return "[]".to_owned(),
     };
 
-    if validated_configuration.subject.datasources.len() != 1 {
+    if validated_configuration.datasources.len() != 1 {
         return "[]".to_owned();
     }
 
-    let datasource = &validated_configuration.subject.datasources[0];
+    let datasource = &validated_configuration.datasources[0];
     let available_native_type_constructors = datasource.active_connector.available_native_type_constructors();
     let available_native_type_constructors: Vec<SerializableNativeTypeConstructor> =
         available_native_type_constructors.iter().map(From::from).collect();

@@ -2,7 +2,7 @@ pub use ::indoc::{formatdoc, indoc};
 pub use expect_test::expect;
 pub use psl::{dml, dml::*};
 
-use psl::{diagnostics::*, Configuration, StringFromEnvVar, ValidatedConfiguration};
+use psl::{diagnostics::*, Configuration, StringFromEnvVar};
 
 pub(crate) fn reformat(input: &str) -> String {
     psl::reformat(input, 2).unwrap_or_else(|| input.to_owned())
@@ -421,13 +421,13 @@ pub(crate) fn parse(datamodel_string: &str) -> Datamodel {
     psl::lift(&schema)
 }
 
-pub(crate) fn parse_config(schema: &str) -> Result<ValidatedConfiguration, String> {
+pub(crate) fn parse_config(schema: &str) -> Result<Configuration, String> {
     psl::parse_configuration(schema).map_err(|err| err.to_pretty_string("schema.prisma", schema))
 }
 
 pub(crate) fn parse_configuration(datamodel_string: &str) -> Configuration {
     match psl::parse_configuration(datamodel_string) {
-        Ok(c) => c.subject,
+        Ok(c) => c,
         Err(errs) => {
             panic!(
                 "Configuration parsing failed\n\n{}",

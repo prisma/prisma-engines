@@ -260,9 +260,7 @@ impl TestApi {
     }
 
     pub fn configuration(&self) -> Configuration {
-        psl::parse_configuration(&format!("{}\n{}", &self.datasource_block(), &self.generator_block()))
-            .unwrap()
-            .subject
+        psl::parse_configuration(&format!("{}\n{}", &self.datasource_block(), &self.generator_block())).unwrap()
     }
 
     #[track_caller]

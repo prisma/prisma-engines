@@ -4,7 +4,7 @@ use crate::{
     PrismaResult,
 };
 use prisma_models::InternalDataModelBuilder;
-use psl::{dml::Datamodel, Configuration, ValidatedConfiguration};
+use psl::{dml::Datamodel, Configuration};
 use query_core::{schema::QuerySchemaRef, schema_builder};
 use request_handlers::{dmmf, GraphQlHandler};
 use std::{env, sync::Arc};
@@ -23,7 +23,7 @@ pub struct DmmfRequest {
 }
 
 pub struct GetConfigRequest {
-    config: ValidatedConfiguration,
+    config: Configuration,
     ignore_env_var_errors: bool,
 }
 
@@ -52,7 +52,7 @@ impl CliCommand {
                 CliOpt::Dmmf => Ok(Some(CliCommand::Dmmf(DmmfRequest {
                     datamodel: opts.datamodel()?,
                     enable_raw_queries: opts.enable_raw_queries,
-                    config: opts.configuration(true)?.subject,
+                    config: opts.configuration(true)?,
                 }))),
                 CliOpt::GetConfig(input) => Ok(Some(CliCommand::GetConfig(GetConfigRequest {
                     config: opts.configuration(input.ignore_env_var_errors)?,
@@ -62,7 +62,7 @@ impl CliCommand {
                     query: input.query.clone(),
                     enable_raw_queries: opts.enable_raw_queries,
                     datamodel: opts.datamodel()?,
-                    config: opts.configuration(false)?.subject,
+                    config: opts.configuration(false)?,
                 }))),
                 CliOpt::DebugPanic(input) => Ok(Some(CliCommand::DebugPanic(DebugPanicRequest {
                     message: input.message.clone(),
@@ -115,9 +115,7 @@ impl CliCommand {
         let config = &mut req.config;
 
         if !req.ignore_env_var_errors {
-            config
-                .subject
-                .resolve_datasource_urls_from_env(&[], |key| env::var(key).ok())?;
+            config.resolve_datasource_urls_from_env(&[], |key| env::var(key).ok())?;
         }
 
         let json = psl::mcf::config_to_mcf_json_value(config);

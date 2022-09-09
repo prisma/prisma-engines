@@ -106,7 +106,7 @@ where
     let validated_schema = psl::parse_schema_parserdb(datamodel_string).unwrap();
 
     let ctx = IntrospectionContext {
-        source: validated_schema.configuration.clone().datasources.pop().unwrap(),
+        source: validated_schema.configuration.datasources.clone().pop().unwrap(),
         composite_type_depth,
         preview_features,
     };
