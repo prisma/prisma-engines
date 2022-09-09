@@ -29,8 +29,6 @@ macro_rules! filters {
 }
 
 filters! {
-    /// String equality.
-    Equals,
     /// String contains another string.
     Contains,
     /// String starts with another string.

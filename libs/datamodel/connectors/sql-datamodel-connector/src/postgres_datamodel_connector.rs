@@ -363,7 +363,7 @@ impl Connector for PostgresDatamodelConnector {
 
     fn string_filters(&self, input_object_name: &str) -> BitFlags<StringFilter> {
         match input_object_name {
-            "Uuid" => StringFilter::Equals.into(),
+            "Uuid" => BitFlags::empty(),
             _ => BitFlags::all(),
         }
     }
