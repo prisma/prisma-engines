@@ -13,12 +13,14 @@ pub mod helper;
 pub mod walker_ext_traits;
 
 mod empty_connector;
+mod filters;
 mod native_type_constructor;
 mod native_type_instance;
 mod referential_integrity;
 
 pub use self::{
     capabilities::{ConnectorCapabilities, ConnectorCapability},
+    filters::*,
     native_type_instance::NativeTypeInstance,
 };
 pub use diagnostics::{DatamodelError, Diagnostics, NativeTypeErrorFactory, Span};
@@ -29,7 +31,7 @@ pub use referential_integrity::ReferentialIntegrity;
 
 use enumflags2::BitFlags;
 use lsp_types::CompletionList;
-use parser_database::{ast::SchemaPosition, IndexAlgorithm, ParserDatabase};
+use parser_database::{ast::SchemaPosition, walkers, IndexAlgorithm, ParserDatabase};
 use std::{borrow::Cow, collections::BTreeMap};
 
 /// The datamodel connector API.
@@ -95,6 +97,32 @@ pub trait Connector: Send + Sync {
         self.referential_actions(integrity).contains(action)
     }
 
+    /// This is used by the query engine schema builder.
+    ///
+    /// For a given scalar type + native type combination, this method should return the name to be
+    /// given to the filter input objects for the type. The significance of that name is that the
+    /// resulting input objects will be cached by name, so for a given filter input object name,
+    /// the filters should always be identical.
+    fn scalar_filter_name(&self, scalar_type_name: String, _native_type_name: Option<&str>) -> Cow<'_, str> {
+        Cow::Owned(scalar_type_name)
+    }
+
+    /// This is used by the query engine schema builder. It is only called for filters of String
+    /// fields and aggregates.
+    ///
+    /// For a given filter input object type name returned by `scalar_filter_name`, it should
+    /// return the string operations to be made available in the Client API.
+    ///
+    /// Implementations of this method _must_ always associate the same filters to the same input
+    /// object type name. This is because the filter types are cached by name, so if different
+    /// calls to the method return different filters, only the first return value will be used.
+    fn string_filters(&self, input_object_name: &str) -> BitFlags<StringFilter> {
+        match input_object_name {
+            "String" => BitFlags::all(), // all the filters are available by default
+            _ => panic!("Unexpected scalar input object name for string filters: `{input_object_name}`"),
+        }
+    }
+
     /// Validate that the arguments passed to a native type attribute are valid.
     fn validate_native_type_arguments(
         &self,
@@ -105,8 +133,8 @@ pub trait Connector: Send + Sync {
     ) {
     }
 
-    fn validate_enum(&self, _enum: parser_database::walkers::EnumWalker<'_>, _: &mut Diagnostics) {}
-    fn validate_model(&self, _model: parser_database::walkers::ModelWalker<'_>, _: &mut Diagnostics) {}
+    fn validate_enum(&self, _enum: walkers::EnumWalker<'_>, _: &mut Diagnostics) {}
+    fn validate_model(&self, _model: walkers::ModelWalker<'_>, _: &mut Diagnostics) {}
 
     fn validate_scalar_field_unknown_default_functions(
         &self,

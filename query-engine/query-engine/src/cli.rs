@@ -4,7 +4,6 @@ use crate::{
     PrismaResult,
 };
 use prisma_models::InternalDataModelBuilder;
-use psl::datamodel_connector::ConnectorCapabilities;
 use psl::{dml::Datamodel, Configuration, ValidatedConfiguration};
 use query_core::{schema::QuerySchemaRef, schema_builder};
 use request_handlers::{dmmf, GraphQlHandler};
@@ -89,9 +88,9 @@ impl CliCommand {
 
     async fn dmmf(request: DmmfRequest) -> PrismaResult<()> {
         let datasource = request.config.datasources.first();
-        let capabilities = datasource
-            .map(|ds| ds.capabilities())
-            .unwrap_or_else(ConnectorCapabilities::empty);
+        let connector = datasource
+            .map(|ds| ds.active_connector)
+            .unwrap_or(&psl::datamodel_connector::EmptyDatamodelConnector);
         let referential_integrity = datasource.map(|ds| ds.referential_integrity()).unwrap_or_default();
 
         // temporary code duplication
@@ -99,7 +98,7 @@ impl CliCommand {
         let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
             internal_data_model,
             request.enable_raw_queries,
-            capabilities,
+            connector,
             request.config.preview_features().iter().collect(),
             referential_integrity,
         ));

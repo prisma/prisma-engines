@@ -29,7 +29,7 @@ impl RunnerInterface for DirectRunner {
         let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
             internal_data_model,
             true,
-            data_source.capabilities(),
+            data_source.active_connector,
             preview_features,
             data_source.referential_integrity(),
         ));

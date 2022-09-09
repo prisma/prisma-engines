@@ -252,7 +252,7 @@ impl QueryEngine {
                 let query_schema = schema_builder::build(
                     internal_data_model,
                     true, // enable raw queries
-                    data_source.capabilities(),
+                    data_source.active_connector,
                     preview_features,
                     data_source.referential_integrity(),
                 );

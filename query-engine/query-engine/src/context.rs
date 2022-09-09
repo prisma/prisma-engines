@@ -79,7 +79,7 @@ impl PrismaContext {
         let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
             internal_data_model,
             enable_raw_queries,
-            data_source.capabilities(),
+            data_source.active_connector,
             preview_features,
             data_source.referential_integrity(),
         ));

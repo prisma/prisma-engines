@@ -2,7 +2,6 @@ use crate::error::ApiError;
 use napi::{bindgen_prelude::*, JsUnknown};
 use napi_derive::napi;
 use prisma_models::InternalDataModelBuilder;
-use psl::datamodel_connector::ConnectorCapabilities;
 use query_core::{schema::QuerySchemaRef, schema_builder};
 use request_handlers::dmmf;
 use std::{
@@ -34,9 +33,9 @@ pub fn dmmf(datamodel_string: String) -> napi::Result<String> {
         .map_err(|errors| ApiError::conversion(errors, &datamodel_string))?;
     let datasource = config.subject.datasources.first();
 
-    let capabilities = datasource
-        .map(|ds| ds.capabilities())
-        .unwrap_or_else(ConnectorCapabilities::empty);
+    let connector = datasource
+        .map(|ds| ds.active_connector)
+        .unwrap_or(&psl::datamodel_connector::EmptyDatamodelConnector);
 
     let referential_integrity = datasource.map(|ds| ds.referential_integrity()).unwrap_or_default();
 
@@ -45,7 +44,7 @@ pub fn dmmf(datamodel_string: String) -> napi::Result<String> {
     let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
         internal_data_model,
         true,
-        capabilities,
+        connector,
         config.subject.preview_features().iter().collect(),
         referential_integrity,
     ));

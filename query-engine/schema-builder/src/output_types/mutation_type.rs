@@ -1,9 +1,8 @@
-use crate::mutations::{create_many, create_one};
-
 use super::*;
-use datamodel_connector::ConnectorCapability;
+use crate::mutations::{create_many, create_one};
 use input_types::fields::{arguments, input_fields};
 use prisma_models::{dml, PrismaValue};
+use psl::datamodel_connector::ConnectorCapability;
 
 /// Builds the root `Mutation` type.
 pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRef) {
@@ -32,12 +31,12 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
 
     create_nested_inputs(ctx);
 
-    if ctx.enable_raw_queries && ctx.capabilities.contains(ConnectorCapability::SqlQueryRaw) {
+    if ctx.enable_raw_queries && ctx.has_capability(ConnectorCapability::SqlQueryRaw) {
         fields.push(create_execute_raw_field());
         fields.push(create_query_raw_field());
     }
 
-    if ctx.enable_raw_queries && ctx.capabilities.contains(ConnectorCapability::MongoDbQueryRaw) {
+    if ctx.enable_raw_queries && ctx.has_capability(ConnectorCapability::MongoDbQueryRaw) {
         fields.push(create_mongodb_run_command_raw());
     }
 
