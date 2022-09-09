@@ -315,7 +315,7 @@ fn mapped_names_should_not_cause_collisions_with_names() {
     "#};
 
     let dml = with_header(schema, crate::Provider::Mongo, &[]);
-    let (_, datamodel) = parse_schema(&dml).unwrap();
+    let datamodel = parse(&dml);
     let r#type = datamodel.assert_has_composite_type("TestData");
 
     r#type.assert_has_scalar_field("id");

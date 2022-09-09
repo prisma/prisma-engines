@@ -43,13 +43,6 @@ pub struct Validated<T> {
 pub type ValidatedDatamodel = Validated<dml::Datamodel>;
 pub type ValidatedConfiguration = Validated<Configuration>;
 
-/// Parse and validate the whole schema
-pub fn parse_schema(schema_str: &str) -> Result<(Configuration, dml::Datamodel), String> {
-    parse_datamodel_internal(schema_str)
-        .map_err(|err| err.to_pretty_string("schema.prisma", schema_str))
-        .map(|v| v.subject)
-}
-
 pub struct ValidatedSchema {
     pub configuration: Configuration,
     pub db: parser_database::ParserDatabase,
@@ -135,15 +128,6 @@ fn parse_datamodel_internal(
         ),
         warnings: out.diagnostics.into_warnings(),
     })
-}
-
-pub fn parse_schema_ast(datamodel_string: &str) -> Result<ast::SchemaAst, diagnostics::Diagnostics> {
-    let mut diagnostics = Diagnostics::default();
-    let schema = schema_ast::parse_schema(datamodel_string, &mut diagnostics);
-
-    diagnostics.to_result()?;
-
-    Ok(schema)
 }
 
 /// Loads all configuration blocks from a datamodel using the built-in source definitions.

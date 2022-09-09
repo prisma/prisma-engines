@@ -129,7 +129,7 @@ fn string_literals_with_double_quotes_work() {
         }
     "#;
 
-    let (_, datamodel) = parse_schema(schema).unwrap();
+    let datamodel = parse(schema);
     let test_composite = datamodel.assert_has_composite_type("Test");
     test_composite
         .assert_has_scalar_field("id")

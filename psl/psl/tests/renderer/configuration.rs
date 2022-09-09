@@ -18,8 +18,8 @@ fn shadow_database_url_round_trips() {
         "#
     );
 
-    let (ref config, ref datamodel) = parse_schema(schema_str).unwrap();
-    let rendered = render_datamodel_and_config_to_string(datamodel, config);
+    let schema = psl::parse_schema_parserdb(schema_str).unwrap();
+    let rendered = render_datamodel_and_config_to_string(&psl::lift(&schema), &schema.configuration);
 
     assert_eq!(schema_str, rendered);
 }

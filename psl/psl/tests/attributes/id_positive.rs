@@ -414,7 +414,7 @@ fn mysql_allows_id_length_prefix() {
         }
     "#};
     let schema = with_header(dml, Provider::Mysql, &[]);
-    assert!(parse_schema(&schema).is_ok());
+    assert_valid(&schema);
 }
 
 #[test]
@@ -429,7 +429,7 @@ fn mysql_allows_compound_id_length_prefix() {
     "#};
 
     let schema = with_header(dml, Provider::Mysql, &[]);
-    assert!(parse_schema(&schema).is_ok());
+    assert_valid(&schema);
 }
 
 #[test]
@@ -441,7 +441,7 @@ fn mssql_allows_id_sort_argument() {
     "#};
 
     let schema = with_header(dml, Provider::SqlServer, &[]);
-    assert!(parse_schema(&schema).is_ok());
+    assert_valid(&schema);
 }
 
 #[test]
@@ -456,7 +456,7 @@ fn mssql_allows_compound_id_sort_argument() {
     "#};
 
     let schema = with_header(dml, Provider::SqlServer, &[]);
-    assert!(parse_schema(&schema).is_ok());
+    assert_valid(&schema);
 }
 
 #[test]
@@ -471,5 +471,5 @@ fn mongodb_compound_unique_can_have_id_as_part_of_it() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    assert!(parse_schema(&schema).is_ok());
+    assert_valid(&schema);
 }

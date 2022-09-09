@@ -177,7 +177,7 @@ fn string_literals_with_double_quotes_work() {
         }
     "#;
 
-    let (_, datamodel) = parse_schema(schema).unwrap();
+    let datamodel = parse(schema);
     let test_model = datamodel.assert_has_model("Test");
     test_model
         .assert_has_scalar_field("id")
@@ -206,7 +206,7 @@ fn mongodb_auto_id() {
         }
     "#};
 
-    let (_, datamodel) = parse_schema(dml).unwrap();
+    let datamodel = parse(dml);
 
     datamodel
         .assert_has_model("a")
