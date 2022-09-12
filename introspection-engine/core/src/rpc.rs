@@ -72,10 +72,9 @@ impl RpcImpl {
         let config = psl::parse_configuration(schema)
             .map_err(|diagnostics| Error::DatamodelError(diagnostics.to_pretty_string("schema.prisma", schema)))?;
 
-        let preview_features = config.subject.preview_features();
+        let preview_features = config.preview_features();
 
         let connection_string = config
-            .subject
             .datasources
             .first()
             .ok_or_else(|| Error::Generic("There is no datasource in the schema.".into()))?
@@ -88,7 +87,7 @@ impl RpcImpl {
             Box::new(SqlIntrospectionConnector::new(&connection_string, preview_features).await?)
         };
 
-        Ok((config.subject, connection_string.clone(), connector))
+        Ok((config, connection_string.clone(), connector))
     }
 
     pub async fn catch<O>(fut: impl std::future::Future<Output = ConnectorResult<O>>) -> RpcResult<O> {
@@ -142,11 +141,9 @@ impl RpcImpl {
 
     /// This function parses the provided schema and returns the contained Datamodel.
     pub fn parse_datamodel(schema: &str) -> RpcResult<Datamodel> {
-        let final_dm = psl::parse_datamodel(schema)
-            .map(|d| d.subject)
-            .map_err(|err| Error::DatamodelError(err.to_pretty_string("schema.prisma", schema)))?;
+        let final_dm = psl::parse_schema_parserdb(schema).map_err(Error::DatamodelError)?;
 
-        Ok(final_dm)
+        Ok(psl::lift(&final_dm))
     }
 
     pub async fn list_databases_internal(schema: String) -> RpcResult<Vec<String>> {

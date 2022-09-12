@@ -19,12 +19,12 @@ pub struct DirectRunner {
 #[async_trait::async_trait]
 impl RunnerInterface for DirectRunner {
     async fn load(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<Self> {
-        let config = psl::parse_configuration(&datamodel).unwrap().subject;
-        let data_source = config.datasources.first().expect("No valid data source found");
-        let preview_features: Vec<_> = config.preview_features().iter().collect();
+        let schema = psl::parse_schema_parserdb(datamodel).unwrap();
+        let data_source = schema.configuration.datasources.first().unwrap();
+        let preview_features: Vec<_> = schema.configuration.preview_features().iter().collect();
         let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
         let (db_name, executor) = executor::load(data_source, &preview_features, &url).await?;
-        let internal_data_model = InternalDataModelBuilder::new(&datamodel).build(db_name);
+        let internal_data_model = InternalDataModelBuilder::new(&schema).build(db_name);
 
         let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
             internal_data_model,

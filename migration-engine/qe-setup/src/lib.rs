@@ -18,7 +18,6 @@ use std::{env, sync::Arc};
 
 fn parse_configuration(datamodel: &str) -> ConnectorResult<(Datasource, String, BitFlags<PreviewFeature>)> {
     let config = psl::parse_configuration(datamodel)
-        .map(|validated_config| validated_config.subject)
         .map_err(|err| ConnectorError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
 
     let url = config.datasources[0]

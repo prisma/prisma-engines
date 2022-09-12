@@ -61,7 +61,7 @@ impl Clone for State {
 }
 
 pub async fn setup(opts: &PrismaOpt, metrics: MetricRegistry) -> PrismaResult<State> {
-    let config = opts.configuration(false)?.subject;
+    let config = opts.configuration(false)?;
     config.validate_that_one_datasource_is_provided()?;
 
     let span = tracing::info_span!("prisma:engine:connect");

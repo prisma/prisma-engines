@@ -414,7 +414,7 @@ async fn missing_select_rights(api: &TestApi) -> TestResult {
     let config = psl::parse_configuration(&datasource).unwrap();
 
     let ctx = IntrospectionContext {
-        source: config.subject.datasources.into_iter().next().unwrap(),
+        source: config.datasources.into_iter().next().unwrap(),
         composite_type_depth: Default::default(),
         preview_features: Default::default(),
     };
