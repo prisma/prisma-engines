@@ -1,6 +1,5 @@
 use crate::{error::ApiError, log_callback::LogCallback, logger::Logger};
 use futures::FutureExt;
-use prisma_models::InternalDataModelBuilder;
 use psl::{common::preview_features::PreviewFeature, dml::Datamodel};
 use query_core::{
     executor,
@@ -45,6 +44,7 @@ enum Inner {
 /// Holding the information to reconnect the engine if needed.
 #[derive(Debug, Clone)]
 struct EngineDatamodel {
+    #[allow(unused)]
     ast: Datamodel,
     raw: String,
 }
@@ -246,7 +246,8 @@ impl QueryEngine {
                 connector.get_connection().await?;
 
                 // Build internal data model
-                let internal_data_model = InternalDataModelBuilder::from(&builder.datamodel.ast).build(db_name);
+                let schema = psl::parse_schema_parserdb(&*builder.datamodel.raw).unwrap();
+                let internal_data_model = prisma_models::convert(&schema, db_name);
 
                 let query_schema = schema_builder::build(
                     internal_data_model,

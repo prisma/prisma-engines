@@ -1,5 +1,4 @@
 use crate::{ConnectorTag, RunnerInterface, TestResult, TxResult};
-use prisma_models::InternalDataModelBuilder;
 use query_core::{executor, schema::QuerySchemaRef, schema_builder, QueryExecutor, TxId};
 use query_engine_metrics::MetricRegistry;
 use request_handlers::{GraphQlBody, GraphQlHandler, MultiQuery};
@@ -24,7 +23,7 @@ impl RunnerInterface for DirectRunner {
         let preview_features: Vec<_> = schema.configuration.preview_features().iter().collect();
         let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
         let (db_name, executor) = executor::load(data_source, &preview_features, &url).await?;
-        let internal_data_model = InternalDataModelBuilder::new(&schema).build(db_name);
+        let internal_data_model = prisma_models::convert(&schema, db_name);
 
         let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
             internal_data_model,

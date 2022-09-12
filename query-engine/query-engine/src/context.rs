@@ -1,6 +1,5 @@
 use crate::{PrismaError, PrismaResult};
-use prisma_models::InternalDataModelBuilder;
-use psl::{dml::Datamodel, Configuration};
+use psl::dml::Datamodel;
 use query_core::{executor, schema::QuerySchemaRef, schema_builder, QueryExecutor};
 use query_engine_metrics::MetricRegistry;
 use std::{env, fmt, sync::Arc};
@@ -25,8 +24,7 @@ impl fmt::Debug for PrismaContext {
 
 pub struct ContextBuilder {
     enable_raw_queries: bool,
-    datamodel: Datamodel,
-    config: Configuration,
+    schema: psl::ValidatedSchema,
     metrics: Option<MetricRegistry>,
 }
 
@@ -42,24 +40,18 @@ impl ContextBuilder {
     }
 
     pub async fn build(self) -> PrismaResult<PrismaContext> {
-        PrismaContext::new(
-            self.config,
-            self.datamodel,
-            self.enable_raw_queries,
-            self.metrics.unwrap_or_default(),
-        )
-        .await
+        PrismaContext::new(self.schema, self.enable_raw_queries, self.metrics.unwrap_or_default()).await
     }
 }
 
 impl PrismaContext {
     /// Initializes a new Prisma context.
     async fn new(
-        config: Configuration,
-        dm: Datamodel,
+        schema: psl::ValidatedSchema,
         enable_raw_queries: bool,
         metrics: MetricRegistry,
     ) -> PrismaResult<Self> {
+        let config = &schema.configuration;
         // We only support one data source at the moment, so take the first one (default not exposed yet).
         let data_source = config
             .datasources
@@ -73,7 +65,7 @@ impl PrismaContext {
         let (db_name, executor) = executor::load(data_source, &preview_features, &url).await?;
 
         // Build internal data model
-        let internal_data_model = InternalDataModelBuilder::from(&dm).build(db_name);
+        let internal_data_model = prisma_models::convert(&schema, db_name);
 
         // Construct query schema
         let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
@@ -86,7 +78,7 @@ impl PrismaContext {
 
         let context = Self {
             query_schema,
-            dm,
+            dm: psl::lift(&schema),
             executor,
             metrics,
         };
@@ -101,11 +93,10 @@ impl PrismaContext {
         Ok(())
     }
 
-    pub fn builder(config: Configuration, datamodel: Datamodel) -> ContextBuilder {
+    pub fn builder(schema: psl::ValidatedSchema) -> ContextBuilder {
         ContextBuilder {
             enable_raw_queries: false,
-            datamodel,
-            config,
+            schema,
             metrics: None,
         }
     }

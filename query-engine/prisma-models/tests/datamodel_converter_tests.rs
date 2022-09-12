@@ -469,7 +469,7 @@ fn duplicate_relation_name() {
         "#;
 
     let dml = psl::parse_schema_parserdb(schema).unwrap();
-    InternalDataModelBuilder::from(&psl::lift(&dml)).build(String::new());
+    prisma_models::convert(&dml, String::new());
 }
 
 #[test]
@@ -492,8 +492,7 @@ fn implicit_many_to_many_relation() {
 
 fn convert(datamodel: &str) -> Arc<InternalDataModel> {
     let schema = psl::parse_schema_parserdb(datamodel).unwrap();
-    let builder = InternalDataModelBuilder::new(&schema);
-    builder.build("not_important".to_string())
+    prisma_models::convert(&schema, "not_important".to_string())
 }
 
 trait DatamodelAssertions {

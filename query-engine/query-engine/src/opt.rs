@@ -1,5 +1,4 @@
 use crate::{error::PrismaError, PrismaResult};
-use psl::dml::Datamodel;
 use serde::Deserialize;
 use std::{env, ffi::OsStr, fs::File, io::Read};
 use structopt::StructOpt;
@@ -130,7 +129,7 @@ impl PrismaOpt {
         Ok(res)
     }
 
-    pub fn datamodel(&self) -> PrismaResult<Datamodel> {
+    pub fn datamodel(&self) -> PrismaResult<psl::ValidatedSchema> {
         let datamodel_str = self.datamodel_str()?;
         let mut schema = psl::validate(datamodel_str.into());
 
@@ -139,7 +138,7 @@ impl PrismaOpt {
             .to_result()
             .map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))?;
 
-        Ok(psl::lift(&schema))
+        Ok(schema)
     }
 
     pub fn configuration(&self, ignore_env_errors: bool) -> PrismaResult<psl::Configuration> {

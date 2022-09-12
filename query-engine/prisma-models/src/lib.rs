@@ -5,6 +5,7 @@
 
 mod builders;
 mod composite_type;
+mod convert;
 mod error;
 mod extensions;
 mod field;
@@ -25,8 +26,8 @@ mod selection_result;
 pub mod pk;
 pub mod prelude;
 
-pub use builders::InternalDataModelBuilder;
 pub use composite_type::*;
+pub use convert::convert;
 pub use error::*;
 pub use field::*;
 pub use field_selection::*;
