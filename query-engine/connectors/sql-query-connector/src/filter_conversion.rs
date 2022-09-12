@@ -116,7 +116,7 @@ impl AliasedCondition for Filter {
                 }
             },
             Filter::Or(mut filters) => match filters.len() {
-                n if n == 0 => ConditionTree::NegativeCondition,
+                n if n == 0 => ConditionTree::NoCondition,
                 n if n == 1 => filters.pop().unwrap().aliased_cond(alias, reverse),
                 _ => {
                     let exprs = filters
