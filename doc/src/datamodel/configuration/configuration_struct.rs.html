@@ -70,6 +70,7 @@
 <span id="64">64</span>
 <span id="65">65</span>
 <span id="66">66</span>
+<span id="67">67</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Datasource</span>, <span class="ident">Generator</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">common::preview_features::PreviewFeature</span>,
@@ -82,6 +83,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Configuration</span> {
     <span class="kw">pub</span> <span class="ident">generators</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Generator</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">datasources</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Datasource</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">warnings</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">diagnostics::DatamodelWarning</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Configuration</span> {

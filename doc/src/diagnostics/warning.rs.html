@@ -40,7 +40,7 @@
 
 <span class="doccomment">/// A non-fatal warning emitted by the schema parser.</span>
 <span class="doccomment">/// For fancy printing, please use the `pretty_print_error` function.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DatamodelWarning</span> {
     <span class="ident">message</span>: <span class="ident">String</span>,
     <span class="ident">span</span>: <span class="ident">Span</span>,

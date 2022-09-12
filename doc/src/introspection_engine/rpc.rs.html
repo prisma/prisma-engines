@@ -190,9 +190,6 @@
 <span id="184">184</span>
 <span id="185">185</span>
 <span id="186">186</span>
-<span id="187">187</span>
-<span id="188">188</span>
-<span id="189">189</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::Error</span>;
 <span class="kw">use</span> <span class="ident">introspection_connector</span>::{
     <span class="ident">CompositeTypeDepth</span>, <span class="ident">ConnectorResult</span>, <span class="ident">DatabaseMetadata</span>, <span class="ident">IntrospectionConnector</span>, <span class="ident">IntrospectionContext</span>,
@@ -267,10 +264,9 @@
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">psl::parse_configuration</span>(<span class="ident">schema</span>)
             .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">diagnostics</span><span class="op">|</span> <span class="ident">Error::DatamodelError</span>(<span class="ident">diagnostics</span>.<span class="ident">to_pretty_string</span>(<span class="string">&quot;schema.prisma&quot;</span>, <span class="ident">schema</span>)))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">preview_features</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">subject</span>.<span class="ident">preview_features</span>();
+        <span class="kw">let</span> <span class="ident">preview_features</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">preview_features</span>();
 
         <span class="kw">let</span> <span class="ident">connection_string</span> <span class="op">=</span> <span class="ident">config</span>
-            .<span class="ident">subject</span>
             .<span class="ident">datasources</span>
             .<span class="ident">first</span>()
             .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Error::Generic</span>(<span class="string">&quot;There is no datasource in the schema.&quot;</span>.<span class="ident">into</span>()))<span class="question-mark">?</span>
@@ -283,7 +279,7 @@
             <span class="ident">Box::new</span>(<span class="ident">SqlIntrospectionConnector::new</span>(<span class="kw-2">&amp;</span><span class="ident">connection_string</span>, <span class="ident">preview_features</span>).<span class="kw">await</span><span class="question-mark">?</span>)
         };
 
-        <span class="prelude-val">Ok</span>((<span class="ident">config</span>.<span class="ident">subject</span>, <span class="ident">connection_string</span>.<span class="ident">clone</span>(), <span class="ident">connector</span>))
+        <span class="prelude-val">Ok</span>((<span class="ident">config</span>, <span class="ident">connection_string</span>.<span class="ident">clone</span>(), <span class="ident">connector</span>))
     }
 
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">catch</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="ident">fut</span>: <span class="kw">impl</span> <span class="ident">std::future::Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">RpcResult</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> {
@@ -337,11 +333,9 @@
 
     <span class="doccomment">/// This function parses the provided schema and returns the contained Datamodel.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_datamodel</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">RpcResult</span><span class="op">&lt;</span><span class="ident">Datamodel</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">final_dm</span> <span class="op">=</span> <span class="ident">psl::parse_datamodel</span>(<span class="ident">schema</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">subject</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">Error::DatamodelError</span>(<span class="ident">err</span>.<span class="ident">to_pretty_string</span>(<span class="string">&quot;schema.prisma&quot;</span>, <span class="ident">schema</span>)))<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">final_dm</span> <span class="op">=</span> <span class="ident">psl::parse_schema_parserdb</span>(<span class="ident">schema</span>).<span class="ident">map_err</span>(<span class="ident">Error::DatamodelError</span>)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">final_dm</span>)
+        <span class="prelude-val">Ok</span>(<span class="ident">psl::lift</span>(<span class="kw-2">&amp;</span><span class="ident">final_dm</span>))
     }
 
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">list_databases_internal</span>(<span class="ident">schema</span>: <span class="ident">String</span>) -&gt; <span class="ident">RpcResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {

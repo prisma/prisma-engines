@@ -343,11 +343,6 @@
 <span id="337">337</span>
 <span id="338">338</span>
 <span id="339">339</span>
-<span id="340">340</span>
-<span id="341">341</span>
-<span id="342">342</span>
-<span id="343">343</span>
-<span id="344">344</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::serialization_ast::datamodel_ast</span>::{
     <span class="ident">Datamodel</span>, <span class="ident">Enum</span>, <span class="ident">EnumValue</span>, <span class="ident">Field</span>, <span class="ident">Function</span>, <span class="ident">Model</span>, <span class="ident">PrimaryKey</span>, <span class="ident">UniqueIndex</span>,
 };
@@ -636,14 +631,9 @@
     <span class="kw">use</span> <span class="ident">std::fs</span>;
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">datamodel_string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Datamodel</span> {
-        <span class="kw">match</span> <span class="ident">psl::parse_datamodel</span>(<span class="ident">datamodel_string</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">subject</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">errs</span>) =&gt; {
-                <span class="macro">panic!</span>(
-                    <span class="string">&quot;Datamodel parsing failed\n\n{}&quot;</span>,
-                    <span class="ident">errs</span>.<span class="ident">to_pretty_string</span>(<span class="string">&quot;&quot;</span>, <span class="ident">datamodel_string</span>)
-                )
-            }
+        <span class="kw">match</span> <span class="ident">psl::parse_schema_parserdb</span>(<span class="ident">datamodel_string</span>) {
+            <span class="prelude-val">Ok</span>(<span class="ident">s</span>) =&gt; <span class="ident">psl::lift</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Datamodel parsing failed\n\n{err}&quot;</span>,),
         }
     }
 

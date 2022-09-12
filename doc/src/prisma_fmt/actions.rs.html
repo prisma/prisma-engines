@@ -33,9 +33,9 @@
 
     <span class="kw">match</span> <span class="ident">datamodel_result</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">validated_configuration</span>) =&gt; {
-            <span class="kw">if</span> <span class="ident">validated_configuration</span>.<span class="ident">subject</span>.<span class="ident">datasources</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
+            <span class="kw">if</span> <span class="ident">validated_configuration</span>.<span class="ident">datasources</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
                 <span class="string">&quot;[]&quot;</span>.<span class="ident">to_string</span>()
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">datasource</span>) <span class="op">=</span> <span class="ident">validated_configuration</span>.<span class="ident">subject</span>.<span class="ident">datasources</span>.<span class="ident">first</span>() {
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">datasource</span>) <span class="op">=</span> <span class="ident">validated_configuration</span>.<span class="ident">datasources</span>.<span class="ident">first</span>() {
                 <span class="kw">let</span> <span class="ident">referential_integrity</span> <span class="op">=</span> <span class="ident">datasource</span>.<span class="ident">referential_integrity</span>();
                 <span class="kw">let</span> <span class="ident">available_referential_actions</span> <span class="op">=</span> <span class="ident">datasource</span>
                     .<span class="ident">active_connector</span>

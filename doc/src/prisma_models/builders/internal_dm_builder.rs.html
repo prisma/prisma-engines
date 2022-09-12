@@ -479,8 +479,6 @@
 <span id="473">473</span>
 <span id="474">474</span>
 <span id="475">475</span>
-<span id="476">476</span>
-<span id="477">477</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">build_composites</span>, <span class="ident">field_builders::RelationFieldBuilder</span>, <span class="ident">relation_builder::RelationBuilder</span>, <span class="ident">CompositeTypeBuilder</span>,
     <span class="ident">FieldBuilder</span>, <span class="ident">IndexBuilder</span>, <span class="ident">ModelBuilder</span>, <span class="ident">PrimaryKeyBuilder</span>,
@@ -504,10 +502,8 @@
 }
 
 <span class="kw">impl</span> <span class="ident">InternalDataModelBuilder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">psl::parse_datamodel</span>(<span class="ident">datamodel</span>)
-            .<span class="ident">expect</span>(<span class="string">&quot;Expected valid datamodel.&quot;</span>)
-            .<span class="ident">subject</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">psl::ValidatedSchema</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">psl::lift</span>(<span class="ident">datamodel</span>);
 
         <span class="ident"><span class="self">Self</span>::from</span>(<span class="kw-2">&amp;</span><span class="ident">datamodel</span>)
     }

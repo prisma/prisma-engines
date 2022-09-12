@@ -157,15 +157,13 @@
 <span id="151">151</span>
 <span id="152">152</span>
 <span id="153">153</span>
-<span id="154">154</span>
-<span id="155">155</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">context::PrismaContext</span>,
     <span class="ident">opt</span>::{<span class="ident">CliOpt</span>, <span class="ident">PrismaOpt</span>, <span class="ident">Subcommand</span>},
     <span class="ident">PrismaResult</span>,
 };
 <span class="kw">use</span> <span class="ident">prisma_models::InternalDataModelBuilder</span>;
-<span class="kw">use</span> <span class="ident">psl</span>::{<span class="ident">dml::Datamodel</span>, <span class="ident">Configuration</span>, <span class="ident">ValidatedConfiguration</span>};
+<span class="kw">use</span> <span class="ident">psl</span>::{<span class="ident">dml::Datamodel</span>, <span class="ident">Configuration</span>};
 <span class="kw">use</span> <span class="ident">query_core</span>::{<span class="ident">schema::QuerySchemaRef</span>, <span class="ident">schema_builder</span>};
 <span class="kw">use</span> <span class="ident">request_handlers</span>::{<span class="ident">dmmf</span>, <span class="ident">GraphQlHandler</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">env</span>, <span class="ident">sync::Arc</span>};
@@ -184,7 +182,7 @@
 }
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetConfigRequest</span> {
-    <span class="ident">config</span>: <span class="ident">ValidatedConfiguration</span>,
+    <span class="ident">config</span>: <span class="ident">Configuration</span>,
     <span class="ident">ignore_env_var_errors</span>: <span class="ident">bool</span>,
 }
 
@@ -213,7 +211,7 @@
                 <span class="ident">CliOpt::Dmmf</span> =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">CliCommand::Dmmf</span>(<span class="ident">DmmfRequest</span> {
                     <span class="ident">datamodel</span>: <span class="ident">opts</span>.<span class="ident">datamodel</span>()<span class="question-mark">?</span>,
                     <span class="ident">enable_raw_queries</span>: <span class="ident">opts</span>.<span class="ident">enable_raw_queries</span>,
-                    <span class="ident">config</span>: <span class="ident">opts</span>.<span class="ident">configuration</span>(<span class="bool-val">true</span>)<span class="question-mark">?</span>.<span class="ident">subject</span>,
+                    <span class="ident">config</span>: <span class="ident">opts</span>.<span class="ident">configuration</span>(<span class="bool-val">true</span>)<span class="question-mark">?</span>,
                 }))),
                 <span class="ident">CliOpt::GetConfig</span>(<span class="ident">input</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">CliCommand::GetConfig</span>(<span class="ident">GetConfigRequest</span> {
                     <span class="ident">config</span>: <span class="ident">opts</span>.<span class="ident">configuration</span>(<span class="ident">input</span>.<span class="ident">ignore_env_var_errors</span>)<span class="question-mark">?</span>,
@@ -223,7 +221,7 @@
                     <span class="ident">query</span>: <span class="ident">input</span>.<span class="ident">query</span>.<span class="ident">clone</span>(),
                     <span class="ident">enable_raw_queries</span>: <span class="ident">opts</span>.<span class="ident">enable_raw_queries</span>,
                     <span class="ident">datamodel</span>: <span class="ident">opts</span>.<span class="ident">datamodel</span>()<span class="question-mark">?</span>,
-                    <span class="ident">config</span>: <span class="ident">opts</span>.<span class="ident">configuration</span>(<span class="bool-val">false</span>)<span class="question-mark">?</span>.<span class="ident">subject</span>,
+                    <span class="ident">config</span>: <span class="ident">opts</span>.<span class="ident">configuration</span>(<span class="bool-val">false</span>)<span class="question-mark">?</span>,
                 }))),
                 <span class="ident">CliOpt::DebugPanic</span>(<span class="ident">input</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">CliCommand::DebugPanic</span>(<span class="ident">DebugPanicRequest</span> {
                     <span class="ident">message</span>: <span class="ident">input</span>.<span class="ident">message</span>.<span class="ident">clone</span>(),
@@ -276,9 +274,7 @@
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">req</span>.<span class="ident">config</span>;
 
         <span class="kw">if</span> <span class="op">!</span><span class="ident">req</span>.<span class="ident">ignore_env_var_errors</span> {
-            <span class="ident">config</span>
-                .<span class="ident">subject</span>
-                .<span class="ident">resolve_datasource_urls_from_env</span>(<span class="kw-2">&amp;</span>[], <span class="op">|</span><span class="ident">key</span><span class="op">|</span> <span class="ident">env::var</span>(<span class="ident">key</span>).<span class="ident">ok</span>())<span class="question-mark">?</span>;
+            <span class="ident">config</span>.<span class="ident">resolve_datasource_urls_from_env</span>(<span class="kw-2">&amp;</span>[], <span class="op">|</span><span class="ident">key</span><span class="op">|</span> <span class="ident">env::var</span>(<span class="ident">key</span>).<span class="ident">ok</span>())<span class="question-mark">?</span>;
         }
 
         <span class="kw">let</span> <span class="ident">json</span> <span class="op">=</span> <span class="ident">psl::mcf::config_to_mcf_json_value</span>(<span class="ident">config</span>);
