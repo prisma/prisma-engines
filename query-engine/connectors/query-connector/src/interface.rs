@@ -119,7 +119,7 @@ impl AggregationSelection {
             AggregationSelection::Field(field) => vec![(
                 field.db_name().to_owned(),
                 field.type_identifier.clone(),
-                FieldArity::Required,
+                field.arity,
             )],
 
             AggregationSelection::Count { all, fields } => {
