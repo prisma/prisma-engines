@@ -3,21 +3,20 @@ use crate::{
     opt::{CliOpt, PrismaOpt, Subcommand},
     PrismaResult,
 };
-use prisma_models::InternalDataModelBuilder;
-use psl::{dml::Datamodel, Configuration};
+use psl::Configuration;
 use query_core::{schema::QuerySchemaRef, schema_builder};
 use request_handlers::{dmmf, GraphQlHandler};
 use std::{env, sync::Arc};
 
 pub struct ExecuteRequest {
     query: String,
-    datamodel: Datamodel,
+    datamodel: psl::ValidatedSchema,
     config: Configuration,
     enable_raw_queries: bool,
 }
 
 pub struct DmmfRequest {
-    datamodel: Datamodel,
+    datamodel: psl::ValidatedSchema,
     enable_raw_queries: bool,
     config: Configuration,
 }
@@ -94,7 +93,7 @@ impl CliCommand {
         let referential_integrity = datasource.map(|ds| ds.referential_integrity()).unwrap_or_default();
 
         // temporary code duplication
-        let internal_data_model = InternalDataModelBuilder::from(&request.datamodel).build("".into());
+        let internal_data_model = prisma_models::convert(&request.datamodel, "".into());
         let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
             internal_data_model,
             request.enable_raw_queries,
@@ -103,7 +102,7 @@ impl CliCommand {
             referential_integrity,
         ));
 
-        let dmmf = dmmf::render_dmmf(&request.datamodel, query_schema);
+        let dmmf = dmmf::render_dmmf(&psl::lift(&request.datamodel), query_schema);
         let serialized = serde_json::to_string_pretty(&dmmf)?;
 
         println!("{}", serialized);
@@ -132,7 +131,7 @@ impl CliCommand {
 
         request.config.validate_that_one_datasource_is_provided()?;
 
-        let cx = PrismaContext::builder(request.config, request.datamodel)
+        let cx = PrismaContext::builder(request.datamodel)
             .enable_raw_queries(request.enable_raw_queries)
             .build()
             .await?;

@@ -3,7 +3,6 @@ use crate::{
     opt::{CliOpt, PrismaOpt, Subcommand},
     PrismaResult,
 };
-use prisma_models::InternalDataModelBuilder;
 use query_core::{schema::QuerySchema, schema_builder};
 use serial_test::serial;
 use std::sync::Arc;
@@ -18,7 +17,7 @@ pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, psl::dml::Datam
         .unwrap_or(&psl::datamodel_connector::EmptyDatamodelConnector);
     let referential_integrity = datasource.map(|ds| ds.referential_integrity()).unwrap_or_default();
 
-    let internal_ref = InternalDataModelBuilder::from(&psl::lift(&dm)).build("db".to_owned());
+    let internal_ref = prisma_models::convert(&dm, "db".to_owned());
     let schema = schema_builder::build(
         internal_ref,
         false,

@@ -4,7 +4,6 @@ mod serialization_ast;
 pub use serialization_ast::DataModelMetaFormat;
 
 use ast_builders::{schema_to_dmmf, DmmfQuerySchemaRenderer};
-use prisma_models::InternalDataModelBuilder;
 use schema::{QuerySchemaRef, QuerySchemaRenderer};
 use std::sync::Arc;
 
@@ -22,7 +21,7 @@ pub fn dmmf_from_schema(schema: &str) -> DataModelMetaFormat {
     // We only support one data source at the moment, so take the first one (default not exposed yet).
     let data_source = config.datasources.first().unwrap();
     let preview_features: Vec<_> = config.preview_features().iter().collect();
-    let internal_data_model = InternalDataModelBuilder::from(&dml).build("dummy".to_owned());
+    let internal_data_model = prisma_models::convert(&schema, "dummy".to_owned());
 
     // Construct query schema
     let query_schema = Arc::new(schema_builder::build(

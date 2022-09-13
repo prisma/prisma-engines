@@ -1,7 +1,6 @@
 use crate::error::ApiError;
 use napi::{bindgen_prelude::*, JsUnknown};
 use napi_derive::napi;
-use prisma_models::InternalDataModelBuilder;
 use query_core::{schema::QuerySchemaRef, schema_builder};
 use request_handlers::dmmf;
 use std::{
@@ -42,7 +41,7 @@ pub fn dmmf(datamodel_string: String) -> napi::Result<String> {
 
     let referential_integrity = datasource.map(|ds| ds.referential_integrity()).unwrap_or_default();
 
-    let internal_data_model = InternalDataModelBuilder::from(&datamodel).build("".into());
+    let internal_data_model = prisma_models::convert(&schema, "".into());
 
     let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
         internal_data_model,
