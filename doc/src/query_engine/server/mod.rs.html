@@ -541,7 +541,7 @@
     <span class="kw">let</span> <span class="ident">enable_metrics</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">preview_features</span>().<span class="ident">contains</span>(<span class="ident">PreviewFeature::Metrics</span>);
 
     <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">datamodel</span>()<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">PrismaContext::builder</span>(<span class="ident">config</span>, <span class="ident">datamodel</span>)
+    <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">PrismaContext::builder</span>(<span class="ident">datamodel</span>)
         .<span class="ident">set_metrics</span>(<span class="ident">metrics</span>)
         .<span class="ident">enable_raw_queries</span>(<span class="ident">opts</span>.<span class="ident">enable_raw_queries</span>)
         .<span class="ident">build</span>()

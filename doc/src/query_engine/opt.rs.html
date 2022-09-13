@@ -218,9 +218,7 @@
 <span id="212">212</span>
 <span id="213">213</span>
 <span id="214">214</span>
-<span id="215">215</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::PrismaError</span>, <span class="ident">PrismaResult</span>};
-<span class="kw">use</span> <span class="ident">psl::dml::Datamodel</span>;
 <span class="kw">use</span> <span class="ident">serde::Deserialize</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">env</span>, <span class="ident">ffi::OsStr</span>, <span class="ident">fs::File</span>, <span class="ident">io::Read</span>};
 <span class="kw">use</span> <span class="ident">structopt::StructOpt</span>;
@@ -351,7 +349,7 @@
         <span class="prelude-val">Ok</span>(<span class="ident">res</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">datamodel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">PrismaResult</span><span class="op">&lt;</span><span class="ident">Datamodel</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">datamodel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">PrismaResult</span><span class="op">&lt;</span><span class="ident">psl::ValidatedSchema</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">datamodel_str</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">datamodel_str</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">psl::validate</span>(<span class="ident">datamodel_str</span>.<span class="ident">into</span>());
 
@@ -360,7 +358,7 @@
             .<span class="ident">to_result</span>()
             .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">errors</span><span class="op">|</span> <span class="ident">PrismaError::ConversionError</span>(<span class="ident">errors</span>, <span class="ident">datamodel_str</span>.<span class="ident">to_string</span>()))<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">psl::lift</span>(<span class="kw-2">&amp;</span><span class="ident">schema</span>))
+        <span class="prelude-val">Ok</span>(<span class="ident">schema</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">configuration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ignore_env_errors</span>: <span class="ident">bool</span>) -&gt; <span class="ident">PrismaResult</span><span class="op">&lt;</span><span class="ident">psl::Configuration</span><span class="op">&gt;</span> {

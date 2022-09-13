@@ -51,14 +51,12 @@
 <span id="45">45</span>
 <span id="46">46</span>
 <span id="47">47</span>
-<span id="48">48</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">ast_builders</span>;
 <span class="kw">mod</span> <span class="ident">serialization_ast</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">serialization_ast::DataModelMetaFormat</span>;
 
 <span class="kw">use</span> <span class="ident">ast_builders</span>::{<span class="ident">schema_to_dmmf</span>, <span class="ident">DmmfQuerySchemaRenderer</span>};
-<span class="kw">use</span> <span class="ident">prisma_models::InternalDataModelBuilder</span>;
 <span class="kw">use</span> <span class="ident">schema</span>::{<span class="ident">QuerySchemaRef</span>, <span class="ident">QuerySchemaRenderer</span>};
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
@@ -76,7 +74,7 @@
     <span class="comment">// We only support one data source at the moment, so take the first one (default not exposed yet).</span>
     <span class="kw">let</span> <span class="ident">data_source</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">datasources</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>();
     <span class="kw">let</span> <span class="ident">preview_features</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">preview_features</span>().<span class="ident">iter</span>().<span class="ident">collect</span>();
-    <span class="kw">let</span> <span class="ident">internal_data_model</span> <span class="op">=</span> <span class="ident">InternalDataModelBuilder::from</span>(<span class="kw-2">&amp;</span><span class="ident">dml</span>).<span class="ident">build</span>(<span class="string">&quot;dummy&quot;</span>.<span class="ident">to_owned</span>());
+    <span class="kw">let</span> <span class="ident">internal_data_model</span> <span class="op">=</span> <span class="ident">prisma_models::convert</span>(<span class="kw-2">&amp;</span><span class="ident">schema</span>, <span class="string">&quot;dummy&quot;</span>.<span class="ident">to_owned</span>());
 
     <span class="comment">// Construct query schema</span>
     <span class="kw">let</span> <span class="ident">query_schema</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">schema_builder::build</span>(
