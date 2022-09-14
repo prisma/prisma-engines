@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":[["ReferentialAction","Describes what happens when related nodes are deleted."]],"struct":[["RelationInfo","Holds information about a relation field."]]};

@@ -279,11 +279,6 @@
 <span id="273">273</span>
 <span id="274">274</span>
 <span id="275">275</span>
-<span id="276">276</span>
-<span id="277">277</span>
-<span id="278">278</span>
-<span id="279">279</span>
-<span id="280">280</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">SourceConfig</span>, <span class="ident">Span</span>},
     <span class="ident">common::preview_features::PreviewFeature</span>,
@@ -293,9 +288,7 @@
 };
 <span class="kw">use</span> <span class="ident">datamodel_connector::ReferentialIntegrity</span>;
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
-<span class="kw">use</span> <span class="ident">mongodb_datamodel_connector</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">parser_database</span>::{<span class="ident">ast::WithDocumentation</span>, <span class="ident">coerce</span>, <span class="ident">coerce_array</span>, <span class="ident">coerce_opt</span>};
-<span class="kw">use</span> <span class="ident">sql_datamodel_connector</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">collections::HashMap</span>};
 
 <span class="kw">const</span> <span class="ident">PREVIEW_FEATURES_KEY</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;previewFeatures&quot;</span>;
@@ -315,11 +308,12 @@
         <span class="ident">ast_schema</span>: <span class="kw-2">&amp;</span><span class="ident">ast::SchemaAst</span>,
         <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
         <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
+        <span class="ident">connectors</span>: <span class="ident"><span class="kw">crate</span>::builtin_connectors::ConnectorRegistry</span>,
     ) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Datasource</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sources</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
         <span class="kw">for</span> <span class="ident">src</span> <span class="kw">in</span> <span class="ident">ast_schema</span>.<span class="ident">sources</span>() {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">source</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">lift_datasource</span>(<span class="ident">src</span>, <span class="ident">preview_features</span>, <span class="ident">diagnostics</span>) {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">source</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">lift_datasource</span>(<span class="ident">src</span>, <span class="ident">preview_features</span>, <span class="ident">diagnostics</span>, <span class="ident">connectors</span>) {
                 <span class="ident">sources</span>.<span class="ident">push</span>(<span class="ident">source</span>)
             }
         }
@@ -342,6 +336,7 @@
         <span class="ident">ast_source</span>: <span class="kw-2">&amp;</span><span class="ident">ast::SourceConfig</span>,
         <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
         <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
+        <span class="ident">connectors</span>: <span class="ident"><span class="kw">crate</span>::builtin_connectors::ConnectorRegistry</span>,
     ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Datasource</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">source_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ast_source</span>.<span class="ident">name</span>.<span class="ident">name</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ast_source</span>
@@ -420,23 +415,18 @@
         <span class="kw">let</span> <span class="ident">documentation</span> <span class="op">=</span> <span class="ident">ast_source</span>.<span class="ident">documentation</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
         <span class="kw">let</span> <span class="ident">referential_integrity</span> <span class="op">=</span> <span class="ident">get_referential_integrity</span>(<span class="kw-2">&amp;</span><span class="ident">args</span>, <span class="ident">preview_features</span>, <span class="ident">ast_source</span>, <span class="ident">diagnostics</span>);
 
-        <span class="kw">let</span> <span class="ident">active_connector</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">datamodel_connector::Connector</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">provider</span> {
-            <span class="ident">p</span> <span class="kw">if</span> <span class="ident">MYSQL</span>.<span class="ident">is_provider</span>(<span class="ident">p</span>) =&gt; <span class="ident">MYSQL</span>,
-            <span class="ident">p</span> <span class="kw">if</span> <span class="ident">POSTGRES</span>.<span class="ident">is_provider</span>(<span class="ident">p</span>) =&gt; <span class="ident">POSTGRES</span>,
-            <span class="ident">p</span> <span class="kw">if</span> <span class="ident">SQLITE</span>.<span class="ident">is_provider</span>(<span class="ident">p</span>) =&gt; <span class="ident">SQLITE</span>,
-            <span class="ident">p</span> <span class="kw">if</span> <span class="ident">MSSQL</span>.<span class="ident">is_provider</span>(<span class="ident">p</span>) =&gt; <span class="ident">MSSQL</span>,
-            <span class="ident">p</span> <span class="kw">if</span> <span class="ident">MONGODB</span>.<span class="ident">is_provider</span>(<span class="ident">p</span>) =&gt; <span class="ident">MONGODB</span>,
-            <span class="ident">p</span> <span class="kw">if</span> <span class="ident">COCKROACH</span>.<span class="ident">is_provider</span>(<span class="ident">p</span>) =&gt; <span class="ident">COCKROACH</span>,
+        <span class="kw">let</span> <span class="ident">active_connector</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">datamodel_connector::Connector</span> <span class="op">=</span>
+            <span class="kw">match</span> <span class="ident">connectors</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_provider</span>(<span class="ident">provider</span>)) {
+                <span class="prelude-val">Some</span>(<span class="ident">c</span>) =&gt; <span class="kw-2">*</span><span class="ident">c</span>,
+                <span class="prelude-val">None</span> =&gt; {
+                    <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_datasource_provider_not_known_error</span>(
+                        <span class="ident">provider</span>,
+                        <span class="ident">provider_arg</span>.<span class="ident">span</span>(),
+                    ));
 
-            <span class="kw">_</span> =&gt; {
-                <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_datasource_provider_not_known_error</span>(
-                    <span class="ident">provider</span>,
-                    <span class="ident">provider_arg</span>.<span class="ident">span</span>(),
-                ));
-
-                <span class="kw">return</span> <span class="prelude-val">None</span>;
-            }
-        };
+                    <span class="kw">return</span> <span class="prelude-val">None</span>;
+                }
+            };
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">integrity</span>) <span class="op">=</span> <span class="ident">referential_integrity</span> {
             <span class="kw">if</span> <span class="op">!</span><span class="ident">active_connector</span>

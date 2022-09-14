@@ -200,7 +200,7 @@
             ));
         }
         (<span class="ident">ScalarType::Bytes</span>, <span class="ident">ast::Expression::StringValue</span>(<span class="ident">value</span>, <span class="ident">span</span>)) =&gt; {
-            <span class="kw">let</span> <span class="ident">details</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">dml::prisma_value::decode_bytes</span>(<span class="ident">value</span>) {
+            <span class="kw">let</span> <span class="ident">details</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">prisma_value::decode_bytes</span>(<span class="ident">value</span>) {
                 <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span>,
                 <span class="prelude-val">Err</span>(<span class="ident">details</span>) =&gt; <span class="ident">details</span>,
             };
