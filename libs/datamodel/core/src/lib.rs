@@ -8,9 +8,7 @@ pub mod common;
 pub mod mcf;
 
 mod configuration;
-mod lift;
 mod reformat;
-mod render;
 mod validate;
 
 pub use crate::{
@@ -19,7 +17,6 @@ pub use crate::{
 };
 pub use datamodel_connector;
 pub use diagnostics;
-pub use dml;
 pub use parser_database::{self, is_reserved_type_name};
 
 use self::{
@@ -27,7 +24,6 @@ use self::{
     validate::{DatasourceLoader, GeneratorLoader},
 };
 use diagnostics::Diagnostics;
-use enumflags2::BitFlags;
 use parser_database::{ast, ParserDatabase, SourceFile};
 
 pub mod builtin_connectors {
@@ -86,7 +82,7 @@ pub fn parse_configuration(schema: &str) -> Result<Configuration, diagnostics::D
 
 fn validate_configuration(schema_ast: &ast::SchemaAst, diagnostics: &mut Diagnostics) -> Configuration {
     let generators = GeneratorLoader::load_generators_from_ast(schema_ast, diagnostics);
-    let preview_features = preview_features(&generators);
+    let preview_features = generators.iter().filter_map(|gen| gen.preview_features).collect();
     let datasources = DatasourceLoader.load_datasources_from_ast(schema_ast, preview_features, diagnostics);
 
     Configuration {
@@ -95,38 +91,3 @@ fn validate_configuration(schema_ast: &ast::SchemaAst, diagnostics: &mut Diagnos
         warnings: diagnostics.warnings().to_owned(),
     }
 }
-
-//
-//  ************** RENDERING FUNCTIONS **************
-//
-
-/// Renders the datamodel _without configuration blocks_.
-pub fn render_datamodel_to_string(datamodel: &dml::Datamodel, configuration: Option<&Configuration>) -> String {
-    let datasource = configuration.and_then(|c| c.datasources.first());
-    let mut out = String::new();
-    render::render_datamodel(render::RenderParams { datasource, datamodel }, &mut out);
-    reformat(&out, DEFAULT_INDENT_WIDTH).expect("Internal error: failed to reformat introspected schema")
-}
-
-/// Renders a datamodel, sources and generators.
-pub fn render_datamodel_and_config_to_string(
-    datamodel: &dml::Datamodel,
-    config: &configuration::Configuration,
-) -> String {
-    let mut out = String::new();
-    let datasource = config.datasources.first();
-    render::render_configuration(config, &mut out);
-    render::render_datamodel(render::RenderParams { datasource, datamodel }, &mut out);
-    reformat(&out, DEFAULT_INDENT_WIDTH).expect("Internal error: failed to reformat introspected schema")
-}
-
-/// Validated schema -> dml::Datamodel.
-pub fn lift(schema: &ValidatedSchema) -> dml::Datamodel {
-    lift::LiftAstToDml::new(&schema.db, schema.connector, schema.referential_integrity()).lift()
-}
-
-fn preview_features(generators: &[Generator]) -> BitFlags<PreviewFeature> {
-    generators.iter().filter_map(|gen| gen.preview_features).collect()
-}
-
-const DEFAULT_INDENT_WIDTH: usize = 2;

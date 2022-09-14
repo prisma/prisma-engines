@@ -1,12 +1,13 @@
-use crate::{common::RelationNames, dml::*, Datasource};
-use datamodel_connector::{constraint_names::ConstraintNames, Connector, EmptyDatamodelConnector};
+use crate::*;
+use ::datamodel::datamodel_connector::{constraint_names::ConstraintNames, Connector, EmptyDatamodelConnector};
+use ::datamodel::{parser_database as db, common::RelationNames, Datasource};
 use schema_ast::string_literal;
 use std::fmt::Write;
 
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct RenderParams<'a> {
     pub datasource: Option<&'a Datasource>,
-    pub datamodel: &'a dml::Datamodel,
+    pub datamodel: &'a Datamodel,
 }
 
 impl RenderParams<'_> {
@@ -410,7 +411,7 @@ fn render_composite_field_type(field_type: &CompositeTypeFieldType, out: &mut St
     }
 }
 
-fn render_field_type(field_type: &dml::FieldType, out: &mut String) {
+fn render_field_type(field_type: &crate::FieldType, out: &mut String) {
     match field_type {
         FieldType::CompositeType(name) | FieldType::Enum(name) => out.push_str(name),
         FieldType::Unsupported(name) => {
@@ -423,7 +424,7 @@ fn render_field_type(field_type: &dml::FieldType, out: &mut String) {
     }
 }
 
-fn render_model_attributes(model: &dml::Model, params: RenderParams<'_>, out: &mut String) {
+fn render_model_attributes(model: &crate::Model, params: RenderParams<'_>, out: &mut String) {
     // @@id
     if let Some(pk) = &model.primary_key {
         if !pk.defined_on_field {
@@ -478,7 +479,7 @@ fn render_model_attributes(model: &dml::Model, params: RenderParams<'_>, out: &m
     }
 }
 
-fn render_field_arity(arity: &dml::FieldArity, out: &mut String) {
+fn render_field_arity(arity: &crate::FieldArity, out: &mut String) {
     match arity {
         FieldArity::Required => (),
         FieldArity::Optional => out.push('?'),
@@ -486,24 +487,24 @@ fn render_field_arity(arity: &dml::FieldArity, out: &mut String) {
     }
 }
 
-fn dml_scalar_type_to_parser_database_scalar_type(st: dml::ScalarType) -> parser_database::ScalarType {
+fn dml_scalar_type_to_parser_database_scalar_type(st: crate::ScalarType) -> db::ScalarType {
     match st {
-        dml::ScalarType::Int => parser_database::ScalarType::Int,
-        dml::ScalarType::BigInt => parser_database::ScalarType::BigInt,
-        dml::ScalarType::Float => parser_database::ScalarType::Float,
-        dml::ScalarType::Boolean => parser_database::ScalarType::Boolean,
-        dml::ScalarType::String => parser_database::ScalarType::String,
-        dml::ScalarType::DateTime => parser_database::ScalarType::DateTime,
-        dml::ScalarType::Json => parser_database::ScalarType::Json,
-        dml::ScalarType::Bytes => parser_database::ScalarType::Bytes,
-        dml::ScalarType::Decimal => parser_database::ScalarType::Decimal,
+        crate::ScalarType::Int => db::ScalarType::Int,
+        crate::ScalarType::BigInt => db::ScalarType::BigInt,
+        crate::ScalarType::Float => db::ScalarType::Float,
+        crate::ScalarType::Boolean => db::ScalarType::Boolean,
+        crate::ScalarType::String => db::ScalarType::String,
+        crate::ScalarType::DateTime => db::ScalarType::DateTime,
+        crate::ScalarType::Json => db::ScalarType::Json,
+        crate::ScalarType::Bytes => db::ScalarType::Bytes,
+        crate::ScalarType::Decimal => db::ScalarType::Decimal,
     }
 }
 
-fn render_default_value(dv: &dml::DefaultValue, out: &mut String) {
+fn render_default_value(dv: &crate::DefaultValue, out: &mut String) {
     match dv.kind() {
-        dml::DefaultKind::Single(v) => render_prisma_value(v, out),
-        dml::DefaultKind::Expression(e) => {
+        crate::DefaultKind::Single(v) => render_prisma_value(v, out),
+        crate::DefaultKind::Expression(e) => {
             out.push_str(e.name());
             out.push('(');
             let mut args = e.args().iter().peekable();

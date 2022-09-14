@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+dml = { path = "../../libs/datamodel/connectors/dml" }
 psl-core = { path = "../../libs/datamodel/core", package = "datamodel", default-features = false }
 
 [dev-dependencies]
@@ -13,4 +14,4 @@ indoc = "1"
 native-types = { path = "../../libs/native-types" }
 
 [features]
-default_generators = ["psl-core/default_generators"]
+default_generators = ["dml/default_generators"]

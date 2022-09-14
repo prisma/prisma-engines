@@ -5,12 +5,12 @@ version = "0.1.0"
 
 [dependencies]
 datamodel-connector = { path = "../connectors/datamodel-connector" }
-dml = { path = "../connectors/dml" }
+diagnostics = { path = "../diagnostics" }
 mongodb-datamodel-connector = { path = "../connectors/mongodb-datamodel-connector" }
+parser-database = { path = "../parser-database" }
+prisma-value = { path = "../../prisma-value" }
 schema-ast = { path = "../schema-ast" }
 sql-datamodel-connector = { path = "../connectors/sql-datamodel-connector" }
-diagnostics = { path = "../diagnostics" }
-parser-database = { path = "../parser-database" }
 
 bigdecimal = "0.3"
 chrono = { version = "0.4.6", default_features = false }
@@ -23,5 +23,3 @@ enumflags2 = "0.7"
 indoc = "1"
 either = "1.6"
 
-[features]
-default_generators = ["dml/default_generators"]
