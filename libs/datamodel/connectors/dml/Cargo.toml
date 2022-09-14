@@ -9,7 +9,7 @@ datamodel = { path = "../../core" }
 schema-ast = { path = "../../schema-ast" }
 
 uuid = { version = "1", features = ["serde", "v4"], optional = true }
-cuid = { git = "https://github.com/prisma/cuid-rust", optional = true }
+cuid = { version = "1.2", optional = true }
 chrono = { version = "0.4.6", features = ["serde"] }
 serde = { version = "1.0.90", features = ["derive"] }
 serde_json = { version = "1.0", features = ["float_roundtrip"] }
