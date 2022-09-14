@@ -33,7 +33,6 @@ macro_rules! sql_trace {
             // Temporary method to pass the traceid in an operation
             fn add_trace_id(self, trace_id: Option<String>) -> Self {
                 if let Some(traceparent) = trace_id {
-                    let out = should_sample(&traceparent);
                     if should_sample(&traceparent) {
                         self.comment(format!("traceparent={}", traceparent))
                     } else {
@@ -48,7 +47,7 @@ macro_rules! sql_trace {
 }
 
 fn should_sample(traceparent: &str) -> bool {
-    let trace_info: Vec<&str> = traceparent.split("-").collect();
+    let trace_info: Vec<&str> = traceparent.split('-').collect();
 
     if trace_info.len() != 4 {
         false
