@@ -1,6 +1,6 @@
 use crate::*;
 use ::datamodel::datamodel_connector::{constraint_names::ConstraintNames, Connector, EmptyDatamodelConnector};
-use ::datamodel::{parser_database as db, common::RelationNames, Datasource};
+use ::datamodel::{common::RelationNames, parser_database as db, Datasource};
 use schema_ast::string_literal;
 use std::fmt::Write;
 
