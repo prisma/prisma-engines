@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/cuid-rust-05420f73eb18afd9/1637fd2/src/random.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>random.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../cuid/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cuid-1.2.0/src/random.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>random.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../cuid/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../cuid/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
@@ -42,11 +42,35 @@
 <span id="36">36</span>
 <span id="37">37</span>
 <span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">rand</span>::{<span class="ident">thread_rng</span>, <span class="ident">CryptoRng</span>, <span class="ident">Rng</span>};
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">BLOCK_SIZE</span>, <span class="ident">DISCRETE_VALUES</span>};
-<span class="kw">use</span> <span class="ident">error::CuidError</span>;
-<span class="kw">use</span> <span class="ident">text</span>::{<span class="ident">pad</span>, <span class="ident">to_base_str</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::CuidError</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::text</span>::{<span class="ident">pad</span>, <span class="ident">to_base_string</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">BLOCK_SIZE</span>, <span class="ident">DISCRETE_VALUES</span>};
 
 <span class="kw">fn</span> <span class="ident">random_float_from_rng</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Rng</span> <span class="op">+</span> <span class="ident">CryptoRng</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">rng</span>: <span class="ident">R</span>) -&gt; <span class="ident">f64</span> {
     <span class="ident">rng</span>.<span class="ident">gen</span>::<span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>()
@@ -60,8 +84,8 @@
     (<span class="ident">random_float</span>() <span class="op">*</span> <span class="ident">max</span>.<span class="ident">into</span>()) <span class="kw">as</span> <span class="ident">u64</span>
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">random_block</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">CuidError</span><span class="op">&gt;</span> {
-    <span class="ident">to_base_str</span>(<span class="ident">random_64_bit_int</span>(<span class="ident">DISCRETE_VALUES</span> <span class="kw">as</span> <span class="ident">u32</span>)).<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">pad</span>(<span class="ident">BLOCK_SIZE</span> <span class="kw">as</span> <span class="ident">u32</span>, <span class="kw-2">&amp;</span><span class="ident">s</span>))
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">random_block</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">CuidError</span><span class="op">&gt;</span> {
+    <span class="ident">to_base_string</span>(<span class="ident">random_64_bit_int</span>(<span class="ident">DISCRETE_VALUES</span> <span class="kw">as</span> <span class="ident">u32</span>)).<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">pad</span>(<span class="ident">BLOCK_SIZE</span>, <span class="ident">s</span>))
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
@@ -70,7 +94,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">random_block_len</span>() {
-        <span class="macro">assert!</span>(<span class="ident">random_block</span>().<span class="ident">unwrap</span>().<span class="ident">len</span>() <span class="op">==</span> <span class="ident">BLOCK_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span>)
+        <span class="macro">assert_eq!</span>(<span class="ident">random_block</span>().<span class="ident">unwrap</span>().<span class="ident">len</span>(), <span class="ident">BLOCK_SIZE</span>);
     }
 
     <span class="comment">// TODO: This is theoretically a bit brittle?</span>
@@ -78,7 +102,31 @@
     <span class="kw">fn</span> <span class="ident">multiple_blocks_not_equal</span>() {
         <span class="macro">assert!</span>(<span class="ident">random_block</span>().<span class="ident">unwrap</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">random_block</span>().<span class="ident">unwrap</span>())
     }
+}
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">nightly</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">benchmarks</span> {
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use</span> <span class="ident">std::u32</span>;
+    <span class="kw">use</span> <span class="ident">test::Bencher</span>;
+
+    <span class="attribute">#[<span class="ident">bench</span>]</span>
+    <span class="kw">fn</span> <span class="ident">bench_random_float</span>(<span class="ident">b</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Bencher</span>) {
+        <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">random_float</span>())
+    }
+
+    <span class="attribute">#[<span class="ident">bench</span>]</span>
+    <span class="kw">fn</span> <span class="ident">bench_random_64_bit_int</span>(<span class="ident">b</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Bencher</span>) {
+        <span class="comment">// this shouldn&#39;t take noticeably more time than generating a</span>
+        <span class="comment">// random float</span>
+        <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">random_64_bit_int</span>(<span class="ident">u32::MAX</span>))
+    }
+
+    <span class="attribute">#[<span class="ident">bench</span>]</span>
+    <span class="kw">fn</span> <span class="ident">bench_random_block</span>(<span class="ident">b</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Bencher</span>) {
+        <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">random_block</span>())
+    }
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="cuid" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0 (4b91a6ea7 2022-08-08)" ></div>

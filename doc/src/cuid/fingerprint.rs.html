@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/cuid-rust-05420f73eb18afd9/1637fd2/src/fingerprint.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>fingerprint.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../cuid/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cuid-1.2.0/src/fingerprint.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>fingerprint.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../cuid/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../cuid/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
@@ -91,46 +91,73 @@
 <span id="85">85</span>
 <span id="86">86</span>
 <span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::process</span>;
 
-<span class="kw">use</span> <span class="ident">error::CuidError</span>;
-<span class="kw">use</span> <span class="ident">hostname::get_hostname</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::CuidError</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::text</span>::{<span class="ident">pad</span>, <span class="ident">to_base_string</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::BASE</span>;
 
-<span class="kw">use</span> <span class="ident">text</span>::{<span class="ident">pad</span>, <span class="ident">to_base_str</span>};
+<span class="kw">static</span> <span class="ident">FINGERPRINT_PADDING</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::BASE</span>;
-
-<span class="kw">static</span> <span class="ident">FINGERPRINT_PADDING</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">2</span>;
-
-<span class="kw">fn</span> <span class="ident">pid</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">CuidError</span><span class="op">&gt;</span> {
-    <span class="ident">to_base_str</span>(<span class="ident">process::id</span>())
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">pad</span>(<span class="ident">FINGERPRINT_PADDING</span> <span class="kw">as</span> <span class="ident">u32</span>, <span class="kw-2">&amp;</span><span class="ident">s</span>))
+<span class="kw">fn</span> <span class="ident">pid</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">CuidError</span><span class="op">&gt;</span> {
+    <span class="ident">to_base_string</span>(<span class="ident">process::id</span>())
+        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">pad</span>(<span class="ident">FINGERPRINT_PADDING</span>, <span class="ident">s</span>))
         .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">CuidError::FingerprintError</span>(<span class="string">&quot;Could not encode pid&quot;</span>))
 }
 
-<span class="kw">fn</span> <span class="ident">convert_hostname</span>(<span class="ident">hostname_getter</span>: <span class="kw">fn</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">CuidError</span><span class="op">&gt;</span> {
-    <span class="ident">hostname_getter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">h</span><span class="op">|</span> {
-            <span class="ident">h</span>.<span class="ident">chars</span>()
-                .<span class="ident">fold</span>(<span class="ident">h</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">BASE</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="op">|</span><span class="ident">acc</span>, <span class="ident">c</span><span class="op">|</span> <span class="ident">acc</span> <span class="op">+</span> <span class="ident">c</span> <span class="kw">as</span> <span class="ident">usize</span>)
-        })
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">print</span><span class="op">|</span> <span class="ident">print</span> <span class="kw">as</span> <span class="ident">u64</span>)
-        .<span class="ident">map</span>(<span class="ident">to_base_str</span>)
-        .<span class="ident">unwrap_or</span>(<span class="prelude-val">Err</span>(<span class="ident">CuidError::FingerprintError</span>(
-            <span class="string">&quot;Could not retrieve hostname&quot;</span>,
-        )))
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">base_str</span><span class="op">|</span> <span class="ident">pad</span>(<span class="ident">FINGERPRINT_PADDING</span> <span class="kw">as</span> <span class="ident">u32</span>, <span class="kw-2">&amp;</span><span class="ident">base_str</span>))
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">box_str</span><span class="op">|</span> <span class="ident">box_str</span>.<span class="ident">into</span>())
+<span class="doccomment">/// Convert the hostname to a padded String in the appropriate base.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// First converts the hostname to a number comprising the length of the</span>
+<span class="doccomment">/// hostname, added to the base radix for CUID strings, added to the sum of</span>
+<span class="doccomment">/// the integer value of each character in the hostname, then converts that</span>
+<span class="doccomment">/// number to base radix.</span>
+<span class="kw">fn</span> <span class="ident">convert_hostname</span>(<span class="ident">hn</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">CuidError</span><span class="op">&gt;</span> {
+    <span class="ident">to_base_string</span>(
+        <span class="ident">hn</span>.<span class="ident">chars</span>()
+            .<span class="ident">fold</span>(<span class="ident">hn</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">BASE</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="op">|</span><span class="ident">acc</span>, <span class="ident">c</span><span class="op">|</span> <span class="ident">acc</span> <span class="op">+</span> <span class="ident">c</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="kw">as</span> <span class="ident">u64</span>,
+    )
+    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">base_str</span><span class="op">|</span> <span class="ident">pad</span>(<span class="ident">FINGERPRINT_PADDING</span>, <span class="ident">base_str</span>))
 }
 
-<span class="kw">fn</span> <span class="ident">host_id</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">CuidError</span><span class="op">&gt;</span> {
-    <span class="ident">convert_hostname</span>(<span class="ident">get_hostname</span>)
+<span class="kw">fn</span> <span class="ident">host_id</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">CuidError</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">hn</span> <span class="op">=</span> <span class="ident">hostname::get</span>()<span class="question-mark">?</span>;
+    <span class="ident">convert_hostname</span>(<span class="kw-2">&amp;</span><span class="ident">hn</span>.<span class="ident">to_string_lossy</span>())
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fingerprint</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">CuidError</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">hid</span> <span class="op">=</span> <span class="ident">host_id</span>()<span class="question-mark">?</span>;
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fingerprint</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">CuidError</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hid</span> <span class="op">=</span> <span class="ident">host_id</span>()<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">procid</span> <span class="op">=</span> <span class="ident">pid</span>()<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>([<span class="ident">procid</span>, <span class="ident">hid</span>].<span class="ident">concat</span>().<span class="ident">into</span>())
+    <span class="ident">hid</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">procid</span>);
+    <span class="prelude-val">Ok</span>(<span class="ident">hid</span>)
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
@@ -140,7 +167,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_pid_length</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">pid</span>().<span class="ident">unwrap</span>().<span class="ident">len</span>(), <span class="ident">FINGERPRINT_PADDING</span> <span class="kw">as</span> <span class="ident">usize</span>)
+        <span class="macro">assert_eq!</span>(<span class="ident">pid</span>().<span class="ident">unwrap</span>().<span class="ident">len</span>(), <span class="ident">FINGERPRINT_PADDING</span>)
     }
 
     <span class="comment">// The below expected host_ids were all generated directly using</span>
@@ -148,27 +175,24 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_convert_hostname_1</span>() {
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;a3&quot;</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">convert_hostname</span>(<span class="op">|</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;foo&quot;</span>.<span class="ident">into</span>())).<span class="ident">unwrap</span>())
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;a3&quot;</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">convert_hostname</span>(<span class="string">&quot;foo&quot;</span>).<span class="ident">unwrap</span>())
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_convert_hostname_2</span>() {
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;9o&quot;</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">convert_hostname</span>(<span class="op">|</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;bar&quot;</span>.<span class="ident">into</span>())).<span class="ident">unwrap</span>())
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;9o&quot;</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">convert_hostname</span>(<span class="string">&quot;bar&quot;</span>).<span class="ident">unwrap</span>())
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_convert_hostname_3</span>() {
-        <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;nf&quot;</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">convert_hostname</span>(<span class="op">|</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;mr-magoo&quot;</span>.<span class="ident">into</span>())).<span class="ident">unwrap</span>()
-        )
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;nf&quot;</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">convert_hostname</span>(<span class="string">&quot;mr-magoo&quot;</span>).<span class="ident">unwrap</span>())
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_convert_hostname_4</span>() {
         <span class="macro">assert_eq!</span>(
             <span class="string">&quot;j9&quot;</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">convert_hostname</span>(<span class="op">|</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;wow-what-a-long-hostname-you-have&quot;</span>.<span class="ident">into</span>())).<span class="ident">unwrap</span>()
+            <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">convert_hostname</span>(<span class="string">&quot;wow-what-a-long-hostname-you-have&quot;</span>).<span class="ident">unwrap</span>()
         )
     }
 
@@ -176,7 +200,41 @@
     <span class="kw">fn</span> <span class="ident">fingerprint_len</span>() {
         <span class="macro">assert_eq!</span>(<span class="number">4</span>, <span class="ident">fingerprint</span>().<span class="ident">unwrap</span>().<span class="ident">len</span>())
     }
+}
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">nightly</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">benchmarks</span> {
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use</span> <span class="ident">test::Bencher</span>;
+
+    <span class="attribute">#[<span class="ident">bench</span>]</span>
+    <span class="kw">fn</span> <span class="ident">bench_pid</span>(<span class="ident">b</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Bencher</span>) {
+        <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
+            <span class="ident">pid</span>().<span class="ident">unwrap</span>();
+        })
+    }
+
+    <span class="attribute">#[<span class="ident">bench</span>]</span>
+    <span class="kw">fn</span> <span class="ident">bench_convert_hostname_real</span>(<span class="ident">b</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Bencher</span>) {
+        <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
+            <span class="ident">convert_hostname</span>(<span class="ident">get_hostname</span>).<span class="ident">unwrap</span>();
+        })
+    }
+
+    <span class="attribute">#[<span class="ident">bench</span>]</span>
+    <span class="kw">fn</span> <span class="ident">bench_convert_hostname_mock</span>(<span class="ident">b</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Bencher</span>) {
+        <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
+            <span class="ident">convert_hostname</span>(<span class="op">|</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">String::from</span>(<span class="string">&quot;hostname&quot;</span>))).<span class="ident">unwrap</span>();
+        })
+    }
+
+    <span class="attribute">#[<span class="ident">bench</span>]</span>
+    <span class="kw">fn</span> <span class="ident">bench_fingerprint</span>(<span class="ident">b</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Bencher</span>) {
+        <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
+            <span class="ident">fingerprint</span>().<span class="ident">unwrap</span>();
+        })
+    }
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="cuid" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0 (4b91a6ea7 2022-08-08)" ></div>
