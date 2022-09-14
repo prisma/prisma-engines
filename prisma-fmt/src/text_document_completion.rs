@@ -1,4 +1,4 @@
-use datamodel::{
+use psl::{
     datamodel_connector::{Connector, Diagnostics, ReferentialIntegrity},
     parse_configuration,
     parser_database::{ast, ParserDatabase, SourceFile},
@@ -31,7 +31,7 @@ pub(crate) fn completion(schema: String, params: CompletionParams) -> Completion
         .map(|datasource| (datasource.active_connector, datasource.referential_integrity()))
         .unwrap_or_else(|| {
             (
-                &datamodel::datamodel_connector::EmptyDatamodelConnector,
+                &psl::datamodel_connector::EmptyDatamodelConnector,
                 Default::default(),
             )
         });

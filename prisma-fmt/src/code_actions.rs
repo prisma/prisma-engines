@@ -1,6 +1,6 @@
 mod relations;
 
-use datamodel::{
+use psl::{
     datamodel_connector::Diagnostics,
     parser_database::{ast, walkers::RefinedRelationWalker, ParserDatabase, SourceFile},
 };

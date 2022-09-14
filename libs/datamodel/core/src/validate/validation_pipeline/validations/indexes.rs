@@ -1,9 +1,10 @@
 use super::{constraint_namespace::ConstraintName, database_name::validate_db_name};
 use crate::{
-    common::preview_features::PreviewFeature, diagnostics::DatamodelError,
+    common::preview_features::PreviewFeature,
+    datamodel_connector::{walker_ext_traits::*, ConnectorCapability},
+    diagnostics::DatamodelError,
     validate::validation_pipeline::context::Context,
 };
-use datamodel_connector::{walker_ext_traits::*, ConnectorCapability};
 use itertools::Itertools;
 use parser_database::{walkers::IndexWalker, IndexAlgorithm};
 

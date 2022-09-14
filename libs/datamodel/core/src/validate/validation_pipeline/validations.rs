@@ -169,7 +169,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
 
         if !ctx
             .connector
-            .has_capability(datamodel_connector::ConnectorCapability::MultiSchema)
+            .has_capability(crate::datamodel_connector::ConnectorCapability::MultiSchema)
         {
             if let Some(ds) = ctx.datasource {
                 if let Some(span) = ds.schemas_span {

@@ -1,4 +1,4 @@
-use datamodel::parser_database::{
+use psl::parser_database::{
     ast::WithSpan,
     walkers::{CompleteInlineRelationWalker, ModelWalker, ScalarFieldWalker},
 };

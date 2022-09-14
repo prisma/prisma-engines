@@ -57,7 +57,7 @@ fn serialize_generators_to_cmf() {
         ]"#]];
 
     let config = parse_configuration(schema);
-    let rendered = psl::mcf::generators_to_json(&config.generators);
+    let rendered = psl::generators_to_json(&config.generators);
 
     expected.assert_eq(&rendered);
 }
@@ -109,7 +109,7 @@ fn preview_features_setting_must_work() {
         ]"#]];
 
     let config = parse_configuration(schema);
-    let rendered = psl::mcf::generators_to_json(&config.generators);
+    let rendered = psl::generators_to_json(&config.generators);
 
     expected.assert_eq(&rendered);
 }
@@ -141,7 +141,7 @@ fn hidden_preview_features_setting_must_work() {
         ]"#]];
 
     let config = parse_configuration(schema);
-    let rendered = psl::mcf::generators_to_json(&config.generators);
+    let rendered = psl::generators_to_json(&config.generators);
 
     expected.assert_eq(&rendered);
 }
@@ -170,7 +170,7 @@ fn back_slashes_in_providers_must_work() {
         ]"#]];
 
     let config = parse_configuration(schema);
-    let rendered = psl::mcf::generators_to_json(&config.generators);
+    let rendered = psl::generators_to_json(&config.generators);
 
     expected.assert_eq(&rendered);
 }
@@ -210,7 +210,7 @@ fn new_lines_in_generator_must_work() {
         ]"#]];
 
     let config = parse_configuration(schema);
-    let rendered = psl::mcf::generators_to_json(&config.generators);
+    let rendered = psl::get_config::generators_to_json(&config.generators);
 
     expected.assert_eq(&rendered);
 }
@@ -309,7 +309,7 @@ fn binary_targets_from_env_var_should_work() {
         ]"#]];
 
     let config = parse_configuration(schema);
-    let rendered = psl::mcf::generators_to_json(&config.generators);
+    let rendered = psl::get_config::generators_to_json(&config.generators);
 
     expected.assert_eq(&rendered);
 }
@@ -342,7 +342,7 @@ fn retain_env_var_definitions_in_generator_block() {
         ]"#]];
 
     let config = parse_configuration(schema);
-    let rendered = psl::mcf::generators_to_json(&config.generators);
+    let rendered = psl::get_config::generators_to_json(&config.generators);
 
     expected.assert_eq(&rendered);
 }

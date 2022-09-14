@@ -1,9 +1,11 @@
 use super::database_name::validate_db_name;
 use crate::{
-    common::preview_features::PreviewFeature, diagnostics::DatamodelError, parser_database::ast::WithSpan,
+    common::preview_features::PreviewFeature,
+    datamodel_connector::{walker_ext_traits::*, ConnectorCapability},
+    diagnostics::DatamodelError,
+    parser_database::ast::WithSpan,
     validate::validation_pipeline::context::Context,
 };
-use datamodel_connector::{walker_ext_traits::*, ConnectorCapability};
 use parser_database::walkers::{ModelWalker, PrimaryKeyWalker};
 use std::borrow::Cow;
 

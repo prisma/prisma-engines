@@ -394,7 +394,7 @@ fn new_lines_in_source_must_work() {
     "#};
 
     let config = parse_configuration(schema);
-    let rendered = psl::mcf::render_sources_to_json(&config.datasources);
+    let rendered = psl::render_sources_to_json(&config.datasources);
 
     let expected = expect![[r#"
         [

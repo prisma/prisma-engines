@@ -56,9 +56,6 @@ version = "0.4"
 path = "../../../psl/psl"
 features = ["default_generators"]
 
-[dependencies.sql-datamodel-connector]
-path = "../../../libs/datamodel/connectors/sql-datamodel-connector"
-
 [dependencies.serde]
 features = ["derive"]
 version = "1.0"

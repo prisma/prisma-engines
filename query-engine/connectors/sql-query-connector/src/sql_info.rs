@@ -46,7 +46,7 @@ impl SqlInfo {
             family: SqlFamily::SQLite,
             max_rows: Some(999),
             max_bind_values: (*BATCH_SIZE_OVERRIDE).or(Some(999)),
-            capabilities: ConnectorCapabilities::new(sql_datamodel_connector::SQLITE.capabilities().to_owned()),
+            capabilities: ConnectorCapabilities::new(psl::builtin_connectors::SQLITE.capabilities().to_owned()),
         }
     }
 
@@ -56,7 +56,7 @@ impl SqlInfo {
             max_rows: None,
             // See https://stackoverflow.com/a/11131824/788562
             max_bind_values: (*BATCH_SIZE_OVERRIDE).or(Some(65535)),
-            capabilities: ConnectorCapabilities::new(sql_datamodel_connector::MYSQL.capabilities().to_owned()),
+            capabilities: ConnectorCapabilities::new(psl::builtin_connectors::MYSQL.capabilities().to_owned()),
         }
     }
 
@@ -65,7 +65,7 @@ impl SqlInfo {
             family: SqlFamily::Postgres,
             max_rows: None,
             max_bind_values: (*BATCH_SIZE_OVERRIDE).or(Some(32767)),
-            capabilities: ConnectorCapabilities::new(sql_datamodel_connector::POSTGRES.capabilities().to_owned()),
+            capabilities: ConnectorCapabilities::new(psl::builtin_connectors::POSTGRES.capabilities().to_owned()),
         }
     }
 
@@ -74,7 +74,7 @@ impl SqlInfo {
             family: SqlFamily::MSSQL,
             max_rows: Some(1000),
             max_bind_values: (*BATCH_SIZE_OVERRIDE).or(Some(2099)),
-            capabilities: ConnectorCapabilities::new(sql_datamodel_connector::MSSQL.capabilities().to_owned()),
+            capabilities: ConnectorCapabilities::new(psl::builtin_connectors::MSSQL.capabilities().to_owned()),
         }
     }
 }

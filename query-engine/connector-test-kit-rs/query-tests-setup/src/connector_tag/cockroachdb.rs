@@ -56,5 +56,5 @@ impl CockroachDbConnectorTag {
 }
 
 fn cockroachdb_capabilities() -> Vec<ConnectorCapability> {
-    sql_datamodel_connector::COCKROACH.capabilities().to_owned()
+    psl::builtin_connectors::COCKROACH.capabilities().to_owned()
 }

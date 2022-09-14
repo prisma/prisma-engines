@@ -1,5 +1,5 @@
 pub(crate) fn run(schema: &str) -> String {
-    let datamodel_result = datamodel::parse_configuration(schema);
+    let datamodel_result = psl::parse_configuration(schema);
 
     match datamodel_result {
         Ok(validated_configuration) => {

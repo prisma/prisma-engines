@@ -6,7 +6,7 @@ mod native;
 mod preview;
 mod text_document_completion;
 
-use datamodel::parser_database::ast;
+use psl::parser_database::ast;
 use log::*;
 use lsp_types::{Position, Range};
 
@@ -57,7 +57,7 @@ pub fn format(schema: &str, params: &str) -> String {
         }
     };
 
-    datamodel::reformat(schema, params.options.tab_size as usize).unwrap_or_else(|| schema.to_owned())
+    psl::reformat(schema, params.options.tab_size as usize).unwrap_or_else(|| schema.to_owned())
 }
 
 pub fn lint(schema: String) -> String {

@@ -1,7 +1,6 @@
-use mongodb_datamodel_connector::MONGODB;
-
 use super::*;
 use crate::{MongoDbSchemaRenderer, TestError, TestResult};
+use psl::builtin_connectors::MONGODB;
 
 #[derive(Debug, Default, Clone)]
 pub struct MongoDbConnectorTag {

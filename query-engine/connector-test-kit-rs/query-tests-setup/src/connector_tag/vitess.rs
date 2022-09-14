@@ -117,5 +117,5 @@ impl Display for VitessVersion {
 }
 
 fn vitess_capabilities() -> Vec<ConnectorCapability> {
-    sql_datamodel_connector::MYSQL.capabilities().to_owned()
+    psl::builtin_connectors::MYSQL.capabilities().to_owned()
 }
