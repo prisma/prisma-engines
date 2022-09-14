@@ -64,7 +64,7 @@ features = ["derive"]
 version = "1.0"
 
 [dependencies.cuid]
-git = "https://github.com/prisma/cuid-rust"
+version = "1.2"
 
 [dependencies.user-facing-errors]
 features = ["sql"]
