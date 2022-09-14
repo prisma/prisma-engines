@@ -7,9 +7,7 @@ use crate::{
 };
 use datamodel_connector::ReferentialIntegrity;
 use enumflags2::BitFlags;
-use mongodb_datamodel_connector::*;
 use parser_database::{ast::WithDocumentation, coerce, coerce_array, coerce_opt};
-use sql_datamodel_connector::*;
 use std::{borrow::Cow, collections::HashMap};
 
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
@@ -29,11 +27,12 @@ impl DatasourceLoader {
         ast_schema: &ast::SchemaAst,
         preview_features: BitFlags<PreviewFeature>,
         diagnostics: &mut Diagnostics,
+        connectors: crate::builtin_connectors::ConnectorRegistry,
     ) -> Vec<Datasource> {
         let mut sources = Vec::new();
 
         for src in ast_schema.sources() {
-            if let Some(source) = self.lift_datasource(src, preview_features, diagnostics) {
+            if let Some(source) = self.lift_datasource(src, preview_features, diagnostics, connectors) {
                 sources.push(source)
             }
         }
@@ -56,6 +55,7 @@ impl DatasourceLoader {
         ast_source: &ast::SourceConfig,
         preview_features: BitFlags<PreviewFeature>,
         diagnostics: &mut Diagnostics,
+        connectors: crate::builtin_connectors::ConnectorRegistry,
     ) -> Option<Datasource> {
         let source_name = &ast_source.name.name;
         let mut args: HashMap<_, _> = ast_source
@@ -134,23 +134,18 @@ impl DatasourceLoader {
         let documentation = ast_source.documentation().map(String::from);
         let referential_integrity = get_referential_integrity(&args, preview_features, ast_source, diagnostics);
 
-        let active_connector: &'static dyn datamodel_connector::Connector = match provider {
-            p if MYSQL.is_provider(p) => MYSQL,
-            p if POSTGRES.is_provider(p) => POSTGRES,
-            p if SQLITE.is_provider(p) => SQLITE,
-            p if MSSQL.is_provider(p) => MSSQL,
-            p if MONGODB.is_provider(p) => MONGODB,
-            p if COCKROACH.is_provider(p) => COCKROACH,
+        let active_connector: &'static dyn datamodel_connector::Connector =
+            match connectors.iter().find(|c| c.is_provider(provider)) {
+                Some(c) => *c,
+                None => {
+                    diagnostics.push_error(DatamodelError::new_datasource_provider_not_known_error(
+                        provider,
+                        provider_arg.span(),
+                    ));
 
-            _ => {
-                diagnostics.push_error(DatamodelError::new_datasource_provider_not_known_error(
-                    provider,
-                    provider_arg.span(),
-                ));
-
-                return None;
-            }
-        };
+                    return None;
+                }
+            };
 
         if let Some(integrity) = referential_integrity {
             if !active_connector
