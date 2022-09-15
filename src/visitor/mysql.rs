@@ -12,6 +12,8 @@ use std::fmt::{self, Write};
 pub struct Mysql<'a> {
     query: String,
     parameters: Vec<Value<'a>>,
+    /// The table a deleting or updating query is acting on.
+    target_table: Option<Table<'a>>,
 }
 
 impl<'a> Mysql<'a> {
@@ -102,12 +104,14 @@ impl<'a> Visitor<'a> for Mysql<'a> {
     where
         Q: Into<Query<'a>>,
     {
+        let query = query.into();
         let mut mysql = Mysql {
             query: String::with_capacity(4096),
             parameters: Vec::with_capacity(128),
+            target_table: get_target_table(query.clone()),
         };
 
-        Mysql::visit_query(&mut mysql, query.into())?;
+        Mysql::visit_query(&mut mysql, query)?;
 
         Ok((mysql.query, mysql.parameters))
     }
@@ -245,6 +249,33 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         }
 
         Ok(())
+    }
+
+    /// MySql will error if a `Update` or `Delete` query has a subselect
+    /// that references a table that is being updated or deleted
+    /// to get around that, we need to wrap the table in a tmp table name
+    ///
+    /// UPDATE `crabbywilderness` SET `val` = ?
+    /// WHERE (`crabbywilderness`.`id`)
+    /// IN (SELECT `t1`.`id` FROM `crabbywilderness` AS `t1`
+    /// INNER JOIN `breakabletomatoes` AS `j` ON `j`.`id` = `t1`.`id2`)
+    fn visit_sub_selection(&mut self, query: SelectQuery<'a>) -> visitor::Result {
+        match query {
+            SelectQuery::Select(select) => {
+                if let Some(table) = &self.target_table {
+                    if select.tables.contains(table) {
+                        let tmp_name = "tmp_subselect_table";
+                        let tmp_table = Table::from(*select).alias(tmp_name);
+                        let sub_select = Select::from_table(tmp_table).value(Table::from(tmp_name).asterisk());
+
+                        return self.visit_select(sub_select);
+                    }
+                }
+
+                self.visit_select(*select)
+            }
+            SelectQuery::Union(union) => self.visit_union(*union),
+        }
     }
 
     fn parameter_substitution(&mut self) -> visitor::Result {
@@ -582,6 +613,14 @@ impl<'a> Visitor<'a> for Mysql<'a> {
     }
 }
 
+fn get_target_table(query: Query<'_>) -> Option<Table<'_>> {
+    match query {
+        Query::Delete(delete) => Some(delete.table.clone()),
+        Query::Update(update) => Some(update.table.clone()),
+        _ => None,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::visitor::*;
@@ -892,6 +931,48 @@ mod tests {
 
         assert_eq!(
             "SELECT `test`.* FROM `test` WHERE (NOT (NOT JSON_CONTAINS(`json`, ?) OR NOT JSON_CONTAINS(?, `json`)))",
+            sql
+        );
+    }
+
+    #[test]
+    fn test_subselect_temp_table_wrapper_for_update() {
+        let table_1 = "table_1";
+        let table_2 = "table2";
+
+        let join = table_2.alias("j").on(("j", "id").equals(Column::from(("t1", "id2"))));
+        let a = table_1.clone().alias("t1");
+        let selection = Select::from_table(a).column(("t1", "id")).inner_join(join);
+
+        let id1 = Column::from((table_1, "id"));
+        let conditions = Row::from(vec![id1]).in_selection(selection);
+        let update = Update::table(table_1).set("val", 2).so_that(conditions);
+
+        let (sql, _) = Mysql::build(update).unwrap();
+
+        assert_eq!(
+            "UPDATE `table_1` SET `val` = ? WHERE (`table_1`.`id`) IN (SELECT `tmp_subselect_table`.* FROM (SELECT `t1`.`id` FROM `table_1` AS `t1` INNER JOIN `table2` AS `j` ON `j`.`id` = `t1`.`id2`) AS `tmp_subselect_table`)",
+            sql
+        );
+    }
+
+    #[test]
+    fn test_subselect_temp_table_wrapper_for_delete() {
+        let table_1 = "table_1";
+        let table_2 = "table2";
+
+        let join = table_2.alias("j").on(("j", "id").equals(Column::from(("t1", "id2"))));
+        let a = table_1.clone().alias("t1");
+        let selection = Select::from_table(a).column(("t1", "id")).inner_join(join);
+
+        let id1 = Column::from((table_1, "id"));
+        let conditions = Row::from(vec![id1]).in_selection(selection);
+        let update = Delete::from_table(table_1).so_that(conditions);
+
+        let (sql, _) = Mysql::build(update).unwrap();
+
+        assert_eq!(
+            "DELETE FROM `table_1` WHERE (`table_1`.`id`) IN (SELECT `tmp_subselect_table`.* FROM (SELECT `t1`.`id` FROM `table_1` AS `t1` INNER JOIN `table2` AS `j` ON `j`.`id` = `t1`.`id2`) AS `tmp_subselect_table`)",
             sql
         );
     }

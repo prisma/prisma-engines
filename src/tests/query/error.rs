@@ -39,7 +39,7 @@ async fn database_already_exists(api: &mut dyn TestApi) -> crate::Result<()> {
 
 #[test_each_connector]
 async fn column_does_not_exist_on_write(api: &mut dyn TestApi) -> crate::Result<()> {
-    let table = api.create_table("id1 int").await?;
+    let table = api.create_temp_table("id1 int").await?;
 
     let insert = Insert::single_into(&table).value("id1", 1).value("does_not_exist", 2);
     let res = api.conn().insert(insert.clone().into()).await;
@@ -60,7 +60,7 @@ async fn column_does_not_exist_on_write(api: &mut dyn TestApi) -> crate::Result<
 
 #[test_each_connector]
 async fn column_does_not_exist_on_read(api: &mut dyn TestApi) -> crate::Result<()> {
-    let table = api.create_table("id1 int").await?;
+    let table = api.create_temp_table("id1 int").await?;
 
     let insert = Insert::single_into(&table).value("id1", 1);
     api.conn().insert(insert.clone().into()).await?;
@@ -84,7 +84,7 @@ async fn column_does_not_exist_on_read(api: &mut dyn TestApi) -> crate::Result<(
 
 #[test_each_connector]
 async fn unique_constraint_violation(api: &mut dyn TestApi) -> crate::Result<()> {
-    let table = api.create_table("id1 int, id2 int").await?;
+    let table = api.create_temp_table("id1 int, id2 int").await?;
     let index = api.create_index(&table, "id1, id2").await?;
 
     let insert = Insert::single_into(&table).value("id1", 1).value("id2", 2);
@@ -114,7 +114,7 @@ async fn unique_constraint_violation(api: &mut dyn TestApi) -> crate::Result<()>
 
 #[test_each_connector]
 async fn null_constraint_violation(api: &mut dyn TestApi) -> crate::Result<()> {
-    let table = api.create_table("id1 int not null, id2 int not null").await?;
+    let table = api.create_temp_table("id1 int not null, id2 int not null").await?;
 
     let res = api.conn().insert(Insert::single_into(&table).into()).await;
     let err = res.unwrap_err();
@@ -149,7 +149,7 @@ async fn null_constraint_violation(api: &mut dyn TestApi) -> crate::Result<()> {
 #[test_each_connector(tags("mysql"))]
 async fn int_unsigned_negative_value_out_of_range(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api
-        .create_table("id int4 auto_increment primary key, big int4 unsigned")
+        .create_temp_table("id int4 auto_increment primary key, big int4 unsigned")
         .await?;
 
     // Negative value
@@ -174,7 +174,7 @@ async fn int_unsigned_negative_value_out_of_range(api: &mut dyn TestApi) -> crat
 #[test_each_connector(tags("mysql"))]
 async fn bigint_unsigned_positive_value_out_of_range(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api
-        .create_table("id int4 auto_increment primary key, big bigint unsigned")
+        .create_temp_table("id int4 auto_increment primary key, big bigint unsigned")
         .await?;
 
     let insert = format!(r#"INSERT INTO `{}` (`big`) VALUES (18446744073709551615)"#, table);
@@ -190,7 +190,7 @@ async fn bigint_unsigned_positive_value_out_of_range(api: &mut dyn TestApi) -> c
 
 #[test_each_connector(tags("mysql", "mssql", "postgresql"))]
 async fn length_mismatch(api: &mut dyn TestApi) -> crate::Result<()> {
-    let table = api.create_table("value varchar(3)").await?;
+    let table = api.create_temp_table("value varchar(3)").await?;
     let insert = Insert::single_into(&table).value("value", "fooo");
 
     let result = api.conn().insert(insert.into()).await;
@@ -204,10 +204,10 @@ async fn length_mismatch(api: &mut dyn TestApi) -> crate::Result<()> {
 
 #[test_each_connector(tags("postgresql", "sqlite"))]
 async fn foreign_key_constraint_violation(api: &mut dyn TestApi) -> crate::Result<()> {
-    let parent = api.create_table("id smallint not null primary key").await?;
+    let parent = api.create_temp_table("id smallint not null primary key").await?;
     let foreign_key = api.foreign_key(&parent, "id", "parent_id");
     let child = api
-        .create_table(&format!("parent_id smallint not null, {}", &foreign_key))
+        .create_temp_table(&format!("parent_id smallint not null, {}", &foreign_key))
         .await?;
 
     let insert = Insert::single_into(&child).value("parent_id", 10);
@@ -265,7 +265,7 @@ async fn garbage_datetime_values(api: &mut dyn TestApi) -> crate::Result<()> {
         .await?;
 
     let table = api
-        .create_table("data datetime not null default '0000-00-00 00:00:00'")
+        .create_temp_table("data datetime not null default '0000-00-00 00:00:00'")
         .await?;
 
     let insert = format!("INSERT INTO {} () VALUES ()", table);
@@ -357,7 +357,7 @@ async fn should_execute_multi_statement_queries_with_raw_cmd(api: &mut dyn TestA
 #[cfg(feature = "uuid")]
 #[test_each_connector(tags("postgresql"))]
 async fn uuid_length_error(api: &mut dyn TestApi) -> crate::Result<()> {
-    let table = api.create_table("value uuid").await?;
+    let table = api.create_temp_table("value uuid").await?;
     let insert = Insert::single_into(&table).value("value", "fooo");
 
     let result = api.conn().insert(insert.into()).await;
@@ -371,7 +371,7 @@ async fn uuid_length_error(api: &mut dyn TestApi) -> crate::Result<()> {
 
 #[test_each_connector(tags("postgresql"))]
 async fn unsupported_column_type(api: &mut dyn TestApi) -> crate::Result<()> {
-    let table = api.create_table("point point, points point[]").await?;
+    let table = api.create_temp_table("point point, points point[]").await?;
     api.conn()
         .query_raw(
             &format!(
@@ -409,7 +409,7 @@ async fn unsupported_column_type(api: &mut dyn TestApi) -> crate::Result<()> {
 
 #[test_each_connector(tags("postgresql"))]
 async fn array_into_scalar_should_fail(api: &mut dyn TestApi) -> crate::Result<()> {
-    let table = api.create_table("string text").await?;
+    let table = api.create_temp_table("string text").await?;
     let insert = Insert::single_into(&table).value("string", Value::array(vec!["abc", "def"]));
     let result = api.conn().insert(insert.into()).await;
 

@@ -29,11 +29,19 @@ impl<'a> TestApi for Sqlite<'a> {
     }
 
     async fn create_type_table(&mut self, r#type: &str) -> crate::Result<String> {
-        self.create_table(&format!("{}, `value` {}", self.autogen_id("id"), r#type))
+        self.create_temp_table(&format!("{}, `value` {}", self.autogen_id("id"), r#type))
             .await
     }
 
-    async fn create_table(&mut self, columns: &str) -> crate::Result<String> {
+    async fn create_table(&mut self, _columns: &str) -> crate::Result<String> {
+        unimplemented!("only required for MySql nested sub select test")
+    }
+
+    async fn delete_table(&mut self, _table_name: &str) -> crate::Result<()> {
+        unimplemented!("only required for MySql nested sub select test")
+    }
+
+    async fn create_temp_table(&mut self, columns: &str) -> crate::Result<String> {
         let name = self.get_name();
 
         let (name, create) = self.render_create_table(&name, columns);
