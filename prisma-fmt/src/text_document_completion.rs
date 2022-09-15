@@ -1,10 +1,11 @@
-use psl::{
-    datamodel_connector::{Connector, Diagnostics, ReferentialIntegrity},
-    parse_configuration,
-    parser_database::{ast, ParserDatabase, SourceFile},
-};
 use log::*;
 use lsp_types::*;
+use psl::{
+    datamodel_connector::{Connector, ReferentialIntegrity},
+    parse_configuration,
+    parser_database::{ast, ParserDatabase, SourceFile},
+    Diagnostics,
+};
 use std::sync::Arc;
 
 pub(crate) fn empty_completion_list() -> CompletionList {
@@ -29,12 +30,7 @@ pub(crate) fn completion(schema: String, params: CompletionParams) -> Completion
         .ok()
         .and_then(|conf| conf.datasources.into_iter().next())
         .map(|datasource| (datasource.active_connector, datasource.referential_integrity()))
-        .unwrap_or_else(|| {
-            (
-                &psl::datamodel_connector::EmptyDatamodelConnector,
-                Default::default(),
-            )
-        });
+        .unwrap_or_else(|| (&psl::datamodel_connector::EmptyDatamodelConnector, Default::default()));
 
     let mut list = CompletionList {
         is_incomplete: false,

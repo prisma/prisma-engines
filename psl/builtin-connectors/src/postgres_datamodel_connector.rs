@@ -1,10 +1,13 @@
 mod validations;
 
-use datamodel::datamodel_connector::{
-    helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
-    parser_database::{ast, walkers, IndexAlgorithm, OperatorClass, ParserDatabase},
-    Connector, ConnectorCapability, ConstraintScope, DatamodelError, Diagnostics, NativeTypeConstructor,
-    NativeTypeInstance, ReferentialAction, ReferentialIntegrity, ScalarType, Span, StringFilter,
+use datamodel::{
+    datamodel_connector::{
+        helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
+        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance,
+        ReferentialIntegrity, StringFilter,
+    },
+    diagnostics::{DatamodelError, Diagnostics},
+    parser_database::{ast, walkers, IndexAlgorithm, OperatorClass, ParserDatabase, ReferentialAction, ScalarType},
 };
 use enumflags2::BitFlags;
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList, InsertTextFormat};
@@ -222,7 +225,7 @@ impl Connector for PostgresDatamodelConnector {
         &self,
         native_type_instance: &NativeTypeInstance,
         _scalar_type: &ScalarType,
-        span: Span,
+        span: ast::Span,
         errors: &mut Diagnostics,
     ) {
         let native_type: PostgresType =
@@ -279,7 +282,7 @@ impl Connector for PostgresDatamodelConnector {
         &self,
         name: &str,
         args: Vec<String>,
-        span: Span,
+        span: ast::Span,
     ) -> Result<NativeTypeInstance, DatamodelError> {
         let cloned_args = args.clone();
 

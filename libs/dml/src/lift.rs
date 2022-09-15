@@ -1,10 +1,12 @@
 use crate::{self as dml, *};
-use ::datamodel::datamodel_connector::{walker_ext_traits::*, Connector, ReferentialIntegrity, ScalarType};
-use ::datamodel::parser_database::{
-    self as db,
-    ast::{self, WithDocumentation, WithName, WithSpan},
-    walkers::*,
-    IndexAlgorithm,
+use ::datamodel::{
+    datamodel_connector::{walker_ext_traits::*, Connector, ReferentialIntegrity},
+    parser_database::{
+        self as db,
+        ast::{self, WithDocumentation, WithName, WithSpan},
+        walkers::*,
+        IndexAlgorithm, ScalarType,
+    },
 };
 use either::Either;
 use std::collections::HashMap;

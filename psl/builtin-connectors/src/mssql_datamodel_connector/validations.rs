@@ -1,7 +1,10 @@
-use datamodel::datamodel_connector::{
-    parser_database::walkers::{IndexWalker, PrimaryKeyWalker},
-    walker_ext_traits::ScalarFieldWalkerExt,
-    Connector, DatamodelError, Diagnostics, ScalarType,
+use datamodel::{
+    datamodel_connector::{walker_ext_traits::ScalarFieldWalkerExt, Connector},
+    diagnostics::{DatamodelError, Diagnostics},
+    parser_database::{
+        walkers::{IndexWalker, PrimaryKeyWalker},
+        ScalarType,
+    },
 };
 use native_types::MsSqlType;
 

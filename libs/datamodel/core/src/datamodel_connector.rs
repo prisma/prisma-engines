@@ -17,18 +17,17 @@ mod referential_integrity;
 
 pub use self::{
     capabilities::{ConnectorCapabilities, ConnectorCapability},
+    empty_connector::EmptyDatamodelConnector,
     filters::*,
+    native_type_constructor::NativeTypeConstructor,
     native_type_instance::NativeTypeInstance,
+    referential_integrity::ReferentialIntegrity,
 };
-pub use diagnostics::{DatamodelError, Diagnostics, NativeTypeErrorFactory, Span};
-pub use empty_connector::EmptyDatamodelConnector;
-pub use native_type_constructor::NativeTypeConstructor;
-pub use parser_database::{self, ReferentialAction, ScalarType};
-pub use referential_integrity::ReferentialIntegrity;
 
+use diagnostics::{DatamodelError, Diagnostics, NativeTypeErrorFactory, Span};
 use enumflags2::BitFlags;
 use lsp_types::CompletionList;
-use parser_database::{ast::SchemaPosition, walkers, IndexAlgorithm, ParserDatabase};
+use parser_database::{ast::SchemaPosition, walkers, IndexAlgorithm, ParserDatabase, ReferentialAction, ScalarType};
 use std::{borrow::Cow, collections::BTreeMap};
 
 /// The datamodel connector API.

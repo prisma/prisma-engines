@@ -4,8 +4,8 @@ use super::{
     default_value,
     names::{NameTaken, Names},
 };
-use crate::{diagnostics::DatamodelError, validate::validation_pipeline::context::Context};
 use crate::datamodel_connector::{walker_ext_traits::*, ConnectorCapability};
+use crate::{diagnostics::DatamodelError, validate::validation_pipeline::context::Context};
 use parser_database::{
     ast::{self, WithSpan},
     walkers::{FieldWalker, PrimaryKeyWalker, ScalarFieldAttributeWalker, ScalarFieldWalker, TypedFieldWalker},

@@ -1,10 +1,13 @@
 mod validations;
 
-use datamodel::datamodel_connector::{
-    helper::{args_vec_from_opt, parse_one_opt_u32, parse_one_u32, parse_two_opt_u32},
-    parser_database::walkers,
-    Connector, ConnectorCapability, ConstraintScope, DatamodelError, Diagnostics, NativeTypeConstructor,
-    NativeTypeInstance, ReferentialAction, ReferentialIntegrity, ScalarType, Span,
+use datamodel::{
+    datamodel_connector::{
+        helper::{args_vec_from_opt, parse_one_opt_u32, parse_one_u32, parse_two_opt_u32},
+        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance,
+        ReferentialIntegrity,
+    },
+    diagnostics::{DatamodelError, Diagnostics, Span},
+    parser_database::{walkers, ReferentialAction, ScalarType},
 };
 use enumflags2::BitFlags;
 use native_types::{

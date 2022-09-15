@@ -1,9 +1,9 @@
-use datamodel::datamodel_connector::{
+use datamodel::{
+    diagnostics::{DatamodelError, Diagnostics},
     parser_database::{
         ast::{WithName, WithSpan},
         walkers::{IndexWalker, ModelWalker, PrimaryKeyWalker, ScalarFieldWalker},
     },
-    DatamodelError, Diagnostics,
 };
 
 /// If `@default(auto())`, then also `@db.ObjectId`

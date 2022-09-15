@@ -21,7 +21,7 @@ pub use psl_core::{
 
 /// The implementation of the CLI getConfig() utility and its JSON format.
 pub mod get_config {
-    pub use psl_core::mcf::{*, config_to_mcf_json_value as get_config};
+    pub use psl_core::mcf::{config_to_mcf_json_value as get_config, *};
 }
 
 /// Parses and validate a schema, but skip analyzing everything except datasource and generator

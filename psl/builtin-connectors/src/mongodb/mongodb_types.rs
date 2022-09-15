@@ -1,4 +1,8 @@
-use datamodel::datamodel_connector::{DatamodelError, NativeTypeConstructor, ScalarType, Span};
+use datamodel::{
+    datamodel_connector::NativeTypeConstructor,
+    diagnostics::{DatamodelError, Span},
+    parser_database::ScalarType,
+};
 use native_types::MongoDbType;
 use once_cell::sync::Lazy;
 use std::collections::HashMap;

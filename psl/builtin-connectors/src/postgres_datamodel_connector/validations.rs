@@ -1,7 +1,7 @@
-use datamodel::datamodel_connector::{
+use datamodel::{
+    datamodel_connector::{walker_ext_traits::*, Connector},
+    diagnostics::{DatamodelError, Diagnostics},
     parser_database::{ast::WithSpan, walkers::IndexWalker, IndexAlgorithm, OperatorClass},
-    walker_ext_traits::*,
-    Connector, DatamodelError, Diagnostics,
 };
 use native_types::PostgresType;
 

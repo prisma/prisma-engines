@@ -1,7 +1,7 @@
-use datamodel::datamodel_connector::{
+use datamodel::{
+    datamodel_connector::{walker_ext_traits::ScalarFieldWalkerExt, Connector},
+    diagnostics::Diagnostics,
     parser_database::walkers::{IndexWalker, PrimaryKeyWalker},
-    walker_ext_traits::ScalarFieldWalkerExt,
-    Connector, Diagnostics,
 };
 
 const LENGTH_GUIDE: &str = " Please use the `length` argument to the field in the index definition to allow this.";

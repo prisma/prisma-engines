@@ -1,9 +1,13 @@
 mod mongodb_types;
 mod validations;
 
-use datamodel::datamodel_connector::{
-    parser_database::walkers::*, Connector, ConnectorCapability, ConstraintScope, DatamodelError, Diagnostics,
-    NativeTypeConstructor, NativeTypeInstance, ReferentialAction, ReferentialIntegrity, ScalarType, Span,
+use datamodel::{
+    datamodel_connector::{
+        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance,
+        ReferentialIntegrity,
+    },
+    diagnostics::{DatamodelError, Diagnostics, Span},
+    parser_database::{walkers::*, ReferentialAction, ScalarType},
 };
 use enumflags2::BitFlags;
 use mongodb_types::*;

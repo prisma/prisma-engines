@@ -1,6 +1,10 @@
-use datamodel::datamodel_connector::{
-    parser_database::ScalarType, Connector, ConnectorCapability, ConstraintScope, DatamodelError,
-    NativeTypeConstructor, NativeTypeInstance, ReferentialAction, ReferentialIntegrity, Span,
+use datamodel::{
+    datamodel_connector::{
+        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance,
+        ReferentialIntegrity,
+    },
+    diagnostics::{DatamodelError, Span},
+    parser_database::{ReferentialAction, ScalarType},
 };
 use enumflags2::BitFlags;
 use std::borrow::Cow;

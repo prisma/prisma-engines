@@ -1,16 +1,19 @@
 mod validations;
 
-use datamodel::datamodel_connector::{
-    helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
+use datamodel::{
+    datamodel_connector::{
+        helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
+        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance,
+        ReferentialIntegrity,
+    },
+    diagnostics::{DatamodelError, Diagnostics},
     parser_database::{
         self,
         ast::{self, SchemaPosition},
         coerce,
         walkers::ModelWalker,
-        IndexAlgorithm, ParserDatabase,
+        IndexAlgorithm, ParserDatabase, ReferentialAction, ScalarType,
     },
-    Connector, ConnectorCapability, ConstraintScope, DatamodelError, Diagnostics, NativeTypeConstructor,
-    NativeTypeInstance, ReferentialAction, ReferentialIntegrity, ScalarType, Span,
 };
 use enumflags2::BitFlags;
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList};
@@ -196,7 +199,7 @@ impl Connector for CockroachDatamodelConnector {
         &self,
         native_type_instance: &NativeTypeInstance,
         _scalar_type: &ScalarType,
-        span: Span,
+        span: ast::Span,
         errors: &mut Diagnostics,
     ) {
         let native_type: CockroachType =
@@ -268,7 +271,7 @@ impl Connector for CockroachDatamodelConnector {
         &self,
         name: &str,
         args: Vec<String>,
-        span: Span,
+        span: ast::Span,
     ) -> Result<NativeTypeInstance, DatamodelError> {
         let cloned_args = args.clone();
 

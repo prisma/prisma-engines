@@ -1,8 +1,8 @@
+use lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand, CodeActionParams, Range, TextEdit, WorkspaceEdit};
 use psl::parser_database::{
     ast::WithSpan,
     walkers::{CompleteInlineRelationWalker, ModelWalker, ScalarFieldWalker},
 };
-use lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand, CodeActionParams, Range, TextEdit, WorkspaceEdit};
 use std::collections::HashMap;
 
 /// If the referencing side of the one-to-one relation does not point

@@ -1,9 +1,9 @@
-use datamodel::datamodel_connector::{
+use datamodel::{
+    diagnostics::{DatamodelError, Diagnostics},
     parser_database::{
         walkers::{IndexWalker, ModelWalker},
-        IndexAlgorithm,
+        IndexAlgorithm, ScalarType,
     },
-    DatamodelError, Diagnostics, ScalarType,
 };
 
 /// Validating the correct usage of GIN indices.
