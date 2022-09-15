@@ -345,17 +345,11 @@
 <span id="339">339</span>
 <span id="340">340</span>
 <span id="341">341</span>
-<span id="342">342</span>
-<span id="343">343</span>
-<span id="344">344</span>
-<span id="345">345</span>
-<span id="346">346</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::iter</span>;
-
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::join::JoinStage</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::join::JoinStage</span>;
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 <span class="kw">use</span> <span class="ident">mongodb::bson</span>::{<span class="ident">doc</span>, <span class="ident">Document</span>};
 <span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">OrderBy</span>, <span class="ident">OrderByHop</span>, <span class="ident">OrderByToManyAggregation</span>, <span class="ident">SortOrder</span>};
+<span class="kw">use</span> <span class="ident">std::iter</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">OrderByData</span> {
@@ -457,8 +451,8 @@
 
     <span class="doccomment">/// The Mongo binding name of this orderBy, required for cursor conditions.</span>
     <span class="doccomment">/// For a relation field, this is only the first item of the path (e.g. orderby_TestModel_1)</span>
-    <span class="doccomment">/// Returns 2 forms, one for the left one and one for the right one. The left one is</span>
-    <span class="doccomment">/// escaped for usage in user-defined variables.</span>
+    <span class="doccomment">/// Returns 2 forms, one for the left one and one for the right one. The left one is a unique,</span>
+    <span class="doccomment">/// valid name for a variable binding.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">binding_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">String</span>, <span class="ident">String</span>) {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">prefix</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">prefix</span> {
             <span class="kw">let</span> <span class="ident">first</span> <span class="op">=</span> <span class="ident">prefix</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>().<span class="ident">to_string</span>();
@@ -466,18 +460,14 @@
             (<span class="ident">first</span>.<span class="ident">clone</span>(), <span class="ident">first</span>)
         } <span class="kw">else</span> {
             <span class="comment">// TODO: Order by relevance won&#39;t work here</span>
-            <span class="kw">let</span> <span class="ident">right</span> <span class="op">=</span> <span class="self">self</span>
-                .<span class="ident">order_by</span>
-                .<span class="ident">field</span>()
-                .<span class="ident">expect</span>(<span class="string">&quot;a field on which to order by is expected&quot;</span>)
-                .<span class="ident">db_name</span>()
-                .<span class="ident">to_owned</span>();
+            <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">order_by</span>.<span class="ident">field</span>().<span class="ident">expect</span>(<span class="string">&quot;a field on which to order by is expected&quot;</span>);
+            <span class="kw">let</span> <span class="ident">right</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>();
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">left</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">clone</span>();
 
-            <span class="kw">let</span> <span class="ident">left</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">right</span>.<span class="ident">starts_with</span>(<span class="string">&#39;_&#39;</span>) {
-                <span class="ident">right</span>.<span class="ident">strip_prefix</span>(<span class="string">&#39;_&#39;</span>).<span class="ident">unwrap</span>().<span class="ident">to_owned</span>()
-            } <span class="kw">else</span> {
-                <span class="ident">right</span>.<span class="ident">to_owned</span>()
-            };
+            <span class="comment">// Issue: https://github.com/prisma/prisma/issues/14001</span>
+            <span class="comment">// Here we can assume the field name is ASCII, because it is the _client_ field name,</span>
+            <span class="comment">// not the mapped name.</span>
+            <span class="ident">left</span>[..<span class="number">1</span>].<span class="ident">make_ascii_lowercase</span>();
 
             (<span class="ident">left</span>, <span class="ident">right</span>)
         }
