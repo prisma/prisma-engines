@@ -351,8 +351,6 @@
 <span id="345">345</span>
 <span id="346">346</span>
 <span id="347">347</span>
-<span id="348">348</span>
-<span id="349">349</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">coerce_null_to_zero_value</span>, <span class="ident">Filter</span>, <span class="ident">QueryArguments</span>, <span class="ident">WriteArgs</span>};
 <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
 <span class="kw">use</span> <span class="ident">dml::FieldArity</span>;
@@ -471,11 +469,9 @@
     <span class="doccomment">/// Returns (&lt;field db name&gt;, TypeIdentifier, FieldArity)</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identifiers</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">TypeIdentifier</span>, <span class="ident">FieldArity</span>)<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">AggregationSelection::Field</span>(<span class="ident">field</span>) =&gt; <span class="macro">vec!</span>[(
-                <span class="ident">field</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>(),
-                <span class="ident">field</span>.<span class="ident">type_identifier</span>.<span class="ident">clone</span>(),
-                <span class="ident">field</span>.<span class="ident">arity</span>,
-            )],
+            <span class="ident">AggregationSelection::Field</span>(<span class="ident">field</span>) =&gt; {
+                <span class="macro">vec!</span>[(<span class="ident">field</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>(), <span class="ident">field</span>.<span class="ident">type_identifier</span>.<span class="ident">clone</span>(), <span class="ident">field</span>.<span class="ident">arity</span>)]
+            }
 
             <span class="ident">AggregationSelection::Count</span> { <span class="ident">all</span>, <span class="ident">fields</span> } =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mapped</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::map_field_types</span>(<span class="ident">fields</span>, <span class="prelude-val">Some</span>(<span class="ident">TypeIdentifier::Int</span>));
