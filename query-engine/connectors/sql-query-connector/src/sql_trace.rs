@@ -47,13 +47,7 @@ macro_rules! sql_trace {
 }
 
 fn should_sample(traceparent: &str) -> bool {
-    let trace_info: Vec<&str> = traceparent.split('-').collect();
-
-    if trace_info.len() != 4 {
-        false
-    } else {
-        trace_info.last() == Some(&"01")
-    }
+    traceparent.split('-').count() == 4 && traceparent.ends_with("-01")
 }
 
 sql_trace!(Insert<'_>);
