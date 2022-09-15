@@ -204,8 +204,6 @@
 <span id="198">198</span>
 <span id="199">199</span>
 <span id="200">200</span>
-<span id="201">201</span>
-<span id="202">202</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">column_metadata</span>, <span class="ident">error</span>::<span class="kw-2">*</span>, <span class="ident">model_extensions</span>::<span class="kw-2">*</span>, <span class="ident">sql_info::SqlInfo</span>, <span class="ident">sql_trace::SqlTraceComment</span>,
     <span class="ident">value_ext::IntoTypedJsonExtension</span>, <span class="ident">AliasedCondition</span>, <span class="ident">ColumnMetadata</span>, <span class="ident">SqlRow</span>, <span class="ident">ToSqlRow</span>,
@@ -258,9 +256,7 @@
                 <span class="ident">Query::Select</span>(<span class="ident">Box::from</span>(<span class="ident">x</span>.<span class="ident">comment</span>(<span class="ident">trace_parent_to_string</span>(<span class="ident">span_ctx</span>))))
             }
             <span class="comment">// This is part of the required changes to pass a traceid</span>
-            (<span class="ident">Query::Select</span>(<span class="ident">x</span>), <span class="prelude-val">Some</span>(<span class="ident">traceparent</span>)) =&gt; {
-                <span class="ident">Query::Select</span>(<span class="ident">Box::from</span>(<span class="ident">x</span>.<span class="ident">comment</span>(<span class="macro">format!</span>(<span class="string">&quot;traceparent={}&quot;</span>, <span class="ident">traceparent</span>))))
-            }
+            (<span class="ident">Query::Select</span>(<span class="ident">x</span>), <span class="ident">trace_id</span>) =&gt; <span class="ident">Query::Select</span>(<span class="ident">Box::from</span>(<span class="ident">x</span>.<span class="ident">add_trace_id</span>(<span class="ident">trace_id</span>))),
             (<span class="ident">q</span>, <span class="kw">_</span>) =&gt; <span class="ident">q</span>,
         };
 
