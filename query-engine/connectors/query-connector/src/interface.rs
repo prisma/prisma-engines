@@ -116,11 +116,9 @@ impl AggregationSelection {
     /// Returns (<field db name>, TypeIdentifier, FieldArity)
     pub fn identifiers(&self) -> Vec<(String, TypeIdentifier, FieldArity)> {
         match self {
-            AggregationSelection::Field(field) => vec![(
-                field.db_name().to_owned(),
-                field.type_identifier.clone(),
-                field.arity,
-            )],
+            AggregationSelection::Field(field) => {
+                vec![(field.db_name().to_owned(), field.type_identifier.clone(), field.arity)]
+            }
 
             AggregationSelection::Count { all, fields } => {
                 let mut mapped = Self::map_field_types(fields, Some(TypeIdentifier::Int));
