@@ -474,7 +474,7 @@
             <span class="ident">AggregationSelection::Field</span>(<span class="ident">field</span>) =&gt; <span class="macro">vec!</span>[(
                 <span class="ident">field</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>(),
                 <span class="ident">field</span>.<span class="ident">type_identifier</span>.<span class="ident">clone</span>(),
-                <span class="ident">FieldArity::Required</span>,
+                <span class="ident">field</span>.<span class="ident">arity</span>,
             )],
 
             <span class="ident">AggregationSelection::Count</span> { <span class="ident">all</span>, <span class="ident">fields</span> } =&gt; {
