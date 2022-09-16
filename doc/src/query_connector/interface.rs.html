@@ -351,6 +351,16 @@
 <span id="345">345</span>
 <span id="346">346</span>
 <span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">coerce_null_to_zero_value</span>, <span class="ident">Filter</span>, <span class="ident">QueryArguments</span>, <span class="ident">WriteArgs</span>};
 <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
 <span class="kw">use</span> <span class="ident">dml::FieldArity</span>;
@@ -653,6 +663,16 @@
         <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
         <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+
+    <span class="doccomment">/// Update record in the `Model` with the given `WriteArgs` filtered by the</span>
+    <span class="doccomment">/// `Filter`.</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update_record</span>(
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
+        <span class="ident">record_filter</span>: <span class="ident">RecordFilter</span>,
+        <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
+        <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Delete records in the `Model` with the given `Filter`.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_records</span>(

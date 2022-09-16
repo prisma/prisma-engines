@@ -358,7 +358,7 @@
 
         <span class="kw">let</span> <span class="ident">filter</span>: <span class="ident">ConditionTree</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">filter</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">aliased_cond</span>(<span class="prelude-val">None</span>, <span class="bool-val">false</span>))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">aliased_condition_from</span>(<span class="prelude-val">None</span>, <span class="bool-val">false</span>))
             .<span class="ident">unwrap_or</span>(<span class="ident">ConditionTree::NoCondition</span>);
 
         <span class="kw">let</span> <span class="ident">conditions</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">filter</span>, <span class="ident">cursor_condition</span>) {
@@ -544,7 +544,7 @@
     );
 
     <span class="kw">match</span> <span class="ident">having</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">filter</span>) =&gt; <span class="ident">grouped</span>.<span class="ident">having</span>(<span class="ident">filter</span>.<span class="ident">aliased_cond</span>(<span class="prelude-val">None</span>, <span class="bool-val">false</span>)),
+        <span class="prelude-val">Some</span>(<span class="ident">filter</span>) =&gt; <span class="ident">grouped</span>.<span class="ident">having</span>(<span class="ident">filter</span>.<span class="ident">aliased_condition_from</span>(<span class="prelude-val">None</span>, <span class="bool-val">false</span>)),
         <span class="prelude-val">None</span> =&gt; <span class="ident">grouped</span>,
     }
 }

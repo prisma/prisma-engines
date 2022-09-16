@@ -24,6 +24,16 @@
 <span id="18">18</span>
 <span id="19">19</span>
 <span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">warnings</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::derive_partial_eq_without_eq</span>)]</span>
 
@@ -44,6 +54,16 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">write_args</span>::<span class="kw-2">*</span>;
 
 <span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">error::ConnectorError</span><span class="op">&gt;</span>;
+
+<span class="doccomment">/// When we write a single record using this update_records function, we always</span>
+<span class="doccomment">/// want the id of the changed record back. Even if the row wasn&#39;t updated. This can happen in situations where</span>
+<span class="doccomment">/// we could increment a null value and the update count would be zero for mysql.</span>
+<span class="doccomment">/// However when we updating any records we want to return an empty array if zero items were updated</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">UpdateType</span> {
+    <span class="ident">Many</span>,
+    <span class="ident">One</span>,
+}
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0 (4b91a6ea7 2022-08-08)" ></div>
 </body></html>

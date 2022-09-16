@@ -1111,6 +1111,47 @@
 <span id="1105">1105</span>
 <span id="1106">1106</span>
 <span id="1107">1107</span>
+<span id="1108">1108</span>
+<span id="1109">1109</span>
+<span id="1110">1110</span>
+<span id="1111">1111</span>
+<span id="1112">1112</span>
+<span id="1113">1113</span>
+<span id="1114">1114</span>
+<span id="1115">1115</span>
+<span id="1116">1116</span>
+<span id="1117">1117</span>
+<span id="1118">1118</span>
+<span id="1119">1119</span>
+<span id="1120">1120</span>
+<span id="1121">1121</span>
+<span id="1122">1122</span>
+<span id="1123">1123</span>
+<span id="1124">1124</span>
+<span id="1125">1125</span>
+<span id="1126">1126</span>
+<span id="1127">1127</span>
+<span id="1128">1128</span>
+<span id="1129">1129</span>
+<span id="1130">1130</span>
+<span id="1131">1131</span>
+<span id="1132">1132</span>
+<span id="1133">1133</span>
+<span id="1134">1134</span>
+<span id="1135">1135</span>
+<span id="1136">1136</span>
+<span id="1137">1137</span>
+<span id="1138">1138</span>
+<span id="1139">1139</span>
+<span id="1140">1140</span>
+<span id="1141">1141</span>
+<span id="1142">1142</span>
+<span id="1143">1143</span>
+<span id="1144">1144</span>
+<span id="1145">1145</span>
+<span id="1146">1146</span>
+<span id="1147">1147</span>
+<span id="1148">1148</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model_extensions</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">connector_interface::filter</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">prisma_models::prelude</span>::<span class="kw-2">*</span>;
@@ -1170,13 +1211,44 @@
     }
 }
 
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConditionState</span> {
+    <span class="ident">reverse</span>: <span class="ident">bool</span>,
+    <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">ConditionState</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>, <span class="ident">reverse</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> { <span class="ident">reverse</span>, <span class="ident">alias</span> }
+    }
+
+    <span class="kw">fn</span> <span class="ident">invert_reverse</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::new</span>(<span class="self">self</span>.<span class="ident">alias</span>, <span class="op">!</span><span class="self">self</span>.<span class="ident">reverse</span>)
+    }
+
+    <span class="kw">fn</span> <span class="ident">alias</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">alias</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">reverse</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">reverse</span>
+    }
+}
+
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AliasedCondition</span> {
     <span class="doccomment">/// Conversion to a query condition tree. Columns will point to the given</span>
     <span class="doccomment">/// alias if provided, otherwise using the fully qualified path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Alias should be used only when nesting, making the top level queries</span>
     <span class="doccomment">/// more explicit.</span>
-    <span class="kw">fn</span> <span class="ident">aliased_cond</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>, <span class="ident">reverse</span>: <span class="ident">bool</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">aliased_cond</span>(<span class="self">self</span>, <span class="ident">state</span>: <span class="ident">ConditionState</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
+
+    <span class="kw">fn</span> <span class="ident">aliased_condition_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>, <span class="ident">reverse</span>: <span class="ident">bool</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="self">Self</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Clone</span>,
+    {
+        <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">aliased_cond</span>(<span class="ident">ConditionState::new</span>(<span class="ident">alias</span>, <span class="ident">reverse</span>))
+    }
 }
 
 <span class="kw">trait</span> <span class="ident">AliasedSelect</span> {
@@ -1213,15 +1285,15 @@
 
 <span class="kw">impl</span> <span class="ident">AliasedCondition</span> <span class="kw">for</span> <span class="ident">Filter</span> {
     <span class="doccomment">/// Conversion from a `Filter` to a query condition tree. Aliased when in a nested `SELECT`.</span>
-    <span class="kw">fn</span> <span class="ident">aliased_cond</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>, <span class="ident">reverse</span>: <span class="ident">bool</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">aliased_cond</span>(<span class="self">self</span>, <span class="ident">state</span>: <span class="ident">ConditionState</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Filter::And</span>(<span class="kw-2">mut</span> <span class="ident">filters</span>) =&gt; <span class="kw">match</span> <span class="ident">filters</span>.<span class="ident">len</span>() {
                 <span class="ident">n</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="number">0</span> =&gt; <span class="ident">ConditionTree::NoCondition</span>,
-                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="number">1</span> =&gt; <span class="ident">filters</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>().<span class="ident">aliased_cond</span>(<span class="ident">alias</span>, <span class="ident">reverse</span>),
+                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="number">1</span> =&gt; <span class="ident">filters</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>().<span class="ident">aliased_cond</span>(<span class="ident">state</span>),
                 <span class="kw">_</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">exprs</span> <span class="op">=</span> <span class="ident">filters</span>
                         .<span class="ident">into_iter</span>()
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">aliased_cond</span>(<span class="ident">alias</span>, <span class="ident">reverse</span>))
+                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">aliased_cond</span>(<span class="ident">state</span>.<span class="ident">clone</span>()))
                         .<span class="ident">map</span>(<span class="ident">Expression::from</span>)
                         .<span class="ident">collect</span>();
 
@@ -1230,11 +1302,11 @@
             },
             <span class="ident">Filter::Or</span>(<span class="kw-2">mut</span> <span class="ident">filters</span>) =&gt; <span class="kw">match</span> <span class="ident">filters</span>.<span class="ident">len</span>() {
                 <span class="ident">n</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="number">0</span> =&gt; <span class="ident">ConditionTree::NegativeCondition</span>,
-                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="number">1</span> =&gt; <span class="ident">filters</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>().<span class="ident">aliased_cond</span>(<span class="ident">alias</span>, <span class="ident">reverse</span>),
+                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="number">1</span> =&gt; <span class="ident">filters</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>().<span class="ident">aliased_cond</span>(<span class="ident">state</span>),
                 <span class="kw">_</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">exprs</span> <span class="op">=</span> <span class="ident">filters</span>
                         .<span class="ident">into_iter</span>()
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">aliased_cond</span>(<span class="ident">alias</span>, <span class="ident">reverse</span>))
+                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">aliased_cond</span>(<span class="ident">state</span>.<span class="ident">clone</span>()))
                         .<span class="ident">map</span>(<span class="ident">Expression::from</span>)
                         .<span class="ident">collect</span>();
 
@@ -1243,20 +1315,20 @@
             },
             <span class="ident">Filter::Not</span>(<span class="kw-2">mut</span> <span class="ident">filters</span>) =&gt; <span class="kw">match</span> <span class="ident">filters</span>.<span class="ident">len</span>() {
                 <span class="ident">n</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="number">0</span> =&gt; <span class="ident">ConditionTree::NoCondition</span>,
-                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="number">1</span> =&gt; <span class="ident">filters</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>().<span class="ident">aliased_cond</span>(<span class="ident">alias</span>, <span class="op">!</span><span class="ident">reverse</span>).<span class="ident">not</span>(),
+                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="number">1</span> =&gt; <span class="ident">filters</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>().<span class="ident">aliased_cond</span>(<span class="ident">state</span>.<span class="ident">invert_reverse</span>()).<span class="ident">not</span>(),
                 <span class="kw">_</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">exprs</span> <span class="op">=</span> <span class="ident">filters</span>
                         .<span class="ident">into_iter</span>()
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">aliased_cond</span>(<span class="ident">alias</span>, <span class="op">!</span><span class="ident">reverse</span>).<span class="ident">not</span>())
+                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">aliased_cond</span>(<span class="ident">state</span>.<span class="ident">clone</span>().<span class="ident">invert_reverse</span>()).<span class="ident">not</span>())
                         .<span class="ident">map</span>(<span class="ident">Expression::from</span>)
                         .<span class="ident">collect</span>();
 
                     <span class="ident">ConditionTree::And</span>(<span class="ident">exprs</span>)
                 }
             },
-            <span class="ident">Filter::Scalar</span>(<span class="ident">filter</span>) =&gt; <span class="ident">filter</span>.<span class="ident">aliased_cond</span>(<span class="ident">alias</span>, <span class="ident">reverse</span>),
-            <span class="ident">Filter::OneRelationIsNull</span>(<span class="ident">filter</span>) =&gt; <span class="ident">filter</span>.<span class="ident">aliased_cond</span>(<span class="ident">alias</span>, <span class="ident">reverse</span>),
-            <span class="ident">Filter::Relation</span>(<span class="ident">filter</span>) =&gt; <span class="ident">filter</span>.<span class="ident">aliased_cond</span>(<span class="ident">alias</span>, <span class="ident">reverse</span>),
+            <span class="ident">Filter::Scalar</span>(<span class="ident">filter</span>) =&gt; <span class="ident">filter</span>.<span class="ident">aliased_cond</span>(<span class="ident">state</span>),
+            <span class="ident">Filter::OneRelationIsNull</span>(<span class="ident">filter</span>) =&gt; <span class="ident">filter</span>.<span class="ident">aliased_cond</span>(<span class="ident">state</span>),
+            <span class="ident">Filter::Relation</span>(<span class="ident">filter</span>) =&gt; <span class="ident">filter</span>.<span class="ident">aliased_cond</span>(<span class="ident">state</span>),
             <span class="ident">Filter::BoolFilter</span>(<span class="ident">b</span>) =&gt; {
                 <span class="kw">if</span> <span class="ident">b</span> {
                     <span class="ident">ConditionTree::NoCondition</span>
@@ -1264,8 +1336,8 @@
                     <span class="ident">ConditionTree::NegativeCondition</span>
                 }
             }
-            <span class="ident">Filter::Aggregation</span>(<span class="ident">filter</span>) =&gt; <span class="ident">filter</span>.<span class="ident">aliased_cond</span>(<span class="ident">alias</span>, <span class="ident">reverse</span>),
-            <span class="ident">Filter::ScalarList</span>(<span class="ident">filter</span>) =&gt; <span class="ident">filter</span>.<span class="ident">aliased_cond</span>(<span class="ident">alias</span>, <span class="ident">reverse</span>),
+            <span class="ident">Filter::Aggregation</span>(<span class="ident">filter</span>) =&gt; <span class="ident">filter</span>.<span class="ident">aliased_cond</span>(<span class="ident">state</span>),
+            <span class="ident">Filter::ScalarList</span>(<span class="ident">filter</span>) =&gt; <span class="ident">filter</span>.<span class="ident">aliased_cond</span>(<span class="ident">state</span>),
             <span class="ident">Filter::Empty</span> =&gt; <span class="ident">ConditionTree::NoCondition</span>,
             <span class="ident">Filter::Composite</span>(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(<span class="string">&quot;SQL connectors do not support composites yet.&quot;</span>),
         }
@@ -1274,7 +1346,7 @@
 
 <span class="kw">impl</span> <span class="ident">AliasedCondition</span> <span class="kw">for</span> <span class="ident">ScalarFilter</span> {
     <span class="doccomment">/// Conversion from a `ScalarFilter` to a query condition tree. Aliased when in a nested `SELECT`.</span>
-    <span class="kw">fn</span> <span class="ident">aliased_cond</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>, <span class="ident">reverse</span>: <span class="ident">bool</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">aliased_cond</span>(<span class="self">self</span>, <span class="ident">state</span>: <span class="ident">ConditionState</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">condition</span> {
             <span class="ident">ScalarCondition::Search</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">|</span> <span class="ident">ScalarCondition::NotSearch</span>(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">projections</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">condition</span>.<span class="ident">clone</span>() {
@@ -1288,7 +1360,7 @@
                 <span class="kw">let</span> <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">projections</span>
                     .<span class="ident">into_iter</span>()
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
-                        <span class="ident">ScalarProjection::Single</span>(<span class="ident">field</span>) =&gt; <span class="ident">field</span>.<span class="ident">aliased_col</span>(<span class="ident">alias</span>),
+                        <span class="ident">ScalarProjection::Single</span>(<span class="ident">field</span>) =&gt; <span class="ident">field</span>.<span class="ident">aliased_col</span>(<span class="ident">state</span>.<span class="ident">alias</span>()),
                         <span class="ident">ScalarProjection::Compound</span>(<span class="kw">_</span>) =&gt; {
                             <span class="macro">unreachable!</span>(<span class="string">&quot;Full-text search does not support compound fields&quot;</span>)
                         }
@@ -1297,9 +1369,17 @@
 
                 <span class="kw">let</span> <span class="ident">comparable</span>: <span class="ident">Expression</span> <span class="op">=</span> <span class="ident">text_search</span>(<span class="ident">columns</span>.<span class="ident">as_slice</span>()).<span class="ident">into</span>();
 
-                <span class="ident">convert_scalar_filter</span>(<span class="ident">comparable</span>, <span class="self">self</span>.<span class="ident">condition</span>, <span class="ident">reverse</span>, <span class="self">self</span>.<span class="ident">mode</span>, <span class="kw-2">&amp;</span>[], <span class="ident">alias</span>, <span class="bool-val">false</span>)
+                <span class="ident">convert_scalar_filter</span>(
+                    <span class="ident">comparable</span>,
+                    <span class="self">self</span>.<span class="ident">condition</span>,
+                    <span class="ident">state</span>.<span class="ident">reverse</span>(),
+                    <span class="self">self</span>.<span class="ident">mode</span>,
+                    <span class="kw-2">&amp;</span>[],
+                    <span class="ident">state</span>.<span class="ident">alias</span>(),
+                    <span class="bool-val">false</span>,
+                )
             }
-            <span class="kw">_</span> =&gt; <span class="ident">scalar_filter_aliased_cond</span>(<span class="self">self</span>, <span class="ident">alias</span>, <span class="ident">reverse</span>),
+            <span class="kw">_</span> =&gt; <span class="ident">scalar_filter_aliased_cond</span>(<span class="self">self</span>, <span class="ident">state</span>.<span class="ident">alias</span>(), <span class="ident">state</span>.<span class="ident">reverse</span>()),
         }
     }
 }
@@ -1332,10 +1412,10 @@
 }
 
 <span class="kw">impl</span> <span class="ident">AliasedCondition</span> <span class="kw">for</span> <span class="ident">ScalarListFilter</span> {
-    <span class="kw">fn</span> <span class="ident">aliased_cond</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>, <span class="ident">_reverse</span>: <span class="ident">bool</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">comparable</span>: <span class="ident">Expression</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">field</span>.<span class="ident">aliased_col</span>(<span class="ident">alias</span>).<span class="ident">into</span>();
+    <span class="kw">fn</span> <span class="ident">aliased_cond</span>(<span class="self">self</span>, <span class="ident">state</span>: <span class="ident">ConditionState</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">comparable</span>: <span class="ident">Expression</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">field</span>.<span class="ident">aliased_col</span>(<span class="ident">state</span>.<span class="ident">alias</span>()).<span class="ident">into</span>();
 
-        <span class="ident">convert_scalar_list_filter</span>(<span class="ident">comparable</span>, <span class="self">self</span>.<span class="ident">condition</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">field</span>, <span class="ident">alias</span>)
+        <span class="ident">convert_scalar_list_filter</span>(<span class="ident">comparable</span>, <span class="self">self</span>.<span class="ident">condition</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">field</span>, <span class="ident">state</span>.<span class="ident">alias</span>())
     }
 }
 
@@ -1376,12 +1456,12 @@
 
 <span class="kw">impl</span> <span class="ident">AliasedCondition</span> <span class="kw">for</span> <span class="ident">RelationFilter</span> {
     <span class="doccomment">/// Conversion from a `RelationFilter` to a query condition tree. Aliased when in a nested `SELECT`.</span>
-    <span class="kw">fn</span> <span class="ident">aliased_cond</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>, <span class="ident">_reverse</span>: <span class="ident">bool</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">aliased_cond</span>(<span class="self">self</span>, <span class="ident">state</span>: <span class="ident">ConditionState</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">ids</span> <span class="op">=</span> <span class="ident">ModelProjection::from</span>(<span class="self">self</span>.<span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">primary_identifier</span>()).<span class="ident">as_columns</span>();
-        <span class="kw">let</span> <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ids</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">aliased_col</span>(<span class="ident">alias</span>)).<span class="ident">collect</span>();
+        <span class="kw">let</span> <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ids</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">aliased_col</span>(<span class="ident">state</span>.<span class="ident">alias</span>())).<span class="ident">collect</span>();
 
         <span class="kw">let</span> <span class="ident">condition</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">condition</span>;
-        <span class="kw">let</span> <span class="ident">sub_select</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">aliased_sel</span>(<span class="ident">alias</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">inc</span>(<span class="ident">AliasMode::Table</span>)));
+        <span class="kw">let</span> <span class="ident">sub_select</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">aliased_sel</span>(<span class="ident">state</span>.<span class="ident">alias</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">inc</span>(<span class="ident">AliasMode::Table</span>)));
 
         <span class="kw">let</span> <span class="ident">comparison</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">condition</span> {
             <span class="ident">RelationCondition::AtLeastOneRelatedRecord</span> =&gt; <span class="ident">Row::from</span>(<span class="ident">columns</span>).<span class="ident">in_selection</span>(<span class="ident">sub_select</span>),
@@ -1417,7 +1497,7 @@
 
         <span class="kw">let</span> <span class="ident">nested_conditions</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">nested_filter</span>
-            .<span class="ident">aliased_cond</span>(<span class="prelude-val">Some</span>(<span class="ident">alias</span>.<span class="ident">flip</span>(<span class="ident">AliasMode::Join</span>)), <span class="bool-val">false</span>)
+            .<span class="ident">aliased_condition_from</span>(<span class="prelude-val">Some</span>(<span class="ident">alias</span>.<span class="ident">flip</span>(<span class="ident">AliasMode::Join</span>)), <span class="bool-val">false</span>)
             .<span class="ident">invert_if</span>(<span class="ident">condition</span>.<span class="ident">invert_of_subselect</span>());
 
         <span class="kw">let</span> <span class="ident">conditions</span> <span class="op">=</span> <span class="ident">selected_identifier</span>
@@ -1438,8 +1518,8 @@
 
 <span class="kw">impl</span> <span class="ident">AliasedCondition</span> <span class="kw">for</span> <span class="ident">OneRelationIsNullFilter</span> {
     <span class="doccomment">/// Conversion from a `OneRelationIsNullFilter` to a query condition tree. Aliased when in a nested `SELECT`.</span>
-    <span class="kw">fn</span> <span class="ident">aliased_cond</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>, <span class="ident">_reverse</span>: <span class="ident">bool</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">alias</span> <span class="op">=</span> <span class="ident">alias</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">to_string</span>(<span class="prelude-val">None</span>));
+    <span class="kw">fn</span> <span class="ident">aliased_cond</span>(<span class="self">self</span>, <span class="ident">state</span>: <span class="ident">ConditionState</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">alias</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">alias</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">to_string</span>(<span class="prelude-val">None</span>));
 
         <span class="kw">let</span> <span class="ident">condition</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">field</span>.<span class="ident">relation_is_inlined_in_parent</span>() {
             <span class="self">self</span>.<span class="ident">field</span>.<span class="ident">as_columns</span>().<span class="ident">fold</span>(<span class="ident">ConditionTree::NoCondition</span>, <span class="op">|</span><span class="ident">acc</span>, <span class="ident">column</span><span class="op">|</span> {
@@ -1499,7 +1579,9 @@
 
 <span class="kw">impl</span> <span class="ident">AliasedCondition</span> <span class="kw">for</span> <span class="ident">AggregationFilter</span> {
     <span class="doccomment">/// Conversion from an `AggregationFilter` to a query condition tree. Aliased when in a nested `SELECT`.</span>
-    <span class="kw">fn</span> <span class="ident">aliased_cond</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>, <span class="ident">reverse</span>: <span class="ident">bool</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">aliased_cond</span>(<span class="self">self</span>, <span class="ident">state</span>: <span class="ident">ConditionState</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">alias</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">alias</span>();
+        <span class="kw">let</span> <span class="ident">reverse</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">reverse</span>();
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">AggregationFilter::Count</span>(<span class="ident">filter</span>) =&gt; <span class="ident">aggregate_conditions</span>(<span class="kw-2">*</span><span class="ident">filter</span>, <span class="ident">alias</span>, <span class="ident">reverse</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">count</span>(<span class="ident">x</span>).<span class="ident">into</span>()),
             <span class="ident">AggregationFilter::Average</span>(<span class="ident">filter</span>) =&gt; <span class="ident">aggregate_conditions</span>(<span class="kw-2">*</span><span class="ident">filter</span>, <span class="ident">alias</span>, <span class="ident">reverse</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">avg</span>(<span class="ident">x</span>).<span class="ident">into</span>()),

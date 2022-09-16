@@ -342,7 +342,7 @@
     };
     <span class="kw">let</span> <span class="ident">select_columns</span> <span class="op">=</span> <span class="ident">right_fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">as_column</span>());
     <span class="kw">let</span> <span class="ident">conditions</span>: <span class="ident">ConditionTree</span> <span class="op">=</span> <span class="ident">filter</span>
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">aliased_cond</span>(<span class="prelude-val">None</span>, <span class="bool-val">false</span>))
+        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">aliased_condition_from</span>(<span class="prelude-val">None</span>, <span class="bool-val">false</span>))
         .<span class="ident">unwrap_or</span>(<span class="ident">ConditionTree::NoCondition</span>);
 
     <span class="comment">// + SELECT Child.&lt;fk&gt; FROM Child WHERE &lt;FILTER&gt;</span>
@@ -419,7 +419,7 @@
     <span class="kw">let</span> <span class="ident">parent_ids</span>: <span class="ident">ModelProjection</span> <span class="op">=</span> <span class="ident">rf</span>.<span class="ident">model</span>().<span class="ident">primary_identifier</span>().<span class="ident">into</span>();
     <span class="comment">// Rendered filters</span>
     <span class="kw">let</span> <span class="ident">conditions</span>: <span class="ident">ConditionTree</span> <span class="op">=</span> <span class="ident">filter</span>
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">aliased_cond</span>(<span class="prelude-val">None</span>, <span class="bool-val">false</span>))
+        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">aliased_condition_from</span>(<span class="prelude-val">None</span>, <span class="bool-val">false</span>))
         .<span class="ident">unwrap_or</span>(<span class="ident">ConditionTree::NoCondition</span>);
 
     <span class="comment">// + SELECT _ParentToChild.ChildId FROM Child WHERE &lt;FILTER&gt;</span>
