@@ -34,7 +34,7 @@
                   "mobc-0.7.3" = "sha256-88jSFqOyMy2E7TP1HtMcE4CQXoKhBpO8XuSFKGtfgqA=";
                   "mysql_async-0.30.0" = "sha256-I1Q9G3H3BW/Paq9aOYGcxQf4JVwN/ZNhGuHwTqbuxWc=";
                   "postgres-native-tls-0.5.0" = "sha256-kwqHalfwrvNQYUdAqObTAab3oWzBLl6hab2JGXVyJ3k=";
-                  "quaint-0.2.0-alpha.13" = "sha256-8vaYhXSFTibNLt+yTj+RQepzJ8CzWthhgQXVtSl+DhI=";
+                  "quaint-0.2.0-alpha.13" = "sha256-kCbxrImKb5VqSjC+W/qZpS7sHSbepayZMId+TpReU5k=";
                   "tokio-native-tls-0.3.0" = "sha256-ayH3TJ1iUQeZicR2nrsuxLykMoPL1fYBqRb21ValR5Q=";
                 };
               };

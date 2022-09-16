@@ -144,7 +144,7 @@ pub fn update_records_node_placeholder<T>(graph: &mut QueryGraph, filter: T, mod
 where
     T: Into<Filter>,
 {
-    let args = WriteArgs::new();
+    let args = WriteArgs::new_empty(crate::executor::get_request_now());
     let filter = filter.into();
     let record_filter = filter.into();
 
@@ -568,7 +568,7 @@ pub fn emulate_on_delete_set_null(
     let set_null_query = WriteQuery::UpdateManyRecords(UpdateManyRecords {
         model: dependent_model.clone(),
         record_filter: RecordFilter::empty(),
-        args: child_update_args.into(),
+        args: WriteArgs::new(child_update_args, crate::executor::get_request_now()),
     });
 
     let set_null_dependents_node = graph.create_node(Query::Write(set_null_query));
@@ -693,7 +693,7 @@ pub fn emulate_on_update_set_null(
     let set_null_query = WriteQuery::UpdateManyRecords(UpdateManyRecords {
         model: dependent_model.clone(),
         record_filter: RecordFilter::empty(),
-        args: child_update_args.into(),
+        args: WriteArgs::new(child_update_args, crate::executor::get_request_now()),
     });
 
     let set_null_dependents_node = graph.create_node(Query::Write(set_null_query));
@@ -992,7 +992,10 @@ pub fn emulate_on_update_cascade(
     let update_query = WriteQuery::UpdateManyRecords(UpdateManyRecords {
         model: dependent_model.clone(),
         record_filter: RecordFilter::empty(),
-        args: child_update_args.into(),
+        args: WriteArgs::new(
+            child_update_args.into_iter().collect(),
+            crate::executor::get_request_now(),
+        ),
     });
 
     let update_dependents_node = graph.create_node(Query::Write(update_query));
