@@ -253,7 +253,13 @@ impl SqlFlavour for SqliteFlavour {
             connection.raw_cmd("PRAGMA main.quick_check")?;
 
             tracing::debug!("Truncating {:?}", file_path);
-            std::fs::File::create(file_path).expect("failed to truncate sqlite file");
+
+            std::fs::File::create(file_path).map_err(|io_error| {
+                ConnectorError::from_source(
+                    io_error,
+                    "Failed to truncate sqlite file. Please check that you have write permissions on the directory.",
+                )
+            })?;
 
             acquire_lock(connection)?;
 
