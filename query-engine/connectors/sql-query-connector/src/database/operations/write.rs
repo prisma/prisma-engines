@@ -1,3 +1,4 @@
+use crate::filter_conversion::AliasedCondition;
 use crate::sql_trace::SqlTraceComment;
 use crate::{error::SqlError, model_extensions::*, query_builder::write, sql_info::SqlInfo, QueryExt};
 use connector_interface::*;
@@ -305,8 +306,10 @@ pub async fn update_records(
     model: &ModelRef,
     record_filter: RecordFilter,
     args: WriteArgs,
+    update_type: UpdateType,
     trace_id: Option<String>,
 ) -> crate::Result<Vec<SelectionResult>> {
+    let filter_condition = record_filter.clone().filter.aliased_condition_from(None, false);
     let ids = conn.filter_selectors(model, record_filter, trace_id.clone()).await?;
     let id_args = pick_args(&model.primary_identifier().into(), &args);
 
@@ -316,11 +319,18 @@ pub async fn update_records(
 
     let updates = {
         let ids: Vec<&SelectionResult> = ids.iter().collect();
-        write::update_many(model, ids.as_slice(), args, trace_id)?
+        write::update_many(model, ids.as_slice(), args, filter_condition, trace_id)?
     };
 
+    let mut count = 0;
     for update in updates {
-        conn.query(update).await?;
+        let update_count = conn.execute(update).await?;
+
+        count += update_count;
+    }
+
+    if update_type == UpdateType::Many && count == 0 {
+        return Ok(Vec::new());
     }
 
     Ok(merge_write_args(ids, id_args))
@@ -333,6 +343,7 @@ pub async fn delete_records(
     record_filter: RecordFilter,
     trace_id: Option<String>,
 ) -> crate::Result<usize> {
+    let filter_condition = record_filter.clone().filter.aliased_condition_from(None, false);
     let ids = conn.filter_selectors(model, record_filter, trace_id.clone()).await?;
     let ids: Vec<&SelectionResult> = ids.iter().collect();
     let count = ids.len();
@@ -341,11 +352,15 @@ pub async fn delete_records(
         return Ok(count);
     }
 
-    for delete in write::delete_many(model, ids.as_slice(), trace_id) {
-        conn.query(delete).await?;
+    let mut row_count = 0;
+    for delete in write::delete_many(model, ids.as_slice(), filter_condition, trace_id) {
+        row_count += conn.execute(delete).await?;
     }
 
-    Ok(count)
+    match usize::try_from(row_count) {
+        Ok(row_count) => Ok(row_count),
+        Err(_) => Ok(count),
+    }
 }
 
 /// Connect relations defined in `child_ids` to a parent defined in `parent_id`.

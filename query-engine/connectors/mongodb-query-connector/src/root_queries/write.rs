@@ -142,6 +142,7 @@ pub async fn update_records<'conn>(
     model: &ModelRef,
     record_filter: RecordFilter,
     mut args: WriteArgs,
+    update_type: UpdateType,
 ) -> crate::Result<Vec<SelectionResult>> {
     let coll = database.collection::<Document>(model.db_name());
 
@@ -198,9 +199,13 @@ pub async fn update_records<'conn>(
 
     if !update_docs.is_empty() {
         logger::log_update_many_vec(coll.name(), &filter, &update_docs);
-        metrics(|| coll.update_many_with_session(filter, update_docs, None, session))
+        let res = metrics(|| coll.update_many_with_session(filter, update_docs, None, session))
             .instrument(span)
             .await?;
+
+        if update_type == UpdateType::Many && res.modified_count == 0 {
+            return Ok(Vec::new());
+        }
     }
 
     let ids = ids

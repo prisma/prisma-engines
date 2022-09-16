@@ -62,9 +62,9 @@ async fn update_one(
     q: UpdateRecord,
     trace_id: Option<String>,
 ) -> InterpretationResult<QueryResult> {
-    let mut res = tx.update_records(&q.model, q.record_filter, q.args, trace_id).await?;
+    let res = tx.update_record(&q.model, q.record_filter, q.args, trace_id).await?;
 
-    Ok(QueryResult::Id(res.pop()))
+    Ok(QueryResult::Id(res))
 }
 
 async fn delete_one(

@@ -102,6 +102,7 @@ pub fn update_many(
     model: &ModelRef,
     ids: &[&SelectionResult],
     args: WriteArgs,
+    filter_condition: ConditionTree<'static>,
     trace_id: Option<String>,
 ) -> crate::Result<Vec<Query<'static>>> {
     if args.args.is_empty() || ids.is_empty() {
@@ -161,17 +162,24 @@ pub fn update_many(
 
     let query = query.append_trace(&Span::current()).add_trace_id(trace_id);
     let columns: Vec<_> = ModelProjection::from(model.primary_identifier()).as_columns().collect();
-    let result: Vec<Query> = super::chunked_conditions(&columns, ids, |conditions| query.clone().so_that(conditions));
+    let result: Vec<Query> = super::chunked_conditions(&columns, ids, |conditions| {
+        query.clone().so_that(conditions.and(filter_condition.clone()))
+    });
 
     Ok(result)
 }
 
-pub fn delete_many(model: &ModelRef, ids: &[&SelectionResult], trace_id: Option<String>) -> Vec<Query<'static>> {
+pub fn delete_many(
+    model: &ModelRef,
+    ids: &[&SelectionResult],
+    filter_condition: ConditionTree<'static>,
+    trace_id: Option<String>,
+) -> Vec<Query<'static>> {
     let columns: Vec<_> = ModelProjection::from(model.primary_identifier()).as_columns().collect();
 
     super::chunked_conditions(&columns, ids, |conditions| {
         Delete::from_table(model.as_table())
-            .so_that(conditions)
+            .so_that(conditions.and(filter_condition.clone()))
             .append_trace(&Span::current())
             .add_trace_id(trace_id.clone())
     })
