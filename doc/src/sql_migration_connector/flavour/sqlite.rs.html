@@ -337,6 +337,12 @@
 <span id="331">331</span>
 <span id="332">332</span>
 <span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">connection</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="self">self</span>::connection</span>::<span class="kw-2">*</span>;
@@ -592,7 +598,13 @@
             <span class="ident">connection</span>.<span class="ident">raw_cmd</span>(<span class="string">&quot;PRAGMA main.quick_check&quot;</span>)<span class="question-mark">?</span>;
 
             <span class="macro">tracing::debug!</span>(<span class="string">&quot;Truncating {:?}&quot;</span>, <span class="ident">file_path</span>);
-            <span class="ident">std::fs::File::create</span>(<span class="ident">file_path</span>).<span class="ident">expect</span>(<span class="string">&quot;failed to truncate sqlite file&quot;</span>);
+
+            <span class="ident">std::fs::File::create</span>(<span class="ident">file_path</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">io_error</span><span class="op">|</span> {
+                <span class="ident">ConnectorError::from_source</span>(
+                    <span class="ident">io_error</span>,
+                    <span class="string">&quot;Failed to truncate sqlite file. Please check that you have write permissions on the directory.&quot;</span>,
+                )
+            })<span class="question-mark">?</span>;
 
             <span class="ident">acquire_lock</span>(<span class="ident">connection</span>)<span class="question-mark">?</span>;
 
