@@ -299,7 +299,7 @@ pub trait WriteOperations {
         record_filter: RecordFilter,
         args: WriteArgs,
         trace_id: Option<String>,
-    ) -> crate::Result<Vec<SelectionResult>>;
+    ) -> crate::Result<usize>;
 
     /// Update record in the `Model` with the given `WriteArgs` filtered by the
     /// `Filter`.

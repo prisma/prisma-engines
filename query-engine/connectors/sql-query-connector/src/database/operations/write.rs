@@ -298,15 +298,14 @@ async fn create_many_empty(
     Ok(count as usize)
 }
 
-/// Update multiple records in a database defined in `conn` and the records
+/// Update one record in a database defined in `conn` and the records
 /// defined in `args`, resulting the identifiers that were modified in the
 /// operation.
-pub async fn update_records(
+pub async fn update_record(
     conn: &dyn QueryExt,
     model: &ModelRef,
     record_filter: RecordFilter,
     args: WriteArgs,
-    update_type: UpdateType,
     trace_id: Option<String>,
 ) -> crate::Result<Vec<SelectionResult>> {
     let filter_condition = record_filter.clone().filter.aliased_condition_from(None, false);
@@ -322,6 +321,44 @@ pub async fn update_records(
         write::update_many(model, ids.as_slice(), args, filter_condition, trace_id)?
     };
 
+    for update in updates {
+        conn.execute(update).await?;
+    }
+
+    Ok(merge_write_args(ids, id_args))
+}
+
+/// Update multiple records in a database defined in `conn` and the records
+/// defined in `args`, and returning the number of updates
+/// This function via two ways, when there are ids in record_filter.selectors, it uses that to update
+/// Otherwise it used the passed down arguments to update.
+/// Future clean up - we should split this into two functions, one that handles updates based on the selector
+/// and another that does an update based on the WriteArgs
+pub async fn update_records(
+    conn: &dyn QueryExt,
+    model: &ModelRef,
+    record_filter: RecordFilter,
+    args: WriteArgs,
+    trace_id: Option<String>,
+) -> crate::Result<usize> {
+    let filter_condition = record_filter.clone().filter.aliased_condition_from(None, false);
+
+    // If no where filter is supplied we need to get the ids for the update
+    let ids: Vec<SelectionResult> = if record_filter.filter.is_empty() {
+        let ids = conn.filter_selectors(model, record_filter, trace_id.clone()).await?;
+        if ids.is_empty() {
+            return Ok(0);
+        }
+        ids
+    } else {
+        Vec::new()
+    };
+
+    let updates = {
+        let ids: Vec<&SelectionResult> = ids.iter().collect();
+        write::update_many(model, ids.as_slice(), args, filter_condition, trace_id)?
+    };
+
     let mut count = 0;
     for update in updates {
         let update_count = conn.execute(update).await?;
@@ -329,11 +366,7 @@ pub async fn update_records(
         count += update_count;
     }
 
-    if update_type == UpdateType::Many && count == 0 {
-        return Ok(Vec::new());
-    }
-
-    Ok(merge_write_args(ids, id_args))
+    Ok(count as usize)
 }
 
 /// Delete multiple records in `conn`, defined in the `Filter`. Result is the number of items deleted.

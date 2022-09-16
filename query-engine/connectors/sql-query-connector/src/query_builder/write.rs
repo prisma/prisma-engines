@@ -105,7 +105,7 @@ pub fn update_many(
     filter_condition: ConditionTree<'static>,
     trace_id: Option<String>,
 ) -> crate::Result<Vec<Query<'static>>> {
-    if args.args.is_empty() || ids.is_empty() {
+    if args.args.is_empty() {
         return Ok(Vec::new());
     }
 
@@ -161,10 +161,14 @@ pub fn update_many(
         });
 
     let query = query.append_trace(&Span::current()).add_trace_id(trace_id);
-    let columns: Vec<_> = ModelProjection::from(model.primary_identifier()).as_columns().collect();
-    let result: Vec<Query> = super::chunked_conditions(&columns, ids, |conditions| {
-        query.clone().so_that(conditions.and(filter_condition.clone()))
-    });
+    let result: Vec<Query> = if ids.is_empty() {
+        Vec::from([query.so_that(filter_condition).into()])
+    } else {
+        let columns: Vec<_> = ModelProjection::from(model.primary_identifier()).as_columns().collect();
+        super::chunked_conditions(&columns, ids, |conditions| {
+            query.clone().so_that(conditions.and(filter_condition.clone()))
+        })
+    };
 
     Ok(result)
 }

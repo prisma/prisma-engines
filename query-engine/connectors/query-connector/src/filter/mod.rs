@@ -201,6 +201,10 @@ impl Filter {
             None
         }
     }
+
+    pub fn is_empty(&self) -> bool {
+        self == &Filter::Empty
+    }
 }
 
 impl From<ScalarFilter> for Filter {
