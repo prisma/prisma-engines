@@ -51,13 +51,13 @@ impl QueryDocument {
 
 #[derive(Debug)]
 pub enum BatchDocument {
-    Multi(Vec<Operation>, bool),
+    Multi(Vec<Operation>, Option<BatchDocumentTransaction>),
     Compact(CompactedDocument),
 }
 
 impl BatchDocument {
-    pub fn new(operations: Vec<Operation>, transactional: bool) -> Self {
-        Self::Multi(operations, transactional)
+    pub fn new(operations: Vec<Operation>, transaction: Option<BatchDocumentTransaction>) -> Self {
+        Self::Multi(operations, transaction)
     }
 
     fn can_compact(&self) -> bool {
@@ -83,6 +83,17 @@ impl BatchDocument {
             Self::Multi(operations, _) if self.can_compact() => Self::Compact(CompactedDocument::from(operations)),
             _ => self,
         }
+    }
+}
+
+#[derive(Debug)]
+pub struct BatchDocumentTransaction {
+    pub isolation_level: Option<String>,
+}
+
+impl BatchDocumentTransaction {
+    pub fn new(isolation_level: Option<String>) -> Self {
+        Self { isolation_level }
     }
 }
 

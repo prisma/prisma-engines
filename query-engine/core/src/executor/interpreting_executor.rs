@@ -1,6 +1,7 @@
 use super::execute_operation::{execute_many_operations, execute_many_self_contained, execute_single_self_contained};
 use crate::{
-    OpenTx, Operation, QueryExecutor, ResponseData, TransactionActorManager, TransactionError, TransactionManager, TxId,
+    BatchDocumentTransaction, OpenTx, Operation, QueryExecutor, ResponseData, TransactionActorManager,
+    TransactionError, TransactionManager, TxId,
 };
 
 use async_trait::async_trait;
@@ -78,13 +79,13 @@ where
         &self,
         tx_id: Option<TxId>,
         operations: Vec<Operation>,
-        transactional: bool,
+        transaction: Option<BatchDocumentTransaction>,
         query_schema: QuerySchemaRef,
         trace_id: Option<String>,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
         if let Some(tx_id) = tx_id {
             self.itx_manager.batch_execute(&tx_id, operations, trace_id).await
-        } else if transactional {
+        } else if let Some(transaction) = transaction {
             let connection_name = self.connector.name();
             let conn_span = info_span!(
                 "prisma:engine:connection",
@@ -92,7 +93,7 @@ where
                 "db.type" = connection_name.as_str()
             );
             let mut conn = self.connector.get_connection().instrument(conn_span).await?;
-            let mut tx = conn.start_transaction(None).await?;
+            let mut tx = conn.start_transaction(transaction.isolation_level).await?;
 
             let results = execute_many_operations(query_schema, tx.as_connection_like(), &operations, trace_id).await;
 

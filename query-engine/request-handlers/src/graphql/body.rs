@@ -1,5 +1,5 @@
 use super::GraphQLProtocolAdapter;
-use query_core::{BatchDocument, Operation, QueryDocument};
+use query_core::{BatchDocument, BatchDocumentTransaction, Operation, QueryDocument};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -23,11 +23,16 @@ pub struct SingleQuery {
 pub struct MultiQuery {
     batch: Vec<SingleQuery>,
     transaction: bool,
+    isolation_level: Option<String>,
 }
 
 impl MultiQuery {
-    pub fn new(batch: Vec<SingleQuery>, transaction: bool) -> Self {
-        Self { batch, transaction }
+    pub fn new(batch: Vec<SingleQuery>, transaction: bool, isolation_level: Option<String>) -> Self {
+        Self {
+            batch,
+            transaction,
+            isolation_level,
+        }
     }
 }
 
@@ -62,11 +67,11 @@ impl GraphQlBody {
                     .into_iter()
                     .map(|body| GraphQLProtocolAdapter::convert_query_to_operation(&body.query, body.operation_name))
                     .collect();
+                let transaction = bodies
+                    .transaction
+                    .then(|| BatchDocumentTransaction::new(bodies.isolation_level));
 
-                Ok(QueryDocument::Multi(BatchDocument::new(
-                    operations?,
-                    bodies.transaction,
-                )))
+                Ok(QueryDocument::Multi(BatchDocument::new(operations?, transaction)))
             }
         }
     }

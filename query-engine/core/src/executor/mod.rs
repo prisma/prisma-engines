@@ -13,7 +13,9 @@ mod pipeline;
 pub use execute_operation::*;
 pub use loader::*;
 
-use crate::{query_document::Operation, response_ir::ResponseData, schema::QuerySchemaRef, TxId};
+use crate::{
+    query_document::Operation, response_ir::ResponseData, schema::QuerySchemaRef, BatchDocumentTransaction, TxId,
+};
 use async_trait::async_trait;
 use connector::Connector;
 
@@ -42,7 +44,7 @@ pub trait QueryExecutor: TransactionManager {
         &self,
         tx_id: Option<TxId>,
         operations: Vec<Operation>,
-        transactional: bool,
+        transaction: Option<BatchDocumentTransaction>,
         query_schema: QuerySchemaRef,
         trace_id: Option<String>,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>>;
