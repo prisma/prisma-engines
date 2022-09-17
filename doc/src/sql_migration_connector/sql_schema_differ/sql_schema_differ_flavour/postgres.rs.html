@@ -653,6 +653,9 @@
 <span id="647">647</span>
 <span id="648">648</span>
 <span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SqlSchemaDifferFlavour</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">database_schema::SqlDatabaseSchema</span>,
@@ -677,6 +680,9 @@
         <span class="string">&quot;(?i)^spatial_ref_sys$&quot;</span>,
         <span class="string">&quot;(?i)^geometry_columns$&quot;</span>,
         <span class="string">&quot;(?i)^geography_columns$&quot;</span>,
+        <span class="comment">// See §11.2 in: https://postgis.net/docs/using_raster_dataman.html</span>
+        <span class="string">&quot;(?i)^raster_columns$&quot;</span>,
+        <span class="string">&quot;(?i)^raster_overviews$&quot;</span>,
     ])
     .<span class="ident">unwrap</span>()
 });
