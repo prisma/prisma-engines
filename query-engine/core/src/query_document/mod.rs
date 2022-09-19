@@ -88,12 +88,16 @@ impl BatchDocument {
 
 #[derive(Debug)]
 pub struct BatchDocumentTransaction {
-    pub isolation_level: Option<String>,
+    isolation_level: Option<String>,
 }
 
 impl BatchDocumentTransaction {
     pub fn new(isolation_level: Option<String>) -> Self {
         Self { isolation_level }
+    }
+
+    pub fn isolation_level(&self) -> Option<String> {
+        self.isolation_level.clone()
     }
 }
 

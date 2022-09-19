@@ -67,9 +67,11 @@ impl GraphQlBody {
                     .into_iter()
                     .map(|body| GraphQLProtocolAdapter::convert_query_to_operation(&body.query, body.operation_name))
                     .collect();
-                let transaction = bodies
-                    .transaction
-                    .then(|| BatchDocumentTransaction::new(bodies.isolation_level));
+                let transaction = if bodies.transaction {
+                    Some(BatchDocumentTransaction::new(bodies.isolation_level))
+                } else {
+                    None
+                };
 
                 Ok(QueryDocument::Multi(BatchDocument::new(operations?, transaction)))
             }

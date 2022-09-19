@@ -1,6 +1,6 @@
 use super::execute_operation::{execute_many_operations, execute_many_self_contained, execute_single_self_contained};
 use crate::{
-    BatchDocumentTransaction, OpenTx, Operation, QueryExecutor, ResponseData, TransactionActorManager,
+    BatchDocumentTransaction, CoreError, OpenTx, Operation, QueryExecutor, ResponseData, TransactionActorManager,
     TransactionError, TransactionManager, TxId,
 };
 
@@ -84,6 +84,12 @@ where
         trace_id: Option<String>,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
         if let Some(tx_id) = tx_id {
+            let batch_isolation_level = transaction.and_then(|t| t.isolation_level());
+            if batch_isolation_level.is_some() {
+                return Err(CoreError::UnsupportedFeatureError(
+                    "Can not set batch isolation level within interactive transaction".into(),
+                ));
+            }
             self.itx_manager.batch_execute(&tx_id, operations, trace_id).await
         } else if let Some(transaction) = transaction {
             let connection_name = self.connector.name();
@@ -93,7 +99,7 @@ where
                 "db.type" = connection_name.as_str()
             );
             let mut conn = self.connector.get_connection().instrument(conn_span).await?;
-            let mut tx = conn.start_transaction(transaction.isolation_level).await?;
+            let mut tx = conn.start_transaction(transaction.isolation_level()).await?;
 
             let results = execute_many_operations(query_schema, tx.as_connection_like(), &operations, trace_id).await;
 
