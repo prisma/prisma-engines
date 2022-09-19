@@ -378,28 +378,51 @@ mod mapped_create {
     fn schema_map() -> String {
         let schema = indoc! {
             r#"
+            model GoodModel {
+              #id(user_id, Int, @id)
+              txt_space String @map("text space")
+            }
+            
             model AModel {
-              user_id  Int @id
+              #id(user_id, Int, @id @default(autoincrement()), @map("user id"))
+              txt_space String @map("text space")
             }
             
             model BModel {
-              user_id  Int @id @map("user id")
-            }"#
+              #id(user_id, Int, @id, @map("user id"))
+              txt_space String @map("text space")
+            }
+            
+            model CModel {
+              #id(user_id, String, @id, @map("user id"))
+              txt_space String @map("text space")
+            }
+            "#
         };
 
         schema.to_owned()
     }
 
     #[connector_test]
-    async fn mapped_name_with_space(runner: Runner) -> TestResult<()> {
+    async fn mapped_name_with_space_does_not_break_returning(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {createOneAModel(data: {user_id: 1}) {user_id}}"#),
-          @r###"{"data":{"createOneAModel":{"user_id":1}}}"###
+          run_query!(&runner, r#"mutation {createOneGoodModel(data: {user_id: 1, txt_space: "test"}) {user_id, txt_space}}"#),
+          @r###"{"data":{"createOneGoodModel":{"user_id":1,"txt_space":"test"}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {createOneBModel(data: {user_id: 1}) {user_id}}"#),
-          @r###"{"data":{"createOneBModel":{"user_id":1}}}"###
+          run_query!(&runner, r#"mutation {createOneAModel(data: {txt_space: "test"}) {user_id, txt_space}}"#),
+          @r###"{"data":{"createOneAModel":{"user_id":1,"txt_space":"test"}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {createOneBModel(data: {user_id: 1, txt_space: "test"}) {user_id, txt_space}}"#),
+          @r###"{"data":{"createOneBModel":{"user_id":1,"txt_space":"test"}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {createOneCModel(data: {user_id: "one", txt_space: "test"}) {user_id, txt_space}}"#),
+          @r###"{"data":{"createOneCModel":{"user_id":"one","txt_space":"test"}}}"###
         );
 
         Ok(())
