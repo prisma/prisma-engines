@@ -372,25 +372,36 @@ mod json_create {
     }
 }
 
-#[test_suite]
+#[test_suite(schema(schema_map))]
 mod mapped_create {
-
+    use query_engine_tests::run_query;
     fn schema_map() -> String {
         let schema = indoc! {
-            r#"model TestModel {
-              user_id  Int @id @map("user id") 
+            r#"
+            model AModel {
+              user_id  Int @id
+            }
+            
+            model BModel {
+              user_id  Int @id @map("user id")
             }"#
         };
 
         schema.to_owned()
     }
 
-    #[connector_test(schema(schema_map))]
+    #[connector_test]
     async fn mapped_name_with_space(runner: Runner) -> TestResult<()> {
-        runner
-            .query("mutation {createOneTestModel(data: {user_id: 1}) {user_id }}")
-            .await?
-            .assert_success();
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {createOneAModel(data: {user_id: 1}) {user_id}}"#),
+          @r###"{"data":{"createOneAModel":{"user_id":1}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {createOneBModel(data: {user_id: 1}) {user_id}}"#),
+          @r###"{"data":{"createOneBModel":{"user_id":1}}}"###
+        );
+
         Ok(())
     }
 }
