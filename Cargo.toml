@@ -58,4 +58,4 @@ opt-level = 'z' # Optimize for size.
 
 [patch."https://github.com/prisma/quaint"]
 # quaint = {path = "/Users/jkomyno/work/prisma/quaint"}
-quaint = { git = "https://github.com/prisma/quaint.git", branch = "feat/postgres-forward-io-invalid-input-error" }
+quaint = { git = "https://github.com/prisma//quaint", branch = "feat/postgres-forward-io-invalid-input-error" }
