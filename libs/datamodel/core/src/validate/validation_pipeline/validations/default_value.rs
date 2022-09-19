@@ -69,7 +69,7 @@ pub(super) fn validate_default_value(
             ));
         }
         (ScalarType::Bytes, ast::Expression::StringValue(value, span)) => {
-            let details = match dml::prisma_value::decode_bytes(value) {
+            let details = match prisma_value::decode_bytes(value) {
                 Ok(_) => return,
                 Err(details) => details,
             };

@@ -102,7 +102,7 @@ fn cycles_are_allowed_outside_of_emulation_and_sqlserver() {
         }
     "#};
 
-    assert!(parse_schema(dml).is_ok());
+    assert_valid(dml)
 }
 
 #[test]
@@ -938,5 +938,5 @@ fn separate_non_crossing_cascade_paths_should_work() {
         }
     "#;
 
-    assert!(parse_schema(dm).is_ok());
+    assert_valid(dm)
 }

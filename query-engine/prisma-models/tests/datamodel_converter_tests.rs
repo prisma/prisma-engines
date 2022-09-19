@@ -468,10 +468,8 @@ fn duplicate_relation_name() {
           
         "#;
 
-    let (_, dml) = psl::parse_schema(schema).unwrap();
-    let res = std::panic::catch_unwind(|| InternalDataModelBuilder::from(&dml));
-
-    assert!(res.is_ok());
+    let dml = psl::parse_schema_parserdb(schema).unwrap();
+    prisma_models::convert(&dml, String::new());
 }
 
 #[test]
@@ -493,8 +491,8 @@ fn implicit_many_to_many_relation() {
 }
 
 fn convert(datamodel: &str) -> Arc<InternalDataModel> {
-    let builder = InternalDataModelBuilder::new(datamodel);
-    builder.build("not_important".to_string())
+    let schema = psl::parse_schema_parserdb(datamodel).unwrap();
+    prisma_models::convert(&schema, "not_important".to_string())
 }
 
 trait DatamodelAssertions {

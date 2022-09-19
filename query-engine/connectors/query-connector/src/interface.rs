@@ -116,11 +116,9 @@ impl AggregationSelection {
     /// Returns (<field db name>, TypeIdentifier, FieldArity)
     pub fn identifiers(&self) -> Vec<(String, TypeIdentifier, FieldArity)> {
         match self {
-            AggregationSelection::Field(field) => vec![(
-                field.db_name().to_owned(),
-                field.type_identifier.clone(),
-                FieldArity::Required,
-            )],
+            AggregationSelection::Field(field) => {
+                vec![(field.db_name().to_owned(), field.type_identifier.clone(), field.arity)]
+            }
 
             AggregationSelection::Count { all, fields } => {
                 let mut mapped = Self::map_field_types(fields, Some(TypeIdentifier::Int));
@@ -302,6 +300,16 @@ pub trait WriteOperations {
         args: WriteArgs,
         trace_id: Option<String>,
     ) -> crate::Result<Vec<SelectionResult>>;
+
+    /// Update record in the `Model` with the given `WriteArgs` filtered by the
+    /// `Filter`.
+    async fn update_record(
+        &mut self,
+        model: &ModelRef,
+        record_filter: RecordFilter,
+        args: WriteArgs,
+        trace_id: Option<String>,
+    ) -> crate::Result<Option<SelectionResult>>;
 
     /// Delete records in the `Model` with the given `Filter`.
     async fn delete_records(

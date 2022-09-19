@@ -1,8 +1,8 @@
 pub use ::indoc::{formatdoc, indoc};
 pub use expect_test::expect;
-pub use psl::{dml, dml::*, parse_datamodel, parse_schema};
+pub use psl::{dml, dml::*};
 
-use psl::{diagnostics::*, Configuration, StringFromEnvVar, ValidatedConfiguration};
+use psl::{diagnostics::*, Configuration, StringFromEnvVar};
 
 pub(crate) fn reformat(input: &str) -> String {
     psl::reformat(input, 2).unwrap_or_else(|| input.to_owned())
@@ -413,28 +413,21 @@ impl WarningAsserts for Vec<DatamodelWarning> {
 }
 
 pub(crate) fn parse_unwrap_err(schema: &str) -> String {
-    parse_schema(schema).unwrap_err()
+    psl::parse_schema_parserdb(schema).map(drop).unwrap_err()
 }
 
 pub(crate) fn parse(datamodel_string: &str) -> Datamodel {
-    match parse_datamodel(datamodel_string) {
-        Ok(s) => s.subject,
-        Err(errs) => {
-            panic!(
-                "Datamodel parsing failed\n\n{}",
-                errs.to_pretty_string("", datamodel_string)
-            )
-        }
-    }
+    let schema = psl::parse_schema_parserdb(datamodel_string).unwrap();
+    psl::lift(&schema)
 }
 
-pub(crate) fn parse_config(schema: &str) -> Result<ValidatedConfiguration, String> {
+pub(crate) fn parse_config(schema: &str) -> Result<Configuration, String> {
     psl::parse_configuration(schema).map_err(|err| err.to_pretty_string("schema.prisma", schema))
 }
 
 pub(crate) fn parse_configuration(datamodel_string: &str) -> Configuration {
     match psl::parse_configuration(datamodel_string) {
-        Ok(c) => c.subject,
+        Ok(c) => c,
         Err(errs) => {
             panic!(
                 "Configuration parsing failed\n\n{}",
@@ -446,25 +439,27 @@ pub(crate) fn parse_configuration(datamodel_string: &str) -> Configuration {
 
 #[track_caller]
 pub(crate) fn expect_error(schema: &str, expectation: &expect_test::Expect) {
-    match parse_schema(schema) {
+    match psl::parse_schema_parserdb(schema) {
         Ok(_) => panic!("Expected a validation error, but the schema is valid."),
         Err(err) => expectation.assert_eq(&err),
     }
 }
 
 pub(crate) fn parse_and_render_error(schema: &str) -> String {
-    match psl::parse_datamodel(schema) {
-        Ok(_) => panic!("Expected an error when parsing schema."),
-        Err(errs) => errs.to_pretty_string("schema.prisma", schema),
-    }
+    parse_unwrap_err(schema)
 }
 
 #[track_caller]
 pub(crate) fn assert_valid(schema: &str) {
-    match psl::parse_schema(schema) {
+    match psl::parse_schema_parserdb(schema) {
         Ok(_) => (),
         Err(err) => panic!("{err}"),
     }
+}
+
+pub(crate) fn rerender(schema: &str) -> String {
+    let schema = psl::parse_schema_parserdb(schema).unwrap();
+    psl::render_datamodel_to_string(&psl::lift(&schema), Some(&schema.configuration))
 }
 
 pub(crate) const SQLITE_SOURCE: &str = r#"

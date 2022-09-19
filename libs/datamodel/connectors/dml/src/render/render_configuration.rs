@@ -1,4 +1,4 @@
-use crate::{configuration::StringFromEnvVar, Configuration, Datasource, Generator};
+use ::datamodel::{Configuration, Datasource, Generator, StringFromEnvVar};
 use schema_ast::string_literal;
 use std::fmt::{self, Write as _};
 

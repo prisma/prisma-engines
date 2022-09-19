@@ -1,11 +1,11 @@
-use crate::parser_database::{
+use crate::{self as dml, *};
+use ::datamodel::datamodel_connector::{walker_ext_traits::*, Connector, ReferentialIntegrity, ScalarType};
+use ::datamodel::parser_database::{
     self as db,
     ast::{self, WithDocumentation, WithName, WithSpan},
     walkers::*,
     IndexAlgorithm,
 };
-use datamodel_connector::{walker_ext_traits::*, Connector, ReferentialIntegrity, ScalarType};
-use dml::*;
 use either::Either;
 use std::collections::HashMap;
 
@@ -97,8 +97,7 @@ impl<'a> LiftAstToDml<'a> {
             field.documentation = ast_field.documentation().map(String::from);
             field.is_ignored = relation_field.is_ignored();
             field.supports_restrict_action(
-                active_connector
-                    .supports_referential_action(&referential_integrity, parser_database::ReferentialAction::Restrict),
+                active_connector.supports_referential_action(&referential_integrity, db::ReferentialAction::Restrict),
             );
             field.emulates_referential_actions(referential_integrity.is_prisma());
         };
@@ -527,31 +526,29 @@ impl<'a> LiftAstToDml<'a> {
     }
 }
 
-fn parser_database_sort_order_to_dml_sort_order(sort_order: parser_database::SortOrder) -> dml::SortOrder {
+fn parser_database_sort_order_to_dml_sort_order(sort_order: db::SortOrder) -> dml::SortOrder {
     match sort_order {
-        parser_database::SortOrder::Asc => dml::SortOrder::Asc,
-        parser_database::SortOrder::Desc => dml::SortOrder::Desc,
+        db::SortOrder::Asc => dml::SortOrder::Asc,
+        db::SortOrder::Desc => dml::SortOrder::Desc,
     }
 }
 
-fn parser_database_referential_action_to_dml_referential_action(
-    ra: parser_database::ReferentialAction,
-) -> dml::ReferentialAction {
+fn parser_database_referential_action_to_dml_referential_action(ra: db::ReferentialAction) -> dml::ReferentialAction {
     match ra {
-        parser_database::ReferentialAction::Cascade => dml::ReferentialAction::Cascade,
-        parser_database::ReferentialAction::SetNull => dml::ReferentialAction::SetNull,
-        parser_database::ReferentialAction::SetDefault => dml::ReferentialAction::SetDefault,
-        parser_database::ReferentialAction::Restrict => dml::ReferentialAction::Restrict,
-        parser_database::ReferentialAction::NoAction => dml::ReferentialAction::NoAction,
+        db::ReferentialAction::Cascade => dml::ReferentialAction::Cascade,
+        db::ReferentialAction::SetNull => dml::ReferentialAction::SetNull,
+        db::ReferentialAction::SetDefault => dml::ReferentialAction::SetDefault,
+        db::ReferentialAction::Restrict => dml::ReferentialAction::Restrict,
+        db::ReferentialAction::NoAction => dml::ReferentialAction::NoAction,
     }
 }
 
-fn parser_database_scalar_type_to_dml_scalar_type(st: parser_database::ScalarType) -> dml::ScalarType {
+fn parser_database_scalar_type_to_dml_scalar_type(st: db::ScalarType) -> dml::ScalarType {
     st.as_str().parse().unwrap()
 }
 
 fn datamodel_connector_native_type_to_dml_native_type(
-    instance: datamodel_connector::NativeTypeInstance,
+    instance: ::datamodel::datamodel_connector::NativeTypeInstance,
 ) -> dml::NativeTypeInstance {
     dml::NativeTypeInstance {
         name: instance.name,
@@ -607,9 +604,7 @@ fn dml_default_kind(default_value: &ast::Expression, scalar_type: Option<ScalarT
             Some(ScalarType::String) => DefaultKind::Single(PrismaValue::String(v.parse().unwrap())),
             Some(ScalarType::Json) => DefaultKind::Single(PrismaValue::Json(v.parse().unwrap())),
             Some(ScalarType::Decimal) => DefaultKind::Single(PrismaValue::Float(v.parse().unwrap())),
-            Some(ScalarType::Bytes) => {
-                DefaultKind::Single(PrismaValue::Bytes(::dml::prisma_value::decode_bytes(v).unwrap()))
-            }
+            Some(ScalarType::Bytes) => DefaultKind::Single(PrismaValue::Bytes(prisma_value::decode_bytes(v).unwrap())),
             other => unreachable!("{:?}", other),
         },
         ast::Expression::Array(values, _) => {

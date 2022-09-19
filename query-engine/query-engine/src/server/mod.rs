@@ -61,7 +61,7 @@ impl Clone for State {
 }
 
 pub async fn setup(opts: &PrismaOpt, metrics: MetricRegistry) -> PrismaResult<State> {
-    let config = opts.configuration(false)?.subject;
+    let config = opts.configuration(false)?;
     config.validate_that_one_datasource_is_provided()?;
 
     let span = tracing::info_span!("prisma:engine:connect");
@@ -73,7 +73,7 @@ pub async fn setup(opts: &PrismaOpt, metrics: MetricRegistry) -> PrismaResult<St
     let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics);
 
     let datamodel = opts.datamodel()?;
-    let cx = PrismaContext::builder(config, datamodel)
+    let cx = PrismaContext::builder(datamodel)
         .set_metrics(metrics)
         .enable_raw_queries(opts.enable_raw_queries)
         .build()

@@ -6,11 +6,12 @@ version = "0.1.0"
 [dependencies]
 anyhow = "1.0"
 async-trait = "0.1"
-bigdecimal = "0.2"
+bigdecimal = "0.3"
 # bson = {version = "1.1.0", features = ["decimal128"]}
 futures = "0.3"
 itertools = "0.10"
-mongodb = { version = "2.1.0", features = ["bson-chrono-0_4", "bson-uuid-0_8"] }
+mongodb = "2.3.0"
+bson = { version = "2.4.0", features = ["chrono-0_4", "uuid-1"] }
 rand = "0.7"
 regex = "1"
 serde_json = { version = "1.0", features = ["float_roundtrip"] }
@@ -18,7 +19,7 @@ thiserror = "1.0"
 tokio = "1.0"
 tracing = "0.1"
 tracing-futures = "0.2"
-uuid = "0.8"
+uuid = "1"
 indexmap = "1.7"
 query-engine-metrics = {path = "../../metrics"}
 
@@ -50,7 +51,7 @@ features = ["derive"]
 version = "1.0"
 
 [dependencies.cuid]
-git = "https://github.com/prisma/cuid-rust"
+version = "1.2"
 
 [dependencies.user-facing-errors]
 features = ["sql"]

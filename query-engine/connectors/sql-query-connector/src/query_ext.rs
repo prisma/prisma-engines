@@ -50,9 +50,7 @@ pub trait QueryExt: Queryable + Send + Sync {
                 Query::Select(Box::from(x.comment(trace_parent_to_string(span_ctx))))
             }
             // This is part of the required changes to pass a traceid
-            (Query::Select(x), Some(traceparent)) => {
-                Query::Select(Box::from(x.comment(format!("traceparent={}", traceparent))))
-            }
+            (Query::Select(x), trace_id) => Query::Select(Box::from(x.add_trace_id(trace_id))),
             (q, _) => q,
         };
 
@@ -163,7 +161,7 @@ pub trait QueryExt: Queryable + Send + Sync {
             .columns(id_cols)
             .append_trace(&Span::current())
             .add_trace_id(trace_id.clone())
-            .so_that(filter.aliased_cond(None, false));
+            .so_that(filter.aliased_condition_from(None, false));
 
         self.select_ids(select, model_id, trace_id).await
     }

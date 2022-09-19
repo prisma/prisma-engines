@@ -1,9 +1,6 @@
 use crate::{error::PrismaError, PrismaResult};
-use psl::dml::Datamodel;
-use psl::ValidatedConfiguration;
 use serde::Deserialize;
-use std::env;
-use std::{ffi::OsStr, fs::File, io::Read};
+use std::{env, ffi::OsStr, fs::File, io::Read};
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt, Clone)]
@@ -132,18 +129,19 @@ impl PrismaOpt {
         Ok(res)
     }
 
-    pub fn datamodel(&self) -> PrismaResult<Datamodel> {
+    pub fn datamodel(&self) -> PrismaResult<psl::ValidatedSchema> {
         let datamodel_str = self.datamodel_str()?;
+        let mut schema = psl::validate(datamodel_str.into());
 
-        let datamodel = psl::parse_datamodel(datamodel_str);
+        schema
+            .diagnostics
+            .to_result()
+            .map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))?;
 
-        match datamodel {
-            Err(errors) => Err(PrismaError::ConversionError(errors, datamodel_str.to_string())),
-            _ => Ok(datamodel.unwrap().subject),
-        }
+        Ok(schema)
     }
 
-    pub fn configuration(&self, ignore_env_errors: bool) -> PrismaResult<ValidatedConfiguration> {
+    pub fn configuration(&self, ignore_env_errors: bool) -> PrismaResult<psl::Configuration> {
         let datamodel_str = self.datamodel_str()?;
 
         let datasource_url_overrides: Vec<(String, String)> = if let Some(ref json) = self.overwrite_datasources {
@@ -157,9 +155,7 @@ impl PrismaOpt {
             psl::parse_configuration(datamodel_str)
         } else {
             psl::parse_configuration(datamodel_str).and_then(|mut config| {
-                config
-                    .subject
-                    .resolve_datasource_urls_from_env(&datasource_url_overrides, |key| env::var(key).ok())?;
+                config.resolve_datasource_urls_from_env(&datasource_url_overrides, |key| env::var(key).ok())?;
 
                 Ok(config)
             })

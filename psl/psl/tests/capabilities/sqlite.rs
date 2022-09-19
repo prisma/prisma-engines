@@ -227,7 +227,7 @@ fn key_order_enforcement_support() {
         }
     "#};
 
-    assert!(parse_schema(dml).is_ok());
+    assert_valid(dml)
 }
 
 #[test]

@@ -1,7 +1,6 @@
-use super::fields::data_input_mapper::*;
-use super::*;
+use super::{fields::data_input_mapper::*, *};
 use constants::args;
-use datamodel_connector::ConnectorCapability;
+use psl::datamodel_connector::ConnectorCapability;
 
 pub(crate) fn update_one_input_types(
     ctx: &mut BuilderContext,
@@ -97,7 +96,7 @@ pub(super) fn filter_checked_update_fields(
                     let model_id = sf.container.as_model().unwrap().primary_identifier();
                     let is_not_disallowed_id = if model_id.contains(&sf.name) {
                         // Is part of the id, connector must allow updating ID fields.
-                        ctx.capabilities.contains(ConnectorCapability::UpdateableId)
+                        ctx.has_capability(ConnectorCapability::UpdateableId)
                     } else {
                         true
                     };
@@ -154,7 +153,7 @@ pub(super) fn filter_unchecked_update_fields(
                     && if let Some(ref id_fields) = &id_fields {
                         // Exclude @@id or @id fields if not updatable
                         if id_fields.contains(sf) {
-                            ctx.capabilities.contains(ConnectorCapability::UpdateableId)
+                            ctx.has_capability(ConnectorCapability::UpdateableId)
                         } else {
                             true
                         }

@@ -3,9 +3,9 @@ pub(crate) fn run(schema: &str) -> String {
 
     match datamodel_result {
         Ok(validated_configuration) => {
-            if validated_configuration.subject.datasources.len() != 1 {
+            if validated_configuration.datasources.len() != 1 {
                 "[]".to_string()
-            } else if let Some(datasource) = validated_configuration.subject.datasources.first() {
+            } else if let Some(datasource) = validated_configuration.datasources.first() {
                 let referential_integrity = datasource.referential_integrity();
                 let available_referential_actions = datasource
                     .active_connector

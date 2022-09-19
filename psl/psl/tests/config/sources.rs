@@ -104,7 +104,7 @@ fn must_error_for_empty_urls() {
 
     let config = parse_config(dml).unwrap();
 
-    let error = config.subject.datasources[0]
+    let error = config.datasources[0]
         .load_url(load_env_var)
         .map_err(|e| e.to_pretty_string("schema.prisma", dml))
         .unwrap_err();
@@ -157,7 +157,7 @@ fn must_error_for_empty_urls_derived_load_env_vars() {
 
     let config = parse_config(dml).unwrap();
 
-    let error = config.subject.datasources[0]
+    let error = config.datasources[0]
         .load_url(load_env_var)
         .map_err(|e| e.to_pretty_string("schema.prisma", dml))
         .unwrap_err();
@@ -185,7 +185,7 @@ fn must_error_if_prisma_protocol_is_used_for_mysql() {
 
     let config = parse_config(dml).unwrap();
 
-    let error = config.subject.datasources[0]
+    let error = config.datasources[0]
         .load_url(load_env_var)
         .map_err(|e| e.to_pretty_string("schema.prisma", dml))
         .unwrap_err();
@@ -218,7 +218,7 @@ fn must_error_if_wrong_protocol_is_used_for_mysql() {
 
     let config = parse_config(dml).unwrap();
 
-    let error = config.subject.datasources[0]
+    let error = config.datasources[0]
         .load_url(load_env_var)
         .map_err(|e| e.to_pretty_string("schema.prisma", dml))
         .unwrap_err();
@@ -247,7 +247,7 @@ fn must_error_if_wrong_protocol_is_used_for_mysql_shadow_database_url() {
 
     let config = parse_config(dml).unwrap();
 
-    let error = config.subject.datasources[0]
+    let error = config.datasources[0]
         .load_shadow_database_url()
         .map_err(|e| e.to_pretty_string("schema.prisma", dml))
         .unwrap_err();
@@ -309,7 +309,7 @@ fn must_error_if_wrong_protocol_is_used_for_postgresql() {
 
     let config = parse_config(dml).unwrap();
 
-    let error = config.subject.datasources[0]
+    let error = config.datasources[0]
         .load_url(load_env_var)
         .map_err(|e| e.to_pretty_string("schema.prisma", dml))
         .unwrap_err();
@@ -338,7 +338,7 @@ fn must_error_if_wrong_protocol_is_used_for_postgresql_shadow_database_url() {
 
     let config = parse_config(dml).unwrap();
 
-    let error = config.subject.datasources[0]
+    let error = config.datasources[0]
         .load_shadow_database_url()
         .map_err(|e| e.to_pretty_string("schema.prisma", dml))
         .unwrap_err();
@@ -366,7 +366,7 @@ fn must_error_if_wrong_protocol_is_used_for_sqlite() {
 
     let config = parse_config(dml).unwrap();
 
-    let error = config.subject.datasources[0]
+    let error = config.datasources[0]
         .load_url(load_env_var)
         .map_err(|e| e.to_pretty_string("schema.prisma", dml))
         .unwrap_err();
@@ -423,7 +423,7 @@ fn must_error_if_env_var_is_missing() {
 
     let config = parse_config(dml).unwrap();
 
-    let error = config.subject.datasources[0]
+    let error = config.datasources[0]
         .load_url(load_env_var)
         .map_err(|e| e.to_pretty_string("schema.prisma", dml))
         .unwrap_err();
@@ -568,7 +568,7 @@ fn fail_when_no_source_is_declared() {
     let invalid_datamodel: &str = r#"        "#;
 
     let error = psl::parse_configuration(invalid_datamodel)
-        .and_then(|res| res.subject.validate_that_one_datasource_is_provided())
+        .and_then(|res| res.validate_that_one_datasource_is_provided())
         .map_err(|e| e.to_pretty_string("schema.prisma", invalid_datamodel))
         .unwrap_err();
 

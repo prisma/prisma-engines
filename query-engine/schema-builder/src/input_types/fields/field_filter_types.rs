@@ -1,10 +1,10 @@
-use super::field_ref_type::WithFieldRefInputExt;
-use super::objects::*;
-use super::*;
-
+use super::{field_ref_type::WithFieldRefInputExt, objects::*, *};
 use constants::{aggregations, filters};
-use datamodel_connector::ConnectorCapability;
-use prisma_models::{dml::DefaultValue, CompositeFieldRef, PrismaValue};
+use prisma_models::{
+    dml::{self, DefaultValue},
+    CompositeFieldRef, PrismaValue,
+};
+use psl::datamodel_connector::ConnectorCapability;
 
 /// Builds filter types for the given model field.
 pub(crate) fn get_field_filter_types(
@@ -40,6 +40,7 @@ pub(crate) fn get_field_filter_types(
             let mut types = vec![InputType::object(full_scalar_filter_type(
                 ctx,
                 &sf.type_identifier,
+                sf.native_type.as_ref(),
                 sf.is_list(),
                 !sf.is_required(),
                 false,
@@ -205,7 +206,7 @@ fn to_many_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeField
 
 fn scalar_list_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputObjectTypeWeakRef {
     let ident = Identifier::new(
-        scalar_filter_name(&sf.type_identifier, true, !sf.is_required(), false, false),
+        scalar_filter_name(&sf.type_identifier.to_string(), true, !sf.is_required(), false, false),
         PRISMA_NAMESPACE,
     );
     return_cached_input!(ctx, &ident);
@@ -244,13 +245,16 @@ fn scalar_list_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> Inp
 fn full_scalar_filter_type(
     ctx: &mut BuilderContext,
     typ: &TypeIdentifier,
+    native_type: Option<&dml::NativeTypeInstance>,
     list: bool,
     nullable: bool,
     nested: bool,
     include_aggregates: bool,
 ) -> InputObjectTypeWeakRef {
+    let native_type_name = native_type.map(|nt| nt.name.as_str());
+    let type_name = ctx.connector.scalar_filter_name(typ.to_string(), native_type_name);
     let ident = Identifier::new(
-        scalar_filter_name(typ, list, nullable, nested, include_aggregates),
+        scalar_filter_name(&type_name, list, nullable, nested, include_aggregates),
         PRISMA_NAMESPACE,
     );
 
@@ -265,7 +269,7 @@ fn full_scalar_filter_type(
         TypeIdentifier::String | TypeIdentifier::UUID => equality_filters(ctx, mapped_scalar_type.clone(), nullable)
             .chain(inclusion_filters(ctx, mapped_scalar_type.clone(), nullable))
             .chain(alphanumeric_filters(ctx, mapped_scalar_type.clone()))
-            .chain(string_filters(ctx, mapped_scalar_type.clone()))
+            .chain(string_filters(ctx, type_name.as_ref(), mapped_scalar_type.clone()))
             .chain(query_mode_field(ctx, nested))
             .collect(),
 
@@ -282,16 +286,13 @@ fn full_scalar_filter_type(
             let mut filters: Vec<InputField> =
                 json_equality_filters(ctx, mapped_scalar_type.clone(), nullable).collect();
 
-            if ctx.capabilities.supports_any(&[
+            if ctx.supports_any(&[
                 ConnectorCapability::JsonFilteringJsonPath,
                 ConnectorCapability::JsonFilteringArrayPath,
             ]) {
                 filters.extend(json_filters(ctx));
 
-                if ctx
-                    .capabilities
-                    .contains(ConnectorCapability::JsonFilteringAlphanumeric)
-                {
+                if ctx.has_capability(ConnectorCapability::JsonFilteringAlphanumeric) {
                     filters.extend(alphanumeric_filters(ctx, mapped_scalar_type.clone()))
                 }
             }
@@ -313,6 +314,7 @@ fn full_scalar_filter_type(
     fields.push(not_filter_field(
         ctx,
         typ,
+        native_type,
         mapped_scalar_type,
         nullable,
         include_aggregates,
@@ -455,14 +457,18 @@ fn alphanumeric_filters(ctx: &mut BuilderContext, mapped_type: InputType) -> imp
     .into_iter()
 }
 
-fn string_filters(ctx: &mut BuilderContext, mapped_type: InputType) -> impl Iterator<Item = InputField> {
+fn string_filters(
+    ctx: &mut BuilderContext,
+    input_object_type_name: &str,
+    mapped_type: InputType,
+) -> impl Iterator<Item = InputField> {
     let field_types = mapped_type.clone().with_field_ref_input(ctx);
 
-    let mut string_filters = vec![
-        input_field(filters::CONTAINS, field_types.clone(), None).optional(),
-        input_field(filters::STARTS_WITH, field_types.clone(), None).optional(),
-        input_field(filters::ENDS_WITH, field_types, None).optional(),
-    ];
+    let string_filters = ctx.connector.string_filters(input_object_type_name);
+    let mut string_filters: Vec<_> = string_filters
+        .iter()
+        .map(|filter| input_field(filter.name(), field_types.clone(), None).optional())
+        .collect();
 
     if ctx.can_full_text_search() {
         string_filters.push(input_field(filters::SEARCH, mapped_type, None).optional());
@@ -474,9 +480,9 @@ fn string_filters(ctx: &mut BuilderContext, mapped_type: InputType) -> impl Iter
 fn json_filters(ctx: &mut BuilderContext) -> impl Iterator<Item = InputField> {
     // TODO: also add json-specific "keys" filters
     // TODO: add json_type filter
-    let path_type = if ctx.capabilities.contains(ConnectorCapability::JsonFilteringJsonPath) {
+    let path_type = if ctx.has_capability(ConnectorCapability::JsonFilteringJsonPath) {
         InputType::string()
-    } else if ctx.capabilities.contains(ConnectorCapability::JsonFilteringArrayPath) {
+    } else if ctx.has_capability(ConnectorCapability::JsonFilteringArrayPath) {
         InputType::list(InputType::string())
     } else {
         unreachable!()
@@ -530,7 +536,7 @@ fn json_filters(ctx: &mut BuilderContext) -> impl Iterator<Item = InputField> {
 fn query_mode_field(ctx: &mut BuilderContext, nested: bool) -> impl Iterator<Item = InputField> {
     // Limit query mode field to the topmost filter level.
     // Only build mode field for connectors with insensitive filter support.
-    let fields = if !nested && ctx.capabilities.contains(ConnectorCapability::InsensitiveFilters) {
+    let fields = if !nested && ctx.has_capability(ConnectorCapability::InsensitiveFilters) {
         let enum_type = query_mode_enum(ctx);
 
         let field = input_field(
@@ -548,33 +554,12 @@ fn query_mode_field(ctx: &mut BuilderContext, nested: bool) -> impl Iterator<Ite
     fields.into_iter()
 }
 
-fn scalar_filter_name(
-    typ: &TypeIdentifier,
-    list: bool,
-    nullable: bool,
-    nested: bool,
-    include_aggregates: bool,
-) -> String {
+fn scalar_filter_name(typ: &str, list: bool, nullable: bool, nested: bool, include_aggregates: bool) -> String {
     let list = if list { "List" } else { "" };
     let nullable = if nullable { "Nullable" } else { "" };
     let nested = if nested { "Nested" } else { "" };
     let aggregates = if include_aggregates { "WithAggregates" } else { "" };
-
-    match typ {
-        TypeIdentifier::UUID => format!("{}Uuid{}{}{}Filter", nested, nullable, list, aggregates),
-        TypeIdentifier::String => format!("{}String{}{}{}Filter", nested, nullable, list, aggregates),
-        TypeIdentifier::Int => format!("{}Int{}{}{}Filter", nested, nullable, list, aggregates),
-        TypeIdentifier::BigInt => format!("{}BigInt{}{}{}Filter", nested, nullable, list, aggregates),
-        TypeIdentifier::Float => format!("{}Float{}{}{}Filter", nested, nullable, list, aggregates),
-        TypeIdentifier::Decimal => format!("{}Decimal{}{}{}Filter", nested, nullable, list, aggregates),
-        TypeIdentifier::Boolean => format!("{}Bool{}{}{}Filter", nested, nullable, list, aggregates),
-        TypeIdentifier::DateTime => format!("{}DateTime{}{}{}Filter", nested, nullable, list, aggregates),
-        TypeIdentifier::Json => format!("{}Json{}{}{}Filter", nested, nullable, list, aggregates),
-        TypeIdentifier::Enum(ref e) => format!("{}Enum{}{}{}{}Filter", nested, e, nullable, list, aggregates),
-        TypeIdentifier::Xml => format!("{}Xml{}{}{}Filter", nested, nullable, list, aggregates),
-        TypeIdentifier::Bytes => format!("{}Bytes{}{}{}Filter", nested, nullable, list, aggregates),
-        TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
-    }
+    format!("{nested}{typ}{nullable}{list}{aggregates}Filter")
 }
 
 fn aggregate_filter_field(
@@ -584,7 +569,7 @@ fn aggregate_filter_field(
     nullable: bool,
     list: bool,
 ) -> InputField {
-    let filters = full_scalar_filter_type(ctx, typ, list, nullable, true, false);
+    let filters = full_scalar_filter_type(ctx, typ, None, list, nullable, true, false);
     input_field(aggregation, InputType::object(filters), None).optional()
 }
 
@@ -599,6 +584,7 @@ fn map_avg_type_ident(typ: TypeIdentifier) -> TypeIdentifier {
 fn not_filter_field(
     ctx: &mut BuilderContext,
     typ: &TypeIdentifier,
+    native_type: Option<&dml::NativeTypeInstance>,
     mapped_scalar_type: InputType,
     is_nullable: bool,
     include_aggregates: bool,
@@ -629,6 +615,7 @@ fn not_filter_field(
             let shorthand = InputType::object(full_scalar_filter_type(
                 ctx,
                 typ,
+                native_type,
                 is_list,
                 is_nullable,
                 true,

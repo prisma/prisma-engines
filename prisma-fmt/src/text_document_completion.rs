@@ -1,6 +1,6 @@
 use datamodel::{
     datamodel_connector::{Connector, Diagnostics, ReferentialIntegrity},
-    parse_configuration, parse_schema_ast,
+    parse_configuration,
     parser_database::{ast, ParserDatabase, SourceFile},
 };
 use log::*;
@@ -15,10 +15,6 @@ pub(crate) fn empty_completion_list() -> CompletionList {
 }
 
 pub(crate) fn completion(schema: String, params: CompletionParams) -> CompletionList {
-    if parse_schema_ast(&schema).is_err() {
-        warn!("Failed to parse schema AST in completion request.");
-        return empty_completion_list();
-    };
     let source_file = SourceFile::new_allocated(Arc::from(schema.into_boxed_str()));
 
     let position =
@@ -31,7 +27,7 @@ pub(crate) fn completion(schema: String, params: CompletionParams) -> Completion
 
     let (connector, referential_integrity) = parse_configuration(source_file.as_str())
         .ok()
-        .and_then(|conf| conf.subject.datasources.into_iter().next())
+        .and_then(|conf| conf.datasources.into_iter().next())
         .map(|datasource| (datasource.active_connector, datasource.referential_integrity()))
         .unwrap_or_else(|| {
             (

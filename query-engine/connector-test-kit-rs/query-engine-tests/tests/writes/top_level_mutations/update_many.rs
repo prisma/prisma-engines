@@ -334,8 +334,23 @@ mod json_update_many {
         );
 
         insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findFirstTestModel(where: {id: 1}) { id, json } }"#),
+          @r###"{"data":{"findFirstTestModel":{"id":1,"json":null}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateManyTestModel(where: { id: 1 }, data: { json: "{}" }) { count }}"#),
+          @r###"{"data":{"updateManyTestModel":{"count":1}}}"###
+        );
+
+        insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { updateManyTestModel(where: { id: 1 }, data: { json: null }) { count }}"#),
           @r###"{"data":{"updateManyTestModel":{"count":1}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findFirstTestModel(where: {id: 1}) { id, json } }"#),
+          @r###"{"data":{"findFirstTestModel":{"id":1,"json":null}}}"###
         );
 
         Ok(())

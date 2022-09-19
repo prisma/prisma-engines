@@ -34,7 +34,7 @@ fn expanded_index_capability_rendering_works() {
     "#]];
 
     let dml = parse(dm);
-    let configuration = psl::parse_configuration(dm).unwrap().subject;
+    let configuration = psl::parse_configuration(dm).unwrap();
     let rendered = psl::render_datamodel_to_string(&dml, Some(&configuration));
     expected.assert_eq(&rendered)
 }
@@ -72,7 +72,7 @@ fn expanded_id_capability_rendering_works_for_mysql() {
     "#]];
 
     let dml = parse(&dm);
-    let configuration = psl::parse_configuration(&dm).unwrap().subject;
+    let configuration = psl::parse_configuration(&dm).unwrap();
     let rendered = psl::render_datamodel_to_string(&dml, Some(&configuration));
     expected.assert_eq(&rendered)
 }

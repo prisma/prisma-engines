@@ -69,7 +69,7 @@ impl From<PrismaValue> for QueryValue {
             PrismaValue::List(l) => Self::List(l.into_iter().map(QueryValue::from).collect()),
             PrismaValue::Int(i) => Self::Int(i),
             PrismaValue::Null => Self::Null,
-            PrismaValue::Uuid(u) => Self::String(u.to_hyphenated().to_string()),
+            PrismaValue::Uuid(u) => Self::String(u.hyphenated().to_string()),
             PrismaValue::Json(s) => Self::String(s),
             PrismaValue::Xml(s) => Self::String(s),
             PrismaValue::Bytes(b) => Self::String(prisma_value::encode_bytes(&b)),

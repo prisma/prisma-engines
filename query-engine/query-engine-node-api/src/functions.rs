@@ -1,8 +1,6 @@
 use crate::error::ApiError;
 use napi::{bindgen_prelude::*, JsUnknown};
 use napi_derive::napi;
-use prisma_models::InternalDataModelBuilder;
-use psl::datamodel_connector::ConnectorCapabilities;
 use query_core::{schema::QuerySchemaRef, schema_builder};
 use request_handlers::dmmf;
 use std::{
@@ -27,30 +25,33 @@ pub fn version() -> Version {
 
 #[napi]
 pub fn dmmf(datamodel_string: String) -> napi::Result<String> {
-    let datamodel =
-        psl::parse_datamodel(&datamodel_string).map_err(|errors| ApiError::conversion(errors, &datamodel_string))?;
+    let mut schema = psl::validate(datamodel_string.into());
 
-    let config = psl::parse_configuration(&datamodel_string)
-        .map_err(|errors| ApiError::conversion(errors, &datamodel_string))?;
-    let datasource = config.subject.datasources.first();
+    schema
+        .diagnostics
+        .to_result()
+        .map_err(|errors| ApiError::conversion(errors, schema.db.source()))?;
 
-    let capabilities = datasource
-        .map(|ds| ds.capabilities())
-        .unwrap_or_else(ConnectorCapabilities::empty);
+    let datasource = schema.configuration.datasources.first();
+    let datamodel = psl::lift(&schema);
+
+    let connector = datasource
+        .map(|ds| ds.active_connector)
+        .unwrap_or(&psl::datamodel_connector::EmptyDatamodelConnector);
 
     let referential_integrity = datasource.map(|ds| ds.referential_integrity()).unwrap_or_default();
 
-    let internal_data_model = InternalDataModelBuilder::from(&datamodel.subject).build("".into());
+    let internal_data_model = prisma_models::convert(&schema, "".into());
 
     let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
         internal_data_model,
         true,
-        capabilities,
-        config.subject.preview_features().iter().collect(),
+        connector,
+        schema.configuration.preview_features().iter().collect(),
         referential_integrity,
     ));
 
-    let dmmf = dmmf::render_dmmf(&datamodel.subject, query_schema);
+    let dmmf = dmmf::render_dmmf(&datamodel, query_schema);
 
     Ok(serde_json::to_string(&dmmf)?)
 }
@@ -83,7 +84,6 @@ pub fn get_config(js_env: Env, options: JsUnknown) -> napi::Result<JsUnknown> {
 
     if !ignore_env_var_errors {
         config
-            .subject
             .resolve_datasource_urls_from_env(&overrides, |key| env.get(key).map(ToString::to_string))
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
     }
