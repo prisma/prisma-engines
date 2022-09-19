@@ -98,19 +98,8 @@ pub fn create_records_empty(model: &ModelRef, skip_duplicates: bool, trace_id: O
     }
 }
 
-pub fn update_many(
-    model: &ModelRef,
-    ids: &[&SelectionResult],
-    args: WriteArgs,
-    filter_condition: ConditionTree<'static>,
-    trace_id: Option<String>,
-) -> crate::Result<Vec<Query<'static>>> {
-    if args.args.is_empty() {
-        return Ok(Vec::new());
-    }
-
+pub fn build_update_and_set_query(model: &ModelRef, args: WriteArgs, trace_id: Option<String>) -> Update<'static> {
     let scalar_fields = model.fields().scalar();
-
     let query = args
         .args
         .into_iter()
@@ -160,17 +149,22 @@ pub fn update_many(
             acc.set(name, value)
         });
 
-    let query = query.append_trace(&Span::current()).add_trace_id(trace_id);
-    let result: Vec<Query> = if ids.is_empty() {
-        Vec::from([query.so_that(filter_condition).into()])
-    } else {
-        let columns: Vec<_> = ModelProjection::from(model.primary_identifier()).as_columns().collect();
-        super::chunked_conditions(&columns, ids, |conditions| {
-            query.clone().so_that(conditions.and(filter_condition.clone()))
-        })
-    };
+    query.append_trace(&Span::current()).add_trace_id(trace_id)
+}
 
-    Ok(result)
+pub fn chunk_update_with_ids(
+    update: Update<'static>,
+    model: &ModelRef,
+    ids: &[&SelectionResult],
+    filter_condition: ConditionTree<'static>,
+) -> crate::Result<Vec<Query<'static>>> {
+    let columns: Vec<_> = ModelProjection::from(model.primary_identifier()).as_columns().collect();
+
+    let query = super::chunked_conditions(&columns, ids, |conditions| {
+        update.clone().so_that(conditions.and(filter_condition.clone()))
+    });
+
+    Ok(query)
 }
 
 pub fn delete_many(

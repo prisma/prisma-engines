@@ -1,4 +1,5 @@
 use crate::filter_conversion::AliasedCondition;
+use crate::query_builder::write::{build_update_and_set_query, chunk_update_with_ids};
 use crate::sql_trace::SqlTraceComment;
 use crate::{error::SqlError, model_extensions::*, query_builder::write, sql_info::SqlInfo, QueryExt};
 use connector_interface::*;
@@ -308,55 +309,44 @@ pub async fn update_record(
     args: WriteArgs,
     trace_id: Option<String>,
 ) -> crate::Result<Vec<SelectionResult>> {
-    let filter_condition = record_filter.clone().filter.aliased_condition_from(None, false);
-    let ids = conn.filter_selectors(model, record_filter, trace_id.clone()).await?;
     let id_args = pick_args(&model.primary_identifier().into(), &args);
 
-    if ids.is_empty() {
-        return Ok(vec![]);
+    // This is to match the behaviour expected but it seems a bit strange to me
+    // This comes across as if the update happened even if it didn't
+    if args.args.is_empty() {
+        let ids: Vec<SelectionResult> = conn
+            .filter_selectors(model, record_filter.clone(), trace_id.clone())
+            .await?;
+
+        return Ok(ids);
     }
 
-    let updates = {
-        let ids: Vec<&SelectionResult> = ids.iter().collect();
-        write::update_many(model, ids.as_slice(), args, filter_condition, trace_id)?
-    };
-
-    for update in updates {
-        conn.execute(update).await?;
-    }
+    let (_, ids) = update_records_from_ids_and_filter(conn, model, record_filter, args, trace_id).await?;
 
     Ok(merge_write_args(ids, id_args))
 }
 
-/// Update multiple records in a database defined in `conn` and the records
-/// defined in `args`, and returning the number of updates
-/// This function via two ways, when there are ids in record_filter.selectors, it uses that to update
-/// Otherwise it used the passed down arguments to update.
-/// Future clean up - we should split this into two functions, one that handles updates based on the selector
-/// and another that does an update based on the WriteArgs
-pub async fn update_records(
+// Generates a query like this:
+//  UPDATE "public"."User" SET "name" = $1 WHERE "public"."User"."id" IN ($2,$3,$4,$5,$6,$7,$8,$9,$10,$11) AND "public"."User"."age" > $1
+async fn update_records_from_ids_and_filter(
     conn: &dyn QueryExt,
     model: &ModelRef,
     record_filter: RecordFilter,
     args: WriteArgs,
     trace_id: Option<String>,
-) -> crate::Result<usize> {
+) -> crate::Result<(usize, Vec<SelectionResult>)> {
     let filter_condition = record_filter.clone().filter.aliased_condition_from(None, false);
+    let ids: Vec<SelectionResult> = conn.filter_selectors(model, record_filter, trace_id.clone()).await?;
 
-    // If no where filter is supplied we need to get the ids for the update
-    let ids: Vec<SelectionResult> = if record_filter.filter.is_empty() {
-        let ids = conn.filter_selectors(model, record_filter, trace_id.clone()).await?;
-        if ids.is_empty() {
-            return Ok(0);
-        }
-        ids
-    } else {
-        Vec::new()
-    };
+    if ids.is_empty() {
+        return Ok((0, Vec::new()));
+    }
+
+    let update = build_update_and_set_query(model, args, trace_id);
 
     let updates = {
         let ids: Vec<&SelectionResult> = ids.iter().collect();
-        write::update_many(model, ids.as_slice(), args, filter_condition, trace_id)?
+        chunk_update_with_ids(update, model, &ids, filter_condition)?
     };
 
     let mut count = 0;
@@ -366,7 +356,48 @@ pub async fn update_records(
         count += update_count;
     }
 
+    Ok((count as usize, ids))
+}
+
+// Generates a query like this:
+//  UPDATE "public"."User" SET "name" = $1 WHERE "public"."User"."age" > $1
+async fn update_records_from_filter(
+    conn: &dyn QueryExt,
+    model: &ModelRef,
+    record_filter: RecordFilter,
+    args: WriteArgs,
+    trace_id: Option<String>,
+) -> crate::Result<usize> {
+    let update = build_update_and_set_query(model, args, trace_id);
+    let filter_condition = record_filter.clone().filter.aliased_condition_from(None, false);
+
+    let update = update.so_that(filter_condition);
+    let count = conn.execute(update.into()).await?;
+
     Ok(count as usize)
+}
+
+/// Update multiple records in a database defined in `conn` and the records
+/// defined in `args`, and returning the number of updates
+/// This works via two ways, when there are ids in record_filter.selectors, it uses that to update
+/// Otherwise it used the passed down arguments to update.
+pub async fn update_records(
+    conn: &dyn QueryExt,
+    model: &ModelRef,
+    record_filter: RecordFilter,
+    args: WriteArgs,
+    trace_id: Option<String>,
+) -> crate::Result<usize> {
+    if args.args.is_empty() {
+        return Ok(0);
+    }
+
+    if record_filter.has_selectors() {
+        let (count, _) = update_records_from_ids_and_filter(conn, model, record_filter, args, trace_id).await?;
+        Ok(count)
+    } else {
+        update_records_from_filter(conn, model, record_filter, args, trace_id).await
+    }
 }
 
 /// Delete multiple records in `conn`, defined in the `Filter`. Result is the number of items deleted.

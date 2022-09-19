@@ -58,6 +58,10 @@ impl RecordFilter {
             selectors: None,
         }
     }
+
+    pub fn has_selectors(&self) -> bool {
+        self.selectors.is_some()
+    }
 }
 
 impl From<Filter> for RecordFilter {
