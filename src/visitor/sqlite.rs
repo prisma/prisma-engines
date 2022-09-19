@@ -201,7 +201,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
                 self.write(" RETURNING ")?;
 
                 for (i, column) in returning.into_iter().enumerate() {
-                    self.write(&column.name)?;
+                    self.delimited_identifiers(&[&*column.name])?;
 
                     if i < (values_len - 1) {
                         self.write(", ")?;
@@ -957,6 +957,19 @@ mod tests {
 
         assert_eq!(
             "SELECT `User`.*, `Toto`.* FROM `User` LEFT JOIN `Post` AS `p` ON `p`.`userId` = `User`.`id`, `Toto`",
+            sql
+        );
+    }
+
+    #[test]
+    fn test_returning() {
+        let insert = Insert::single_into("test").value("user id", 1).value("txt", "hello");
+        let insert: Insert = Insert::from(insert).returning(&["user id"]).into();
+
+        let (sql, _) = Sqlite::build(insert).unwrap();
+
+        assert_eq!(
+            "INSERT INTO `test` (`user id`, `txt`) VALUES (?,?) RETURNING `user id`",
             sql
         );
     }

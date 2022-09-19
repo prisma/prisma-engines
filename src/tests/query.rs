@@ -694,11 +694,12 @@ async fn returning_insert(api: &mut dyn TestApi) -> crate::Result<()> {
     let row = res.get(0).unwrap();
     // NOTE: RETURNING statements are 'special', it does not have the decl for the returned type, INT falls into the NONE case, so is int64
     if api.connector_tag().intersects(Tags::SQLITE) {
-        assert_eq!(Some(1), row["id"].as_i64());
+        assert_eq!(Some(1), row["`id`"].as_i64());
+        assert_eq!(Some("Naukio"), row["`name`"].as_str());
     } else {
         assert_eq!(Some(1), row["id"].as_i32());
+        assert_eq!(Some("Naukio"), row["name"].as_str());
     }
-    assert_eq!(Some("Naukio"), row["name"].as_str());
 
     Ok(())
 }
