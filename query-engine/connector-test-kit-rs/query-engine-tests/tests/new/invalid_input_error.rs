@@ -2,12 +2,12 @@ use query_engine_tests::*;
 
 #[test_suite(schema(generic), only(Postgres))]
 mod find_many {
-    use query_engine_tests::assert_query;
-
     #[connector_test]
-    async fn return_assertion_violation_value_too_large_to_transmit(runner: Runner) -> TestResult<()> {
+    async fn value_too_large_to_transmit(runner: Runner) -> TestResult<()> {
         let n = 32767;
-        let ids: Vec<u32> = (1..n).collect();
+
+        // [1,2,...,n]
+        let ids: Vec<u32> = (1..n + 1).collect();
 
         let query = format!(
             r#"
@@ -36,12 +36,14 @@ mod find_many {
 
 #[test_suite(schema(generic), only(Postgres))]
 mod raw_params {
-    use query_engine_tests::assert_query;
-
     #[connector_test]
-    async fn return_assertion_violation_value_too_large_to_transmit(runner: Runner) -> TestResult<()> {
+    async fn value_too_large_to_transmit(runner: Runner) -> TestResult<()> {
         let n = 32768;
-        let ids: Vec<u32> = (1..n).collect();
+
+        // [1,2,...,n]
+        let ids: Vec<u32> = (1..n + 1).collect();
+
+        // "$1,$2,...,$n"
         let params: String = ids
             .iter()
             .map(|id| format!("${}", id))
@@ -52,11 +54,8 @@ mod raw_params {
             r#"
             mutation {{
               queryRaw(
-                query: "SELECT * FROM "public"."TestModel" WHERE id IN ({})",
+                query: "SELECT * FROM \"TestModel\" WHERE id IN ({})",
                 parameters: "{:?}"
-              ) {{
-                json
-              }}
               )
             }}"#,
             params, ids,
