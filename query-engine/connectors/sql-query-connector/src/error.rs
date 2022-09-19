@@ -10,6 +10,7 @@ pub enum RawError {
         expected: usize,
         actual: usize,
     },
+    QueryInvalidInput(Box<dyn std::error::Error + Send + Sync + 'static>),
     ConnectionClosed,
     Database {
         code: Option<String>,
@@ -26,6 +27,7 @@ impl From<RawError> for SqlError {
             RawError::IncorrectNumberOfParameters { expected, actual } => {
                 Self::IncorrectNumberOfParameters { expected, actual }
             }
+            RawError::QueryInvalidInput(qe) => Self::QueryInvalidInput(qe),
             RawError::UnsupportedColumnType { column_type } => Self::RawError {
                 code: String::from("N/A"),
                 message: format!(
@@ -44,7 +46,7 @@ impl From<RawError> for SqlError {
 
 impl From<quaint::error::Error> for RawError {
     fn from(e: quaint::error::Error) -> Self {
-        match e.kind() {
+        let raw_error = match e.kind() {
             quaint::error::ErrorKind::IncorrectNumberOfParameters { expected, actual } => {
                 Self::IncorrectNumberOfParameters {
                     expected: *expected,
@@ -59,6 +61,13 @@ impl From<quaint::error::Error> for RawError {
                 code: e.original_code().map(ToString::to_string),
                 message: e.original_message().map(ToString::to_string),
             },
+        };
+
+        // note: this additional match is needed to move Box<dyn std::error::Error + Send + Sync + 'static> into any RawError
+        // that needs to wrap the Box, e.g., RawError::QueryInvalidInput
+        match QuaintKind::from(e) {
+            quaint::error::ErrorKind::QueryInvalidInput(qe) => Self::QueryInvalidInput(qe),
+            _ => raw_error,
         }
     }
 }
@@ -98,6 +107,9 @@ pub enum SqlError {
 
     #[error("Error querying the database: {}", _0)]
     QueryError(Box<dyn std::error::Error + Send + Sync>),
+
+    #[error("Invalid input provided to query: {}", _0)]
+    QueryInvalidInput(Box<dyn std::error::Error + Send + Sync>),
 
     #[error("The column value was different from the model")]
     ColumnReadFailure(Box<dyn std::error::Error + Send + Sync>),
@@ -215,6 +227,7 @@ impl SqlError {
                 child_name,
             }),
             SqlError::ConversionError(e) => ConnectorError::from_kind(ErrorKind::ConversionError(e)),
+            SqlError::QueryInvalidInput(e) => ConnectorError::from_kind(ErrorKind::QueryInvalidInput(e)),
             SqlError::IncorrectNumberOfParameters { expected, actual } => {
                 ConnectorError::from_kind(ErrorKind::IncorrectNumberOfParameters { expected, actual })
             }
@@ -273,6 +286,7 @@ impl From<quaint::error::Error> for SqlError {
     fn from(e: quaint::error::Error) -> Self {
         match QuaintKind::from(e) {
             QuaintKind::QueryError(qe) => Self::QueryError(qe),
+            QuaintKind::QueryInvalidInput(qe) => Self::QueryInvalidInput(qe),
             e @ QuaintKind::IoError(_) => Self::ConnectionError(e),
             QuaintKind::NotFound => Self::RecordDoesNotExist,
             QuaintKind::UniqueConstraintViolation { constraint } => Self::UniqueConstraintViolation {

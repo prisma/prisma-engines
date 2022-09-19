@@ -57,6 +57,11 @@ impl ConnectorError {
                     message: format!("{}", message),
                 },
             )),
+            ErrorKind::QueryInvalidInput(message) => Some(KnownError::new(
+                user_facing_errors::query_engine::DatabaseAssertionViolation {
+                    database_error: format!("{}", message),
+                },
+            )),
             ErrorKind::UnsupportedFeature(feature) => {
                 Some(KnownError::new(user_facing_errors::query_engine::UnsupportedFeature {
                     feature: feature.clone(),
@@ -169,6 +174,9 @@ pub enum ErrorKind {
 
     #[error("Conversion error: {}", _0)]
     ConversionError(anyhow::Error),
+
+    #[error("Invalid input provided to query: {}", _0)]
+    QueryInvalidInput(Box<dyn std::error::Error + Send + Sync>),
 
     #[error("Conversion error: {}", _0)]
     InternalConversionError(String),

@@ -2,6 +2,7 @@ mod create_many;
 mod cursor;
 mod disconnect;
 mod interactive_tx;
+mod invalid_input_error;
 mod metrics;
 mod multi_schema;
 mod native_types;
