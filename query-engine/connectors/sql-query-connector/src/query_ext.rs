@@ -140,7 +140,6 @@ pub trait QueryExt: Queryable + Send + Sync {
         record_filter: RecordFilter,
         trace_id: Option<String>,
     ) -> crate::Result<Vec<SelectionResult>> {
-        println!("IN FILTER {:?}", record_filter);
         if let Some(selectors) = record_filter.selectors {
             Ok(selectors)
         } else {
