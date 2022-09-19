@@ -86,6 +86,7 @@ mod interactive_tx {
 
         let error = res.err().unwrap();
         let known_err = error.as_known().unwrap();
+        println!("KNOWN ERROR {:?}", known_err);
 
         assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
         assert!(known_err
