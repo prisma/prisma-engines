@@ -23,12 +23,15 @@ mod find_many {
             ids,
         );
 
+        let old_query_batch_size = std::env::var("QUERY_BATCH_SIZE");
+        std::env::set_var("QUERY_BATCH_SIZE", n.to_string());
         assert_error!(
             runner,
             query,
             2034,
             "Assertion violation on the database: `value too large to transmit`"
         );
+        std::env::set_var("QUERY_BATCH_SIZE", old_query_batch_size.unwrap_or_default());
 
         Ok(())
     }
