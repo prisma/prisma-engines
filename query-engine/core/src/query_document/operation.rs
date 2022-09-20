@@ -14,6 +14,13 @@ impl Operation {
         }
     }
 
+    pub fn is_upsert(&self) -> bool {
+        match self {
+            Self::Write(selection) => selection.is_upsert(),
+            _ => false,
+        }
+    }
+
     pub fn into_read(self) -> Option<Selection> {
         match self {
             Self::Read(sel) => Some(sel),

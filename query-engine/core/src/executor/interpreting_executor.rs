@@ -51,14 +51,36 @@ where
         if let Some(tx_id) = tx_id {
             self.itx_manager.execute(&tx_id, operation, trace_id).await
         } else {
-            execute_single_self_contained(
+            let is_upsert = operation.is_upsert();
+            let res = execute_single_self_contained(
                 &self.connector,
-                query_schema,
-                operation,
-                trace_id,
+                query_schema.clone(),
+                operation.clone(),
+                trace_id.clone(),
                 self.force_transactions,
             )
-            .await
+            .await;
+
+            if res.is_err() || is_upsert {
+                if let Err(err) = &res {
+                    if err.is_unqiue_constraint_error() {
+                        // If the engine does an upsert and it fails on the unique constraint
+                        // we can try again because it initial attempt had tried to do an insert
+                        // and failed due to fact that another query also tried to insert a new row and won.
+                        // the rety will do an update
+                        return execute_single_self_contained(
+                            &self.connector,
+                            query_schema,
+                            operation,
+                            trace_id,
+                            self.force_transactions,
+                        )
+                        .await;
+                    }
+                }
+            }
+
+            res
         }
     }
 

@@ -74,6 +74,22 @@ impl CoreError {
             field_name
         ))
     }
+
+    pub fn is_unqiue_constraint_error(&self) -> bool {
+        match self {
+            Self::InterpreterError(e) => match e {
+                InterpreterError::ConnectorError(conn_err) => {
+                    if let Some(user_facing) = &conn_err.user_facing_error {
+                        user_facing.error_code == "P2002"
+                    } else {
+                        false
+                    }
+                }
+                _ => false,
+            },
+            _ => false,
+        }
+    }
 }
 
 impl From<QueryGraphBuilderError> for CoreError {

@@ -61,6 +61,10 @@ impl Selection {
         self.name.starts_with("findUnique")
     }
 
+    pub fn is_upsert(&self) -> bool {
+        self.name.starts_with("upsert")
+    }
+
     pub fn arguments(&self) -> &[(String, QueryValue)] {
         &self.arguments
     }
