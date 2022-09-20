@@ -157,7 +157,7 @@ impl MongoFilterVisitor {
 
         let filter_doc = match condition {
             ScalarCondition::Equals(val) => {
-                doc! { "$eq": [&field_name, self.as_bson_coerce_count(field, val)?] }
+                doc! { "$eq": [&field_name, self.as_bson_coerce_count(field, val)?]}
             }
             ScalarCondition::NotEquals(val) => {
                 doc! { "$ne": [&field_name, self.as_bson_coerce_count(field, val)?] }
