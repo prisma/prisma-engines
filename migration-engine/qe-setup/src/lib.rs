@@ -41,7 +41,7 @@ pub async fn setup(prisma_schema: &str, db_schemas: &[&str]) -> ConnectorResult<
 
     match &source.active_provider {
         provider if [POSTGRES.provider_name(), COCKROACH.provider_name()].contains(provider) => {
-            postgres_setup(url, prisma_schema, db_schemas).await?
+            postgres_setup(url, prisma_schema).await?
         }
         provider if MSSQL.is_provider(provider) => mssql_setup(url, prisma_schema, db_schemas).await?,
         provider if MYSQL.is_provider(provider) => {
@@ -54,30 +54,6 @@ pub async fn setup(prisma_schema: &str, db_schemas: &[&str]) -> ConnectorResult<
         }
 
         provider if MONGODB.is_provider(provider) => mongo_setup(prisma_schema, &url).await?,
-
-        x => unimplemented!("Connector {} is not supported yet", x),
-    };
-
-    Ok(())
-}
-
-/// Database teardown for connector-test-kit-rs.
-pub async fn teardown(prisma_schema: &str, db_schemas: &[&str]) -> ConnectorResult<()> {
-    let (source, url, _) = parse_configuration(prisma_schema)?;
-
-    match &source.active_provider {
-        provider if [POSTGRES.provider_name(), COCKROACH.provider_name()].contains(provider) => {
-            postgres_teardown(&url, db_schemas).await?;
-        }
-
-        provider
-            if [
-                SQLITE.provider_name(),
-                MSSQL.provider_name(),
-                MYSQL.provider_name(),
-                MONGODB.provider_name(),
-            ]
-            .contains(provider) => {}
 
         x => unimplemented!("Connector {} is not supported yet", x),
     };

@@ -36,10 +36,6 @@ impl ConnectorTagInterface for CockroachDbConnectorTag {
     fn is_versioned(&self) -> bool {
         false
     }
-
-    fn requires_teardown(&self) -> bool {
-        true
-    }
 }
 
 impl CockroachDbConnectorTag {

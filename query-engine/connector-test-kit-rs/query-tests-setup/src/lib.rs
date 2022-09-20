@@ -45,11 +45,6 @@ pub async fn setup_project(datamodel: &str, db_schemas: &[&str]) -> TestResult<(
     Ok(qe_setup::setup(datamodel, db_schemas).await?)
 }
 
-/// Teardown of a test setup.
-pub async fn teardown_project(datamodel: &str, db_schemas: &[&str]) -> TestResult<()> {
-    Ok(qe_setup::teardown(datamodel, db_schemas).await?)
-}
-
 /// Helper method to allow a sync shell function to run the async test blocks.
 pub fn run_with_tokio<O, F: std::future::Future<Output = O>>(fut: F) -> O {
     Builder::new_current_thread()
@@ -153,7 +148,6 @@ fn run_relation_link_test_impl(
     if ConnectorTag::should_run(config, enabled_connectors, capabilities, test_name) {
         let datamodel = render_test_datamodel(config, test_database, template, &[], None, Default::default());
         let connector = config.test_connector_tag().unwrap();
-        let requires_teardown = connector.requires_teardown();
         let metrics = setup_metrics();
         let metrics_for_subscriber = metrics.clone();
 
@@ -167,10 +161,6 @@ fn run_relation_link_test_impl(
                     .unwrap();
 
                 test_fn(&runner, &dm_with_params_json).await.unwrap();
-
-                if requires_teardown {
-                    teardown_project(&datamodel, Default::default()).await.unwrap();
-                }
             }
             .with_subscriber(test_tracing_subscriber(&ENV_LOG_LEVEL, metrics_for_subscriber)),
         );
@@ -264,16 +254,11 @@ pub fn run_connector_test_impl(
         async {
             crate::setup_project(&datamodel, db_schemas).await.unwrap();
 
-            let requires_teardown = connector.requires_teardown();
             let runner = Runner::load(crate::CONFIG.runner(), datamodel.clone(), connector, metrics)
                 .await
                 .unwrap();
 
             test_fn(runner).await.unwrap();
-
-            if requires_teardown {
-                crate::teardown_project(&datamodel, db_schemas).await.unwrap();
-            }
         }
         .with_subscriber(test_tracing_subscriber(&ENV_LOG_LEVEL, metrics_for_subscriber)),
     );

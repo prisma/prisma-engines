@@ -16,13 +16,7 @@ impl ConnectorTagInterface for PostgresConnectorTag {
         Box::new(SqlDatamodelRenderer::new())
     }
 
-    fn connection_string(&self, database: &str, is_ci: bool, is_multi_schema: bool) -> String {
-        let database = if is_multi_schema {
-            database.to_string()
-        } else {
-            format!("db?schema={}", database)
-        };
-
+    fn connection_string(&self, database: &str, is_ci: bool, _: bool) -> String {
         match self.version {
             Some(PostgresVersion::V9) if is_ci => {
                 format!("postgresql://postgres:prisma@test-db-postgres-9:5432/{}", database)
@@ -77,10 +71,6 @@ impl ConnectorTagInterface for PostgresConnectorTag {
 
     fn is_versioned(&self) -> bool {
         true
-    }
-
-    fn requires_teardown(&self) -> bool {
-        false
     }
 }
 
