@@ -174,7 +174,7 @@ mod interactive_tx {
         ];
 
         // Tx flag is not set, but it executes on an ITX.
-        runner.batch(queries, false).await?;
+        runner.batch(queries, false, None).await?;
         let res = runner.commit_tx(tx_id.clone()).await?;
         assert!(res.is_ok());
         runner.clear_active_tx();
@@ -200,7 +200,7 @@ mod interactive_tx {
         ];
 
         // Tx flag is not set, but it executes on an ITX.
-        runner.batch(queries, false).await?;
+        runner.batch(queries, false, None).await?;
         let res = runner.rollback_tx(tx_id.clone()).await?;
         assert!(res.is_ok());
         runner.clear_active_tx();
@@ -228,7 +228,7 @@ mod interactive_tx {
         ];
 
         // Tx flag is not set, but it executes on an ITX.
-        let batch_results = runner.batch(queries, false).await?;
+        let batch_results = runner.batch(queries, false, None).await?;
         batch_results.assert_failure(2002, None);
 
         let res = runner.commit_tx(tx_id.clone()).await?;
@@ -313,6 +313,7 @@ mod interactive_tx {
                     "{ findManyTestModel { id } }".to_string(),
                 ],
                 false,
+                None,
             )
             .await?
             .assert_failure(
