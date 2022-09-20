@@ -140,8 +140,8 @@ impl<'a> GraphQlHandler<'a> {
                         // Copying here is mandatory due to some of the queries
                         // might be repeated with the same arguments in the original
                         // batch. We need to give the same answer for both of them.
-                        match data.get(&vals) {
-                            Some(result) => {
+                        match data.iter().find(|(k, _)| k == &vals) {
+                            Some((_, result)) => {
                                 // Filter out all the keys not selected in the
                                 // original query.
                                 let result: IndexMap<String, Item> = result
