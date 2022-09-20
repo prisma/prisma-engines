@@ -1126,6 +1126,7 @@
 <span id="1120">1120</span>
 <span id="1121">1121</span>
 <span id="1122">1122</span>
+<span id="1123">1123</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">constants::group_by</span>, <span class="ident">error::MongoError</span>, <span class="ident">join::JoinStage</span>, <span class="ident">query_builder::AggregationType</span>, <span class="ident">IntoBson</span>};
 <span class="kw">use</span> <span class="ident">connector_interface</span>::{
     <span class="ident">AggregationFilter</span>, <span class="ident">CompositeCondition</span>, <span class="ident">CompositeFilter</span>, <span class="ident">ConditionListValue</span>, <span class="ident">ConditionValue</span>, <span class="ident">Filter</span>,
@@ -1285,10 +1286,10 @@
 
         <span class="kw">let</span> <span class="ident">filter_doc</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">condition</span> {
             <span class="ident">ScalarCondition::Equals</span>(<span class="ident">val</span>) =&gt; {
-                <span class="macro">doc!</span> { <span class="string">&quot;$eq&quot;</span>: [<span class="kw-2">&amp;</span><span class="ident">field_name</span>, <span class="self">self</span>.<span class="ident">as_bson_coerce_count</span>(<span class="ident">field</span>, <span class="ident">val</span>)<span class="question-mark">?</span>] }
+                <span class="macro">doc!</span> { <span class="string">&quot;$eq&quot;</span>: [<span class="kw-2">&amp;</span><span class="ident">field_name</span>, <span class="self">self</span>.<span class="ident">coerce_to_bson_for_filter</span>(<span class="ident">field</span>, <span class="ident">val</span>)<span class="question-mark">?</span>] }
             }
             <span class="ident">ScalarCondition::NotEquals</span>(<span class="ident">val</span>) =&gt; {
-                <span class="macro">doc!</span> { <span class="string">&quot;$ne&quot;</span>: [<span class="kw-2">&amp;</span><span class="ident">field_name</span>, <span class="self">self</span>.<span class="ident">as_bson_coerce_count</span>(<span class="ident">field</span>, <span class="ident">val</span>)<span class="question-mark">?</span>] }
+                <span class="macro">doc!</span> { <span class="string">&quot;$ne&quot;</span>: [<span class="kw-2">&amp;</span><span class="ident">field_name</span>, <span class="self">self</span>.<span class="ident">coerce_to_bson_for_filter</span>(<span class="ident">field</span>, <span class="ident">val</span>)<span class="question-mark">?</span>] }
             }
             <span class="ident">ScalarCondition::Contains</span>(<span class="ident">val</span>) =&gt; <span class="self">self</span>.<span class="ident">regex_match</span>(<span class="kw-2">&amp;</span><span class="ident">field_name</span>, <span class="ident">field</span>, <span class="string">&quot;.*&quot;</span>, <span class="ident">val</span>, <span class="string">&quot;.*&quot;</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>,
             <span class="ident">ScalarCondition::NotContains</span>(<span class="ident">val</span>) =&gt; {
@@ -1303,16 +1304,16 @@
                 <span class="macro">doc!</span> { <span class="string">&quot;$not&quot;</span>: <span class="self">self</span>.<span class="ident">regex_match</span>(<span class="kw-2">&amp;</span><span class="ident">field_name</span>, <span class="ident">field</span>, <span class="string">&quot;&quot;</span>, <span class="ident">val</span>, <span class="string">&quot;$&quot;</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span> }
             }
             <span class="ident">ScalarCondition::LessThan</span>(<span class="ident">val</span>) =&gt; {
-                <span class="macro">doc!</span> { <span class="string">&quot;$lt&quot;</span>: [<span class="kw-2">&amp;</span><span class="ident">field_name</span>, <span class="self">self</span>.<span class="ident">as_bson_coerce_count</span>(<span class="ident">field</span>, <span class="ident">val</span>)<span class="question-mark">?</span>] }
+                <span class="macro">doc!</span> { <span class="string">&quot;$lt&quot;</span>: [<span class="kw-2">&amp;</span><span class="ident">field_name</span>, <span class="self">self</span>.<span class="ident">coerce_to_bson_for_filter</span>(<span class="ident">field</span>, <span class="ident">val</span>)<span class="question-mark">?</span>] }
             }
             <span class="ident">ScalarCondition::LessThanOrEquals</span>(<span class="ident">val</span>) =&gt; {
-                <span class="macro">doc!</span> { <span class="string">&quot;$lte&quot;</span>: [<span class="kw-2">&amp;</span><span class="ident">field_name</span>, <span class="self">self</span>.<span class="ident">as_bson_coerce_count</span>(<span class="ident">field</span>, <span class="ident">val</span>)<span class="question-mark">?</span>] }
+                <span class="macro">doc!</span> { <span class="string">&quot;$lte&quot;</span>: [<span class="kw-2">&amp;</span><span class="ident">field_name</span>, <span class="self">self</span>.<span class="ident">coerce_to_bson_for_filter</span>(<span class="ident">field</span>, <span class="ident">val</span>)<span class="question-mark">?</span>] }
             }
             <span class="ident">ScalarCondition::GreaterThan</span>(<span class="ident">val</span>) =&gt; {
-                <span class="macro">doc!</span> { <span class="string">&quot;$gt&quot;</span>: [<span class="kw-2">&amp;</span><span class="ident">field_name</span>, <span class="self">self</span>.<span class="ident">as_bson_coerce_count</span>(<span class="ident">field</span>, <span class="ident">val</span>)<span class="question-mark">?</span>] }
+                <span class="macro">doc!</span> { <span class="string">&quot;$gt&quot;</span>: [<span class="kw-2">&amp;</span><span class="ident">field_name</span>, <span class="self">self</span>.<span class="ident">coerce_to_bson_for_filter</span>(<span class="ident">field</span>, <span class="ident">val</span>)<span class="question-mark">?</span>] }
             }
             <span class="ident">ScalarCondition::GreaterThanOrEquals</span>(<span class="ident">val</span>) =&gt; {
-                <span class="macro">doc!</span> { <span class="string">&quot;$gte&quot;</span>: [<span class="kw-2">&amp;</span><span class="ident">field_name</span>, <span class="self">self</span>.<span class="ident">as_bson_coerce_count</span>(<span class="ident">field</span>, <span class="ident">val</span>)<span class="question-mark">?</span>] }
+                <span class="macro">doc!</span> { <span class="string">&quot;$gte&quot;</span>: [<span class="kw-2">&amp;</span><span class="ident">field_name</span>, <span class="self">self</span>.<span class="ident">coerce_to_bson_for_filter</span>(<span class="ident">field</span>, <span class="ident">val</span>)<span class="question-mark">?</span>] }
             }
             <span class="comment">// Todo: The nested list unpack looks like a bug somewhere.</span>
             <span class="comment">//       Likely join code mistakenly repacks a list into a list of PrismaValue somewhere in the core.</span>
@@ -1327,7 +1328,7 @@
                                 <span class="ident">bson_values</span>.<span class="ident">extend</span>(
                                     <span class="ident">inner</span>
                                         .<span class="ident">into_iter</span>()
-                                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">as_bson_coerce_count</span>(<span class="ident">field</span>, <span class="ident">val</span>))
+                                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">coerce_to_bson_for_filter</span>(<span class="ident">field</span>, <span class="ident">val</span>))
                                         .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
                                 )
                             }
@@ -1336,7 +1337,7 @@
                         <span class="macro">doc!</span> { <span class="string">&quot;$in&quot;</span>: [<span class="kw-2">&amp;</span><span class="ident">field_name</span>, <span class="ident">bson_values</span>] }
                     }
                     <span class="kw">_</span> =&gt; {
-                        <span class="macro">doc!</span> { <span class="string">&quot;$in&quot;</span>: [<span class="kw-2">&amp;</span><span class="ident">field_name</span>, <span class="self">self</span>.<span class="ident">as_bson_coerce_count</span>(<span class="ident">field</span>, <span class="ident">PrismaValue::List</span>(<span class="ident">vals</span>))<span class="question-mark">?</span>] }
+                        <span class="macro">doc!</span> { <span class="string">&quot;$in&quot;</span>: [<span class="kw-2">&amp;</span><span class="ident">field_name</span>, <span class="self">self</span>.<span class="ident">coerce_to_bson_for_filter</span>(<span class="ident">field</span>, <span class="ident">PrismaValue::List</span>(<span class="ident">vals</span>))<span class="question-mark">?</span>] }
                     }
                 },
                 <span class="ident">ConditionListValue::FieldRef</span>(<span class="ident">field_ref</span>) =&gt; {
@@ -1347,7 +1348,7 @@
                 <span class="ident">ConditionListValue::List</span>(<span class="ident">vals</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">bson_values</span> <span class="op">=</span> <span class="ident">vals</span>
                         .<span class="ident">into_iter</span>()
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">as_bson_coerce_count</span>(<span class="ident">field</span>, <span class="ident">val</span>))
+                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">coerce_to_bson_for_filter</span>(<span class="ident">field</span>, <span class="ident">val</span>))
                         .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
 
                     <span class="macro">doc!</span> { <span class="string">&quot;$not&quot;</span>: { <span class="string">&quot;$in&quot;</span>: [<span class="kw-2">&amp;</span><span class="ident">field_name</span>, <span class="ident">bson_values</span>] } }
@@ -1853,13 +1854,14 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// When converting the value of a `_count` aggregation filter for a field that&#39;s _not_ numerical,</span>
     <span class="doccomment">/// we force the `TypeIdentifier` to be `Int` to prevent panics.</span>
-    <span class="kw">fn</span> <span class="ident">as_bson_coerce_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sf</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>, <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">coerce_to_bson_for_filter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sf</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>, <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionValue</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">into</span>() {
             <span class="ident">ConditionValue::Value</span>(<span class="ident">value</span>) =&gt; {
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">parent_is_count_aggregation</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">sf</span>.<span class="ident">is_numeric</span>() {
                     (<span class="kw-2">&amp;</span><span class="ident">TypeIdentifier::Int</span>, <span class="ident">value</span>).<span class="ident">into_bson</span>()
                 } <span class="kw">else</span> {
-                    (<span class="ident">sf</span>, <span class="ident">value</span>).<span class="ident">into_bson</span>()
+                    <span class="kw">let</span> <span class="ident">bson_value</span> <span class="op">=</span> (<span class="ident">sf</span>, <span class="ident">value</span>).<span class="ident">into_bson</span>()<span class="question-mark">?</span>;
+                    <span class="prelude-val">Ok</span>(<span class="ident">Bson::Document</span>(<span class="macro">doc!</span> {<span class="string">&quot;$literal&quot;</span>: <span class="ident">bson_value</span>}))
                 }
             }
             <span class="ident">ConditionValue::FieldRef</span>(<span class="ident">field_ref</span>) =&gt; <span class="self">self</span>.<span class="ident">prefixed_field_ref</span>(<span class="kw-2">&amp;</span><span class="ident">field_ref</span>),
