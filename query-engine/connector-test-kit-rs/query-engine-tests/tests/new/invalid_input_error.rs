@@ -1,5 +1,6 @@
 use query_engine_tests::*;
 
+/*
 #[test_suite(schema(generic), only(Postgres))]
 mod find_many {
     #[connector_test]
@@ -36,6 +37,7 @@ mod find_many {
         Ok(())
     }
 }
+*/
 
 #[test_suite(schema(generic), only(Postgres))]
 mod raw_params {
