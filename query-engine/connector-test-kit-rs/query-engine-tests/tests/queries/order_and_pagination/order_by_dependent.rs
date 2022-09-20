@@ -458,7 +458,7 @@ mod order_by_dependent {
             r#"model Parent {
             #id(id, Int, @id)
           
-            resource   Resource @relation("Resource", fields: [resourceId], references: [id])
+            resource   Resource @relation("Resource", fields: [resourceId], references: [id], onUpdate: NoAction, onDelete: NoAction)
             resourceId Int      @unique
           }
           
@@ -466,7 +466,7 @@ mod order_by_dependent {
             #id(id, Int, @id)
           
             dependsOnId Int?
-            dependsOn   Resource?  @relation("DependsOn", fields: [dependsOnId], references: [id])
+            dependsOn   Resource?  @relation("DependsOn", fields: [dependsOnId], references: [id], onUpdate: NoAction, onDelete: NoAction)
           
             dependedOn  Resource[] @relation("DependsOn")
             parent      Parent?    @relation("Resource")
