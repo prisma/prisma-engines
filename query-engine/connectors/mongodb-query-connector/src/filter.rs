@@ -731,7 +731,8 @@ impl MongoFilterVisitor {
                 if self.parent_is_count_aggregation() && !sf.is_numeric() {
                     (&TypeIdentifier::Int, value).into_bson()
                 } else {
-                    (sf, value).into_bson()
+                    let bson_value = (sf, value).into_bson()?;
+                    Ok(Bson::Document(doc! {"$literal": bson_value}))
                 }
             }
             ConditionValue::FieldRef(field_ref) => self.prefixed_field_ref(&field_ref),
