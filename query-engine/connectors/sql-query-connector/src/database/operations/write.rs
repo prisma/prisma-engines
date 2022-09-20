@@ -140,7 +140,7 @@ pub async fn create_record(
         // All values provided in the write arrghs
         (Some(identifier), _, _) if !identifier.misses_autogen_value() => Ok(identifier),
 
-        // PostgreSQL with a working RETURNING statement
+        // with a working RETURNING statement
         (_, n, _) if n > 0 => Ok(try_convert(&model.primary_identifier().into(), result_set)?),
 
         // We have an auto-incremented id that we got from MySQL or SQLite
