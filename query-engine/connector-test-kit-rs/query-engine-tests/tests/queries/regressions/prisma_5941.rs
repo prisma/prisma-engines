@@ -1,4 +1,3 @@
-use indoc::indoc;
 use query_engine_tests::*;
 
 #[test_suite(schema(schema), capabilities(AnyId))]
@@ -68,7 +67,6 @@ mod regression {
             })
             .await?
             .assert_success();
-
 
         let queries = vec![
             r#"query {findUniqueArtist(where:{firstName_lastName_birth:{firstName:"Sponge",lastName:"Bob", birth: "2011-01-01T00:00:00Z"}}) {firstName lastName birth}}"#.to_string(),
