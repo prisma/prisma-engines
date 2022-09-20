@@ -119,6 +119,12 @@
 <span id="113">113</span>
 <span id="114">114</span>
 <span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ConnectorTag</span>, <span class="ident">RunnerInterface</span>, <span class="ident">TestResult</span>, <span class="ident">TxResult</span>};
 <span class="kw">use</span> <span class="ident">query_core</span>::{<span class="ident">executor</span>, <span class="ident">schema::QuerySchemaRef</span>, <span class="ident">schema_builder</span>, <span class="ident">QueryExecutor</span>, <span class="ident">TxId</span>};
 <span class="kw">use</span> <span class="ident">query_engine_metrics::MetricRegistry</span>;
@@ -170,11 +176,17 @@
         <span class="prelude-val">Ok</span>(<span class="ident">handler</span>.<span class="ident">handle</span>(<span class="ident">query</span>, <span class="self">self</span>.<span class="ident">current_tx_id</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>).<span class="kw">await</span>.<span class="ident">into</span>())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">batch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">queries</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">transaction</span>: <span class="ident">bool</span>) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::QueryResult</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">batch</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">queries</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+        <span class="ident">transaction</span>: <span class="ident">bool</span>,
+        <span class="ident">isolation_level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::QueryResult</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">handler</span> <span class="op">=</span> <span class="ident">GraphQlHandler::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">executor</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">query_schema</span>);
         <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">GraphQlBody::Multi</span>(<span class="ident">MultiQuery::new</span>(
             <span class="ident">queries</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
             <span class="ident">transaction</span>,
+            <span class="ident">isolation_level</span>,
         ));
 
         <span class="prelude-val">Ok</span>(<span class="ident">handler</span>.<span class="ident">handle</span>(<span class="ident">query</span>, <span class="self">self</span>.<span class="ident">current_tx_id</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>).<span class="kw">await</span>.<span class="ident">into</span>())

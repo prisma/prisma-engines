@@ -196,8 +196,8 @@
 <span class="kw">use</span> <span class="ident">futures::FutureExt</span>;
 <span class="kw">use</span> <span class="ident">indexmap::IndexMap</span>;
 <span class="kw">use</span> <span class="ident">query_core</span>::{
-    <span class="ident">schema::QuerySchemaRef</span>, <span class="ident">BatchDocument</span>, <span class="ident">CompactedDocument</span>, <span class="ident">Item</span>, <span class="ident">Operation</span>, <span class="ident">QueryDocument</span>, <span class="ident">QueryExecutor</span>,
-    <span class="ident">QueryValue</span>, <span class="ident">ResponseData</span>, <span class="ident">TxId</span>,
+    <span class="ident">schema::QuerySchemaRef</span>, <span class="ident">BatchDocument</span>, <span class="ident">BatchDocumentTransaction</span>, <span class="ident">CompactedDocument</span>, <span class="ident">Item</span>, <span class="ident">Operation</span>, <span class="ident">QueryDocument</span>,
+    <span class="ident">QueryExecutor</span>, <span class="ident">QueryValue</span>, <span class="ident">ResponseData</span>, <span class="ident">TxId</span>,
 };
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">panic::AssertUnwindSafe</span>};
 
@@ -223,8 +223,8 @@
         <span class="kw">match</span> <span class="ident">body</span>.<span class="ident">into_doc</span>() {
             <span class="prelude-val">Ok</span>(<span class="ident">QueryDocument::Single</span>(<span class="ident">query</span>)) =&gt; <span class="self">self</span>.<span class="ident">handle_single</span>(<span class="ident">query</span>, <span class="ident">tx_id</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>,
             <span class="prelude-val">Ok</span>(<span class="ident">QueryDocument::Multi</span>(<span class="ident">batch</span>)) =&gt; <span class="kw">match</span> <span class="ident">batch</span>.<span class="ident">compact</span>() {
-                <span class="ident">BatchDocument::Multi</span>(<span class="ident">batch</span>, <span class="ident">transactional</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">handle_batch</span>(<span class="ident">batch</span>, <span class="ident">transactional</span>, <span class="ident">tx_id</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>
+                <span class="ident">BatchDocument::Multi</span>(<span class="ident">batch</span>, <span class="ident">transaction</span>) =&gt; {
+                    <span class="self">self</span>.<span class="ident">handle_batch</span>(<span class="ident">batch</span>, <span class="ident">transaction</span>, <span class="ident">tx_id</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>
                 }
                 <span class="ident">BatchDocument::Compact</span>(<span class="ident">compacted</span>) =&gt; <span class="self">self</span>.<span class="ident">handle_compacted</span>(<span class="ident">compacted</span>, <span class="ident">tx_id</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>,
             },
@@ -257,7 +257,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_batch</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">queries</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Operation</span><span class="op">&gt;</span>,
-        <span class="ident">transactional</span>: <span class="ident">bool</span>,
+        <span class="ident">transaction</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BatchDocumentTransaction</span><span class="op">&gt;</span>,
         <span class="ident">tx_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TxId</span><span class="op">&gt;</span>,
         <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">PrismaResponse</span> {
@@ -266,7 +266,7 @@
         <span class="kw">match</span> <span class="ident">AssertUnwindSafe</span>(<span class="self">self</span>.<span class="ident">executor</span>.<span class="ident">execute_all</span>(
             <span class="ident">tx_id</span>,
             <span class="ident">queries</span>,
-            <span class="ident">transactional</span>,
+            <span class="ident">transaction</span>,
             <span class="self">self</span>.<span class="ident">query_schema</span>.<span class="ident">clone</span>(),
             <span class="ident">trace_id</span>,
         ))

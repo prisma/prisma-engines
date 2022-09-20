@@ -77,8 +77,15 @@
 <span id="71">71</span>
 <span id="72">72</span>
 <span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::GraphQLProtocolAdapter</span>;
-<span class="kw">use</span> <span class="ident">query_core</span>::{<span class="ident">BatchDocument</span>, <span class="ident">Operation</span>, <span class="ident">QueryDocument</span>};
+<span class="kw">use</span> <span class="ident">query_core</span>::{<span class="ident">BatchDocument</span>, <span class="ident">BatchDocumentTransaction</span>, <span class="ident">Operation</span>, <span class="ident">QueryDocument</span>};
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
@@ -102,11 +109,16 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MultiQuery</span> {
     <span class="ident">batch</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SingleQuery</span><span class="op">&gt;</span>,
     <span class="ident">transaction</span>: <span class="ident">bool</span>,
+    <span class="ident">isolation_level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">MultiQuery</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">batch</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SingleQuery</span><span class="op">&gt;</span>, <span class="ident">transaction</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">batch</span>, <span class="ident">transaction</span> }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">batch</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SingleQuery</span><span class="op">&gt;</span>, <span class="ident">transaction</span>: <span class="ident">bool</span>, <span class="ident">isolation_level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">batch</span>,
+            <span class="ident">transaction</span>,
+            <span class="ident">isolation_level</span>,
+        }
     }
 }
 
@@ -141,11 +153,13 @@
                     .<span class="ident">into_iter</span>()
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">body</span><span class="op">|</span> <span class="ident">GraphQLProtocolAdapter::convert_query_to_operation</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>.<span class="ident">query</span>, <span class="ident">body</span>.<span class="ident">operation_name</span>))
                     .<span class="ident">collect</span>();
+                <span class="kw">let</span> <span class="ident">transaction</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">bodies</span>.<span class="ident">transaction</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">BatchDocumentTransaction::new</span>(<span class="ident">bodies</span>.<span class="ident">isolation_level</span>))
+                } <span class="kw">else</span> {
+                    <span class="prelude-val">None</span>
+                };
 
-                <span class="prelude-val">Ok</span>(<span class="ident">QueryDocument::Multi</span>(<span class="ident">BatchDocument::new</span>(
-                    <span class="ident">operations</span><span class="question-mark">?</span>,
-                    <span class="ident">bodies</span>.<span class="ident">transaction</span>,
-                )))
+                <span class="prelude-val">Ok</span>(<span class="ident">QueryDocument::Multi</span>(<span class="ident">BatchDocument::new</span>(<span class="ident">operations</span><span class="question-mark">?</span>, <span class="ident">transaction</span>)))
             }
         }
     }
