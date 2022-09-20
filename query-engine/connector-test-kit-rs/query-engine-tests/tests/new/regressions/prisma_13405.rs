@@ -57,10 +57,10 @@ mod mongodb {
         Ok(())
     }
 
-    async fn run_in_itx<T, F, G>(mut runner: Runner, f: G) -> TestResult<T>
+    async fn run_in_itx<T, F, O>(mut runner: Runner, f: O) -> TestResult<T>
     where
         F: Future<Output = TestResult<T>>,
-        G: FnOnce(Rc<Runner>) -> F,
+        O: FnOnce(Rc<Runner>) -> F,
     {
         let tx_id = start_itx(&mut runner).await?;
 
