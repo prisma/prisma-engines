@@ -49,11 +49,17 @@ impl RunnerInterface for DirectRunner {
         Ok(handler.handle(query, self.current_tx_id.clone(), None).await.into())
     }
 
-    async fn batch(&self, queries: Vec<String>, transaction: bool) -> TestResult<crate::QueryResult> {
+    async fn batch(
+        &self,
+        queries: Vec<String>,
+        transaction: bool,
+        isolation_level: Option<String>,
+    ) -> TestResult<crate::QueryResult> {
         let handler = GraphQlHandler::new(&*self.executor, &self.query_schema);
         let query = GraphQlBody::Multi(MultiQuery::new(
             queries.into_iter().map(Into::into).collect(),
             transaction,
+            isolation_level,
         ));
 
         Ok(handler.handle(query, self.current_tx_id.clone(), None).await.into())

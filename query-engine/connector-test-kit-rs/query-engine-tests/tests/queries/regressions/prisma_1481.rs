@@ -37,7 +37,7 @@ mod element {
                 count
               }
             }"#.to_string(),
-        ], true).await?.to_string(),
+        ], true, None).await?.to_string(),
           @r###"{"batchResult":[{"data":{"executeRaw":0}},{"data":{"updateManyUser":{"count":0}}}]}"###
         );
 

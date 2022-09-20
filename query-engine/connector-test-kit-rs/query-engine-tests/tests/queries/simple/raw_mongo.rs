@@ -186,7 +186,7 @@ mod raw_mongo {
           run_command_raw(
             json!({ "insert": "TestModel", "documents": [{ "_id": 2, "field": "B" }, { "_id": 3, "field": "C" }] }),
           )
-        ], false).await?.to_string();
+        ], false, None).await?.to_string();
 
         insta::assert_snapshot!(
           res,

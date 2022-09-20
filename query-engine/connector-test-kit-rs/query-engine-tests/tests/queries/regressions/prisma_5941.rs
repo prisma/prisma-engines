@@ -36,7 +36,7 @@ mod regression {
             r#"query {findUniqueArtist(where:{firstName_lastName_birth:{firstName:"Sponge",lastName:"Bob", birth: "1999-05-01T00:00:00.000Z"}}) {firstName lastName birth}}"#.to_string(),
         ];
 
-        let batch_results = runner.batch(queries, false).await?;
+        let batch_results = runner.batch(queries, false, None).await?;
         insta::assert_snapshot!(
             batch_results.to_string(),
             @r###"{"batchResult":[{"data":{"findUniqueArtist":{"firstName":"Sponge","lastName":"Bob","birth":"1999-05-01T00:00:00.000Z"}}},{"data":{"findUniqueArtist":{"firstName":"Sponge","lastName":"Bob","birth":"1999-05-01T00:00:00.000Z"}}}]}"###
