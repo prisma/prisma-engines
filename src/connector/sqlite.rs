@@ -323,4 +323,31 @@ mod tests {
         let err = other_conn.select(select).await.unwrap_err();
         assert!(matches!(err.kind(), ErrorKind::TableDoesNotExist { .. }));
     }
+
+    #[tokio::test]
+    async fn quoting_in_returning_in_sqlite_works() {
+        let conn = Sqlite::new_in_memory().unwrap();
+
+        conn.raw_cmd("CREATE TABLE test (id  INTEGER PRIMARY KEY, `txt space` TEXT NOT NULL);")
+            .await
+            .unwrap();
+
+        let insert = Insert::single_into("test").value("txt space", "henlo");
+        conn.insert(insert.into()).await.unwrap();
+
+        let select = Select::from_table("test").value(asterisk());
+        let result = conn.select(select.clone()).await.unwrap();
+        let result = result.into_single().unwrap();
+
+        assert_eq!(result.get("id").unwrap(), &Value::int32(1));
+        assert_eq!(result.get("txt space").unwrap(), &Value::text("henlo"));
+
+        let insert = Insert::single_into("test").value("txt space", "henlo");
+        let insert: Insert = Insert::from(insert).returning(&["txt space"]).into();
+
+        let result = conn.insert(insert.into()).await.unwrap();
+        let result = result.into_single().unwrap();
+
+        assert_eq!(result.get("txt space").unwrap(), &Value::text("henlo"));
+    }
 }

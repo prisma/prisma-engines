@@ -201,8 +201,10 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
                 self.write(" RETURNING ")?;
 
                 for (i, column) in returning.into_iter().enumerate() {
-                    self.delimited_identifiers(&[&*column.name])?;
-
+                    //yay https://sqlite.org/forum/info/6c141f151fa5c444db257eb4d95c302b70bfe5515901cf987e83ed8ebd434c49?t=h
+                    self.surround_with_backticks(&*column.name)?;
+                    self.write(" AS ")?;
+                    self.surround_with_backticks(&*column.name)?;
                     if i < (values_len - 1) {
                         self.write(", ")?;
                     }
@@ -969,7 +971,7 @@ mod tests {
         let (sql, _) = Sqlite::build(insert).unwrap();
 
         assert_eq!(
-            "INSERT INTO `test` (`user id`, `txt`) VALUES (?,?) RETURNING `user id`",
+            "INSERT INTO `test` (`user id`, `txt`) VALUES (?,?) RETURNING `user id` AS `user id`",
             sql
         );
     }

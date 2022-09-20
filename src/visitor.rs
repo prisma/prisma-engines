@@ -349,16 +349,20 @@ pub trait Visitor<'a> {
     fn delimited_identifiers(&mut self, parts: &[&str]) -> Result {
         let len = parts.len();
 
-        for (i, parts) in parts.iter().enumerate() {
-            self.surround_with(Self::C_BACKTICK_OPEN, Self::C_BACKTICK_CLOSE, |ref mut s| {
-                s.write(parts)
-            })?;
+        for (i, part) in parts.iter().enumerate() {
+            self.surround_with_backticks(part)?;
 
             if i < (len - 1) {
                 self.write(".")?;
             }
         }
 
+        Ok(())
+    }
+
+    /// A helper for delimiting a part of an identifier, surrounding it with `C_BACKTICK`
+    fn surround_with_backticks(&mut self, part: &str) -> Result {
+        self.surround_with(Self::C_BACKTICK_OPEN, Self::C_BACKTICK_CLOSE, |ref mut s| s.write(part))?;
         Ok(())
     }
 
