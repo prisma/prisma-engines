@@ -403,7 +403,7 @@ mod mapped_create {
         schema.to_owned()
     }
 
-    #[connector_test(exclude(mongodb))]
+    #[connector_test(exclude(mongodb, cockroachdb))]
     async fn mapped_name_with_space_does_not_break_returning(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {createOneGoodModel(data: {user_id: 1, txt_space: "test"}) {user_id, txt_space}}"#),
