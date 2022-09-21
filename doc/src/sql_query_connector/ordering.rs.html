@@ -214,6 +214,12 @@
 <span id="208">208</span>
 <span id="209">209</span>
 <span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">join_utils</span>::<span class="kw-2">*</span>, <span class="ident">model_extensions</span>::<span class="kw-2">*</span>, <span class="ident">query_arguments_ext::QueryArgumentsExt</span>};
 <span class="kw">use</span> <span class="ident">connector_interface::QueryArguments</span>;
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
@@ -233,172 +239,178 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">joins</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AliasedJoin</span><span class="op">&gt;</span>,
 }
 
-<span class="doccomment">/// Builds all expressions for an `ORDER BY` clause based on the query arguments.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(
-    <span class="ident">query_arguments</span>: <span class="kw-2">&amp;</span><span class="ident">QueryArguments</span>,
-    <span class="ident">base_model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="comment">// The model the ordering will start from</span>
-) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OrderByDefinition</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">needs_reversed_order</span> <span class="op">=</span> <span class="ident">query_arguments</span>.<span class="ident">needs_reversed_order</span>();
-
-    <span class="comment">// The index is used to differentiate potentially separate relations to the same model.</span>
-    <span class="ident">query_arguments</span>
-        .<span class="ident">order_by</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">enumerate</span>()
-        .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">index</span>, <span class="ident">order_by</span>)<span class="op">|</span> <span class="kw">match</span> <span class="ident">order_by</span> {
-            <span class="ident">OrderBy::Scalar</span>(<span class="ident">order_by</span>) =&gt; <span class="ident">build_order_scalar</span>(<span class="ident">order_by</span>, <span class="ident">base_model</span>, <span class="ident">needs_reversed_order</span>, <span class="ident">index</span>),
-            <span class="ident">OrderBy::ScalarAggregation</span>(<span class="ident">order_by</span>) =&gt; <span class="ident">build_order_aggr_scalar</span>(<span class="ident">order_by</span>, <span class="ident">needs_reversed_order</span>),
-            <span class="ident">OrderBy::ToManyAggregation</span>(<span class="ident">order_by</span>) =&gt; {
-                <span class="ident">build_order_aggr_rel</span>(<span class="ident">order_by</span>, <span class="ident">base_model</span>, <span class="ident">needs_reversed_order</span>, <span class="ident">index</span>)
-            }
-            <span class="ident">OrderBy::Relevance</span>(<span class="ident">order_by</span>) =&gt; <span class="ident">build_order_relevance</span>(<span class="ident">order_by</span>, <span class="ident">needs_reversed_order</span>),
-        })
-        .<span class="ident">collect_vec</span>()
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OrderByBuilder</span> {
+    <span class="comment">// Used to generate unique join alias</span>
+    <span class="ident">join_counter</span>: <span class="ident">usize</span>,
 }
 
-<span class="kw">fn</span> <span class="ident">build_order_scalar</span>(
-    <span class="ident">order_by</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByScalar</span>,
-    <span class="ident">base_model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">needs_reversed_order</span>: <span class="ident">bool</span>,
-    <span class="ident">index</span>: <span class="ident">usize</span>,
-) -&gt; <span class="ident">OrderByDefinition</span> {
-    <span class="kw">let</span> (<span class="ident">joins</span>, <span class="ident">order_column</span>) <span class="op">=</span> <span class="ident">compute_joins_scalar</span>(<span class="ident">order_by</span>, <span class="ident">index</span>, <span class="ident">base_model</span>);
-    <span class="kw">let</span> <span class="ident">order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">into_order</span>(
-        <span class="kw-2">&amp;</span><span class="ident">order_by</span>.<span class="ident">sort_order</span>,
-        <span class="ident">order_by</span>.<span class="ident">nulls_order</span>.<span class="ident">as_ref</span>(),
-        <span class="ident">needs_reversed_order</span>,
-    ));
-    <span class="kw">let</span> <span class="ident">order_definition</span>: <span class="ident">OrderDefinition</span> <span class="op">=</span> (<span class="ident">order_column</span>.<span class="ident">clone</span>().<span class="ident">into</span>(), <span class="ident">order</span>);
+<span class="kw">impl</span> <span class="ident">OrderByBuilder</span> {
+    <span class="doccomment">/// Builds all expressions for an `ORDER BY` clause based on the query arguments.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">query_arguments</span>: <span class="kw-2">&amp;</span><span class="ident">QueryArguments</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OrderByDefinition</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">needs_reversed_order</span> <span class="op">=</span> <span class="ident">query_arguments</span>.<span class="ident">needs_reversed_order</span>();
 
-    <span class="ident">OrderByDefinition</span> {
-        <span class="ident">order_column</span>: <span class="ident">order_column</span>.<span class="ident">into</span>(),
-        <span class="ident">order_definition</span>,
-        <span class="ident">joins</span>,
+        <span class="comment">// The index is used to differentiate potentially separate relations to the same model.</span>
+        <span class="ident">query_arguments</span>
+            .<span class="ident">order_by</span>
+            .<span class="ident">iter</span>()
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">order_by</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">order_by</span> {
+                <span class="ident">OrderBy::Scalar</span>(<span class="ident">order_by</span>) =&gt; <span class="self">self</span>.<span class="ident">build_order_scalar</span>(<span class="ident">order_by</span>, <span class="ident">needs_reversed_order</span>),
+                <span class="ident">OrderBy::ScalarAggregation</span>(<span class="ident">order_by</span>) =&gt; <span class="self">self</span>.<span class="ident">build_order_aggr_scalar</span>(<span class="ident">order_by</span>, <span class="ident">needs_reversed_order</span>),
+                <span class="ident">OrderBy::ToManyAggregation</span>(<span class="ident">order_by</span>) =&gt; <span class="self">self</span>.<span class="ident">build_order_aggr_rel</span>(<span class="ident">order_by</span>, <span class="ident">needs_reversed_order</span>),
+                <span class="ident">OrderBy::Relevance</span>(<span class="ident">order_by</span>) =&gt; <span class="self">self</span>.<span class="ident">build_order_relevance</span>(<span class="ident">order_by</span>, <span class="ident">needs_reversed_order</span>),
+            })
+            .<span class="ident">collect_vec</span>()
     }
-}
 
-<span class="kw">fn</span> <span class="ident">build_order_relevance</span>(<span class="ident">order_by</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByRelevance</span>, <span class="ident">needs_reversed_order</span>: <span class="ident">bool</span>) -&gt; <span class="ident">OrderByDefinition</span> {
-    <span class="kw">let</span> <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">order_by</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> <span class="ident">sf</span>.<span class="ident">as_column</span>().<span class="ident">into</span>()).<span class="ident">collect</span>();
-    <span class="kw">let</span> <span class="ident">order_column</span>: <span class="ident">Expression</span> <span class="op">=</span> <span class="ident">text_search_relevance</span>(<span class="kw-2">&amp;</span><span class="ident">columns</span>, <span class="ident">order_by</span>.<span class="ident">search</span>.<span class="ident">clone</span>()).<span class="ident">into</span>();
-    <span class="kw">let</span> <span class="ident">order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">into_order</span>(<span class="kw-2">&amp;</span><span class="ident">order_by</span>.<span class="ident">sort_order</span>, <span class="prelude-val">None</span>, <span class="ident">needs_reversed_order</span>));
-    <span class="kw">let</span> <span class="ident">order_definition</span>: <span class="ident">OrderDefinition</span> <span class="op">=</span> (<span class="ident">order_column</span>.<span class="ident">clone</span>(), <span class="ident">order</span>);
+    <span class="kw">fn</span> <span class="ident">build_order_scalar</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">order_by</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByScalar</span>, <span class="ident">needs_reversed_order</span>: <span class="ident">bool</span>) -&gt; <span class="ident">OrderByDefinition</span> {
+        <span class="kw">let</span> (<span class="ident">joins</span>, <span class="ident">order_column</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">compute_joins_scalar</span>(<span class="ident">order_by</span>);
+        <span class="kw">let</span> <span class="ident">order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">into_order</span>(
+            <span class="kw-2">&amp;</span><span class="ident">order_by</span>.<span class="ident">sort_order</span>,
+            <span class="ident">order_by</span>.<span class="ident">nulls_order</span>.<span class="ident">as_ref</span>(),
+            <span class="ident">needs_reversed_order</span>,
+        ));
+        <span class="kw">let</span> <span class="ident">order_definition</span>: <span class="ident">OrderDefinition</span> <span class="op">=</span> (<span class="ident">order_column</span>.<span class="ident">clone</span>().<span class="ident">into</span>(), <span class="ident">order</span>);
 
-    <span class="ident">OrderByDefinition</span> {
-        <span class="ident">order_column</span>,
-        <span class="ident">order_definition</span>,
-        <span class="ident">joins</span>: <span class="macro">vec!</span>[],
-    }
-}
-
-<span class="kw">fn</span> <span class="ident">build_order_aggr_scalar</span>(<span class="ident">order_by</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByScalarAggregation</span>, <span class="ident">needs_reversed_order</span>: <span class="ident">bool</span>) -&gt; <span class="ident">OrderByDefinition</span> {
-    <span class="kw">let</span> <span class="ident">order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">into_order</span>(<span class="kw-2">&amp;</span><span class="ident">order_by</span>.<span class="ident">sort_order</span>, <span class="prelude-val">None</span>, <span class="ident">needs_reversed_order</span>));
-    <span class="kw">let</span> <span class="ident">order_column</span> <span class="op">=</span> <span class="ident">order_by</span>.<span class="ident">field</span>.<span class="ident">as_column</span>();
-    <span class="kw">let</span> <span class="ident">order_definition</span>: <span class="ident">OrderDefinition</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">order_by</span>.<span class="ident">sort_aggregation</span> {
-        <span class="ident">SortAggregation::Count</span> =&gt; (<span class="ident">count</span>(<span class="ident">order_column</span>.<span class="ident">clone</span>()).<span class="ident">into</span>(), <span class="ident">order</span>),
-        <span class="ident">SortAggregation::Avg</span> =&gt; (<span class="ident">avg</span>(<span class="ident">order_column</span>.<span class="ident">clone</span>()).<span class="ident">into</span>(), <span class="ident">order</span>),
-        <span class="ident">SortAggregation::Sum</span> =&gt; (<span class="ident">sum</span>(<span class="ident">order_column</span>.<span class="ident">clone</span>()).<span class="ident">into</span>(), <span class="ident">order</span>),
-        <span class="ident">SortAggregation::Min</span> =&gt; (<span class="ident">min</span>(<span class="ident">order_column</span>.<span class="ident">clone</span>()).<span class="ident">into</span>(), <span class="ident">order</span>),
-        <span class="ident">SortAggregation::Max</span> =&gt; (<span class="ident">max</span>(<span class="ident">order_column</span>.<span class="ident">clone</span>()).<span class="ident">into</span>(), <span class="ident">order</span>),
-    };
-
-    <span class="ident">OrderByDefinition</span> {
-        <span class="ident">order_column</span>: <span class="ident">order_column</span>.<span class="ident">into</span>(),
-        <span class="ident">order_definition</span>,
-        <span class="ident">joins</span>: <span class="macro">vec!</span>[],
-    }
-}
-
-<span class="kw">fn</span> <span class="ident">build_order_aggr_rel</span>(
-    <span class="ident">order_by</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByToManyAggregation</span>,
-    <span class="ident">base_model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">needs_reversed_order</span>: <span class="ident">bool</span>,
-    <span class="ident">index</span>: <span class="ident">usize</span>,
-) -&gt; <span class="ident">OrderByDefinition</span> {
-    <span class="kw">let</span> <span class="ident">order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">into_order</span>(<span class="kw-2">&amp;</span><span class="ident">order_by</span>.<span class="ident">sort_order</span>, <span class="prelude-val">None</span>, <span class="ident">needs_reversed_order</span>));
-    <span class="kw">let</span> (<span class="ident">joins</span>, <span class="ident">order_column</span>) <span class="op">=</span> <span class="ident">compute_joins_aggregation</span>(<span class="ident">order_by</span>, <span class="ident">index</span>, <span class="ident">base_model</span>);
-    <span class="kw">let</span> <span class="ident">order_definition</span>: <span class="ident">OrderDefinition</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">order_by</span>.<span class="ident">sort_aggregation</span> {
-        <span class="ident">SortAggregation::Count</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">exprs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">order_column</span>.<span class="ident">clone</span>().<span class="ident">into</span>(), <span class="ident">Value::integer</span>(<span class="number">0</span>).<span class="ident">into</span>()];
-
-            <span class="comment">// We coalesce the order by expr to 0 so that if there&#39;s no relation,</span>
-            <span class="comment">// `COALESCE(NULL, 0)` will return `0`, thus preserving the order</span>
-            (<span class="ident">coalesce</span>(<span class="ident">exprs</span>).<span class="ident">into</span>(), <span class="ident">order</span>)
+        <span class="ident">OrderByDefinition</span> {
+            <span class="ident">order_column</span>: <span class="ident">order_column</span>.<span class="ident">into</span>(),
+            <span class="ident">order_definition</span>,
+            <span class="ident">joins</span>,
         }
-        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Order by relation aggregation other than count are not supported&quot;</span>),
-    };
-
-    <span class="ident">OrderByDefinition</span> {
-        <span class="ident">order_column</span>: <span class="ident">order_column</span>.<span class="ident">into</span>(),
-        <span class="ident">order_definition</span>,
-        <span class="ident">joins</span>,
     }
-}
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compute_joins_aggregation</span>(
-    <span class="ident">order_by</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByToManyAggregation</span>,
-    <span class="ident">order_by_index</span>: <span class="ident">usize</span>,
-    <span class="ident">base_model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-) -&gt; (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AliasedJoin</span><span class="op">&gt;</span>, <span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="ident">join_prefix</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">ORDER_JOIN_PREFIX</span>, <span class="ident">order_by_index</span>);
-    <span class="kw">let</span> (<span class="ident">last_hop</span>, <span class="ident">rest_hops</span>) <span class="op">=</span> <span class="ident">order_by</span>
-        .<span class="ident">path</span>
-        .<span class="ident">split_last</span>()
-        .<span class="ident">expect</span>(<span class="string">&quot;An order by relation aggregation has to have at least one hop&quot;</span>);
+    <span class="kw">fn</span> <span class="ident">build_order_relevance</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">order_by</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByRelevance</span>, <span class="ident">needs_reversed_order</span>: <span class="ident">bool</span>) -&gt; <span class="ident">OrderByDefinition</span> {
+        <span class="kw">let</span> <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">order_by</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> <span class="ident">sf</span>.<span class="ident">as_column</span>().<span class="ident">into</span>()).<span class="ident">collect</span>();
+        <span class="kw">let</span> <span class="ident">order_column</span>: <span class="ident">Expression</span> <span class="op">=</span> <span class="ident">text_search_relevance</span>(<span class="kw-2">&amp;</span><span class="ident">columns</span>, <span class="ident">order_by</span>.<span class="ident">search</span>.<span class="ident">clone</span>()).<span class="ident">into</span>();
+        <span class="kw">let</span> <span class="ident">order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">into_order</span>(<span class="kw-2">&amp;</span><span class="ident">order_by</span>.<span class="ident">sort_order</span>, <span class="prelude-val">None</span>, <span class="ident">needs_reversed_order</span>));
+        <span class="kw">let</span> <span class="ident">order_definition</span>: <span class="ident">OrderDefinition</span> <span class="op">=</span> (<span class="ident">order_column</span>.<span class="ident">clone</span>(), <span class="ident">order</span>);
 
-    <span class="comment">// Unwraps are safe because the SQL connector doesn&#39;t yet support any other type of orderBy hop but the relation hop.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">joins</span> <span class="op">=</span> <span class="ident">rest_hops</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">hop</span><span class="op">|</span> <span class="ident">compute_one2m_join</span>(<span class="ident">base_model</span>, <span class="ident">hop</span>.<span class="ident">into_relation_hop</span>().<span class="ident">unwrap</span>(), <span class="ident">join_prefix</span>.<span class="ident">as_str</span>()))
-        .<span class="ident">collect_vec</span>();
+        <span class="ident">OrderByDefinition</span> {
+            <span class="ident">order_column</span>,
+            <span class="ident">order_definition</span>,
+            <span class="ident">joins</span>: <span class="macro">vec!</span>[],
+        }
+    }
 
-    <span class="kw">let</span> <span class="ident">aggregation_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">order_by</span>.<span class="ident">sort_aggregation</span> {
-        <span class="ident">SortAggregation::Count</span> =&gt; <span class="ident">AggregationType::Count</span>,
-        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Order by relation aggregation other than count are not supported&quot;</span>),
-    };
+    <span class="kw">fn</span> <span class="ident">build_order_aggr_scalar</span>(
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">order_by</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByScalarAggregation</span>,
+        <span class="ident">needs_reversed_order</span>: <span class="ident">bool</span>,
+    ) -&gt; <span class="ident">OrderByDefinition</span> {
+        <span class="kw">let</span> <span class="ident">order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">into_order</span>(<span class="kw-2">&amp;</span><span class="ident">order_by</span>.<span class="ident">sort_order</span>, <span class="prelude-val">None</span>, <span class="ident">needs_reversed_order</span>));
+        <span class="kw">let</span> <span class="ident">order_column</span> <span class="op">=</span> <span class="ident">order_by</span>.<span class="ident">field</span>.<span class="ident">as_column</span>();
+        <span class="kw">let</span> <span class="ident">order_definition</span>: <span class="ident">OrderDefinition</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">order_by</span>.<span class="ident">sort_aggregation</span> {
+            <span class="ident">SortAggregation::Count</span> =&gt; (<span class="ident">count</span>(<span class="ident">order_column</span>.<span class="ident">clone</span>()).<span class="ident">into</span>(), <span class="ident">order</span>),
+            <span class="ident">SortAggregation::Avg</span> =&gt; (<span class="ident">avg</span>(<span class="ident">order_column</span>.<span class="ident">clone</span>()).<span class="ident">into</span>(), <span class="ident">order</span>),
+            <span class="ident">SortAggregation::Sum</span> =&gt; (<span class="ident">sum</span>(<span class="ident">order_column</span>.<span class="ident">clone</span>()).<span class="ident">into</span>(), <span class="ident">order</span>),
+            <span class="ident">SortAggregation::Min</span> =&gt; (<span class="ident">min</span>(<span class="ident">order_column</span>.<span class="ident">clone</span>()).<span class="ident">into</span>(), <span class="ident">order</span>),
+            <span class="ident">SortAggregation::Max</span> =&gt; (<span class="ident">max</span>(<span class="ident">order_column</span>.<span class="ident">clone</span>()).<span class="ident">into</span>(), <span class="ident">order</span>),
+        };
 
-    <span class="comment">// We perform the aggregation on the last join</span>
-    <span class="kw">let</span> <span class="ident">last_aggr_join</span> <span class="op">=</span> <span class="ident">compute_aggr_join</span>(
-        <span class="ident">last_hop</span>.<span class="ident">into_relation_hop</span>().<span class="ident">unwrap</span>(),
-        <span class="ident">aggregation_type</span>,
-        <span class="prelude-val">None</span>,
-        <span class="ident">ORDER_AGGREGATOR_ALIAS</span>,
-        <span class="ident">join_prefix</span>.<span class="ident">as_str</span>(),
-        <span class="ident">joins</span>.<span class="ident">last</span>(),
-    );
+        <span class="ident">OrderByDefinition</span> {
+            <span class="ident">order_column</span>: <span class="ident">order_column</span>.<span class="ident">into</span>(),
+            <span class="ident">order_definition</span>,
+            <span class="ident">joins</span>: <span class="macro">vec!</span>[],
+        }
+    }
 
-    <span class="comment">// This is the final column identifier to be used for the scalar field to order by.</span>
-    <span class="comment">// `{last_join_alias}.{ORDER_AGGREGATOR_ALIAS}`</span>
-    <span class="kw">let</span> <span class="ident">order_by_column</span> <span class="op">=</span> <span class="ident">Column::from</span>((<span class="ident">last_aggr_join</span>.<span class="ident">alias</span>.<span class="ident">to_owned</span>(), <span class="ident">ORDER_AGGREGATOR_ALIAS</span>.<span class="ident">to_owned</span>()));
+    <span class="kw">fn</span> <span class="ident">build_order_aggr_rel</span>(
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">order_by</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByToManyAggregation</span>,
+        <span class="ident">needs_reversed_order</span>: <span class="ident">bool</span>,
+    ) -&gt; <span class="ident">OrderByDefinition</span> {
+        <span class="kw">let</span> <span class="ident">order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Order</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">into_order</span>(<span class="kw-2">&amp;</span><span class="ident">order_by</span>.<span class="ident">sort_order</span>, <span class="prelude-val">None</span>, <span class="ident">needs_reversed_order</span>));
+        <span class="kw">let</span> (<span class="ident">joins</span>, <span class="ident">order_column</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">compute_joins_aggregation</span>(<span class="ident">order_by</span>);
+        <span class="kw">let</span> <span class="ident">order_definition</span>: <span class="ident">OrderDefinition</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">order_by</span>.<span class="ident">sort_aggregation</span> {
+            <span class="ident">SortAggregation::Count</span> =&gt; {
+                <span class="kw">let</span> <span class="ident">exprs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">order_column</span>.<span class="ident">clone</span>().<span class="ident">into</span>(), <span class="ident">Value::integer</span>(<span class="number">0</span>).<span class="ident">into</span>()];
 
-    <span class="ident">joins</span>.<span class="ident">push</span>(<span class="ident">last_aggr_join</span>);
+                <span class="comment">// We coalesce the order by expr to 0 so that if there&#39;s no relation,</span>
+                <span class="comment">// `COALESCE(NULL, 0)` will return `0`, thus preserving the order</span>
+                (<span class="ident">coalesce</span>(<span class="ident">exprs</span>).<span class="ident">into</span>(), <span class="ident">order</span>)
+            }
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Order by relation aggregation other than count are not supported&quot;</span>),
+        };
 
-    (<span class="ident">joins</span>, <span class="ident">order_by_column</span>)
-}
+        <span class="ident">OrderByDefinition</span> {
+            <span class="ident">order_column</span>: <span class="ident">order_column</span>.<span class="ident">into</span>(),
+            <span class="ident">order_definition</span>,
+            <span class="ident">joins</span>,
+        }
+    }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compute_joins_scalar</span>(
-    <span class="ident">order_by</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByScalar</span>,
-    <span class="ident">order_by_index</span>: <span class="ident">usize</span>,
-    <span class="ident">base_model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-) -&gt; (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AliasedJoin</span><span class="op">&gt;</span>, <span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="ident">join_prefix</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">ORDER_JOIN_PREFIX</span>, <span class="ident">order_by_index</span>);
-    <span class="kw">let</span> <span class="ident">joins</span> <span class="op">=</span> <span class="ident">order_by</span>
-        .<span class="ident">path</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">hop</span><span class="op">|</span> <span class="ident">compute_one2m_join</span>(<span class="ident">base_model</span>, <span class="ident">hop</span>.<span class="ident">into_relation_hop</span>().<span class="ident">unwrap</span>(), <span class="ident">join_prefix</span>.<span class="ident">as_str</span>()))
-        .<span class="ident">collect_vec</span>();
+    <span class="kw">fn</span> <span class="ident">compute_joins_aggregation</span>(
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">order_by</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByToManyAggregation</span>,
+    ) -&gt; (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AliasedJoin</span><span class="op">&gt;</span>, <span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) {
+        <span class="kw">let</span> (<span class="ident">last_hop</span>, <span class="ident">rest_hops</span>) <span class="op">=</span> <span class="ident">order_by</span>
+            .<span class="ident">path</span>
+            .<span class="ident">split_last</span>()
+            .<span class="ident">expect</span>(<span class="string">&quot;An order by relation aggregation has to have at least one hop&quot;</span>);
 
-    <span class="comment">// This is the final column identifier to be used for the scalar field to order by.</span>
-    <span class="comment">// - If we order by a scalar field on the base model, we simply use the model&#39;s scalar field. eg:</span>
-    <span class="comment">//   `{modelTable}.{field}`</span>
-    <span class="comment">// - If we order by some relations, we use the alias used for the last join, e.g.</span>
-    <span class="comment">//   `{join_alias}.{field}`</span>
-    <span class="kw">let</span> <span class="ident">order_by_column</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">last_join</span>) <span class="op">=</span> <span class="ident">joins</span>.<span class="ident">last</span>() {
-        <span class="ident">Column::from</span>((<span class="ident">last_join</span>.<span class="ident">alias</span>.<span class="ident">to_owned</span>(), <span class="ident">order_by</span>.<span class="ident">field</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>()))
-    } <span class="kw">else</span> {
-        <span class="ident">order_by</span>.<span class="ident">field</span>.<span class="ident">as_column</span>()
-    };
+        <span class="comment">// Unwraps are safe because the SQL connector doesn&#39;t yet support any other type of orderBy hop but the relation hop.</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">joins</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">hop</span>) <span class="kw">in</span> <span class="ident">rest_hops</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
+            <span class="kw">let</span> <span class="ident">previous_join</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">0</span> { <span class="ident">joins</span>.<span class="ident">get</span>(<span class="ident">i</span> <span class="op">-</span> <span class="number">1</span>) } <span class="kw">else</span> { <span class="prelude-val">None</span> };
 
-    (<span class="ident">joins</span>, <span class="ident">order_by_column</span>)
+            <span class="kw">let</span> <span class="ident">join</span> <span class="op">=</span> <span class="ident">compute_one2m_join</span>(<span class="ident">hop</span>.<span class="ident">into_relation_hop</span>().<span class="ident">unwrap</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">join_prefix</span>(), <span class="ident">previous_join</span>);
+
+            <span class="ident">joins</span>.<span class="ident">push</span>(<span class="ident">join</span>);
+        }
+
+        <span class="kw">let</span> <span class="ident">aggregation_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">order_by</span>.<span class="ident">sort_aggregation</span> {
+            <span class="ident">SortAggregation::Count</span> =&gt; <span class="ident">AggregationType::Count</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Order by relation aggregation other than count are not supported&quot;</span>),
+        };
+
+        <span class="comment">// We perform the aggregation on the last join</span>
+        <span class="kw">let</span> <span class="ident">last_aggr_join</span> <span class="op">=</span> <span class="ident">compute_aggr_join</span>(
+            <span class="ident">last_hop</span>.<span class="ident">into_relation_hop</span>().<span class="ident">unwrap</span>(),
+            <span class="ident">aggregation_type</span>,
+            <span class="prelude-val">None</span>,
+            <span class="ident">ORDER_AGGREGATOR_ALIAS</span>,
+            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">join_prefix</span>(),
+            <span class="ident">joins</span>.<span class="ident">last</span>(),
+        );
+
+        <span class="comment">// This is the final column identifier to be used for the scalar field to order by.</span>
+        <span class="comment">// `{last_join_alias}.{ORDER_AGGREGATOR_ALIAS}`</span>
+        <span class="kw">let</span> <span class="ident">order_by_column</span> <span class="op">=</span> <span class="ident">Column::from</span>((<span class="ident">last_aggr_join</span>.<span class="ident">alias</span>.<span class="ident">to_owned</span>(), <span class="ident">ORDER_AGGREGATOR_ALIAS</span>.<span class="ident">to_owned</span>()));
+
+        <span class="ident">joins</span>.<span class="ident">push</span>(<span class="ident">last_aggr_join</span>);
+
+        (<span class="ident">joins</span>, <span class="ident">order_by_column</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compute_joins_scalar</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">order_by</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByScalar</span>) -&gt; (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AliasedJoin</span><span class="op">&gt;</span>, <span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">joins</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+
+        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">hop</span>) <span class="kw">in</span> <span class="ident">order_by</span>.<span class="ident">path</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
+            <span class="kw">let</span> <span class="ident">previous_join</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">0</span> { <span class="ident">joins</span>.<span class="ident">get</span>(<span class="ident">i</span> <span class="op">-</span> <span class="number">1</span>) } <span class="kw">else</span> { <span class="prelude-val">None</span> };
+            <span class="kw">let</span> <span class="ident">join</span> <span class="op">=</span> <span class="ident">compute_one2m_join</span>(<span class="ident">hop</span>.<span class="ident">into_relation_hop</span>().<span class="ident">unwrap</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">join_prefix</span>(), <span class="ident">previous_join</span>);
+
+            <span class="ident">joins</span>.<span class="ident">push</span>(<span class="ident">join</span>);
+        }
+
+        <span class="comment">// This is the final column identifier to be used for the scalar field to order by.</span>
+        <span class="comment">// - If we order by a scalar field on the base model, we simply use the model&#39;s scalar field. eg:</span>
+        <span class="comment">//   `{modelTable}.{field}`</span>
+        <span class="comment">// - If we order by some relations, we use the alias used for the last join, e.g.</span>
+        <span class="comment">//   `{join_alias}.{field}`</span>
+        <span class="kw">let</span> <span class="ident">order_by_column</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">last_join</span>) <span class="op">=</span> <span class="ident">joins</span>.<span class="ident">last</span>() {
+            <span class="ident">Column::from</span>((<span class="ident">last_join</span>.<span class="ident">alias</span>.<span class="ident">to_owned</span>(), <span class="ident">order_by</span>.<span class="ident">field</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>()))
+        } <span class="kw">else</span> {
+            <span class="ident">order_by</span>.<span class="ident">field</span>.<span class="ident">as_column</span>()
+        };
+
+        (<span class="ident">joins</span>, <span class="ident">order_by_column</span>)
+    }
+
+    <span class="kw">fn</span> <span class="ident">join_prefix</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">String</span> {
+        <span class="self">self</span>.<span class="ident">join_counter</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+
+        <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">ORDER_JOIN_PREFIX</span>, <span class="self">self</span>.<span class="ident">join_counter</span>)
+    }
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_order</span>(<span class="ident">prisma_order</span>: <span class="kw-2">&amp;</span><span class="ident">SortOrder</span>, <span class="ident">nulls_order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">NullsOrder</span><span class="op">&gt;</span>, <span class="ident">reverse</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Order</span> {
