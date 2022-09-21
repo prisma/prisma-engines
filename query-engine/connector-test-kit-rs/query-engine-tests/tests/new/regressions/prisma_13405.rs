@@ -69,7 +69,8 @@ mod mongodb {
             );
 
             Ok(())
-        }).await
+        })
+        .await
     }
 
     async fn run_in_itx<T, F, O>(mut runner: Runner, f: O) -> TestResult<T>
