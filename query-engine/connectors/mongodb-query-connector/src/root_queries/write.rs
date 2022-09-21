@@ -1,6 +1,6 @@
 use super::*;
 use crate::{
-    error::DecorateErrorWithFieldInformationExtension,
+    error::{DecorateErrorWithFieldInformationExtension, MongoError},
     filter::{FilterPrefix, MongoFilter, MongoFilterVisitor},
     logger, output_meta,
     query_builder::MongoReadQueryBuilder,
@@ -410,7 +410,7 @@ pub async fn execute_raw<'conn>(
     _session: &mut ClientSession,
     _inputs: HashMap<String, PrismaValue>,
 ) -> crate::Result<usize> {
-    unimplemented!()
+    Err(MongoError::Unsupported("execute_raw".into()))
 }
 
 /// Execute a plain MongoDB query, returning the answer as a JSON `Value`.
