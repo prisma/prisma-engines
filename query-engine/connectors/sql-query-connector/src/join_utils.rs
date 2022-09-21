@@ -216,7 +216,11 @@ fn compute_aggr_join_m2m(
     }
 }
 
-pub fn compute_one2m_join(base_model: &ModelRef, rf: &RelationFieldRef, join_prefix: &str) -> AliasedJoin {
+pub fn compute_one2m_join(
+    rf: &RelationFieldRef,
+    join_prefix: &str,
+    previous_join: Option<&AliasedJoin>,
+) -> AliasedJoin {
     let (left_fields, right_fields) = if rf.is_inlined_on_enclosing_model() {
         (rf.scalar_fields(), rf.referenced_fields())
     } else {
@@ -226,13 +230,6 @@ pub fn compute_one2m_join(base_model: &ModelRef, rf: &RelationFieldRef, join_pre
         )
     };
 
-    // `rf` is always the relation field on the left model in the join (parent).
-    let left_table_alias = if rf.model().name != base_model.name {
-        Some(format!("{}_{}", join_prefix, &rf.model().name))
-    } else {
-        None
-    };
-
     let right_table_alias = format!("{}_{}", join_prefix, &rf.related_model().name);
 
     let related_model = rf.related_model();
@@ -240,10 +237,9 @@ pub fn compute_one2m_join(base_model: &ModelRef, rf: &RelationFieldRef, join_pre
 
     let on_conditions: Vec<Expression> = pairs
         .map(|(a, b)| {
-            let a_col = if let Some(alias) = left_table_alias.clone() {
-                Column::from((alias, a.db_name().to_owned()))
-            } else {
-                a.as_column()
+            let a_col = match previous_join {
+                Some(prev_join) => Column::from((prev_join.alias.to_owned(), a.db_name().to_owned())),
+                None => a.as_column(),
             };
 
             let b_col = Column::from((right_table_alias.clone(), b.db_name().to_owned()));
