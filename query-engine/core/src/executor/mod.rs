@@ -18,7 +18,6 @@ use crate::{
 };
 use async_trait::async_trait;
 use connector::Connector;
-
 use tracing::Dispatch;
 
 #[async_trait]
@@ -89,4 +88,34 @@ pub trait TransactionManager {
 
 pub fn get_current_dispatcher() -> Dispatch {
     tracing::dispatcher::get_default(|current| current.clone())
+}
+
+tokio::task_local! {
+    static REQUEST_NOW: prisma_value::PrismaValue;
+}
+
+/// A timestamp that should be the `NOW()` value for the whole duration of a request. So all
+/// `@default(now())` and `@updatedAt` should use it.
+///
+/// That panics if REQUEST_NOW has not been set with with_request_now().
+///
+/// If we had a query context we carry for all the lifetime of the query, it would belong there.
+pub(crate) fn get_request_now() -> prisma_value::PrismaValue {
+    REQUEST_NOW.with(|rn| rn.clone())
+}
+
+/// Execute a future with the current "now" timestamp that can be retrieved through
+/// `get_request_now()`, initializing it if necessary.
+pub(crate) async fn with_request_now<F, R>(fut: F) -> R
+where
+    F: std::future::Future<Output = R>,
+{
+    let is_set = REQUEST_NOW.try_with(|_| async {}).is_ok();
+
+    if is_set {
+        fut.await
+    } else {
+        let now = prisma_value::PrismaValue::DateTime(chrono::Utc::now().into());
+        REQUEST_NOW.scope(now, fut).await
+    }
 }

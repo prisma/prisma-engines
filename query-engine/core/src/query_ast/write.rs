@@ -36,7 +36,7 @@ impl WriteQuery {
             )
         }
 
-        args.update_datetimes(model);
+        args.update_datetimes(&model);
     }
 
     pub fn returns(&self, field_selection: &FieldSelection) -> bool {

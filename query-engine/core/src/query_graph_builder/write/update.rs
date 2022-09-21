@@ -148,7 +148,7 @@ where
     let update_args = WriteArgsParser::from(&model, data_map)?;
     let mut args = update_args.args;
 
-    args.update_datetimes(Arc::clone(&model));
+    args.update_datetimes(&model);
 
     let filter: Filter = filter.into();
     let update_parent = Query::Write(WriteQuery::UpdateRecord(UpdateRecord {
@@ -183,7 +183,7 @@ where
     let update_args = WriteArgsParser::from(&model, data_map)?;
     let mut args = update_args.args;
 
-    args.update_datetimes(Arc::clone(&model));
+    args.update_datetimes(&model);
 
     let update_many = UpdateManyRecords {
         model,

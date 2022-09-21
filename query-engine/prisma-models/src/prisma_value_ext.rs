@@ -2,8 +2,6 @@ use super::{PrismaValue, TypeIdentifier};
 use crate::DomainError;
 use bigdecimal::ToPrimitive;
 
-// use std::convert::TryFrom;
-
 pub trait PrismaValueExtensions {
     fn coerce(self, to_type: &TypeIdentifier) -> crate::Result<PrismaValue>;
 }

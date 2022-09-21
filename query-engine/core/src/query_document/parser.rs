@@ -3,9 +3,8 @@ use crate::schema::*;
 use bigdecimal::{BigDecimal, ToPrimitive};
 use chrono::prelude::*;
 use indexmap::IndexMap;
-use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
-use psl::dml::{ValueGenerator, ValueGeneratorFn};
+use psl::dml::ValueGeneratorFn;
 use std::{borrow::Borrow, collections::HashSet, convert::TryFrom, str::FromStr, sync::Arc};
 use uuid::Uuid;
 
@@ -13,18 +12,14 @@ use uuid::Uuid;
 
 pub struct QueryDocumentParser {
     /// NOW() default value that's reused for all NOW() defaults on a single query
-    default_now: Lazy<PrismaValue>,
-}
-
-impl Default for QueryDocumentParser {
-    fn default() -> Self {
-        Self {
-            default_now: Lazy::new(|| ValueGenerator::new_now().generate().unwrap()),
-        }
-    }
+    default_now: PrismaValue,
 }
 
 impl QueryDocumentParser {
+    pub fn new(default_now: PrismaValue) -> Self {
+        QueryDocumentParser { default_now }
+    }
+
     /// Parses and validates a set of selections against a schema (output) object.
     /// On an output object, optional types designate whether or not an output field can be nulled.
     /// In contrast, nullable and optional types on an input object are separate concepts.
@@ -233,7 +228,7 @@ impl QueryDocumentParser {
     }
 
     /// Attempts to parse given query value into a concrete PrismaValue based on given scalar type.
-    pub fn parse_scalar(
+    fn parse_scalar(
         &self,
         parent_path: &QueryPath,
         value: QueryValue,
@@ -255,6 +250,7 @@ impl QueryDocumentParser {
             (QueryValue::String(s), ScalarType::DateTime) => {
                 self.parse_datetime(parent_path, s.as_str()).map(PrismaValue::DateTime)
             }
+            (QueryValue::DateTime(s), ScalarType::DateTime) => Ok(PrismaValue::DateTime(s)),
 
             (QueryValue::Int(i), ScalarType::Int) => Ok(PrismaValue::Int(i)),
             (QueryValue::Int(i), ScalarType::Float) => Ok(PrismaValue::Float(BigDecimal::from(i))),
