@@ -334,11 +334,11 @@ mod one2many_req {
 
         // Linking field updated but no child connected: works
         insta::assert_snapshot!(
-            run_query!(&runner, r#"mutation { updateManyParent(where: { id: 2 }, data: { uniq: "u2" }) { count }}"#),
+            run_query!(&runner, r#"mutation { updateManyParent(where: { id: 2 }, data: { uniq: "u22" }) { count }}"#),
             @r###"{"data":{"updateManyParent":{"count":1}}}"###
         );
 
-        // Child connected but no linking field updated: works
+        // No child connected and no linking field updated: works
         insta::assert_snapshot!(
             run_query!(&runner, r#"mutation { updateManyParent(where: { id: 2 }, data: { name: "Alice2" }) { count }}"#),
             @r###"{"data":{"updateManyParent":{"count":1}}}"###
@@ -476,11 +476,11 @@ mod one2many_opt {
 
         // Linking field updated but no child connected: works
         insta::assert_snapshot!(
-            run_query!(&runner, r#"mutation { updateManyParent(where: { id: 2 }, data: { uniq: "u2" }) { count }}"#),
+            run_query!(&runner, r#"mutation { updateManyParent(where: { id: 2 }, data: { uniq: "u22" }) { count }}"#),
             @r###"{"data":{"updateManyParent":{"count":1}}}"###
         );
 
-        // Child connected but no linking field updated: works
+        // No connected and no linking field updated: works
         insta::assert_snapshot!(
             run_query!(&runner, r#"mutation { updateManyParent(where: { id: 2 }, data: { name: "Alice2" }) { count }}"#),
             @r###"{"data":{"updateManyParent":{"count":1}}}"###
