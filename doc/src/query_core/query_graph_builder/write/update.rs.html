@@ -355,7 +355,7 @@
     <span class="kw">let</span> <span class="ident">update_args</span> <span class="op">=</span> <span class="ident">WriteArgsParser::from</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>, <span class="ident">data_map</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">update_args</span>.<span class="ident">args</span>;
 
-    <span class="ident">args</span>.<span class="ident">update_datetimes</span>(<span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>));
+    <span class="ident">args</span>.<span class="ident">update_datetimes</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>);
 
     <span class="kw">let</span> <span class="ident">filter</span>: <span class="ident">Filter</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">into</span>();
     <span class="kw">let</span> <span class="ident">update_parent</span> <span class="op">=</span> <span class="ident">Query::Write</span>(<span class="ident">WriteQuery::UpdateRecord</span>(<span class="ident">UpdateRecord</span> {
@@ -390,7 +390,7 @@
     <span class="kw">let</span> <span class="ident">update_args</span> <span class="op">=</span> <span class="ident">WriteArgsParser::from</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>, <span class="ident">data_map</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">update_args</span>.<span class="ident">args</span>;
 
-    <span class="ident">args</span>.<span class="ident">update_datetimes</span>(<span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>));
+    <span class="ident">args</span>.<span class="ident">update_datetimes</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>);
 
     <span class="kw">let</span> <span class="ident">update_many</span> <span class="op">=</span> <span class="ident">UpdateManyRecords</span> {
         <span class="ident">model</span>,

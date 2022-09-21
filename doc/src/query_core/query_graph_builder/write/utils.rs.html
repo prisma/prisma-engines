@@ -1076,6 +1076,9 @@
 <span id="1070">1070</span>
 <span id="1071">1071</span>
 <span id="1072">1072</span>
+<span id="1073">1073</span>
+<span id="1074">1074</span>
+<span id="1075">1075</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">query_ast</span>::<span class="kw-2">*</span>,
     <span class="ident">query_graph</span>::{<span class="ident">Flow</span>, <span class="ident">Node</span>, <span class="ident">NodeRef</span>, <span class="ident">QueryGraph</span>, <span class="ident">QueryGraphDependency</span>},
@@ -1222,7 +1225,7 @@
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>,
 {
-    <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">WriteArgs::new</span>();
+    <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">WriteArgs::new_empty</span>(<span class="ident"><span class="kw">crate</span>::executor::get_request_now</span>());
     <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">into</span>();
     <span class="kw">let</span> <span class="ident">record_filter</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">into</span>();
 
@@ -1646,7 +1649,7 @@
     <span class="kw">let</span> <span class="ident">set_null_query</span> <span class="op">=</span> <span class="ident">WriteQuery::UpdateManyRecords</span>(<span class="ident">UpdateManyRecords</span> {
         <span class="ident">model</span>: <span class="ident">dependent_model</span>.<span class="ident">clone</span>(),
         <span class="ident">record_filter</span>: <span class="ident">RecordFilter::empty</span>(),
-        <span class="ident">args</span>: <span class="ident">child_update_args</span>.<span class="ident">into</span>(),
+        <span class="ident">args</span>: <span class="ident">WriteArgs::new</span>(<span class="ident">child_update_args</span>, <span class="ident"><span class="kw">crate</span>::executor::get_request_now</span>()),
     });
 
     <span class="kw">let</span> <span class="ident">set_null_dependents_node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">Query::Write</span>(<span class="ident">set_null_query</span>));
@@ -1771,7 +1774,7 @@
     <span class="kw">let</span> <span class="ident">set_null_query</span> <span class="op">=</span> <span class="ident">WriteQuery::UpdateManyRecords</span>(<span class="ident">UpdateManyRecords</span> {
         <span class="ident">model</span>: <span class="ident">dependent_model</span>.<span class="ident">clone</span>(),
         <span class="ident">record_filter</span>: <span class="ident">RecordFilter::empty</span>(),
-        <span class="ident">args</span>: <span class="ident">child_update_args</span>.<span class="ident">into</span>(),
+        <span class="ident">args</span>: <span class="ident">WriteArgs::new</span>(<span class="ident">child_update_args</span>, <span class="ident"><span class="kw">crate</span>::executor::get_request_now</span>()),
     });
 
     <span class="kw">let</span> <span class="ident">set_null_dependents_node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">Query::Write</span>(<span class="ident">set_null_query</span>));
@@ -2112,7 +2115,10 @@
     <span class="kw">let</span> <span class="ident">update_query</span> <span class="op">=</span> <span class="ident">WriteQuery::UpdateManyRecords</span>(<span class="ident">UpdateManyRecords</span> {
         <span class="ident">model</span>: <span class="ident">dependent_model</span>.<span class="ident">clone</span>(),
         <span class="ident">record_filter</span>: <span class="ident">RecordFilter::empty</span>(),
-        <span class="ident">args</span>: <span class="ident">child_update_args</span>.<span class="ident">into</span>(),
+        <span class="ident">args</span>: <span class="ident">WriteArgs::new</span>(
+            <span class="ident">child_update_args</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>(),
+            <span class="ident"><span class="kw">crate</span>::executor::get_request_now</span>(),
+        ),
     });
 
     <span class="kw">let</span> <span class="ident">update_dependents_node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">Query::Write</span>(<span class="ident">update_query</span>));

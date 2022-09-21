@@ -502,18 +502,10 @@
 <span id="496">496</span>
 <span id="497">497</span>
 <span id="498">498</span>
-<span id="499">499</span>
-<span id="500">500</span>
-<span id="501">501</span>
-<span id="502">502</span>
-<span id="503">503</span>
-<span id="504">504</span>
-<span id="505">505</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">error</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ErrorKind</span>},
     <span class="ident">Filter</span>,
 };
-<span class="kw">use</span> <span class="ident">chrono::Utc</span>;
 <span class="kw">use</span> <span class="ident">indexmap</span>::{<span class="ident">map::Keys</span>, <span class="ident">IndexMap</span>};
 <span class="kw">use</span> <span class="ident">prisma_models</span>::{
     <span class="ident">CompositeFieldRef</span>, <span class="ident">Field</span>, <span class="ident">ModelProjection</span>, <span class="ident">ModelRef</span>, <span class="ident">PrismaValue</span>, <span class="ident">ScalarFieldRef</span>, <span class="ident">SelectedField</span>, <span class="ident">SelectionResult</span>,
@@ -521,8 +513,9 @@
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Borrow</span>, <span class="ident">convert::TryInto</span>, <span class="ident">ops::Deref</span>};
 
 <span class="doccomment">/// WriteArgs represent data to be written to an underlying data source.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WriteArgs</span> {
+    <span class="kw">pub</span> <span class="ident">request_now</span>: <span class="ident">PrismaValue</span>,
     <span class="kw">pub</span> <span class="ident">args</span>: <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">DatasourceFieldName</span>, <span class="ident">WriteOperation</span><span class="op">&gt;</span>,
 }
 
@@ -863,23 +856,16 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">DatasourceFieldName</span>, <span class="ident">WriteOperation</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">WriteArgs</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">args</span>: <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">DatasourceFieldName</span>, <span class="ident">WriteOperation</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">args</span> }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">DatasourceFieldName</span>, <span class="ident">WriteOperation</span>)<span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">WriteArgs</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">pairs</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">DatasourceFieldName</span>, <span class="ident">WriteOperation</span>)<span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">args</span>: <span class="ident">pairs</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>(),
-        }
-    }
-}
-
 <span class="kw">impl</span> <span class="ident">WriteArgs</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">args</span>: <span class="ident">IndexMap::new</span>() }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">args</span>: <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">DatasourceFieldName</span>, <span class="ident">WriteOperation</span><span class="op">&gt;</span>, <span class="ident">request_now</span>: <span class="ident">PrismaValue</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> { <span class="ident">args</span>, <span class="ident">request_now</span> }
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_empty</span>(<span class="ident">request_now</span>: <span class="ident">PrismaValue</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">args</span>: <span class="ident">Default::default</span>(),
+            <span class="ident">request_now</span>,
+        }
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">T</span>, <span class="ident">arg</span>: <span class="ident">V</span>)
@@ -915,19 +901,19 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_datetimes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) {
-        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">PrismaValue::DateTime</span>(<span class="ident">Utc::now</span>().<span class="ident">into</span>());
         <span class="kw">let</span> <span class="ident">updated_at_fields</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">updated_at</span>();
+        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">request_now</span>;
 
         <span class="kw">for</span> <span class="ident">f</span> <span class="kw">in</span> <span class="ident">updated_at_fields</span> {
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">get</span>(<span class="ident">f</span>.<span class="ident">db_name</span>()).<span class="ident">is_none</span>() {
-                <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">insert</span>(<span class="ident">f</span>.<span class="ident">into</span>(), <span class="ident">WriteOperation::scalar_set</span>(<span class="ident">now</span>.<span class="ident">clone</span>()));
+                <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">insert</span>(<span class="ident">f</span>.<span class="ident">into</span>(), <span class="ident">WriteOperation::scalar_set</span>(<span class="ident">value</span>.<span class="ident">clone</span>()));
             }
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update_datetimes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">model</span>: <span class="ident">ModelRef</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update_datetimes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">args</span>.<span class="ident">is_empty</span>() {
-            <span class="self">self</span>.<span class="ident">add_datetimes</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>)
+            <span class="self">self</span>.<span class="ident">add_datetimes</span>(<span class="ident">model</span>)
         }
     }
 
@@ -961,7 +947,7 @@
 <span class="doccomment">/// Picks all arguments out of `args` that are updating a value for a field</span>
 <span class="doccomment">/// contained in `projection`, as those need to be merged into the records later on.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pick_args</span>(<span class="ident">projection</span>: <span class="kw-2">&amp;</span><span class="ident">ModelProjection</span>, <span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="ident">WriteArgs</span>) -&gt; <span class="ident">WriteArgs</span> {
-    <span class="kw">let</span> <span class="ident">pairs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">projection</span>
+    <span class="kw">let</span> <span class="ident">pairs</span> <span class="op">=</span> <span class="ident">projection</span>
         .<span class="ident">scalar_fields</span>()
         .<span class="ident">into_iter</span>()
         .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> {
@@ -970,7 +956,7 @@
         })
         .<span class="ident">collect</span>();
 
-    <span class="ident">WriteArgs::from</span>(<span class="ident">pairs</span>)
+    <span class="ident">WriteArgs::new</span>(<span class="ident">pairs</span>, <span class="ident">args</span>.<span class="ident">request_now</span>.<span class="ident">clone</span>())
 }
 
 <span class="doccomment">/// Merges the incoming write argument values into the given, already loaded, ids. Overwrites existing values.</span>

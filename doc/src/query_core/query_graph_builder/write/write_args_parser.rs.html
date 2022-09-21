@@ -240,6 +240,9 @@
 <span id="234">234</span>
 <span id="235">235</span>
 <span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::query_document</span>::{<span class="ident">ParsedInputMap</span>, <span class="ident">ParsedInputValue</span>};
 <span class="kw">use</span> <span class="ident">connector</span>::{<span class="ident">DatasourceFieldName</span>, <span class="ident">WriteArgs</span>, <span class="ident">WriteOperation</span>};
@@ -249,7 +252,7 @@
 <span class="kw">use</span> <span class="ident">schema_builder::constants</span>::{<span class="ident">args</span>, <span class="ident">json_null</span>, <span class="ident">operations</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryInto</span>, <span class="ident">sync::Arc</span>};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WriteArgsParser</span> {
     <span class="kw">pub</span> <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
     <span class="kw">pub</span> <span class="ident">nested</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">RelationFieldRef</span>, <span class="ident">ParsedInputMap</span>)<span class="op">&gt;</span>,
@@ -260,7 +263,10 @@
     <span class="doccomment">/// E.g.: { data: { THIS MAP } } from the `data` argument of a write query.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="ident">data_map</span>: <span class="ident">ParsedInputMap</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident">data_map</span>.<span class="ident">into_iter</span>().<span class="ident">try_fold</span>(
-            <span class="ident">WriteArgsParser::default</span>(),
+            <span class="ident">WriteArgsParser</span> {
+                <span class="ident">args</span>: <span class="ident">WriteArgs::new_empty</span>(<span class="ident"><span class="kw">crate</span>::executor::get_request_now</span>()),
+                <span class="ident">nested</span>: <span class="ident">Default::default</span>(),
+            },
             <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">args</span>, (<span class="ident">k</span>, <span class="ident">v</span>): (<span class="ident">String</span>, <span class="ident">ParsedInputValue</span>)<span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">find_from_all</span>(<span class="kw-2">&amp;</span><span class="ident">k</span>).<span class="ident">unwrap</span>();
 

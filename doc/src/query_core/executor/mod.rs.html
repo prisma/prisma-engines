@@ -96,6 +96,35 @@
 <span id="90">90</span>
 <span id="91">91</span>
 <span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
 </pre><pre class="rust"><code><span class="doccomment">//! What the executor module DOES:</span>
 <span class="doccomment">//! - Defining an overarching executor trait, to be used on consumers of the core crate.</span>
 <span class="doccomment">//! - Defining executor implementations that combine the different core modules into a coherent</span>
@@ -116,7 +145,6 @@
 };
 <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
 <span class="kw">use</span> <span class="ident">connector::Connector</span>;
-
 <span class="kw">use</span> <span class="ident">tracing::Dispatch</span>;
 
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
@@ -187,6 +215,36 @@
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_current_dispatcher</span>() -&gt; <span class="ident">Dispatch</span> {
     <span class="ident">tracing::dispatcher::get_default</span>(<span class="op">|</span><span class="ident">current</span><span class="op">|</span> <span class="ident">current</span>.<span class="ident">clone</span>())
+}
+
+<span class="macro">tokio::task_local!</span> {
+    <span class="kw">static</span> <span class="ident">REQUEST_NOW</span>: <span class="ident">prisma_value::PrismaValue</span>;
+}
+
+<span class="doccomment">/// A timestamp that should be the `NOW()` value for the whole duration of a request. So all</span>
+<span class="doccomment">/// `@default(now())` and `@updatedAt` should use it.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// That panics if REQUEST_NOW has not been set with with_request_now().</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// If we had a query context we carry for all the lifetime of the query, it would belong there.</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_request_now</span>() -&gt; <span class="ident">prisma_value::PrismaValue</span> {
+    <span class="ident">REQUEST_NOW</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">rn</span><span class="op">|</span> <span class="ident">rn</span>.<span class="ident">clone</span>())
+}
+
+<span class="doccomment">/// Execute a future with the current &quot;now&quot; timestamp that can be retrieved through</span>
+<span class="doccomment">/// `get_request_now()`, initializing it if necessary.</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">with_request_now</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">fut</span>: <span class="ident">F</span>) -&gt; <span class="ident">R</span>
+<span class="kw">where</span>
+    <span class="ident">F</span>: <span class="ident">std::future::Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">R</span><span class="op">&gt;</span>,
+{
+    <span class="kw">let</span> <span class="ident">is_set</span> <span class="op">=</span> <span class="ident">REQUEST_NOW</span>.<span class="ident">try_with</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="kw">async</span> {}).<span class="ident">is_ok</span>();
+
+    <span class="kw">if</span> <span class="ident">is_set</span> {
+        <span class="ident">fut</span>.<span class="kw">await</span>
+    } <span class="kw">else</span> {
+        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">prisma_value::PrismaValue::DateTime</span>(<span class="ident">chrono::Utc::now</span>().<span class="ident">into</span>());
+        <span class="ident">REQUEST_NOW</span>.<span class="ident">scope</span>(<span class="ident">now</span>, <span class="ident">fut</span>).<span class="kw">await</span>
+    }
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0 (4b91a6ea7 2022-08-08)" ></div>
