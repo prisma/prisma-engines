@@ -54,7 +54,22 @@ mod mongodb {
 
     #[connector_test]
     async fn aggregate_raw_works_with_itx(runner: Runner) -> TestResult<()> {
-        Ok(())
+        run_in_itx(runner, |runner| async move {
+            run_query!(
+                runner,
+                r#"mutation { createOneTestModel(data: { id: 1, field: "A" }) { id }}"#
+            );
+
+            insta::assert_snapshot!(
+                run_query!(
+                    runner,
+                    r#"query { aggregateTestModelRaw(pipeline: ["{\"$match\": {\"_id\": 1}}"]) }"#
+                ),
+                @r###"{"data":{"aggregateTestModelRaw":[{"_id":1,"field":"A"}]}}"###
+            );
+
+            Ok(())
+        }).await
     }
 
     async fn run_in_itx<T, F, O>(mut runner: Runner, f: O) -> TestResult<T>
