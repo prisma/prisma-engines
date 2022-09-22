@@ -10,7 +10,7 @@ pub enum RawError {
         expected: usize,
         actual: usize,
     },
-    QueryInvalidInput(Box<dyn std::error::Error + Send + Sync + 'static>),
+    QueryInvalidInput(String),
     ConnectionClosed,
     Database {
         code: Option<String>,
@@ -27,7 +27,7 @@ impl From<RawError> for SqlError {
             RawError::IncorrectNumberOfParameters { expected, actual } => {
                 Self::IncorrectNumberOfParameters { expected, actual }
             }
-            RawError::QueryInvalidInput(qe) => Self::QueryInvalidInput(qe),
+            RawError::QueryInvalidInput(message) => Self::QueryInvalidInput(message),
             RawError::UnsupportedColumnType { column_type } => Self::RawError {
                 code: String::from("N/A"),
                 message: format!(
@@ -46,7 +46,7 @@ impl From<RawError> for SqlError {
 
 impl From<quaint::error::Error> for RawError {
     fn from(e: quaint::error::Error) -> Self {
-        let raw_error = match e.kind() {
+        match e.kind() {
             quaint::error::ErrorKind::IncorrectNumberOfParameters { expected, actual } => {
                 Self::IncorrectNumberOfParameters {
                     expected: *expected,
@@ -57,17 +57,11 @@ impl From<quaint::error::Error> for RawError {
             quaint::error::ErrorKind::UnsupportedColumnType { column_type } => Self::UnsupportedColumnType {
                 column_type: column_type.to_owned(),
             },
+            quaint::error::ErrorKind::QueryInvalidInput(message) => Self::QueryInvalidInput(message.to_owned()),
             _ => Self::Database {
                 code: e.original_code().map(ToString::to_string),
                 message: e.original_message().map(ToString::to_string),
             },
-        };
-
-        // note: this additional match is needed to move Box<dyn std::error::Error + Send + Sync + 'static> into any RawError
-        // that needs to wrap the Box, e.g., RawError::QueryInvalidInput
-        match QuaintKind::from(e) {
-            quaint::error::ErrorKind::QueryInvalidInput(qe) => Self::QueryInvalidInput(qe),
-            _ => raw_error,
         }
     }
 }
@@ -109,7 +103,7 @@ pub enum SqlError {
     QueryError(Box<dyn std::error::Error + Send + Sync>),
 
     #[error("Invalid input provided to query: {}", _0)]
-    QueryInvalidInput(Box<dyn std::error::Error + Send + Sync>),
+    QueryInvalidInput(String),
 
     #[error("The column value was different from the model")]
     ColumnReadFailure(Box<dyn std::error::Error + Send + Sync>),

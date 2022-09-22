@@ -176,7 +176,7 @@ pub enum ErrorKind {
     ConversionError(anyhow::Error),
 
     #[error("Invalid input provided to query: {}", _0)]
-    QueryInvalidInput(Box<dyn std::error::Error + Send + Sync>),
+    QueryInvalidInput(String),
 
     #[error("Conversion error: {}", _0)]
     InternalConversionError(String),

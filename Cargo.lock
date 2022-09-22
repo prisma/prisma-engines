@@ -3086,7 +3086,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma//quaint?branch=feat/postgres-forward-io-invalid-input-error#16b6730eb8fb5e03475b0e5db90ec546ad72181e"
+source = "git+https://github.com/prisma//quaint?branch=feat/postgres-forward-io-invalid-input-error#4a845a98cb020b35f3742df4a0ba615d82b2c7b9"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
