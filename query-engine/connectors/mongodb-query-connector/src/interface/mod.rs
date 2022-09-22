@@ -82,3 +82,50 @@ async fn catch<O>(
         Err(err) => Err(err.into_connector_error()),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn test_schema(url: &str) -> String {
+        format!(
+            r#"
+            datasource db {{
+              provider = "mongodb"
+              url      = "{url}"
+            }}
+
+            model User {{
+              id    String @id @map("_id") @default(auto()) @db.ObjectId
+            }}
+            "#
+        )
+    }
+
+    fn datasource_from_url(url: &str) -> Datasource {
+        let schema = psl::validate(test_schema(url).into());
+        schema.configuration.datasources[0].clone()
+    }
+
+    /// Regression test for https://github.com/prisma/prisma/issues/13388
+    #[tokio::test]
+    async fn test_error_details_forwarding_srv_port() {
+        let url = "mongodb+srv://root:example@localhost:27017/myDatabase";
+        let datasource = datasource_from_url(url);
+
+        let error = MongoDb::new(&datasource, url).await.err().unwrap();
+
+        assert!(error.to_string().contains("a port cannot be specified with 'mongodb+srv'"));
+    }
+
+    /// Regression test for https://github.com/prisma/prisma/issues/11883
+    #[tokio::test]
+    async fn test_error_details_forwarding_illegal_characters() {
+        let url = "mongodb://localhost:C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==@localhost:10255/e2e-tests?ssl=true";
+        let datasource = datasource_from_url(url);
+
+        let error = MongoDb::new(&datasource, url).await.err().unwrap();
+
+        assert!(error.to_string().contains("illegal character in database name"));
+    }
+}
