@@ -13,6 +13,7 @@ pub enum QueryValue {
     Enum(String),
     List(Vec<QueryValue>),
     Object(IndexMap<String, QueryValue>),
+    DateTime(chrono::DateTime<chrono::FixedOffset>),
 }
 
 impl PartialEq for QueryValue {
@@ -26,6 +27,9 @@ impl PartialEq for QueryValue {
             (QueryValue::Enum(kind1), QueryValue::Enum(kind2)) => kind1 == kind2,
             (QueryValue::List(list1), QueryValue::List(list2)) => list1 == list2,
             (QueryValue::Object(t1), QueryValue::Object(t2)) => t1 == t2,
+            (QueryValue::DateTime(t1), QueryValue::DateTime(t2)) => t1 == t2,
+            (QueryValue::String(t1), QueryValue::DateTime(t2)) => t1 == stringify_date(t2).as_str(),
+            (QueryValue::DateTime(t1), QueryValue::String(t2)) => stringify_date(t1).as_str() == t2,
             _ => false,
         }
     }
@@ -38,6 +42,7 @@ impl Hash for QueryValue {
             Self::Float(f) => f.hash(state),
             Self::String(s) => s.hash(state),
             Self::Boolean(b) => b.hash(state),
+            Self::DateTime(dt) => stringify_date(dt).hash(state),
             Self::Null => (),
             Self::Enum(s) => s.hash(state),
             Self::List(l) => l.hash(state),
@@ -64,7 +69,7 @@ impl From<PrismaValue> for QueryValue {
             PrismaValue::String(s) => Self::String(s),
             PrismaValue::Float(f) => Self::Float(f),
             PrismaValue::Boolean(b) => Self::Boolean(b),
-            PrismaValue::DateTime(dt) => Self::String(stringify_date(&dt)),
+            PrismaValue::DateTime(dt) => Self::DateTime(dt),
             PrismaValue::Enum(s) => Self::Enum(s),
             PrismaValue::List(l) => Self::List(l.into_iter().map(QueryValue::from).collect()),
             PrismaValue::Int(i) => Self::Int(i),

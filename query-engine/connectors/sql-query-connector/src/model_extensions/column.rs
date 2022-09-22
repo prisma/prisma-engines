@@ -103,10 +103,6 @@ where
         let col = sf.db_name().to_string();
 
         let column = Column::from((full_table_name, col)).type_family(sf.type_family());
-
-        match sf.default_value.as_ref().and_then(|d| d.get()) {
-            Some(default) => column.default(sf.value(default)),
-            None => column.default(quaint::ast::DefaultValue::Generated),
-        }
+        column.default(quaint::ast::DefaultValue::Generated)
     }
 }

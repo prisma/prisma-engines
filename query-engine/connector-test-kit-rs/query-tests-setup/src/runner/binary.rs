@@ -46,10 +46,16 @@ impl RunnerInterface for BinaryRunner {
         Ok(PrismaResponse::Single(gql_response).into())
     }
 
-    async fn batch(&self, queries: Vec<String>, transaction: bool) -> TestResult<crate::QueryResult> {
+    async fn batch(
+        &self,
+        queries: Vec<String>,
+        transaction: bool,
+        isolation_level: Option<String>,
+    ) -> TestResult<crate::QueryResult> {
         let query = GraphQlBody::Multi(MultiQuery::new(
             queries.into_iter().map(Into::into).collect(),
             transaction,
+            isolation_level,
         ));
 
         let body = serde_json::to_vec(&query).unwrap();

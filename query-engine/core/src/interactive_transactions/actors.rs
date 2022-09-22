@@ -272,7 +272,7 @@ pub fn spawn_itx_actor(
     span.record("itx_id", &tx_id_str.as_str());
 
     tokio::task::spawn(
-        async move {
+        crate::executor::with_request_now(async move {
             let sleep = time::sleep(timeout);
             tokio::pin!(sleep);
 
@@ -300,7 +300,7 @@ pub fn spawn_itx_actor(
             let _ = send_done.send(server.id.clone()).await;
 
             trace!("[{}] has stopped with {}", server.id.to_string(), server.cached_tx);
-        }
+        })
         .instrument(span)
         .with_subscriber(dispatcher),
     );

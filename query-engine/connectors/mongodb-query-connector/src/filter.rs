@@ -157,10 +157,10 @@ impl MongoFilterVisitor {
 
         let filter_doc = match condition {
             ScalarCondition::Equals(val) => {
-                doc! { "$eq": [&field_name, self.as_bson_coerce_count(field, val)?] }
+                doc! { "$eq": [&field_name, self.coerce_to_bson_for_filter(field, val)?] }
             }
             ScalarCondition::NotEquals(val) => {
-                doc! { "$ne": [&field_name, self.as_bson_coerce_count(field, val)?] }
+                doc! { "$ne": [&field_name, self.coerce_to_bson_for_filter(field, val)?] }
             }
             ScalarCondition::Contains(val) => self.regex_match(&field_name, field, ".*", val, ".*", false)?,
             ScalarCondition::NotContains(val) => {
@@ -175,16 +175,16 @@ impl MongoFilterVisitor {
                 doc! { "$not": self.regex_match(&field_name, field, "", val, "$", false)? }
             }
             ScalarCondition::LessThan(val) => {
-                doc! { "$lt": [&field_name, self.as_bson_coerce_count(field, val)?] }
+                doc! { "$lt": [&field_name, self.coerce_to_bson_for_filter(field, val)?] }
             }
             ScalarCondition::LessThanOrEquals(val) => {
-                doc! { "$lte": [&field_name, self.as_bson_coerce_count(field, val)?] }
+                doc! { "$lte": [&field_name, self.coerce_to_bson_for_filter(field, val)?] }
             }
             ScalarCondition::GreaterThan(val) => {
-                doc! { "$gt": [&field_name, self.as_bson_coerce_count(field, val)?] }
+                doc! { "$gt": [&field_name, self.coerce_to_bson_for_filter(field, val)?] }
             }
             ScalarCondition::GreaterThanOrEquals(val) => {
-                doc! { "$gte": [&field_name, self.as_bson_coerce_count(field, val)?] }
+                doc! { "$gte": [&field_name, self.coerce_to_bson_for_filter(field, val)?] }
             }
             // Todo: The nested list unpack looks like a bug somewhere.
             //       Likely join code mistakenly repacks a list into a list of PrismaValue somewhere in the core.
@@ -199,7 +199,7 @@ impl MongoFilterVisitor {
                                 bson_values.extend(
                                     inner
                                         .into_iter()
-                                        .map(|val| self.as_bson_coerce_count(field, val))
+                                        .map(|val| self.coerce_to_bson_for_filter(field, val))
                                         .collect::<crate::Result<Vec<_>>>()?,
                                 )
                             }
@@ -208,7 +208,7 @@ impl MongoFilterVisitor {
                         doc! { "$in": [&field_name, bson_values] }
                     }
                     _ => {
-                        doc! { "$in": [&field_name, self.as_bson_coerce_count(field, PrismaValue::List(vals))?] }
+                        doc! { "$in": [&field_name, self.coerce_to_bson_for_filter(field, PrismaValue::List(vals))?] }
                     }
                 },
                 ConditionListValue::FieldRef(field_ref) => {
@@ -219,7 +219,7 @@ impl MongoFilterVisitor {
                 ConditionListValue::List(vals) => {
                     let bson_values = vals
                         .into_iter()
-                        .map(|val| self.as_bson_coerce_count(field, val))
+                        .map(|val| self.coerce_to_bson_for_filter(field, val))
                         .collect::<crate::Result<Vec<_>>>()?;
 
                     doc! { "$not": { "$in": [&field_name, bson_values] } }
@@ -725,13 +725,14 @@ impl MongoFilterVisitor {
     ///
     /// When converting the value of a `_count` aggregation filter for a field that's _not_ numerical,
     /// we force the `TypeIdentifier` to be `Int` to prevent panics.
-    fn as_bson_coerce_count(&self, sf: &ScalarFieldRef, value: impl Into<ConditionValue>) -> crate::Result<Bson> {
+    fn coerce_to_bson_for_filter(&self, sf: &ScalarFieldRef, value: impl Into<ConditionValue>) -> crate::Result<Bson> {
         match value.into() {
             ConditionValue::Value(value) => {
                 if self.parent_is_count_aggregation() && !sf.is_numeric() {
                     (&TypeIdentifier::Int, value).into_bson()
                 } else {
-                    (sf, value).into_bson()
+                    let bson_value = (sf, value).into_bson()?;
+                    Ok(Bson::Document(doc! {"$literal": bson_value}))
                 }
             }
             ConditionValue::FieldRef(field_ref) => self.prefixed_field_ref(&field_ref),

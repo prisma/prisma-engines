@@ -129,7 +129,7 @@ impl PrismaOpt {
         Ok(res)
     }
 
-    pub fn datamodel(&self) -> PrismaResult<psl::ValidatedSchema> {
+    pub fn schema(&self, ignore_env_errors: bool) -> PrismaResult<psl::ValidatedSchema> {
         let datamodel_str = self.datamodel_str()?;
         let mut schema = psl::validate(datamodel_str.into());
 
@@ -137,6 +137,20 @@ impl PrismaOpt {
             .diagnostics
             .to_result()
             .map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))?;
+
+        let datasource_url_overrides: Vec<(String, String)> = if let Some(ref json) = self.overwrite_datasources {
+            let datasource_url_overrides: Vec<SourceOverride> = serde_json::from_str(json)?;
+            datasource_url_overrides.into_iter().map(|x| (x.name, x.url)).collect()
+        } else {
+            Vec::new()
+        };
+
+        if !ignore_env_errors {
+            schema
+                .configuration
+                .resolve_datasource_urls_from_env(&datasource_url_overrides, |key| env::var(key).ok())
+                .map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))?;
+        }
 
         Ok(schema)
     }
@@ -148,7 +162,7 @@ impl PrismaOpt {
             let datasource_url_overrides: Vec<SourceOverride> = serde_json::from_str(json)?;
             datasource_url_overrides.into_iter().map(|x| (x.name, x.url)).collect()
         } else {
-            vec![]
+            Vec::new()
         };
 
         let config_result = if ignore_env_errors {
