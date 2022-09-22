@@ -115,7 +115,9 @@ mod tests {
 
         let error = MongoDb::new(&datasource, url).await.err().unwrap();
 
-        assert!(error.to_string().contains("a port cannot be specified with 'mongodb+srv'"));
+        assert!(error
+            .to_string()
+            .contains("a port cannot be specified with 'mongodb+srv'"));
     }
 
     /// Regression test for https://github.com/prisma/prisma/issues/11883
