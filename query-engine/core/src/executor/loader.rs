@@ -2,8 +2,10 @@ use super::{interpreting_executor::InterpretingExecutor, QueryExecutor};
 use crate::CoreError;
 use connection_string::JdbcString;
 use connector::Connector;
+#[cfg(feature = "mongodb")]
 use mongodb_client::MongoConnectionString;
 use psl::{builtin_connectors::*, common::preview_features::PreviewFeature, Datasource};
+#[cfg(feature = "sql")]
 use sql_connector::*;
 use std::collections::HashMap;
 use std::str::FromStr;
@@ -21,10 +23,15 @@ pub async fn load(
     url: &str,
 ) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     match source.active_provider {
+        #[cfg(feature = "sql")]
         p if SQLITE.is_provider(p) => sqlite(source, url, features).await,
+        #[cfg(feature = "sql")]
         p if MYSQL.is_provider(p) => mysql(source, url, features).await,
+        #[cfg(feature = "sql")]
         p if POSTGRES.is_provider(p) => postgres(source, url, features).await,
+        #[cfg(feature = "sql")]
         p if MSSQL.is_provider(p) => mssql(source, url, features).await,
+        #[cfg(feature = "sql")]
         p if COCKROACH.is_provider(p) => postgres(source, url, features).await,
 
         #[cfg(feature = "mongodb")]
@@ -93,6 +100,7 @@ pub fn db_name(source: &Datasource, url: &str) -> crate::Result<String> {
     }
 }
 
+#[cfg(feature = "sql")]
 async fn sqlite(
     source: &Datasource,
     url: &str,
@@ -108,6 +116,7 @@ async fn sqlite(
     Ok((db_name, sql_executor(sqlite, false)))
 }
 
+#[cfg(feature = "sql")]
 async fn postgres(
     source: &Datasource,
     url: &str,
@@ -132,6 +141,7 @@ async fn postgres(
     Ok((db_name, sql_executor(psql, force_transactions)))
 }
 
+#[cfg(feature = "sql")]
 async fn mysql(
     source: &Datasource,
     url: &str,
@@ -147,6 +157,7 @@ async fn mysql(
     Ok((db_name, sql_executor(mysql, false)))
 }
 
+#[cfg(feature = "sql")]
 async fn mssql(
     source: &Datasource,
     url: &str,
