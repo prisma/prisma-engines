@@ -331,3 +331,10 @@ pub struct MissingFieldsInModel {
 pub struct ValueFitError {
     pub details: String,
 }
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2034",
+    message = "Transaction failed due to a write conflict or a deadlock. Please retry your transaction"
+)]
+pub struct TransactionWriteConflict {}
