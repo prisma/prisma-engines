@@ -29,8 +29,8 @@ impl MongoDb {
     pub async fn new(_source: &Datasource, url: &str) -> connector_interface::Result<Self> {
         let client = mongodb_client::create(&url).await.map_err(|err| {
             let kind = match err.kind {
-                mongodb_client::ErrorKind::InvalidArgument { .. } => ErrorKind::InvalidDatabaseUrl {
-                    details: "Unable to parse URL.".to_owned(),
+                mongodb_client::ErrorKind::InvalidArgument { message } => ErrorKind::InvalidDatabaseUrl {
+                    details: format!("MongoDB connection string error: {message}"),
                     url: url.to_owned(),
                 },
                 mongodb_client::ErrorKind::Other(err) => ErrorKind::ConnectionError(err.into()),
