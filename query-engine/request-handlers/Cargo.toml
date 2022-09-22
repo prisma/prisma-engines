@@ -20,8 +20,3 @@ thiserror = "1"
 tracing = "0.1"
 url = "2"
 connection-string = "0.1"
-
-[dev-dependencies]
-test-setup = { path = "../../libs/test-setup" }
-serial_test = "*"
-prisma-models = { path = "../prisma-models" }
