@@ -1,5 +1,9 @@
 use query_engine_tests::*;
 
+/*
+// TODO: uncomment this test when we figure out how to properly override environment variables
+// for a single test. For the moment, we're asserting the user-facing error message in TypeScript tests.
+
 #[test_suite(schema(generic), only(Postgres))]
 mod find_many {
     #[connector_test]
@@ -36,6 +40,7 @@ mod find_many {
         Ok(())
     }
 }
+*/
 
 #[test_suite(schema(generic), only(Postgres))]
 mod raw_params {
