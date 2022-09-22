@@ -1,6 +1,7 @@
 use super::{interpreting_executor::InterpretingExecutor, QueryExecutor};
 use crate::CoreError;
 use connection_string::JdbcString;
+#[cfg(feature = "sql")]
 use connector::Connector;
 #[cfg(feature = "mongodb")]
 use mongodb_client::MongoConnectionString;
@@ -173,6 +174,7 @@ async fn mssql(
     Ok((db_name, sql_executor(mssql, false)))
 }
 
+#[cfg(feature = "sql")]
 fn sql_executor<T>(connector: T, force_transactions: bool) -> Box<dyn QueryExecutor + Send + Sync>
 where
     T: Connector + Send + Sync + 'static,

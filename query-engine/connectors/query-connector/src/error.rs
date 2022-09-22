@@ -33,6 +33,7 @@ impl ConnectorError {
                     column: column.clone(),
                 }))
             }
+            #[cfg(feature = "sql")]
             ErrorKind::InvalidDatabaseUrl { details, url: _ } => {
                 let details = user_facing_errors::quaint::invalid_connection_string_description(details);
 

@@ -41,6 +41,7 @@ git = "https://github.com/prisma/quaint"
 [dependencies.connector-interface]
 package = "query-connector"
 path = "../query-connector"
+features = ["sql"]
 
 [dependencies.prisma-models]
 path = "../../prisma-models"
