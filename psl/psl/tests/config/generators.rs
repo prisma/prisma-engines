@@ -399,7 +399,7 @@ fn empty_preview_features_array_should_work() {
         }
     "#;
 
-    let schema = psl::parse_schema_parserdb(schema).unwrap();
+    let schema = psl::parse_schema(schema).unwrap();
     assert!(schema.configuration.preview_features().is_empty());
 }
 
@@ -417,7 +417,7 @@ fn empty_preview_features_array_with_empty_space_should_work() {
         }
     "#;
 
-    let schema = psl::parse_schema_parserdb(schema).unwrap();
+    let schema = psl::parse_schema(schema).unwrap();
     assert!(schema.configuration.preview_features().is_empty());
 }
 

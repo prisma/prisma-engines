@@ -30,7 +30,7 @@ async fn connection_string_problems_give_a_nice_error() {
             provider.1
         );
 
-        let dml = psl::parse_schema_parserdb(dm).unwrap();
+        let dml = psl::parse_schema(dm).unwrap();
 
         let error = PrismaContext::builder(dml)
             .enable_raw_queries(true)

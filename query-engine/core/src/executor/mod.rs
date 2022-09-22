@@ -1,3 +1,5 @@
+#![allow(clippy::declare_interior_mutable_const)]
+
 //! What the executor module DOES:
 //! - Defining an overarching executor trait, to be used on consumers of the core crate.
 //! - Defining executor implementations that combine the different core modules into a coherent

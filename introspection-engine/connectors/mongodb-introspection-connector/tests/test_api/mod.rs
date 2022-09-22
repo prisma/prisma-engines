@@ -103,7 +103,7 @@ where
         features,
     );
 
-    let validated_schema = psl::parse_schema_parserdb(datamodel_string).unwrap();
+    let validated_schema = psl::parse_schema(datamodel_string).unwrap();
 
     let ctx = IntrospectionContext {
         source: validated_schema.configuration.datasources.clone().pop().unwrap(),

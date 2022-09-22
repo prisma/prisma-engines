@@ -228,7 +228,7 @@ async fn main() -> anyhow::Result<()> {
             let mut datamodel = String::new();
             file.read_to_string(&mut datamodel).unwrap();
 
-            if let Err(e) = psl::parse_schema_parserdb(datamodel) {
+            if let Err(e) = psl::parse_schema(datamodel) {
                 println!("{e}");
             };
         }

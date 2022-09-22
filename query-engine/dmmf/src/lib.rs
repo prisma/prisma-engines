@@ -14,7 +14,7 @@ pub fn dmmf_json_from_schema(schema: &str) -> String {
 
 // enable raw param?
 pub fn dmmf_from_schema(schema: &str) -> DataModelMetaFormat {
-    let schema = psl::parse_schema_parserdb(schema).unwrap();
+    let schema = psl::parse_schema(schema).unwrap();
     let config = &schema.configuration;
     let dml = psl::lift(&schema);
 

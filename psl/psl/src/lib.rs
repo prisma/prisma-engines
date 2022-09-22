@@ -31,7 +31,7 @@ pub fn parse_configuration(schema: &str) -> Result<Configuration, Diagnostics> {
 }
 
 /// Parse and analyze a Prisma schema.
-pub fn parse_schema_parserdb(file: impl Into<SourceFile>) -> Result<ValidatedSchema, String> {
+pub fn parse_schema(file: impl Into<SourceFile>) -> Result<ValidatedSchema, String> {
     let mut schema = validate(file.into());
     schema
         .diagnostics
