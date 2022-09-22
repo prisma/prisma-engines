@@ -59,7 +59,7 @@ impl ConnectorError {
             )),
             ErrorKind::QueryInvalidInput(message) => Some(KnownError::new(
                 user_facing_errors::query_engine::DatabaseAssertionViolation {
-                    database_error: format!("{}", message),
+                    database_error: message.to_owned(),
                 },
             )),
             ErrorKind::UnsupportedFeature(feature) => {
