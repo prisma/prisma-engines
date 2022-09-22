@@ -104,5 +104,5 @@ pub fn coerce_array<'a, T>(
         _ => out.push(coercion(expr, diagnostics)?),
     }
 
-    is_valid.then(|| out)
+    is_valid.then_some(out)
 }
