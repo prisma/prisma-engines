@@ -220,7 +220,7 @@ fn making_an_existing_id_field_autoincrement_works_with_indices(api: TestApi) {
     });
 
     // Data to see we don't lose anything in the translation.
-    for (i, content) in (&["A", "B", "C"]).iter().enumerate() {
+    for (i, content) in ["A", "B", "C"].iter().enumerate() {
         let insert = Insert::single_into(api.render_table_name("Post"))
             .value("content", *content)
             .value("id", i);
@@ -300,7 +300,7 @@ fn making_an_existing_id_field_autoincrement_works_with_foreign_keys(api: TestAp
     });
 
     // Data to see we don't lose anything in the translation.
-    for (i, content) in (&["A", "B", "C"]).iter().enumerate() {
+    for (i, content) in ["A", "B", "C"].iter().enumerate() {
         let insert = Insert::single_into(api.render_table_name("Author"));
 
         let author_id = api
