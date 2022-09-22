@@ -244,6 +244,9 @@ pub enum ErrorKind {
     #[error("Transaction was already closed: {}", _0)]
     TransactionAlreadyClosed(String),
 
+    #[error("Transaction write conflict")]
+    TransactionWriteConflict,
+
     #[error("Invalid isolation level: {}", _0)]
     InvalidIsolationLevel(String),
 

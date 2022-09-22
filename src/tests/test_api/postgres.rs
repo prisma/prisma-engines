@@ -84,6 +84,10 @@ impl<'a> TestApi for PostgreSql<'a> {
         &self.conn
     }
 
+    async fn create_additional_connection(&self) -> crate::Result<Quaint> {
+        Quaint::new(&*CONN_STR).await
+    }
+
     fn unique_constraint(&mut self, column: &str) -> String {
         format!("UNIQUE({})", column)
     }

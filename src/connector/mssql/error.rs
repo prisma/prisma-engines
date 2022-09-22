@@ -214,6 +214,14 @@ impl From<tiberius::error::Error> for Error {
 
                 builder.build()
             }
+            tiberius::error::Error::Server(e) if e.code() == 1205 => {
+                let mut builder = Error::builder(ErrorKind::TransactionWriteConflict);
+
+                builder.set_original_code(format!("{}", e.code()));
+                builder.set_original_message(e.message().to_string());
+
+                builder.build()
+            }
             tiberius::error::Error::Server(e) => {
                 let kind = ErrorKind::QueryError(e.clone().into());
 

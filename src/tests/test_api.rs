@@ -34,5 +34,6 @@ pub trait TestApi {
     fn foreign_key(&mut self, parent_table: &str, parent_column: &str, child_column: &str) -> String;
     fn autogen_id(&self, name: &str) -> String;
     fn conn(&self) -> &crate::single::Quaint;
+    async fn create_additional_connection(&self) -> crate::Result<crate::single::Quaint>;
     fn get_name(&mut self) -> String;
 }

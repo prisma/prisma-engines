@@ -73,6 +73,10 @@ impl<'a> TestApi for MsSql<'a> {
         &self.conn
     }
 
+    async fn create_additional_connection(&self) -> crate::Result<Quaint> {
+        Quaint::new(&*CONN_STR).await
+    }
+
     fn render_create_table(&mut self, table_name: &str, columns: &str) -> (String, String) {
         let table_name = format!("##{}", table_name);
         let create = format!(

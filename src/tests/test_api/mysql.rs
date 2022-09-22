@@ -29,6 +29,7 @@ pub(crate) async fn mysql_mariadb_test_api<'a>() -> crate::Result<MySql<'a>> {
 pub struct MySql<'a> {
     names: Generator<'a>,
     conn: Quaint,
+    conn_str: String,
     tag: Tags,
 }
 
@@ -37,7 +38,12 @@ impl<'a> MySql<'a> {
         let names = Generator::default();
         let conn = Quaint::new(conn_str).await?;
 
-        Ok(Self { names, conn, tag })
+        Ok(Self {
+            names,
+            conn,
+            tag,
+            conn_str: conn_str.into(),
+        })
     }
 
     fn render_perm_create_table(&mut self, table_name: &str, columns: &str) -> (String, String) {
@@ -121,6 +127,10 @@ impl<'a> TestApi for MySql<'a> {
 
     fn conn(&self) -> &Quaint {
         &self.conn
+    }
+
+    async fn create_additional_connection(&self) -> crate::Result<Quaint> {
+        Quaint::new(&self.conn_str).await
     }
 
     fn unique_constraint(&mut self, column: &str) -> String {

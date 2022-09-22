@@ -444,3 +444,33 @@ async fn snapshot_isolation_error(api: &mut dyn TestApi) -> crate::Result<()> {
 
     Ok(())
 }
+
+#[test_each_connector(tags("postgresql"))]
+async fn concurrent_transaction_conflict(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api.get_name();
+    let create_table = format!("CREATE TABLE {} (id int not null primary key, count int)", table);
+    api.conn().raw_cmd(&create_table).await?;
+    api.conn()
+        .insert(Insert::single_into(&table).value("id", 1).value("count", 1).into())
+        .await?;
+
+    let conn1 = api.create_additional_connection().await?;
+    let conn2 = api.create_additional_connection().await?;
+
+    let tx1 = conn1.start_transaction(Some(IsolationLevel::Serializable)).await?;
+    let tx2 = conn2.start_transaction(Some(IsolationLevel::Serializable)).await?;
+
+    tx1.query(Select::from_table(&table).into()).await?;
+    tx2.query(Select::from_table(&table).into()).await?;
+
+    tx1.update(Update::table(&table).set("count", 2).into()).await?;
+    tx1.commit().await?;
+
+    let res = tx2.update(Update::table(&table).set("count", 3).into());
+
+    let err = res.await.err().expect("Conflicting transaction must fail");
+
+    assert!(matches!(err.kind(), ErrorKind::TransactionWriteConflict));
+
+    Ok(())
+}

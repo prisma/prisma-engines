@@ -7,6 +7,7 @@ pub(crate) async fn sqlite_test_api<'a>() -> crate::Result<Sqlite<'a>> {
     Sqlite::new().await
 }
 
+const CONN_STR: &str = "file:db/test.db";
 pub struct Sqlite<'a> {
     names: Generator<'a>,
     conn: Quaint,
@@ -15,8 +16,7 @@ pub struct Sqlite<'a> {
 impl<'a> Sqlite<'a> {
     pub async fn new() -> crate::Result<Sqlite<'a>> {
         let names = Generator::default();
-        let conn_str = "file:db/test.db";
-        let conn = Quaint::new(&conn_str).await?;
+        let conn = Quaint::new(CONN_STR).await?;
 
         Ok(Self { names, conn })
     }
@@ -79,6 +79,10 @@ impl<'a> TestApi for Sqlite<'a> {
 
     fn conn(&self) -> &Quaint {
         &self.conn
+    }
+
+    async fn create_additional_connection(&self) -> crate::Result<Quaint> {
+        Quaint::new(CONN_STR).await
     }
 
     fn unique_constraint(&mut self, column: &str) -> String {

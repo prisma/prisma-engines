@@ -180,6 +180,20 @@ impl From<tokio_postgres::error::Error> for Error {
 
                 builder.build()
             }
+            Some(code) if code == "40001" => {
+                let code = code.to_string();
+                let db_error = e.into_source().and_then(|e| e.downcast::<DbError>().ok());
+                let message = db_error.as_ref().map(|e| e.message());
+                let mut builder = Error::builder(ErrorKind::TransactionWriteConflict);
+
+                builder.set_original_code(code);
+
+                if let Some(message) = message {
+                    builder.set_original_message(message);
+                }
+
+                builder.build()
+            }
             Some(code) if code == "42P01" => {
                 let code = code.to_string();
                 let db_error = e.into_source().and_then(|e| e.downcast::<DbError>().ok());

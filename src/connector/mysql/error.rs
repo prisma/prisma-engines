@@ -214,6 +214,16 @@ impl From<my::Error> for Error {
             my::Error::Server(ServerError {
                 ref message,
                 code,
+                state: _,
+            }) if code == 1213 => {
+                let mut builder = Error::builder(ErrorKind::TransactionWriteConflict);
+                builder.set_original_code(format!("{}", code));
+                builder.set_original_message(message);
+                builder.build()
+            }
+            my::Error::Server(ServerError {
+                ref message,
+                code,
                 ref state,
             }) => {
                 let kind = ErrorKind::QueryError(
