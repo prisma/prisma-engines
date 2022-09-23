@@ -11,6 +11,16 @@ use std::env;
 pub static BATCH_SIZE_OVERRIDE: Lazy<Option<usize>> =
     Lazy::new(|| env::var("QUERY_BATCH_SIZE").ok().and_then(|size| size.parse().ok()));
 
+#[cfg(not(test))]
+fn get_batch_size(default: usize) -> Option<usize> {
+    (*BATCH_SIZE_OVERRIDE).or(Some(default))
+}
+
+#[cfg(test)]
+fn get_batch_size(_: usize) -> Option<usize> {
+    env::var("QUERY_BATCH_SIZE").ok().and_then(|size| size.parse().ok())
+}
+
 pub enum SqlFamily {
     SQLite,
     Postgres,
@@ -45,7 +55,7 @@ impl SqlInfo {
         Self {
             family: SqlFamily::SQLite,
             max_rows: Some(999),
-            max_bind_values: (*BATCH_SIZE_OVERRIDE).or(Some(999)),
+            max_bind_values: get_batch_size(999),
             capabilities: ConnectorCapabilities::new(psl::builtin_connectors::SQLITE.capabilities().to_owned()),
         }
     }
@@ -55,7 +65,7 @@ impl SqlInfo {
             family: SqlFamily::MySQL,
             max_rows: None,
             // See https://stackoverflow.com/a/11131824/788562
-            max_bind_values: (*BATCH_SIZE_OVERRIDE).or(Some(65535)),
+            max_bind_values: get_batch_size(65535),
             capabilities: ConnectorCapabilities::new(psl::builtin_connectors::MYSQL.capabilities().to_owned()),
         }
     }
@@ -64,7 +74,7 @@ impl SqlInfo {
         Self {
             family: SqlFamily::Postgres,
             max_rows: None,
-            max_bind_values: (*BATCH_SIZE_OVERRIDE).or(Some(32767)),
+            max_bind_values: get_batch_size(32767),
             capabilities: ConnectorCapabilities::new(psl::builtin_connectors::POSTGRES.capabilities().to_owned()),
         }
     }
@@ -73,7 +83,7 @@ impl SqlInfo {
         Self {
             family: SqlFamily::MSSQL,
             max_rows: Some(1000),
-            max_bind_values: (*BATCH_SIZE_OVERRIDE).or(Some(2099)),
+            max_bind_values: get_batch_size(2099),
             capabilities: ConnectorCapabilities::new(psl::builtin_connectors::MSSQL.capabilities().to_owned()),
         }
     }

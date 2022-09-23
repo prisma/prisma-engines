@@ -57,6 +57,11 @@ impl ConnectorError {
                     message: format!("{}", message),
                 },
             )),
+            ErrorKind::QueryInvalidInput(message) => Some(KnownError::new(
+                user_facing_errors::query_engine::DatabaseAssertionViolation {
+                    database_error: message.to_owned(),
+                },
+            )),
             ErrorKind::UnsupportedFeature(feature) => {
                 Some(KnownError::new(user_facing_errors::query_engine::UnsupportedFeature {
                     feature: feature.clone(),
@@ -172,6 +177,9 @@ pub enum ErrorKind {
 
     #[error("Conversion error: {}", _0)]
     ConversionError(anyhow::Error),
+
+    #[error("Invalid input provided to query: {}", _0)]
+    QueryInvalidInput(String),
 
     #[error("Conversion error: {}", _0)]
     InternalConversionError(String),

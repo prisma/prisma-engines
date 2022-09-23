@@ -1,3 +1,4 @@
+mod assertion_violation_error;
 mod create_many;
 mod cursor;
 mod disconnect;

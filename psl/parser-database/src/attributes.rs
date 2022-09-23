@@ -390,7 +390,7 @@ fn visit_relation_field_attributes<'db>(
             _ => {
                 format!(
                     " Did you mean to provide `@@unique([{fields}])`?",
-                    fields = suggested_fields.join(", ")
+                    fields = suggested_fields.join(", "),
                 )
             }
         };
