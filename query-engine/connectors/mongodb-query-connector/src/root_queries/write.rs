@@ -215,7 +215,9 @@ pub async fn update_records<'conn>(
         }
     }
 
-    update_docs.push(set.into_bson()?.into_document()?);
+    if !set.pairs.is_empty() {
+        update_docs.push(set.into_bson()?.into_document()?);
+    }
 
     // println!("{:?}", update_docs);
 
