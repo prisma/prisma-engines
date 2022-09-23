@@ -403,6 +403,21 @@
 <span id="403">403</span>
 <span id="404">404</span>
 <span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">validations</span>;
 
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
@@ -412,7 +427,7 @@
     <span class="ident">datamodel_connector</span>::{
         <span class="ident">helper</span>::{<span class="ident">arg_vec_from_opt</span>, <span class="ident">args_vec_from_opt</span>, <span class="ident">parse_one_opt_u32</span>, <span class="ident">parse_two_opt_u32</span>},
         <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ConstraintScope</span>, <span class="ident">NativeTypeConstructor</span>, <span class="ident">NativeTypeInstance</span>,
-        <span class="ident">ReferentialIntegrity</span>,
+        <span class="ident">ReferentialIntegrity</span>, <span class="ident">StringFilter</span>,
     },
     <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>},
     <span class="ident">parser_database</span>::{
@@ -423,6 +438,7 @@
         <span class="ident">IndexAlgorithm</span>, <span class="ident">ParserDatabase</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ScalarType</span>,
     },
 };
+<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
 <span class="kw">const</span> <span class="ident">BIT_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Bit&quot;</span>;
 <span class="kw">const</span> <span class="ident">BOOL_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Bool&quot;</span>;
@@ -742,6 +758,20 @@
             <span class="ident">NativeTypeInstance::new</span>(<span class="ident">constructor</span>.<span class="ident">name</span>, <span class="ident">args</span>, <span class="ident">native_type</span>.<span class="ident">to_json</span>())
         } <span class="kw">else</span> {
             <span class="macro">unreachable!</span>()
+        }
+    }
+
+    <span class="kw">fn</span> <span class="ident">scalar_filter_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">scalar_type_name</span>: <span class="ident">String</span>, <span class="ident">native_type_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="ident">native_type_name</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;uuid&quot;</span>) =&gt; <span class="string">&quot;Uuid&quot;</span>.<span class="ident">into</span>(),
+            <span class="kw">_</span> =&gt; <span class="ident">scalar_type_name</span>.<span class="ident">into</span>(),
+        }
+    }
+
+    <span class="kw">fn</span> <span class="ident">string_filters</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input_object_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">StringFilter</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="ident">input_object_name</span> {
+            <span class="string">&quot;Uuid&quot;</span> =&gt; <span class="ident">BitFlags::empty</span>(),
+            <span class="kw">_</span> =&gt; <span class="ident">BitFlags::all</span>(),
         }
     }
 
