@@ -1,6 +1,6 @@
 use super::constraint_namespace::ConstraintNamespace;
 use crate::ast::{FieldId, ModelId};
-use datamodel_connector::Connector;
+use crate::datamodel_connector::Connector;
 use parser_database::{walkers::RelationName, ParserDatabase};
 use std::collections::{HashMap, HashSet};
 
@@ -92,7 +92,7 @@ impl<'db> Names<'db> {
 /// Generate namespaces per database requirements, and add the names to it from the constraints
 /// part of the namespace.
 fn infer_namespaces<'db>(db: &'db ParserDatabase, connector: &dyn Connector) -> ConstraintNamespace<'db> {
-    use datamodel_connector::ConstraintScope;
+    use crate::datamodel_connector::ConstraintScope;
 
     let mut namespaces = ConstraintNamespace::default();
 

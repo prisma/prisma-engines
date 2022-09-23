@@ -174,5 +174,5 @@ fn escaped_windows_paths_should_work() {
 
 fn render_schema_json(schema: &str) -> String {
     let config = parse_configuration(schema);
-    psl::mcf::render_sources_to_json(&config.datasources)
+    psl::get_config::render_sources_to_json(&config.datasources)
 }

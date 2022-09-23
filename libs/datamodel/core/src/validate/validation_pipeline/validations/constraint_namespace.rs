@@ -1,4 +1,4 @@
-use datamodel_connector::{walker_ext_traits::*, Connector, ConstraintScope};
+use crate::datamodel_connector::{walker_ext_traits::*, Connector, ConstraintScope};
 use parser_database::{ast, ParserDatabase};
 use std::{borrow::Cow, collections::HashMap, ops::Deref};
 

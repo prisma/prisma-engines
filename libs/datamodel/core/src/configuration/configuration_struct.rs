@@ -1,9 +1,9 @@
 use super::{Datasource, Generator};
 use crate::{
     common::preview_features::PreviewFeature,
+    datamodel_connector::ReferentialIntegrity,
     diagnostics::{DatamodelError, Diagnostics},
 };
-use datamodel_connector::ReferentialIntegrity;
 use enumflags2::BitFlags;
 
 #[derive(Debug)]

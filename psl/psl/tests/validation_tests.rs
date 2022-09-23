@@ -37,7 +37,7 @@ fn run_validation_test(test_file_path: &str) {
         .unwrap_or_default();
 
     let source_file = psl::parser_database::SourceFile::new_allocated(Arc::from(text.into_boxed_str()));
-    let validation_result = psl::parse_schema_parserdb(source_file.clone());
+    let validation_result = psl::parse_schema(source_file.clone());
 
     let errors = match (last_comment_contents.is_empty(), validation_result) {
         (true, Ok(_)) => return, // expected and got a valid schema

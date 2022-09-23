@@ -4,12 +4,12 @@ pub(super) use sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour;
 
 use crate::{flavour::SqlFlavour, SqlDatabaseSchema};
 use psl::{
-    datamodel_connector::{walker_ext_traits::*, ReferentialAction, ScalarType},
+    datamodel_connector::walker_ext_traits::*,
     dml::{prisma_value, PrismaValue},
     parser_database::{
         ast,
         walkers::{ModelWalker, ScalarFieldWalker},
-        ScalarFieldType, SortOrder,
+        ReferentialAction, ScalarFieldType, ScalarType, SortOrder,
     },
     ValidatedSchema,
 };

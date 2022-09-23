@@ -140,5 +140,5 @@ impl ToString for MySqlVersion {
 }
 
 fn mysql_capabilities() -> Vec<ConnectorCapability> {
-    sql_datamodel_connector::MYSQL.capabilities().to_owned()
+    psl::builtin_connectors::MYSQL.capabilities().to_owned()
 }

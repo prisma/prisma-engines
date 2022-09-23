@@ -31,7 +31,7 @@ use std::{env, path::Path};
 use user_facing_errors::common::InvalidConnectionString;
 
 fn parse_schema(schema: SourceFile) -> CoreResult<ValidatedSchema> {
-    psl::parse_schema_parserdb(schema).map_err(CoreError::new_schema_parser_error)
+    psl::parse_schema(schema).map_err(CoreError::new_schema_parser_error)
 }
 
 fn connector_for_connection_string(

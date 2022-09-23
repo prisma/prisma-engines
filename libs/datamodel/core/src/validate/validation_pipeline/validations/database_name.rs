@@ -8,7 +8,7 @@ pub(super) fn validate_db_name(
     // How many @ in the error message?
     double_at: bool,
 ) {
-    if let Some(err) = datamodel_connector::constraint_names::ConstraintNames::is_db_name_too_long(
+    if let Some(err) = crate::datamodel_connector::constraint_names::ConstraintNames::is_db_name_too_long(
         attribute.span,
         model_name,
         db_name,

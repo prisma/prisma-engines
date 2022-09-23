@@ -2,10 +2,10 @@ use crate::{
     ast::{self, SourceConfig, Span},
     common::preview_features::PreviewFeature,
     configuration::StringFromEnvVar,
+    datamodel_connector::ReferentialIntegrity,
     diagnostics::{DatamodelError, Diagnostics},
     Datasource,
 };
-use datamodel_connector::ReferentialIntegrity;
 use enumflags2::BitFlags;
 use parser_database::{ast::WithDocumentation, coerce, coerce_array, coerce_opt};
 use std::{borrow::Cow, collections::HashMap};
@@ -27,7 +27,7 @@ impl DatasourceLoader {
         ast_schema: &ast::SchemaAst,
         preview_features: BitFlags<PreviewFeature>,
         diagnostics: &mut Diagnostics,
-        connectors: crate::builtin_connectors::ConnectorRegistry,
+        connectors: crate::ConnectorRegistry,
     ) -> Vec<Datasource> {
         let mut sources = Vec::new();
 
@@ -55,7 +55,7 @@ impl DatasourceLoader {
         ast_source: &ast::SourceConfig,
         preview_features: BitFlags<PreviewFeature>,
         diagnostics: &mut Diagnostics,
-        connectors: crate::builtin_connectors::ConnectorRegistry,
+        connectors: crate::ConnectorRegistry,
     ) -> Option<Datasource> {
         let source_name = &ast_source.name.name;
         let mut args: HashMap<_, _> = ast_source
@@ -134,7 +134,7 @@ impl DatasourceLoader {
         let documentation = ast_source.documentation().map(String::from);
         let referential_integrity = get_referential_integrity(&args, preview_features, ast_source, diagnostics);
 
-        let active_connector: &'static dyn datamodel_connector::Connector =
+        let active_connector: &'static dyn crate::datamodel_connector::Connector =
             match connectors.iter().find(|c| c.is_provider(provider)) {
                 Some(c) => *c,
                 None => {

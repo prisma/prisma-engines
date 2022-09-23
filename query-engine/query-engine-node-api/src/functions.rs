@@ -88,7 +88,7 @@ pub fn get_config(js_env: Env, options: JsUnknown) -> napi::Result<JsUnknown> {
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
     }
 
-    let serialized = psl::mcf::config_to_mcf_json_value(&config);
+    let serialized = psl::get_config::config_to_mcf_json_value(&config);
 
     js_env.to_js_value(&serialized)
 }

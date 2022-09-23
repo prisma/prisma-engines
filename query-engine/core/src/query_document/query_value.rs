@@ -1,7 +1,6 @@
 use bigdecimal::BigDecimal;
 use indexmap::IndexMap;
 use prisma_value::{stringify_date, PrismaValue};
-use std::hash::Hash;
 
 #[derive(Debug, Clone, Eq)]
 pub enum QueryValue {
@@ -28,28 +27,12 @@ impl PartialEq for QueryValue {
             (QueryValue::List(list1), QueryValue::List(list2)) => list1 == list2,
             (QueryValue::Object(t1), QueryValue::Object(t2)) => t1 == t2,
             (QueryValue::DateTime(t1), QueryValue::DateTime(t2)) => t1 == t2,
-            (QueryValue::String(t1), QueryValue::DateTime(t2)) => t1 == stringify_date(t2).as_str(),
-            (QueryValue::DateTime(t1), QueryValue::String(t2)) => stringify_date(t1).as_str() == t2,
-            _ => false,
-        }
-    }
-}
-
-impl Hash for QueryValue {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        match self {
-            Self::Int(i) => i.hash(state),
-            Self::Float(f) => f.hash(state),
-            Self::String(s) => s.hash(state),
-            Self::Boolean(b) => b.hash(state),
-            Self::DateTime(dt) => stringify_date(dt).hash(state),
-            Self::Null => (),
-            Self::Enum(s) => s.hash(state),
-            Self::List(l) => l.hash(state),
-            Self::Object(map) => {
-                let converted: std::collections::BTreeMap<&String, &QueryValue> = map.into_iter().collect();
-                converted.hash(state);
+            (QueryValue::String(t1), QueryValue::DateTime(t2)) | (QueryValue::DateTime(t2), QueryValue::String(t1)) => {
+                chrono::DateTime::parse_from_rfc3339(t1)
+                    .map(|t1| &t1 == t2)
+                    .unwrap_or_else(|_| t1 == stringify_date(t2).as_str())
             }
+            _ => false,
         }
     }
 }

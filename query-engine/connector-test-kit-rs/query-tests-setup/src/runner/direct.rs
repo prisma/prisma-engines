@@ -18,7 +18,7 @@ pub struct DirectRunner {
 #[async_trait::async_trait]
 impl RunnerInterface for DirectRunner {
     async fn load(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<Self> {
-        let schema = psl::parse_schema_parserdb(datamodel).unwrap();
+        let schema = psl::parse_schema(datamodel).unwrap();
         let data_source = schema.configuration.datasources.first().unwrap();
         let preview_features: Vec<_> = schema.configuration.preview_features().iter().collect();
         let url = data_source.load_url(|key| env::var(key).ok()).unwrap();

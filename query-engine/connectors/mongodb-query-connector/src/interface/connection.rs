@@ -76,9 +76,9 @@ impl WriteOperations for MongoDbConnection {
         record_filter: connector_interface::RecordFilter,
         args: WriteArgs,
         _trace_id: Option<String>,
-    ) -> connector_interface::Result<Vec<SelectionResult>> {
+    ) -> connector_interface::Result<usize> {
         catch(async move {
-            write::update_records(
+            let result = write::update_records(
                 &self.database,
                 &mut self.session,
                 model,
@@ -86,7 +86,9 @@ impl WriteOperations for MongoDbConnection {
                 args,
                 UpdateType::Many,
             )
-            .await
+            .await?;
+
+            Ok(result.len())
         })
         .await
     }

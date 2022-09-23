@@ -1,4 +1,4 @@
-use datamodel::diagnostics::{DatamodelError, DatamodelWarning};
+use psl::diagnostics::{DatamodelError, DatamodelWarning};
 
 #[derive(serde::Serialize)]
 pub struct MiniError {
@@ -9,7 +9,7 @@ pub struct MiniError {
 }
 
 pub(crate) fn run(schema: &str) -> String {
-    let schema = datamodel::validate(schema.into());
+    let schema = psl::validate(schema.into());
     let diagnostics = &schema.diagnostics;
 
     let mut mini_errors: Vec<MiniError> = diagnostics

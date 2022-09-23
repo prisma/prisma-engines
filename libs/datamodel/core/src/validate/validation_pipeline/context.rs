@@ -1,5 +1,7 @@
-use crate::{Datasource, PreviewFeature};
-use datamodel_connector::{Connector, ReferentialIntegrity};
+use crate::{
+    datamodel_connector::{Connector, ReferentialIntegrity},
+    Datasource, PreviewFeature,
+};
 use diagnostics::{DatamodelError, Diagnostics};
 use enumflags2::BitFlags;
 

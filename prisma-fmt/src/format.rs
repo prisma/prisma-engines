@@ -1,5 +1,5 @@
 use crate::FormatOpts;
-use datamodel::reformat;
+use psl::reformat;
 use std::{
     fs::{self, File},
     io::{self, BufWriter, Read, Write as _},

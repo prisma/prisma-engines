@@ -1,8 +1,8 @@
 use crate::{
     configuration::StringFromEnvVar,
+    datamodel_connector::{Connector, ConnectorCapabilities, ReferentialIntegrity},
     diagnostics::{DatamodelError, Diagnostics, Span},
 };
-use datamodel_connector::{Connector, ConnectorCapabilities, ReferentialIntegrity};
 use std::{borrow::Cow, path::Path};
 
 /// a `datasource` from the prisma schema.
