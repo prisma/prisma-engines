@@ -602,12 +602,12 @@
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">flavour::SqlFlavour</span>, <span class="ident">SqlDatabaseSchema</span>};
 <span class="kw">use</span> <span class="ident">psl</span>::{
-    <span class="ident">datamodel_connector</span>::{<span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ScalarType</span>},
+    <span class="ident">datamodel_connector::walker_ext_traits</span>::<span class="kw-2">*</span>,
     <span class="ident">dml</span>::{<span class="ident">prisma_value</span>, <span class="ident">PrismaValue</span>},
     <span class="ident">parser_database</span>::{
         <span class="ident">ast</span>,
         <span class="ident">walkers</span>::{<span class="ident">ModelWalker</span>, <span class="ident">ScalarFieldWalker</span>},
-        <span class="ident">ScalarFieldType</span>, <span class="ident">SortOrder</span>,
+        <span class="ident">ReferentialAction</span>, <span class="ident">ScalarFieldType</span>, <span class="ident">ScalarType</span>, <span class="ident">SortOrder</span>,
     },
     <span class="ident">ValidatedSchema</span>,
 };

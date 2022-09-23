@@ -29,7 +29,7 @@
     <span class="comment">// How many @ in the error message?</span>
     <span class="ident">double_at</span>: <span class="ident">bool</span>,
 ) {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">datamodel_connector::constraint_names::ConstraintNames::is_db_name_too_long</span>(
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::datamodel_connector::constraint_names::ConstraintNames::is_db_name_too_long</span>(
         <span class="ident">attribute</span>.<span class="ident">span</span>,
         <span class="ident">model_name</span>,
         <span class="ident">db_name</span>,

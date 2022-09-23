@@ -688,7 +688,7 @@
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">introspect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="ident">IntrospectParams</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">IntrospectResult</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">source_file</span> <span class="op">=</span> <span class="ident">SourceFile::new_allocated</span>(<span class="ident">Arc::from</span>(<span class="ident">params</span>.<span class="ident">schema</span>.<span class="ident">clone</span>().<span class="ident">into_boxed_str</span>()));
-        <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">psl::parse_schema_parserdb</span>(<span class="ident">source_file</span>).<span class="ident">map_err</span>(<span class="ident">ConnectorError::new_schema_parser_error</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">psl::parse_schema</span>(<span class="ident">source_file</span>).<span class="ident">map_err</span>(<span class="ident">ConnectorError::new_schema_parser_error</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">with_connector_for_schema</span>(
             <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">schema</span>,
             <span class="prelude-val">None</span>,

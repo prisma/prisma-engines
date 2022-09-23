@@ -68,9 +68,9 @@
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Datasource</span>, <span class="ident">Generator</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">common::preview_features::PreviewFeature</span>,
+    <span class="ident">datamodel_connector::ReferentialIntegrity</span>,
     <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>},
 };
-<span class="kw">use</span> <span class="ident">datamodel_connector::ReferentialIntegrity</span>;
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>

@@ -138,7 +138,7 @@
             <span class="ident">family</span>: <span class="ident">SqlFamily::SQLite</span>,
             <span class="ident">max_rows</span>: <span class="prelude-val">Some</span>(<span class="number">999</span>),
             <span class="ident">max_bind_values</span>: (<span class="kw-2">*</span><span class="ident">BATCH_SIZE_OVERRIDE</span>).<span class="ident">or</span>(<span class="prelude-val">Some</span>(<span class="number">999</span>)),
-            <span class="ident">capabilities</span>: <span class="ident">ConnectorCapabilities::new</span>(<span class="ident">sql_datamodel_connector::SQLITE</span>.<span class="ident">capabilities</span>().<span class="ident">to_owned</span>()),
+            <span class="ident">capabilities</span>: <span class="ident">ConnectorCapabilities::new</span>(<span class="ident">psl::builtin_connectors::SQLITE</span>.<span class="ident">capabilities</span>().<span class="ident">to_owned</span>()),
         }
     }
 
@@ -148,7 +148,7 @@
             <span class="ident">max_rows</span>: <span class="prelude-val">None</span>,
             <span class="comment">// See https://stackoverflow.com/a/11131824/788562</span>
             <span class="ident">max_bind_values</span>: (<span class="kw-2">*</span><span class="ident">BATCH_SIZE_OVERRIDE</span>).<span class="ident">or</span>(<span class="prelude-val">Some</span>(<span class="number">65535</span>)),
-            <span class="ident">capabilities</span>: <span class="ident">ConnectorCapabilities::new</span>(<span class="ident">sql_datamodel_connector::MYSQL</span>.<span class="ident">capabilities</span>().<span class="ident">to_owned</span>()),
+            <span class="ident">capabilities</span>: <span class="ident">ConnectorCapabilities::new</span>(<span class="ident">psl::builtin_connectors::MYSQL</span>.<span class="ident">capabilities</span>().<span class="ident">to_owned</span>()),
         }
     }
 
@@ -157,7 +157,7 @@
             <span class="ident">family</span>: <span class="ident">SqlFamily::Postgres</span>,
             <span class="ident">max_rows</span>: <span class="prelude-val">None</span>,
             <span class="ident">max_bind_values</span>: (<span class="kw-2">*</span><span class="ident">BATCH_SIZE_OVERRIDE</span>).<span class="ident">or</span>(<span class="prelude-val">Some</span>(<span class="number">32767</span>)),
-            <span class="ident">capabilities</span>: <span class="ident">ConnectorCapabilities::new</span>(<span class="ident">sql_datamodel_connector::POSTGRES</span>.<span class="ident">capabilities</span>().<span class="ident">to_owned</span>()),
+            <span class="ident">capabilities</span>: <span class="ident">ConnectorCapabilities::new</span>(<span class="ident">psl::builtin_connectors::POSTGRES</span>.<span class="ident">capabilities</span>().<span class="ident">to_owned</span>()),
         }
     }
 
@@ -166,7 +166,7 @@
             <span class="ident">family</span>: <span class="ident">SqlFamily::MSSQL</span>,
             <span class="ident">max_rows</span>: <span class="prelude-val">Some</span>(<span class="number">1000</span>),
             <span class="ident">max_bind_values</span>: (<span class="kw-2">*</span><span class="ident">BATCH_SIZE_OVERRIDE</span>).<span class="ident">or</span>(<span class="prelude-val">Some</span>(<span class="number">2099</span>)),
-            <span class="ident">capabilities</span>: <span class="ident">ConnectorCapabilities::new</span>(<span class="ident">sql_datamodel_connector::MSSQL</span>.<span class="ident">capabilities</span>().<span class="ident">to_owned</span>()),
+            <span class="ident">capabilities</span>: <span class="ident">ConnectorCapabilities::new</span>(<span class="ident">psl::builtin_connectors::MSSQL</span>.<span class="ident">capabilities</span>().<span class="ident">to_owned</span>()),
         }
     }
 }

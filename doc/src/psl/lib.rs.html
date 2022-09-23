@@ -3,10 +3,94 @@
 <span id="3">3</span>
 <span id="4">4</span>
 <span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../README.md&quot;</span>)]</span>
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>, <span class="ident">missing_docs</span>)]</span>
 
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">builtin_psl_connectors</span> <span class="kw">as</span> <span class="ident">builtin_connectors</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">dml</span>::{<span class="self">self</span>, <span class="ident">lift</span>, <span class="ident">render_datamodel_and_config_to_string</span>, <span class="ident">render_datamodel_to_string</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">psl_core</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">psl_core</span>::{
+    <span class="ident">common</span>,
+    <span class="ident">datamodel_connector</span>,
+    <span class="ident">diagnostics</span>::{<span class="self">self</span>, <span class="ident">Diagnostics</span>},
+    <span class="ident">is_reserved_type_name</span>,
+    <span class="ident">mcf::config_to_mcf_json_value</span> <span class="kw">as</span> <span class="ident">get_config</span>,
+    <span class="ident">mcf</span>::{<span class="ident">generators_to_json</span>, <span class="ident">render_sources_to_json</span>}, <span class="comment">// for tests</span>
+    <span class="ident">parser_database</span>::{<span class="self">self</span>, <span class="ident">SourceFile</span>},
+    <span class="ident">reformat</span>,
+    <span class="ident">Configuration</span>,
+    <span class="ident">Datasource</span>,
+    <span class="ident">Generator</span>,
+    <span class="ident">StringFromEnvVar</span>,
+    <span class="ident">ValidatedSchema</span>,
+};
+
+<span class="doccomment">/// The implementation of the CLI getConfig() utility and its JSON format.</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">get_config</span> {
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">psl_core::mcf</span>::{<span class="ident">config_to_mcf_json_value</span> <span class="kw">as</span> <span class="ident">get_config</span>, <span class="kw-2">*</span>};
+}
+
+<span class="doccomment">/// Parses and validate a schema, but skip analyzing everything except datasource and generator</span>
+<span class="doccomment">/// blocks.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_configuration</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Configuration</span>, <span class="ident">Diagnostics</span><span class="op">&gt;</span> {
+    <span class="ident">psl_core::parse_configuration</span>(<span class="ident">schema</span>, <span class="ident">builtin_connectors::BUILTIN_CONNECTORS</span>)
+}
+
+<span class="doccomment">/// Parse and analyze a Prisma schema.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_schema</span>(<span class="ident">file</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">SourceFile</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ValidatedSchema</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">validate</span>(<span class="ident">file</span>.<span class="ident">into</span>());
+    <span class="ident">schema</span>
+        .<span class="ident">diagnostics</span>
+        .<span class="ident">to_result</span>()
+        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">to_pretty_string</span>(<span class="string">&quot;schema.prisma&quot;</span>, <span class="ident">schema</span>.<span class="ident">db</span>.<span class="ident">source</span>()))<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>(<span class="ident">schema</span>)
+}
+
+<span class="doccomment">/// The most general API for dealing with Prisma schemas. It accumulates what analysis and</span>
+<span class="doccomment">/// validation information it can, and returns it along with any error and warning diagnostics.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">validate</span>(<span class="ident">file</span>: <span class="ident">SourceFile</span>) -&gt; <span class="ident">ValidatedSchema</span> {
+    <span class="ident">psl_core::validate</span>(<span class="ident">file</span>, <span class="ident">builtin_connectors::BUILTIN_CONNECTORS</span>)
+}
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="psl" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>

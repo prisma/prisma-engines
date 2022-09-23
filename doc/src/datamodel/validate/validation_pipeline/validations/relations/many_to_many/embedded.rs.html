@@ -202,8 +202,8 @@
 <span id="202">202</span>
 <span id="203">203</span>
 <span id="204">204</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">diagnostics::DatamodelError</span>, <span class="ident">validate::validation_pipeline::context::Context</span>};
-<span class="kw">use</span> <span class="ident">datamodel_connector::ConnectorCapability</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::datamodel_connector::ConnectorCapability</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">diagnostics::DatamodelError</span>, <span class="ident">validate::validation_pipeline::context::Context</span>};
 <span class="kw">use</span> <span class="ident">parser_database</span>::{<span class="ident">ast::WithSpan</span>, <span class="ident">walkers::TwoWayEmbeddedManyToManyRelationWalker</span>};
 
 <span class="doccomment">/// Only MongoDb should support embedded M:N relations.</span>

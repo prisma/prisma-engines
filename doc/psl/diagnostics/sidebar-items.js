@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":[["DatamodelError",""],["DatamodelWarning","A non-fatal warning emitted by the schema parser. For fancy printing, please use the `pretty_print_error` function."],["Diagnostics","Represents a list of validation or parser errors and warnings."],["NativeTypeErrorFactory",""],["Span","Represents a location in a datamodel’s text representation."]]};

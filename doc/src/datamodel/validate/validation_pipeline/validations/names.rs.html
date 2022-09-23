@@ -134,7 +134,7 @@
 <span id="134">134</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::constraint_namespace::ConstraintNamespace</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>::{<span class="ident">FieldId</span>, <span class="ident">ModelId</span>};
-<span class="kw">use</span> <span class="ident">datamodel_connector::Connector</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::datamodel_connector::Connector</span>;
 <span class="kw">use</span> <span class="ident">parser_database</span>::{<span class="ident">walkers::RelationName</span>, <span class="ident">ParserDatabase</span>};
 <span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">HashMap</span>, <span class="ident">HashSet</span>};
 
@@ -226,7 +226,7 @@
 <span class="doccomment">/// Generate namespaces per database requirements, and add the names to it from the constraints</span>
 <span class="doccomment">/// part of the namespace.</span>
 <span class="kw">fn</span> <span class="ident">infer_namespaces</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>(<span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="ident">ConstraintNamespace</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">use</span> <span class="ident">datamodel_connector::ConstraintScope</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::datamodel_connector::ConstraintScope</span>;
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">namespaces</span> <span class="op">=</span> <span class="ident">ConstraintNamespace::default</span>();
 

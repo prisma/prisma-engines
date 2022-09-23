@@ -52,7 +52,7 @@
         .<span class="ident">unwrap</span>();
 
     <span class="kw">let</span> <span class="ident">parsed_schema</span> <span class="op">=</span>
-        <span class="ident">psl::parse_schema_parserdb</span>(<span class="ident">SourceFile::new_allocated</span>(<span class="ident">Arc::from</span>(<span class="ident">schema</span>.<span class="ident">to_owned</span>().<span class="ident">into_boxed_str</span>()))).<span class="ident">unwrap</span>();
+        <span class="ident">psl::parse_schema</span>(<span class="ident">SourceFile::new_allocated</span>(<span class="ident">Arc::from</span>(<span class="ident">schema</span>.<span class="ident">to_owned</span>().<span class="ident">into_boxed_str</span>()))).<span class="ident">unwrap</span>();
 
     <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="ident">parsed_schema</span>.<span class="ident">db</span>.<span class="ident">walk_models</span>() {
         <span class="ident">client</span>

@@ -296,12 +296,16 @@
 <span id="296">296</span>
 <span id="297">297</span>
 <span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::database_name::validate_db_name</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">common::preview_features::PreviewFeature</span>, <span class="ident">diagnostics::DatamodelError</span>, <span class="ident">parser_database::ast::WithSpan</span>,
+    <span class="ident">common::preview_features::PreviewFeature</span>,
+    <span class="ident">datamodel_connector</span>::{<span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>, <span class="ident">ConnectorCapability</span>},
+    <span class="ident">diagnostics::DatamodelError</span>,
+    <span class="ident">parser_database::ast::WithSpan</span>,
     <span class="ident">validate::validation_pipeline::context::Context</span>,
 };
-<span class="kw">use</span> <span class="ident">datamodel_connector</span>::{<span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>, <span class="ident">ConnectorCapability</span>};
 <span class="kw">use</span> <span class="ident">parser_database::walkers</span>::{<span class="ident">ModelWalker</span>, <span class="ident">PrimaryKeyWalker</span>};
 <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 

@@ -221,11 +221,11 @@
 <span id="221">221</span>
 <span id="222">222</span>
 <span id="223">223</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel::parser_database</span>::{
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">lsp_types</span>::{<span class="ident">CodeAction</span>, <span class="ident">CodeActionKind</span>, <span class="ident">CodeActionOrCommand</span>, <span class="ident">CodeActionParams</span>, <span class="ident">Range</span>, <span class="ident">TextEdit</span>, <span class="ident">WorkspaceEdit</span>};
+<span class="kw">use</span> <span class="ident">psl::parser_database</span>::{
     <span class="ident">ast::WithSpan</span>,
     <span class="ident">walkers</span>::{<span class="ident">CompleteInlineRelationWalker</span>, <span class="ident">ModelWalker</span>, <span class="ident">ScalarFieldWalker</span>},
 };
-<span class="kw">use</span> <span class="ident">lsp_types</span>::{<span class="ident">CodeAction</span>, <span class="ident">CodeActionKind</span>, <span class="ident">CodeActionOrCommand</span>, <span class="ident">CodeActionParams</span>, <span class="ident">Range</span>, <span class="ident">TextEdit</span>, <span class="ident">WorkspaceEdit</span>};
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="doccomment">/// If the referencing side of the one-to-one relation does not point</span>

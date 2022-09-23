@@ -153,11 +153,9 @@
 <span id="153">153</span>
 <span id="154">154</span>
 <span id="155">155</span>
-<span id="156">156</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">mongodb_datamodel_connector::MONGODB</span>;
-
-<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">MongoDbSchemaRenderer</span>, <span class="ident">TestError</span>, <span class="ident">TestResult</span>};
+<span class="kw">use</span> <span class="ident">psl::builtin_connectors::MONGODB</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MongoDbConnectorTag</span> {

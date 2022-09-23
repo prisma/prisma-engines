@@ -234,7 +234,7 @@
 <span class="kw">use</span> <span class="ident">user_facing_errors::common::InvalidConnectionString</span>;
 
 <span class="kw">fn</span> <span class="ident">parse_schema</span>(<span class="ident">schema</span>: <span class="ident">SourceFile</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">ValidatedSchema</span><span class="op">&gt;</span> {
-    <span class="ident">psl::parse_schema_parserdb</span>(<span class="ident">schema</span>).<span class="ident">map_err</span>(<span class="ident">CoreError::new_schema_parser_error</span>)
+    <span class="ident">psl::parse_schema</span>(<span class="ident">schema</span>).<span class="ident">map_err</span>(<span class="ident">CoreError::new_schema_parser_error</span>)
 }
 
 <span class="kw">fn</span> <span class="ident">connector_for_connection_string</span>(

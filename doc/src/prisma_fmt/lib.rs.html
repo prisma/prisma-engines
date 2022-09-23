@@ -217,9 +217,9 @@
 <span class="kw">mod</span> <span class="ident">preview</span>;
 <span class="kw">mod</span> <span class="ident">text_document_completion</span>;
 
-<span class="kw">use</span> <span class="ident">datamodel::parser_database::ast</span>;
 <span class="kw">use</span> <span class="ident">log</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">lsp_types</span>::{<span class="ident">Position</span>, <span class="ident">Range</span>};
+<span class="kw">use</span> <span class="ident">psl::parser_database::ast</span>;
 
 <span class="doccomment">/// The API is modelled on an LSP [completion</span>
 <span class="doccomment">/// request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_completion).</span>
@@ -268,7 +268,7 @@
         }
     };
 
-    <span class="ident">datamodel::reformat</span>(<span class="ident">schema</span>, <span class="ident">params</span>.<span class="ident">options</span>.<span class="ident">tab_size</span> <span class="kw">as</span> <span class="ident">usize</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">schema</span>.<span class="ident">to_owned</span>())
+    <span class="ident">psl::reformat</span>(<span class="ident">schema</span>, <span class="ident">params</span>.<span class="ident">options</span>.<span class="ident">tab_size</span> <span class="kw">as</span> <span class="ident">usize</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">schema</span>.<span class="ident">to_owned</span>())
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lint</span>(<span class="ident">schema</span>: <span class="ident">String</span>) -&gt; <span class="ident">String</span> {

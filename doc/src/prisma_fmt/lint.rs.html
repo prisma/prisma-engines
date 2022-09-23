@@ -86,7 +86,7 @@
 <span id="86">86</span>
 <span id="87">87</span>
 <span id="88">88</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel::diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">DatamodelWarning</span>};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">psl::diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">DatamodelWarning</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">serde::Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MiniError</span> {
@@ -97,7 +97,7 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">run</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">datamodel::validate</span>(<span class="ident">schema</span>.<span class="ident">into</span>());
+    <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">psl::validate</span>(<span class="ident">schema</span>.<span class="ident">into</span>());
     <span class="kw">let</span> <span class="ident">diagnostics</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">schema</span>.<span class="ident">diagnostics</span>;
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mini_errors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MiniError</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">diagnostics</span>

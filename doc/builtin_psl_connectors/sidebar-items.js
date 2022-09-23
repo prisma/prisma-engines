@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":[["BUILTIN_CONNECTORS",""],["COCKROACH",""],["MONGODB",""],["MSSQL",""],["MYSQL",""],["POSTGRES",""],["SQLITE",""]],"mod":[["cockroach_datamodel_connector",""]]};

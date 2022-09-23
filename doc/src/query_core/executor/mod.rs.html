@@ -119,7 +119,11 @@
 <span id="119">119</span>
 <span id="120">120</span>
 <span id="121">121</span>
-</pre><pre class="rust"><code><span class="doccomment">//! What the executor module DOES:</span>
+<span id="122">122</span>
+<span id="123">123</span>
+</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::declare_interior_mutable_const</span>)]</span>
+
+<span class="doccomment">//! What the executor module DOES:</span>
 <span class="doccomment">//! - Defining an overarching executor trait, to be used on consumers of the core crate.</span>
 <span class="doccomment">//! - Defining executor implementations that combine the different core modules into a coherent</span>
 <span class="doccomment">//!   string of actions to execute a given query document.</span>

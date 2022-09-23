@@ -383,8 +383,8 @@
     <span class="ident">default_value</span>,
     <span class="ident">names</span>::{<span class="ident">NameTaken</span>, <span class="ident">Names</span>},
 };
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::datamodel_connector</span>::{<span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>, <span class="ident">ConnectorCapability</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">diagnostics::DatamodelError</span>, <span class="ident">validate::validation_pipeline::context::Context</span>};
-<span class="kw">use</span> <span class="ident">datamodel_connector</span>::{<span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>, <span class="ident">ConnectorCapability</span>};
 <span class="kw">use</span> <span class="ident">parser_database</span>::{
     <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">WithSpan</span>},
     <span class="ident">walkers</span>::{<span class="ident">FieldWalker</span>, <span class="ident">PrimaryKeyWalker</span>, <span class="ident">ScalarFieldAttributeWalker</span>, <span class="ident">ScalarFieldWalker</span>, <span class="ident">TypedFieldWalker</span>},

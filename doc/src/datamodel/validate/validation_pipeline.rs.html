@@ -49,11 +49,19 @@
 <span id="49">49</span>
 <span id="50">50</span>
 <span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">context</span>;
 <span class="kw">mod</span> <span class="ident">validations</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">common::preview_features::PreviewFeature</span>, <span class="ident">configuration</span>, <span class="ident">diagnostics::Diagnostics</span>};
-<span class="kw">use</span> <span class="ident">datamodel_connector</span>::{<span class="ident">Connector</span>, <span class="ident">EmptyDatamodelConnector</span>, <span class="ident">ReferentialIntegrity</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">common::preview_features::PreviewFeature</span>,
+    <span class="ident">configuration</span>,
+    <span class="ident">datamodel_connector</span>::{<span class="ident">Connector</span>, <span class="ident">EmptyDatamodelConnector</span>, <span class="ident">ReferentialIntegrity</span>},
+    <span class="ident">diagnostics::Diagnostics</span>,
+};
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">parser_database::ParserDatabase</span>;
 

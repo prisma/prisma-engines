@@ -327,7 +327,7 @@
 
     <span class="doccomment">/// This function parses the provided schema and returns the contained Datamodel.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_datamodel</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">RpcResult</span><span class="op">&lt;</span><span class="ident">Datamodel</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">final_dm</span> <span class="op">=</span> <span class="ident">psl::parse_schema_parserdb</span>(<span class="ident">schema</span>).<span class="ident">map_err</span>(<span class="ident">Error::DatamodelError</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">final_dm</span> <span class="op">=</span> <span class="ident">psl::parse_schema</span>(<span class="ident">schema</span>).<span class="ident">map_err</span>(<span class="ident">Error::DatamodelError</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">psl::lift</span>(<span class="kw-2">&amp;</span><span class="ident">final_dm</span>))
     }

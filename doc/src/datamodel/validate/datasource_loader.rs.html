@@ -277,10 +277,10 @@
     <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">SourceConfig</span>, <span class="ident">Span</span>},
     <span class="ident">common::preview_features::PreviewFeature</span>,
     <span class="ident">configuration::StringFromEnvVar</span>,
+    <span class="ident">datamodel_connector::ReferentialIntegrity</span>,
     <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>},
     <span class="ident">Datasource</span>,
 };
-<span class="kw">use</span> <span class="ident">datamodel_connector::ReferentialIntegrity</span>;
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">parser_database</span>::{<span class="ident">ast::WithDocumentation</span>, <span class="ident">coerce</span>, <span class="ident">coerce_array</span>, <span class="ident">coerce_opt</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">collections::HashMap</span>};
@@ -302,7 +302,7 @@
         <span class="ident">ast_schema</span>: <span class="kw-2">&amp;</span><span class="ident">ast::SchemaAst</span>,
         <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
         <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
-        <span class="ident">connectors</span>: <span class="ident"><span class="kw">crate</span>::builtin_connectors::ConnectorRegistry</span>,
+        <span class="ident">connectors</span>: <span class="ident"><span class="kw">crate</span>::ConnectorRegistry</span>,
     ) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Datasource</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sources</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
@@ -330,7 +330,7 @@
         <span class="ident">ast_source</span>: <span class="kw-2">&amp;</span><span class="ident">ast::SourceConfig</span>,
         <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
         <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
-        <span class="ident">connectors</span>: <span class="ident"><span class="kw">crate</span>::builtin_connectors::ConnectorRegistry</span>,
+        <span class="ident">connectors</span>: <span class="ident"><span class="kw">crate</span>::ConnectorRegistry</span>,
     ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Datasource</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">source_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ast_source</span>.<span class="ident">name</span>.<span class="ident">name</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ast_source</span>
@@ -409,7 +409,7 @@
         <span class="kw">let</span> <span class="ident">documentation</span> <span class="op">=</span> <span class="ident">ast_source</span>.<span class="ident">documentation</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
         <span class="kw">let</span> <span class="ident">referential_integrity</span> <span class="op">=</span> <span class="ident">get_referential_integrity</span>(<span class="kw-2">&amp;</span><span class="ident">args</span>, <span class="ident">preview_features</span>, <span class="ident">ast_source</span>, <span class="ident">diagnostics</span>);
 
-        <span class="kw">let</span> <span class="ident">active_connector</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">datamodel_connector::Connector</span> <span class="op">=</span>
+        <span class="kw">let</span> <span class="ident">active_connector</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident"><span class="kw">crate</span>::datamodel_connector::Connector</span> <span class="op">=</span>
             <span class="kw">match</span> <span class="ident">connectors</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_provider</span>(<span class="ident">provider</span>)) {
                 <span class="prelude-val">Some</span>(<span class="ident">c</span>) =&gt; <span class="kw-2">*</span><span class="ident">c</span>,
                 <span class="prelude-val">None</span> =&gt; {

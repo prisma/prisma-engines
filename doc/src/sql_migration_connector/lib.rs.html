@@ -482,7 +482,7 @@
     ) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">SqlDatabaseSchema</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">target</span> {
             <span class="ident">DiffTarget::Datamodel</span>(<span class="ident">schema</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">psl::parse_schema_parserdb</span>(<span class="ident">schema</span>).<span class="ident">map_err</span>(<span class="ident">ConnectorError::new_schema_parser_error</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">psl::parse_schema</span>(<span class="ident">schema</span>).<span class="ident">map_err</span>(<span class="ident">ConnectorError::new_schema_parser_error</span>)<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class="ident">sql_schema_calculator::calculate_sql_schema</span>(
                     <span class="kw-2">&amp;</span><span class="ident">schema</span>,
                     <span class="self">self</span>.<span class="ident">flavour</span>.<span class="ident">as_ref</span>(),
