@@ -1,6 +1,6 @@
+use crate::datamodel_connector::ConnectorCapability;
 use crate::{diagnostics::DatamodelError, validate::validation_pipeline::context::Context};
 use bigdecimal::BigDecimal;
-use datamodel_connector::ConnectorCapability;
 use parser_database::ScalarType;
 use schema_ast::ast::{self, Expression};
 

@@ -290,6 +290,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "builtin-psl-connectors"
+version = "0.1.0"
+dependencies = [
+ "connection-string",
+ "datamodel",
+ "either",
+ "enumflags2",
+ "lsp-types",
+ "native-types",
+ "once_cell",
+ "regex",
+ "serde_json",
+]
+
+[[package]]
 name = "bumpalo"
 version = "3.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -660,31 +675,17 @@ version = "0.1.0"
 dependencies = [
  "bigdecimal",
  "chrono",
- "datamodel-connector",
  "diagnostics",
- "either",
  "enumflags2",
  "indoc",
  "itertools",
- "mongodb-datamodel-connector",
+ "lsp-types",
  "once_cell",
  "parser-database",
  "prisma-value",
  "regex",
  "schema-ast",
  "serde",
- "serde_json",
- "sql-datamodel-connector",
-]
-
-[[package]]
-name = "datamodel-connector"
-version = "0.1.0"
-dependencies = [
- "diagnostics",
- "enumflags2",
- "lsp-types",
- "parser-database",
  "serde_json",
  "url",
 ]
@@ -2123,17 +2124,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "mongodb-datamodel-connector"
-version = "0.1.0"
-dependencies = [
- "datamodel-connector",
- "enumflags2",
- "native-types",
- "once_cell",
- "serde_json",
-]
-
-[[package]]
 name = "mongodb-introspection-connector"
 version = "0.1.0"
 dependencies = [
@@ -2912,13 +2902,13 @@ dependencies = [
 name = "prisma-fmt"
 version = "0.1.0"
 dependencies = [
- "datamodel",
  "dissimilar",
  "expect-test",
  "indoc",
  "log",
  "lsp-types",
  "once_cell",
+ "psl",
  "serde",
  "serde_json",
  "structopt",
@@ -3059,6 +3049,7 @@ dependencies = [
 name = "psl"
 version = "0.1.0"
 dependencies = [
+ "builtin-psl-connectors",
  "datamodel",
  "dissimilar",
  "dml",
@@ -3304,10 +3295,10 @@ dependencies = [
  "base64 0.13.0",
  "chrono",
  "colored",
- "datamodel-connector",
  "indoc",
  "insta",
  "prisma-value",
+ "psl",
  "query-engine-metrics",
  "query-test-macros",
  "query-tests-setup",
@@ -3344,7 +3335,6 @@ dependencies = [
  "indoc",
  "itertools",
  "lazy_static",
- "mongodb-datamodel-connector",
  "nom",
  "parse-hyperlinks",
  "prisma-models",
@@ -3357,7 +3347,6 @@ dependencies = [
  "request-handlers",
  "serde",
  "serde_json",
- "sql-datamodel-connector",
  "thiserror",
  "tokio",
  "tracing",
@@ -3707,9 +3696,9 @@ dependencies = [
 name = "schema"
 version = "0.1.0"
 dependencies = [
- "datamodel-connector",
  "once_cell",
  "prisma-models",
+ "psl",
 ]
 
 [[package]]
@@ -4016,21 +4005,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6e63cff320ae2c57904679ba7cb63280a3dc4613885beafb148ee7bf9aa9042d"
 
 [[package]]
-name = "sql-datamodel-connector"
-version = "0.1.0"
-dependencies = [
- "connection-string",
- "datamodel-connector",
- "either",
- "enumflags2",
- "lsp-types",
- "native-types",
- "once_cell",
- "regex",
- "serde_json",
-]
-
-[[package]]
 name = "sql-ddl"
 version = "0.1.0"
 dependencies = [
@@ -4110,7 +4084,6 @@ dependencies = [
  "rand 0.7.3",
  "serde",
  "serde_json",
- "sql-datamodel-connector",
  "thiserror",
  "tokio",
  "tracing",

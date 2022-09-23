@@ -112,7 +112,7 @@ impl CliCommand {
             config.resolve_datasource_urls_from_env(&[], |key| env::var(key).ok())?;
         }
 
-        let json = psl::mcf::config_to_mcf_json_value(config);
+        let json = psl::get_config::config_to_mcf_json_value(config);
         let serialized = serde_json::to_string(&json)?;
 
         println!("{}", serialized);

@@ -200,5 +200,5 @@ impl ToString for PostgresVersion {
 }
 
 fn postgres_capabilities() -> Vec<ConnectorCapability> {
-    sql_datamodel_connector::POSTGRES.capabilities().to_owned()
+    psl::builtin_connectors::POSTGRES.capabilities().to_owned()
 }

@@ -5,8 +5,8 @@ pub(super) mod one_to_one;
 mod visited_relation;
 
 use super::constraint_namespace::ConstraintName;
+use crate::datamodel_connector::{walker_ext_traits::*, Connector, ConnectorCapability, ReferentialIntegrity};
 use crate::{diagnostics::DatamodelError, validate::validation_pipeline::context::Context};
-use datamodel_connector::{walker_ext_traits::*, Connector, ConnectorCapability, ReferentialIntegrity};
 use itertools::Itertools;
 use parser_database::{
     ast::WithSpan,

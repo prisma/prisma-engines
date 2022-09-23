@@ -300,7 +300,7 @@ impl GenericApi for EngineState {
 
     async fn introspect(&self, params: IntrospectParams) -> CoreResult<IntrospectResult> {
         let source_file = SourceFile::new_allocated(Arc::from(params.schema.clone().into_boxed_str()));
-        let schema = psl::parse_schema_parserdb(source_file).map_err(ConnectorError::new_schema_parser_error)?;
+        let schema = psl::parse_schema(source_file).map_err(ConnectorError::new_schema_parser_error)?;
         self.with_connector_for_schema(
             &params.schema,
             None,

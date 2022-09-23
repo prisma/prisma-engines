@@ -6,8 +6,6 @@ edition = "2021"
 
 [dependencies]
 serde_json = "1.0"
-mongodb-datamodel-connector = { path = "../../../libs/datamodel/connectors/mongodb-datamodel-connector" }
-sql-datamodel-connector = { path = "../../../libs/datamodel/connectors/sql-datamodel-connector" }
 prisma-models = { path = "../../prisma-models" }
 lazy_static = "1.4"
 enum_dispatch = "0.3"

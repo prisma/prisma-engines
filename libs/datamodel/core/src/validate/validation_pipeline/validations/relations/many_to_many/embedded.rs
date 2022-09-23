@@ -1,5 +1,5 @@
+use crate::datamodel_connector::ConnectorCapability;
 use crate::{diagnostics::DatamodelError, validate::validation_pipeline::context::Context};
-use datamodel_connector::ConnectorCapability;
 use parser_database::{ast::WithSpan, walkers::TwoWayEmbeddedManyToManyRelationWalker};
 
 /// Only MongoDb should support embedded M:N relations.

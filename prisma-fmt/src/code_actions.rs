@@ -1,10 +1,10 @@
 mod relations;
 
-use datamodel::{
-    datamodel_connector::Diagnostics,
-    parser_database::{ast, walkers::RefinedRelationWalker, ParserDatabase, SourceFile},
-};
 use lsp_types::{CodeActionOrCommand, CodeActionParams, Diagnostic};
+use psl::{
+    parser_database::{ast, walkers::RefinedRelationWalker, ParserDatabase, SourceFile},
+    Diagnostics,
+};
 use std::sync::Arc;
 
 pub(crate) fn empty_code_actions() -> Vec<CodeActionOrCommand> {

@@ -124,5 +124,5 @@ impl ToString for SqlServerVersion {
 }
 
 fn sql_server_capabilities() -> Vec<ConnectorCapability> {
-    sql_datamodel_connector::MSSQL.capabilities().to_owned()
+    psl::builtin_connectors::MSSQL.capabilities().to_owned()
 }

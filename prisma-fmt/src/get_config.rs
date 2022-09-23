@@ -46,7 +46,7 @@ pub(crate) fn get_config(params: &str) -> String {
 }
 
 fn get_config_impl(params: GetConfigParams) -> Result<serde_json::Value, GetConfigError> {
-    let mut config = match datamodel::parse_configuration(&params.prisma_schema) {
+    let mut config = match psl::parse_configuration(&params.prisma_schema) {
         Ok(config) => config,
         Err(err) => {
             return Err(GetConfigError {
@@ -66,7 +66,7 @@ fn get_config_impl(params: GetConfigParams) -> Result<serde_json::Value, GetConf
             })?;
     }
 
-    Ok(datamodel::mcf::config_to_mcf_json_value(&config))
+    Ok(psl::get_config(&config))
 }
 
 #[cfg(test)]

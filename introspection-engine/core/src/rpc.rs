@@ -141,7 +141,7 @@ impl RpcImpl {
 
     /// This function parses the provided schema and returns the contained Datamodel.
     pub fn parse_datamodel(schema: &str) -> RpcResult<Datamodel> {
-        let final_dm = psl::parse_schema_parserdb(schema).map_err(Error::DatamodelError)?;
+        let final_dm = psl::parse_schema(schema).map_err(Error::DatamodelError)?;
 
         Ok(psl::lift(&final_dm))
     }
