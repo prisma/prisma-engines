@@ -599,6 +599,21 @@ impl PostgreSql {
             res => res,
         }
     }
+
+    fn check_bind_variables_len(&self, params: &[Value<'_>]) -> crate::Result<()> {
+        if params.len() > i16::MAX as usize {
+            // tokio_postgres would return an error here. Let's avoid calling the driver
+            // and return an error early.
+            let kind = ErrorKind::QueryInvalidInput(format!(
+                "too many bind variables in prepared statement, expected maximum of {}, received {}",
+                i16::MAX,
+                params.len()
+            ));
+            Err(Error::builder(kind).build())
+        } else {
+            Ok(())
+        }
+    }
 }
 
 // A SetSearchPath statement (Display-impl) for connection initialization.
@@ -627,6 +642,8 @@ impl Queryable for PostgreSql {
     }
 
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
+        self.check_bind_variables_len(params)?;
+
         metrics::query("postgres.query_raw", sql, params, move || async move {
             let stmt = self.fetch_cached(sql, &[]).await?;
 
@@ -655,6 +672,8 @@ impl Queryable for PostgreSql {
     }
 
     async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
+        self.check_bind_variables_len(params)?;
+
         metrics::query("postgres.query_raw", sql, params, move || async move {
             let stmt = self.fetch_cached(sql, params).await?;
 
@@ -689,6 +708,8 @@ impl Queryable for PostgreSql {
     }
 
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
+        self.check_bind_variables_len(params)?;
+
         metrics::query("postgres.execute_raw", sql, params, move || async move {
             let stmt = self.fetch_cached(sql, &[]).await?;
 
@@ -711,6 +732,8 @@ impl Queryable for PostgreSql {
     }
 
     async fn execute_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
+        self.check_bind_variables_len(params)?;
+
         metrics::query("postgres.execute_raw", sql, params, move || async move {
             let stmt = self.fetch_cached(sql, params).await?;
 
