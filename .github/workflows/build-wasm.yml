@@ -23,12 +23,6 @@ jobs:
           target: wasm32-unknown-unknown
           default: true
 
-      - name: Build the datamodel crate with default features
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: -p datamodel --release --target=wasm32-unknown-unknown
-
       - name: Build the migration-connector crate with default features
         uses: actions-rs/cargo@v1
         with:

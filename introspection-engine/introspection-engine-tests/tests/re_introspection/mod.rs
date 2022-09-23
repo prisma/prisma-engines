@@ -1302,14 +1302,13 @@ async fn updated_at(api: &TestApi) {
     let final_dm = formatdoc! {r#"
         model User {{
             id           Int @id @default(autoincrement())
-            lastupdated  DateTime?  @updatedAt {}
+            lastupdated  DateTime?  @updatedAt {native_datetime}
         }}
 
         model Unrelated {{
             id               Int @id @default(autoincrement())
         }}
-        "#,
-        native_datetime = native_datetime,
+        "#
     };
 
     api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await.unwrap());

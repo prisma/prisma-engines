@@ -1,0 +1,24 @@
+[package]
+name = "dml"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+prisma-value = { path = "../prisma-value" }
+psl-core = { path = "../../psl/psl-core" }
+schema-ast = { path = "../../psl/schema-ast" }
+native-types = { path = "../native-types" }
+
+uuid = { version = "1", features = ["serde", "v4"], optional = true }
+cuid = { version = "1.2", optional = true }
+chrono = { version = "0.4.6", features = ["serde"] }
+serde = { version = "1.0.90", features = ["derive"] }
+serde_json = { version = "1.0", features = ["float_roundtrip"] }
+enumflags2 = "0.7"
+indoc = "1"
+either = "1.6"
+
+[features]
+# Support for generating default UUID and CUID default values. This implies
+# random number generation works, so it doesn't compile on targets like wasm32.
+default_generators = ["uuid", "cuid"]

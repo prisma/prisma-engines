@@ -51,5 +51,5 @@ impl SqliteConnectorTag {
 }
 
 fn sqlite_capabilities() -> Vec<ConnectorCapability> {
-    sql_datamodel_connector::SQLITE.capabilities().to_owned()
+    psl::builtin_connectors::SQLITE.capabilities().to_owned()
 }

@@ -341,5 +341,5 @@ impl TestApi {
 
 #[track_caller]
 fn parse_datamodel(dm: &str) -> Datamodel {
-    psl::lift(&psl::parse_schema_parserdb(dm).unwrap())
+    psl::lift(&psl::parse_schema(dm).unwrap())
 }

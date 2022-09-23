@@ -44,19 +44,19 @@ impl List {
         self.len() == 0
     }
 
-    pub fn index_by(self, keys: &[String]) -> IndexMap<Vec<QueryValue>, Map> {
-        let mut map = IndexMap::with_capacity(self.len());
+    pub fn index_by(self, keys: &[String]) -> Vec<(Vec<QueryValue>, Map)> {
+        let mut map = Vec::with_capacity(self.len());
 
         for item in self.into_iter() {
             let inner = item.into_map().unwrap();
 
-            let key = keys
+            let key: Vec<QueryValue> = keys
                 .iter()
                 .map(|key| inner.get(key).unwrap().clone().into_value().unwrap())
                 .map(QueryValue::from)
                 .collect();
 
-            map.insert(key, inner);
+            map.push((key, inner));
         }
 
         map

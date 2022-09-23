@@ -38,7 +38,7 @@ async fn introspecting_cockroach_db_with_postgres_provider(api: TestApi) {
         composite_type_depth: CompositeTypeDepth::Infinite,
     };
 
-    let schema = psl::parse_schema_parserdb(schema).unwrap();
+    let schema = psl::parse_schema(schema).unwrap();
     api.api.introspect(&psl::lift(&schema), ctx).await.unwrap();
 }
 

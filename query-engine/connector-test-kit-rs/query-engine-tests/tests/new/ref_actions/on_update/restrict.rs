@@ -349,7 +349,7 @@ mod one2many_req {
 
     async fn create_test_data(runner: &Runner) -> TestResult<()> {
         run_query!(
-            &runner,
+            runner,
             r#"mutation { createOneParent(data: { id: 1, name: "Bob", uniq: "1", children: { create: { id: 1 }}}) { id }}"#
         );
 
@@ -491,7 +491,7 @@ mod one2many_opt {
 
     async fn create_test_data(runner: &Runner) -> TestResult<()> {
         run_query!(
-            &runner,
+            runner,
             r#"mutation { createOneParent(data: { id: 1, name: "Bob", uniq: "1", children: { create: { id: 1 }}}) { id }}"#
         );
 

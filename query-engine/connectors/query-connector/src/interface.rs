@@ -58,6 +58,10 @@ impl RecordFilter {
             selectors: None,
         }
     }
+
+    pub fn has_selectors(&self) -> bool {
+        self.selectors.is_some()
+    }
 }
 
 impl From<Filter> for RecordFilter {
@@ -299,7 +303,7 @@ pub trait WriteOperations {
         record_filter: RecordFilter,
         args: WriteArgs,
         trace_id: Option<String>,
-    ) -> crate::Result<Vec<SelectionResult>>;
+    ) -> crate::Result<usize>;
 
     /// Update record in the `Model` with the given `WriteArgs` filtered by the
     /// `Filter`.

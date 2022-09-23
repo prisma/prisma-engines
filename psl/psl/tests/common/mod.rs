@@ -413,11 +413,11 @@ impl WarningAsserts for Vec<DatamodelWarning> {
 }
 
 pub(crate) fn parse_unwrap_err(schema: &str) -> String {
-    psl::parse_schema_parserdb(schema).map(drop).unwrap_err()
+    psl::parse_schema(schema).map(drop).unwrap_err()
 }
 
 pub(crate) fn parse(datamodel_string: &str) -> Datamodel {
-    let schema = psl::parse_schema_parserdb(datamodel_string).unwrap();
+    let schema = psl::parse_schema(datamodel_string).unwrap();
     psl::lift(&schema)
 }
 
@@ -439,7 +439,7 @@ pub(crate) fn parse_configuration(datamodel_string: &str) -> Configuration {
 
 #[track_caller]
 pub(crate) fn expect_error(schema: &str, expectation: &expect_test::Expect) {
-    match psl::parse_schema_parserdb(schema) {
+    match psl::parse_schema(schema) {
         Ok(_) => panic!("Expected a validation error, but the schema is valid."),
         Err(err) => expectation.assert_eq(&err),
     }
@@ -451,14 +451,14 @@ pub(crate) fn parse_and_render_error(schema: &str) -> String {
 
 #[track_caller]
 pub(crate) fn assert_valid(schema: &str) {
-    match psl::parse_schema_parserdb(schema) {
+    match psl::parse_schema(schema) {
         Ok(_) => (),
         Err(err) => panic!("{err}"),
     }
 }
 
 pub(crate) fn rerender(schema: &str) -> String {
-    let schema = psl::parse_schema_parserdb(schema).unwrap();
+    let schema = psl::parse_schema(schema).unwrap();
     psl::render_datamodel_to_string(&psl::lift(&schema), Some(&schema.configuration))
 }
 
