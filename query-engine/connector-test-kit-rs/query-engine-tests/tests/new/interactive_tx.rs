@@ -370,6 +370,55 @@ mod interactive_tx {
 
         Ok(())
     }
+
+    #[connector_test(only(Postgres))]
+    async fn write_conflict(mut runner: Runner) -> TestResult<()> {
+        // create row
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1, field: "initial" }) { id }}"#),
+          @r###"{"data":{"createOneTestModel":{"id":1}}}"###
+        );
+
+        // First transaction.
+        let tx_id_a = runner.start_tx(5000, 5000, Some("Serializable".into())).await?;
+
+        // Second transaction.
+        let tx_id_b = runner.start_tx(5000, 5000, Some("Serializable".into())).await?;
+
+        // Read on first transaction.
+        runner.set_active_tx(tx_id_a.clone());
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel { id field }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1,"field":"initial"}]}}"###
+        );
+
+        // Read on the second transaction.
+        runner.set_active_tx(tx_id_b.clone());
+        insta::assert_snapshot!(
+            run_query!(&runner, r#"query { findManyTestModel { id field }}"#),
+            @r###"{"data":{"findManyTestModel":[{"id":1,"field":"initial"}]}}"###
+        );
+
+        // write and commit on the first transaction
+        runner.set_active_tx(tx_id_a.clone());
+        insta::assert_snapshot!(
+            run_query!(&runner, r#"mutation { updateManyTestModel(data: { field: "a" }) { count }}"#),
+            @r###"{"data":{"updateManyTestModel":{"count":1}}}"###
+        );
+
+        let commit_res = runner.commit_tx(tx_id_a.clone()).await?;
+        assert!(commit_res.is_ok());
+
+        // attempt to write on the second transaction
+        runner.set_active_tx(tx_id_b.clone());
+        let res = runner
+            .query(r#"mutation { updateManyTestModel(data: { field: "b" }) { count }}"#)
+            .await?;
+
+        res.assert_failure(2034, None);
+
+        Ok(())
+    }
 }
 
 #[test_suite(schema(generic))]

@@ -94,6 +94,9 @@ impl ConnectorError {
             ErrorKind::TransactionAborted { message } => Some(KnownError::new(
                 user_facing_errors::query_engine::InteractiveTransactionError { error: message.clone() },
             )),
+            ErrorKind::TransactionWriteConflict => Some(KnownError::new(
+                user_facing_errors::query_engine::TransactionWriteConflict {},
+            )),
             ErrorKind::MongoReplicaSetRequired => Some(KnownError::new(
                 user_facing_errors::query_engine::MongoReplicaSetRequired {},
             )),
@@ -223,6 +226,9 @@ pub enum ErrorKind {
 
     #[error("{}", message)]
     TransactionAlreadyClosed { message: String },
+
+    #[error("Transaction write conflict")]
+    TransactionWriteConflict,
 
     #[error("The query parameter limit supported by your database is exceeded: {0}.")]
     QueryParameterLimitExceeded(String),
