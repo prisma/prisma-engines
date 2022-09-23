@@ -355,6 +355,10 @@
 <span id="355">355</span>
 <span id="356">356</span>
 <span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">coerce_null_to_zero_value</span>, <span class="ident">Filter</span>, <span class="ident">QueryArguments</span>, <span class="ident">WriteArgs</span>};
 <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
 <span class="kw">use</span> <span class="ident">dml::FieldArity</span>;
@@ -414,6 +418,10 @@
             <span class="ident">filter</span>: <span class="ident">Filter::empty</span>(),
             <span class="ident">selectors</span>: <span class="prelude-val">None</span>,
         }
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_selectors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">selectors</span>.<span class="ident">is_some</span>()
     }
 }
 
@@ -656,7 +664,7 @@
         <span class="ident">record_filter</span>: <span class="ident">RecordFilter</span>,
         <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
         <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Update record in the `Model` with the given `WriteArgs` filtered by the</span>
     <span class="doccomment">/// `Filter`.</span>

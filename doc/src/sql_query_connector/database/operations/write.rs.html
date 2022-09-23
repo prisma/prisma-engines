@@ -416,7 +416,72 @@
 <span id="416">416</span>
 <span id="417">417</span>
 <span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::filter_conversion::AliasedCondition</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::query_builder::write</span>::{<span class="ident">build_update_and_set_query</span>, <span class="ident">chunk_update_with_ids</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sql_trace::SqlTraceComment</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::SqlError</span>, <span class="ident">model_extensions</span>::<span class="kw-2">*</span>, <span class="ident">query_builder::write</span>, <span class="ident">sql_info::SqlInfo</span>, <span class="ident">QueryExt</span>};
 <span class="kw">use</span> <span class="ident">connector_interface</span>::<span class="kw-2">*</span>;
@@ -716,28 +781,54 @@
     <span class="prelude-val">Ok</span>(<span class="ident">count</span> <span class="kw">as</span> <span class="ident">usize</span>)
 }
 
-<span class="doccomment">/// Update multiple records in a database defined in `conn` and the records</span>
+<span class="doccomment">/// Update one record in a database defined in `conn` and the records</span>
 <span class="doccomment">/// defined in `args`, resulting the identifiers that were modified in the</span>
 <span class="doccomment">/// operation.</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update_records</span>(
+<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update_record</span>(
     <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
     <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
     <span class="ident">record_filter</span>: <span class="ident">RecordFilter</span>,
     <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
-    <span class="ident">update_type</span>: <span class="ident">UpdateType</span>,
     <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">filter_condition</span> <span class="op">=</span> <span class="ident">record_filter</span>.<span class="ident">clone</span>().<span class="ident">filter</span>.<span class="ident">aliased_condition_from</span>(<span class="prelude-val">None</span>, <span class="bool-val">false</span>);
-    <span class="kw">let</span> <span class="ident">ids</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">filter_selectors</span>(<span class="ident">model</span>, <span class="ident">record_filter</span>, <span class="ident">trace_id</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">id_args</span> <span class="op">=</span> <span class="ident">pick_args</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">primary_identifier</span>().<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="ident">args</span>);
 
-    <span class="kw">if</span> <span class="ident">ids</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[]);
+    <span class="comment">// This is to match the behaviour expected but it seems a bit strange to me</span>
+    <span class="comment">// This comes across as if the update happened even if it didn&#39;t</span>
+    <span class="kw">if</span> <span class="ident">args</span>.<span class="ident">args</span>.<span class="ident">is_empty</span>() {
+        <span class="kw">let</span> <span class="ident">ids</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">conn</span>
+            .<span class="ident">filter_selectors</span>(<span class="ident">model</span>, <span class="ident">record_filter</span>.<span class="ident">clone</span>(), <span class="ident">trace_id</span>.<span class="ident">clone</span>())
+            .<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">ids</span>);
     }
+
+    <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">ids</span>) <span class="op">=</span> <span class="ident">update_records_from_ids_and_filter</span>(<span class="ident">conn</span>, <span class="ident">model</span>, <span class="ident">record_filter</span>, <span class="ident">args</span>, <span class="ident">trace_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+
+    <span class="prelude-val">Ok</span>(<span class="ident">merge_write_args</span>(<span class="ident">ids</span>, <span class="ident">id_args</span>))
+}
+
+<span class="comment">// Generates a query like this:</span>
+<span class="comment">//  UPDATE &quot;public&quot;.&quot;User&quot; SET &quot;name&quot; = $1 WHERE &quot;public&quot;.&quot;User&quot;.&quot;id&quot; IN ($2,$3,$4,$5,$6,$7,$8,$9,$10,$11) AND &quot;public&quot;.&quot;User&quot;.&quot;age&quot; &gt; $1</span>
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update_records_from_ids_and_filter</span>(
+    <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
+    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
+    <span class="ident">record_filter</span>: <span class="ident">RecordFilter</span>,
+    <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
+    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">filter_condition</span> <span class="op">=</span> <span class="ident">record_filter</span>.<span class="ident">clone</span>().<span class="ident">filter</span>.<span class="ident">aliased_condition_from</span>(<span class="prelude-val">None</span>, <span class="bool-val">false</span>);
+    <span class="kw">let</span> <span class="ident">ids</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">filter_selectors</span>(<span class="ident">model</span>, <span class="ident">record_filter</span>, <span class="ident">trace_id</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+
+    <span class="kw">if</span> <span class="ident">ids</span>.<span class="ident">is_empty</span>() {
+        <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="number">0</span>, <span class="ident">Vec::new</span>()));
+    }
+
+    <span class="kw">let</span> <span class="ident">update</span> <span class="op">=</span> <span class="ident">build_update_and_set_query</span>(<span class="ident">model</span>, <span class="ident">args</span>, <span class="ident">trace_id</span>);
 
     <span class="kw">let</span> <span class="ident">updates</span> <span class="op">=</span> {
         <span class="kw">let</span> <span class="ident">ids</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ids</span>.<span class="ident">iter</span>().<span class="ident">collect</span>();
-        <span class="ident">write::update_many</span>(<span class="ident">model</span>, <span class="ident">ids</span>.<span class="ident">as_slice</span>(), <span class="ident">args</span>, <span class="ident">filter_condition</span>, <span class="ident">trace_id</span>)<span class="question-mark">?</span>
+        <span class="ident">chunk_update_with_ids</span>(<span class="ident">update</span>, <span class="ident">model</span>, <span class="kw-2">&amp;</span><span class="ident">ids</span>, <span class="ident">filter_condition</span>)<span class="question-mark">?</span>
     };
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">count</span> <span class="op">=</span> <span class="number">0</span>;
@@ -747,11 +838,48 @@
         <span class="ident">count</span> <span class="op">+</span><span class="op">=</span> <span class="ident">update_count</span>;
     }
 
-    <span class="kw">if</span> <span class="ident">update_type</span> <span class="op">==</span> <span class="ident">UpdateType::Many</span> <span class="op">&amp;&amp;</span> <span class="ident">count</span> <span class="op">==</span> <span class="number">0</span> {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Vec::new</span>());
+    <span class="prelude-val">Ok</span>((<span class="ident">count</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">ids</span>))
+}
+
+<span class="comment">// Generates a query like this:</span>
+<span class="comment">//  UPDATE &quot;public&quot;.&quot;User&quot; SET &quot;name&quot; = $1 WHERE &quot;public&quot;.&quot;User&quot;.&quot;age&quot; &gt; $1</span>
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update_records_from_filter</span>(
+    <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
+    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
+    <span class="ident">record_filter</span>: <span class="ident">RecordFilter</span>,
+    <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
+    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">update</span> <span class="op">=</span> <span class="ident">build_update_and_set_query</span>(<span class="ident">model</span>, <span class="ident">args</span>, <span class="ident">trace_id</span>);
+    <span class="kw">let</span> <span class="ident">filter_condition</span> <span class="op">=</span> <span class="ident">record_filter</span>.<span class="ident">clone</span>().<span class="ident">filter</span>.<span class="ident">aliased_condition_from</span>(<span class="prelude-val">None</span>, <span class="bool-val">false</span>);
+
+    <span class="kw">let</span> <span class="ident">update</span> <span class="op">=</span> <span class="ident">update</span>.<span class="ident">so_that</span>(<span class="ident">filter_condition</span>);
+    <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">execute</span>(<span class="ident">update</span>.<span class="ident">into</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+
+    <span class="prelude-val">Ok</span>(<span class="ident">count</span> <span class="kw">as</span> <span class="ident">usize</span>)
+}
+
+<span class="doccomment">/// Update multiple records in a database defined in `conn` and the records</span>
+<span class="doccomment">/// defined in `args`, and returning the number of updates</span>
+<span class="doccomment">/// This works via two ways, when there are ids in record_filter.selectors, it uses that to update</span>
+<span class="doccomment">/// Otherwise it used the passed down arguments to update.</span>
+<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update_records</span>(
+    <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
+    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
+    <span class="ident">record_filter</span>: <span class="ident">RecordFilter</span>,
+    <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
+    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">if</span> <span class="ident">args</span>.<span class="ident">args</span>.<span class="ident">is_empty</span>() {
+        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="number">0</span>);
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">merge_write_args</span>(<span class="ident">ids</span>, <span class="ident">id_args</span>))
+    <span class="kw">if</span> <span class="ident">record_filter</span>.<span class="ident">has_selectors</span>() {
+        <span class="kw">let</span> (<span class="ident">count</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">update_records_from_ids_and_filter</span>(<span class="ident">conn</span>, <span class="ident">model</span>, <span class="ident">record_filter</span>, <span class="ident">args</span>, <span class="ident">trace_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="ident">count</span>)
+    } <span class="kw">else</span> {
+        <span class="ident">update_records_from_filter</span>(<span class="ident">conn</span>, <span class="ident">model</span>, <span class="ident">record_filter</span>, <span class="ident">args</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>
+    }
 }
 
 <span class="doccomment">/// Delete multiple records in `conn`, defined in the `Filter`. Result is the number of items deleted.</span>

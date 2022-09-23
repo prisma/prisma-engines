@@ -271,14 +271,13 @@
 <span id="271">271</span>
 <span id="272">272</span>
 <span id="273">273</span>
-<span id="274">274</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::catch</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">database::operations</span>::<span class="kw-2">*</span>, <span class="ident">sql_info::SqlInfo</span>, <span class="ident">SqlError</span>};
 <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
 <span class="kw">use</span> <span class="ident">connector</span>::{<span class="ident">ConnectionLike</span>, <span class="ident">RelAggregationSelection</span>};
 <span class="kw">use</span> <span class="ident">connector_interface</span>::{
     <span class="self">self</span> <span class="kw">as</span> <span class="ident">connector</span>, <span class="ident">filter::Filter</span>, <span class="ident">AggregationRow</span>, <span class="ident">AggregationSelection</span>, <span class="ident">QueryArguments</span>, <span class="ident">ReadOperations</span>,
-    <span class="ident">RecordFilter</span>, <span class="ident">Transaction</span>, <span class="ident">UpdateType</span>, <span class="ident">WriteArgs</span>, <span class="ident">WriteOperations</span>,
+    <span class="ident">RecordFilter</span>, <span class="ident">Transaction</span>, <span class="ident">WriteArgs</span>, <span class="ident">WriteOperations</span>,
 };
 <span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">SelectionResult</span>};
 <span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
@@ -462,9 +461,9 @@
         <span class="ident">record_filter</span>: <span class="ident">RecordFilter</span>,
         <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
         <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">connector::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">connector::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="ident">catch</span>(<span class="self">self</span>.<span class="ident">connection_info</span>.<span class="ident">clone</span>(), <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="ident">write::update_records</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>, <span class="ident">model</span>, <span class="ident">record_filter</span>, <span class="ident">args</span>, <span class="ident">UpdateType::Many</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>
+            <span class="ident">write::update_records</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>, <span class="ident">model</span>, <span class="ident">record_filter</span>, <span class="ident">args</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>
         })
         .<span class="kw">await</span>
     }
@@ -477,8 +476,7 @@
         <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">connector::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">catch</span>(<span class="self">self</span>.<span class="ident">connection_info</span>.<span class="ident">clone</span>(), <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span>
-                <span class="ident">write::update_records</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>, <span class="ident">model</span>, <span class="ident">record_filter</span>, <span class="ident">args</span>, <span class="ident">UpdateType::One</span>, <span class="ident">trace_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">write::update_record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>, <span class="ident">model</span>, <span class="ident">record_filter</span>, <span class="ident">args</span>, <span class="ident">trace_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(<span class="ident">res</span>.<span class="ident">pop</span>())
         })
         .<span class="kw">await</span>

@@ -227,7 +227,7 @@
 ) -&gt; <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">QueryResult</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">tx</span>.<span class="ident">update_records</span>(<span class="kw-2">&amp;</span><span class="ident">q</span>.<span class="ident">model</span>, <span class="ident">q</span>.<span class="ident">record_filter</span>, <span class="ident">q</span>.<span class="ident">args</span>, <span class="ident">trace_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(<span class="ident">QueryResult::Count</span>(<span class="ident">res</span>.<span class="ident">len</span>()))
+    <span class="prelude-val">Ok</span>(<span class="ident">QueryResult::Count</span>(<span class="ident">res</span> <span class="kw">as</span> <span class="ident">usize</span>))
 }
 
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_many</span>(

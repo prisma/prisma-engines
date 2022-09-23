@@ -241,6 +241,8 @@
 <span id="241">241</span>
 <span id="242">242</span>
 <span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::catch</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">error::MongoError</span>,
@@ -319,9 +321,9 @@
         <span class="ident">record_filter</span>: <span class="ident">connector_interface::RecordFilter</span>,
         <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
         <span class="ident">_trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="ident">catch</span>(<span class="kw">async</span> <span class="kw">move</span> {
-            <span class="ident">write::update_records</span>(
+            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">write::update_records</span>(
                 <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>,
                 <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">session</span>,
                 <span class="ident">model</span>,
@@ -329,7 +331,9 @@
                 <span class="ident">args</span>,
                 <span class="ident">UpdateType::Many</span>,
             )
-            .<span class="kw">await</span>
+            .<span class="kw">await</span><span class="question-mark">?</span>;
+
+            <span class="prelude-val">Ok</span>(<span class="ident">result</span>.<span class="ident">len</span>())
         })
         .<span class="kw">await</span>
     }

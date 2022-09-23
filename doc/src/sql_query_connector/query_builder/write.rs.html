@@ -232,8 +232,6 @@
 <span id="232">232</span>
 <span id="233">233</span>
 <span id="234">234</span>
-<span id="235">235</span>
-<span id="236">236</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model_extensions</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sql_trace::SqlTraceComment</span>;
 <span class="kw">use</span> <span class="ident">connector_interface</span>::{<span class="ident">DatasourceFieldName</span>, <span class="ident">ScalarWriteOperation</span>, <span class="ident">WriteArgs</span>};
@@ -334,19 +332,8 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update_many</span>(
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">ids</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">SelectionResult</span>],
-    <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
-    <span class="ident">filter_condition</span>: <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>,
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">args</span>.<span class="ident">args</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">ids</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Vec::new</span>());
-    }
-
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_update_and_set_query</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="ident">args</span>: <span class="ident">WriteArgs</span>, <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident">Update</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">scalar_fields</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">scalar</span>();
-
     <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">args</span>
         .<span class="ident">args</span>
         .<span class="ident">into_iter</span>()
@@ -396,13 +383,22 @@
             <span class="ident">acc</span>.<span class="ident">set</span>(<span class="ident">name</span>, <span class="ident">value</span>)
         });
 
-    <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">append_trace</span>(<span class="kw-2">&amp;</span><span class="ident">Span::current</span>()).<span class="ident">add_trace_id</span>(<span class="ident">trace_id</span>);
+    <span class="ident">query</span>.<span class="ident">append_trace</span>(<span class="kw-2">&amp;</span><span class="ident">Span::current</span>()).<span class="ident">add_trace_id</span>(<span class="ident">trace_id</span>)
+}
+
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">chunk_update_with_ids</span>(
+    <span class="ident">update</span>: <span class="ident">Update</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>,
+    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
+    <span class="ident">ids</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">SelectionResult</span>],
+    <span class="ident">filter_condition</span>: <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>,
+) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ModelProjection::from</span>(<span class="ident">model</span>.<span class="ident">primary_identifier</span>()).<span class="ident">as_columns</span>().<span class="ident">collect</span>();
-    <span class="kw">let</span> <span class="ident">result</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Query</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::chunked_conditions</span>(<span class="kw-2">&amp;</span><span class="ident">columns</span>, <span class="ident">ids</span>, <span class="op">|</span><span class="ident">conditions</span><span class="op">|</span> {
-        <span class="ident">query</span>.<span class="ident">clone</span>().<span class="ident">so_that</span>(<span class="ident">conditions</span>.<span class="ident">and</span>(<span class="ident">filter_condition</span>.<span class="ident">clone</span>()))
+
+    <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::chunked_conditions</span>(<span class="kw-2">&amp;</span><span class="ident">columns</span>, <span class="ident">ids</span>, <span class="op">|</span><span class="ident">conditions</span><span class="op">|</span> {
+        <span class="ident">update</span>.<span class="ident">clone</span>().<span class="ident">so_that</span>(<span class="ident">conditions</span>.<span class="ident">and</span>(<span class="ident">filter_condition</span>.<span class="ident">clone</span>()))
     });
 
-    <span class="prelude-val">Ok</span>(<span class="ident">result</span>)
+    <span class="prelude-val">Ok</span>(<span class="ident">query</span>)
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete_many</span>(
