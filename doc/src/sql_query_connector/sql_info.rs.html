@@ -90,6 +90,16 @@
 <span id="90">90</span>
 <span id="91">91</span>
 <span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
 <span class="kw">use</span> <span class="ident">psl::datamodel_connector</span>::{<span class="ident">ConnectorCapabilities</span>, <span class="ident">ConnectorCapability</span>};
 <span class="kw">use</span> <span class="ident">quaint::prelude::ConnectionInfo</span>;
@@ -102,6 +112,16 @@
 <span class="doccomment">/// value to a smaller number.</span>
 <span class="kw">pub</span> <span class="kw">static</span> <span class="ident">BATCH_SIZE_OVERRIDE</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span>
     <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">env::var</span>(<span class="string">&quot;QUERY_BATCH_SIZE&quot;</span>).<span class="ident">ok</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">size</span><span class="op">|</span> <span class="ident">size</span>.<span class="ident">parse</span>().<span class="ident">ok</span>()));
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">test</span>))]</span>
+<span class="kw">fn</span> <span class="ident">get_batch_size</span>(<span class="ident">default</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    (<span class="kw-2">*</span><span class="ident">BATCH_SIZE_OVERRIDE</span>).<span class="ident">or</span>(<span class="prelude-val">Some</span>(<span class="ident">default</span>))
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">fn</span> <span class="ident">get_batch_size</span>(<span class="kw">_</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="ident">env::var</span>(<span class="string">&quot;QUERY_BATCH_SIZE&quot;</span>).<span class="ident">ok</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">size</span><span class="op">|</span> <span class="ident">size</span>.<span class="ident">parse</span>().<span class="ident">ok</span>())
+}
 
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SqlFamily</span> {
     <span class="ident">SQLite</span>,
@@ -137,7 +157,7 @@
         <span class="self">Self</span> {
             <span class="ident">family</span>: <span class="ident">SqlFamily::SQLite</span>,
             <span class="ident">max_rows</span>: <span class="prelude-val">Some</span>(<span class="number">999</span>),
-            <span class="ident">max_bind_values</span>: (<span class="kw-2">*</span><span class="ident">BATCH_SIZE_OVERRIDE</span>).<span class="ident">or</span>(<span class="prelude-val">Some</span>(<span class="number">999</span>)),
+            <span class="ident">max_bind_values</span>: <span class="ident">get_batch_size</span>(<span class="number">999</span>),
             <span class="ident">capabilities</span>: <span class="ident">ConnectorCapabilities::new</span>(<span class="ident">psl::builtin_connectors::SQLITE</span>.<span class="ident">capabilities</span>().<span class="ident">to_owned</span>()),
         }
     }
@@ -147,7 +167,7 @@
             <span class="ident">family</span>: <span class="ident">SqlFamily::MySQL</span>,
             <span class="ident">max_rows</span>: <span class="prelude-val">None</span>,
             <span class="comment">// See https://stackoverflow.com/a/11131824/788562</span>
-            <span class="ident">max_bind_values</span>: (<span class="kw-2">*</span><span class="ident">BATCH_SIZE_OVERRIDE</span>).<span class="ident">or</span>(<span class="prelude-val">Some</span>(<span class="number">65535</span>)),
+            <span class="ident">max_bind_values</span>: <span class="ident">get_batch_size</span>(<span class="number">65535</span>),
             <span class="ident">capabilities</span>: <span class="ident">ConnectorCapabilities::new</span>(<span class="ident">psl::builtin_connectors::MYSQL</span>.<span class="ident">capabilities</span>().<span class="ident">to_owned</span>()),
         }
     }
@@ -156,7 +176,7 @@
         <span class="self">Self</span> {
             <span class="ident">family</span>: <span class="ident">SqlFamily::Postgres</span>,
             <span class="ident">max_rows</span>: <span class="prelude-val">None</span>,
-            <span class="ident">max_bind_values</span>: (<span class="kw-2">*</span><span class="ident">BATCH_SIZE_OVERRIDE</span>).<span class="ident">or</span>(<span class="prelude-val">Some</span>(<span class="number">32767</span>)),
+            <span class="ident">max_bind_values</span>: <span class="ident">get_batch_size</span>(<span class="number">32767</span>),
             <span class="ident">capabilities</span>: <span class="ident">ConnectorCapabilities::new</span>(<span class="ident">psl::builtin_connectors::POSTGRES</span>.<span class="ident">capabilities</span>().<span class="ident">to_owned</span>()),
         }
     }
@@ -165,7 +185,7 @@
         <span class="self">Self</span> {
             <span class="ident">family</span>: <span class="ident">SqlFamily::MSSQL</span>,
             <span class="ident">max_rows</span>: <span class="prelude-val">Some</span>(<span class="number">1000</span>),
-            <span class="ident">max_bind_values</span>: (<span class="kw-2">*</span><span class="ident">BATCH_SIZE_OVERRIDE</span>).<span class="ident">or</span>(<span class="prelude-val">Some</span>(<span class="number">2099</span>)),
+            <span class="ident">max_bind_values</span>: <span class="ident">get_batch_size</span>(<span class="number">2099</span>),
             <span class="ident">capabilities</span>: <span class="ident">ConnectorCapabilities::new</span>(<span class="ident">psl::builtin_connectors::MSSQL</span>.<span class="ident">capabilities</span>().<span class="ident">to_owned</span>()),
         }
     }

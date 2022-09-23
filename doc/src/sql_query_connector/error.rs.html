@@ -351,6 +351,14 @@
 <span id="351">351</span>
 <span id="352">352</span>
 <span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">connector_interface</span>::{<span class="ident">error</span>::<span class="kw-2">*</span>, <span class="ident">Filter</span>};
 <span class="kw">use</span> <span class="ident">prisma_models::prelude::DomainError</span>;
 <span class="kw">use</span> <span class="ident">quaint::error::ErrorKind</span> <span class="kw">as</span> <span class="ident">QuaintKind</span>;
@@ -363,6 +371,7 @@
         <span class="ident">expected</span>: <span class="ident">usize</span>,
         <span class="ident">actual</span>: <span class="ident">usize</span>,
     },
+    <span class="ident">QueryInvalidInput</span>(<span class="ident">String</span>),
     <span class="ident">ConnectionClosed</span>,
     <span class="ident">Database</span> {
         <span class="ident">code</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
@@ -379,6 +388,7 @@
             <span class="ident">RawError::IncorrectNumberOfParameters</span> { <span class="ident">expected</span>, <span class="ident">actual</span> } =&gt; {
                 <span class="ident"><span class="self">Self</span>::IncorrectNumberOfParameters</span> { <span class="ident">expected</span>, <span class="ident">actual</span> }
             }
+            <span class="ident">RawError::QueryInvalidInput</span>(<span class="ident">message</span>) =&gt; <span class="ident"><span class="self">Self</span>::QueryInvalidInput</span>(<span class="ident">message</span>),
             <span class="ident">RawError::UnsupportedColumnType</span> { <span class="ident">column_type</span> } =&gt; <span class="ident"><span class="self">Self</span>::RawError</span> {
                 <span class="ident">code</span>: <span class="ident">String::from</span>(<span class="string">&quot;N/A&quot;</span>),
                 <span class="ident">message</span>: <span class="macro">format!</span>(
@@ -408,6 +418,7 @@
             <span class="ident">quaint::error::ErrorKind::UnsupportedColumnType</span> { <span class="ident">column_type</span> } =&gt; <span class="ident"><span class="self">Self</span>::UnsupportedColumnType</span> {
                 <span class="ident">column_type</span>: <span class="ident">column_type</span>.<span class="ident">to_owned</span>(),
             },
+            <span class="ident">quaint::error::ErrorKind::QueryInvalidInput</span>(<span class="ident">message</span>) =&gt; <span class="ident"><span class="self">Self</span>::QueryInvalidInput</span>(<span class="ident">message</span>.<span class="ident">to_owned</span>()),
             <span class="kw">_</span> =&gt; <span class="ident"><span class="self">Self</span>::Database</span> {
                 <span class="ident">code</span>: <span class="ident">e</span>.<span class="ident">original_code</span>().<span class="ident">map</span>(<span class="ident">ToString::to_string</span>),
                 <span class="ident">message</span>: <span class="ident">e</span>.<span class="ident">original_message</span>().<span class="ident">map</span>(<span class="ident">ToString::to_string</span>),
@@ -451,6 +462,9 @@
 
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Error querying the database: {}&quot;</span>, <span class="ident">_0</span>)]</span>
     <span class="ident">QueryError</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>),
+
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Invalid input provided to query: {}&quot;</span>, <span class="ident">_0</span>)]</span>
+    <span class="ident">QueryInvalidInput</span>(<span class="ident">String</span>),
 
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The column value was different from the model&quot;</span>)]</span>
     <span class="ident">ColumnReadFailure</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>),
@@ -571,6 +585,7 @@
                 <span class="ident">child_name</span>,
             }),
             <span class="ident">SqlError::ConversionError</span>(<span class="ident">e</span>) =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ConversionError</span>(<span class="ident">e</span>)),
+            <span class="ident">SqlError::QueryInvalidInput</span>(<span class="ident">e</span>) =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::QueryInvalidInput</span>(<span class="ident">e</span>)),
             <span class="ident">SqlError::IncorrectNumberOfParameters</span> { <span class="ident">expected</span>, <span class="ident">actual</span> } =&gt; {
                 <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::IncorrectNumberOfParameters</span> { <span class="ident">expected</span>, <span class="ident">actual</span> })
             }
@@ -636,6 +651,7 @@
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">quaint::error::Error</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">QuaintKind::from</span>(<span class="ident">e</span>) {
             <span class="ident">QuaintKind::QueryError</span>(<span class="ident">qe</span>) =&gt; <span class="ident"><span class="self">Self</span>::QueryError</span>(<span class="ident">qe</span>),
+            <span class="ident">QuaintKind::QueryInvalidInput</span>(<span class="ident">qe</span>) =&gt; <span class="ident"><span class="self">Self</span>::QueryInvalidInput</span>(<span class="ident">qe</span>),
             <span class="ident">e</span> @ <span class="ident">QuaintKind::IoError</span>(<span class="kw">_</span>) =&gt; <span class="ident"><span class="self">Self</span>::ConnectionError</span>(<span class="ident">e</span>),
             <span class="ident">QuaintKind::NotFound</span> =&gt; <span class="ident"><span class="self">Self</span>::RecordDoesNotExist</span>,
             <span class="ident">QuaintKind::UniqueConstraintViolation</span> { <span class="ident">constraint</span> } =&gt; <span class="ident"><span class="self">Self</span>::UniqueConstraintViolation</span> {

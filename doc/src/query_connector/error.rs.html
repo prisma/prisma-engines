@@ -255,6 +255,14 @@
 <span id="255">255</span>
 <span id="256">256</span>
 <span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt::Display</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::filter::Filter</span>;
@@ -312,6 +320,11 @@
             <span class="ident">ErrorKind::ConversionError</span>(<span class="ident">message</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">KnownError::new</span>(
                 <span class="ident">user_facing_errors::query_engine::InconsistentColumnData</span> {
                     <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">message</span>),
+                },
+            )),
+            <span class="ident">ErrorKind::QueryInvalidInput</span>(<span class="ident">message</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">KnownError::new</span>(
+                <span class="ident">user_facing_errors::query_engine::DatabaseAssertionViolation</span> {
+                    <span class="ident">database_error</span>: <span class="ident">message</span>.<span class="ident">to_owned</span>(),
                 },
             )),
             <span class="ident">ErrorKind::UnsupportedFeature</span>(<span class="ident">feature</span>) =&gt; {
@@ -429,6 +442,9 @@
 
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Conversion error: {}&quot;</span>, <span class="ident">_0</span>)]</span>
     <span class="ident">ConversionError</span>(<span class="ident">anyhow::Error</span>),
+
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Invalid input provided to query: {}&quot;</span>, <span class="ident">_0</span>)]</span>
+    <span class="ident">QueryInvalidInput</span>(<span class="ident">String</span>),
 
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Conversion error: {}&quot;</span>, <span class="ident">_0</span>)]</span>
     <span class="ident">InternalConversionError</span>(<span class="ident">String</span>),
