@@ -30,7 +30,7 @@ mod raw_params {
         assert_error!(
             runner,
             mutation,
-            2034,
+            2035,
             "Assertion violation on the database: `too many bind variables in prepared statement, expected maximum of 32767, received 32768`"
         );
 

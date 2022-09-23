@@ -42,7 +42,3 @@ opt-level = 3
 codegen-units = 1
 opt-level = 'z' # Optimize for size.
 #strip="symbols"
-
-[patch."https://github.com/prisma/quaint"]
-# quaint = {path = "/Users/jkomyno/work/prisma/quaint"}
-quaint = { git = "https://github.com/prisma//quaint", branch = "feat/postgres-forward-io-invalid-input-error" }
