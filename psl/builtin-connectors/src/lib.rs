@@ -8,7 +8,7 @@ mod mysql_datamodel_connector;
 mod postgres_datamodel_connector;
 mod sqlite_datamodel_connector;
 
-use datamodel::{datamodel_connector::Connector, ConnectorRegistry};
+use psl_core::{datamodel_connector::Connector, ConnectorRegistry};
 
 pub const POSTGRES: &'static dyn Connector = &postgres_datamodel_connector::PostgresDatamodelConnector;
 pub const COCKROACH: &'static dyn Connector = &cockroach_datamodel_connector::CockroachDatamodelConnector;

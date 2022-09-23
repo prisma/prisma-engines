@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-datamodel = { path = "../../libs/datamodel/core" }
+psl-core = { path = "../psl-core" }
 native-types = { path = "../../libs/native-types" }
 
 connection-string = "0.1"

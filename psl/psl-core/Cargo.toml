@@ -1,12 +1,12 @@
 [package]
 edition = "2021"
-name = "datamodel"
+name = "psl-core"
 version = "0.1.0"
 
 [dependencies]
 diagnostics = { path = "../diagnostics" }
 parser-database = { path = "../parser-database" }
-prisma-value = { path = "../../prisma-value" }
+prisma-value = { path = "../../libs/prisma-value" }
 schema-ast = { path = "../schema-ast" }
 
 bigdecimal = "0.3"
