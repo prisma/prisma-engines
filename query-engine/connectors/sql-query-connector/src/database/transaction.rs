@@ -4,7 +4,7 @@ use async_trait::async_trait;
 use connector::{ConnectionLike, RelAggregationSelection};
 use connector_interface::{
     self as connector, filter::Filter, AggregationRow, AggregationSelection, QueryArguments, ReadOperations,
-    RecordFilter, Transaction, UpdateType, WriteArgs, WriteOperations,
+    RecordFilter, Transaction, WriteArgs, WriteOperations,
 };
 use prisma_models::{prelude::*, SelectionResult};
 use prisma_value::PrismaValue;
@@ -188,9 +188,9 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
         record_filter: RecordFilter,
         args: WriteArgs,
         trace_id: Option<String>,
-    ) -> connector::Result<Vec<SelectionResult>> {
+    ) -> connector::Result<usize> {
         catch(self.connection_info.clone(), async move {
-            write::update_records(&self.inner, model, record_filter, args, UpdateType::Many, trace_id).await
+            write::update_records(&self.inner, model, record_filter, args, trace_id).await
         })
         .await
     }
@@ -203,8 +203,7 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
         trace_id: Option<String>,
     ) -> connector::Result<Option<SelectionResult>> {
         catch(self.connection_info.clone(), async move {
-            let mut res =
-                write::update_records(&self.inner, model, record_filter, args, UpdateType::One, trace_id).await?;
+            let mut res = write::update_record(&self.inner, model, record_filter, args, trace_id).await?;
             Ok(res.pop())
         })
         .await
