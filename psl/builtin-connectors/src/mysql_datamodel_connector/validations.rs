@@ -1,4 +1,4 @@
-use datamodel::{
+use psl_core::{
     datamodel_connector::{walker_ext_traits::ScalarFieldWalkerExt, Connector},
     diagnostics::Diagnostics,
     parser_database::walkers::{IndexWalker, PrimaryKeyWalker},

@@ -1,7 +1,11 @@
 mod validations;
 
 use connection_string::JdbcString;
-use datamodel::{
+use enumflags2::BitFlags;
+use lsp_types::{CompletionItem, CompletionItemKind, CompletionList};
+use native_types::{MsSqlType, MsSqlTypeParameter, NativeType};
+use once_cell::sync::Lazy;
+use psl_core::{
     datamodel_connector::{
         helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
         Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance,
@@ -10,10 +14,6 @@ use datamodel::{
     diagnostics::{DatamodelError, Diagnostics, Span},
     parser_database::{self, ast, ParserDatabase, ReferentialAction, ScalarType},
 };
-use enumflags2::BitFlags;
-use lsp_types::{CompletionItem, CompletionItemKind, CompletionList};
-use native_types::{MsSqlType, MsSqlTypeParameter, NativeType};
-use once_cell::sync::Lazy;
 use std::borrow::Cow;
 
 use MsSqlType::*;

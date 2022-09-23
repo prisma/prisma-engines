@@ -1,5 +1,6 @@
 use crate::{self as dml, *};
-use ::datamodel::{
+use either::Either;
+use psl_core::{
     datamodel_connector::{walker_ext_traits::*, Connector, ReferentialIntegrity},
     parser_database::{
         self as db,
@@ -8,7 +9,6 @@ use ::datamodel::{
         IndexAlgorithm, ScalarType,
     },
 };
-use either::Either;
 use std::collections::HashMap;
 
 /// Helper for lifting a datamodel.
@@ -550,7 +550,7 @@ fn parser_database_scalar_type_to_dml_scalar_type(st: db::ScalarType) -> dml::Sc
 }
 
 fn datamodel_connector_native_type_to_dml_native_type(
-    instance: ::datamodel::datamodel_connector::NativeTypeInstance,
+    instance: psl_core::datamodel_connector::NativeTypeInstance,
 ) -> dml::NativeTypeInstance {
     dml::NativeTypeInstance {
         name: instance.name,

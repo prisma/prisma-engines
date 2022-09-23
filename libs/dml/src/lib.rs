@@ -23,7 +23,7 @@ pub use self::{
 };
 pub use prisma_value::{self, PrismaValue};
 
-use ::datamodel::{reformat, Configuration, ValidatedSchema};
+use psl_core::{reformat, Configuration, ValidatedSchema};
 
 /// Find the model mapping to the passed in database name.
 pub fn find_model_by_db_name<'a>(datamodel: &'a Datamodel, db_name: &str) -> Option<&'a Model> {

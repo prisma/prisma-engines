@@ -1,9 +1,9 @@
-use datamodel::{
+use native_types::PostgresType;
+use psl_core::{
     datamodel_connector::{walker_ext_traits::*, Connector},
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{ast::WithSpan, walkers::IndexWalker, IndexAlgorithm, OperatorClass},
 };
-use native_types::PostgresType;
 
 pub(super) fn compatible_native_types(index: IndexWalker<'_>, connector: &dyn Connector, errors: &mut Diagnostics) {
     for field in index.fields() {
