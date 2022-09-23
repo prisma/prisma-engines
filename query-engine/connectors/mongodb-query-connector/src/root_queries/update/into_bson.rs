@@ -14,6 +14,22 @@ impl IntoBson for Set {
     }
 }
 
+impl IntoBson for MergedSet {
+    fn into_bson(self) -> crate::Result<Bson> {
+        let mut inner_doc = Document::new();
+
+        for (path, exp) in self.pairs {
+            inner_doc.insert(path.path(true), exp.into_bson()?);
+        }
+
+        let doc = doc! {
+            "$set": inner_doc
+        };
+
+        Ok(Bson::from(doc))
+    }
+}
+
 impl IntoBson for IfThenElse {
     fn into_bson(self) -> crate::Result<Bson> {
         let doc = doc! {

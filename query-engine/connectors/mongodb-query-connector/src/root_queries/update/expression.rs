@@ -68,6 +68,11 @@ pub(crate) struct Set {
     pub expression: Box<UpdateExpression>,
 }
 
+#[derive(Debug, Clone)]
+pub(crate) struct MergedSet {
+    pub pairs: Vec<(FieldPath, Box<UpdateExpression>)>,
+}
+
 impl Set {
     /// Get a reference to the set's field path.
     pub(crate) fn field_path(&self) -> &FieldPath {

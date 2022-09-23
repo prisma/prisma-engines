@@ -5,7 +5,7 @@ use crate::{
     logger, output_meta,
     query_builder::MongoReadQueryBuilder,
     root_queries::raw::{MongoCommand, MongoOperation},
-    IntoBson,
+    BsonTransform, IntoBson,
 };
 use connector_interface::*;
 use mongodb::{
@@ -191,11 +191,33 @@ pub async fn update_records<'conn>(
 
     let mut update_docs: Vec<Document> = vec![];
 
+    //merging of set and unset operations should happen here
+    //to do that write_op.into_update_docs should not already return a doc but a vec<>
+    use crate::root_queries::update::expression::MergedSet;
+    use crate::root_queries::update::into_expression::IntoUpdateExpressions;
+    use crate::root_queries::update::into_operation::IntoUpdateOperation;
+    use crate::root_queries::update::operation::UpdateOperation;
+    let mut set = MergedSet { pairs: vec![] };
     for (field, write_op) in fields {
         let field_path = FieldPath::new_from_segment(&field);
+        let operations = write_op.into_update_operations(&field, field_path)?;
+        let mut expressions = vec![];
 
-        update_docs.extend(write_op.into_update_docs(&field, field_path)?);
+        for op in operations {
+            match op {
+                UpdateOperation::Generic(set_op) => set.pairs.push((set_op.field_path, Box::new(set_op.expression))),
+                _ => expressions.extend(op.into_update_expressions()?),
+            }
+        }
+
+        for expr in expressions {
+            update_docs.push(expr.into_bson()?.into_document()?);
+        }
     }
+
+    update_docs.push(set.into_bson()?.into_document()?);
+
+    // println!("{:?}", update_docs);
 
     if !update_docs.is_empty() {
         logger::log_update_many_vec(coll.name(), &filter, &update_docs);
