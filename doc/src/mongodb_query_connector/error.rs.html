@@ -283,6 +283,10 @@
 <span id="283">283</span>
 <span id="284">284</span>
 <span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">connector_interface::error</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ErrorKind</span>, <span class="ident">MultiError</span>};
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 <span class="kw">use</span> <span class="ident">mongodb</span>::{
@@ -421,6 +425,10 @@
 
                 <span class="ident">mongodb::error::ErrorKind::Command</span>(<span class="ident">CommandError</span> { <span class="ident">code</span>, .. }) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">code</span> <span class="op">==</span> <span class="number">20</span> =&gt; {
                     <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::MongoReplicaSetRequired</span>)
+                }
+
+                <span class="ident">mongodb::error::ErrorKind::Command</span>(<span class="ident">CommandError</span> { <span class="ident">code</span>, .. }) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">code</span> <span class="op">==</span> <span class="number">112</span> =&gt; {
+                    <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::TransactionWriteConflict</span>)
                 }
 
                 <span class="ident">mongodb::error::ErrorKind::Write</span>(<span class="ident">write_failure</span>) =&gt; <span class="kw">match</span> <span class="ident">write_failure</span> {
