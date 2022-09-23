@@ -69,7 +69,8 @@
 <span id="69">69</span>
 <span id="70">70</span>
 <span id="71">71</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel</span>::{
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">native_types::MsSqlType</span>;
+<span class="kw">use</span> <span class="ident">psl_core</span>::{
     <span class="ident">datamodel_connector</span>::{<span class="ident">walker_ext_traits::ScalarFieldWalkerExt</span>, <span class="ident">Connector</span>},
     <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>},
     <span class="ident">parser_database</span>::{
@@ -77,7 +78,6 @@
         <span class="ident">ScalarType</span>,
     },
 };
-<span class="kw">use</span> <span class="ident">native_types::MsSqlType</span>;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">index_uses_correct_field_types</span>(
     <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>,

@@ -691,7 +691,8 @@
 <span id="691">691</span>
 <span id="692">692</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">dml</span>, <span class="kw-2">*</span>};
-<span class="kw">use</span> <span class="ident">::datamodel</span>::{
+<span class="kw">use</span> <span class="ident">either::Either</span>;
+<span class="kw">use</span> <span class="ident">psl_core</span>::{
     <span class="ident">datamodel_connector</span>::{<span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>, <span class="ident">Connector</span>, <span class="ident">ReferentialIntegrity</span>},
     <span class="ident">parser_database</span>::{
         <span class="self">self</span> <span class="kw">as</span> <span class="ident">db</span>,
@@ -700,7 +701,6 @@
         <span class="ident">IndexAlgorithm</span>, <span class="ident">ScalarType</span>,
     },
 };
-<span class="kw">use</span> <span class="ident">either::Either</span>;
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="doccomment">/// Helper for lifting a datamodel.</span>
@@ -1242,7 +1242,7 @@
 }
 
 <span class="kw">fn</span> <span class="ident">datamodel_connector_native_type_to_dml_native_type</span>(
-    <span class="ident">instance</span>: <span class="ident">::datamodel::datamodel_connector::NativeTypeInstance</span>,
+    <span class="ident">instance</span>: <span class="ident">psl_core::datamodel_connector::NativeTypeInstance</span>,
 ) -&gt; <span class="ident">dml::NativeTypeInstance</span> {
     <span class="ident">dml::NativeTypeInstance</span> {
         <span class="ident">name</span>: <span class="ident">instance</span>.<span class="ident">name</span>,

@@ -74,13 +74,13 @@
 <span id="74">74</span>
 <span id="75">75</span>
 <span id="76">76</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel</span>::{
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">native_types::MongoDbType</span>;
+<span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
+<span class="kw">use</span> <span class="ident">psl_core</span>::{
     <span class="ident">datamodel_connector::NativeTypeConstructor</span>,
     <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Span</span>},
     <span class="ident">parser_database::ScalarType</span>,
 };
-<span class="kw">use</span> <span class="ident">native_types::MongoDbType</span>;
-<span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="doccomment">/// The names of types as they appear in the Prisma schema.</span>

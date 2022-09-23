@@ -464,7 +464,11 @@
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">validations</span>;
 
 <span class="kw">use</span> <span class="ident">connection_string::JdbcString</span>;
-<span class="kw">use</span> <span class="ident">datamodel</span>::{
+<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
+<span class="kw">use</span> <span class="ident">lsp_types</span>::{<span class="ident">CompletionItem</span>, <span class="ident">CompletionItemKind</span>, <span class="ident">CompletionList</span>};
+<span class="kw">use</span> <span class="ident">native_types</span>::{<span class="ident">MsSqlType</span>, <span class="ident">MsSqlTypeParameter</span>, <span class="ident">NativeType</span>};
+<span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
+<span class="kw">use</span> <span class="ident">psl_core</span>::{
     <span class="ident">datamodel_connector</span>::{
         <span class="ident">helper</span>::{<span class="ident">arg_vec_from_opt</span>, <span class="ident">args_vec_from_opt</span>, <span class="ident">parse_one_opt_u32</span>, <span class="ident">parse_two_opt_u32</span>},
         <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ConstraintScope</span>, <span class="ident">NativeTypeConstructor</span>, <span class="ident">NativeTypeInstance</span>,
@@ -473,10 +477,6 @@
     <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>, <span class="ident">Span</span>},
     <span class="ident">parser_database</span>::{<span class="self">self</span>, <span class="ident">ast</span>, <span class="ident">ParserDatabase</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ScalarType</span>},
 };
-<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
-<span class="kw">use</span> <span class="ident">lsp_types</span>::{<span class="ident">CompletionItem</span>, <span class="ident">CompletionItemKind</span>, <span class="ident">CompletionList</span>};
-<span class="kw">use</span> <span class="ident">native_types</span>::{<span class="ident">MsSqlType</span>, <span class="ident">MsSqlTypeParameter</span>, <span class="ident">NativeType</span>};
-<span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
 <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
 <span class="kw">use</span> <span class="ident">MsSqlType</span>::<span class="kw-2">*</span>;

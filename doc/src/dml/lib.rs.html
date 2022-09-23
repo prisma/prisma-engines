@@ -81,7 +81,7 @@
 };
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">prisma_value</span>::{<span class="self">self</span>, <span class="ident">PrismaValue</span>};
 
-<span class="kw">use</span> <span class="ident">::datamodel</span>::{<span class="ident">reformat</span>, <span class="ident">Configuration</span>, <span class="ident">ValidatedSchema</span>};
+<span class="kw">use</span> <span class="ident">psl_core</span>::{<span class="ident">reformat</span>, <span class="ident">Configuration</span>, <span class="ident">ValidatedSchema</span>};
 
 <span class="doccomment">/// Find the model mapping to the passed in database name.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_model_by_db_name</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Datamodel</span>, <span class="ident">db_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Model</span><span class="op">&gt;</span> {

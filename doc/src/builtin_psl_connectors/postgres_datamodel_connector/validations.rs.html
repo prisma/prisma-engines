@@ -450,12 +450,12 @@
 <span id="450">450</span>
 <span id="451">451</span>
 <span id="452">452</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel</span>::{
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">native_types::PostgresType</span>;
+<span class="kw">use</span> <span class="ident">psl_core</span>::{
     <span class="ident">datamodel_connector</span>::{<span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>, <span class="ident">Connector</span>},
     <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>},
     <span class="ident">parser_database</span>::{<span class="ident">ast::WithSpan</span>, <span class="ident">walkers::IndexWalker</span>, <span class="ident">IndexAlgorithm</span>, <span class="ident">OperatorClass</span>},
 };
-<span class="kw">use</span> <span class="ident">native_types::PostgresType</span>;
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">compatible_native_types</span>(<span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) {
     <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">index</span>.<span class="ident">fields</span>() {
