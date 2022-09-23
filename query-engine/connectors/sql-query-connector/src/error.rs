@@ -168,6 +168,9 @@ pub enum SqlError {
     #[error("Transaction write conflict")]
     TransactionWriteConflict,
 
+    #[error("ROLLBACK statement has no corresponding BEGIN statement")]
+    RollbackWithoutBegin,
+
     #[error("Query parameter limit exceeded error: {0}.")]
     QueryParameterLimitExceeded(String),
 
@@ -271,6 +274,7 @@ impl SqlError {
                 )),
                 kind: ErrorKind::TransactionWriteConflict,
             },
+            SqlError::RollbackWithoutBegin => ConnectorError::from_kind(ErrorKind::RollbackWithoutBegin),
             SqlError::QueryParameterLimitExceeded(e) => {
                 ConnectorError::from_kind(ErrorKind::QueryParameterLimitExceeded(e))
             }
@@ -312,6 +316,7 @@ impl From<quaint::error::Error> for SqlError {
             QuaintKind::ConnectionClosed => SqlError::ConnectionClosed,
             QuaintKind::InvalidIsolationLevel(msg) => Self::InvalidIsolationLevel(msg),
             QuaintKind::TransactionWriteConflict => Self::TransactionWriteConflict,
+            QuaintKind::RollbackWithoutBegin => Self::RollbackWithoutBegin,
             e @ QuaintKind::UnsupportedColumnType { .. } => SqlError::ConversionError(e.into()),
             e @ QuaintKind::TransactionAlreadyClosed(_) => SqlError::TransactionAlreadyClosed(format!("{}", e)),
             e @ QuaintKind::IncorrectNumberOfParameters { .. } => SqlError::QueryError(e.into()),

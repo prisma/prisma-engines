@@ -4330,8 +4330,7 @@ dependencies = [
 [[package]]
 name = "tiberius"
 version = "0.11.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6f9232bb2d5c2e28c922c1247c9e8cf0bec361ae1865300308387ced5d0a922d"
+source = "git+https://github.com/prisma/tiberius?branch=fix/read-stream-on-error#cadfda913ee8cadefe06ea4e9b9c925e056c1867"
 dependencies = [
  "async-native-tls",
  "async-trait",
