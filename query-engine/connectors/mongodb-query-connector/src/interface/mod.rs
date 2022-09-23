@@ -102,18 +102,17 @@ mod tests {
         )
     }
 
-    fn datasource_from_url(url: &str) -> Datasource {
+    async fn mongodb_connector(url: &str) -> connector_interface::Result<MongoDb> {
         let schema = psl::validate(test_schema(url).into());
-        schema.configuration.datasources[0].clone()
+        let datasource = &schema.configuration.datasources[0];
+        MongoDb::new(datasource, url).await
     }
 
     /// Regression test for https://github.com/prisma/prisma/issues/13388
     #[tokio::test]
     async fn test_error_details_forwarding_srv_port() {
         let url = "mongodb+srv://root:example@localhost:27017/myDatabase";
-        let datasource = datasource_from_url(url);
-
-        let error = MongoDb::new(&datasource, url).await.err().unwrap();
+        let error = mongodb_connector(url).await.err().unwrap();
 
         assert!(error
             .to_string()
@@ -124,9 +123,7 @@ mod tests {
     #[tokio::test]
     async fn test_error_details_forwarding_illegal_characters() {
         let url = "mongodb://localhost:C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==@localhost:10255/e2e-tests?ssl=true";
-        let datasource = datasource_from_url(url);
-
-        let error = MongoDb::new(&datasource, url).await.err().unwrap();
+        let error = mongodb_connector(url).await.err().unwrap();
 
         assert!(error.to_string().contains("illegal character in database name"));
     }
