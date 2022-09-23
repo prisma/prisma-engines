@@ -138,6 +138,10 @@ impl MongoError {
                     ConnectorError::from_kind(ErrorKind::MongoReplicaSetRequired)
                 }
 
+                mongodb::error::ErrorKind::Command(CommandError { code, .. }) if *code == 112 => {
+                    ConnectorError::from_kind(ErrorKind::TransactionWriteConflict)
+                }
+
                 mongodb::error::ErrorKind::Write(write_failure) => match write_failure {
                     mongodb::error::WriteFailure::WriteConcernError(concern_error) => match concern_error.code {
                         11000 => ConnectorError::from_kind(unique_violation_error(concern_error.message.as_str())),

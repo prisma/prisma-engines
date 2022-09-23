@@ -159,6 +159,9 @@ pub enum SqlError {
     #[error("{}", _0)]
     InvalidIsolationLevel(String),
 
+    #[error("Transaction write conflict")]
+    TransactionWriteConflict,
+
     #[error("Query parameter limit exceeded error: {0}.")]
     QueryParameterLimitExceeded(String),
 
@@ -254,6 +257,13 @@ impl SqlError {
                 )),
                 kind: ErrorKind::TransactionAlreadyClosed { message },
             },
+
+            SqlError::TransactionWriteConflict => ConnectorError {
+                user_facing_error: Some(user_facing_errors::KnownError::new(
+                    user_facing_errors::query_engine::TransactionWriteConflict {},
+                )),
+                kind: ErrorKind::TransactionWriteConflict,
+            },
             SqlError::QueryParameterLimitExceeded(e) => {
                 ConnectorError::from_kind(ErrorKind::QueryParameterLimitExceeded(e))
             }
@@ -293,6 +303,7 @@ impl From<quaint::error::Error> for SqlError {
             QuaintKind::TableDoesNotExist { table } => SqlError::TableDoesNotExist(format!("{}", table)),
             QuaintKind::ConnectionClosed => SqlError::ConnectionClosed,
             QuaintKind::InvalidIsolationLevel(msg) => Self::InvalidIsolationLevel(msg),
+            QuaintKind::TransactionWriteConflict => Self::TransactionWriteConflict,
             e @ QuaintKind::UnsupportedColumnType { .. } => SqlError::ConversionError(e.into()),
             e @ QuaintKind::TransactionAlreadyClosed(_) => SqlError::TransactionAlreadyClosed(format!("{}", e)),
             e @ QuaintKind::IncorrectNumberOfParameters { .. } => SqlError::QueryError(e.into()),
