@@ -1,10 +1,10 @@
-use datamodel::{
+use native_types::MongoDbType;
+use once_cell::sync::Lazy;
+use psl_core::{
     datamodel_connector::NativeTypeConstructor,
     diagnostics::{DatamodelError, Span},
     parser_database::ScalarType,
 };
-use native_types::MongoDbType;
-use once_cell::sync::Lazy;
 use std::collections::HashMap;
 
 /// The names of types as they appear in the Prisma schema.

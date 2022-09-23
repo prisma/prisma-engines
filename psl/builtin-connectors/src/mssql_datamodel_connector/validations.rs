@@ -1,4 +1,5 @@
-use datamodel::{
+use native_types::MsSqlType;
+use psl_core::{
     datamodel_connector::{walker_ext_traits::ScalarFieldWalkerExt, Connector},
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{
@@ -6,7 +7,6 @@ use datamodel::{
         ScalarType,
     },
 };
-use native_types::MsSqlType;
 
 pub(crate) fn index_uses_correct_field_types(
     connector: &dyn Connector,

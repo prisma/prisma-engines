@@ -1,4 +1,5 @@
-use datamodel::{
+use enumflags2::BitFlags;
+use psl_core::{
     datamodel_connector::{
         Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance,
         ReferentialIntegrity,
@@ -6,7 +7,6 @@ use datamodel::{
     diagnostics::{DatamodelError, Span},
     parser_database::{ReferentialAction, ScalarType},
 };
-use enumflags2::BitFlags;
 use std::borrow::Cow;
 
 const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[];

@@ -1,7 +1,10 @@
 mod mongodb_types;
 mod validations;
 
-use datamodel::{
+use enumflags2::BitFlags;
+use mongodb_types::*;
+use native_types::{MongoDbType, NativeType};
+use psl_core::{
     datamodel_connector::{
         Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance,
         ReferentialIntegrity,
@@ -9,9 +12,6 @@ use datamodel::{
     diagnostics::{DatamodelError, Diagnostics, Span},
     parser_database::{walkers::*, ReferentialAction, ScalarType},
 };
-use enumflags2::BitFlags;
-use mongodb_types::*;
-use native_types::{MongoDbType, NativeType};
 use std::result::Result as StdResult;
 
 const CAPABILITIES: &[ConnectorCapability] = &[

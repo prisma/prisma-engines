@@ -5,8 +5,8 @@ edition = "2021"
 
 [dependencies]
 prisma-value = { path = "../prisma-value" }
-datamodel = { path = "../datamodel/core" }
-schema-ast = { path = "../datamodel/schema-ast" }
+psl-core = { path = "../../psl/psl-core" }
+schema-ast = { path = "../../psl/schema-ast" }
 native-types = { path = "../native-types" }
 
 uuid = { version = "1", features = ["serde", "v4"], optional = true }

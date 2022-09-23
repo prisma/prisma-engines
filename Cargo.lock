@@ -294,12 +294,12 @@ name = "builtin-psl-connectors"
 version = "0.1.0"
 dependencies = [
  "connection-string",
- "datamodel",
  "either",
  "enumflags2",
  "lsp-types",
  "native-types",
  "once_cell",
+ "psl-core",
  "regex",
  "serde_json",
 ]
@@ -670,27 +670,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3ee2393c4a91429dffb4bedf19f4d6abf27d8a732c8ce4980305d782e5426d57"
 
 [[package]]
-name = "datamodel"
-version = "0.1.0"
-dependencies = [
- "bigdecimal",
- "chrono",
- "diagnostics",
- "enumflags2",
- "indoc",
- "itertools",
- "lsp-types",
- "once_cell",
- "parser-database",
- "prisma-value",
- "regex",
- "schema-ast",
- "serde",
- "serde_json",
- "url",
-]
-
-[[package]]
 name = "derivative"
 version = "2.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -747,12 +726,12 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "cuid",
- "datamodel",
  "either",
  "enumflags2",
  "indoc",
  "native-types",
  "prisma-value",
+ "psl-core",
  "schema-ast",
  "serde",
  "serde_json",
@@ -3050,12 +3029,33 @@ name = "psl"
 version = "0.1.0"
 dependencies = [
  "builtin-psl-connectors",
- "datamodel",
  "dissimilar",
  "dml",
  "expect-test",
  "indoc",
  "native-types",
+ "psl-core",
+]
+
+[[package]]
+name = "psl-core"
+version = "0.1.0"
+dependencies = [
+ "bigdecimal",
+ "chrono",
+ "diagnostics",
+ "enumflags2",
+ "indoc",
+ "itertools",
+ "lsp-types",
+ "once_cell",
+ "parser-database",
+ "prisma-value",
+ "regex",
+ "schema-ast",
+ "serde",
+ "serde_json",
+ "url",
 ]
 
 [[package]]
