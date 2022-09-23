@@ -304,6 +304,17 @@
 <span id="304">304</span>
 <span id="305">305</span>
 <span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">error::MongoError</span>,
@@ -508,17 +519,28 @@
         .<span class="kw">await</span>
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_raw</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_inputs</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">PrismaValue</span><span class="op">&gt;</span>) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">MongoError::Unsupported</span>(<span class="string">&quot;Raw queries&quot;</span>.<span class="ident">to_owned</span>()).<span class="ident">into_connector_error</span>())
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_raw</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">inputs</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">PrismaValue</span><span class="op">&gt;</span>) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+        <span class="ident">catch</span>(<span class="kw">async</span> <span class="kw">move</span> { <span class="ident">write::execute_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connection</span>.<span class="ident">database</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connection</span>.<span class="ident">session</span>, <span class="ident">inputs</span>).<span class="kw">await</span> })
+            .<span class="kw">await</span>
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query_raw</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">_model</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ModelRef</span><span class="op">&gt;</span>,
-        <span class="ident">_inputs</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">PrismaValue</span><span class="op">&gt;</span>,
-        <span class="ident">_query_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+        <span class="ident">model</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ModelRef</span><span class="op">&gt;</span>,
+        <span class="ident">inputs</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">PrismaValue</span><span class="op">&gt;</span>,
+        <span class="ident">query_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">MongoError::Unsupported</span>(<span class="string">&quot;Raw queries&quot;</span>.<span class="ident">to_owned</span>()).<span class="ident">into_connector_error</span>())
+        <span class="ident">catch</span>(<span class="kw">async</span> <span class="kw">move</span> {
+            <span class="ident">write::query_raw</span>(
+                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connection</span>.<span class="ident">database</span>,
+                <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connection</span>.<span class="ident">session</span>,
+                <span class="ident">model</span>,
+                <span class="ident">inputs</span>,
+                <span class="ident">query_type</span>,
+            )
+            .<span class="kw">await</span>
+        })
+        .<span class="kw">await</span>
     }
 }
 

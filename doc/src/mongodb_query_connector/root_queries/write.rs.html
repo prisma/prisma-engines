@@ -481,7 +481,7 @@
 <span id="481">481</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">error::DecorateErrorWithFieldInformationExtension</span>,
+    <span class="ident">error</span>::{<span class="ident">DecorateErrorWithFieldInformationExtension</span>, <span class="ident">MongoError</span>},
     <span class="ident">filter</span>::{<span class="ident">FilterPrefix</span>, <span class="ident">MongoFilter</span>, <span class="ident">MongoFilterVisitor</span>},
     <span class="ident">logger</span>, <span class="ident">output_meta</span>,
     <span class="ident">query_builder::MongoReadQueryBuilder</span>,
@@ -891,7 +891,7 @@
     <span class="ident">_session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
     <span class="ident">_inputs</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">PrismaValue</span><span class="op">&gt;</span>,
 ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="macro">unimplemented!</span>()
+    <span class="prelude-val">Err</span>(<span class="ident">MongoError::Unsupported</span>(<span class="string">&quot;execute_raw&quot;</span>.<span class="ident">into</span>()))
 }
 
 <span class="doccomment">/// Execute a plain MongoDB query, returning the answer as a JSON `Value`.</span>
