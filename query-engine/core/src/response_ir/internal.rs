@@ -540,20 +540,22 @@ fn convert_prisma_value(field: &OutputFieldRef, value: PrismaValue, st: &ScalarT
         (ScalarType::Json, PrismaValue::String(s)) => PrismaValue::Json(s),
         (ScalarType::Json, PrismaValue::Json(s)) => PrismaValue::Json(s),
 
-        (ScalarType::Int, PrismaValue::Float(f)) => PrismaValue::Int(f.to_i64().unwrap()),
+        (ScalarType::Int, PrismaValue::Float(f)) => {
+            PrismaValue::Int(f.to_i64().ok_or(CoreError::decimal_conversion_error(&f, "i64"))?)
+        }
         (ScalarType::Int, PrismaValue::Int(i)) => PrismaValue::Int(i),
 
         (ScalarType::Float, PrismaValue::Float(f)) => PrismaValue::Float(f),
-        (ScalarType::Float, PrismaValue::Int(i)) => {
-            PrismaValue::Int(i.to_i64().expect("Unable to convert BigDecimal to i64."))
-        }
+        (ScalarType::Float, PrismaValue::Int(i)) => PrismaValue::Int(i),
 
         (ScalarType::Decimal, PrismaValue::Int(i)) => PrismaValue::String(i.to_string()),
         (ScalarType::Decimal, PrismaValue::Float(f)) => PrismaValue::String(f.to_string()),
 
         (ScalarType::BigInt, PrismaValue::BigInt(i)) => PrismaValue::BigInt(i),
         (ScalarType::BigInt, PrismaValue::Int(i)) => PrismaValue::BigInt(i),
-        (ScalarType::BigInt, PrismaValue::Float(f)) => PrismaValue::BigInt(f.to_i64().unwrap()),
+        (ScalarType::BigInt, PrismaValue::Float(f)) => {
+            PrismaValue::BigInt(f.to_i64().ok_or(CoreError::decimal_conversion_error(&f, "i64"))?)
+        }
 
         (ScalarType::Boolean, PrismaValue::Boolean(b)) => PrismaValue::Boolean(b),
         (ScalarType::Int, PrismaValue::Boolean(b)) => PrismaValue::Int(b as i64),

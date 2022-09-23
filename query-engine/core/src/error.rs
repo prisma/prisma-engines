@@ -2,6 +2,7 @@ use crate::{
     InterpreterError, QueryGraphBuilderError, QueryGraphError, QueryParserError, QueryParserErrorKind,
     RelationViolation, TransactionError,
 };
+use bigdecimal::BigDecimal;
 use connector::error::ConnectorError;
 use prisma_models::DomainError;
 use thiserror::Error;
@@ -48,8 +49,12 @@ pub enum CoreError {
     #[error("Unsupported feature: {}", _0)]
     UnsupportedFeatureError(String),
 
-    #[error("{}", _0)]
-    ConversionError(String),
+    #[error("Unable to convert {from_type} value \"{value}\" to type {to_type}")]
+    ConversionError {
+        value: String,
+        from_type: String,
+        to_type: String,
+    },
 
     #[error("{}", _0)]
     SerializationError(String),
@@ -73,6 +78,14 @@ impl CoreError {
             "Inconsistent query result: Field {} is required to return data, got `null` instead.",
             field_name
         ))
+    }
+
+    pub fn decimal_conversion_error(decimal: &BigDecimal, to_type: &str) -> Self {
+        CoreError::ConversionError {
+            value: decimal.to_string(),
+            from_type: "BigDecimal".into(),
+            to_type: to_type.into(),
+        }
     }
 }
 
