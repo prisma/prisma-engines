@@ -732,11 +732,11 @@ mod max_integer {
 
         // int4
         insta::assert_snapshot!(
-          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ id: 3, int4: {} }}) {{ id int }} }}", i32::MAX)),
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ id: 3, int4: {} }}) {{ id int4 }} }}", i32::MAX)),
           @r###"{"data":{"createOneTest":{"id":3,"int4":2147483647}}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ id: 4, int4: {} }}) {{ id int }} }}", i32::MIN)),
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ id: 4, int4: {} }}) {{ id int4 }} }}", i32::MIN)),
           @r###"{"data":{"createOneTest":{"id":4,"int4":-2147483648}}}"###
         );
 

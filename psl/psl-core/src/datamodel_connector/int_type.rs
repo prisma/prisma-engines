@@ -14,14 +14,14 @@ pub enum IntType {
 impl std::fmt::Display for IntType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            IntType::Signed8 => write!(f, "8-bit signed integer"),
-            IntType::Signed16 => write!(f, "16-bit signed integer"),
-            IntType::Signed24 => write!(f, "24-bit signed integer"),
-            IntType::Signed32 => write!(f, "32-bit signed integer"),
-            IntType::Unsigned8 => write!(f, "8-bit unsigned integer"),
-            IntType::Unsigned16 => write!(f, "16-bit unsigned integer"),
-            IntType::Unsigned24 => write!(f, "24-bit unsigned integer"),
-            IntType::Unsigned32 => write!(f, "32-bit unsigned integer"),
+            IntType::Signed8 => f.write_str("8-bit signed integer"),
+            IntType::Signed16 => f.write_str("16-bit signed integer"),
+            IntType::Signed24 => f.write_str("24-bit signed integer"),
+            IntType::Signed32 => f.write_str("32-bit signed integer"),
+            IntType::Unsigned8 => f.write_str("8-bit unsigned integer"),
+            IntType::Unsigned16 => f.write_str("16-bit unsigned integer"),
+            IntType::Unsigned24 => f.write_str("24-bit unsigned integer"),
+            IntType::Unsigned32 => f.write_str("32-bit unsigned integer"),
             IntType::Custom(min, max) => write!(f, "custom integer (min: {}, max: {})", min, max),
         }
     }
