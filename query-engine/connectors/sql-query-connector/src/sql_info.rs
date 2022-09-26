@@ -77,7 +77,8 @@ impl SqlInfo {
         Self {
             family: SqlFamily::Postgres,
             max_rows: None,
-            max_bind_values: get_batch_size(32766),
+            // TODO: this threshold is not tight
+            max_bind_values: get_batch_size(25000),
             capabilities: ConnectorCapabilities::new(psl::builtin_connectors::POSTGRES.capabilities().to_owned()),
         }
     }
