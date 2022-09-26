@@ -1,18 +1,21 @@
-use once_cell::sync::Lazy;
 use psl::datamodel_connector::{ConnectorCapabilities, ConnectorCapability};
 use quaint::prelude::ConnectionInfo;
 use std::env;
 
-/// Overrides the default number of allowed elements in query's `IN` or `NOT IN`
-/// statement for the currently loaded connector.
-/// Certain databases error out if querying with too many items. For test
-/// purposes, this value can be set with the `QUERY_BATCH_SIZE` environment
-/// value to a smaller number.
-pub static BATCH_SIZE_OVERRIDE: Lazy<Option<usize>> =
-    Lazy::new(|| env::var("QUERY_BATCH_SIZE").ok().and_then(|size| size.parse().ok()));
-
 #[cfg(not(test))]
 fn get_batch_size(default: usize) -> Option<usize> {
+    use once_cell::sync::Lazy;
+
+    /// Overrides the default number of allowed elements in query's `IN` or `NOT IN`
+    /// statement for the currently loaded connector.
+    /// Certain databases error out if querying with too many items. For test
+    /// purposes, this value can be set with the `QUERY_BATCH_SIZE` environment
+    /// value to a smaller number.
+    static BATCH_SIZE_OVERRIDE: Lazy<Option<usize>> = Lazy::new(|| {
+        env::var("QUERY_BATCH_SIZE")
+            .ok()
+            .map(|size| size.parse().expect("QUERY_BATCH_SIZE: not a valid size"))
+    });
     (*BATCH_SIZE_OVERRIDE).or(Some(default))
 }
 
