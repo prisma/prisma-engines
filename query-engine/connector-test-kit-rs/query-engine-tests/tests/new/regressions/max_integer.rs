@@ -100,14 +100,14 @@ mod max_integer {
             runner,
             format!("mutation {{ createOneTest(data: {{ id: 1, int: {} }}) {{ id int }} }}", I32_OVERFLOW_MAX),
             2009,
-            "Unable to fit integer value (or large JS integer serialized in exponent notation) '2147483648' into a 32-bit signed integer for field 'int'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '2147483648' into a 32-bit signed integer for field 'int'. If you're trying to store large integers, consider using `BigInt`."
         );
 
         assert_error!(
             runner,
             format!("mutation {{ createOneTest(data: {{ id: 1, int: {} }}) {{ id int }} }}", I32_OVERFLOW_MIN),
             2009,
-            "Unable to fit integer value (or large JS integer serialized in exponent notation) '-2147483649' into a 32-bit signed integer for field 'int'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '-2147483649' into a 32-bit signed integer for field 'int'. If you're trying to store large integers, consider using `BigInt`."
         );
 
         Ok(())
@@ -487,15 +487,15 @@ mod max_integer {
         // tinyint
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ tinyint: {} }}) {{ id }} }}", I8_OVERFLOW_MAX),
+            format!("mutation {{ createOneTest(data: {{ tinyint: {} }}) {{ id }} }}", U8_OVERFLOW_MAX),
             2009,
-            "Unable to fit integer value '128' into a 8-bit signed integer for field 'tinyint'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '256' into a 8-bit unsigned integer for field 'tinyint'. If you're trying to store large integers, consider using `BigInt`."
         );
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ tinyint: {} }}) {{ id }} }}", I8_OVERFLOW_MIN),
+            format!("mutation {{ createOneTest(data: {{ tinyint: {} }}) {{ id }} }}", OVERFLOW_MIN),
             2009,
-            "Unable to fit integer value '-129' into a 8-bit signed integer for field 'tinyint'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '-1' into a 8-bit unsigned integer for field 'tinyint'. If you're trying to store large integers, consider using `BigInt`."
         );
 
         // smallint
@@ -533,12 +533,12 @@ mod max_integer {
     async fn fitted_int_should_work_mssql(runner: Runner) -> TestResult<()> {
         // tinyint
         insta::assert_snapshot!(
-          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ tinyint: {} }}) {{ tinyint }} }}", i8::MAX)),
-          @r###"{"data":{"createOneTest":{"tinyint":127}}}"###
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ tinyint: {} }}) {{ tinyint }} }}", u8::MAX)),
+          @r###"{"data":{"createOneTest":{"tinyint":255}}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ tinyint: {} }}) {{ tinyint }} }}", i8::MIN)),
-          @r###"{"data":{"createOneTest":{"tinyint":-128}}}"###
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ tinyint: {} }}) {{ tinyint }} }}", u8::MIN)),
+          @r###"{"data":{"createOneTest":{"tinyint":0}}}"###
         );
 
         // smallint
@@ -567,7 +567,7 @@ mod max_integer {
     fn overflow_cockroach() -> String {
         let schema = indoc! {
             r#"model Test {
-                id Int @id @default(autoincrement())
+                id Int @id
                 int2 Int? @test.Int2
                 int4 Int? @test.Int4
                 oid  Int? @test.Oid
@@ -583,13 +583,13 @@ mod max_integer {
         // int2
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ int2: {} }}) {{ id }} }}", I16_OVERFLOW_MAX),
+            format!("mutation {{ createOneTest(data: {{ id: 1, int2: {} }}) {{ id }} }}", I16_OVERFLOW_MAX),
             2009,
             "Unable to fit integer value '32768' into a 16-bit signed integer for field 'int2'. If you're trying to store large integers, consider using `BigInt`."
         );
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ int2: {} }}) {{ id }} }}", I16_OVERFLOW_MIN),
+            format!("mutation {{ createOneTest(data: {{ id: 1, int2: {} }}) {{ id }} }}", I16_OVERFLOW_MIN),
             2009,
             "Unable to fit integer value '-32769' into a 16-bit signed integer for field 'int2'. If you're trying to store large integers, consider using `BigInt`."
         );
@@ -597,13 +597,13 @@ mod max_integer {
         // int4
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ int4: {} }}) {{ id }} }}", I32_OVERFLOW_MAX),
+            format!("mutation {{ createOneTest(data: {{ id: 1, int4: {} }}) {{ id }} }}", I32_OVERFLOW_MAX),
             2009,
             "Unable to fit integer value '2147483648' into a 32-bit signed integer for field 'int4'. If you're trying to store large integers, consider using `BigInt`."
         );
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ int4: {} }}) {{ id }} }}", I32_OVERFLOW_MIN),
+            format!("mutation {{ createOneTest(data: {{ id: 1, int4: {} }}) {{ id }} }}", I32_OVERFLOW_MIN),
             2009,
             "Unable to fit integer value '-2147483649' into a 32-bit signed integer for field 'int4'. If you're trying to store large integers, consider using `BigInt`."
         );
@@ -611,13 +611,13 @@ mod max_integer {
         // oid
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ oid: {} }}) {{ id }} }}", U32_OVERFLOW_MAX),
+            format!("mutation {{ createOneTest(data: {{ id: 1, oid: {} }}) {{ id }} }}", U32_OVERFLOW_MAX),
             2009,
             "Unable to fit integer value '4294967296' into a 32-bit unsigned integer for field 'oid'. If you're trying to store large integers, consider using `BigInt`."
         );
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ oid: {} }}) {{ id }} }}", OVERFLOW_MIN),
+            format!("mutation {{ createOneTest(data: {{ id: 1, oid: {} }}) {{ id }} }}", OVERFLOW_MIN),
             2009,
             "Unable to fit integer value '-1' into a 32-bit unsigned integer for field 'oid'. If you're trying to store large integers, consider using `BigInt`."
         );
@@ -629,31 +629,31 @@ mod max_integer {
     async fn fitted_int_should_work_cockroach(runner: Runner) -> TestResult<()> {
         // int2
         insta::assert_snapshot!(
-          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ int2: {} }}) {{ id int2 }} }}", i16::MAX)),
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ id: 1, int2: {} }}) {{ id int2 }} }}", i16::MAX)),
           @r###"{"data":{"createOneTest":{"id":3,"int2":32767}}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ int2: {} }}) {{ id int2 }} }}", i16::MIN)),
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ id: 2, int2: {} }}) {{ id int2 }} }}", i16::MIN)),
           @r###"{"data":{"createOneTest":{"id":4,"int2":-32768}}}"###
         );
 
         // int4
         insta::assert_snapshot!(
-          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ int4: {} }}) {{ id int }} }}", i32::MAX)),
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ id: 3, int4: {} }}) {{ id int }} }}", i32::MAX)),
           @r###"{"data":{"createOneTest":{"id":1,"int4":2147483647}}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ int4: {} }}) {{ id int }} }}", i32::MIN)),
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ id: 4, int4: {} }}) {{ id int }} }}", i32::MIN)),
           @r###"{"data":{"createOneTest":{"id":2,"int4":-2147483648}}}"###
         );
 
         // oid
         insta::assert_snapshot!(
-          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ oid: {} }}) {{ id oid }} }}", u32::MAX)),
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ id: 5, oid: {} }}) {{ id oid }} }}", u32::MAX)),
           @r###"{"data":{"createOneTest":{"id":5,"oid":4294967295}}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ oid: {} }}) {{ id oid }} }}", u32::MIN)),
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ id: 6, oid: {} }}) {{ id oid }} }}", u32::MIN)),
           @r###"{"data":{"createOneTest":{"id":6,"oid":0}}}"###
         );
 
@@ -663,7 +663,7 @@ mod max_integer {
     fn overflow_mongodb() -> String {
         let schema = indoc! {
             r#"model Test {
-                id Int @id
+                #id(id, Int, @id)
                 int Int? @test.Int
             }"#
         };

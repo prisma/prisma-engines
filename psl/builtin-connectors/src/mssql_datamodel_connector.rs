@@ -444,7 +444,7 @@ impl Connector for MsSqlDatamodelConnector {
         let nt: MsSqlType = serde_json::from_value(native_type).unwrap();
 
         match nt {
-            TinyInt => Some(IntType::Signed8),
+            TinyInt => Some(IntType::Unsigned8),
             SmallInt => Some(IntType::Signed16),
             Int => Some(IntType::Signed32),
             _ => None,
