@@ -4,7 +4,7 @@ use bigdecimal::{BigDecimal, ToPrimitive};
 use chrono::prelude::*;
 use indexmap::IndexMap;
 use prisma_value::PrismaValue;
-use psl::dml::ValueGeneratorFn;
+use psl::{datamodel_connector::IntType, dml::ValueGeneratorFn};
 use std::{borrow::Borrow, collections::HashSet, convert::TryFrom, str::FromStr, sync::Arc};
 use uuid::Uuid;
 
@@ -252,14 +252,32 @@ impl QueryDocumentParser {
             }
             (QueryValue::DateTime(s), ScalarType::DateTime) => Ok(PrismaValue::DateTime(s)),
 
-            (QueryValue::Int(i), ScalarType::Int) => Ok(PrismaValue::Int(i)),
+            (QueryValue::Int(i), ScalarType::Int(int_type)) => {
+                let fits_in_specified_type = match &int_type {
+                    IntType::Signed8 => i8::try_from(i).is_ok(),
+                    IntType::Signed16 => i16::try_from(i).is_ok(),
+                    IntType::Signed24 => fits_in_i24(i),
+                    IntType::Signed32 => i32::try_from(i).is_ok(),
+                    IntType::Unsigned8 => u8::try_from(i).is_ok(),
+                    IntType::Unsigned16 => u16::try_from(i).is_ok(),
+                    IntType::Unsigned24 => fits_in_u24(i),
+                    IntType::Unsigned32 => u32::try_from(i).is_ok(),
+                };
+
+                if fits_in_specified_type {
+                    Ok(PrismaValue::Int(i))
+                } else {
+                    Err(QueryParserError::new(parent_path.clone(), QueryParserErrorKind::ValueFitError(
+                        format!("Unable to fit integer value '{}' into a {} for field '{}'. If you're trying to store large integers, consider using `BigInt`.", i, int_type, parent_path.last().unwrap()))))
+                }
+            },
             (QueryValue::Int(i), ScalarType::Float) => Ok(PrismaValue::Float(BigDecimal::from(i))),
             (QueryValue::Int(i), ScalarType::Decimal) => Ok(PrismaValue::Float(BigDecimal::from(i))),
             (QueryValue::Int(i), ScalarType::BigInt) => Ok(PrismaValue::BigInt(i)),
 
             (QueryValue::Float(f), ScalarType::Float) => Ok(PrismaValue::Float(f)),
             (QueryValue::Float(f), ScalarType::Decimal) => Ok(PrismaValue::Float(f)),
-            (QueryValue::Float(f), ScalarType::Int) => match f.to_i64() {
+            (QueryValue::Float(f), ScalarType::Int(_)) => match f.to_i64() {
                 Some(converted) => Ok(PrismaValue::Int(converted)),
                 None => Err(QueryParserError::new(parent_path.clone(), QueryParserErrorKind::ValueFitError(
                             format!("Unable to fit float value (or large JS integer serialized in exponent notation) '{}' into a 64 Bit signed integer for field '{}'. If you're trying to store large integers, consider using `BigInt`.", f, parent_path.last().unwrap())))),
@@ -528,4 +546,18 @@ impl<'a, T: std::cmp::Eq + std::hash::Hash> Diff<'a, T> {
 
         Diff { left, right, _equal }
     }
+}
+
+fn fits_in_i24(from: i64) -> bool {
+    let i24_min = -8388608;
+    let i24_max = 8388607;
+
+    from >= i24_min && from <= i24_max
+}
+
+fn fits_in_u24(from: i64) -> bool {
+    let u24_min = 0;
+    let u24_max = 16777215;
+
+    from >= u24_min && from <= u24_max
 }

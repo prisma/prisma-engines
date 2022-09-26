@@ -1,7 +1,7 @@
 use super::*;
 use fmt::Debug;
 use prisma_models::{psl::common::preview_features::PreviewFeature, InternalDataModelRef, ModelRef};
-use psl::datamodel_connector::{ConnectorCapability, ReferentialIntegrity};
+use psl::datamodel_connector::{int_type::IntType, ConnectorCapability, ReferentialIntegrity};
 use std::{borrow::Borrow, fmt};
 
 /// The query schema.
@@ -217,7 +217,7 @@ impl ToString for Identifier {
 pub enum ScalarType {
     Null,
     String,
-    Int,
+    Int(IntType),
     BigInt,
     Float,
     Decimal,
@@ -235,7 +235,7 @@ impl std::fmt::Display for ScalarType {
         let typ = match self {
             ScalarType::Null => "Null",
             ScalarType::String => "String",
-            ScalarType::Int => "Int",
+            ScalarType::Int(_) => "Int",
             ScalarType::BigInt => "BigInt",
             ScalarType::Boolean => "Boolean",
             ScalarType::Float => "Float",

@@ -106,8 +106,8 @@ pub(crate) fn relation_selection_arguments(
         where_argument(ctx, model),
         order_by_argument(ctx, &model.into(), &order_by_options),
         input_field(args::CURSOR, unique_input_type, None).optional(),
-        input_field(args::TAKE, InputType::int(), None).optional(),
-        input_field(args::SKIP, InputType::int(), None).optional(),
+        input_field(args::TAKE, InputType::int32(), None).optional(),
+        input_field(args::SKIP, InputType::int32(), None).optional(),
     ];
 
     if include_distinct {
@@ -162,7 +162,7 @@ pub(crate) fn group_by_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> 
             None,
         )
         .optional(),
-        input_field(args::TAKE, InputType::int(), None).optional(),
-        input_field(args::SKIP, InputType::int(), None).optional(),
+        input_field(args::TAKE, InputType::int32(), None).optional(),
+        input_field(args::SKIP, InputType::int32(), None).optional(),
     ]
 }
