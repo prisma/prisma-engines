@@ -1,0 +1,19 @@
+datasource test {
+    provider = "sqlite"
+    url = env("TEST_DATABASE_URL")
+}
+
+model A {
+  left  Int
+  right Int
+
+  @@id([left, right], clustered: false)
+}
+
+
+// [1;91merror[0m: [1mError parsing attribute "@@id": Defining clustering is not supported in the current connector.[0m
+//   [1;94m-->[0m  [4mschema.prisma:10[0m
+// [1;94m   | [0m
+// [1;94m 9 | [0m
+// [1;94m10 | [0m  [1;91m@@id([left, right], clustered: false)[0m
+// [1;94m   | [0m

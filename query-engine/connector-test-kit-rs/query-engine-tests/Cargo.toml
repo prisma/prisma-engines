@@ -14,11 +14,12 @@ tracing = "0.1"
 tracing-futures = "0.2"
 colored = "2"
 chrono = "0.4"
-datamodel-connector = { path = "../../../libs/datamodel/connectors/datamodel-connector" }
+psl = { path = "../../../psl/psl" }
 base64 = "0.13"
-uuid = "0.8"
-tokio = "1.8"
+uuid = "1"
+tokio = "1.21.0"
 prisma-value = { path = "../../../libs/prisma-value" }
+query-engine-metrics = { path = "../../metrics"}
 
 [dev-dependencies]
 insta = "1.7.1"

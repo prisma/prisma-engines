@@ -6,13 +6,13 @@ pub use test_macros::test_connector;
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
 use crate::{BarrelMigrationExecutor, Result};
-use datamodel::common::preview_features::PreviewFeature;
-use datamodel::{dml::Datamodel, Configuration};
 use introspection_connector::{
     CompositeTypeDepth, ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionContext,
     IntrospectionResult, Version,
 };
 use migration_connector::{ConnectorParams, MigrationConnector};
+use psl::common::preview_features::PreviewFeature;
+use psl::{dml::Datamodel, Configuration};
 use quaint::{prelude::SqlFamily, single::Quaint};
 use sql_introspection_connector::SqlIntrospectionConnector;
 use sql_migration_connector::SqlMigrationConnector;
@@ -106,7 +106,7 @@ impl TestApi {
     pub async fn introspect(&self) -> Result<String> {
         let introspection_result = self.test_introspect_internal(Datamodel::new()).await?;
 
-        Ok(datamodel::render_datamodel_and_config_to_string(
+        Ok(psl::render_datamodel_and_config_to_string(
             &introspection_result.data_model,
             &self.configuration(),
         ))
@@ -115,7 +115,7 @@ impl TestApi {
     pub async fn introspect_dml(&self) -> Result<String> {
         let introspection_result = self.test_introspect_internal(Datamodel::new()).await?;
 
-        Ok(datamodel::render_datamodel_to_string(
+        Ok(psl::render_datamodel_to_string(
             &introspection_result.data_model,
             Some(&self.configuration()),
         ))
@@ -163,7 +163,7 @@ impl TestApi {
 
         let rendering_span = tracing::info_span!("render_datamodel after introspection");
         let _span = rendering_span.enter();
-        let dm = datamodel::render_datamodel_and_config_to_string(&introspection_result.data_model, &config);
+        let dm = psl::render_datamodel_and_config_to_string(&introspection_result.data_model, &config);
 
         Ok(dm)
     }
@@ -177,7 +177,7 @@ impl TestApi {
 
         let rendering_span = tracing::info_span!("render_datamodel after introspection");
         let _span = rendering_span.enter();
-        let dm = datamodel::render_datamodel_to_string(&introspection_result.data_model, Some(&config));
+        let dm = psl::render_datamodel_to_string(&introspection_result.data_model, Some(&config));
 
         Ok(dm)
     }
@@ -260,9 +260,7 @@ impl TestApi {
     }
 
     pub fn configuration(&self) -> Configuration {
-        datamodel::parse_configuration(&format!("{}\n{}", &self.datasource_block(), &self.generator_block()))
-            .unwrap()
-            .subject
+        psl::parse_configuration(&format!("{}\n{}", &self.datasource_block(), &self.generator_block())).unwrap()
     }
 
     #[track_caller]
@@ -276,7 +274,7 @@ impl TestApi {
         let config = self.configuration();
         let data_model = parse_datamodel(schema);
         let reintrospected = self.test_introspect_internal(data_model).await.unwrap();
-        let found = datamodel::render_datamodel_to_string(&reintrospected.data_model, Some(&config));
+        let found = psl::render_datamodel_to_string(&reintrospected.data_model, Some(&config));
         expectation.assert_eq(&found);
     }
 
@@ -285,17 +283,11 @@ impl TestApi {
         let expected_with_source = self.dm_with_sources(expected_without_header);
         let expected_with_generator = self.dm_with_generator_and_preview_flags(&expected_with_source);
 
-        let parsed_expected = datamodel::parse_datamodel(&expected_with_generator)
-            .map_err(|err| err.to_pretty_string("schema.prisma", &expected_with_generator))
-            .unwrap()
-            .subject;
+        let parsed_expected = parse_datamodel(&expected_with_generator);
+        let parsed_result = parse_datamodel(result_with_header);
 
-        let parsed_result = datamodel::parse_datamodel(result_with_header).unwrap().subject;
-
-        let reformatted_expected =
-            datamodel::render_datamodel_and_config_to_string(&parsed_expected, &self.configuration());
-        let reformatted_result =
-            datamodel::render_datamodel_and_config_to_string(&parsed_result, &self.configuration());
+        let reformatted_expected = psl::render_datamodel_and_config_to_string(&parsed_expected, &self.configuration());
+        let reformatted_result = psl::render_datamodel_and_config_to_string(&parsed_result, &self.configuration());
 
         println!("{}", reformatted_expected);
         println!("{}", reformatted_result);
@@ -349,8 +341,5 @@ impl TestApi {
 
 #[track_caller]
 fn parse_datamodel(dm: &str) -> Datamodel {
-    datamodel::parse_datamodel(dm)
-        .map_err(|diagnostics| diagnostics.to_pretty_string("schema.prisma", dm))
-        .unwrap()
-        .subject
+    psl::lift(&psl::parse_schema(dm).unwrap())
 }

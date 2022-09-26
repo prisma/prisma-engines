@@ -1,10 +1,10 @@
 use crate::{context::PrismaContext, opt::PrismaOpt, PrismaResult};
-use datamodel::common::preview_features::PreviewFeature;
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{header::CONTENT_TYPE, Body, HeaderMap, Method, Request, Response, Server, StatusCode};
 use opentelemetry::{global, propagation::Extractor, Context};
-use query_core::{schema::QuerySchemaRenderer, set_parent_context_from_json_str, TxId};
-use query_core::{MetricFormat, MetricRegistry};
+use psl::common::preview_features::PreviewFeature;
+use query_core::{schema::QuerySchemaRenderer, TxId};
+use query_engine_metrics::{MetricFormat, MetricRegistry};
 use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlHandler, TxInput};
 use serde_json::json;
 use std::collections::HashMap;
@@ -61,11 +61,11 @@ impl Clone for State {
 }
 
 pub async fn setup(opts: &PrismaOpt, metrics: MetricRegistry) -> PrismaResult<State> {
-    let config = opts.configuration(false)?.subject;
+    let datamodel = opts.schema(false)?;
+    let config = &datamodel.configuration;
     config.validate_that_one_datasource_is_provided()?;
 
-    let span = tracing::info_span!("prisma:engine:connect", user_facing = true);
-    let _ = set_parent_context_from_json_str(&span, &(opts.tracing_headers));
+    let span = tracing::info_span!("prisma:engine:connect");
 
     let enable_itx = config
         .preview_features()
@@ -73,8 +73,7 @@ pub async fn setup(opts: &PrismaOpt, metrics: MetricRegistry) -> PrismaResult<St
 
     let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics);
 
-    let datamodel = opts.datamodel()?;
-    let cx = PrismaContext::builder(config, datamodel)
+    let cx = PrismaContext::builder(datamodel)
         .set_metrics(metrics)
         .enable_raw_queries(opts.enable_raw_queries)
         .build()

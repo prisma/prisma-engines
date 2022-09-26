@@ -4,9 +4,9 @@ mod quaint_result_set_ext;
 pub use migration_assertions::*;
 pub use quaint_result_set_ext::*;
 
-use datamodel::datamodel_connector::Connector;
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
+use psl::datamodel_connector::Connector;
 use sql::{
     postgres::PostgresSchemaExt,
     walkers::{ColumnWalker, ForeignKeyWalker, IndexWalker, TableWalker},
@@ -423,7 +423,7 @@ impl<'a> ColumnAssertion<'a> {
         let found = self.column.default();
 
         match found.map(|d| d.kind()) {
-            Some(DefaultKind::DbGenerated(val)) => assert!(
+            Some(DefaultKind::DbGenerated(Some(val))) => assert!(
                 val == expected,
                 "Assertion failed. Expected the default value for `{}` to be dbgenerated with `{:?}`, got `{:?}`",
                 self.column.name(),

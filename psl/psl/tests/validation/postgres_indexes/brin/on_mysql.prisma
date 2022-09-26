@@ -1,0 +1,18 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model A {
+  id Int  @id
+  a  Int
+
+  @@index([a(ops: raw("whatever_ops"))], type: Brin)
+}
+
+// [1;91merror[0m: [1mError parsing attribute "@@index": The given index type is not supported with the current connector[0m
+//   [1;94m-->[0m  [4mschema.prisma:10[0m
+// [1;94m   | [0m
+// [1;94m 9 | [0m
+// [1;94m10 | [0m  @@index([a(ops: raw("whatever_ops"))], [1;91mtype: Brin[0m)
+// [1;94m   | [0m

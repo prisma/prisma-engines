@@ -9,7 +9,7 @@ use tracing::Span;
 
 /// `INSERT` a new record to the database. Resulting an `INSERT` ast and an
 /// optional `RecordProjection` if available from the arguments or model.
-pub fn create_record(model: &ModelRef, mut args: WriteArgs, trace_id: Option<String>) -> Insert<'static> {
+pub(crate) fn create_record(model: &ModelRef, mut args: WriteArgs, trace_id: Option<String>) -> Insert<'static> {
     let fields: Vec<_> = model
         .fields()
         .scalar()
@@ -98,18 +98,8 @@ pub fn create_records_empty(model: &ModelRef, skip_duplicates: bool, trace_id: O
     }
 }
 
-pub fn update_many(
-    model: &ModelRef,
-    ids: &[&SelectionResult],
-    args: WriteArgs,
-    trace_id: Option<String>,
-) -> crate::Result<Vec<Query<'static>>> {
-    if args.args.is_empty() || ids.is_empty() {
-        return Ok(Vec::new());
-    }
-
+pub fn build_update_and_set_query(model: &ModelRef, args: WriteArgs, trace_id: Option<String>) -> Update<'static> {
     let scalar_fields = model.fields().scalar();
-
     let query = args
         .args
         .into_iter()
@@ -159,19 +149,35 @@ pub fn update_many(
             acc.set(name, value)
         });
 
-    let query = query.append_trace(&Span::current()).add_trace_id(trace_id);
-    let columns: Vec<_> = ModelProjection::from(model.primary_identifier()).as_columns().collect();
-    let result: Vec<Query> = super::chunked_conditions(&columns, ids, |conditions| query.clone().so_that(conditions));
-
-    Ok(result)
+    query.append_trace(&Span::current()).add_trace_id(trace_id)
 }
 
-pub fn delete_many(model: &ModelRef, ids: &[&SelectionResult], trace_id: Option<String>) -> Vec<Query<'static>> {
+pub fn chunk_update_with_ids(
+    update: Update<'static>,
+    model: &ModelRef,
+    ids: &[&SelectionResult],
+    filter_condition: ConditionTree<'static>,
+) -> crate::Result<Vec<Query<'static>>> {
+    let columns: Vec<_> = ModelProjection::from(model.primary_identifier()).as_columns().collect();
+
+    let query = super::chunked_conditions(&columns, ids, |conditions| {
+        update.clone().so_that(conditions.and(filter_condition.clone()))
+    });
+
+    Ok(query)
+}
+
+pub fn delete_many(
+    model: &ModelRef,
+    ids: &[&SelectionResult],
+    filter_condition: ConditionTree<'static>,
+    trace_id: Option<String>,
+) -> Vec<Query<'static>> {
     let columns: Vec<_> = ModelProjection::from(model.primary_identifier()).as_columns().collect();
 
     super::chunked_conditions(&columns, ids, |conditions| {
         Delete::from_table(model.as_table())
-            .so_that(conditions)
+            .so_that(conditions.and(filter_condition.clone()))
             .append_trace(&Span::current())
             .add_trace_id(trace_id.clone())
     })

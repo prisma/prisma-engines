@@ -1,8 +1,4 @@
-use super::{
-    expression::{self},
-    into_expression::IntoUpdateExpression,
-};
-
+use super::{expression, into_expression::IntoUpdateExpression};
 use connector_interface::{FieldPath, Filter};
 use mongodb::bson::{doc, Document};
 

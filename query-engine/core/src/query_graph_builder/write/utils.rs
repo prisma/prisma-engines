@@ -4,9 +4,9 @@ use crate::{
     ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use connector::{DatasourceFieldName, Filter, RecordFilter, WriteArgs, WriteOperation};
-use datamodel::dml::ReferentialAction;
 use indexmap::IndexMap;
 use prisma_models::{FieldSelection, ModelRef, PrismaValue, RelationFieldRef, SelectionResult};
+use psl::dml::ReferentialAction;
 use schema::ConnectorContext;
 use std::sync::Arc;
 
@@ -144,7 +144,7 @@ pub fn update_records_node_placeholder<T>(graph: &mut QueryGraph, filter: T, mod
 where
     T: Into<Filter>,
 {
-    let args = WriteArgs::new();
+    let args = WriteArgs::new_empty(crate::executor::get_request_now());
     let filter = filter.into();
     let record_filter = filter.into();
 
@@ -325,7 +325,7 @@ pub fn insert_emulated_on_delete(
     for rf in relation_fields {
         match rf.relation().on_delete() {
             ReferentialAction::NoAction => continue, // Explicitly do nothing.
-            ReferentialAction::Restrict => emulate_restrict(graph, &rf, parent_node, child_node)?,
+            ReferentialAction::Restrict => emulate_on_delete_restrict(graph, &rf, parent_node, child_node)?,
             ReferentialAction::SetNull => {
                 emulate_on_delete_set_null(graph, connector_ctx, &rf, parent_node, child_node)?
             }
@@ -367,7 +367,7 @@ pub fn insert_emulated_on_delete(
 /// └ ▶   Delete / Update   │
 ///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
 /// ```
-pub fn emulate_restrict(
+pub fn emulate_on_delete_restrict(
     graph: &mut QueryGraph,
     relation_field: &RelationFieldRef,
     parent_node: &NodeRef,
@@ -568,7 +568,7 @@ pub fn emulate_on_delete_set_null(
     let set_null_query = WriteQuery::UpdateManyRecords(UpdateManyRecords {
         model: dependent_model.clone(),
         record_filter: RecordFilter::empty(),
-        args: child_update_args.into(),
+        args: WriteArgs::new(child_update_args, crate::executor::get_request_now()),
     });
 
     let set_null_dependents_node = graph.create_node(Query::Write(set_null_query));
@@ -693,7 +693,7 @@ pub fn emulate_on_update_set_null(
     let set_null_query = WriteQuery::UpdateManyRecords(UpdateManyRecords {
         model: dependent_model.clone(),
         record_filter: RecordFilter::empty(),
-        args: child_update_args.into(),
+        args: WriteArgs::new(child_update_args, crate::executor::get_request_now()),
     });
 
     let set_null_dependents_node = graph.create_node(Query::Write(set_null_query));
@@ -746,7 +746,7 @@ pub fn emulate_on_update_set_null(
         match rf.relation().on_update() {
             ReferentialAction::NoAction => continue,
             ReferentialAction::Restrict => {
-                emulate_restrict(graph, &rf, &dependent_records_node, &set_null_dependents_node)?
+                emulate_on_delete_restrict(graph, &rf, &dependent_records_node, &set_null_dependents_node)?
             }
             ReferentialAction::SetNull => emulate_on_update_set_null(
                 graph,
@@ -765,6 +765,48 @@ pub fn emulate_on_update_set_null(
             x => panic!("Unsupported referential action emulation: {}", x),
         }
     }
+
+    Ok(())
+}
+
+pub fn emulate_on_update_restrict(
+    graph: &mut QueryGraph,
+    relation_field: &RelationFieldRef,
+    parent_node: &NodeRef,
+    child_node: &NodeRef,
+) -> QueryGraphBuilderResult<()> {
+    let noop_node = graph.create_node(Node::Empty);
+    let relation_field = relation_field.related_field();
+    let child_model_identifier = relation_field.related_model().primary_identifier();
+    let read_node = insert_find_children_by_parent_node(graph, parent_node, &relation_field, Filter::empty())?;
+
+    let linking_fields = relation_field.linking_fields();
+
+    // Unwraps are safe as in this stage, no node content can be replaced.
+    let parent_update_args = extract_update_args(graph.node_content(child_node).unwrap());
+
+    let linking_fields_updated = linking_fields
+        .into_iter()
+        .any(|parent_pk| parent_update_args.get_field_value(parent_pk.db_name()).is_some());
+
+    graph.create_edge(
+        &read_node,
+        &noop_node,
+        QueryGraphDependency::ProjectedDataDependency(
+            child_model_identifier,
+            Box::new(move |noop_node, child_ids| {
+                // If any linking fields are to be updated and there are already connected children, then fail
+                if !child_ids.is_empty() && linking_fields_updated {
+                    return Err(QueryGraphBuilderError::RelationViolation((relation_field).into()));
+                }
+
+                Ok(noop_node)
+            }),
+        ),
+    )?;
+
+    // Edge from empty node to the child (delete).
+    graph.create_edge(&noop_node, child_node, QueryGraphDependency::ExecutionOrder)?;
 
     Ok(())
 }
@@ -852,7 +894,7 @@ pub fn insert_emulated_on_update_with_intermediary_node(
     for rf in relation_fields {
         match rf.relation().on_update() {
             ReferentialAction::NoAction => continue, // Explicitly do nothing.
-            ReferentialAction::Restrict => emulate_restrict(graph, &rf, &join_node, child_node)?,
+            ReferentialAction::Restrict => emulate_on_update_restrict(graph, &rf, &join_node, child_node)?,
             ReferentialAction::SetNull => {
                 emulate_on_update_set_null(graph, &rf, connector_ctx, &join_node, child_node)?
             }
@@ -883,7 +925,7 @@ pub fn insert_emulated_on_update(
     for rf in relation_fields {
         match rf.relation().on_update() {
             ReferentialAction::NoAction => continue, // Explicitly do nothing.
-            ReferentialAction::Restrict => emulate_restrict(graph, &rf, &parent_node, child_node)?,
+            ReferentialAction::Restrict => emulate_on_update_restrict(graph, &rf, &parent_node, child_node)?,
             ReferentialAction::SetNull => {
                 emulate_on_update_set_null(graph, &rf, connector_ctx, &parent_node, child_node)?
             }
@@ -992,7 +1034,10 @@ pub fn emulate_on_update_cascade(
     let update_query = WriteQuery::UpdateManyRecords(UpdateManyRecords {
         model: dependent_model.clone(),
         record_filter: RecordFilter::empty(),
-        args: child_update_args.into(),
+        args: WriteArgs::new(
+            child_update_args.into_iter().collect(),
+            crate::executor::get_request_now(),
+        ),
     });
 
     let update_dependents_node = graph.create_node(Query::Write(update_query));

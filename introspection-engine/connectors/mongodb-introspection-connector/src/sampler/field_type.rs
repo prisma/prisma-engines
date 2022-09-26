@@ -1,9 +1,8 @@
-use datamodel::dml::{self, NativeTypeInstance, ScalarType};
+use super::statistics::Name;
 use mongodb::bson::Bson;
 use native_types::MongoDbType;
+use psl::dml::{self, NativeTypeInstance, ScalarType};
 use std::fmt;
-
-use super::statistics::Name;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub(super) enum FieldType {

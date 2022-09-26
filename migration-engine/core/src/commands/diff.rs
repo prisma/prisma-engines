@@ -133,7 +133,7 @@ async fn json_rpc_diff_target_to_connector(
                     "You must pass the --shadow-database-url if you want to diff a migrations directory.".to_owned(),
                 )),
                 (None, _) => Err(ConnectorError::from_msg(
-                    "Could not determine the connector from the migrations directory (missing migrations_lock.toml)."
+                    "Could not determine the connector from the migrations directory (missing migration_lock.toml)."
                         .to_owned(),
                 )),
             }

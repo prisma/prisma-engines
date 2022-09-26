@@ -176,6 +176,22 @@ mod one2one_opt {
             @r###"{"data":{"updateOneParent":{"id":1}}}"###
         );
 
+        Ok(())
+    }
+
+    /// Updating the parent succeeds if no child is connected.
+    #[connector_test]
+    async fn update_parent_with_many(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1" }) { id }}"#),
+          @r###"{"data":{"createOneParent":{"id":1}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneParent(data: { id: 2, uniq: "2" }) { id }}"#),
+          @r###"{"data":{"createOneParent":{"id":2}}}"###
+        );
+
         insta::assert_snapshot!(
             run_query!(&runner, r#"mutation { updateManyParent(where: { id: 1 }, data: { uniq: "u1" }) { count }}"#),
             @r###"{"data":{"updateManyParent":{"count":1}}}"###

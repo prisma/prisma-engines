@@ -49,6 +49,9 @@ pub trait GenericApi: Send + Sync + 'static {
     /// Evaluate the consequences of running the next migration we would generate, given the current state of a Prisma schema.
     async fn evaluate_data_loss(&self, input: EvaluateDataLossInput) -> CoreResult<EvaluateDataLossOutput>;
 
+    /// Introspect the database schema.
+    async fn introspect(&self, input: IntrospectParams) -> CoreResult<IntrospectResult>;
+
     /// List the migration directories.
     async fn list_migration_directories(
         &self,

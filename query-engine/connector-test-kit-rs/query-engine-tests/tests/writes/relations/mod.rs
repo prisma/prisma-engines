@@ -4,5 +4,6 @@ mod optional_rel;
 mod rel_defaults;
 mod rel_design;
 mod rel_graphql;
+mod rel_names;
 mod required_rel;
 mod same_model_self_rel_without_back_rel;

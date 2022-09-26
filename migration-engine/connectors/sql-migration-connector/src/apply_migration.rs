@@ -129,6 +129,9 @@ fn render_raw_sql(
         SqlMigrationStep::AlterEnum(alter_enum) => renderer.render_alter_enum(alter_enum, schemas),
         SqlMigrationStep::RedefineTables(redefine_tables) => renderer.render_redefine_tables(redefine_tables, schemas),
         SqlMigrationStep::CreateEnum(enum_id) => renderer.render_create_enum(schemas.next.walk(*enum_id)),
+        SqlMigrationStep::CreateSchema(namespace_id) => {
+            vec![renderer.render_create_namespace(schemas.next.walk(*namespace_id))]
+        }
         SqlMigrationStep::DropEnum(enum_id) => renderer.render_drop_enum(schemas.previous.walk(*enum_id)),
         SqlMigrationStep::CreateTable { table_id } => {
             let table = schemas.next.walk(*table_id);
@@ -156,12 +159,12 @@ fn render_raw_sql(
         }
         SqlMigrationStep::RenameIndex { index } => renderer.render_rename_index(schemas.walk(*index)),
         SqlMigrationStep::DropView(drop_view) => {
-            let view = schemas.previous.view_walker_at(drop_view.view_index);
+            let view = schemas.previous.walk(drop_view.view_id);
 
             vec![renderer.render_drop_view(view)]
         }
         SqlMigrationStep::DropUserDefinedType(drop_udt) => {
-            let udt = schemas.previous.udt_walker_at(drop_udt.udt_index);
+            let udt = schemas.previous.walk(drop_udt.udt_id);
 
             vec![renderer.render_drop_user_defined_type(&udt)]
         }

@@ -88,7 +88,7 @@ pub(super) fn get_default_value(default_string: &str, tpe: &ColumnType) -> Optio
 
     Some(match parsed_default {
         Some(default_value) => default_value,
-        None => DefaultValue::db_generated(default_string),
+        None => DefaultValue::db_generated(default_string.to_owned()),
     })
 }
 
@@ -110,7 +110,7 @@ fn parse_unsupported(_parser: &mut Parser<'_>) -> Option<DefaultValue> {
 }
 
 fn parse_datetime_default(parser: &mut Parser<'_>) -> Option<DefaultValue> {
-    let value = match parser.peek_token()? {
+    match parser.peek_token()? {
         Token::Identifier => {
             let func_name = parser.expect(Token::Identifier)?;
             if let Some(Token::OpeningBrace) = parser.peek_token() {
@@ -128,9 +128,7 @@ fn parse_datetime_default(parser: &mut Parser<'_>) -> Option<DefaultValue> {
             }
         }
         _ => None,
-    };
-
-    value
+    }
 }
 
 fn parse_enum_default(parser: &mut Parser<'_>) -> Option<DefaultValue> {
@@ -506,7 +504,7 @@ fn get_list_default_value(parser: &mut Parser<'_>, tpe: &ColumnType) -> DefaultV
 
     values
         .map(|values| DefaultValue::value(PrismaValue::List(values)))
-        .unwrap_or_else(|| DefaultValue::db_generated(parser.input))
+        .unwrap_or_else(|| DefaultValue::db_generated(parser.input.to_owned()))
 }
 
 /// Some(()) on valid cast or absence of cast. None if we can't make sense of the input.

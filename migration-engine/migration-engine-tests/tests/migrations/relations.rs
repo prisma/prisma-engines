@@ -1,8 +1,8 @@
 mod cockroachdb;
 mod vitess;
 
-use datamodel::dml::ReferentialAction;
 use migration_engine_tests::test_api::*;
+use psl::dml::ReferentialAction;
 use sql_schema_describer::{ColumnTypeFamily, ForeignKeyAction};
 
 #[test_connector(exclude(Vitess))]

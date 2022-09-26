@@ -1,0 +1,18 @@
+datasource db {
+  provider = "mysql"
+  url = env("TEST_DATABASE_URL")
+}
+
+model A {
+  id Int  @id
+  a  Json
+
+  @@index([a(ops: JsonbOps)], type: Gin)
+}
+
+// [1;91merror[0m: [1mError parsing attribute "@@index": The given index type is not supported with the current connector[0m
+//   [1;94m-->[0m  [4mschema.prisma:10[0m
+// [1;94m   | [0m
+// [1;94m 9 | [0m
+// [1;94m10 | [0m  @@index([a(ops: JsonbOps)], [1;91mtype: Gin[0m)
+// [1;94m   | [0m

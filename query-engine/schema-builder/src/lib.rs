@@ -30,9 +30,10 @@
 //! The cache can be consumed to produce a list of strong references to the individual input and output
 //! object types, which are then moved to the query schema to keep weak references alive (see TypeRefCache for additional infos).
 
+pub mod constants;
+
 #[macro_use]
 mod cache;
-pub mod constants;
 mod enum_types;
 mod input_types;
 mod mutations;
@@ -40,11 +41,11 @@ mod output_types;
 mod utils;
 
 use cache::TypeRefCache;
-use datamodel_connector::{ConnectorCapabilities, ConnectorCapability, ReferentialIntegrity};
 use prisma_models::{
-    datamodel::common::preview_features::PreviewFeature, CompositeTypeRef, Field as ModelField, Index,
-    InternalDataModelRef, ModelRef, RelationFieldRef, TypeIdentifier,
+    psl::common::preview_features::PreviewFeature, CompositeTypeRef, Field as ModelField, Index, InternalDataModelRef,
+    ModelRef, RelationFieldRef, TypeIdentifier,
 };
+use psl::datamodel_connector::{Connector, ConnectorCapability, ReferentialIntegrity};
 use schema::*;
 use std::sync::Arc;
 
@@ -54,7 +55,7 @@ pub(crate) struct BuilderContext {
     internal_data_model: InternalDataModelRef,
     enable_raw_queries: bool,
     cache: TypeCache,
-    capabilities: ConnectorCapabilities,
+    connector: &'static dyn Connector,
     preview_features: Vec<PreviewFeature>,
     nested_create_inputs_queue: NestedInputsQueue,
     nested_update_inputs_queue: NestedInputsQueue,
@@ -65,14 +66,14 @@ impl BuilderContext {
     pub fn new(
         internal_data_model: InternalDataModelRef,
         enable_raw_queries: bool,
-        capabilities: ConnectorCapabilities,
+        connector: &'static dyn Connector,
         preview_features: Vec<PreviewFeature>,
     ) -> Self {
         Self {
             internal_data_model,
             enable_raw_queries,
             cache: TypeCache::new(),
-            capabilities,
+            connector,
             preview_features,
             nested_create_inputs_queue: Vec::new(),
             nested_update_inputs_queue: Vec::new(),
@@ -84,7 +85,7 @@ impl BuilderContext {
     }
 
     pub fn has_capability(&self, capability: ConnectorCapability) -> bool {
-        self.capabilities.contains(capability)
+        self.connector.has_capability(capability)
     }
 
     /// Get an input (object) type.
@@ -130,6 +131,10 @@ impl BuilderContext {
     pub fn composite_types(&self) -> Vec<CompositeTypeRef> {
         self.internal_data_model.composite_types().to_owned()
     }
+
+    pub fn supports_any(&self, capabilities: &[ConnectorCapability]) -> bool {
+        capabilities.iter().any(|c| self.connector.has_capability(*c))
+    }
 }
 
 #[derive(Debug)]
@@ -170,14 +175,14 @@ impl TypeCache {
 pub fn build(
     internal_data_model: InternalDataModelRef,
     enable_raw_queries: bool,
-    capabilities: ConnectorCapabilities,
+    connector: &'static dyn Connector,
     preview_features: Vec<PreviewFeature>,
     referential_integrity: ReferentialIntegrity,
 ) -> QuerySchema {
     let mut ctx = BuilderContext::new(
         internal_data_model,
         enable_raw_queries,
-        capabilities,
+        connector,
         preview_features.clone(),
     );
 
@@ -206,7 +211,7 @@ pub fn build(
         output_objects,
         enum_types,
         ctx.internal_data_model,
-        ctx.capabilities.capabilities,
+        ctx.connector.capabilities().to_owned(),
         preview_features,
         referential_integrity,
     )

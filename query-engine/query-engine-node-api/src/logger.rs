@@ -1,5 +1,6 @@
 use core::fmt;
-use query_core::{is_user_facing_trace_filter, MetricRegistry};
+use query_core::is_user_facing_trace_filter;
+use query_engine_metrics::MetricRegistry;
 use serde_json::Value;
 use std::collections::BTreeMap;
 use std::sync::Arc;
@@ -61,7 +62,7 @@ impl Logger {
         let layer = CallbackLayer::new(log_callback_arc).with_filter(filters);
 
         let metrics = if enable_metrics {
-            query_core::metrics::setup();
+            query_engine_metrics::setup();
             Some(MetricRegistry::new())
         } else {
             None

@@ -1,0 +1,19 @@
+datasource test {
+  provider = "postgresql"
+  url = env("TEST_DATABASE_URL")
+}
+
+model A {
+  id Int    @id
+  a  String @test.Text
+
+  @@index([a(ops: TextOps)], type: Gist)
+}
+
+
+// [1;91merror[0m: [1mError parsing attribute "@@index": The given operator class `TextOps` is not supported with the `Gist` index type.[0m
+//   [1;94m-->[0m  [4mschema.prisma:10[0m
+// [1;94m   | [0m
+// [1;94m 9 | [0m
+// [1;94m10 | [0m  [1;91m@@index([a(ops: TextOps)], type: Gist)[0m
+// [1;94m   | [0m

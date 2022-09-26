@@ -1,7 +1,6 @@
 [package]
 name = "native-types"
 version = "0.1.0"
-authors = ["Marcus Böhm <wif.mboehm@gmx.de>"]
 edition = "2021"
 
 [dependencies]

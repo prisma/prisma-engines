@@ -13,7 +13,7 @@ pub struct Fields {
     composite: OnceCell<Vec<CompositeFieldWeak>>,
     model: ModelWeakRef,
     // created_at: OnceCell<Option<ScalarFieldRef>>,
-    updated_at: OnceCell<Option<ScalarFieldRef>>,
+    updated_at: OnceCell<Vec<ScalarFieldRef>>,
 }
 
 impl Fields {
@@ -77,12 +77,13 @@ impl Fields {
         }
     }
 
-    pub fn updated_at(&self) -> &Option<ScalarFieldRef> {
+    pub fn updated_at(&self) -> &Vec<ScalarFieldRef> {
         self.updated_at.get_or_init(|| {
             self.scalar_weak()
                 .iter()
                 .map(|sf| sf.upgrade().unwrap())
-                .find(|sf| sf.is_updated_at)
+                .filter(|sf| sf.is_updated_at)
+                .collect()
         })
     }
 

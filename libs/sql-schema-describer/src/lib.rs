@@ -1,6 +1,7 @@
 //! Database description. This crate is used heavily in the introspection and migration engines.
 
 #![deny(rust_2018_idioms, unsafe_code)]
+#![allow(clippy::derive_partial_eq_without_eq)]
 
 pub mod mssql;
 pub mod mysql;
@@ -54,6 +55,8 @@ pub struct SqlMetadata {
 /// The result of describing a database schema.
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct SqlSchema {
+    /// Namespaces (schemas)
+    namespaces: Vec<String>,
     /// The schema's tables.
     tables: Vec<Table>,
     /// The schema's enums.
@@ -210,9 +213,15 @@ impl SqlSchema {
         });
     }
 
-    pub fn push_table(&mut self, name: String) -> TableId {
+    pub fn push_namespace(&mut self, name: String) -> NamespaceId {
+        let id = NamespaceId(self.namespaces.len() as u32);
+        self.namespaces.push(name);
+        id
+    }
+
+    pub fn push_table(&mut self, name: String, namespace_id: NamespaceId) -> TableId {
         let id = TableId(self.tables.len() as u32);
-        self.tables.push(Table { name });
+        self.tables.push(Table { namespace_id, name });
         id
     }
 
@@ -233,11 +242,11 @@ impl SqlSchema {
     }
 
     pub fn view_walkers(&self) -> impl Iterator<Item = ViewWalker<'_>> {
-        (0..self.views.len()).map(move |view_index| ViewWalker::new(self, view_index))
+        (0..self.views.len()).map(move |view_index| self.walk(ViewId(view_index as u32)))
     }
 
     pub fn udt_walkers(&self) -> impl Iterator<Item = UserDefinedTypeWalker<'_>> {
-        (0..self.user_defined_types.len()).map(move |udt_index| UserDefinedTypeWalker::new(self, udt_index))
+        (0..self.user_defined_types.len()).map(move |udt_index| self.walk(UdtId(udt_index as u32)))
     }
 
     pub fn enum_walkers(&self) -> impl Iterator<Item = EnumWalker<'_>> {
@@ -259,29 +268,26 @@ impl SqlSchema {
         Walker { id, schema: self }
     }
 
-    pub fn udt_walker_at(&self, index: usize) -> UserDefinedTypeWalker<'_> {
-        UserDefinedTypeWalker {
-            udt_index: index,
-            schema: self,
-        }
-    }
-
-    pub fn view_walker_at(&self, index: usize) -> ViewWalker<'_> {
-        ViewWalker {
-            view_index: index,
-            schema: self,
-        }
-    }
-
     /// Traverse all the columns in the schema.
     pub fn walk_columns(&self) -> impl Iterator<Item = ColumnWalker<'_>> {
         (0..self.columns.len()).map(|idx| self.walk(ColumnId(idx as u32)))
+    }
+
+    /// Traverse all namespaces in the catalog.
+    pub fn walk_namespaces(&self) -> impl ExactSizeIterator<Item = NamespaceWalker<'_>> {
+        (0..self.namespaces.len()).map(|idx| self.walk(NamespaceId(idx as u32)))
+    }
+
+    /// No tables or enums in the catalog.
+    pub fn is_empty(&self) -> bool {
+        self.tables.is_empty() && self.enums.is_empty()
     }
 }
 
 /// A table found in a schema.
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct Table {
+    namespace_id: NamespaceId,
     name: String,
 }
 
@@ -548,6 +554,8 @@ struct ForeignKeyColumn {
 /// A SQL enum.
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct Enum {
+    /// The namespace the enum type belongs to, if applicable.
+    pub namespace_id: NamespaceId,
     /// Enum name.
     pub name: String,
     /// Possible enum values.
@@ -581,12 +589,12 @@ pub enum DefaultKind {
     /// A unique row ID,
     UniqueRowid,
     /// An unrecognized Default Value
-    DbGenerated(String),
+    DbGenerated(Option<String>),
 }
 
 impl DefaultValue {
     pub fn db_generated(val: impl Into<String>) -> Self {
-        Self::new(DefaultKind::DbGenerated(val.into()))
+        Self::new(DefaultKind::DbGenerated(Some(val.into())))
     }
 
     pub fn now() -> Self {

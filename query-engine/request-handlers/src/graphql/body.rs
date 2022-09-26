@@ -1,7 +1,5 @@
 use super::GraphQLProtocolAdapter;
-use crate::HandlerError;
-use graphql_parser as gql;
-use query_core::{BatchDocument, Operation, QueryDocument};
+use query_core::{BatchDocument, BatchDocumentTransaction, Operation, QueryDocument};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -25,11 +23,16 @@ pub struct SingleQuery {
 pub struct MultiQuery {
     batch: Vec<SingleQuery>,
     transaction: bool,
+    isolation_level: Option<String>,
 }
 
 impl MultiQuery {
-    pub fn new(batch: Vec<SingleQuery>, transaction: bool) -> Self {
-        Self { batch, transaction }
+    pub fn new(batch: Vec<SingleQuery>, transaction: bool, isolation_level: Option<String>) -> Self {
+        Self {
+            batch,
+            transaction,
+            isolation_level,
+        }
     }
 }
 
@@ -54,17 +57,7 @@ impl GraphQlBody {
     pub(crate) fn into_doc(self) -> crate::Result<QueryDocument> {
         match self {
             GraphQlBody::Single(body) => {
-                let gql_doc = match gql::parse_query(&body.query) {
-                    Ok(doc) => doc,
-                    Err(err)
-                        if err.to_string().contains("number too large to fit in target type")
-                            | err.to_string().contains("number too small to fit in target type") =>
-                    {
-                        return Err(HandlerError::ValueFitError("Query parsing failure: A number used in the query does not fit into a 64 bit signed integer. Consider using `BigInt` as field type if you're trying to store large integers.".to_owned()));
-                    }
-                    err @ Err(_) => err?,
-                };
-                let operation = GraphQLProtocolAdapter::convert(gql_doc, body.operation_name)?;
+                let operation = GraphQLProtocolAdapter::convert_query_to_operation(&body.query, body.operation_name)?;
 
                 Ok(QueryDocument::Single(operation))
             }
@@ -72,16 +65,15 @@ impl GraphQlBody {
                 let operations: crate::Result<Vec<Operation>> = bodies
                     .batch
                     .into_iter()
-                    .map(|body| {
-                        let gql_doc = gql::parse_query(&body.query)?;
-                        GraphQLProtocolAdapter::convert(gql_doc, body.operation_name)
-                    })
+                    .map(|body| GraphQLProtocolAdapter::convert_query_to_operation(&body.query, body.operation_name))
                     .collect();
+                let transaction = if bodies.transaction {
+                    Some(BatchDocumentTransaction::new(bodies.isolation_level))
+                } else {
+                    None
+                };
 
-                Ok(QueryDocument::Multi(BatchDocument::new(
-                    operations?,
-                    bodies.transaction,
-                )))
+                Ok(QueryDocument::Multi(BatchDocument::new(operations?, transaction)))
             }
         }
     }

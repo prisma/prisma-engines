@@ -16,18 +16,12 @@ jobs:
     name: "WebAssembly build ${{ github.event.ref }} for commit ${{ github.event.inputs.commit }}"
     runs-on: buildjet-16vcpu-ubuntu-2004
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           target: wasm32-unknown-unknown
           default: true
-
-      - name: Build the datamodel crate with default features
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: -p datamodel --release --target=wasm32-unknown-unknown
 
       - name: Build the migration-connector crate with default features
         uses: actions-rs/cargo@v1

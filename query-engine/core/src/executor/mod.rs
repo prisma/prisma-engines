@@ -1,3 +1,5 @@
+#![allow(clippy::declare_interior_mutable_const)]
+
 //! What the executor module DOES:
 //! - Defining an overarching executor trait, to be used on consumers of the core crate.
 //! - Defining executor implementations that combine the different core modules into a coherent
@@ -13,10 +15,11 @@ mod pipeline;
 pub use execute_operation::*;
 pub use loader::*;
 
-use crate::{query_document::Operation, response_ir::ResponseData, schema::QuerySchemaRef, TxId};
+use crate::{
+    query_document::Operation, response_ir::ResponseData, schema::QuerySchemaRef, BatchDocumentTransaction, TxId,
+};
 use async_trait::async_trait;
 use connector::Connector;
-
 use tracing::Dispatch;
 
 #[async_trait]
@@ -42,7 +45,7 @@ pub trait QueryExecutor: TransactionManager {
         &self,
         tx_id: Option<TxId>,
         operations: Vec<Operation>,
-        transactional: bool,
+        transaction: Option<BatchDocumentTransaction>,
         query_schema: QuerySchemaRef,
         trace_id: Option<String>,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>>;
@@ -87,4 +90,34 @@ pub trait TransactionManager {
 
 pub fn get_current_dispatcher() -> Dispatch {
     tracing::dispatcher::get_default(|current| current.clone())
+}
+
+tokio::task_local! {
+    static REQUEST_NOW: prisma_value::PrismaValue;
+}
+
+/// A timestamp that should be the `NOW()` value for the whole duration of a request. So all
+/// `@default(now())` and `@updatedAt` should use it.
+///
+/// That panics if REQUEST_NOW has not been set with with_request_now().
+///
+/// If we had a query context we carry for all the lifetime of the query, it would belong there.
+pub(crate) fn get_request_now() -> prisma_value::PrismaValue {
+    REQUEST_NOW.with(|rn| rn.clone())
+}
+
+/// Execute a future with the current "now" timestamp that can be retrieved through
+/// `get_request_now()`, initializing it if necessary.
+pub(crate) async fn with_request_now<F, R>(fut: F) -> R
+where
+    F: std::future::Future<Output = R>,
+{
+    let is_set = REQUEST_NOW.try_with(|_| async {}).is_ok();
+
+    if is_set {
+        fut.await
+    } else {
+        let now = prisma_value::PrismaValue::DateTime(chrono::Utc::now().into());
+        REQUEST_NOW.scope(now, fut).await
+    }
 }

@@ -5,14 +5,14 @@ pub(crate) use name::Name;
 
 use super::{field_type::FieldType, CompositeTypeDepth};
 use convert_case::{Case, Casing};
-use datamodel::dml::{
-    self, CompositeType, CompositeTypeField, CompositeTypeFieldType, Datamodel, DefaultValue, Field, FieldArity, Model,
-    PrimaryKeyDefinition, PrimaryKeyField, ScalarField, ScalarType, ValueGenerator, WithDatabaseName,
-};
 use introspection_connector::Warning;
 use mongodb::bson::{Bson, Document};
 use mongodb_schema_describer::IndexWalker;
 use once_cell::sync::Lazy;
+use psl::dml::{
+    self, CompositeType, CompositeTypeField, CompositeTypeFieldType, Datamodel, DefaultValue, Field, FieldArity, Model,
+    PrimaryKeyDefinition, PrimaryKeyField, ScalarField, ScalarType, ValueGenerator, WithDatabaseName,
+};
 use regex::Regex;
 use std::{
     borrow::Cow,

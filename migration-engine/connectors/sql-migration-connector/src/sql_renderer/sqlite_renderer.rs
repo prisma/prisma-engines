@@ -4,9 +4,9 @@ use crate::{
     pair::Pair,
     sql_migration::{AlterEnum, AlterTable, RedefineTable, TableChange},
 };
-use datamodel::dml::PrismaValue;
 use indoc::formatdoc;
 use once_cell::sync::Lazy;
+use psl::dml::PrismaValue;
 use regex::Regex;
 use sql_ddl::sqlite as ddl;
 use sql_schema_describer::{walkers::*, *};
@@ -100,9 +100,13 @@ impl SqlRenderer for SqliteFlavour {
         unreachable!("Unreachable render_create_enum() on SQLite. SQLite does not have enums.")
     }
 
-    fn render_create_table_as(&self, table: TableWalker<'_>, table_name: &str) -> String {
+    fn render_create_table(&self, table: TableWalker<'_>) -> String {
+        self.render_create_table_as(table, TableName(None, Quoted::sqlite_ident(table.name())))
+    }
+
+    fn render_create_table_as(&self, table: TableWalker<'_>, table_name: TableName<&str>) -> String {
         let mut create_table = sql_ddl::sqlite::CreateTable {
-            table_name: table_name.into(),
+            table_name: &table_name,
             columns: table.columns().map(|col| render_column(&col)).collect(),
             primary_key: None,
             foreign_keys: table
@@ -187,7 +191,10 @@ impl SqlRenderer for SqliteFlavour {
             let tables = schemas.walk(redefine_table.table_ids);
             let temporary_table_name = format!("new_{}", &tables.next.name());
 
-            result.push(self.render_create_table_as(tables.next, &temporary_table_name));
+            result.push(self.render_create_table_as(
+                tables.next,
+                TableName(None, Quoted::sqlite_ident(&temporary_table_name)),
+            ));
 
             copy_current_table_into_new_table(&mut result, redefine_table, tables, &temporary_table_name);
 
@@ -304,7 +311,12 @@ fn render_column<'a>(column: &ColumnWalker<'a>) -> ddl::Column<'a> {
         autoincrement: column.is_single_primary_key() && column.column_type_family().is_int(),
         default: column
             .default()
-            .filter(|default| !matches!(default.kind(), DefaultKind::Sequence(_)))
+            .filter(|default| {
+                !matches!(
+                    default.kind(),
+                    DefaultKind::Sequence(_) | DefaultKind::DbGenerated(None)
+                )
+            })
             .map(render_default),
         name: column.name().into(),
         not_null: !column.arity().is_nullable(),
@@ -315,7 +327,7 @@ fn render_column<'a>(column: &ColumnWalker<'a>) -> ddl::Column<'a> {
 
 fn render_default(default: &DefaultValue) -> Cow<'_, str> {
     match default.kind() {
-        DefaultKind::DbGenerated(val) => val.as_str().into(),
+        DefaultKind::DbGenerated(Some(val)) => val.as_str().into(),
         DefaultKind::Value(PrismaValue::String(val)) | DefaultKind::Value(PrismaValue::Enum(val)) => {
             Quoted::sqlite_string(escape_quotes(val)).to_string().into()
         }
@@ -327,6 +339,6 @@ fn render_default(default: &DefaultValue) -> Cow<'_, str> {
         DefaultKind::Now => "CURRENT_TIMESTAMP".into(),
         DefaultKind::Value(PrismaValue::DateTime(val)) => Quoted::sqlite_string(val).to_string().into(),
         DefaultKind::Value(val) => val.to_string().into(),
-        DefaultKind::Sequence(_) | DefaultKind::UniqueRowid => unreachable!(),
+        DefaultKind::DbGenerated(None) | DefaultKind::Sequence(_) | DefaultKind::UniqueRowid => unreachable!(),
     }
 }

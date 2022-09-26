@@ -4,14 +4,15 @@ name = "mongodb-migration-connector"
 version = "0.1.0"
 
 [dependencies]
-datamodel = { path = "../../../libs/datamodel/core", default_features = false }
+psl = { path = "../../../psl/psl" }
 mongodb-client = { path = "../../../libs/mongodb-client" }
 mongodb-schema-describer = { path = "../../../libs/mongodb-schema-describer" }
 migration-connector = { path = "../migration-connector" }
+mongodb-introspection-connector = { path = "../../../introspection-engine/connectors/mongodb-introspection-connector" }
 
 enumflags2 = "0.7"
 futures = "0.3"
-mongodb = "2.1.0"
+mongodb = "2.3.0"
 serde_json = "1"
 tokio = { version = "1.0", features = ["parking_lot"] }
 tracing = "0.1"

@@ -1,7 +1,8 @@
 use super::*;
 use fmt::Debug;
 use once_cell::sync::OnceCell;
-use prisma_models::dml;
+use prisma_models::{dml, prelude::ParentContainer};
+use psl::datamodel_connector::IntType;
 use std::{boxed::Box, fmt, sync::Arc};
 
 #[derive(PartialEq)]
@@ -14,9 +15,13 @@ pub struct InputObjectType {
 
 /// Object tags help differentiating objects during parsing / raw input data processing,
 /// especially if complex object unions are present.
-#[derive(Debug, PartialEq, Copy, Clone)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum ObjectTag {
     CompositeEnvelope,
+    RelationEnvelope,
+    // Holds the type against which a field can be compared
+    FieldRefType(InputType),
+    WhereInputType(ParentContainer),
 }
 
 #[derive(Debug, Default, PartialEq)]
@@ -206,8 +211,12 @@ impl InputType {
         InputType::Scalar(ScalarType::String)
     }
 
-    pub fn int() -> InputType {
-        InputType::Scalar(ScalarType::Int)
+    pub fn int32() -> InputType {
+        InputType::Scalar(ScalarType::Int(IntType::Signed32))
+    }
+
+    pub fn int(int_type: IntType) -> InputType {
+        InputType::Scalar(ScalarType::Int(int_type))
     }
 
     pub fn bigint() -> InputType {
@@ -265,6 +274,13 @@ impl InputType {
             Self::List(inner) => inner.is_empty(),
             Self::Object(weak) => weak.into_arc().is_empty(),
         }
+    }
+
+    pub fn is_json(&self) -> bool {
+        matches!(
+            self,
+            Self::Scalar(ScalarType::Json) | Self::Scalar(ScalarType::JsonList)
+        )
     }
 }
 

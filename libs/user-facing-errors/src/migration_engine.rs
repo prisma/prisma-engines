@@ -263,7 +263,7 @@ pub struct ForeignKeyCreationNotAllowed;
 #[derive(Debug, SimpleUserFacingError)]
 #[user_facing(
     code = "P3022",
-    message = "Direct execution of DDL (Data Definition Language) SQL statements is disabled on this database. Please read more here how to handle this: https://pris.ly/d/migrate-no-direct-ddl"
+    message = "Direct execution of DDL (Data Definition Language) SQL statements is disabled on this database. Please read more here about how to handle this: https://pris.ly/d/migrate-no-direct-ddl"
 )]
 pub struct DirectDdlNotAllowed;
 

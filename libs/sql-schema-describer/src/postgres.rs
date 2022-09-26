@@ -512,7 +512,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for name in names {
             let cloned_name = name.clone();
-            let id = sql_schema.push_table(name);
+            let id = sql_schema.push_table(name, Default::default());
             map.insert(cloned_name, id);
         }
 
@@ -636,7 +636,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 || (self.is_cockroach()
                     && matches!(
                         default.as_ref().map(|d| d.kind()),
-                        Some(DefaultKind::DbGenerated(s)) if s == "unique_rowid()"
+                        Some(DefaultKind::DbGenerated(Some(s))) if s == "unique_rowid()"
                     ));
 
             let col = Column {
@@ -1035,7 +1035,11 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         let mut enums: Vec<Enum> = enum_values
             .into_iter()
-            .map(|(k, v)| Enum { name: k, values: v })
+            .map(|(k, v)| Enum {
+                namespace_id: Default::default(),
+                name: k,
+                values: v,
+            })
             .collect();
 
         enums.sort_by(|a, b| Ord::cmp(&a.name, &b.name));

@@ -232,8 +232,12 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
     api.raw_cmd(&schema);
     let expectation = expect![[r#"
         SqlSchema {
+            namespaces: [],
             tables: [
                 Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "indexes_test",
                 },
             ],
@@ -250,9 +254,9 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
                             family: String,
                             arity: Required,
                             native_type: Some(
-                                Object({
+                                Object {
                                     "String": Null,
-                                }),
+                                },
                             ),
                         },
                         default: None,
@@ -270,9 +274,9 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
                             family: String,
                             arity: Required,
                             native_type: Some(
-                                Object({
+                                Object {
                                     "String": Null,
-                                }),
+                                },
                             ),
                         },
                         default: None,
@@ -290,9 +294,7 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
                             family: Int,
                             arity: Required,
                             native_type: Some(
-                                String(
-                                    "Int4",
-                                ),
+                                String("Int4"),
                             ),
                         },
                         default: None,

@@ -19,7 +19,7 @@ query-core = { path = "../core" }
 request-handlers = { path = "../request-handlers" }
 query-connector = { path = "../connectors/query-connector" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
-datamodel = { path = "../../libs/datamodel/core" }
+psl = { path = "../../psl/psl" }
 sql-connector = { path = "../connectors/sql-query-connector", package = "sql-query-connector" }
 prisma-models = { path = "../prisma-models" }
 
@@ -36,11 +36,11 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3" }
 tracing-futures = "0.2"
 tracing-opentelemetry = "0.17.3"
-datamodel-connector = { path = "../../libs/datamodel/connectors/datamodel-connector" }
 opentelemetry = { version = "0.17"}
 
 tokio = { version = "1", features = ["sync"] }
 futures = "0.3"
+query-engine-metrics = {path = "../metrics"}
 
 [build-dependencies]
 napi-build = "1"

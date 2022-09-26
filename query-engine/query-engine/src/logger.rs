@@ -8,7 +8,8 @@ use opentelemetry::{
     KeyValue,
 };
 use opentelemetry_otlp::WithExportConfig;
-use query_core::{is_user_facing_trace_filter, MetricRegistry};
+use query_core::is_user_facing_trace_filter;
+use query_engine_metrics::MetricRegistry;
 use tracing::{dispatcher::SetGlobalDefaultError, subscriber};
 use tracing_subscriber::{filter::filter_fn, layer::SubscriberExt, EnvFilter, Layer};
 

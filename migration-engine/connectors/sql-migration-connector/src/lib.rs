@@ -16,10 +16,10 @@ mod sql_schema_calculator;
 mod sql_schema_differ;
 
 use database_schema::SqlDatabaseSchema;
-use datamodel::ValidatedSchema;
 use flavour::{MssqlFlavour, MysqlFlavour, PostgresFlavour, SqlFlavour, SqliteFlavour};
 use migration_connector::{migrations_directory::MigrationDirectory, *};
 use pair::Pair;
+use psl::ValidatedSchema;
 use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};
 use sql_schema_describer as sql;
 use std::sync::Arc;
@@ -116,8 +116,7 @@ impl SqlMigrationConnector {
     ) -> ConnectorResult<SqlDatabaseSchema> {
         match target {
             DiffTarget::Datamodel(schema) => {
-                let schema =
-                    datamodel::parse_schema_parserdb(schema).map_err(ConnectorError::new_schema_parser_error)?;
+                let schema = psl::parse_schema(schema).map_err(ConnectorError::new_schema_parser_error)?;
                 Ok(sql_schema_calculator::calculate_sql_schema(
                     &schema,
                     self.flavour.as_ref(),
@@ -222,6 +221,24 @@ impl MigrationConnector for SqlMigrationConnector {
         self.flavour.drop_database()
     }
 
+    fn introspect<'a>(
+        &'a mut self,
+        schema: &'a ValidatedSchema,
+        ctx: IntrospectionContext,
+    ) -> BoxFuture<'a, ConnectorResult<IntrospectionResult>> {
+        Box::pin(async move {
+            let sql_schema = self.flavour.describe_schema().await?;
+            let previous_datamodel = psl::lift(schema);
+            let datamodel = sql_introspection_connector::calculate_datamodel::calculate_datamodel(
+                &sql_schema,
+                &previous_datamodel,
+                ctx,
+            )
+            .map_err(|err| ConnectorError::from_source(err, "Introspection error"))?;
+            Ok(datamodel)
+        })
+    }
+
     fn migration_file_extension(&self) -> &'static str {
         "sql"
     }
@@ -306,8 +323,7 @@ async fn best_effort_reset_impl(flavour: &mut (dyn SqlFlavour + Send + Sync)) ->
     let drop_views = source_schema
         .view_walkers()
         .filter(|view| !flavour.view_should_be_ignored(view.name()))
-        .map(|vw| vw.view_index())
-        .map(DropView::new)
+        .map(|vw| DropView::new(vw.id))
         .map(SqlMigrationStep::DropView);
 
     steps.extend(drop_views);
@@ -318,7 +334,7 @@ async fn best_effort_reset_impl(flavour: &mut (dyn SqlFlavour + Send + Sync)) ->
 
     let drop_udts = source_schema
         .udt_walkers()
-        .map(|udtw| udtw.udt_index())
+        .map(|udtw| udtw.id)
         .map(DropUserDefinedType::new)
         .map(SqlMigrationStep::DropUserDefinedType);
 

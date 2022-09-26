@@ -1,13 +1,16 @@
 use super::group_by_builder::*;
-use crate::root_queries::metrics;
+
 use crate::{
+    constants::*,
     cursor::{CursorBuilder, CursorData},
-    filter::{convert_filter, FilterPrefix},
+    filter::{FilterPrefix, MongoFilterVisitor},
     join::JoinStage,
     logger::log_read_query as log_query,
     orderby::OrderByBuilder,
+    root_queries::metrics,
     vacuum_cursor, BsonTransform, IntoBson,
 };
+
 use connector_interface::{AggregationSelection, Filter, QueryArguments, RelAggregationSelection};
 use itertools::Itertools;
 use mongodb::{
@@ -165,7 +168,9 @@ impl MongoReadQueryBuilder {
         let query = match args.filter {
             Some(filter) => {
                 // If a filter comes with joins, it needs to be run _after_ the initial filter query / $matches.
-                let (filter, filter_joins) = convert_filter(filter, false, FilterPrefix::default())?.render();
+                let (filter, filter_joins) = MongoFilterVisitor::new(FilterPrefix::default(), false)
+                    .visit(filter)?
+                    .render();
                 if !filter_joins.is_empty() {
                     joins.extend(filter_joins);
                     post_filters.push(filter);
@@ -424,12 +429,21 @@ impl MongoReadQueryBuilder {
     ) -> crate::Result<Self> {
         for aggr in aggregation_selections {
             let join = match aggr {
-                RelAggregationSelection::Count(rf) => JoinStage {
-                    source: rf.clone(),
-                    alias: Some(aggr.db_alias()),
-                    nested: vec![],
-                },
+                RelAggregationSelection::Count(rf, filter) => {
+                    let filter = filter
+                        .as_ref()
+                        .map(|f| MongoFilterVisitor::new(FilterPrefix::default(), false).visit(f.clone()))
+                        .transpose()?;
+
+                    JoinStage {
+                        source: rf.clone(),
+                        alias: Some(aggr.db_alias()),
+                        nested: vec![],
+                        filter,
+                    }
+                }
             };
+
             let projection = doc! {
               aggr.db_alias(): { "$size": format!("${}", aggr.db_alias()) }
             };
@@ -462,11 +476,11 @@ impl MongoReadQueryBuilder {
             group_by.with_having_filter(&having);
 
             // Having filters can only appear in group by queries.
-            // All group by fields go into the "_id" key of the result document.
+            // All group by fields go into the UNDERSCORE_ID key of the result document.
             // As it is the only place where the flat scalars are contained for the group,
             // we need to refer to that object.
-            let prefix = FilterPrefix::from("_id");
-            let (filter_doc, _) = convert_filter(having, false, prefix)?.render();
+            let prefix = FilterPrefix::from(group_by::UNDERSCORE_ID);
+            let (filter_doc, _) = MongoFilterVisitor::new(prefix, false).visit(having)?.render();
 
             self.aggregation_filters.push(filter_doc);
         }

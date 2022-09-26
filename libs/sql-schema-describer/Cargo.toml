@@ -1,5 +1,4 @@
 [package]
-authors = ["Arve Knudsen <arve.knudsen@gmail.com>"]
 edition = "2021"
 name = "sql-schema-describer"
 version = "0.1.0"
@@ -9,7 +8,7 @@ native-types = { path = "../native-types" }
 prisma-value = { path = "../prisma-value" }
 
 async-trait = "0.1.17"
-bigdecimal = "0.2"
+bigdecimal = "0.3"
 enumflags2 = "0.7"
 indexmap = { version = "1.9.1", default_features = false }
 indoc = "1"
@@ -34,7 +33,6 @@ features = [
 ]
 
 [dev-dependencies]
-barrel = { git = "https://github.com/prisma/barrel.git", features = ["sqlite3", "mysql", "pg", "mssql"], branch = "mssql-support" }
 expect-test = "1.2.2"
 pretty_assertions = "0.6"
 test-macros = { path = "../test-macros" }

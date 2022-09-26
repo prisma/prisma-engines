@@ -2,8 +2,8 @@ mod error;
 
 pub use error::{ConnectorError, ErrorKind};
 
-use datamodel::{common::preview_features::PreviewFeature, dml::Datamodel, Datasource};
 use enumflags2::BitFlags;
+use psl::{common::preview_features::PreviewFeature, dml::Datamodel, Datasource};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -32,7 +32,7 @@ pub struct DatabaseMetadata {
     pub size_in_bytes: usize,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub enum Version {
     NonPrisma,
     Prisma1,
@@ -52,7 +52,7 @@ pub struct IntrospectionResult {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Warning {
-    pub code: i16,
+    pub code: u32,
     pub message: String,
     pub affected: Value,
 }

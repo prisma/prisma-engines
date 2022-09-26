@@ -3,13 +3,13 @@ mod sql_schema_calculator_flavour;
 pub(super) use sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour;
 
 use crate::{flavour::SqlFlavour, SqlDatabaseSchema};
-use datamodel::{
-    datamodel_connector::{walker_ext_traits::*, ReferentialAction, ScalarType},
+use psl::{
+    datamodel_connector::walker_ext_traits::*,
     dml::{prisma_value, PrismaValue},
     parser_database::{
         ast,
         walkers::{ModelWalker, ScalarFieldWalker},
-        ScalarFieldType, SortOrder,
+        ReferentialAction, ScalarFieldType, ScalarType, SortOrder,
     },
     ValidatedSchema,
 };
@@ -19,14 +19,29 @@ use std::collections::HashMap;
 pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn SqlFlavour) -> SqlDatabaseSchema {
     let mut schema = SqlDatabaseSchema::default();
 
-    schema.describer_schema.enums = flavour.calculate_enums(datamodel);
-
     let mut context = Context {
         datamodel,
         schema: &mut schema,
         flavour,
         model_id_to_table_id: HashMap::with_capacity(datamodel.db.models_count()),
+        schemas: Default::default(),
     };
+
+    if datamodel
+        .configuration
+        .preview_features()
+        .contains(psl::common::preview_features::PreviewFeature::MultiSchema)
+    {
+        if let Some(ds) = context.datamodel.configuration.datasources.get(0) {
+            for (schema, _) in &ds.schemas {
+                context
+                    .schemas
+                    .insert(schema, context.schema.describer_schema.push_namespace(schema.clone()));
+            }
+        }
+    }
+
+    context.schema.describer_schema.enums = flavour.calculate_enums(&context);
 
     // Two types of tables: model tables and implicit M2M relation tables (a.k.a. join tables.).
     push_model_tables(&mut context);
@@ -43,7 +58,15 @@ pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn Sq
 
 fn push_model_tables(ctx: &mut Context<'_>) {
     for model in ctx.datamodel.db.walk_models() {
-        let table_id = ctx.schema.describer_schema.push_table(model.database_name().to_owned());
+        let namespace_id = model
+            .schema()
+            .and_then(|(name, _)| ctx.schemas.get(name))
+            .copied()
+            .unwrap_or_default();
+        let table_id = ctx
+            .schema
+            .describer_schema
+            .push_table(model.database_name().to_owned(), namespace_id);
         ctx.model_id_to_table_id.insert(model.model_id(), table_id);
 
         for field in model.scalar_fields() {
@@ -197,7 +220,8 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
             format!("{table_name}_B{fk_suffix}")
         };
 
-        let table_id = ctx.schema.describer_schema.push_table(table_name.clone());
+        let namespace_id = ctx.walk(model_a_table_id).namespace_id(); // we put the join table in the schema of table A.
+        let table_id = ctx.schema.describer_schema.push_table(table_name.clone(), namespace_id);
         let column_a_type = ctx
             .walk(model_a_table_id)
             .primary_key_columns()
@@ -438,9 +462,8 @@ fn push_column_for_builtin_scalar_type(
     let default: Option<ColumnDefault> = field.default_value().map(|v| {
         let column_default = {
             if v.is_dbgenerated() {
-                unwrap_dbgenerated(v.value())
-                    .map(|v| ColumnDefault::Available(sql::DefaultValue::new(sql::DefaultKind::DbGenerated(v))))
-                    .unwrap_or(ColumnDefault::NA)
+                let value = unwrap_dbgenerated(v.value());
+                ColumnDefault::Available(sql::DefaultValue::new(sql::DefaultKind::DbGenerated(value)))
             } else if v.is_now() {
                 ColumnDefault::Available(sql::DefaultValue::now())
             } else if v.is_autoincrement() {
@@ -544,6 +567,7 @@ pub(crate) struct Context<'a> {
     datamodel: &'a ValidatedSchema,
     schema: &'a mut SqlDatabaseSchema,
     flavour: &'a dyn SqlFlavour,
+    schemas: HashMap<&'a str, sql::NamespaceId>,
     model_id_to_table_id: HashMap<ast::ModelId, sql::TableId>,
 }
 

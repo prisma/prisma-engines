@@ -1,8 +1,9 @@
 use crate::{ConnectorTag, RunnerInterface, TestError, TestResult, TxResult};
 use hyper::{Body, Method, Request, Response};
-use query_core::{MetricRegistry, TxId};
+use query_core::TxId;
 use query_engine::opt::PrismaOpt;
 use query_engine::server::{routes, setup, State};
+use query_engine_metrics::MetricRegistry;
 use request_handlers::{GQLBatchResponse, GQLError, GQLResponse, GraphQlBody, MultiQuery, PrismaResponse};
 
 pub struct BinaryRunner {
@@ -45,10 +46,16 @@ impl RunnerInterface for BinaryRunner {
         Ok(PrismaResponse::Single(gql_response).into())
     }
 
-    async fn batch(&self, queries: Vec<String>, transaction: bool) -> TestResult<crate::QueryResult> {
+    async fn batch(
+        &self,
+        queries: Vec<String>,
+        transaction: bool,
+        isolation_level: Option<String>,
+    ) -> TestResult<crate::QueryResult> {
         let query = GraphQlBody::Multi(MultiQuery::new(
             queries.into_iter().map(Into::into).collect(),
             transaction,
+            isolation_level,
         ));
 
         let body = serde_json::to_vec(&query).unwrap();

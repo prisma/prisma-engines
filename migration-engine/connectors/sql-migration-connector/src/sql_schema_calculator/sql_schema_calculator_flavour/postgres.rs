@@ -1,20 +1,23 @@
-use super::SqlSchemaCalculatorFlavour;
+use super::{super::Context, SqlSchemaCalculatorFlavour};
 use crate::flavour::{PostgresFlavour, SqlFlavour};
-use datamodel::{
+use either::Either;
+use psl::{
     builtin_connectors::cockroach_datamodel_connector::SequenceFunction,
     datamodel_connector::walker_ext_traits::IndexWalkerExt,
     parser_database::{walkers::*, IndexAlgorithm, OperatorClass},
-    ValidatedSchema,
 };
-use either::Either;
 use sql_schema_describer::{self as sql, postgres::PostgresSchemaExt};
 
 impl SqlSchemaCalculatorFlavour for PostgresFlavour {
-    fn calculate_enums(&self, datamodel: &ValidatedSchema) -> Vec<sql::Enum> {
-        datamodel
+    fn calculate_enums(&self, ctx: &Context<'_>) -> Vec<sql::Enum> {
+        ctx.datamodel
             .db
             .walk_enums()
             .map(|r#enum| sql::Enum {
+                namespace_id: r#enum
+                    .schema()
+                    .map(|(schema, _)| ctx.schemas[schema])
+                    .unwrap_or_default(),
                 name: r#enum.database_name().to_owned(),
                 values: r#enum.values().map(|val| val.database_name().to_owned()).collect(),
             })

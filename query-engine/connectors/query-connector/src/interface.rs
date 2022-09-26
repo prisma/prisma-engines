@@ -58,6 +58,10 @@ impl RecordFilter {
             selectors: None,
         }
     }
+
+    pub fn has_selectors(&self) -> bool {
+        self.selectors.is_some()
+    }
 }
 
 impl From<Filter> for RecordFilter {
@@ -116,11 +120,9 @@ impl AggregationSelection {
     /// Returns (<field db name>, TypeIdentifier, FieldArity)
     pub fn identifiers(&self) -> Vec<(String, TypeIdentifier, FieldArity)> {
         match self {
-            AggregationSelection::Field(field) => vec![(
-                field.db_name().to_owned(),
-                field.type_identifier.clone(),
-                FieldArity::Required,
-            )],
+            AggregationSelection::Field(field) => {
+                vec![(field.db_name().to_owned(), field.type_identifier.clone(), field.arity)]
+            }
 
             AggregationSelection::Count { all, fields } => {
                 let mut mapped = Self::map_field_types(fields, Some(TypeIdentifier::Int));
@@ -174,7 +176,7 @@ pub enum AggregationResult {
 #[derive(Debug, Clone)]
 pub enum RelAggregationSelection {
     // Always a count(*) for now
-    Count(RelationFieldRef),
+    Count(RelationFieldRef, Option<Filter>),
 }
 
 pub type RelAggregationRow = Vec<RelAggregationResult>;
@@ -187,7 +189,7 @@ pub enum RelAggregationResult {
 impl RelAggregationSelection {
     pub fn db_alias(&self) -> String {
         match self {
-            RelAggregationSelection::Count(rf) => {
+            RelAggregationSelection::Count(rf, _) => {
                 format!("_aggr_count_{}", rf.name.to_owned())
             }
         }
@@ -195,19 +197,19 @@ impl RelAggregationSelection {
 
     pub fn field_name(&self) -> &str {
         match self {
-            RelAggregationSelection::Count(rf) => rf.name.as_str(),
+            RelAggregationSelection::Count(rf, _) => rf.name.as_str(),
         }
     }
 
     pub fn type_identifier_with_arity(&self) -> (TypeIdentifier, FieldArity) {
         match self {
-            RelAggregationSelection::Count(_) => (TypeIdentifier::Int, FieldArity::Required),
+            RelAggregationSelection::Count(_, _) => (TypeIdentifier::Int, FieldArity::Required),
         }
     }
 
     pub fn into_result(self, val: PrismaValue) -> RelAggregationResult {
         match self {
-            RelAggregationSelection::Count(rf) => RelAggregationResult::Count(rf, coerce_null_to_zero_value(val)),
+            RelAggregationSelection::Count(rf, _) => RelAggregationResult::Count(rf, coerce_null_to_zero_value(val)),
         }
     }
 }
@@ -301,7 +303,17 @@ pub trait WriteOperations {
         record_filter: RecordFilter,
         args: WriteArgs,
         trace_id: Option<String>,
-    ) -> crate::Result<Vec<SelectionResult>>;
+    ) -> crate::Result<usize>;
+
+    /// Update record in the `Model` with the given `WriteArgs` filtered by the
+    /// `Filter`.
+    async fn update_record(
+        &mut self,
+        model: &ModelRef,
+        record_filter: RecordFilter,
+        args: WriteArgs,
+        trace_id: Option<String>,
+    ) -> crate::Result<Option<SelectionResult>>;
 
     /// Delete records in the `Model` with the given `Filter`.
     async fn delete_records(

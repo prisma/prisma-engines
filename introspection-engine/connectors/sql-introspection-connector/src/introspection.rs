@@ -5,15 +5,14 @@ use crate::{
         calculate_scalar_field, is_new_migration_table, is_old_migration_table, is_prisma_1_point_0_join_table,
         is_prisma_1_point_1_or_2_join_table, is_relay_table, primary_key_is_clustered,
     },
-    version_checker::VersionChecker,
     SqlError, SqlFamilyTrait,
 };
-use datamodel::dml::{self, Field, Model, PrimaryKeyDefinition, PrimaryKeyField, RelationField, SortOrder};
+use psl::dml::{self, Field, Model, PrimaryKeyDefinition, PrimaryKeyField, RelationField, SortOrder};
 use sql_schema_describer::{walkers::TableWalker, ForeignKeyId, SQLSortOrder};
 use std::collections::HashSet;
 use tracing::debug;
 
-pub(crate) fn introspect(version_check: &mut VersionChecker, ctx: &mut Context) -> Result<(), SqlError> {
+pub(crate) fn introspect(ctx: &mut Context) -> Result<(), SqlError> {
     let schema = ctx.schema;
     // collect m2m table names
     let m2m_tables: Vec<String> = schema
@@ -34,7 +33,6 @@ pub(crate) fn introspect(version_check: &mut VersionChecker, ctx: &mut Context) 
         let mut model = Model::new(table.name().to_owned(), None);
 
         for column in table.columns() {
-            version_check.check_column_for_type_and_default_value(column);
             let field = calculate_scalar_field(column, ctx);
             model.add_field(Field::ScalarField(field));
         }
@@ -64,9 +62,6 @@ pub(crate) fn introspect(version_check: &mut VersionChecker, ctx: &mut Context) 
             .foreign_keys()
             .filter(|fk| !duplicated_foreign_keys.contains(&fk.id))
         {
-            version_check.has_inline_relations(table);
-            version_check.uses_on_delete(foreign_key);
-
             let mut relation_field = calculate_relation_field(foreign_key, &m2m_tables, &duplicated_foreign_keys);
 
             relation_field.supports_restrict_action(!ctx.sql_family().is_mssql());
@@ -105,9 +100,6 @@ pub(crate) fn introspect(version_check: &mut VersionChecker, ctx: &mut Context) 
                 clustered,
             });
         }
-
-        version_check.always_has_created_at_updated_at(table, &model);
-        version_check.has_p1_compatible_primary_key_column(table);
 
         ctx.datamodel.add_model(model);
     }

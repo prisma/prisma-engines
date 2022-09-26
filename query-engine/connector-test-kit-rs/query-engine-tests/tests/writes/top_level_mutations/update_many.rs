@@ -296,7 +296,11 @@ mod update_many {
         );
 
         let count = &res["data"]["updateManyTestModel"]["count"];
-        assert_eq!(count, 3);
+
+        // MySql does not count incrementing a null so the count is different
+        if !matches!(runner.connector(), ConnectorTag::MySql(_)) {
+            assert_eq!(count, 3);
+        }
 
         let res = run_query!(runner, format!(r#"{{ findManyTestModel {{ {} }} }}"#, field));
         Ok(res)
@@ -334,8 +338,23 @@ mod json_update_many {
         );
 
         insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findFirstTestModel(where: {id: 1}) { id, json } }"#),
+          @r###"{"data":{"findFirstTestModel":{"id":1,"json":null}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateManyTestModel(where: { id: 1 }, data: { json: "{}" }) { count }}"#),
+          @r###"{"data":{"updateManyTestModel":{"count":1}}}"###
+        );
+
+        insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { updateManyTestModel(where: { id: 1 }, data: { json: null }) { count }}"#),
           @r###"{"data":{"updateManyTestModel":{"count":1}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findFirstTestModel(where: {id: 1}) { id, json } }"#),
+          @r###"{"data":{"findFirstTestModel":{"id":1,"json":null}}}"###
         );
 
         Ok(())

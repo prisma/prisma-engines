@@ -17,10 +17,11 @@ pub use destructive_change_checker::{
 };
 pub use diff::DiffTarget;
 pub use error::{ConnectorError, ConnectorResult};
+pub use introspection_connector::{IntrospectionConnector, IntrospectionContext, IntrospectionResult};
 pub use migration_persistence::{MigrationPersistence, MigrationRecord, PersistenceNotInitializedError, Timestamp};
 
-use datamodel::ValidatedSchema;
 use migrations_directory::MigrationDirectory;
+use psl::ValidatedSchema;
 use std::sync::Arc;
 
 /// Alias for a pinned, boxed future, used by the traits.
@@ -189,6 +190,13 @@ pub trait MigrationConnector: Send + Sync + 'static {
         target: DiffTarget<'a>,
         shadow_database_connection_string: Option<String>,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>>;
+
+    /// In-tro-spec-shon.
+    fn introspect<'a>(
+        &'a mut self,
+        schema: &'a ValidatedSchema,
+        ctx: introspection_connector::IntrospectionContext,
+    ) -> BoxFuture<'_, ConnectorResult<introspection_connector::IntrospectionResult>>;
 
     /// If possible, check that the passed in migrations apply cleanly.
     fn validate_migrations<'a>(

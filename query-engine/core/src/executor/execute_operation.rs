@@ -1,13 +1,12 @@
 use std::time::Instant;
 
 use super::pipeline::QueryPipeline;
-use crate::{
-    IrSerializer, Operation, QueryGraph, QueryGraphBuilder, QueryInterpreter, ResponseData,
-    PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, PRISMA_CLIENT_QUERIES_TOTAL,
-};
+use crate::{IrSerializer, Operation, QueryGraph, QueryGraphBuilder, QueryInterpreter, ResponseData};
 use connector::{Connection, ConnectionLike, Connector};
 use futures::future;
-use metrics::{histogram, increment_counter};
+use query_engine_metrics::{
+    histogram, increment_counter, metrics, PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, PRISMA_CLIENT_QUERIES_TOTAL,
+};
 use schema::QuerySchemaRef;
 use tracing::Instrument;
 use tracing_futures::WithSubscriber;
@@ -158,9 +157,7 @@ async fn execute_on(
 ) -> crate::Result<ResponseData> {
     increment_counter!(PRISMA_CLIENT_QUERIES_TOTAL);
     let interpreter = QueryInterpreter::new(conn);
-    let result = QueryPipeline::new(graph, interpreter, serializer)
+    QueryPipeline::new(graph, interpreter, serializer)
         .execute(trace_id)
-        .await;
-
-    result
+        .await
 }

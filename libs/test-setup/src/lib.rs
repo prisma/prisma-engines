@@ -1,8 +1,10 @@
 #![deny(unsafe_code, rust_2018_idioms)]
+#![allow(clippy::derive_partial_eq_without_eq)]
 
 //! This crate contains constants and utilities that are useful for writing tests across the
 //! engines.
 
+pub mod mysql;
 /// Tokio test runtime utils.
 pub mod runtime;
 
@@ -10,7 +12,6 @@ mod capabilities;
 mod diff;
 mod logging;
 mod mssql;
-mod mysql;
 mod postgres;
 mod sqlite;
 mod tags;

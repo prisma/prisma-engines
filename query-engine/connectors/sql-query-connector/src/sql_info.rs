@@ -1,15 +1,28 @@
-use datamodel::datamodel_connector::{ConnectorCapabilities, ConnectorCapability};
-use once_cell::sync::Lazy;
+use psl::datamodel_connector::{ConnectorCapabilities, ConnectorCapability};
 use quaint::prelude::ConnectionInfo;
 use std::env;
 
-/// Overrides the default number of allowed elements in query's `IN` or `NOT IN`
-/// statement for the currently loaded connector.
-/// Certain databases error out if querying with too many items. For test
-/// purposes, this value can be set with the `QUERY_BATCH_SIZE` environment
-/// value to a smaller number.
-pub static BATCH_SIZE_OVERRIDE: Lazy<Option<usize>> =
-    Lazy::new(|| env::var("QUERY_BATCH_SIZE").ok().and_then(|size| size.parse().ok()));
+#[cfg(not(test))]
+fn get_batch_size(default: usize) -> Option<usize> {
+    use once_cell::sync::Lazy;
+
+    /// Overrides the default number of allowed elements in query's `IN` or `NOT IN`
+    /// statement for the currently loaded connector.
+    /// Certain databases error out if querying with too many items. For test
+    /// purposes, this value can be set with the `QUERY_BATCH_SIZE` environment
+    /// value to a smaller number.
+    static BATCH_SIZE_OVERRIDE: Lazy<Option<usize>> = Lazy::new(|| {
+        env::var("QUERY_BATCH_SIZE")
+            .ok()
+            .map(|size| size.parse().expect("QUERY_BATCH_SIZE: not a valid size"))
+    });
+    (*BATCH_SIZE_OVERRIDE).or(Some(default))
+}
+
+#[cfg(test)]
+fn get_batch_size(_: usize) -> Option<usize> {
+    env::var("QUERY_BATCH_SIZE").ok().and_then(|size| size.parse().ok())
+}
 
 pub enum SqlFamily {
     SQLite,
@@ -45,8 +58,8 @@ impl SqlInfo {
         Self {
             family: SqlFamily::SQLite,
             max_rows: Some(999),
-            max_bind_values: (*BATCH_SIZE_OVERRIDE).or(Some(999)),
-            capabilities: ConnectorCapabilities::new(sql_datamodel_connector::SQLITE.capabilities().to_owned()),
+            max_bind_values: get_batch_size(999),
+            capabilities: ConnectorCapabilities::new(psl::builtin_connectors::SQLITE.capabilities().to_owned()),
         }
     }
 
@@ -55,8 +68,8 @@ impl SqlInfo {
             family: SqlFamily::MySQL,
             max_rows: None,
             // See https://stackoverflow.com/a/11131824/788562
-            max_bind_values: (*BATCH_SIZE_OVERRIDE).or(Some(65535)),
-            capabilities: ConnectorCapabilities::new(sql_datamodel_connector::MYSQL.capabilities().to_owned()),
+            max_bind_values: get_batch_size(65535),
+            capabilities: ConnectorCapabilities::new(psl::builtin_connectors::MYSQL.capabilities().to_owned()),
         }
     }
 
@@ -64,8 +77,8 @@ impl SqlInfo {
         Self {
             family: SqlFamily::Postgres,
             max_rows: None,
-            max_bind_values: (*BATCH_SIZE_OVERRIDE).or(Some(32767)),
-            capabilities: ConnectorCapabilities::new(sql_datamodel_connector::POSTGRES.capabilities().to_owned()),
+            max_bind_values: get_batch_size(32766),
+            capabilities: ConnectorCapabilities::new(psl::builtin_connectors::POSTGRES.capabilities().to_owned()),
         }
     }
 
@@ -73,8 +86,8 @@ impl SqlInfo {
         Self {
             family: SqlFamily::MSSQL,
             max_rows: Some(1000),
-            max_bind_values: (*BATCH_SIZE_OVERRIDE).or(Some(2099)),
-            capabilities: ConnectorCapabilities::new(sql_datamodel_connector::MSSQL.capabilities().to_owned()),
+            max_bind_values: get_batch_size(2099),
+            capabilities: ConnectorCapabilities::new(psl::builtin_connectors::MSSQL.capabilities().to_owned()),
         }
     }
 }

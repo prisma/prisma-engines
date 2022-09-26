@@ -1,7 +1,7 @@
 use super::*;
 use crate::{
-    error::DecorateErrorWithFieldInformationExtension,
-    filter::{convert_filter, FilterPrefix, MongoFilter},
+    error::{DecorateErrorWithFieldInformationExtension, MongoError},
+    filter::{FilterPrefix, MongoFilter, MongoFilterVisitor},
     logger, output_meta,
     query_builder::MongoReadQueryBuilder,
     root_queries::raw::{MongoCommand, MongoOperation},
@@ -142,6 +142,7 @@ pub async fn update_records<'conn>(
     model: &ModelRef,
     record_filter: RecordFilter,
     mut args: WriteArgs,
+    update_type: UpdateType,
 ) -> crate::Result<Vec<SelectionResult>> {
     let coll = database.collection::<Document>(model.db_name());
 
@@ -163,7 +164,7 @@ pub async fn update_records<'conn>(
             })
             .collect::<crate::Result<Vec<_>>>()?
     } else {
-        let filter = convert_filter(record_filter.filter, false, FilterPrefix::default())?;
+        let filter = MongoFilterVisitor::new(FilterPrefix::default(), false).visit(record_filter.filter)?;
         find_ids(database, coll.clone(), session, model, filter).await?
     };
 
@@ -198,9 +199,13 @@ pub async fn update_records<'conn>(
 
     if !update_docs.is_empty() {
         logger::log_update_many_vec(coll.name(), &filter, &update_docs);
-        metrics(|| coll.update_many_with_session(filter, update_docs, None, session))
+        let res = metrics(|| coll.update_many_with_session(filter, update_docs, None, session))
             .instrument(span)
             .await?;
+
+        if update_type == UpdateType::Many && res.modified_count == 0 {
+            return Ok(Vec::new());
+        }
     }
 
     let ids = ids
@@ -235,7 +240,7 @@ pub async fn delete_records<'conn>(
             })
             .collect::<crate::Result<Vec<_>>>()?
     } else {
-        let filter = convert_filter(record_filter.filter, false, FilterPrefix::default())?;
+        let filter = MongoFilterVisitor::new(FilterPrefix::default(), false).visit(record_filter.filter)?;
         find_ids(database, coll.clone(), session, model, filter).await?
     };
 
@@ -405,7 +410,7 @@ pub async fn execute_raw<'conn>(
     _session: &mut ClientSession,
     _inputs: HashMap<String, PrismaValue>,
 ) -> crate::Result<usize> {
-    unimplemented!()
+    Err(MongoError::Unsupported("execute_raw".into()))
 }
 
 /// Execute a plain MongoDB query, returning the answer as a JSON `Value`.

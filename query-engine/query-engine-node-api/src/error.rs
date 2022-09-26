@@ -1,4 +1,4 @@
-use datamodel::diagnostics::Diagnostics;
+use psl::diagnostics::Diagnostics;
 use query_connector::error::ConnectorError;
 use query_core::CoreError;
 use thiserror::Error;

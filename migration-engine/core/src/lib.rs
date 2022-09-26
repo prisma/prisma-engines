@@ -1,5 +1,6 @@
 #![deny(rust_2018_idioms, unsafe_code, missing_docs)]
 #![allow(clippy::needless_collect)] // the implementation of that rule is way too eager, it rejects necessary collects
+#![allow(clippy::derive_partial_eq_without_eq)]
 
 //! The top-level library crate for the migration engine.
 
@@ -30,7 +31,7 @@ use std::{env, path::Path};
 use user_facing_errors::common::InvalidConnectionString;
 
 fn parse_schema(schema: SourceFile) -> CoreResult<ValidatedSchema> {
-    psl::parse_schema_parserdb(schema).map_err(CoreError::new_schema_parser_error)
+    psl::parse_schema(schema).map_err(CoreError::new_schema_parser_error)
 }
 
 fn connector_for_connection_string(
@@ -100,7 +101,6 @@ fn connector_for_connection_string(
 /// Same as schema_to_connector, but it will only read the provider, not the connector params.
 fn schema_to_connector_unchecked(schema: &str) -> CoreResult<Box<dyn migration_connector::MigrationConnector>> {
     let config = psl::parse_configuration(schema)
-        .map(|validated_config| validated_config.subject)
         .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", schema)))?;
 
     let preview_features = config.preview_features();
@@ -181,7 +181,6 @@ pub fn migration_api(
 
 fn parse_configuration(datamodel: &str) -> CoreResult<(Datasource, String, BitFlags<PreviewFeature>, Option<String>)> {
     let config = psl::parse_configuration(datamodel)
-        .map(|validated_config| validated_config.subject)
         .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
 
     let preview_features = config.preview_features();

@@ -86,6 +86,7 @@ mod interactive_tx {
 
         let error = res.err().unwrap();
         let known_err = error.as_known().unwrap();
+        println!("KNOWN ERROR {:?}", known_err);
 
         assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
         assert!(known_err
@@ -174,7 +175,7 @@ mod interactive_tx {
         ];
 
         // Tx flag is not set, but it executes on an ITX.
-        runner.batch(queries, false).await?;
+        runner.batch(queries, false, None).await?;
         let res = runner.commit_tx(tx_id.clone()).await?;
         assert!(res.is_ok());
         runner.clear_active_tx();
@@ -200,7 +201,7 @@ mod interactive_tx {
         ];
 
         // Tx flag is not set, but it executes on an ITX.
-        runner.batch(queries, false).await?;
+        runner.batch(queries, false, None).await?;
         let res = runner.rollback_tx(tx_id.clone()).await?;
         assert!(res.is_ok());
         runner.clear_active_tx();
@@ -228,7 +229,7 @@ mod interactive_tx {
         ];
 
         // Tx flag is not set, but it executes on an ITX.
-        let batch_results = runner.batch(queries, false).await?;
+        let batch_results = runner.batch(queries, false, None).await?;
         batch_results.assert_failure(2002, None);
 
         let res = runner.commit_tx(tx_id.clone()).await?;
@@ -313,6 +314,7 @@ mod interactive_tx {
                     "{ findManyTestModel { id } }".to_string(),
                 ],
                 false,
+                None,
             )
             .await?
             .assert_failure(
@@ -365,6 +367,55 @@ mod interactive_tx {
         let res = runner.commit_tx(tx_id_a.clone()).await?;
 
         assert!(res.is_ok());
+
+        Ok(())
+    }
+
+    #[connector_test(only(Postgres))]
+    async fn write_conflict(mut runner: Runner) -> TestResult<()> {
+        // create row
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1, field: "initial" }) { id }}"#),
+          @r###"{"data":{"createOneTestModel":{"id":1}}}"###
+        );
+
+        // First transaction.
+        let tx_id_a = runner.start_tx(5000, 5000, Some("Serializable".into())).await?;
+
+        // Second transaction.
+        let tx_id_b = runner.start_tx(5000, 5000, Some("Serializable".into())).await?;
+
+        // Read on first transaction.
+        runner.set_active_tx(tx_id_a.clone());
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel { id field }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1,"field":"initial"}]}}"###
+        );
+
+        // Read on the second transaction.
+        runner.set_active_tx(tx_id_b.clone());
+        insta::assert_snapshot!(
+            run_query!(&runner, r#"query { findManyTestModel { id field }}"#),
+            @r###"{"data":{"findManyTestModel":[{"id":1,"field":"initial"}]}}"###
+        );
+
+        // write and commit on the first transaction
+        runner.set_active_tx(tx_id_a.clone());
+        insta::assert_snapshot!(
+            run_query!(&runner, r#"mutation { updateManyTestModel(data: { field: "a" }) { count }}"#),
+            @r###"{"data":{"updateManyTestModel":{"count":1}}}"###
+        );
+
+        let commit_res = runner.commit_tx(tx_id_a.clone()).await?;
+        assert!(commit_res.is_ok());
+
+        // attempt to write on the second transaction
+        runner.set_active_tx(tx_id_b.clone());
+        let res = runner
+            .query(r#"mutation { updateManyTestModel(data: { field: "b" }) { count }}"#)
+            .await?;
+
+        res.assert_failure(2034, None);
 
         Ok(())
     }
@@ -444,7 +495,7 @@ mod itx_isolation {
 
         match tx_id {
             Ok(_) => panic!("Expected mongo to throw an unsupported error, but it succeeded instead."),
-            Err(err) => assert!(dbg!(err.to_string()).contains(
+            Err(err) => assert!(err.to_string().contains(
                 "Unsupported connector feature: Mongo does not support setting transaction isolation levels"
             )),
         };

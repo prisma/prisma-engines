@@ -5,7 +5,8 @@ mod node_api;
 pub use binary::*;
 pub use direct::*;
 pub use node_api::*;
-use query_core::{MetricRegistry, TxId};
+use query_core::TxId;
+use query_engine_metrics::MetricRegistry;
 
 use crate::{ConnectorTag, ConnectorVersion, QueryResult, TestError, TestResult};
 use colored::*;
@@ -21,7 +22,12 @@ pub trait RunnerInterface: Sized {
     async fn query(&self, query: String) -> TestResult<QueryResult>;
 
     /// Queries the engine with a batch.
-    async fn batch(&self, queries: Vec<String>, transaction: bool) -> TestResult<QueryResult>;
+    async fn batch(
+        &self,
+        queries: Vec<String>,
+        transaction: bool,
+        isolation_level: Option<String>,
+    ) -> TestResult<QueryResult>;
 
     /// start a transaction for a batch run
     async fn start_tx(
@@ -132,11 +138,16 @@ impl Runner {
         }
     }
 
-    pub async fn batch(&self, queries: Vec<String>, transaction: bool) -> TestResult<QueryResult> {
+    pub async fn batch(
+        &self,
+        queries: Vec<String>,
+        transaction: bool,
+        isolation_level: Option<String>,
+    ) -> TestResult<QueryResult> {
         match self {
-            Runner::Direct(r) => r.batch(queries, transaction).await,
+            Runner::Direct(r) => r.batch(queries, transaction, isolation_level).await,
             Runner::NodeApi(_) => todo!(),
-            Runner::Binary(r) => r.batch(queries, transaction).await,
+            Runner::Binary(r) => r.batch(queries, transaction, isolation_level).await,
         }
     }
 

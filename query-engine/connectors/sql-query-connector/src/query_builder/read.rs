@@ -1,6 +1,6 @@
 use crate::{
-    cursor_condition, filter_conversion::AliasedCondition, model_extensions::*, nested_aggregations, ordering,
-    sql_trace::SqlTraceComment,
+    cursor_condition, filter_conversion::AliasedCondition, model_extensions::*, nested_aggregations,
+    ordering::OrderByBuilder, sql_trace::SqlTraceComment,
 };
 use connector_interface::{filter::Filter, AggregationSelection, QueryArguments, RelAggregationSelection};
 use itertools::Itertools;
@@ -58,7 +58,7 @@ impl SelectDefinition for QueryArguments {
         aggr_selections: &[RelAggregationSelection],
         trace_id: Option<String>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
-        let order_by_definitions = ordering::build(&self, &model);
+        let order_by_definitions = OrderByBuilder::default().build(&self);
         let (table_opt, cursor_condition) = cursor_condition::build(&self, &model, &order_by_definitions);
         let aggregation_joins = nested_aggregations::build(aggr_selections);
 
@@ -67,7 +67,7 @@ impl SelectDefinition for QueryArguments {
 
         let filter: ConditionTree = self
             .filter
-            .map(|f| f.aliased_cond(None))
+            .map(|f| f.aliased_condition_from(None, false))
             .unwrap_or(ConditionTree::NoCondition);
 
         let conditions = match (filter, cursor_condition) {
@@ -253,7 +253,7 @@ pub fn group_by_aggregate(
     );
 
     match having {
-        Some(filter) => grouped.having(filter.aliased_cond(None)),
+        Some(filter) => grouped.having(filter.aliased_condition_from(None, false)),
         None => grouped,
     }
 }

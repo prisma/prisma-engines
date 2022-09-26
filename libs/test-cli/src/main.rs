@@ -228,9 +228,8 @@ async fn main() -> anyhow::Result<()> {
             let mut datamodel = String::new();
             file.read_to_string(&mut datamodel).unwrap();
 
-            if let Err(e) = datamodel::parse_datamodel(&datamodel) {
-                let pretty = e.to_pretty_string("schema.prisma", &datamodel);
-                println!("{pretty}");
+            if let Err(e) = psl::parse_schema(datamodel) {
+                println!("{e}");
             };
         }
         Command::ResetDatabase(cmd) => {
@@ -304,11 +303,6 @@ fn minimal_schema_from_url(url: &str) -> anyhow::Result<String> {
             datasource db {{
               provider = "{}"
               url = "{}"
-            }}
-
-            generator js {{
-              provider        = "prisma-client-js"
-              previewFeatures = ["mongodb"]
             }}
         "#,
         provider, url

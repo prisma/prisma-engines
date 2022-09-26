@@ -4,6 +4,7 @@ use opentelemetry::trace::TraceContextExt;
 use serde_json::{json, Value};
 use std::borrow::Cow;
 
+use std::time::Duration;
 use std::{collections::HashMap, time::SystemTime};
 use tracing::{Metadata, Span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
@@ -47,14 +48,17 @@ fn span_to_json(span: &SpanData) -> Value {
         _ => span.name.clone(),
     };
 
+    let hr_start_time = convert_to_high_res_time(span.start_time.duration_since(SystemTime::UNIX_EPOCH).unwrap());
+    let hr_end_time = convert_to_high_res_time(span.end_time.duration_since(SystemTime::UNIX_EPOCH).unwrap());
+
     json!({
         "span": true,
         "trace_id": span.span_context.trace_id().to_string(),
         "span_id": span.span_context.span_id().to_string(),
         "parent_span_id": span.parent_span_id.to_string(),
         "name": name,
-        "start_time": span.start_time.duration_since(SystemTime::UNIX_EPOCH).unwrap().as_millis().to_string(),
-        "end_time": span.end_time.duration_since(SystemTime::UNIX_EPOCH).unwrap().as_millis().to_string(),
+        "start_time": hr_start_time,
+        "end_time": hr_end_time,
         "attributes": attributes,
         "links": create_link_json(span)
     })
@@ -105,4 +109,38 @@ pub fn is_user_facing_trace_filter(meta: &Metadata) -> bool {
     }
 
     meta.target() == "quaint::connector::metrics" && meta.name() == "quaint:query"
+}
+
+/**
+ * Take from the otel library on what the format should be for High-Resolution time
+ * Defines High-Resolution Time.
+ *
+ * The first number, HrTime[0], is UNIX Epoch time in seconds since 00:00:00 UTC on 1 January 1970.
+ * The second number, HrTime[1], represents the partial second elapsed since Unix Epoch time represented by first number in nanoseconds.
+ * For example, 2021-01-01T12:30:10.150Z in UNIX Epoch time in milliseconds is represented as 1609504210150.
+ * The first number is calculated by converting and truncating the Epoch time in milliseconds to seconds:
+ * HrTime[0] = Math.trunc(1609504210150 / 1000) = 1609504210.
+ * The second number is calculated by converting the digits after the decimal point of the subtraction, (1609504210150 / 1000) - HrTime[0], to nanoseconds:
+ * HrTime[1] = Number((1609504210.150 - HrTime[0]).toFixed(9)) * 1e9 = 150000000.
+ * This is represented in HrTime format as [1609504210, 150000000].
+ */
+type HrTime = [u64; 2];
+pub fn convert_to_high_res_time(time: Duration) -> HrTime {
+    let secs = time.as_secs();
+    let partial = time.subsec_nanos();
+    [secs, partial as u64]
+}
+
+#[cfg(test)]
+mod tests {
+    use std::time::Duration;
+
+    use super::*;
+
+    #[test]
+    fn test_high_resolution_time_works() {
+        // 2021-01-01T12:30:10.150Z in UNIX Epoch time in milliseconds
+        let time_val = Duration::from_millis(1609504210150);
+        assert_eq!([1609504210, 150000000], convert_to_high_res_time(time_val));
+    }
 }

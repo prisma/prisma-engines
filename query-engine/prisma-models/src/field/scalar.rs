@@ -68,6 +68,10 @@ impl ScalarField {
     pub fn container(&self) -> &ParentContainer {
         &self.container
     }
+
+    pub fn native_type(&self) -> Option<&NativeTypeInstance> {
+        self.native_type.as_ref()
+    }
 }
 
 impl Debug for ScalarField {
@@ -83,7 +87,7 @@ impl Debug for ScalarField {
             .field("arity", &self.arity)
             .field("db_name", &self.db_name)
             .field("default_value", &self.default_value)
-            .field("model", &self.container().name())
+            .field("container", &self.container().name())
             .field("is_unique", &self.is_unique)
             .field("read_only", &self.read_only)
             .finish()

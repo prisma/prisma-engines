@@ -46,7 +46,7 @@ pub(crate) fn get_config(params: &str) -> String {
 }
 
 fn get_config_impl(params: GetConfigParams) -> Result<serde_json::Value, GetConfigError> {
-    let mut config = match datamodel::parse_configuration(&params.prisma_schema) {
+    let mut config = match psl::parse_configuration(&params.prisma_schema) {
         Ok(config) => config,
         Err(err) => {
             return Err(GetConfigError {
@@ -59,7 +59,6 @@ fn get_config_impl(params: GetConfigParams) -> Result<serde_json::Value, GetConf
     if !params.ignore_env_var_errors {
         let overrides: Vec<(_, _)> = params.datasource_overrides.into_iter().collect();
         config
-            .subject
             .resolve_datasource_urls_from_env(&overrides, |key| params.env.get(key).map(String::from))
             .map_err(|env_error| GetConfigError {
                 error_code: None,
@@ -67,7 +66,7 @@ fn get_config_impl(params: GetConfigParams) -> Result<serde_json::Value, GetConf
             })?;
     }
 
-    Ok(datamodel::mcf::config_to_mcf_json_value(&config))
+    Ok(psl::get_config(&config))
 }
 
 #[cfg(test)]
@@ -90,7 +89,7 @@ mod tests {
         });
 
         let expected = expect![[
-            r#"{"error":{"message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:5\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 4 | \u001b[0m\n\u001b[1;94m 5 | \u001b[0m            \u001b[1;91mdatasøurce yolo {\u001b[0m\n\u001b[1;94m 6 | \u001b[0m            }\n\u001b[1;94m   | \u001b[0m\n\u001b[1;91merror\u001b[0m: \u001b[1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:6\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 5 | \u001b[0m            datasøurce yolo {\n\u001b[1;94m 6 | \u001b[0m            \u001b[1;91m}\u001b[0m\n\u001b[1;94m 7 | \u001b[0m        \n\u001b[1;94m   | \u001b[0m\n","error_code":null}}"#
+            r#"{"error":{"message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:5\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 4 | \u001b[0m\n\u001b[1;94m 5 | \u001b[0m            \u001b[1;91mdatasøurce yolo {\u001b[0m\n\u001b[1;94m 6 | \u001b[0m            }\n\u001b[1;94m   | \u001b[0m\n\u001b[1;91merror\u001b[0m: \u001b[1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:6\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 5 | \u001b[0m            datasøurce yolo {\n\u001b[1;94m 6 | \u001b[0m            \u001b[1;91m}\u001b[0m\n\u001b[1;94m 7 | \u001b[0m        \n\u001b[1;94m   | \u001b[0m\n\u001b[1;91merror\u001b[0m: \u001b[1mArgument \"provider\" is missing in generator block \"js\".\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:2\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 1 | \u001b[0m\n\u001b[1;94m 2 | \u001b[0m            \u001b[1;91mgenerator js {\u001b[0m\n\u001b[1;94m 3 | \u001b[0m            }\n\u001b[1;94m   | \u001b[0m\n","error_code":null}}"#
         ]];
         let response = get_config(&request.to_string());
 

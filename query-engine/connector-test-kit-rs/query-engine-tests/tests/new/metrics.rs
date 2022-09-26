@@ -2,6 +2,9 @@ use query_engine_tests::test_suite;
 
 #[test_suite(schema(generic))]
 mod metrics {
+    use query_engine_metrics::{
+        PRISMA_CLIENT_QUERIES_ACTIVE, PRISMA_CLIENT_QUERIES_TOTAL, PRISMA_DATASOURCE_QUERIES_TOTAL,
+    };
     use query_engine_tests::ConnectorVersion::{MongoDb, SqlServer, Sqlite};
     use query_engine_tests::*;
     use serde_json::Value;
@@ -20,8 +23,8 @@ mod metrics {
 
         let json = runner.get_metrics().to_json(Default::default());
         // We cannot assert the full response it will be slightly different per database
-        let total_queries = get_counter(&json, "prisma_datasource_queries_total");
-        let total_operations = get_counter(&json, "prisma_client_queries_total");
+        let total_queries = get_counter(&json, PRISMA_DATASOURCE_QUERIES_TOTAL);
+        let total_operations = get_counter(&json, PRISMA_CLIENT_QUERIES_TOTAL);
 
         match runner.connector_version() {
             Sqlite => assert_eq!(total_queries, 9),
@@ -49,7 +52,7 @@ mod metrics {
         let _ = runner.commit_tx(tx_id).await?;
 
         let json = runner.get_metrics().to_json(Default::default());
-        let active_transactions = get_gauge(&json, "prisma_client_queries_active");
+        let active_transactions = get_gauge(&json, PRISMA_CLIENT_QUERIES_ACTIVE);
         assert_eq!(active_transactions, 0.0);
 
         let tx_id = runner.start_tx(5000, 5000, None).await?;
@@ -66,7 +69,7 @@ mod metrics {
         let _ = runner.rollback_tx(tx_id.clone()).await?;
 
         let json = runner.get_metrics().to_json(Default::default());
-        let active_transactions = get_gauge(&json, "prisma_client_queries_active");
+        let active_transactions = get_gauge(&json, PRISMA_CLIENT_QUERIES_ACTIVE);
         assert_eq!(active_transactions, 0.0);
         Ok(())
     }

@@ -56,7 +56,7 @@ impl StringEnumType {
 
     /// Attempts to find an enum value for the given value key.
     pub fn value_for(&self, name: &str) -> Option<&str> {
-        self.values.iter().find_map(|val| (val == name).then(|| val.as_str()))
+        self.values.iter().find_map(|val| (val == name).then_some(val.as_str()))
     }
 
     pub fn values(&self) -> &[String] {
@@ -119,7 +119,7 @@ impl FieldRefEnumType {
 
     /// Attempts to find an enum value for the given value key.
     pub fn value_for(&self, name: &str) -> Option<&ScalarFieldRef> {
-        self.values.iter().find_map(|val| (val.0 == name).then(|| &val.1))
+        self.values.iter().find_map(|val| (val.0 == name).then_some(&val.1))
     }
 
     pub fn values(&self) -> Vec<String> {

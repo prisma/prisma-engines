@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
     runs-on: buildjet-16vcpu-ubuntu-2004
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: actions-rs/toolchain@v1
         with:
@@ -37,3 +37,5 @@ jobs:
       - run: "cargo clean && cargo build --release -p query-engine-node-api"
         name: "Compile Query Engine Library"
 
+      - name: "Check that Cargo.lock did not change"
+        run: "git diff --exit-code"

@@ -6,7 +6,7 @@ use crate::{
 use enumflags2::BitFlags;
 use sql_schema_describer::{
     walkers::{ColumnWalker, TableWalker},
-    ColumnId, EnumId, ForeignKeyId, IndexId, SqlSchema, TableId,
+    ColumnId, EnumId, ForeignKeyId, IndexId, SqlSchema, TableId, UdtId, ViewId,
 };
 use std::{collections::BTreeSet, fmt::Write as _};
 
@@ -60,17 +60,18 @@ impl SqlMigration {
             let idx = idx as u32;
             match step {
                 SqlMigrationStep::AlterSequence(_, _) => (),
+                SqlMigrationStep::CreateSchema(_) => (), // todo
                 SqlMigrationStep::DropView(drop_view) => {
                     drift_items.insert((
                         DriftType::RemovedView,
-                        self.schemas().previous.view_walker_at(drop_view.view_index).name(),
+                        self.schemas().previous.walk(drop_view.view_id).name(),
                         idx,
                     ));
                 }
                 SqlMigrationStep::DropUserDefinedType(drop_udt) => {
                     drift_items.insert((
                         DriftType::RemovedUdt,
-                        self.schemas().previous.udt_walker_at(drop_udt.udt_index).name(),
+                        self.schemas().previous.walk(drop_udt.udt_id).name(),
                         idx,
                     ));
                 }
@@ -201,6 +202,7 @@ impl SqlMigration {
                     out.push_str(self.schemas().next.walk(*enum_id).name());
                     out.push('\n');
                 }
+                SqlMigrationStep::CreateSchema(_) => {} // todo
                 SqlMigrationStep::AlterEnum(alter_enum) => {
                     for added in &alter_enum.created_variants {
                         out.push_str("  [+] Added variant `");
@@ -405,6 +407,7 @@ fn render_column_changes(columns: Pair<ColumnWalker<'_>>, changes: &ColumnChange
 // you would intuitively expect.
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) enum SqlMigrationStep {
+    CreateSchema(sql_schema_describer::NamespaceId),
     AlterSequence(Pair<u32>, SequenceChanges),
     DropView(DropView),
     DropUserDefinedType(DropUserDefinedType),
@@ -468,6 +471,7 @@ impl SqlMigrationStep {
             SqlMigrationStep::AlterTable(_) => "AlterTable",
             SqlMigrationStep::CreateEnum(_) => "CreateEnum",
             SqlMigrationStep::CreateIndex { .. } => "CreateIndex",
+            SqlMigrationStep::CreateSchema { .. } => "CreateSchema",
             SqlMigrationStep::CreateTable { .. } => "CreateTable",
             SqlMigrationStep::DropEnum(_) => "DropEnum",
             SqlMigrationStep::DropForeignKey { .. } => "DropForeignKey",
@@ -511,29 +515,24 @@ pub(crate) enum TableChange {
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct DropView {
-    pub view_index: usize,
+    pub view_id: ViewId,
 }
 
 impl DropView {
-    pub fn new(view_index: usize) -> Self {
-        Self { view_index }
+    pub fn new(view_id: ViewId) -> Self {
+        Self { view_id }
     }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct DropUserDefinedType {
-    pub udt_index: usize,
+    pub udt_id: UdtId,
 }
 
 impl DropUserDefinedType {
-    pub(crate) fn new(udt_index: usize) -> Self {
-        Self { udt_index }
+    pub(crate) fn new(udt_id: UdtId) -> Self {
+        Self { udt_id }
     }
-}
-
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub(crate) struct DropColumn {
-    pub index: usize,
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]

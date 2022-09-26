@@ -1,5 +1,4 @@
 use crate::test_api::*;
-use barrel::{types, Migration};
 use pretty_assertions::assert_eq;
 use sql_schema_describer::*;
 
@@ -91,46 +90,49 @@ fn procedures_can_be_described(api: TestApi) {
 
 #[test_connector(tags(Mssql))]
 fn all_mssql_column_types_must_work(api: TestApi) {
-    let mut migration = Migration::new();
-    migration.create_table("User", move |t| {
-        t.add_column("primary_col", types::integer());
-        t.add_column("bit_col", types::custom("bit"));
-        t.add_column("decimal_col", types::custom("decimal"));
-        t.add_column("int_col", types::custom("int"));
-        t.add_column("money_col", types::custom("money"));
-        t.add_column("numeric_col", types::custom("numeric"));
-        t.add_column("smallint_col", types::custom("smallint"));
-        t.add_column("smallmoney_col", types::custom("smallmoney"));
-        t.add_column("tinyint_col", types::custom("tinyint"));
-        t.add_column("float_col", types::custom("float(24)"));
-        t.add_column("double_col", types::custom("float(53)"));
-        t.add_column("date_col", types::custom("date"));
-        t.add_column("datetime2_col", types::custom("datetime2"));
-        t.add_column("datetime_col", types::custom("datetime"));
-        t.add_column("datetimeoffset_col", types::custom("datetimeoffset"));
-        t.add_column("smalldatetime_col", types::custom("smalldatetime"));
-        t.add_column("time_col", types::custom("time"));
-        t.add_column("char_col", types::custom("char(255)"));
-        t.add_column("varchar_col", types::custom("varchar(255)"));
-        t.add_column("varchar_max_col", types::custom("varchar(max)"));
-        t.add_column("text_col", types::custom("text"));
-        t.add_column("nvarchar_col", types::custom("nvarchar(255)"));
-        t.add_column("nvarchar_max_col", types::custom("nvarchar(max)"));
-        t.add_column("ntext_col", types::custom("ntext"));
-        t.add_column("binary_col", types::custom("binary(20)"));
-        t.add_column("varbinary_col", types::custom("varbinary(20)"));
-        t.add_column("varbinary_max_col", types::custom("varbinary(max)"));
-        t.add_column("image_col", types::custom("image"));
-        t.add_column("xml_col", types::custom("xml"));
-        t.inject_custom("CONSTRAINT \"thepk\" PRIMARY KEY (primary_col)");
-    });
-
-    let full_sql = migration.make::<barrel::backend::MsSql>();
-    api.raw_cmd(&full_sql);
+    let sql = r#"
+        CREATE TABLE [User] (
+            [primary_col] INTEGER,
+            [bit_col] bit,
+            [decimal_col] decimal,
+            [int_col] int,
+            [money_col] money,
+            [numeric_col] numeric,
+            [smallint_col] smallint,
+            [smallmoney_col] smallmoney,
+            [tinyint_col] tinyint,
+            [float_col] float(24),
+            [double_col] float(53),
+            [date_col] date,
+            [datetime2_col] datetime2,
+            [datetime_col] datetime,
+            [datetimeoffset_col] datetimeoffset,
+            [smalldatetime_col] smalldatetime,
+            [time_col] time,
+            [char_col] char(255),
+            [varchar_col] varchar(255),
+            [varchar_max_col] varchar(max),
+            [text_col] text,
+            [nvarchar_col] nvarchar(255),
+            [nvarchar_max_col] nvarchar(max),
+            [ntext_col] ntext,
+            [binary_col] binary(20),
+            [varbinary_col] varbinary(20),
+            [varbinary_max_col] varbinary(max),
+            [image_col] image,
+            [xml_col] xml,
+            CONSTRAINT "thepk" PRIMARY KEY (primary_col)
+        );
+    "#;
+    api.raw_cmd(sql);
     let expectation = expect![[r#"
         SqlSchema {
+            namespaces: [],
             tables: [
                 Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "User",
                 },
             ],
@@ -147,9 +149,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             family: Int,
                             arity: Required,
                             native_type: Some(
-                                String(
-                                    "Int",
-                                ),
+                                String("Int"),
                             ),
                         },
                         default: None,
@@ -165,11 +165,9 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "bit",
                             family: Boolean,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "Bit",
-                                ),
+                                String("Bit"),
                             ),
                         },
                         default: None,
@@ -185,18 +183,14 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "decimal(18,0)",
                             family: Decimal,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
-                                Object({
-                                    "Decimal": Array([
-                                        Number(
-                                            18,
-                                        ),
-                                        Number(
-                                            0,
-                                        ),
-                                    ]),
-                                }),
+                                Object {
+                                    "Decimal": Array [
+                                        Number(18),
+                                        Number(0),
+                                    ],
+                                },
                             ),
                         },
                         default: None,
@@ -212,11 +206,9 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "int",
                             family: Int,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "Int",
-                                ),
+                                String("Int"),
                             ),
                         },
                         default: None,
@@ -232,11 +224,9 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "money",
                             family: Float,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "Money",
-                                ),
+                                String("Money"),
                             ),
                         },
                         default: None,
@@ -252,18 +242,14 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "numeric(18,0)",
                             family: Decimal,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
-                                Object({
-                                    "Decimal": Array([
-                                        Number(
-                                            18,
-                                        ),
-                                        Number(
-                                            0,
-                                        ),
-                                    ]),
-                                }),
+                                Object {
+                                    "Decimal": Array [
+                                        Number(18),
+                                        Number(0),
+                                    ],
+                                },
                             ),
                         },
                         default: None,
@@ -279,11 +265,9 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "smallint",
                             family: Int,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "SmallInt",
-                                ),
+                                String("SmallInt"),
                             ),
                         },
                         default: None,
@@ -299,11 +283,9 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "smallmoney",
                             family: Float,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "SmallMoney",
-                                ),
+                                String("SmallMoney"),
                             ),
                         },
                         default: None,
@@ -319,11 +301,9 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "tinyint",
                             family: Int,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "TinyInt",
-                                ),
+                                String("TinyInt"),
                             ),
                         },
                         default: None,
@@ -339,11 +319,9 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "real",
                             family: Float,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "Real",
-                                ),
+                                String("Real"),
                             ),
                         },
                         default: None,
@@ -359,13 +337,11 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "float(53)",
                             family: Float,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
-                                Object({
-                                    "Float": Number(
-                                        53,
-                                    ),
-                                }),
+                                Object {
+                                    "Float": Number(53),
+                                },
                             ),
                         },
                         default: None,
@@ -381,11 +357,9 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "date",
                             family: DateTime,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "Date",
-                                ),
+                                String("Date"),
                             ),
                         },
                         default: None,
@@ -401,11 +375,9 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "datetime2",
                             family: DateTime,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "DateTime2",
-                                ),
+                                String("DateTime2"),
                             ),
                         },
                         default: None,
@@ -421,11 +393,9 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "datetime",
                             family: DateTime,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "DateTime",
-                                ),
+                                String("DateTime"),
                             ),
                         },
                         default: None,
@@ -441,11 +411,9 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "datetimeoffset",
                             family: DateTime,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "DateTimeOffset",
-                                ),
+                                String("DateTimeOffset"),
                             ),
                         },
                         default: None,
@@ -461,11 +429,9 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "smalldatetime",
                             family: DateTime,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "SmallDateTime",
-                                ),
+                                String("SmallDateTime"),
                             ),
                         },
                         default: None,
@@ -481,11 +447,9 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "time",
                             family: DateTime,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "Time",
-                                ),
+                                String("Time"),
                             ),
                         },
                         default: None,
@@ -501,13 +465,11 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "char(255)",
                             family: String,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
-                                Object({
-                                    "Char": Number(
-                                        255,
-                                    ),
-                                }),
+                                Object {
+                                    "Char": Number(255),
+                                },
                             ),
                         },
                         default: None,
@@ -523,15 +485,13 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "varchar(255)",
                             family: String,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
-                                Object({
-                                    "VarChar": Object({
-                                        "Number": Number(
-                                            255,
-                                        ),
-                                    }),
-                                }),
+                                Object {
+                                    "VarChar": Object {
+                                        "Number": Number(255),
+                                    },
+                                },
                             ),
                         },
                         default: None,
@@ -547,13 +507,11 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "varchar(max)",
                             family: String,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
-                                Object({
-                                    "VarChar": String(
-                                        "Max",
-                                    ),
-                                }),
+                                Object {
+                                    "VarChar": String("Max"),
+                                },
                             ),
                         },
                         default: None,
@@ -569,11 +527,9 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "text",
                             family: String,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "Text",
-                                ),
+                                String("Text"),
                             ),
                         },
                         default: None,
@@ -589,15 +545,13 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "nvarchar(255)",
                             family: String,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
-                                Object({
-                                    "NVarChar": Object({
-                                        "Number": Number(
-                                            255,
-                                        ),
-                                    }),
-                                }),
+                                Object {
+                                    "NVarChar": Object {
+                                        "Number": Number(255),
+                                    },
+                                },
                             ),
                         },
                         default: None,
@@ -613,13 +567,11 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "nvarchar(max)",
                             family: String,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
-                                Object({
-                                    "NVarChar": String(
-                                        "Max",
-                                    ),
-                                }),
+                                Object {
+                                    "NVarChar": String("Max"),
+                                },
                             ),
                         },
                         default: None,
@@ -635,11 +587,9 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "ntext",
                             family: String,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "NText",
-                                ),
+                                String("NText"),
                             ),
                         },
                         default: None,
@@ -655,13 +605,11 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "binary(20)",
                             family: Binary,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
-                                Object({
-                                    "Binary": Number(
-                                        20,
-                                    ),
-                                }),
+                                Object {
+                                    "Binary": Number(20),
+                                },
                             ),
                         },
                         default: None,
@@ -677,15 +625,13 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "varbinary(20)",
                             family: Binary,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
-                                Object({
-                                    "VarBinary": Object({
-                                        "Number": Number(
-                                            20,
-                                        ),
-                                    }),
-                                }),
+                                Object {
+                                    "VarBinary": Object {
+                                        "Number": Number(20),
+                                    },
+                                },
                             ),
                         },
                         default: None,
@@ -701,13 +647,11 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "varbinary(max)",
                             family: Binary,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
-                                Object({
-                                    "VarBinary": String(
-                                        "Max",
-                                    ),
-                                }),
+                                Object {
+                                    "VarBinary": String("Max"),
+                                },
                             ),
                         },
                         default: None,
@@ -723,11 +667,9 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "image",
                             family: Binary,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "Image",
-                                ),
+                                String("Image"),
                             ),
                         },
                         default: None,
@@ -743,11 +685,9 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "xml",
                             family: String,
-                            arity: Required,
+                            arity: Nullable,
                             native_type: Some(
-                                String(
-                                    "Xml",
-                                ),
+                                String("Xml"),
                             ),
                         },
                         default: None,
@@ -901,51 +841,4 @@ fn mssql_foreign_key_on_delete_must_be_handled(api: TestApi) {
         let fk = table.foreign_key_for_column(column).unwrap();
         assert_eq!(action, fk.on_delete_action());
     }
-}
-
-#[test_connector(tags(Mssql))]
-fn mssql_multi_field_indexes_must_be_inferred(api: TestApi) {
-    let mut migration = Migration::new();
-    migration.create_table("Employee", move |t| {
-        t.add_column("id", types::primary());
-        t.add_column("age", types::integer());
-        t.add_column("name", types::varchar(200));
-        t.add_index("age_and_name_index", types::index(vec!["name", "age"]).unique(true));
-    });
-
-    let full_sql = migration.make::<barrel::backend::MsSql>();
-    api.raw_cmd(&full_sql);
-    let result = api.describe();
-    result.assert_table("Employee", |t| {
-        t.assert_index_on_columns(&["name", "age"], |idx| idx.assert_name("age_and_name_index"))
-    });
-}
-
-#[test_connector(tags(Mssql))]
-fn mssql_join_table_unique_indexes_must_be_inferred(api: TestApi) {
-    let mut migration = Migration::new();
-
-    migration.create_table("Cat", move |t| {
-        t.add_column("id", types::primary());
-        t.add_column("name", types::text());
-    });
-
-    migration.create_table("Human", move |t| {
-        t.add_column("id", types::primary());
-        t.add_column("name", types::text());
-    });
-
-    migration.create_table("CatToHuman", move |t| {
-        t.add_column("cat", types::foreign("Cat", "id").nullable(true));
-        t.add_column("human", types::foreign("Human", "id").nullable(true));
-        t.add_column("relationship", types::text());
-        t.add_index("cat_and_human_index", types::index(vec!["cat", "human"]).unique(true));
-    });
-
-    let full_sql = migration.make::<barrel::backend::MsSql>();
-    api.raw_cmd(&full_sql);
-    let result = api.describe();
-    result.assert_table("CatToHuman", |t| {
-        t.assert_index_on_columns(&["cat", "human"], |idx| idx.assert_name("cat_and_human_index"))
-    });
 }
