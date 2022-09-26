@@ -75,6 +75,10 @@
 <span id="75">75</span>
 <span id="76">76</span>
 <span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::datamodel_connector</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Span</span>};
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
@@ -140,6 +144,10 @@
 
     <span class="kw">fn</span> <span class="ident">validate_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="kw">fn</span> <span class="ident">int_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_native_type</span>: <span class="ident">serde_json::Value</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IntType</span><span class="op">&gt;</span> {
+        <span class="prelude-val">None</span>
     }
 }
 

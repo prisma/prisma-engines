@@ -529,15 +529,50 @@
 <span id="529">529</span>
 <span id="530">530</span>
 <span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::schema</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">bigdecimal</span>::{<span class="ident">BigDecimal</span>, <span class="ident">ToPrimitive</span>};
 <span class="kw">use</span> <span class="ident">chrono::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">indexmap::IndexMap</span>;
 <span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
-<span class="kw">use</span> <span class="ident">psl::dml::ValueGeneratorFn</span>;
+<span class="kw">use</span> <span class="ident">psl</span>::{<span class="ident">datamodel_connector::IntType</span>, <span class="ident">dml::ValueGeneratorFn</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Borrow</span>, <span class="ident">collections::HashSet</span>, <span class="ident">convert::TryFrom</span>, <span class="ident">str::FromStr</span>, <span class="ident">sync::Arc</span>};
 <span class="kw">use</span> <span class="ident">uuid::Uuid</span>;
+
+<span class="kw">const</span> <span class="ident">I24_MIN</span>: <span class="ident">i64</span> <span class="op">=</span> <span class="op">-</span><span class="number">8388608</span>;
+<span class="kw">const</span> <span class="ident">I24_MAX</span>: <span class="ident">i64</span> <span class="op">=</span> <span class="number">8388607</span>;
+
+<span class="kw">const</span> <span class="ident">U24_MIN</span>: <span class="ident">i64</span> <span class="op">=</span> <span class="number">0</span>;
+<span class="kw">const</span> <span class="ident">U24_MAX</span>: <span class="ident">i64</span> <span class="op">=</span> <span class="number">16777215</span>;
 
 <span class="comment">// todo: validate is one of!</span>
 
@@ -783,14 +818,33 @@
             }
             (<span class="ident">QueryValue::DateTime</span>(<span class="ident">s</span>), <span class="ident">ScalarType::DateTime</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">PrismaValue::DateTime</span>(<span class="ident">s</span>)),
 
-            (<span class="ident">QueryValue::Int</span>(<span class="ident">i</span>), <span class="ident">ScalarType::Int</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>)),
+            (<span class="ident">QueryValue::Int</span>(<span class="ident">i</span>), <span class="ident">ScalarType::Int</span>(<span class="ident">int_type</span>)) =&gt; {
+                <span class="kw">let</span> <span class="ident">fits_in_specified_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">int_type</span> {
+                    <span class="ident">IntType::Signed8</span> =&gt; <span class="ident">i8::try_from</span>(<span class="ident">i</span>).<span class="ident">is_ok</span>(),
+                    <span class="ident">IntType::Signed16</span> =&gt; <span class="ident">i16::try_from</span>(<span class="ident">i</span>).<span class="ident">is_ok</span>(),
+                    <span class="ident">IntType::Signed24</span> =&gt; <span class="ident">fits_in_range</span>(<span class="ident">i</span>, <span class="ident">I24_MIN</span>, <span class="ident">I24_MAX</span>),
+                    <span class="ident">IntType::Signed32</span> =&gt; <span class="ident">i32::try_from</span>(<span class="ident">i</span>).<span class="ident">is_ok</span>(),
+                    <span class="ident">IntType::Unsigned8</span> =&gt; <span class="ident">u8::try_from</span>(<span class="ident">i</span>).<span class="ident">is_ok</span>(),
+                    <span class="ident">IntType::Unsigned16</span> =&gt; <span class="ident">u16::try_from</span>(<span class="ident">i</span>).<span class="ident">is_ok</span>(),
+                    <span class="ident">IntType::Unsigned24</span> =&gt; <span class="ident">fits_in_range</span>(<span class="ident">i</span>, <span class="ident">U24_MIN</span>, <span class="ident">U24_MAX</span>),
+                    <span class="ident">IntType::Unsigned32</span> =&gt; <span class="ident">u32::try_from</span>(<span class="ident">i</span>).<span class="ident">is_ok</span>(),
+                    <span class="ident">IntType::Custom</span>(<span class="ident">min</span>, <span class="ident">max</span>) =&gt; <span class="ident">fits_in_range</span>(<span class="ident">i</span>, <span class="kw-2">*</span><span class="ident">min</span>, <span class="kw-2">*</span><span class="ident">max</span>)
+                };
+
+                <span class="kw">if</span> <span class="ident">fits_in_specified_type</span> {
+                    <span class="prelude-val">Ok</span>(<span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>))
+                } <span class="kw">else</span> {
+                    <span class="prelude-val">Err</span>(<span class="ident">QueryParserError::new</span>(<span class="ident">parent_path</span>.<span class="ident">clone</span>(), <span class="ident">QueryParserErrorKind::ValueFitError</span>(
+                        <span class="macro">format!</span>(<span class="string">&quot;Unable to fit integer value &#39;{}&#39; into a {} for field &#39;{}&#39;.&quot;</span>, <span class="ident">i</span>, <span class="ident">int_type</span>, <span class="ident">parent_path</span>.<span class="ident">last</span>().<span class="ident">unwrap</span>()))))
+                }
+            },
             (<span class="ident">QueryValue::Int</span>(<span class="ident">i</span>), <span class="ident">ScalarType::Float</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">PrismaValue::Float</span>(<span class="ident">BigDecimal::from</span>(<span class="ident">i</span>))),
             (<span class="ident">QueryValue::Int</span>(<span class="ident">i</span>), <span class="ident">ScalarType::Decimal</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">PrismaValue::Float</span>(<span class="ident">BigDecimal::from</span>(<span class="ident">i</span>))),
             (<span class="ident">QueryValue::Int</span>(<span class="ident">i</span>), <span class="ident">ScalarType::BigInt</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">PrismaValue::BigInt</span>(<span class="ident">i</span>)),
 
             (<span class="ident">QueryValue::Float</span>(<span class="ident">f</span>), <span class="ident">ScalarType::Float</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">PrismaValue::Float</span>(<span class="ident">f</span>)),
             (<span class="ident">QueryValue::Float</span>(<span class="ident">f</span>), <span class="ident">ScalarType::Decimal</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">PrismaValue::Float</span>(<span class="ident">f</span>)),
-            (<span class="ident">QueryValue::Float</span>(<span class="ident">f</span>), <span class="ident">ScalarType::Int</span>) =&gt; <span class="kw">match</span> <span class="ident">f</span>.<span class="ident">to_i64</span>() {
+            (<span class="ident">QueryValue::Float</span>(<span class="ident">f</span>), <span class="ident">ScalarType::Int</span>(<span class="kw">_</span>)) =&gt; <span class="kw">match</span> <span class="ident">f</span>.<span class="ident">to_i64</span>() {
                 <span class="prelude-val">Some</span>(<span class="ident">converted</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">PrismaValue::Int</span>(<span class="ident">converted</span>)),
                 <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryParserError::new</span>(<span class="ident">parent_path</span>.<span class="ident">clone</span>(), <span class="ident">QueryParserErrorKind::ValueFitError</span>(
                             <span class="macro">format!</span>(<span class="string">&quot;Unable to fit float value (or large JS integer serialized in exponent notation) &#39;{}&#39; into a 64 Bit signed integer for field &#39;{}&#39;. If you&#39;re trying to store large integers, consider using `BigInt`.&quot;</span>, <span class="ident">f</span>, <span class="ident">parent_path</span>.<span class="ident">last</span>().<span class="ident">unwrap</span>())))),
@@ -1059,6 +1113,10 @@
 
         <span class="ident">Diff</span> { <span class="ident">left</span>, <span class="ident">right</span>, <span class="ident">_equal</span> }
     }
+}
+
+<span class="kw">fn</span> <span class="ident">fits_in_range</span>(<span class="ident">val</span>: <span class="ident">i64</span>, <span class="ident">min</span>: <span class="ident">i64</span>, <span class="ident">max</span>: <span class="ident">i64</span>) -&gt; <span class="ident">bool</span> {
+    <span class="ident">val</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">min</span> <span class="op">&amp;&amp;</span> <span class="ident">val</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">max</span>
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>

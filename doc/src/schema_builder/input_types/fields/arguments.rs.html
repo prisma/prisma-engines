@@ -274,8 +274,8 @@
         <span class="ident">where_argument</span>(<span class="ident">ctx</span>, <span class="ident">model</span>),
         <span class="ident">order_by_argument</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="ident">order_by_options</span>),
         <span class="ident">input_field</span>(<span class="ident">args::CURSOR</span>, <span class="ident">unique_input_type</span>, <span class="prelude-val">None</span>).<span class="ident">optional</span>(),
-        <span class="ident">input_field</span>(<span class="ident">args::TAKE</span>, <span class="ident">InputType::int</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>(),
-        <span class="ident">input_field</span>(<span class="ident">args::SKIP</span>, <span class="ident">InputType::int</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>(),
+        <span class="ident">input_field</span>(<span class="ident">args::TAKE</span>, <span class="ident">InputType::int32</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>(),
+        <span class="ident">input_field</span>(<span class="ident">args::SKIP</span>, <span class="ident">InputType::int32</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>(),
     ];
 
     <span class="kw">if</span> <span class="ident">include_distinct</span> {
@@ -330,8 +330,8 @@
             <span class="prelude-val">None</span>,
         )
         .<span class="ident">optional</span>(),
-        <span class="ident">input_field</span>(<span class="ident">args::TAKE</span>, <span class="ident">InputType::int</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>(),
-        <span class="ident">input_field</span>(<span class="ident">args::SKIP</span>, <span class="ident">InputType::int</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>(),
+        <span class="ident">input_field</span>(<span class="ident">args::TAKE</span>, <span class="ident">InputType::int32</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>(),
+        <span class="ident">input_field</span>(<span class="ident">args::SKIP</span>, <span class="ident">InputType::int32</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>(),
     ]
 }
 </code></pre></div>

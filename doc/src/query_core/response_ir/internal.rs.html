@@ -1145,10 +1145,10 @@
         (<span class="ident">ScalarType::Json</span>, <span class="ident">PrismaValue::String</span>(<span class="ident">s</span>)) =&gt; <span class="ident">PrismaValue::Json</span>(<span class="ident">s</span>),
         (<span class="ident">ScalarType::Json</span>, <span class="ident">PrismaValue::Json</span>(<span class="ident">s</span>)) =&gt; <span class="ident">PrismaValue::Json</span>(<span class="ident">s</span>),
 
-        (<span class="ident">ScalarType::Int</span>, <span class="ident">PrismaValue::Float</span>(<span class="ident">f</span>)) =&gt; {
+        (<span class="ident">ScalarType::Int</span>(<span class="kw">_</span>), <span class="ident">PrismaValue::Float</span>(<span class="ident">f</span>)) =&gt; {
             <span class="ident">PrismaValue::Int</span>(<span class="ident">f</span>.<span class="ident">to_i64</span>().<span class="ident">ok_or</span>(<span class="ident">CoreError::decimal_conversion_error</span>(<span class="kw-2">&amp;</span><span class="ident">f</span>, <span class="string">&quot;i64&quot;</span>))<span class="question-mark">?</span>)
         }
-        (<span class="ident">ScalarType::Int</span>, <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>)) =&gt; <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>),
+        (<span class="ident">ScalarType::Int</span>(<span class="kw">_</span>), <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>)) =&gt; <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>),
 
         (<span class="ident">ScalarType::Float</span>, <span class="ident">PrismaValue::Float</span>(<span class="ident">f</span>)) =&gt; <span class="ident">PrismaValue::Float</span>(<span class="ident">f</span>),
         (<span class="ident">ScalarType::Float</span>, <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>)) =&gt; <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>),
@@ -1163,7 +1163,7 @@
         }
 
         (<span class="ident">ScalarType::Boolean</span>, <span class="ident">PrismaValue::Boolean</span>(<span class="ident">b</span>)) =&gt; <span class="ident">PrismaValue::Boolean</span>(<span class="ident">b</span>),
-        (<span class="ident">ScalarType::Int</span>, <span class="ident">PrismaValue::Boolean</span>(<span class="ident">b</span>)) =&gt; <span class="ident">PrismaValue::Int</span>(<span class="ident">b</span> <span class="kw">as</span> <span class="ident">i64</span>),
+        (<span class="ident">ScalarType::Int</span>(<span class="kw">_</span>), <span class="ident">PrismaValue::Boolean</span>(<span class="ident">b</span>)) =&gt; <span class="ident">PrismaValue::Int</span>(<span class="ident">b</span> <span class="kw">as</span> <span class="ident">i64</span>),
         (<span class="ident">ScalarType::DateTime</span>, <span class="ident">PrismaValue::DateTime</span>(<span class="ident">dt</span>)) =&gt; <span class="ident">PrismaValue::DateTime</span>(<span class="ident">dt</span>),
         (<span class="ident">ScalarType::UUID</span>, <span class="ident">PrismaValue::Uuid</span>(<span class="ident">u</span>)) =&gt; <span class="ident">PrismaValue::Uuid</span>(<span class="ident">u</span>),
         (<span class="ident">ScalarType::Bytes</span>, <span class="ident">PrismaValue::Bytes</span>(<span class="ident">b</span>)) =&gt; <span class="ident">PrismaValue::Bytes</span>(<span class="ident">b</span>),

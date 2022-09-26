@@ -116,10 +116,14 @@
 <span id="116">116</span>
 <span id="117">117</span>
 <span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">psl_core</span>::{
     <span class="ident">datamodel_connector</span>::{
-        <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ConstraintScope</span>, <span class="ident">NativeTypeConstructor</span>, <span class="ident">NativeTypeInstance</span>,
+        <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ConstraintScope</span>, <span class="ident">IntType</span>, <span class="ident">NativeTypeConstructor</span>, <span class="ident">NativeTypeInstance</span>,
         <span class="ident">ReferentialIntegrity</span>,
     },
     <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Span</span>},
@@ -232,6 +236,10 @@
         }
 
         <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="kw">fn</span> <span class="ident">int_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_native_type</span>: <span class="ident">serde_json::Value</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IntType</span><span class="op">&gt;</span> {
+        <span class="prelude-val">None</span>
     }
 }
 </code></pre></div>

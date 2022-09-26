@@ -575,6 +575,19 @@
 <span id="575">575</span>
 <span id="576">576</span>
 <span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">validations</span>;
 
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
@@ -586,6 +599,7 @@
 <span class="kw">use</span> <span class="ident">psl_core</span>::{
     <span class="ident">datamodel_connector</span>::{
         <span class="ident">helper</span>::{<span class="ident">arg_vec_from_opt</span>, <span class="ident">args_vec_from_opt</span>, <span class="ident">parse_one_opt_u32</span>, <span class="ident">parse_two_opt_u32</span>},
+        <span class="ident">int_type::IntType</span>,
         <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ConstraintScope</span>, <span class="ident">NativeTypeConstructor</span>, <span class="ident">NativeTypeInstance</span>,
         <span class="ident">ReferentialIntegrity</span>, <span class="ident">StringFilter</span>,
     },
@@ -756,6 +770,7 @@
             <span class="comment">//Int</span>
             <span class="ident">SmallInt</span> =&gt; <span class="ident">ScalarType::Int</span>,
             <span class="ident">Integer</span> =&gt; <span class="ident">ScalarType::Int</span>,
+            <span class="comment">// Unsigned 32-bit int</span>
             <span class="ident">Oid</span> =&gt; <span class="ident">ScalarType::Int</span>,
             <span class="comment">//BigInt</span>
             <span class="ident">BigInt</span> =&gt; <span class="ident">ScalarType::BigInt</span>,
@@ -1027,6 +1042,17 @@
                 }
             }
             <span class="kw">_</span> =&gt; (),
+        }
+    }
+
+    <span class="kw">fn</span> <span class="ident">int_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">native_type</span>: <span class="ident">serde_json::Value</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IntType</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">nt</span>: <span class="ident">PostgresType</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">native_type</span>).<span class="ident">unwrap</span>();
+
+        <span class="kw">match</span> <span class="ident">nt</span> {
+            <span class="ident">SmallInt</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">IntType::Signed16</span>),
+            <span class="ident">Integer</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">IntType::Signed32</span>),
+            <span class="ident">Oid</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">IntType::Unsigned32</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 }

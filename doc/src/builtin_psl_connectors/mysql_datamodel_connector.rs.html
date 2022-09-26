@@ -406,6 +406,25 @@
 <span id="406">406</span>
 <span id="407">407</span>
 <span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">validations</span>;
 
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
@@ -416,6 +435,7 @@
 <span class="kw">use</span> <span class="ident">psl_core</span>::{
     <span class="ident">datamodel_connector</span>::{
         <span class="ident">helper</span>::{<span class="ident">args_vec_from_opt</span>, <span class="ident">parse_one_opt_u32</span>, <span class="ident">parse_one_u32</span>, <span class="ident">parse_two_opt_u32</span>},
+        <span class="ident">int_type::IntType</span>,
         <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ConstraintScope</span>, <span class="ident">NativeTypeConstructor</span>, <span class="ident">NativeTypeInstance</span>,
         <span class="ident">ReferentialIntegrity</span>,
     },
@@ -812,6 +832,24 @@
         }
 
         <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="kw">fn</span> <span class="ident">int_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">native_type</span>: <span class="ident">serde_json::Value</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IntType</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">nt</span>: <span class="ident">MySqlType</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">native_type</span>).<span class="ident">unwrap</span>();
+
+        <span class="kw">match</span> <span class="ident">nt</span> {
+            <span class="ident">MySqlType::TinyInt</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">IntType::Signed8</span>),
+            <span class="ident">MySqlType::SmallInt</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">IntType::Signed16</span>),
+            <span class="ident">MySqlType::MediumInt</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">IntType::Signed24</span>),
+            <span class="ident">MySqlType::Int</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">IntType::Signed32</span>),
+            <span class="ident">MySqlType::UnsignedTinyInt</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">IntType::Unsigned8</span>),
+            <span class="ident">MySqlType::UnsignedSmallInt</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">IntType::Unsigned16</span>),
+            <span class="ident">MySqlType::UnsignedMediumInt</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">IntType::Unsigned24</span>),
+            <span class="ident">MySqlType::UnsignedInt</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">IntType::Unsigned32</span>),
+            <span class="comment">// Technically stored as an Unsigned8 but with values ranging from 1901 and 2155</span>
+            <span class="ident">MySqlType::Year</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">IntType::Custom</span>(<span class="number">1901</span>, <span class="number">2155</span>)),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+        }
     }
 }
 </code></pre></div>

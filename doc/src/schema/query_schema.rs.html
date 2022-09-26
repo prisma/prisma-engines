@@ -254,7 +254,7 @@
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">fmt::Debug</span>;
 <span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">psl::common::preview_features::PreviewFeature</span>, <span class="ident">InternalDataModelRef</span>, <span class="ident">ModelRef</span>};
-<span class="kw">use</span> <span class="ident">psl::datamodel_connector</span>::{<span class="ident">ConnectorCapability</span>, <span class="ident">ReferentialIntegrity</span>};
+<span class="kw">use</span> <span class="ident">psl::datamodel_connector</span>::{<span class="ident">int_type::IntType</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ReferentialIntegrity</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Borrow</span>, <span class="ident">fmt</span>};
 
 <span class="doccomment">/// The query schema.</span>
@@ -470,7 +470,7 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ScalarType</span> {
     <span class="ident">Null</span>,
     <span class="ident">String</span>,
-    <span class="ident">Int</span>,
+    <span class="ident">Int</span>(<span class="ident">IntType</span>),
     <span class="ident">BigInt</span>,
     <span class="ident">Float</span>,
     <span class="ident">Decimal</span>,
@@ -488,7 +488,7 @@
         <span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">ScalarType::Null</span> =&gt; <span class="string">&quot;Null&quot;</span>,
             <span class="ident">ScalarType::String</span> =&gt; <span class="string">&quot;String&quot;</span>,
-            <span class="ident">ScalarType::Int</span> =&gt; <span class="string">&quot;Int&quot;</span>,
+            <span class="ident">ScalarType::Int</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;Int&quot;</span>,
             <span class="ident">ScalarType::BigInt</span> =&gt; <span class="string">&quot;BigInt&quot;</span>,
             <span class="ident">ScalarType::Boolean</span> =&gt; <span class="string">&quot;Boolean&quot;</span>,
             <span class="ident">ScalarType::Float</span> =&gt; <span class="string">&quot;Float&quot;</span>,

@@ -133,6 +133,15 @@
 <span id="133">133</span>
 <span id="134">134</span>
 <span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">mongodb_types</span>;
 <span class="kw">mod</span> <span class="ident">validations</span>;
 
@@ -141,7 +150,7 @@
 <span class="kw">use</span> <span class="ident">native_types</span>::{<span class="ident">MongoDbType</span>, <span class="ident">NativeType</span>};
 <span class="kw">use</span> <span class="ident">psl_core</span>::{
     <span class="ident">datamodel_connector</span>::{
-        <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ConstraintScope</span>, <span class="ident">NativeTypeConstructor</span>, <span class="ident">NativeTypeInstance</span>,
+        <span class="ident">int_type::IntType</span>, <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ConstraintScope</span>, <span class="ident">NativeTypeConstructor</span>, <span class="ident">NativeTypeInstance</span>,
         <span class="ident">ReferentialIntegrity</span>,
     },
     <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>, <span class="ident">Span</span>},
@@ -266,6 +275,15 @@
 
     <span class="kw">fn</span> <span class="ident">allowed_referential_integrity_settings</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">enumflags2::BitFlags</span><span class="op">&lt;</span><span class="ident">ReferentialIntegrity</span><span class="op">&gt;</span> {
         <span class="ident">ReferentialIntegrity::Prisma</span>.<span class="ident">into</span>()
+    }
+
+    <span class="kw">fn</span> <span class="ident">int_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">native_type</span>: <span class="ident">serde_json::Value</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IntType</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">nt</span>: <span class="ident">MongoDbType</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">native_type</span>).<span class="ident">unwrap</span>();
+
+        <span class="kw">match</span> <span class="ident">nt</span> {
+            <span class="ident">MongoDbType::Int</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">IntType::Signed32</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+        }
     }
 }
 </code></pre></div>
