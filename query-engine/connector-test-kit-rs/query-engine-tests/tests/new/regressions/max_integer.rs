@@ -554,11 +554,11 @@ mod max_integer {
         // int
         insta::assert_snapshot!(
           run_query!(&runner, format!("mutation {{ createOneTest(data: {{ int: {} }}) {{ int }} }}", i32::MAX)),
-          @r###"{"data":{"createOneTest":{"int":2147483648}}}"###
+          @r###"{"data":{"createOneTest":{"int":2147483647}}}"###
         );
         insta::assert_snapshot!(
           run_query!(&runner, format!("mutation {{ createOneTest(data: {{ int: {} }}) {{ int }} }}", i32::MIN)),
-          @r###"{"data":{"createOneTest":{"int":2147483648}}}"###
+          @r###"{"data":{"createOneTest":{"int":-2147483648}}}"###
         );
 
         Ok(())
