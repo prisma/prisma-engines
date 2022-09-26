@@ -98,16 +98,22 @@ mod max_integer {
     async fn int_should_fail_if_gt_i32_max(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ id: 1, int: {} }}) {{ id int }} }}", I32_OVERFLOW_MAX),
+            format!(
+                "mutation {{ createOneTest(data: {{ id: 1, int: {} }}) {{ id int }} }}",
+                I32_OVERFLOW_MAX
+            ),
             2009,
-            "Unable to fit integer value '2147483648' into a 32-bit signed integer for field 'int'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '2147483648' into a 32-bit signed integer for field 'int'."
         );
 
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ id: 1, int: {} }}) {{ id int }} }}", I32_OVERFLOW_MIN),
+            format!(
+                "mutation {{ createOneTest(data: {{ id: 1, int: {} }}) {{ id int }} }}",
+                I32_OVERFLOW_MIN
+            ),
             2009,
-            "Unable to fit integer value '-2147483649' into a 32-bit signed integer for field 'int'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '-2147483649' into a 32-bit signed integer for field 'int'."
         );
 
         Ok(())
@@ -131,43 +137,61 @@ mod max_integer {
         // int
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ int: {} }}) {{ id }} }}", I32_OVERFLOW_MAX),
+            format!(
+                "mutation {{ createOneTest(data: {{ int: {} }}) {{ id }} }}",
+                I32_OVERFLOW_MAX
+            ),
             2009,
-            "Unable to fit integer value '2147483648' into a 32-bit signed integer for field 'int'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '2147483648' into a 32-bit signed integer for field 'int'."
         );
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ int: {} }}) {{ id }} }}", I32_OVERFLOW_MIN),
+            format!(
+                "mutation {{ createOneTest(data: {{ int: {} }}) {{ id }} }}",
+                I32_OVERFLOW_MIN
+            ),
             2009,
-            "Unable to fit integer value '-2147483649' into a 32-bit signed integer for field 'int'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '-2147483649' into a 32-bit signed integer for field 'int'."
         );
 
         // smallint
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ smallint: {} }}) {{ id }} }}", I16_OVERFLOW_MAX),
+            format!(
+                "mutation {{ createOneTest(data: {{ smallint: {} }}) {{ id }} }}",
+                I16_OVERFLOW_MAX
+            ),
             2009,
-            "Unable to fit integer value '32768' into a 16-bit signed integer for field 'smallint'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '32768' into a 16-bit signed integer for field 'smallint'."
         );
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ smallint: {} }}) {{ id }} }}", I16_OVERFLOW_MIN),
+            format!(
+                "mutation {{ createOneTest(data: {{ smallint: {} }}) {{ id }} }}",
+                I16_OVERFLOW_MIN
+            ),
             2009,
-            "Unable to fit integer value '-32769' into a 16-bit signed integer for field 'smallint'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '-32769' into a 16-bit signed integer for field 'smallint'."
         );
 
         //oid
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ oid: {} }}) {{ id }} }}", U32_OVERFLOW_MAX),
+            format!(
+                "mutation {{ createOneTest(data: {{ oid: {} }}) {{ id }} }}",
+                U32_OVERFLOW_MAX
+            ),
             2009,
-            "Unable to fit integer value '4294967296' into a 32-bit unsigned integer for field 'oid'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '4294967296' into a 32-bit unsigned integer for field 'oid'."
         );
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ oid: {} }}) {{ id }} }}", OVERFLOW_MIN),
+            format!(
+                "mutation {{ createOneTest(data: {{ oid: {} }}) {{ id }} }}",
+                OVERFLOW_MIN
+            ),
             2009,
-            "Unable to fit integer value '-1' into a 32-bit unsigned integer for field 'oid'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '-1' into a 32-bit unsigned integer for field 'oid'."
         );
 
         Ok(())
@@ -228,146 +252,181 @@ mod max_integer {
         schema.to_owned()
     }
 
-    // Ensures that an integer larger than i32::MAX fails with native types that should fit in an i32
     #[connector_test(schema(overflow_mysql), only(MySql))]
     async fn unfitted_int_should_fail_mysql(runner: Runner) -> TestResult<()> {
         // tinyint
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ tinyint: {} }}) {{ id }} }}", I8_OVERFLOW_MAX),
+            format!(
+                "mutation {{ createOneTest(data: {{ tinyint: {} }}) {{ id }} }}",
+                I8_OVERFLOW_MAX
+            ),
             2009,
-            "Unable to fit integer value '128' into a 8-bit signed integer for field 'tinyint'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '128' into a 8-bit signed integer for field 'tinyint'."
         );
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ tinyint: {} }}) {{ id }} }}", I8_OVERFLOW_MIN),
+            format!(
+                "mutation {{ createOneTest(data: {{ tinyint: {} }}) {{ id }} }}",
+                I8_OVERFLOW_MIN
+            ),
             2009,
-            "Unable to fit integer value '-129' into a 8-bit signed integer for field 'tinyint'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '-129' into a 8-bit signed integer for field 'tinyint'."
         );
 
         // smallint
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ smallint: {} }}) {{ id }} }}", I16_OVERFLOW_MAX),
+            format!(
+                "mutation {{ createOneTest(data: {{ smallint: {} }}) {{ id }} }}",
+                I16_OVERFLOW_MAX
+            ),
             2009,
-            "Unable to fit integer value '32768' into a 16-bit signed integer for field 'smallint'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '32768' into a 16-bit signed integer for field 'smallint'."
         );
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ smallint: {} }}) {{ id }} }}", I16_OVERFLOW_MIN),
+            format!(
+                "mutation {{ createOneTest(data: {{ smallint: {} }}) {{ id }} }}",
+                I16_OVERFLOW_MIN
+            ),
             2009,
-            "Unable to fit integer value '-32769' into a 16-bit signed integer for field 'smallint'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '-32769' into a 16-bit signed integer for field 'smallint'."
         );
 
         // mediumint
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ mediumint: {} }}) {{ id }} }}", I24_OVERFLOW_MAX),
+            format!(
+                "mutation {{ createOneTest(data: {{ mediumint: {} }}) {{ id }} }}",
+                I24_OVERFLOW_MAX
+            ),
             2009,
-            "Unable to fit integer value '8388608' into a 24-bit signed integer for field 'mediumint'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '8388608' into a 24-bit signed integer for field 'mediumint'."
         );
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ mediumint: {} }}) {{ id }} }}", I24_OVERFLOW_MIN),
+            format!(
+                "mutation {{ createOneTest(data: {{ mediumint: {} }}) {{ id }} }}",
+                I24_OVERFLOW_MIN
+            ),
             2009,
-            "Unable to fit integer value '-8388609' into a 24-bit signed integer for field 'mediumint'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '-8388609' into a 24-bit signed integer for field 'mediumint'."
         );
 
         // int
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ int: {} }}) {{ id }} }}", I32_OVERFLOW_MAX),
+            format!(
+                "mutation {{ createOneTest(data: {{ int: {} }}) {{ id }} }}",
+                I32_OVERFLOW_MAX
+            ),
             2009,
-            "Unable to fit integer value '2147483648' into a 32-bit signed integer for field 'int'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '2147483648' into a 32-bit signed integer for field 'int'."
         );
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ int: {} }}) {{ id }} }}", I32_OVERFLOW_MIN),
+            format!(
+                "mutation {{ createOneTest(data: {{ int: {} }}) {{ id }} }}",
+                I32_OVERFLOW_MIN
+            ),
             2009,
-            "Unable to fit integer value '-2147483649' into a 32-bit signed integer for field 'int'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '-2147483649' into a 32-bit signed integer for field 'int'."
         );
 
         // year
-        assert_error!(
-            runner,
-            format!("mutation {{ createOneTest(data: {{ year: {} }}) {{ id }} }}", U16_OVERFLOW_MAX),
-            2009,
-            "Unable to fit integer value '65536' into a 16-bit unsigned integer for field 'year'. If you're trying to store large integers, consider using `BigInt`."
-        );
-        assert_error!(
-            runner,
-            format!("mutation {{ createOneTest(data: {{ year: {} }}) {{ id }} }}", OVERFLOW_MIN),
-            2009,
-            "Unable to fit integer value '-1' into a 16-bit unsigned integer for field 'year'. If you're trying to store large integers, consider using `BigInt`."
-        );
         // Type year is stored as an 8-bit unsigned integer but the actual boundaries are 1901-2155.
         assert_error!(
             runner,
             format!("mutation {{ createOneTest(data: {{ year: {} }}) {{ id }} }}", 2156),
-            2020,
-            "Out of range value for column 'year'"
+            2009,
+            "Unable to fit integer value '2156' into a custom integer (min: 1901, max: 2155) for field 'year'."
         );
         assert_error!(
             runner,
             format!("mutation {{ createOneTest(data: {{ year: {} }}) {{ id }} }}", 1900),
-            2020,
-            "Out of range value for column 'year'"
+            2009,
+            "Unable to fit integer value '1900' into a custom integer (min: 1901, max: 2155) for field 'year'."
         );
 
         // unsigned tinyint
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ unsigned_tinyint: {} }}) {{ id }} }}", U8_OVERFLOW_MAX),
+            format!(
+                "mutation {{ createOneTest(data: {{ unsigned_tinyint: {} }}) {{ id }} }}",
+                U8_OVERFLOW_MAX
+            ),
             2009,
-            "Unable to fit integer value '256' into a 8-bit unsigned integer for field 'unsigned_tinyint'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '256' into a 8-bit unsigned integer for field 'unsigned_tinyint'."
         );
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ unsigned_tinyint: {} }}) {{ id }} }}", OVERFLOW_MIN),
+            format!(
+                "mutation {{ createOneTest(data: {{ unsigned_tinyint: {} }}) {{ id }} }}",
+                OVERFLOW_MIN
+            ),
             2009,
-            "Unable to fit integer value '-1' into a 8-bit unsigned integer for field 'unsigned_tinyint'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '-1' into a 8-bit unsigned integer for field 'unsigned_tinyint'."
         );
 
         // unsigned smallint
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ unsigned_smallint: {} }}) {{ id }} }}", U16_OVERFLOW_MAX),
+            format!(
+                "mutation {{ createOneTest(data: {{ unsigned_smallint: {} }}) {{ id }} }}",
+                U16_OVERFLOW_MAX
+            ),
             2009,
-            "Unable to fit integer value '65536' into a 16-bit unsigned integer for field 'unsigned_smallint'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '65536' into a 16-bit unsigned integer for field 'unsigned_smallint'."
         );
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ unsigned_smallint: {} }}) {{ id }} }}", OVERFLOW_MIN),
+            format!(
+                "mutation {{ createOneTest(data: {{ unsigned_smallint: {} }}) {{ id }} }}",
+                OVERFLOW_MIN
+            ),
             2009,
-            "Unable to fit integer value '-1' into a 16-bit unsigned integer for field 'unsigned_smallint'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '-1' into a 16-bit unsigned integer for field 'unsigned_smallint'."
         );
 
         // unsigned mediumint
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ unsigned_mediumint: {} }}) {{ id }} }}", U24_OVERFLOW_MAX),
+            format!(
+                "mutation {{ createOneTest(data: {{ unsigned_mediumint: {} }}) {{ id }} }}",
+                U24_OVERFLOW_MAX
+            ),
             2009,
-            "Unable to fit integer value '16777216' into a 24-bit unsigned integer for field 'unsigned_mediumint'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '16777216' into a 24-bit unsigned integer for field 'unsigned_mediumint'."
         );
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ unsigned_mediumint: {} }}) {{ id }} }}", OVERFLOW_MIN),
+            format!(
+                "mutation {{ createOneTest(data: {{ unsigned_mediumint: {} }}) {{ id }} }}",
+                OVERFLOW_MIN
+            ),
             2009,
-            "Unable to fit integer value '-1' into a 24-bit unsigned integer for field 'unsigned_mediumint'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '-1' into a 24-bit unsigned integer for field 'unsigned_mediumint'."
         );
 
         // unsigned int
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ unsigned_int: {} }}) {{ id }} }}", U32_OVERFLOW_MAX),
+            format!(
+                "mutation {{ createOneTest(data: {{ unsigned_int: {} }}) {{ id }} }}",
+                U32_OVERFLOW_MAX
+            ),
             2009,
-            "Unable to fit integer value '4294967296' into a 32-bit unsigned integer for field 'unsigned_int'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '4294967296' into a 32-bit unsigned integer for field 'unsigned_int'."
         );
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ unsigned_int: {} }}) {{ id }} }}", OVERFLOW_MIN),
+            format!(
+                "mutation {{ createOneTest(data: {{ unsigned_int: {} }}) {{ id }} }}",
+                OVERFLOW_MIN
+            ),
             2009,
-            "Unable to fit integer value '-1' into a 32-bit unsigned integer for field 'unsigned_int'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '-1' into a 32-bit unsigned integer for field 'unsigned_int'."
         );
 
         Ok(())
@@ -481,49 +540,66 @@ mod max_integer {
         schema.to_owned()
     }
 
-    // Ensures that an integer larger than their max fails
     #[connector_test(schema(overflow_mssql), only(SqlServer))]
     async fn unfitted_int_should_fail_mssql(runner: Runner) -> TestResult<()> {
         // tinyint
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ tinyint: {} }}) {{ id }} }}", U8_OVERFLOW_MAX),
+            format!(
+                "mutation {{ createOneTest(data: {{ tinyint: {} }}) {{ id }} }}",
+                U8_OVERFLOW_MAX
+            ),
             2009,
-            "Unable to fit integer value '256' into a 8-bit unsigned integer for field 'tinyint'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '256' into a 8-bit unsigned integer for field 'tinyint'."
         );
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ tinyint: {} }}) {{ id }} }}", OVERFLOW_MIN),
+            format!(
+                "mutation {{ createOneTest(data: {{ tinyint: {} }}) {{ id }} }}",
+                OVERFLOW_MIN
+            ),
             2009,
-            "Unable to fit integer value '-1' into a 8-bit unsigned integer for field 'tinyint'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '-1' into a 8-bit unsigned integer for field 'tinyint'."
         );
 
         // smallint
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ smallint: {} }}) {{ id }} }}", I16_OVERFLOW_MAX),
+            format!(
+                "mutation {{ createOneTest(data: {{ smallint: {} }}) {{ id }} }}",
+                I16_OVERFLOW_MAX
+            ),
             2009,
-            "Unable to fit integer value '32768' into a 16-bit signed integer for field 'smallint'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '32768' into a 16-bit signed integer for field 'smallint'."
         );
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ smallint: {} }}) {{ id }} }}", I16_OVERFLOW_MIN),
+            format!(
+                "mutation {{ createOneTest(data: {{ smallint: {} }}) {{ id }} }}",
+                I16_OVERFLOW_MIN
+            ),
             2009,
-            "Unable to fit integer value '-32769' into a 16-bit signed integer for field 'smallint'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '-32769' into a 16-bit signed integer for field 'smallint'."
         );
 
         // int
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ int: {} }}) {{ id }} }}", I32_OVERFLOW_MAX),
+            format!(
+                "mutation {{ createOneTest(data: {{ int: {} }}) {{ id }} }}",
+                I32_OVERFLOW_MAX
+            ),
             2009,
-            "Unable to fit integer value '2147483648' into a 32-bit signed integer for field 'int'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '2147483648' into a 32-bit signed integer for field 'int'."
         );
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ int: {} }}) {{ id }} }}", I32_OVERFLOW_MIN),
+            format!(
+                "mutation {{ createOneTest(data: {{ int: {} }}) {{ id }} }}",
+                I32_OVERFLOW_MIN
+            ),
             2009,
-            "Unable to fit integer value '2147483648' into a 32-bit signed integer for field 'int'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '-2147483649' into a 32-bit signed integer for field 'int'."
         );
 
         Ok(())
@@ -577,49 +653,66 @@ mod max_integer {
         schema.to_owned()
     }
 
-    // Ensures that an integer larger than i32::MAX fails with native types that should fit in an i32
     #[connector_test(schema(overflow_cockroach), only(CockroachDb))]
     async fn unfitted_int_should_fail_cockroach(runner: Runner) -> TestResult<()> {
         // int2
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ id: 1, int2: {} }}) {{ id }} }}", I16_OVERFLOW_MAX),
+            format!(
+                "mutation {{ createOneTest(data: {{ id: 1, int2: {} }}) {{ id }} }}",
+                I16_OVERFLOW_MAX
+            ),
             2009,
-            "Unable to fit integer value '32768' into a 16-bit signed integer for field 'int2'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '32768' into a 16-bit signed integer for field 'int2'."
         );
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ id: 1, int2: {} }}) {{ id }} }}", I16_OVERFLOW_MIN),
+            format!(
+                "mutation {{ createOneTest(data: {{ id: 1, int2: {} }}) {{ id }} }}",
+                I16_OVERFLOW_MIN
+            ),
             2009,
-            "Unable to fit integer value '-32769' into a 16-bit signed integer for field 'int2'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '-32769' into a 16-bit signed integer for field 'int2'."
         );
 
         // int4
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ id: 1, int4: {} }}) {{ id }} }}", I32_OVERFLOW_MAX),
+            format!(
+                "mutation {{ createOneTest(data: {{ id: 1, int4: {} }}) {{ id }} }}",
+                I32_OVERFLOW_MAX
+            ),
             2009,
-            "Unable to fit integer value '2147483648' into a 32-bit signed integer for field 'int4'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '2147483648' into a 32-bit signed integer for field 'int4'."
         );
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ id: 1, int4: {} }}) {{ id }} }}", I32_OVERFLOW_MIN),
+            format!(
+                "mutation {{ createOneTest(data: {{ id: 1, int4: {} }}) {{ id }} }}",
+                I32_OVERFLOW_MIN
+            ),
             2009,
-            "Unable to fit integer value '-2147483649' into a 32-bit signed integer for field 'int4'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '-2147483649' into a 32-bit signed integer for field 'int4'."
         );
 
         // oid
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ id: 1, oid: {} }}) {{ id }} }}", U32_OVERFLOW_MAX),
+            format!(
+                "mutation {{ createOneTest(data: {{ id: 1, oid: {} }}) {{ id }} }}",
+                U32_OVERFLOW_MAX
+            ),
             2009,
-            "Unable to fit integer value '4294967296' into a 32-bit unsigned integer for field 'oid'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '4294967296' into a 32-bit unsigned integer for field 'oid'."
         );
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ id: 1, oid: {} }}) {{ id }} }}", OVERFLOW_MIN),
+            format!(
+                "mutation {{ createOneTest(data: {{ id: 1, oid: {} }}) {{ id }} }}",
+                OVERFLOW_MIN
+            ),
             2009,
-            "Unable to fit integer value '-1' into a 32-bit unsigned integer for field 'oid'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '-1' into a 32-bit unsigned integer for field 'oid'."
         );
 
         Ok(())
@@ -630,21 +723,21 @@ mod max_integer {
         // int2
         insta::assert_snapshot!(
           run_query!(&runner, format!("mutation {{ createOneTest(data: {{ id: 1, int2: {} }}) {{ id int2 }} }}", i16::MAX)),
-          @r###"{"data":{"createOneTest":{"id":3,"int2":32767}}}"###
+          @r###"{"data":{"createOneTest":{"id":1,"int2":32767}}}"###
         );
         insta::assert_snapshot!(
           run_query!(&runner, format!("mutation {{ createOneTest(data: {{ id: 2, int2: {} }}) {{ id int2 }} }}", i16::MIN)),
-          @r###"{"data":{"createOneTest":{"id":4,"int2":-32768}}}"###
+          @r###"{"data":{"createOneTest":{"id":2,"int2":-32768}}}"###
         );
 
         // int4
         insta::assert_snapshot!(
           run_query!(&runner, format!("mutation {{ createOneTest(data: {{ id: 3, int4: {} }}) {{ id int }} }}", i32::MAX)),
-          @r###"{"data":{"createOneTest":{"id":1,"int4":2147483647}}}"###
+          @r###"{"data":{"createOneTest":{"id":3,"int4":2147483647}}}"###
         );
         insta::assert_snapshot!(
           run_query!(&runner, format!("mutation {{ createOneTest(data: {{ id: 4, int4: {} }}) {{ id int }} }}", i32::MIN)),
-          @r###"{"data":{"createOneTest":{"id":2,"int4":-2147483648}}}"###
+          @r###"{"data":{"createOneTest":{"id":4,"int4":-2147483648}}}"###
         );
 
         // oid
@@ -675,9 +768,12 @@ mod max_integer {
     async fn unfitted_int_should_fail_mongodb(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
-            format!("mutation {{ createOneTest(data: {{ id: 1, int: {} }}) {{ id }} }}", I32_OVERFLOW_MAX),
+            format!(
+                "mutation {{ createOneTest(data: {{ id: 1, int: {} }}) {{ id }} }}",
+                I32_OVERFLOW_MAX
+            ),
             2009,
-            "Unable to fit integer value '2147483648' into a 32-bit signed integer for field 'int'. If you're trying to store large integers, consider using `BigInt`."
+            "Unable to fit integer value '2147483648' into a 32-bit signed integer for field 'int'."
         );
 
         Ok(())

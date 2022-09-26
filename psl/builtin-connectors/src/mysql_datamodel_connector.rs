@@ -419,9 +419,8 @@ impl Connector for MySqlDatamodelConnector {
             MySqlType::UnsignedSmallInt => Some(IntType::Unsigned16),
             MySqlType::UnsignedMediumInt => Some(IntType::Unsigned24),
             MySqlType::UnsignedInt => Some(IntType::Unsigned32),
-            // Technically stored as an Unsigned8 but with values ranging
-            // from 1901 and 2155, so we have to validate the value with greater boudaries
-            MySqlType::Year => Some(IntType::Unsigned16),
+            // Technically stored as an Unsigned8 but with values ranging from 1901 and 2155
+            MySqlType::Year => Some(IntType::Custom(1901, 2155)),
             _ => None,
         }
     }

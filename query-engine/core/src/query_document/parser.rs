@@ -8,6 +8,12 @@ use psl::{datamodel_connector::IntType, dml::ValueGeneratorFn};
 use std::{borrow::Borrow, collections::HashSet, convert::TryFrom, str::FromStr, sync::Arc};
 use uuid::Uuid;
 
+const I24_MIN: i64 = -8388608;
+const I24_MAX: i64 = 8388607;
+
+const U24_MIN: i64 = 0;
+const U24_MAX: i64 = 16777215;
+
 // todo: validate is one of!
 
 pub struct QueryDocumentParser {
@@ -256,19 +262,20 @@ impl QueryDocumentParser {
                 let fits_in_specified_type = match &int_type {
                     IntType::Signed8 => i8::try_from(i).is_ok(),
                     IntType::Signed16 => i16::try_from(i).is_ok(),
-                    IntType::Signed24 => fits_in_i24(i),
+                    IntType::Signed24 => fits_in_range(i, I24_MIN, I24_MAX),
                     IntType::Signed32 => i32::try_from(i).is_ok(),
                     IntType::Unsigned8 => u8::try_from(i).is_ok(),
                     IntType::Unsigned16 => u16::try_from(i).is_ok(),
-                    IntType::Unsigned24 => fits_in_u24(i),
+                    IntType::Unsigned24 => fits_in_range(i, U24_MIN, U24_MAX),
                     IntType::Unsigned32 => u32::try_from(i).is_ok(),
+                    IntType::Custom(min, max) => fits_in_range(i, *min, *max)
                 };
 
                 if fits_in_specified_type {
                     Ok(PrismaValue::Int(i))
                 } else {
                     Err(QueryParserError::new(parent_path.clone(), QueryParserErrorKind::ValueFitError(
-                        format!("Unable to fit integer value '{}' into a {} for field '{}'. If you're trying to store large integers, consider using `BigInt`.", i, int_type, parent_path.last().unwrap()))))
+                        format!("Unable to fit integer value '{}' into a {} for field '{}'.", i, int_type, parent_path.last().unwrap()))))
                 }
             },
             (QueryValue::Int(i), ScalarType::Float) => Ok(PrismaValue::Float(BigDecimal::from(i))),
@@ -548,16 +555,6 @@ impl<'a, T: std::cmp::Eq + std::hash::Hash> Diff<'a, T> {
     }
 }
 
-fn fits_in_i24(from: i64) -> bool {
-    let i24_min = -8388608;
-    let i24_max = 8388607;
-
-    from >= i24_min && from <= i24_max
-}
-
-fn fits_in_u24(from: i64) -> bool {
-    let u24_min = 0;
-    let u24_max = 16777215;
-
-    from >= u24_min && from <= u24_max
+fn fits_in_range(val: i64, min: i64, max: i64) -> bool {
+    val >= min && val <= max
 }
