@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schema), only(Postgres))]
+#[test_suite(schema(schema), only(Postgres, CockroachDb))]
 mod uuid_filter_spec {
     fn schema() -> String {
         r#"

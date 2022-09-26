@@ -2,9 +2,7 @@
 
 /introspection-engine @prisma/schema-team
 
-/libs/datamodel @prisma/schema-team
 /libs/json-rpc-stdio @prisma/schema-team
-/libs/psl @prisma/schema-team
 /libs/sql-ddl @prisma/schema-team
 /libs/sql-schema-describer @prisma/schema-team
 /libs/test-macros @prisma/schema-team
@@ -13,3 +11,5 @@
 /migration-engine @prisma/schema-team
 
 /prisma-fmt @prisma/schema-team
+
+/psl @prisma/schema-team

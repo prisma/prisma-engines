@@ -7,7 +7,7 @@ use psl_core::{
     datamodel_connector::{
         helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
         Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance,
-        ReferentialIntegrity,
+        ReferentialIntegrity, StringFilter,
     },
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{
@@ -18,6 +18,7 @@ use psl_core::{
         IndexAlgorithm, ParserDatabase, ReferentialAction, ScalarType,
     },
 };
+use std::borrow::Cow;
 
 const BIT_TYPE_NAME: &str = "Bit";
 const BOOL_TYPE_NAME: &str = "Bool";
@@ -337,6 +338,20 @@ impl Connector for CockroachDatamodelConnector {
             NativeTypeInstance::new(constructor.name, args, native_type.to_json())
         } else {
             unreachable!()
+        }
+    }
+
+    fn scalar_filter_name(&self, scalar_type_name: String, native_type_name: Option<&str>) -> Cow<'_, str> {
+        match native_type_name {
+            Some(name) if name.eq_ignore_ascii_case("uuid") => "Uuid".into(),
+            _ => scalar_type_name.into(),
+        }
+    }
+
+    fn string_filters(&self, input_object_name: &str) -> BitFlags<StringFilter> {
+        match input_object_name {
+            "Uuid" => BitFlags::empty(),
+            _ => BitFlags::all(),
         }
     }
 
