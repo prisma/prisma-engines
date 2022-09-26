@@ -100,21 +100,27 @@
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
-<span class="kw">use</span> <span class="ident">psl::datamodel_connector</span>::{<span class="ident">ConnectorCapabilities</span>, <span class="ident">ConnectorCapability</span>};
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">psl::datamodel_connector</span>::{<span class="ident">ConnectorCapabilities</span>, <span class="ident">ConnectorCapability</span>};
 <span class="kw">use</span> <span class="ident">quaint::prelude::ConnectionInfo</span>;
 <span class="kw">use</span> <span class="ident">std::env</span>;
 
-<span class="doccomment">/// Overrides the default number of allowed elements in query&#39;s `IN` or `NOT IN`</span>
-<span class="doccomment">/// statement for the currently loaded connector.</span>
-<span class="doccomment">/// Certain databases error out if querying with too many items. For test</span>
-<span class="doccomment">/// purposes, this value can be set with the `QUERY_BATCH_SIZE` environment</span>
-<span class="doccomment">/// value to a smaller number.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">BATCH_SIZE_OVERRIDE</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span>
-    <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">env::var</span>(<span class="string">&quot;QUERY_BATCH_SIZE&quot;</span>).<span class="ident">ok</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">size</span><span class="op">|</span> <span class="ident">size</span>.<span class="ident">parse</span>().<span class="ident">ok</span>()));
-
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">test</span>))]</span>
 <span class="kw">fn</span> <span class="ident">get_batch_size</span>(<span class="ident">default</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
+
+    <span class="doccomment">/// Overrides the default number of allowed elements in query&#39;s `IN` or `NOT IN`</span>
+    <span class="doccomment">/// statement for the currently loaded connector.</span>
+    <span class="doccomment">/// Certain databases error out if querying with too many items. For test</span>
+    <span class="doccomment">/// purposes, this value can be set with the `QUERY_BATCH_SIZE` environment</span>
+    <span class="doccomment">/// value to a smaller number.</span>
+    <span class="kw">static</span> <span class="ident">BATCH_SIZE_OVERRIDE</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> {
+        <span class="ident">env::var</span>(<span class="string">&quot;QUERY_BATCH_SIZE&quot;</span>)
+            .<span class="ident">ok</span>()
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">size</span><span class="op">|</span> <span class="ident">size</span>.<span class="ident">parse</span>().<span class="ident">expect</span>(<span class="string">&quot;QUERY_BATCH_SIZE: not a valid size&quot;</span>))
+    });
     (<span class="kw-2">*</span><span class="ident">BATCH_SIZE_OVERRIDE</span>).<span class="ident">or</span>(<span class="prelude-val">Some</span>(<span class="ident">default</span>))
 }
 
