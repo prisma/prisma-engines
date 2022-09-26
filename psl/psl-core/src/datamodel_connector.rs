@@ -6,6 +6,8 @@ pub mod capabilities;
 pub mod constraint_names;
 /// Helpers for implementors of `Connector`.
 pub mod helper;
+/// Type to represent the storage and unsignedness of an integer type.
+pub mod int_type;
 /// Extensions for parser database walkers with context from the connector.
 pub mod walker_ext_traits;
 
@@ -19,6 +21,7 @@ pub use self::{
     capabilities::{ConnectorCapabilities, ConnectorCapability},
     empty_connector::EmptyDatamodelConnector,
     filters::*,
+    int_type::IntType,
     native_type_constructor::NativeTypeConstructor,
     native_type_instance::NativeTypeInstance,
     referential_integrity::ReferentialIntegrity,
@@ -92,6 +95,10 @@ pub trait Connector: Send + Sync {
     fn supports_referential_action(&self, integrity: &ReferentialIntegrity, action: ReferentialAction) -> bool {
         self.referential_actions(integrity).contains(action)
     }
+
+    /// Given a native integer type, returns its storage and unsignedness.
+    /// Returns `None` if the native type is not an integer.
+    fn int_type(&self, native_type: serde_json::Value) -> Option<IntType>;
 
     /// This is used by the query engine schema builder.
     ///

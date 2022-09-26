@@ -56,7 +56,7 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
     }
 
     fn map_scalar_list(&self, ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputField {
-        let list_input_type = map_scalar_input_type(ctx, &sf.type_identifier, sf.is_list());
+        let list_input_type = map_scalar_input_type_for_field(ctx, sf);
         let ident = Identifier::new(
             format!("{}Update{}Input", sf.container.name(), sf.name),
             PRISMA_NAMESPACE,
@@ -73,7 +73,7 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
                         input_field(
                             operations::PUSH,
                             vec![
-                                map_scalar_input_type(ctx, &sf.type_identifier, false),
+                                map_scalar_input_type(ctx, &sf.type_identifier, false, sf.native_type()),
                                 list_input_type.clone(),
                             ],
                             None,

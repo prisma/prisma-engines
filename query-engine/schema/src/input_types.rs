@@ -2,6 +2,7 @@ use super::*;
 use fmt::Debug;
 use once_cell::sync::OnceCell;
 use prisma_models::{dml, prelude::ParentContainer};
+use psl::datamodel_connector::IntType;
 use std::{boxed::Box, fmt, sync::Arc};
 
 #[derive(PartialEq)]
@@ -210,8 +211,12 @@ impl InputType {
         InputType::Scalar(ScalarType::String)
     }
 
-    pub fn int() -> InputType {
-        InputType::Scalar(ScalarType::Int)
+    pub fn int32() -> InputType {
+        InputType::Scalar(ScalarType::Int(IntType::Signed32))
+    }
+
+    pub fn int(int_type: IntType) -> InputType {
+        InputType::Scalar(ScalarType::Int(int_type))
     }
 
     pub fn bigint() -> InputType {

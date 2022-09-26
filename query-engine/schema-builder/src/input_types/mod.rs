@@ -4,17 +4,27 @@ pub(crate) mod objects;
 use super::*;
 use crate::enum_types::*;
 use fields::*;
-use prisma_models::ScalarFieldRef;
+use prisma_models::{dml::NativeTypeInstance, ScalarFieldRef};
 use schema::*;
 
 fn map_scalar_input_type_for_field(ctx: &mut BuilderContext, field: &ScalarFieldRef) -> InputType {
-    map_scalar_input_type(ctx, &field.type_identifier, field.is_list())
+    map_scalar_input_type(ctx, &field.type_identifier, field.is_list(), field.native_type())
 }
 
-fn map_scalar_input_type(ctx: &mut BuilderContext, typ: &TypeIdentifier, list: bool) -> InputType {
+fn map_scalar_input_type(
+    ctx: &mut BuilderContext,
+    typ: &TypeIdentifier,
+    list: bool,
+    native_type: Option<&NativeTypeInstance>,
+) -> InputType {
+    let int_type = native_type.and_then(|nt| ctx.connector.int_type(nt.serialized_native_type.clone()));
+
     let typ = match typ {
         TypeIdentifier::String => InputType::string(),
-        TypeIdentifier::Int => InputType::int(),
+        TypeIdentifier::Int => match int_type {
+            Some(int_type) => InputType::int(int_type),
+            None => InputType::int32(),
+        },
         TypeIdentifier::Float => InputType::float(),
         TypeIdentifier::Decimal => InputType::decimal(),
         TypeIdentifier::Boolean => InputType::boolean(),
