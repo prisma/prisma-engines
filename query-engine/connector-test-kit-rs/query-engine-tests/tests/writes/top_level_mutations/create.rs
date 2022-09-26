@@ -90,16 +90,24 @@ mod create {
     // A Create Mutation should create and return item with explicit null attributes
     #[connector_test]
     async fn return_item_explicit_null_attrs(runner: Runner) -> TestResult<()> {
+        let query = r#"mutation {
+        createOneScalarModel(data: {
+          id: "1",
+          optString: null, optInt: null, optBoolean: null, optEnum: null, optFloat: null
+        }){
+          optString, optInt, optFloat, optBoolean, optEnum
+        }
+      }"#;
+
+        let mut result = runner.query(query).await?;
+
+        if result.failed() && matches!(runner.connector(), ConnectorTag::MongoDb(_)) {
+            result = runner.query(query).await?;
+        }
+
         insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
-            createOneScalarModel(data: {
-              id: "1",
-              optString: null, optInt: null, optBoolean: null, optEnum: null, optFloat: null
-            }){
-              optString, optInt, optFloat, optBoolean, optEnum
-            }
-          }"#),
-          @r###"{"data":{"createOneScalarModel":{"optString":null,"optInt":null,"optFloat":null,"optBoolean":null,"optEnum":null}}}"###
+            result.to_string(),
+            @r###"{"data":{"createOneScalarModel":{"optString":null,"optInt":null,"optFloat":null,"optBoolean":null,"optEnum":null}}}"###
         );
 
         Ok(())
