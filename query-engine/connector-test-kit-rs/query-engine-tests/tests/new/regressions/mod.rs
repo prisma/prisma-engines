@@ -10,6 +10,7 @@ mod prisma_14001;
 mod prisma_14696;
 mod prisma_14703;
 mod prisma_15204;
+mod prisma_15264;
 mod prisma_5952;
 mod prisma_6173;
 mod prisma_7010;
