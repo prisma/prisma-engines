@@ -192,7 +192,10 @@
 <span id="192">192</span>
 <span id="193">193</span>
 <span id="194">194</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast</span>, <span class="ident">types::SortOrder</span>, <span class="ident">DatamodelError</span>};
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast</span>, <span class="ident">coerce</span>, <span class="ident">types::SortOrder</span>, <span class="ident">DatamodelError</span>};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">OperatorClass</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">Constant</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass</span>),
@@ -230,14 +233,7 @@
                 ..<span class="ident">Default::default</span>()
             }),
             <span class="ident">ast::Expression::Function</span>(<span class="ident">field_name</span>, <span class="ident">args</span>, <span class="kw">_</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">field_args</span>(<span class="kw-2">&amp;</span><span class="ident">args</span>.<span class="ident">arguments</span>) {
-                    <span class="prelude-val">Ok</span>(<span class="ident">args</span>) =&gt; <span class="ident">args</span>,
-                    <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
-                        <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">err</span>);
-                        <span class="kw">return</span> <span class="prelude-val">None</span>;
-                    }
-                };
-
+                <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">field_args</span>(<span class="kw-2">&amp;</span><span class="ident">args</span>.<span class="ident">arguments</span>, <span class="ident">diagnostics</span>);
                 <span class="kw">let</span> <span class="ident">attrs</span> <span class="op">=</span> <span class="ident">IndexFieldAttributes</span> {
                     <span class="ident">field_name</span>,
                     <span class="ident">sort_order</span>: <span class="ident">args</span>.<span class="ident">sort_order</span>,
@@ -262,129 +258,139 @@
     <span class="ident"><span class="kw">crate</span>::coerce_array</span>(<span class="ident">expr</span>, <span class="kw-2">&amp;</span><span class="ident">f</span>, <span class="ident">diagnostics</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">field_args</span>(<span class="ident">args</span>: <span class="kw-2">&amp;</span>[<span class="ident">ast::Argument</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">FieldArguments</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">DatamodelError</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">field_args</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">ast::Argument</span>], <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">diagnostics::Diagnostics</span>) -&gt; <span class="ident">FieldArguments</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="ident">args</span>
         .<span class="ident">iter</span>()
         .<span class="ident">find</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()) <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="string">&quot;sort&quot;</span>))
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">arg</span>.<span class="ident">value</span>.<span class="ident">as_constant_value</span>() {
-            <span class="prelude-val">Some</span>((<span class="string">&quot;Asc&quot;</span>, <span class="kw">_</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">SortOrder::Asc</span>)),
-            <span class="prelude-val">Some</span>((<span class="string">&quot;Desc&quot;</span>, <span class="kw">_</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">SortOrder::Desc</span>)),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">DatamodelError::new_parser_error</span>(<span class="string">&quot;Asc, Desc&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">arg</span>.<span class="ident">span</span>)),
-        })
-        .<span class="ident">transpose</span>()<span class="question-mark">?</span>
-        .<span class="ident">flatten</span>();
+        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">coerce::constant</span>(<span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">value</span>, <span class="ident">diagnostics</span>) {
+            <span class="prelude-val">Some</span>(<span class="string">&quot;Asc&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">SortOrder::Asc</span>),
+            <span class="prelude-val">Some</span>(<span class="string">&quot;Desc&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">SortOrder::Desc</span>),
+            <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; {
+                <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_parser_error</span>(<span class="string">&quot;Asc, Desc&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">arg</span>.<span class="ident">span</span>));
+                <span class="prelude-val">None</span>
+            }
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+        });
 
     <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">args</span>
         .<span class="ident">iter</span>()
         .<span class="ident">find</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()) <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="string">&quot;length&quot;</span>))
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">value</span> {
-            <span class="ident">ast::Expression::NumericValue</span>(<span class="ident">s</span>, <span class="kw">_</span>) =&gt; <span class="ident">s</span>
-                .<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>()
-                .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">DatamodelError::new_parser_error</span>(<span class="string">&quot;valid integer&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">arg</span>.<span class="ident">span</span>)),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">DatamodelError::new_parser_error</span>(<span class="string">&quot;valid integer&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">arg</span>.<span class="ident">span</span>)),
-        })
-        .<span class="ident">transpose</span>()<span class="question-mark">?</span>;
+        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">coerce::integer</span>(<span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">value</span>, <span class="ident">diagnostics</span>))
+        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">i</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span>)
+        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span> <span class="kw">as</span> <span class="ident">u32</span>);
 
     <span class="kw">let</span> <span class="ident">operator_class</span> <span class="op">=</span> <span class="ident">args</span>
         .<span class="ident">iter</span>()
         .<span class="ident">find</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()) <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="string">&quot;ops&quot;</span>))
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">value</span> {
+        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">value</span> {
             <span class="ident">ast::Expression::ConstantValue</span>(<span class="ident">s</span>, <span class="ident">span</span>) =&gt; <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">as_str</span>() {
                 <span class="comment">// gist</span>
-                <span class="string">&quot;InetOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::InetOps</span>)),
+                <span class="string">&quot;InetOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::InetOps</span>)),
 
                 <span class="comment">// gin</span>
-                <span class="string">&quot;JsonbOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::JsonbOps</span>)),
-                <span class="string">&quot;JsonbPathOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::JsonbPathOps</span>)),
-                <span class="string">&quot;ArrayOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::ArrayOps</span>)),
+                <span class="string">&quot;JsonbOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::JsonbOps</span>)),
+                <span class="string">&quot;JsonbPathOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::JsonbPathOps</span>)),
+                <span class="string">&quot;ArrayOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::ArrayOps</span>)),
 
                 <span class="comment">// sp-gist</span>
-                <span class="string">&quot;TextOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TextOps</span>)),
+                <span class="string">&quot;TextOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TextOps</span>)),
 
                 <span class="comment">// brin</span>
-                <span class="string">&quot;BitMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::BitMinMaxOps</span>)),
-                <span class="string">&quot;VarBitMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::VarBitMinMaxOps</span>)),
-                <span class="string">&quot;BpcharBloomOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::BpcharBloomOps</span>)),
-                <span class="string">&quot;BpcharMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::BpcharMinMaxOps</span>)),
-                <span class="string">&quot;ByteaBloomOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::ByteaBloomOps</span>)),
-                <span class="string">&quot;ByteaMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::ByteaMinMaxOps</span>)),
-                <span class="string">&quot;DateBloomOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::DateBloomOps</span>)),
-                <span class="string">&quot;DateMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::DateMinMaxOps</span>)),
-                <span class="string">&quot;DateMinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::DateMinMaxMultiOps</span>)),
-                <span class="string">&quot;Float4BloomOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Float4BloomOps</span>)),
-                <span class="string">&quot;Float4MinMaxOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Float4MinMaxOps</span>)),
-                <span class="string">&quot;Float4MinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Float4MinMaxMultiOps</span>)),
-                <span class="string">&quot;Float8BloomOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Float8BloomOps</span>)),
-                <span class="string">&quot;Float8MinMaxOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Float8MinMaxOps</span>)),
-                <span class="string">&quot;Float8MinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Float8MinMaxMultiOps</span>)),
-                <span class="string">&quot;InetInclusionOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::InetInclusionOps</span>)),
-                <span class="string">&quot;InetBloomOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::InetBloomOps</span>)),
-                <span class="string">&quot;InetMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::InetMinMaxOps</span>)),
-                <span class="string">&quot;InetMinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::InetMinMaxMultiOps</span>)),
-                <span class="string">&quot;Int2BloomOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Int2BloomOps</span>)),
-                <span class="string">&quot;Int2MinMaxOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Int2MinMaxOps</span>)),
-                <span class="string">&quot;Int2MinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Int2MinMaxMultiOps</span>)),
-                <span class="string">&quot;Int4BloomOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Int4BloomOps</span>)),
-                <span class="string">&quot;Int4MinMaxOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Int4MinMaxOps</span>)),
-                <span class="string">&quot;Int4MinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Int4MinMaxMultiOps</span>)),
-                <span class="string">&quot;Int8BloomOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Int8BloomOps</span>)),
-                <span class="string">&quot;Int8MinMaxOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Int8MinMaxOps</span>)),
-                <span class="string">&quot;Int8MinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Int8MinMaxMultiOps</span>)),
-                <span class="string">&quot;NumericBloomOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::NumericBloomOps</span>)),
-                <span class="string">&quot;NumericMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::NumericMinMaxOps</span>)),
-                <span class="string">&quot;NumericMinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::NumericMinMaxMultiOps</span>)),
-                <span class="string">&quot;OidBloomOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::OidBloomOps</span>)),
-                <span class="string">&quot;OidMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::OidMinMaxOps</span>)),
-                <span class="string">&quot;OidMinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::OidMinMaxMultiOps</span>)),
-                <span class="string">&quot;TextBloomOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TextBloomOps</span>)),
-                <span class="string">&quot;TextMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TextMinMaxOps</span>)),
-                <span class="string">&quot;TimestampBloomOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimestampBloomOps</span>)),
-                <span class="string">&quot;TimestampMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimestampMinMaxOps</span>)),
-                <span class="string">&quot;TimestampMinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimestampMinMaxMultiOps</span>)),
-                <span class="string">&quot;TimestampTzBloomOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimestampTzBloomOps</span>)),
-                <span class="string">&quot;TimestampTzMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimestampTzMinMaxOps</span>)),
-                <span class="string">&quot;TimestampTzMinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimestampTzMinMaxMultiOps</span>)),
-                <span class="string">&quot;TimeBloomOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimeBloomOps</span>)),
-                <span class="string">&quot;TimeMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimeMinMaxOps</span>)),
-                <span class="string">&quot;TimeMinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimeMinMaxMultiOps</span>)),
-                <span class="string">&quot;TimeTzBloomOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimeTzBloomOps</span>)),
-                <span class="string">&quot;TimeTzMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimeTzMinMaxOps</span>)),
-                <span class="string">&quot;TimeTzMinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimeTzMinMaxMultiOps</span>)),
-                <span class="string">&quot;UuidBloomOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::UuidBloomOps</span>)),
-                <span class="string">&quot;UuidMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::UuidMinMaxOps</span>)),
-                <span class="string">&quot;UuidMinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::UuidMinMaxMultiOps</span>)),
+                <span class="string">&quot;BitMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::BitMinMaxOps</span>)),
+                <span class="string">&quot;VarBitMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::VarBitMinMaxOps</span>)),
+                <span class="string">&quot;BpcharBloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::BpcharBloomOps</span>)),
+                <span class="string">&quot;BpcharMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::BpcharMinMaxOps</span>)),
+                <span class="string">&quot;ByteaBloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::ByteaBloomOps</span>)),
+                <span class="string">&quot;ByteaMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::ByteaMinMaxOps</span>)),
+                <span class="string">&quot;DateBloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::DateBloomOps</span>)),
+                <span class="string">&quot;DateMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::DateMinMaxOps</span>)),
+                <span class="string">&quot;DateMinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::DateMinMaxMultiOps</span>)),
+                <span class="string">&quot;Float4BloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Float4BloomOps</span>)),
+                <span class="string">&quot;Float4MinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Float4MinMaxOps</span>)),
+                <span class="string">&quot;Float4MinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Float4MinMaxMultiOps</span>)),
+                <span class="string">&quot;Float8BloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Float8BloomOps</span>)),
+                <span class="string">&quot;Float8MinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Float8MinMaxOps</span>)),
+                <span class="string">&quot;Float8MinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Float8MinMaxMultiOps</span>)),
+                <span class="string">&quot;InetInclusionOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::InetInclusionOps</span>)),
+                <span class="string">&quot;InetBloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::InetBloomOps</span>)),
+                <span class="string">&quot;InetMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::InetMinMaxOps</span>)),
+                <span class="string">&quot;InetMinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::InetMinMaxMultiOps</span>)),
+                <span class="string">&quot;Int2BloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Int2BloomOps</span>)),
+                <span class="string">&quot;Int2MinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Int2MinMaxOps</span>)),
+                <span class="string">&quot;Int2MinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Int2MinMaxMultiOps</span>)),
+                <span class="string">&quot;Int4BloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Int4BloomOps</span>)),
+                <span class="string">&quot;Int4MinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Int4MinMaxOps</span>)),
+                <span class="string">&quot;Int4MinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Int4MinMaxMultiOps</span>)),
+                <span class="string">&quot;Int8BloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Int8BloomOps</span>)),
+                <span class="string">&quot;Int8MinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Int8MinMaxOps</span>)),
+                <span class="string">&quot;Int8MinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::Int8MinMaxMultiOps</span>)),
+                <span class="string">&quot;NumericBloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::NumericBloomOps</span>)),
+                <span class="string">&quot;NumericMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::NumericMinMaxOps</span>)),
+                <span class="string">&quot;NumericMinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::NumericMinMaxMultiOps</span>)),
+                <span class="string">&quot;OidBloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::OidBloomOps</span>)),
+                <span class="string">&quot;OidMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::OidMinMaxOps</span>)),
+                <span class="string">&quot;OidMinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::OidMinMaxMultiOps</span>)),
+                <span class="string">&quot;TextBloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TextBloomOps</span>)),
+                <span class="string">&quot;TextMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TextMinMaxOps</span>)),
+                <span class="string">&quot;TimestampBloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimestampBloomOps</span>)),
+                <span class="string">&quot;TimestampMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimestampMinMaxOps</span>)),
+                <span class="string">&quot;TimestampMinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimestampMinMaxMultiOps</span>)),
+                <span class="string">&quot;TimestampTzBloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimestampTzBloomOps</span>)),
+                <span class="string">&quot;TimestampTzMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimestampTzMinMaxOps</span>)),
+                <span class="string">&quot;TimestampTzMinMaxMultiOps&quot;</span> =&gt; {
+                    <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimestampTzMinMaxMultiOps</span>))
+                }
+                <span class="string">&quot;TimeBloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimeBloomOps</span>)),
+                <span class="string">&quot;TimeMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimeMinMaxOps</span>)),
+                <span class="string">&quot;TimeMinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimeMinMaxMultiOps</span>)),
+                <span class="string">&quot;TimeTzBloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimeTzBloomOps</span>)),
+                <span class="string">&quot;TimeTzMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimeTzMinMaxOps</span>)),
+                <span class="string">&quot;TimeTzMinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::TimeTzMinMaxMultiOps</span>)),
+                <span class="string">&quot;UuidBloomOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::UuidBloomOps</span>)),
+                <span class="string">&quot;UuidMinMaxOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::UuidMinMaxOps</span>)),
+                <span class="string">&quot;UuidMinMaxMultiOps&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::from</span>(<span class="ident"><span class="kw">crate</span>::OperatorClass::UuidMinMaxMultiOps</span>)),
 
-                <span class="ident">s</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">DatamodelError::new_parser_error</span>(
-                    <span class="macro">format!</span>(<span class="string">&quot;Invalid operator class: {s}&quot;</span>),
-                    <span class="kw-2">*</span><span class="ident">span</span>,
-                )),
+                <span class="ident">s</span> =&gt; {
+                    <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_parser_error</span>(
+                        <span class="macro">format!</span>(<span class="string">&quot;Invalid operator class: {s}&quot;</span>),
+                        <span class="kw-2">*</span><span class="ident">span</span>,
+                    ));
+                    <span class="prelude-val">None</span>
+                }
             },
             <span class="ident">ast::Expression::Function</span>(<span class="ident">fun</span>, <span class="ident">args</span>, <span class="ident">span</span>) =&gt; <span class="kw">match</span> <span class="ident">fun</span>.<span class="ident">as_str</span>() {
                 <span class="string">&quot;raw&quot;</span> =&gt; <span class="kw">match</span> <span class="ident">args</span>.<span class="ident">arguments</span>.<span class="ident">as_slice</span>() {
                     [<span class="ident">arg</span>] =&gt; <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">value</span> {
-                        <span class="ident">ast::Expression::StringValue</span>(<span class="ident">s</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OperatorClass::Raw</span>(<span class="ident">s</span>.<span class="ident">as_str</span>())),
-                        <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">DatamodelError::new_parser_error</span>(
-                            <span class="string">&quot;Invalid parameter type: expected string&quot;</span>.<span class="ident">into</span>(),
-                            <span class="kw-2">*</span><span class="ident">span</span>,
-                        )),
+                        <span class="ident">ast::Expression::StringValue</span>(<span class="ident">s</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::Raw</span>(<span class="ident">s</span>.<span class="ident">as_str</span>())),
+                        <span class="kw">_</span> =&gt; {
+                            <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_parser_error</span>(
+                                <span class="string">&quot;Invalid parameter type: expected string&quot;</span>.<span class="ident">into</span>(),
+                                <span class="kw-2">*</span><span class="ident">span</span>,
+                            ));
+                            <span class="prelude-val">None</span>
+                        }
                     },
-                    <span class="ident">args</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">DatamodelError::new_parser_error</span>(
-                        <span class="macro">format!</span>(<span class="string">&quot;Wrong number of arguments. Expected: 1, got: {}&quot;</span>, <span class="ident">args</span>.<span class="ident">len</span>()),
-                        <span class="kw-2">*</span><span class="ident">span</span>,
-                    )),
+                    <span class="ident">args</span> =&gt; {
+                        <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_parser_error</span>(
+                            <span class="macro">format!</span>(<span class="string">&quot;Wrong number of arguments. Expected: 1, got: {}&quot;</span>, <span class="ident">args</span>.<span class="ident">len</span>()),
+                            <span class="kw-2">*</span><span class="ident">span</span>,
+                        ));
+                        <span class="prelude-val">None</span>
+                    }
                 },
                 <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(),
             },
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">DatamodelError::new_parser_error</span>(<span class="string">&quot;operator class&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">arg</span>.<span class="ident">span</span>)),
-        })
-        .<span class="ident">transpose</span>()<span class="question-mark">?</span>;
+            <span class="kw">_</span> =&gt; {
+                <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_parser_error</span>(<span class="string">&quot;operator class&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">arg</span>.<span class="ident">span</span>));
+                <span class="prelude-val">None</span>
+            }
+        });
 
-    <span class="prelude-val">Ok</span>(<span class="ident">FieldArguments</span> {
+    <span class="ident">FieldArguments</span> {
         <span class="ident">sort_order</span>,
         <span class="ident">length</span>,
         <span class="ident">operator_class</span>,
-    })
+    }
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="parser_database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
