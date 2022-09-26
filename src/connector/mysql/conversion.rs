@@ -108,30 +108,36 @@ impl TypeIdentifier for my::Column {
     fn is_int32(&self) -> bool {
         use ColumnType::*;
 
+        let is_unsigned = self.flags().intersects(ColumnFlags::UNSIGNED_FLAG);
+
         // https://dev.mysql.com/doc/internals/en/binary-protocol-value.html#packet-ProtocolBinary
         // MYSQL_TYPE_TINY  = i8
         // MYSQL_TYPE_SHORT = i16
         // MYSQL_TYPE_YEAR  = i16
-        // MYSQL_TYPE_LONG  = i32
-        // MYSQL_TYPE_INT24 = i32
+        // SIGNED MYSQL_TYPE_LONG  = i32
+        // SIGNED MYSQL_TYPE_INT24 = i32
         matches!(
-            self.column_type(),
-            MYSQL_TYPE_TINY | MYSQL_TYPE_SHORT | MYSQL_TYPE_YEAR | MYSQL_TYPE_LONG | MYSQL_TYPE_INT24
+            (self.column_type(), is_unsigned),
+            (MYSQL_TYPE_TINY, _)
+                | (MYSQL_TYPE_SHORT, _)
+                | (MYSQL_TYPE_YEAR, _)
+                | (MYSQL_TYPE_LONG, false)
+                | (MYSQL_TYPE_INT24, false)
         )
     }
 
     fn is_int64(&self) -> bool {
         use ColumnType::*;
 
+        let is_unsigned = self.flags().intersects(ColumnFlags::UNSIGNED_FLAG);
+
         // https://dev.mysql.com/doc/internals/en/binary-protocol-value.html#packet-ProtocolBinary
         // MYSQL_TYPE_LONGLONG = i64
         // UNSIGNED MYSQL_TYPE_LONG = u32
         // UNSIGNED MYSQL_TYPE_INT24 = u32
         matches!(
-            (self.column_type(), self.flags()),
-            (MYSQL_TYPE_LONGLONG, _)
-                | (MYSQL_TYPE_LONG, ColumnFlags::UNSIGNED_FLAG)
-                | (MYSQL_TYPE_INT24, ColumnFlags::UNSIGNED_FLAG)
+            (self.column_type(), is_unsigned),
+            (MYSQL_TYPE_LONGLONG, _) | (MYSQL_TYPE_LONG, true) | (MYSQL_TYPE_INT24, true)
         )
     }
 

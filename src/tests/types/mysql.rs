@@ -83,6 +83,15 @@ test_type!(int_unsigned(
     "int unsigned",
     Value::Int64(None),
     Value::int64(0),
+    Value::int64(2173158296i64),
+    Value::int64(4294967295i64)
+));
+
+test_type!(int_unsigned_not_null(
+    mysql,
+    "int unsigned not null",
+    Value::int64(0),
+    Value::int64(2173158296i64),
     Value::int64(4294967295i64)
 ));
 
