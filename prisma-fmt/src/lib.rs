@@ -6,9 +6,9 @@ mod native;
 mod preview;
 mod text_document_completion;
 
-use datamodel::parser_database::ast;
 use log::*;
 use lsp_types::{Position, Range};
+use psl::parser_database::ast;
 
 /// The API is modelled on an LSP [completion
 /// request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_completion).
@@ -57,7 +57,7 @@ pub fn format(schema: &str, params: &str) -> String {
         }
     };
 
-    datamodel::reformat(schema, params.options.tab_size as usize).unwrap_or_else(|| schema.to_owned())
+    psl::reformat(schema, params.options.tab_size as usize).unwrap_or_else(|| schema.to_owned())
 }
 
 pub fn lint(schema: String) -> String {

@@ -16,12 +16,12 @@ use crate::{
     sql_destructive_change_checker::DestructiveChangeCheckerFlavour, sql_renderer::SqlRenderer,
     sql_schema_calculator::SqlSchemaCalculatorFlavour, sql_schema_differ::SqlSchemaDifferFlavour,
 };
-use datamodel::{common::preview_features::PreviewFeature, ValidatedSchema};
 use enumflags2::BitFlags;
 use migration_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult,
     MigrationRecord, PersistenceNotInitializedError,
 };
+use psl::{common::preview_features::PreviewFeature, ValidatedSchema};
 use quaint::prelude::{ConnectionInfo, Table};
 use sql_schema_describer::SqlSchema;
 use std::fmt::Debug;
@@ -137,7 +137,7 @@ pub(crate) trait SqlFlavour:
     fn create_migrations_table(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
 
     /// The datamodel connector corresponding to the flavour
-    fn datamodel_connector(&self) -> &'static dyn datamodel::datamodel_connector::Connector;
+    fn datamodel_connector(&self) -> &'static dyn psl::datamodel_connector::Connector;
 
     fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<SqlSchema>>;
 

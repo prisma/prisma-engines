@@ -1,0 +1,18 @@
+model User {
+  #id(id, Int, @id)
+  Seat Seat?
+}
+
+model Seat {
+  #id(id, Int, @id)
+  movie     String @unique
+  userId    Int?   @unique
+  claimedBy User?  @relation(fields: [userId], references: [id])
+  version   Int    @default(0)
+  @@unique([id, version])
+}
+
+model Resource {
+  #id(id, Int, @id)
+  occStamp Int @default(0) @unique
+}

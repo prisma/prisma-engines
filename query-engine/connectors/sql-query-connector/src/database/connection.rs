@@ -6,9 +6,9 @@ use connector_interface::{
     self as connector, filter::Filter, AggregationRow, AggregationSelection, Connection, QueryArguments,
     ReadOperations, RecordFilter, Transaction, WriteArgs, WriteOperations,
 };
-use datamodel::common::preview_features::PreviewFeature;
 use prisma_models::{prelude::*, SelectionResult};
 use prisma_value::PrismaValue;
+use psl::common::preview_features::PreviewFeature;
 use quaint::{
     connector::{IsolationLevel, TransactionCapable},
     prelude::ConnectionInfo,
@@ -207,9 +207,23 @@ where
         record_filter: RecordFilter,
         args: WriteArgs,
         trace_id: Option<String>,
-    ) -> connector::Result<Vec<SelectionResult>> {
+    ) -> connector::Result<usize> {
         catch(self.connection_info.clone(), async move {
             write::update_records(&self.inner, model, record_filter, args, trace_id).await
+        })
+        .await
+    }
+
+    async fn update_record(
+        &mut self,
+        model: &ModelRef,
+        record_filter: RecordFilter,
+        args: WriteArgs,
+        trace_id: Option<String>,
+    ) -> connector::Result<Option<SelectionResult>> {
+        catch(self.connection_info.clone(), async move {
+            let mut res = write::update_record(&self.inner, model, record_filter, args, trace_id).await?;
+            Ok(res.pop())
         })
         .await
     }

@@ -1,10 +1,12 @@
+use crate::filter_conversion::AliasedCondition;
+use crate::query_builder::write::{build_update_and_set_query, chunk_update_with_ids};
 use crate::sql_trace::SqlTraceComment;
 use crate::{error::SqlError, model_extensions::*, query_builder::write, sql_info::SqlInfo, QueryExt};
 use connector_interface::*;
-use datamodel::common::preview_features::PreviewFeature;
 use itertools::Itertools;
 use prisma_models::*;
-use prisma_value::PrismaValue;
+use psl::common::preview_features::PreviewFeature;
+use psl::dml::prisma_value::PrismaValue;
 use quaint::{
     error::ErrorKind,
     prelude::{native_uuid, uuid_to_bin, uuid_to_bin_swapped, Aliasable, Select, SqlFamily},
@@ -139,7 +141,7 @@ pub async fn create_record(
         // All values provided in the write arrghs
         (Some(identifier), _, _) if !identifier.misses_autogen_value() => Ok(identifier),
 
-        // PostgreSQL with a working RETURNING statement
+        // with a working RETURNING statement
         (_, n, _) if n > 0 => Ok(try_convert(&model.primary_identifier().into(), result_set)?),
 
         // We have an auto-incremented id that we got from MySQL or SQLite
@@ -297,33 +299,105 @@ async fn create_many_empty(
     Ok(count as usize)
 }
 
-/// Update multiple records in a database defined in `conn` and the records
+/// Update one record in a database defined in `conn` and the records
 /// defined in `args`, resulting the identifiers that were modified in the
 /// operation.
-pub async fn update_records(
+pub async fn update_record(
     conn: &dyn QueryExt,
     model: &ModelRef,
     record_filter: RecordFilter,
     args: WriteArgs,
     trace_id: Option<String>,
 ) -> crate::Result<Vec<SelectionResult>> {
-    let ids = conn.filter_selectors(model, record_filter, trace_id.clone()).await?;
     let id_args = pick_args(&model.primary_identifier().into(), &args);
 
-    if ids.is_empty() {
-        return Ok(vec![]);
+    // This is to match the behaviour expected but it seems a bit strange to me
+    // This comes across as if the update happened even if it didn't
+    if args.args.is_empty() {
+        let ids: Vec<SelectionResult> = conn
+            .filter_selectors(model, record_filter.clone(), trace_id.clone())
+            .await?;
+
+        return Ok(ids);
     }
+
+    let (_, ids) = update_records_from_ids_and_filter(conn, model, record_filter, args, trace_id).await?;
+
+    Ok(merge_write_args(ids, id_args))
+}
+
+// Generates a query like this:
+//  UPDATE "public"."User" SET "name" = $1 WHERE "public"."User"."id" IN ($2,$3,$4,$5,$6,$7,$8,$9,$10,$11) AND "public"."User"."age" > $1
+async fn update_records_from_ids_and_filter(
+    conn: &dyn QueryExt,
+    model: &ModelRef,
+    record_filter: RecordFilter,
+    args: WriteArgs,
+    trace_id: Option<String>,
+) -> crate::Result<(usize, Vec<SelectionResult>)> {
+    let filter_condition = record_filter.clone().filter.aliased_condition_from(None, false);
+    let ids: Vec<SelectionResult> = conn.filter_selectors(model, record_filter, trace_id.clone()).await?;
+
+    if ids.is_empty() {
+        return Ok((0, Vec::new()));
+    }
+
+    let update = build_update_and_set_query(model, args, trace_id);
 
     let updates = {
         let ids: Vec<&SelectionResult> = ids.iter().collect();
-        write::update_many(model, ids.as_slice(), args, trace_id)?
+        chunk_update_with_ids(update, model, &ids, filter_condition)?
     };
 
+    let mut count = 0;
     for update in updates {
-        conn.query(update).await?;
+        let update_count = conn.execute(update).await?;
+
+        count += update_count;
     }
 
-    Ok(merge_write_args(ids, id_args))
+    Ok((count as usize, ids))
+}
+
+// Generates a query like this:
+//  UPDATE "public"."User" SET "name" = $1 WHERE "public"."User"."age" > $1
+async fn update_records_from_filter(
+    conn: &dyn QueryExt,
+    model: &ModelRef,
+    record_filter: RecordFilter,
+    args: WriteArgs,
+    trace_id: Option<String>,
+) -> crate::Result<usize> {
+    let update = build_update_and_set_query(model, args, trace_id);
+    let filter_condition = record_filter.clone().filter.aliased_condition_from(None, false);
+
+    let update = update.so_that(filter_condition);
+    let count = conn.execute(update.into()).await?;
+
+    Ok(count as usize)
+}
+
+/// Update multiple records in a database defined in `conn` and the records
+/// defined in `args`, and returning the number of updates
+/// This works via two ways, when there are ids in record_filter.selectors, it uses that to update
+/// Otherwise it used the passed down arguments to update.
+pub async fn update_records(
+    conn: &dyn QueryExt,
+    model: &ModelRef,
+    record_filter: RecordFilter,
+    args: WriteArgs,
+    trace_id: Option<String>,
+) -> crate::Result<usize> {
+    if args.args.is_empty() {
+        return Ok(0);
+    }
+
+    if record_filter.has_selectors() {
+        let (count, _) = update_records_from_ids_and_filter(conn, model, record_filter, args, trace_id).await?;
+        Ok(count)
+    } else {
+        update_records_from_filter(conn, model, record_filter, args, trace_id).await
+    }
 }
 
 /// Delete multiple records in `conn`, defined in the `Filter`. Result is the number of items deleted.
@@ -333,6 +407,7 @@ pub async fn delete_records(
     record_filter: RecordFilter,
     trace_id: Option<String>,
 ) -> crate::Result<usize> {
+    let filter_condition = record_filter.clone().filter.aliased_condition_from(None, false);
     let ids = conn.filter_selectors(model, record_filter, trace_id.clone()).await?;
     let ids: Vec<&SelectionResult> = ids.iter().collect();
     let count = ids.len();
@@ -341,11 +416,15 @@ pub async fn delete_records(
         return Ok(count);
     }
 
-    for delete in write::delete_many(model, ids.as_slice(), trace_id) {
-        conn.query(delete).await?;
+    let mut row_count = 0;
+    for delete in write::delete_many(model, ids.as_slice(), filter_condition, trace_id) {
+        row_count += conn.execute(delete).await?;
     }
 
-    Ok(count)
+    match usize::try_from(row_count) {
+        Ok(row_count) => Ok(row_count),
+        Err(_) => Ok(count),
+    }
 }
 
 /// Connect relations defined in `child_ids` to a parent defined in `parent_id`.

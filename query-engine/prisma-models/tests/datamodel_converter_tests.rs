@@ -298,7 +298,7 @@ fn explicit_relation_fields() {
     let relation_name = "BlogToPost";
     let blog = datamodel.assert_model("Blog");
     let post = datamodel.assert_model("Post");
-    let relation = datamodel.assert_relation(relation_name);
+    let relation = datamodel.assert_relation(("Blog", "Post"), relation_name);
 
     blog.assert_relation_field("posts")
         .assert_list()
@@ -339,7 +339,7 @@ fn many_to_many_relations() {
     let relation_name = "BlogToPost";
     let blog = datamodel.assert_model("Blog");
     let post = datamodel.assert_model("Post");
-    let relation = datamodel.assert_relation(relation_name);
+    let relation = datamodel.assert_relation(("Blog", "Post"), relation_name);
 
     blog.assert_relation_field("posts")
         .assert_list()
@@ -468,10 +468,8 @@ fn duplicate_relation_name() {
           
         "#;
 
-    let (_, dml) = datamodel::parse_schema(schema).unwrap();
-    let res = std::panic::catch_unwind(|| InternalDataModelBuilder::from(&dml));
-
-    assert!(res.is_ok());
+    let dml = psl::parse_schema(schema).unwrap();
+    prisma_models::convert(&dml, String::new());
 }
 
 #[test]
@@ -493,13 +491,13 @@ fn implicit_many_to_many_relation() {
 }
 
 fn convert(datamodel: &str) -> Arc<InternalDataModel> {
-    let builder = InternalDataModelBuilder::new(datamodel);
-    builder.build("not_important".to_string())
+    let schema = psl::parse_schema(datamodel).unwrap();
+    prisma_models::convert(&schema, "not_important".to_string())
 }
 
 trait DatamodelAssertions {
     fn assert_model(&self, name: &str) -> Arc<Model>;
-    fn assert_relation(&self, name: &str) -> Arc<Relation>;
+    fn assert_relation(&self, models: (&str, &str), name: &str) -> Arc<Relation>;
 }
 
 impl DatamodelAssertions for InternalDataModel {
@@ -507,8 +505,8 @@ impl DatamodelAssertions for InternalDataModel {
         self.find_model(name).unwrap()
     }
 
-    fn assert_relation(&self, name: &str) -> Arc<Relation> {
-        self.find_relation(name).unwrap().upgrade().unwrap()
+    fn assert_relation(&self, models: (&str, &str), name: &str) -> Arc<Relation> {
+        self.find_relation(models, name).unwrap().upgrade().unwrap()
     }
 }
 

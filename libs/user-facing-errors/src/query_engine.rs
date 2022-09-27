@@ -331,3 +331,17 @@ pub struct MissingFieldsInModel {
 pub struct ValueFitError {
     pub details: String,
 }
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2034",
+    message = "Transaction failed due to a write conflict or a deadlock. Please retry your transaction"
+)]
+pub struct TransactionWriteConflict {}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2035", message = "Assertion violation on the database: `{database_error}`")]
+pub struct DatabaseAssertionViolation {
+    /// Database error returned by the underlying connector driver.
+    pub database_error: String,
+}

@@ -99,6 +99,58 @@ mod update {
         schema.to_owned()
     }
 
+    fn schema_8() -> String {
+        let schema = indoc! {
+            r#"model TestModel {
+              #id(id, Int, @id)
+              test                  Int?
+              updatedAt_w_default   DateTime  @default(now()) @updatedAt
+              updatedAt_wo_default  DateTime? @updatedAt
+              createdAt             DateTime  @default(now())
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // More than one "updateAt" is being updated by the QE
+    // a default value does not influence it being updated
+    #[connector_test(schema(schema_8))]
+    async fn updated_at_with_default(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1}"#).await?;
+        create_row(&runner, r#"{ id: 2}"#).await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            updateOneTestModel(
+              where: { id: 1 }
+              data: {
+                test: 1
+              }
+            ) {
+              id
+            }
+          }"#),
+          @r###"{"data":{"updateOneTestModel":{"id":1}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query {
+            findManyTestModel(
+              where: { AND: [{updatedAt_w_default: { gt: { _ref: "createdAt" } }},
+                             {updatedAt_wo_default: { gt: { _ref: "createdAt" } }},
+                             {updatedAt_wo_default: { equals: { _ref: "updatedAt_w_default" } }}
+                     ]}
+            ) {
+              id
+            }
+          }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        Ok(())
+    }
+
     //"An updateOne mutation" should "update an item"
     #[connector_test(schema(schema_1))]
     async fn update_an_item(runner: Runner) -> TestResult<()> {

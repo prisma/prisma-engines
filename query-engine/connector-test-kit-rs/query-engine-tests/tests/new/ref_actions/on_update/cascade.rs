@@ -494,7 +494,7 @@ mod multiple_cascading_paths {
     //   - User -> Comment
     //   - User -> Post -> Comment
     #[connector_test]
-    async fn should_work(runner: Runner) -> TestResult<()> {
+    async fn it_should_work(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,
             r#"mutation {

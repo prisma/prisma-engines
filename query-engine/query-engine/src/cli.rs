@@ -3,29 +3,23 @@ use crate::{
     opt::{CliOpt, PrismaOpt, Subcommand},
     PrismaResult,
 };
-use datamodel::ValidatedConfiguration;
-use datamodel::{dml::Datamodel, Configuration};
-use datamodel_connector::ConnectorCapabilities;
-use prisma_models::InternalDataModelBuilder;
 use query_core::{schema::QuerySchemaRef, schema_builder};
 use request_handlers::{dmmf, GraphQlHandler};
 use std::{env, sync::Arc};
 
 pub struct ExecuteRequest {
     query: String,
-    datamodel: Datamodel,
-    config: Configuration,
+    schema: psl::ValidatedSchema,
     enable_raw_queries: bool,
 }
 
 pub struct DmmfRequest {
-    datamodel: Datamodel,
+    schema: psl::ValidatedSchema,
     enable_raw_queries: bool,
-    config: Configuration,
 }
 
 pub struct GetConfigRequest {
-    config: ValidatedConfiguration,
+    config: psl::Configuration,
     ignore_env_var_errors: bool,
 }
 
@@ -52,9 +46,8 @@ impl CliCommand {
         match subcommand {
             Subcommand::Cli(ref cliopts) => match cliopts {
                 CliOpt::Dmmf => Ok(Some(CliCommand::Dmmf(DmmfRequest {
-                    datamodel: opts.datamodel()?,
+                    schema: opts.schema(true)?,
                     enable_raw_queries: opts.enable_raw_queries,
-                    config: opts.configuration(true)?.subject,
                 }))),
                 CliOpt::GetConfig(input) => Ok(Some(CliCommand::GetConfig(GetConfigRequest {
                     config: opts.configuration(input.ignore_env_var_errors)?,
@@ -63,8 +56,7 @@ impl CliCommand {
                 CliOpt::ExecuteRequest(input) => Ok(Some(CliCommand::ExecuteRequest(ExecuteRequest {
                     query: input.query.clone(),
                     enable_raw_queries: opts.enable_raw_queries,
-                    datamodel: opts.datamodel()?,
-                    config: opts.configuration(false)?.subject,
+                    schema: opts.schema(false)?,
                 }))),
                 CliOpt::DebugPanic(input) => Ok(Some(CliCommand::DebugPanic(DebugPanicRequest {
                     message: input.message.clone(),
@@ -89,23 +81,23 @@ impl CliCommand {
     }
 
     async fn dmmf(request: DmmfRequest) -> PrismaResult<()> {
-        let datasource = request.config.datasources.first();
-        let capabilities = datasource
-            .map(|ds| ds.capabilities())
-            .unwrap_or_else(ConnectorCapabilities::empty);
+        let datasource = request.schema.configuration.datasources.first();
+        let connector = datasource
+            .map(|ds| ds.active_connector)
+            .unwrap_or(&psl::datamodel_connector::EmptyDatamodelConnector);
         let referential_integrity = datasource.map(|ds| ds.referential_integrity()).unwrap_or_default();
 
         // temporary code duplication
-        let internal_data_model = InternalDataModelBuilder::from(&request.datamodel).build("".into());
+        let internal_data_model = prisma_models::convert(&request.schema, "".into());
         let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
             internal_data_model,
             request.enable_raw_queries,
-            capabilities,
-            request.config.preview_features().iter().collect(),
+            connector,
+            request.schema.configuration.preview_features().iter().collect(),
             referential_integrity,
         ));
 
-        let dmmf = dmmf::render_dmmf(&request.datamodel, query_schema);
+        let dmmf = dmmf::render_dmmf(&psl::lift(&request.schema), query_schema);
         let serialized = serde_json::to_string_pretty(&dmmf)?;
 
         println!("{}", serialized);
@@ -117,12 +109,10 @@ impl CliCommand {
         let config = &mut req.config;
 
         if !req.ignore_env_var_errors {
-            config
-                .subject
-                .resolve_datasource_urls_from_env(&[], |key| env::var(key).ok())?;
+            config.resolve_datasource_urls_from_env(&[], |key| env::var(key).ok())?;
         }
 
-        let json = datamodel::mcf::config_to_mcf_json_value(config);
+        let json = psl::get_config::config_to_mcf_json_value(config);
         let serialized = serde_json::to_string(&json)?;
 
         println!("{}", serialized);
@@ -134,9 +124,12 @@ impl CliCommand {
         let decoded = base64::decode(&request.query)?;
         let decoded_request = String::from_utf8(decoded)?;
 
-        request.config.validate_that_one_datasource_is_provided()?;
+        request
+            .schema
+            .configuration
+            .validate_that_one_datasource_is_provided()?;
 
-        let cx = PrismaContext::builder(request.config, request.datamodel)
+        let cx = PrismaContext::builder(request.schema)
             .enable_raw_queries(request.enable_raw_queries)
             .build()
             .await?;

@@ -1,4 +1,5 @@
 use super::*;
+
 use constants::filters;
 use prisma_models::{prelude::ParentContainer, CompositeFieldRef};
 use std::sync::Arc;
@@ -12,7 +13,10 @@ pub(crate) fn scalar_filter_object_type(
     let ident = Identifier::new(format!("{}ScalarWhere{}Input", model.name, aggregate), PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
 
-    let input_object = Arc::new(init_input_object_type(ident.clone()));
+    let mut input_object = init_input_object_type(ident.clone());
+    input_object.set_tag(ObjectTag::WhereInputType(ParentContainer::Model(Arc::downgrade(model))));
+
+    let input_object = Arc::new(input_object);
     ctx.cache_input_type(ident, input_object.clone());
 
     let weak_ref = Arc::downgrade(&input_object);
@@ -52,7 +56,10 @@ where
     let ident = Identifier::new(format!("{}WhereInput", container.name()), PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
 
-    let input_object = Arc::new(init_input_object_type(ident.clone()));
+    let mut input_object = init_input_object_type(ident.clone());
+    input_object.set_tag(ObjectTag::WhereInputType(container.clone()));
+
+    let input_object = Arc::new(input_object);
     ctx.cache_input_type(ident, input_object.clone());
 
     let weak_ref = Arc::downgrade(&input_object);

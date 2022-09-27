@@ -636,7 +636,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 || (self.is_cockroach()
                     && matches!(
                         default.as_ref().map(|d| d.kind()),
-                        Some(DefaultKind::DbGenerated(s)) if s == "unique_rowid()"
+                        Some(DefaultKind::DbGenerated(Some(s))) if s == "unique_rowid()"
                     ));
 
             let col = Column {

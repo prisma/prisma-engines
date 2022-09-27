@@ -4,11 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-mongodb = { version = "2.1.0", features = ["bson-chrono-0_4", "bson-uuid-0_8"] }
+mongodb = "2.3.0"
 thiserror = "1.0"
 async-trait = "0.1"
 mongodb-client = { path = "../../../libs/mongodb-client" }
-datamodel = { path = "../../../libs/datamodel/core" }
+psl = { path = "../../../psl/psl" }
 introspection-connector = { path = "../introspection-connector" }
 user-facing-errors = { path = "../../../libs/user-facing-errors" }
 native-types = { path = "../../../libs/native-types" }

@@ -17,12 +17,12 @@ mod warnings;
 
 pub use error::*;
 
-use datamodel::{common::preview_features::PreviewFeature, dml::Datamodel};
 use enumflags2::BitFlags;
 use introspection_connector::{
     ConnectorError, ConnectorResult, DatabaseMetadata, ErrorKind, IntrospectionConnector, IntrospectionContext,
     IntrospectionResult,
 };
+use psl::{common::preview_features::PreviewFeature, dml::Datamodel};
 use quaint::prelude::SqlFamily;
 use quaint::{prelude::ConnectionInfo, single::Quaint};
 use schema_describer_loading::load_describer;

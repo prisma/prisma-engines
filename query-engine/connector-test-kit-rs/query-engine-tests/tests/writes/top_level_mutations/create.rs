@@ -87,7 +87,7 @@ mod create {
         Ok(())
     }
 
-    // "A Create Mutation" should "create and return item with explicit null attributes"
+    // A Create Mutation should create and return item with explicit null attributes
     #[connector_test]
     async fn return_item_explicit_null_attrs(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
@@ -105,9 +105,25 @@ mod create {
         Ok(())
     }
 
-    // "A Create Mutation" should "create and return item with explicit null attributes when other mutation has explicit non-null values"
+    // "A Create Mutation" should "create and return item with implicit null attributes and createdAt should be set"
     #[connector_test]
-    async fn return_item_explicit_null_attrs_other_mut(runner: Runner) -> TestResult<()> {
+    async fn return_item_implicit_null_attr(runner: Runner) -> TestResult<()> {
+        // if the query succeeds createdAt did work. If would not have been set we would get a NullConstraintViolation.
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            createOneScalarModel(data:{ id: "1" }){
+              optString, optInt, optFloat, optBoolean, optEnum
+            }
+          }"#),
+          @r###"{"data":{"createOneScalarModel":{"optString":null,"optInt":null,"optFloat":null,"optBoolean":null,"optEnum":null}}}"###
+        );
+
+        Ok(())
+    }
+
+    // A Create Mutation should create and return item with explicit null values after previous mutation with explicit non-null values
+    #[connector_test(exclude(CockroachDb))]
+    async fn return_item_non_null_attrs_then_explicit_null_attrs(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
             createOneScalarModel(
@@ -127,22 +143,6 @@ mod create {
               optString, optInt, optFloat, optBoolean, optEnum
             }
            }"#),
-          @r###"{"data":{"createOneScalarModel":{"optString":null,"optInt":null,"optFloat":null,"optBoolean":null,"optEnum":null}}}"###
-        );
-
-        Ok(())
-    }
-
-    // "A Create Mutation" should "create and return item with implicit null attributes and createdAt should be set"
-    #[connector_test]
-    async fn return_item_implicit_null_attr(runner: Runner) -> TestResult<()> {
-        // if the query succeeds createdAt did work. If would not have been set we would get a NullConstraintViolation.
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
-            createOneScalarModel(data:{ id: "1" }){
-              optString, optInt, optFloat, optBoolean, optEnum
-            }
-          }"#),
           @r###"{"data":{"createOneScalarModel":{"optString":null,"optInt":null,"optFloat":null,"optBoolean":null,"optEnum":null}}}"###
         );
 
@@ -366,6 +366,63 @@ mod json_create {
               }"#,
             2009,
             "Value types mismatch. Have: Enum(\"AnyNull\")"
+        );
+
+        Ok(())
+    }
+}
+
+#[test_suite(schema(schema_map))]
+mod mapped_create {
+    use query_engine_tests::run_query;
+    fn schema_map() -> String {
+        let schema = indoc! {
+            r#"
+            model GoodModel {
+              #id(user_id, Int, @id)
+              txt_space String @map("text space")
+            }
+            
+            model AModel {
+              #id(user_id, Int, @id @default(autoincrement()), @map("user id"))
+              txt_space String @map("text space")
+            }
+            
+            model BModel {
+              #id(user_id, Int, @id, @map("user id"))
+              txt_space String @map("text space")
+            }
+            
+            model CModel {
+              #id(user_id, String, @id, @map("user id"))
+              txt_space String @map("text space")
+            }
+            "#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(exclude(mongodb, cockroachdb))]
+    async fn mapped_name_with_space_does_not_break_returning(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {createOneGoodModel(data: {user_id: 1, txt_space: "test"}) {user_id, txt_space}}"#),
+          @r###"{"data":{"createOneGoodModel":{"user_id":1,"txt_space":"test"}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {createOneAModel(data: {txt_space: "test"}) {user_id, txt_space}}"#),
+          @r###"{"data":{"createOneAModel":{"user_id":1,"txt_space":"test"}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {createOneBModel(data: {user_id: 1, txt_space: "test"}) {user_id, txt_space}}"#),
+          @r###"{"data":{"createOneBModel":{"user_id":1,"txt_space":"test"}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {createOneCModel(data: {user_id: "one", txt_space: "test"}) {user_id, txt_space}}"#),
+          @r###"{"data":{"createOneCModel":{"user_id":"one","txt_space":"test"}}}"###
         );
 
         Ok(())

@@ -277,6 +277,11 @@ impl SqlSchema {
     pub fn walk_namespaces(&self) -> impl ExactSizeIterator<Item = NamespaceWalker<'_>> {
         (0..self.namespaces.len()).map(|idx| self.walk(NamespaceId(idx as u32)))
     }
+
+    /// No tables or enums in the catalog.
+    pub fn is_empty(&self) -> bool {
+        self.tables.is_empty() && self.enums.is_empty()
+    }
 }
 
 /// A table found in a schema.
@@ -584,12 +589,12 @@ pub enum DefaultKind {
     /// A unique row ID,
     UniqueRowid,
     /// An unrecognized Default Value
-    DbGenerated(String),
+    DbGenerated(Option<String>),
 }
 
 impl DefaultValue {
     pub fn db_generated(val: impl Into<String>) -> Self {
-        Self::new(DefaultKind::DbGenerated(val.into()))
+        Self::new(DefaultKind::DbGenerated(Some(val.into())))
     }
 
     pub fn now() -> Self {

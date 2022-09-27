@@ -1,6 +1,6 @@
 use connector::error::ConnectorError;
-use datamodel::diagnostics::Diagnostics;
 use graphql_parser::query::ParseError as GqlParseError;
+use psl::diagnostics::Diagnostics;
 use query_core::CoreError;
 
 use thiserror::Error;

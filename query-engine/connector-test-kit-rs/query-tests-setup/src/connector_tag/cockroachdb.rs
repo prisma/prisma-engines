@@ -15,7 +15,7 @@ impl ConnectorTagInterface for CockroachDbConnectorTag {
         Box::new(SqlDatamodelRenderer::new())
     }
 
-    fn connection_string(&self, database: &str, is_ci: bool) -> String {
+    fn connection_string(&self, database: &str, is_ci: bool, _is_multi_schema: bool) -> String {
         // Use the same database and schema name for CockroachDB - unfortunately CockroachDB
         // can't handle 1 schema per test in a database well at this point in time.
         if is_ci {
@@ -56,5 +56,5 @@ impl CockroachDbConnectorTag {
 }
 
 fn cockroachdb_capabilities() -> Vec<ConnectorCapability> {
-    sql_datamodel_connector::COCKROACH.capabilities().to_owned()
+    psl::builtin_connectors::COCKROACH.capabilities().to_owned()
 }

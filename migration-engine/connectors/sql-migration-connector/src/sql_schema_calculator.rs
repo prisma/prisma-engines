@@ -3,13 +3,13 @@ mod sql_schema_calculator_flavour;
 pub(super) use sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour;
 
 use crate::{flavour::SqlFlavour, SqlDatabaseSchema};
-use datamodel::{
-    datamodel_connector::{walker_ext_traits::*, ReferentialAction, ScalarType},
+use psl::{
+    datamodel_connector::walker_ext_traits::*,
     dml::{prisma_value, PrismaValue},
     parser_database::{
         ast,
         walkers::{ModelWalker, ScalarFieldWalker},
-        ScalarFieldType, SortOrder,
+        ReferentialAction, ScalarFieldType, ScalarType, SortOrder,
     },
     ValidatedSchema,
 };
@@ -30,7 +30,7 @@ pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn Sq
     if datamodel
         .configuration
         .preview_features()
-        .contains(datamodel::common::preview_features::PreviewFeature::MultiSchema)
+        .contains(psl::common::preview_features::PreviewFeature::MultiSchema)
     {
         if let Some(ds) = context.datamodel.configuration.datasources.get(0) {
             for (schema, _) in &ds.schemas {
@@ -462,9 +462,8 @@ fn push_column_for_builtin_scalar_type(
     let default: Option<ColumnDefault> = field.default_value().map(|v| {
         let column_default = {
             if v.is_dbgenerated() {
-                unwrap_dbgenerated(v.value())
-                    .map(|v| ColumnDefault::Available(sql::DefaultValue::new(sql::DefaultKind::DbGenerated(v))))
-                    .unwrap_or(ColumnDefault::NA)
+                let value = unwrap_dbgenerated(v.value());
+                ColumnDefault::Available(sql::DefaultValue::new(sql::DefaultKind::DbGenerated(value)))
             } else if v.is_now() {
                 ColumnDefault::Available(sql::DefaultValue::now())
             } else if v.is_autoincrement() {

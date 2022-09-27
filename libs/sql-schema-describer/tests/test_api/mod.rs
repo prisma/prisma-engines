@@ -4,7 +4,6 @@ pub use quaint::{prelude::Queryable, single::Quaint};
 pub use test_macros::test_connector;
 pub use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Capabilities, Tags};
 
-use barrel::Migration;
 use quaint::prelude::SqlFamily;
 use sql_schema_describer::{
     postgres::Circumstances,
@@ -117,19 +116,6 @@ impl TestApi {
 
     pub(crate) fn database(&self) -> &Quaint {
         &self.database
-    }
-
-    pub(crate) fn execute_barrel(&self, migration_fn: impl FnOnce(&mut Migration)) {
-        let mut migration = Migration::new().schema(self.schema_name());
-        migration_fn(&mut migration);
-
-        let full_sql = migration.make_from(match self.sql_family() {
-            SqlFamily::Mysql => barrel::SqlVariant::Mysql,
-            SqlFamily::Postgres => barrel::SqlVariant::Pg,
-            SqlFamily::Sqlite => barrel::SqlVariant::Sqlite,
-            SqlFamily::Mssql => barrel::SqlVariant::Mssql,
-        });
-        tok(self.database.raw_cmd(&full_sql)).unwrap();
     }
 
     pub(crate) fn schema_name(&self) -> &str {
@@ -274,16 +260,6 @@ impl ColumnAssertion<'_> {
 
     pub fn assert_is_list(&self) -> &Self {
         assert!(self.column.arity().is_list());
-        self
-    }
-
-    pub fn assert_not_null(&self) -> &Self {
-        assert!(self.column.arity().is_required());
-        self
-    }
-
-    pub fn assert_nullable(&self) -> &Self {
-        assert!(self.column.arity().is_nullable());
         self
     }
 

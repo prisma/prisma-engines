@@ -2,10 +2,9 @@ use super::*;
 use crate::schema::*;
 use bigdecimal::{BigDecimal, ToPrimitive};
 use chrono::prelude::*;
-use datamodel::dml::{ValueGenerator, ValueGeneratorFn};
 use indexmap::IndexMap;
-use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
+use psl::dml::ValueGeneratorFn;
 use std::{borrow::Borrow, collections::HashSet, convert::TryFrom, str::FromStr, sync::Arc};
 use uuid::Uuid;
 
@@ -13,18 +12,14 @@ use uuid::Uuid;
 
 pub struct QueryDocumentParser {
     /// NOW() default value that's reused for all NOW() defaults on a single query
-    default_now: Lazy<PrismaValue>,
-}
-
-impl Default for QueryDocumentParser {
-    fn default() -> Self {
-        Self {
-            default_now: Lazy::new(|| ValueGenerator::new_now().generate().unwrap()),
-        }
-    }
+    default_now: PrismaValue,
 }
 
 impl QueryDocumentParser {
+    pub fn new(default_now: PrismaValue) -> Self {
+        QueryDocumentParser { default_now }
+    }
+
     /// Parses and validates a set of selections against a schema (output) object.
     /// On an output object, optional types designate whether or not an output field can be nulled.
     /// In contrast, nullable and optional types on an input object are separate concepts.
@@ -97,7 +92,7 @@ impl QueryDocumentParser {
     }
 
     /// Parses and validates selection arguments against a schema defined field.
-    pub fn parse_arguments(
+    fn parse_arguments(
         &self,
         parent_path: QueryPath,
         schema_field: &OutputFieldRef,
@@ -156,7 +151,7 @@ impl QueryDocumentParser {
 
     /// Parses and validates a QueryValue against possible input types.
     /// Matching is done in order of definition on the input type. First matching type wins.
-    pub fn parse_input_value(
+    fn parse_input_value(
         &self,
         parent_path: QueryPath,
         value: QueryValue,
@@ -233,7 +228,7 @@ impl QueryDocumentParser {
     }
 
     /// Attempts to parse given query value into a concrete PrismaValue based on given scalar type.
-    pub fn parse_scalar(
+    fn parse_scalar(
         &self,
         parent_path: &QueryPath,
         value: QueryValue,
@@ -255,6 +250,7 @@ impl QueryDocumentParser {
             (QueryValue::String(s), ScalarType::DateTime) => {
                 self.parse_datetime(parent_path, s.as_str()).map(PrismaValue::DateTime)
             }
+            (QueryValue::DateTime(s), ScalarType::DateTime) => Ok(PrismaValue::DateTime(s)),
 
             (QueryValue::Int(i), ScalarType::Int) => Ok(PrismaValue::Int(i)),
             (QueryValue::Int(i), ScalarType::Float) => Ok(PrismaValue::Float(BigDecimal::from(i))),
@@ -266,7 +262,7 @@ impl QueryDocumentParser {
             (QueryValue::Float(f), ScalarType::Int) => match f.to_i64() {
                 Some(converted) => Ok(PrismaValue::Int(converted)),
                 None => Err(QueryParserError::new(parent_path.clone(), QueryParserErrorKind::ValueFitError(
-                    format!("Unable to fit float value (or large JS integer serialized in exponent notation) '{}' into a 64 Bit signed integer for field '{}'. If you're trying to store large integers, consider using `BigInt`.", f, parent_path.last().unwrap())))),
+                            format!("Unable to fit float value (or large JS integer serialized in exponent notation) '{}' into a 64 Bit signed integer for field '{}'. If you're trying to store large integers, consider using `BigInt`.", f, parent_path.last().unwrap())))),
             },
 
             (QueryValue::Boolean(b), ScalarType::Boolean) => Ok(PrismaValue::Boolean(b)),
@@ -282,7 +278,7 @@ impl QueryDocumentParser {
         }
     }
 
-    pub fn parse_datetime(&self, path: &QueryPath, s: &str) -> QueryParserResult<DateTime<FixedOffset>> {
+    fn parse_datetime(&self, path: &QueryPath, s: &str) -> QueryParserResult<DateTime<FixedOffset>> {
         DateTime::parse_from_rfc3339(s).map_err(|err| QueryParserError {
             path: path.clone(),
             error_kind: QueryParserErrorKind::ValueParseError(format!(
@@ -292,7 +288,7 @@ impl QueryDocumentParser {
         })
     }
 
-    pub fn parse_bytes(&self, path: &QueryPath, s: String) -> QueryParserResult<PrismaValue> {
+    fn parse_bytes(&self, path: &QueryPath, s: String) -> QueryParserResult<PrismaValue> {
         prisma_value::decode_bytes(&s)
             .map(PrismaValue::Bytes)
             .map_err(|_| QueryParserError {
@@ -304,7 +300,7 @@ impl QueryDocumentParser {
             })
     }
 
-    pub fn parse_decimal(&self, path: &QueryPath, s: String) -> QueryParserResult<PrismaValue> {
+    fn parse_decimal(&self, path: &QueryPath, s: String) -> QueryParserResult<PrismaValue> {
         BigDecimal::from_str(&s)
             .map(PrismaValue::Float)
             .map_err(|_| QueryParserError {
@@ -313,7 +309,7 @@ impl QueryDocumentParser {
             })
     }
 
-    pub fn parse_bigint(&self, path: &QueryPath, s: String) -> QueryParserResult<PrismaValue> {
+    fn parse_bigint(&self, path: &QueryPath, s: String) -> QueryParserResult<PrismaValue> {
         s.parse::<i64>().map(PrismaValue::BigInt).map_err(|_| QueryParserError {
             path: path.clone(),
             error_kind: QueryParserErrorKind::ValueParseError(format!("'{}' is not a valid big integer string", s)),
@@ -321,7 +317,7 @@ impl QueryDocumentParser {
     }
 
     // [DTODO] This is likely incorrect or at least using the wrong abstractions.
-    pub fn parse_json_list(&self, path: &QueryPath, s: &str) -> QueryParserResult<PrismaValue> {
+    fn parse_json_list(&self, path: &QueryPath, s: &str) -> QueryParserResult<PrismaValue> {
         let json = self.parse_json(path, s)?;
 
         let values = json.as_array().ok_or_else(|| QueryParserError {
@@ -343,21 +339,21 @@ impl QueryDocumentParser {
         Ok(PrismaValue::List(prisma_values))
     }
 
-    pub fn parse_json(&self, path: &QueryPath, s: &str) -> QueryParserResult<serde_json::Value> {
+    fn parse_json(&self, path: &QueryPath, s: &str) -> QueryParserResult<serde_json::Value> {
         serde_json::from_str(s).map_err(|err| QueryParserError {
             path: path.clone(),
             error_kind: QueryParserErrorKind::ValueParseError(format!("Invalid json: {}", err)),
         })
     }
 
-    pub fn parse_uuid(&self, path: &QueryPath, s: &str) -> QueryParserResult<Uuid> {
+    fn parse_uuid(&self, path: &QueryPath, s: &str) -> QueryParserResult<Uuid> {
         Uuid::parse_str(s).map_err(|err| QueryParserError {
             path: path.clone(),
             error_kind: QueryParserErrorKind::ValueParseError(format!("Invalid UUID: {}", err)),
         })
     }
 
-    pub fn parse_list(
+    fn parse_list(
         &self,
         path: &QueryPath,
         values: Vec<QueryValue>,
@@ -369,12 +365,7 @@ impl QueryDocumentParser {
             .collect::<QueryParserResult<Vec<ParsedInputValue>>>()
     }
 
-    pub fn parse_enum(
-        &self,
-        path: &QueryPath,
-        val: QueryValue,
-        typ: &EnumTypeRef,
-    ) -> QueryParserResult<ParsedInputValue> {
+    fn parse_enum(&self, path: &QueryPath, val: QueryValue, typ: &EnumTypeRef) -> QueryParserResult<ParsedInputValue> {
         let raw = match val {
             QueryValue::Enum(s) => s,
             QueryValue::String(s) => s,
@@ -418,7 +409,7 @@ impl QueryDocumentParser {
     }
 
     /// Parses and validates an input object recursively.
-    pub fn parse_input_object(
+    fn parse_input_object(
         &self,
         parent_path: QueryPath,
         object: IndexMap<String, QueryValue>,
@@ -449,7 +440,7 @@ impl QueryDocumentParser {
                 match &field.default_value {
                     Some(default_value) => {
                         let query_value = match &default_value.kind {
-                            datamodel::dml::DefaultKind::Expression(ref expr)
+                            psl::dml::DefaultKind::Expression(ref expr)
                                 if matches!(expr.generator(), ValueGeneratorFn::Now) =>
                             {
                                 self.default_now.clone().into()
@@ -516,7 +507,8 @@ impl QueryDocumentParser {
             return Err(QueryParserError::new(path, error_kind));
         }
 
-        map.set_tag(schema_object.tag);
+        map.set_tag(schema_object.tag.clone());
+
         Ok(map)
     }
 }

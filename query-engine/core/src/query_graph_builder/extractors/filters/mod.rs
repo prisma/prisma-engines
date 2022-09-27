@@ -199,8 +199,9 @@ fn fold_search_filters(filters: &Vec<Filter>) -> Vec<Filter> {
         match filter {
             Filter::Scalar(ref sf) => match sf.condition {
                 ScalarCondition::Search(ref pv, _) => {
+                    let pv = pv.as_value().unwrap();
                     // If there's already an entry, then store the "additional" projections that will need to be merged
-                    if let Some(projections) = projections_by_val.get_mut(&pv) {
+                    if let Some(projections) = projections_by_val.get_mut(pv) {
                         projections.push(sf.projection.clone());
                     } else {
                         // Otherwise, store the first search filter found on which we'll merge the additional projections
@@ -257,7 +258,8 @@ fn extract_scalar_filters(field: &ScalarFieldRef, value: ParsedInputValue) -> Qu
                 Some(i) => parse_query_mode(i)?,
                 None => QueryMode::Default,
             };
-            let mut filters: Vec<Filter> = scalar::parse(filter_map, field, false)?;
+
+            let mut filters: Vec<Filter> = scalar::ScalarFilterParser::new(field, false).parse(filter_map)?;
 
             filters.iter_mut().for_each(|f| f.set_mode(mode.clone()));
             Ok(filters)
@@ -276,19 +278,16 @@ fn extract_relation_filters(field: &RelationFieldRef, value: ParsedInputValue) -
         // Implicit is null filter (`where: { <field>: null }`)
         ParsedInputValue::Single(PrismaValue::Null) => Ok(vec![field.one_relation_is_null()]),
 
-        // Either implicit `is`, or complex filter.
+        // Complex relation filter
+        ParsedInputValue::Map(filter_map) if filter_map.is_relation_envelope() => filter_map
+            .clone()
+            .into_iter()
+            .map(|(k, v)| relation::parse(&k, field, v))
+            .collect::<QueryGraphBuilderResult<Vec<_>>>(),
+
+        // Implicit is
         ParsedInputValue::Map(filter_map) => {
-            // Two options: An intermediate object with `is`, `every`, etc., or directly the object to filter with implicit `is`.
-            // There are corner cases where it is unclear what object should be used, due to overlap of fields of the related model and the filter object.
-            // The parse heuristic is to first try to parse the map as the full filter object and if that fails, parse it as implicit `is` filter instead.
-            filter_map
-                .clone()
-                .into_iter()
-                .map(|(k, v)| relation::parse(&k, field, v))
-                .collect::<QueryGraphBuilderResult<Vec<_>>>()
-                .or_else(|_| {
-                    extract_filter(filter_map, &field.related_model()).map(|filter| vec![field.to_one_related(filter)])
-                })
+            extract_filter(filter_map, &field.related_model()).map(|filter| vec![field.to_one_related(filter)])
         }
 
         x => Err(QueryGraphBuilderError::InputError(format!(

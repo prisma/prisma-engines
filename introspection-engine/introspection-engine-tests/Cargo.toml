@@ -11,7 +11,7 @@ sql-migration-connector = { path = "../../migration-engine/connectors/sql-migrat
 introspection-connector = { path = "../connectors/introspection-connector" }
 introspection-core = { path = "../core" }
 sql-schema-describer = { path = "../../libs/sql-schema-describer" }
-datamodel = { path = "../../libs/datamodel/core" }
+psl = { path = "../../psl/psl" }
 test-macros = { path = "../../libs/test-macros" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 test-setup = { path = "../../libs/test-setup" }

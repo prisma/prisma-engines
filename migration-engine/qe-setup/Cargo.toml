@@ -4,13 +4,14 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-datamodel = { path = "../../libs/datamodel/core" }
+psl = { path = "../../psl/psl" }
 mongodb-client = { path = "../../libs/mongodb-client" }
 migration-core = { path = "../core" }
+test-setup = { path = "../../libs/test-setup" }
 
 connection-string = "*"
 enumflags2 = "*"
-mongodb = "2.1.0"
+mongodb = "2.3.0"
 tempfile = "3.3.0"
 url = "2"
 

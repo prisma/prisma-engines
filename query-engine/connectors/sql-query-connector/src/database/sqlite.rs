@@ -6,7 +6,7 @@ use connector_interface::{
     error::{ConnectorError, ErrorKind},
     Connection, Connector,
 };
-use datamodel::{common::preview_features::PreviewFeature, Datasource};
+use psl::{common::preview_features::PreviewFeature, Datasource};
 use quaint::{connector::SqliteParams, error::ErrorKind as QuaintKind, pooled::Quaint, prelude::ConnectionInfo};
 use std::{convert::TryFrom, time::Duration};
 

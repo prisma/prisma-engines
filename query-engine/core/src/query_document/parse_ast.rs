@@ -17,6 +17,18 @@ impl ParsedInputMap {
     pub fn set_tag(&mut self, tag: Option<ObjectTag>) {
         self.tag = tag;
     }
+
+    pub fn is_relation_envelope(&self) -> bool {
+        matches!(&self.tag, Some(ObjectTag::RelationEnvelope))
+    }
+
+    pub fn is_composite_envelope(&self) -> bool {
+        matches!(&self.tag, Some(ObjectTag::CompositeEnvelope))
+    }
+
+    pub fn is_field_ref_type(&self) -> bool {
+        matches!(&self.tag, Some(ObjectTag::FieldRefType(_)))
+    }
 }
 
 impl From<IndexMap<String, ParsedInputValue>> for ParsedInputMap {

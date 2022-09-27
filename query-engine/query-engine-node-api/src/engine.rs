@@ -1,7 +1,6 @@
 use crate::{error::ApiError, log_callback::LogCallback, logger::Logger};
-use datamodel::{common::preview_features::PreviewFeature, dml::Datamodel, ValidatedConfiguration};
 use futures::FutureExt;
-use prisma_models::InternalDataModelBuilder;
+use psl::common::preview_features::PreviewFeature;
 use query_core::{
     executor,
     schema::{QuerySchema, QuerySchemaRenderer},
@@ -42,24 +41,16 @@ enum Inner {
     Connected(ConnectedEngine),
 }
 
-/// Holding the information to reconnect the engine if needed.
-#[derive(Debug, Clone)]
-struct EngineDatamodel {
-    ast: Datamodel,
-    raw: String,
-}
-
 /// Everything needed to connect to the database and have the core running.
 struct EngineBuilder {
-    datamodel: EngineDatamodel,
-    config: ValidatedConfiguration,
+    schema: Arc<psl::ValidatedSchema>,
     config_dir: PathBuf,
     env: HashMap<String, String>,
 }
 
 /// Internal structure for querying and reconnecting with the engine.
 struct ConnectedEngine {
-    datamodel: EngineDatamodel,
+    schema: Arc<psl::ValidatedSchema>,
     query_schema: Arc<QuerySchema>,
     executor: crate::Executor,
     config_dir: PathBuf,
@@ -157,37 +148,29 @@ impl QueryEngine {
 
         let env = stringify_env_values(env)?; // we cannot trust anything JS sends us from process.env
         let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
+        let mut schema = psl::validate(datamodel.into());
+        let config = &mut schema.configuration;
 
-        let config = if ignore_env_var_errors {
-            datamodel::parse_configuration(&datamodel).map_err(|errors| ApiError::conversion(errors, &datamodel))?
-        } else {
-            datamodel::parse_configuration(&datamodel)
-                .and_then(|mut config| {
-                    config
-                        .subject
-                        .resolve_datasource_urls_from_env(&overrides, |key| env.get(key).map(ToString::to_string))?;
+        schema
+            .diagnostics
+            .to_result()
+            .map_err(|err| ApiError::conversion(err, schema.db.source()))?;
 
-                    Ok(config)
-                })
-                .map_err(|errors| ApiError::conversion(errors, &datamodel))?
-        };
+        if !ignore_env_var_errors {
+            config
+                .resolve_datasource_urls_from_env(&overrides, |key| env.get(key).map(ToString::to_string))
+                .map_err(|err| ApiError::conversion(err, schema.db.source()))?;
+        }
 
         config
-            .subject
             .validate_that_one_datasource_is_provided()
-            .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
+            .map_err(|errors| ApiError::conversion(errors, schema.db.source()))?;
 
-        let ast = datamodel::parse_datamodel(&datamodel)
-            .map_err(|errors| ApiError::conversion(errors, &datamodel))?
-            .subject;
-
-        let datamodel = EngineDatamodel { ast, raw: datamodel };
-        let enable_metrics = config.subject.preview_features().contains(PreviewFeature::Metrics);
-        let enable_tracing = config.subject.preview_features().contains(PreviewFeature::Tracing);
+        let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics);
+        let enable_tracing = config.preview_features().contains(PreviewFeature::Tracing);
 
         let builder = EngineBuilder {
-            datamodel,
-            config,
+            schema: Arc::new(schema),
             config_dir,
             env,
         };
@@ -231,34 +214,34 @@ impl QueryEngine {
             let engine = async move {
                 // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
                 let data_source = builder
-                    .config
-                    .subject
+                    .schema
+                    .configuration
                     .datasources
                     .first()
                     .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
 
-                let preview_features: Vec<_> = builder.config.subject.preview_features().iter().collect();
+                let preview_features: Vec<_> = builder.schema.configuration.preview_features().iter().collect();
                 let url = data_source
                     .load_url_with_config_dir(&builder.config_dir, |key| builder.env.get(key).map(ToString::to_string))
-                    .map_err(|err| crate::error::ApiError::Conversion(err, builder.datamodel.raw.clone()))?;
+                    .map_err(|err| crate::error::ApiError::Conversion(err, builder.schema.db.source().to_owned()))?;
 
                 let (db_name, executor) = executor::load(data_source, &preview_features, &url).await?;
                 let connector = executor.primary_connector();
                 connector.get_connection().await?;
 
                 // Build internal data model
-                let internal_data_model = InternalDataModelBuilder::from(&builder.datamodel.ast).build(db_name);
+                let internal_data_model = prisma_models::convert(&builder.schema, db_name);
 
                 let query_schema = schema_builder::build(
                     internal_data_model,
                     true, // enable raw queries
-                    data_source.capabilities(),
+                    data_source.active_connector,
                     preview_features,
                     data_source.referential_integrity(),
                 );
 
                 Ok(ConnectedEngine {
-                    datamodel: builder.datamodel.clone(),
+                    schema: builder.schema.clone(),
                     query_schema: Arc::new(query_schema),
                     executor,
                     config_dir: builder.config_dir.clone(),
@@ -292,12 +275,8 @@ impl QueryEngine {
                 let mut inner = self.inner.write().await;
                 let engine = inner.as_engine()?;
 
-                let config = datamodel::parse_configuration(&engine.datamodel.raw)
-                    .map_err(|errors| ApiError::conversion(errors, &engine.datamodel.raw))?;
-
                 let builder = EngineBuilder {
-                    datamodel: engine.datamodel.clone(),
-                    config,
+                    schema: engine.schema.clone(),
                     config_dir: engine.config_dir.clone(),
                     env: engine.env.clone(),
                 };

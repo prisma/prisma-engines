@@ -7,7 +7,7 @@ edition = "2021"
 [dependencies]
 query-core = { path = "../core" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
-datamodel = { path = "../../libs/datamodel/core" }
+psl = { path = "../../psl/psl" }
 dmmf_crate = { path = "../dmmf", package = "dmmf" }
 itertools = "0.10"
 graphql-parser = { git = "https://github.com/prisma/graphql-parser" }
@@ -15,14 +15,8 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1"
 futures = "0.3"
 indexmap = { version = "1.7", features = ["serde-1"] }
-bigdecimal = "0.2"
+bigdecimal = "0.3"
 thiserror = "1"
 tracing = "0.1"
 url = "2"
 connection-string = "0.1"
-
-[dev-dependencies]
-test-setup = { path = "../../libs/test-setup" }
-serial_test = "*"
-datamodel-connector = { path = "../../libs/datamodel/connectors/datamodel-connector" }
-prisma-models = { path = "../prisma-models" }

@@ -9,7 +9,7 @@ pub(crate) mod operations;
 
 use async_trait::async_trait;
 use connector_interface::{error::ConnectorError, Connector};
-use datamodel::{common::preview_features::PreviewFeature, Datasource};
+use psl::{common::preview_features::PreviewFeature, Datasource};
 
 pub use mssql::*;
 pub use mysql::*;

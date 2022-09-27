@@ -3,7 +3,9 @@ use crate::{
     error::MongoError,
     root_queries::{aggregate, read, write},
 };
-use connector_interface::{ConnectionLike, ReadOperations, RelAggregationSelection, Transaction, WriteOperations};
+use connector_interface::{
+    ConnectionLike, ReadOperations, RelAggregationSelection, Transaction, UpdateType, WriteOperations,
+};
 use mongodb::options::{Acknowledgment, ReadConcern, TransactionOptions, WriteConcern};
 use prisma_models::SelectionResult;
 use query_engine_metrics::{decrement_gauge, increment_gauge, metrics, PRISMA_CLIENT_QUERIES_ACTIVE};
@@ -105,16 +107,40 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         record_filter: connector_interface::RecordFilter,
         args: connector_interface::WriteArgs,
         _trace_id: Option<String>,
-    ) -> connector_interface::Result<Vec<SelectionResult>> {
+    ) -> connector_interface::Result<usize> {
         catch(async move {
-            write::update_records(
+            let result = write::update_records(
                 &self.connection.database,
                 &mut self.connection.session,
                 model,
                 record_filter,
                 args,
+                UpdateType::Many,
             )
-            .await
+            .await?;
+            Ok(result.len())
+        })
+        .await
+    }
+
+    async fn update_record(
+        &mut self,
+        model: &ModelRef,
+        record_filter: connector_interface::RecordFilter,
+        args: connector_interface::WriteArgs,
+        _trace_id: Option<String>,
+    ) -> connector_interface::Result<Option<SelectionResult>> {
+        catch(async move {
+            let mut res = write::update_records(
+                &self.connection.database,
+                &mut self.connection.session,
+                model,
+                record_filter,
+                args,
+                UpdateType::One,
+            )
+            .await?;
+            Ok(res.pop())
         })
         .await
     }
@@ -176,17 +202,28 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         .await
     }
 
-    async fn execute_raw(&mut self, _inputs: HashMap<String, PrismaValue>) -> connector_interface::Result<usize> {
-        Err(MongoError::Unsupported("Raw queries".to_owned()).into_connector_error())
+    async fn execute_raw(&mut self, inputs: HashMap<String, PrismaValue>) -> connector_interface::Result<usize> {
+        catch(async move { write::execute_raw(&self.connection.database, &mut self.connection.session, inputs).await })
+            .await
     }
 
     async fn query_raw(
         &mut self,
-        _model: Option<&ModelRef>,
-        _inputs: HashMap<String, PrismaValue>,
-        _query_type: Option<String>,
+        model: Option<&ModelRef>,
+        inputs: HashMap<String, PrismaValue>,
+        query_type: Option<String>,
     ) -> connector_interface::Result<serde_json::Value> {
-        Err(MongoError::Unsupported("Raw queries".to_owned()).into_connector_error())
+        catch(async move {
+            write::query_raw(
+                &self.connection.database,
+                &mut self.connection.session,
+                model,
+                inputs,
+                query_type,
+            )
+            .await
+        })
+        .await
     }
 }
 

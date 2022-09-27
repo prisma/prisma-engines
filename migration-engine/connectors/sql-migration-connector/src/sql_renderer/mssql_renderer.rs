@@ -6,9 +6,9 @@ use crate::{
     pair::Pair,
     sql_migration::{AlterEnum, AlterTable, RedefineTable},
 };
-use datamodel::dml::PrismaValue;
 use indoc::{formatdoc, indoc};
 use native_types::{MsSqlType, MsSqlTypeParameter};
+use psl::dml::PrismaValue;
 use sql_schema_describer::{self as sql, mssql::MssqlSchemaExt};
 use std::{borrow::Cow, fmt::Write};
 
@@ -37,6 +37,7 @@ impl MssqlFlavour {
         } else {
             column
                 .default()
+                .filter(|d| !matches!(d.kind(), sql::DefaultKind::DbGenerated(None)))
                 .map(|default| {
                     // named constraints
                     let constraint_name = default
@@ -513,7 +514,7 @@ fn escape_string_literal(s: &str) -> String {
 
 fn render_default(default: &sql::DefaultValue) -> Cow<'_, str> {
     match default.kind() {
-        sql::DefaultKind::DbGenerated(val) => val.as_str().into(),
+        sql::DefaultKind::DbGenerated(val) => val.as_ref().unwrap().as_str().into(),
         sql::DefaultKind::Value(PrismaValue::String(val)) | sql::DefaultKind::Value(PrismaValue::Enum(val)) => {
             Quoted::mssql_string(escape_string_literal(val)).to_string().into()
         }

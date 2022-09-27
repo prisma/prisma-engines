@@ -1,5 +1,5 @@
 use crate::{parent_container::ParentContainer, CompositeField, CompositeFieldRef, CompositeTypeRef};
-use datamodel::dml::{DefaultValue, FieldArity};
+use psl::dml::{DefaultValue, FieldArity};
 use std::{fmt::Debug, sync::Arc};
 
 #[derive(Debug)]

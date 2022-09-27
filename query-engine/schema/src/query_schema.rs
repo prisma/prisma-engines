@@ -1,7 +1,7 @@
 use super::*;
-use datamodel_connector::{ConnectorCapability, ReferentialIntegrity};
 use fmt::Debug;
-use prisma_models::{datamodel::common::preview_features::PreviewFeature, InternalDataModelRef, ModelRef};
+use prisma_models::{psl::common::preview_features::PreviewFeature, InternalDataModelRef, ModelRef};
+use psl::datamodel_connector::{ConnectorCapability, ReferentialIntegrity};
 use std::{borrow::Borrow, fmt};
 
 /// The query schema.
@@ -228,4 +228,26 @@ pub enum ScalarType {
     UUID,
     Xml,
     Bytes,
+}
+
+impl std::fmt::Display for ScalarType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let typ = match self {
+            ScalarType::Null => "Null",
+            ScalarType::String => "String",
+            ScalarType::Int => "Int",
+            ScalarType::BigInt => "BigInt",
+            ScalarType::Boolean => "Boolean",
+            ScalarType::Float => "Float",
+            ScalarType::Decimal => "Decimal",
+            ScalarType::DateTime => "DateTime",
+            ScalarType::Json => "Json",
+            ScalarType::UUID => "UUID",
+            ScalarType::JsonList => "Json",
+            ScalarType::Xml => "Xml",
+            ScalarType::Bytes => "Bytes",
+        };
+
+        write!(f, "{}", typ)
+    }
 }

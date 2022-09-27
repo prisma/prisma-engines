@@ -4,7 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-datamodel = { path = "../../../libs/datamodel/core", default_features = false }
+psl = { path = "../../../psl/psl" }
+introspection-connector = { path = "../../../introspection-engine/connectors/introspection-connector" }
 user-facing-errors = { path = "../../../libs/user-facing-errors" }
 
 chrono = "0.4"

@@ -6,6 +6,7 @@
 use crate::{api::GenericApi, commands, json_rpc::types::*, CoreResult};
 use enumflags2::BitFlags;
 use migration_connector::{ConnectorError, ConnectorHost, MigrationConnector};
+use psl::parser_database::SourceFile;
 use std::{collections::HashMap, future::Future, path::Path, pin::Pin, sync::Arc};
 use tokio::sync::{mpsc, Mutex};
 use tracing_futures::Instrument;
@@ -294,6 +295,40 @@ impl GenericApi for EngineState {
         self.with_default_connector(Box::new(|connector| {
             Box::pin(commands::evaluate_data_loss(input, connector).instrument(tracing::info_span!("EvaluateDataLoss")))
         }))
+        .await
+    }
+
+    async fn introspect(&self, params: IntrospectParams) -> CoreResult<IntrospectResult> {
+        let source_file = SourceFile::new_allocated(Arc::from(params.schema.clone().into_boxed_str()));
+        let schema = psl::parse_schema(source_file).map_err(ConnectorError::new_schema_parser_error)?;
+        self.with_connector_for_schema(
+            &params.schema,
+            None,
+            Box::new(move |connector| {
+                let ctx = migration_connector::IntrospectionContext {
+                    composite_type_depth: From::from(params.composite_type_depth as isize),
+                    preview_features: schema.configuration.preview_features(),
+                    source: schema.configuration.datasources[0].clone(),
+                };
+                Box::pin(async move {
+                    let result = connector.introspect(&schema, ctx).await?;
+                    let rendered_result =
+                        psl::render_datamodel_and_config_to_string(&result.data_model, &schema.configuration);
+                    Ok(IntrospectResult {
+                        datamodel: rendered_result,
+                        version: format!("{:?}", result.version),
+                        warnings: result
+                            .warnings
+                            .into_iter()
+                            .map(|warning| crate::json_rpc::types::IntrospectionWarning {
+                                code: warning.code as u32,
+                                message: warning.message,
+                            })
+                            .collect(),
+                    })
+                })
+            }),
+        )
         .await
     }
 

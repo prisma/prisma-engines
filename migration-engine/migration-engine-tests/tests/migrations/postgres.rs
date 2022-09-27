@@ -1,6 +1,6 @@
-use datamodel::parser_database::SourceFile;
 use migration_core::migration_connector::DiffTarget;
 use migration_engine_tests::test_api::*;
+use psl::parser_database::SourceFile;
 use quaint::Value;
 use sql_schema_describer::ColumnTypeFamily;
 use std::fmt::Write;
@@ -71,6 +71,8 @@ fn existing_postgis_tables_must_not_be_migrated(api: TestApi) {
         /* The capitalized Geometry is intentional here, because we want the matching to be case-insensitive. */
         CREATE TABLE IF NOT EXISTS "Geometry_columns" ( id SERIAL PRIMARY KEY );
         CREATE TABLE IF NOT EXISTS "geography_columns" ( id SERIAL PRIMARY KEY );
+        CREATE TABLE IF NOT EXISTS "raster_columns" ( id SERIAL PRIMARY KEY );
+        CREATE TABLE IF NOT EXISTS "raster_overviews" ( id SERIAL PRIMARY KEY );
     "#;
 
     api.raw_cmd(create_tables);
@@ -79,7 +81,9 @@ fn existing_postgis_tables_must_not_be_migrated(api: TestApi) {
     api.assert_schema()
         .assert_has_table("spatial_ref_sys")
         .assert_has_table("Geometry_columns")
-        .assert_has_table("geography_columns");
+        .assert_has_table("geography_columns")
+        .assert_has_table("raster_columns")
+        .assert_has_table("raster_overviews");
 }
 
 // Reference for the views created by PostGIS: https://postgis.net/docs/manual-1.4/ch04.html#id418599
@@ -722,5 +726,34 @@ fn bigint_defaults_work(api: TestApi) {
     api.expect_sql_for_schema(schema, &sql);
 
     api.schema_push(schema).send().assert_green();
+    api.schema_push(schema).send().assert_green().assert_no_steps();
+}
+
+// https://github.com/prisma/prisma/issues/14799
+#[test_connector(tags(Postgres12), exclude(CockroachDb))]
+fn dbgenerated_on_generated_columns_is_idempotent(api: TestApi) {
+    let sql = r#"
+        CREATE TABLE "table" (
+         "id" TEXT NOT NULL,
+         "hereBeDragons" TEXT NOT NULL GENERATED ALWAYS AS ('this row ID is: '::text || "id") STORED,
+
+         CONSTRAINT "table_pkey" PRIMARY KEY ("id")
+        );
+    "#;
+
+    api.raw_cmd(sql);
+
+    let schema = r#"
+        datasource db {
+            provider = "postgresql"
+            url = env("TEST_DATABASE_URL")
+        }
+
+        model table {
+            id String @id
+            hereBeDragons String @default(dbgenerated())
+        }
+    "#;
+
     api.schema_push(schema).send().assert_green().assert_no_steps();
 }

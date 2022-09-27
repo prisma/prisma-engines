@@ -4,57 +4,7 @@ use itertools::Itertools;
 use schema_builder::constants::filters;
 use std::borrow::Cow;
 
-#[derive(Debug, Clone, PartialEq)]
-pub struct SelectionBuilder {
-    name: String,
-    alias: Option<String>,
-    arguments: Vec<(String, QueryValue)>,
-    nested_selections: Vec<Selection>,
-}
-
-impl SelectionBuilder {
-    pub fn alias(&mut self, value: impl Into<String>) -> &mut Self {
-        self.alias = Some(value.into());
-        self
-    }
-
-    pub fn arguments(&self) -> &[(String, QueryValue)] {
-        &self.arguments
-    }
-
-    pub fn set_arguments(&mut self, value: Vec<(String, QueryValue)>) -> &mut Self {
-        self.arguments = value;
-        self
-    }
-
-    pub fn push_argument(&mut self, key: impl Into<String>, arg: impl Into<QueryValue>) -> &mut Self {
-        self.arguments.push((key.into(), arg.into()));
-        self
-    }
-
-    pub fn nested_selections(&mut self, sels: Vec<Selection>) -> &mut Self {
-        self.nested_selections = sels;
-        self
-    }
-
-    pub fn push_nested_selection(&mut self, selection: Selection) -> &mut Self {
-        self.nested_selections.push(selection);
-        self
-    }
-
-    pub fn contains_nested_selection(&self, name: &str) -> bool {
-        self.nested_selections.iter().any(|sel| sel.name() == name)
-    }
-
-    pub fn build(self) -> Selection {
-        Selection {
-            name: self.name,
-            alias: self.alias,
-            arguments: self.arguments,
-            nested_selections: self.nested_selections,
-        }
-    }
-}
+pub type SelectionArgument = (String, QueryValue);
 
 #[derive(Debug, Clone)]
 pub struct Selection {
@@ -79,12 +29,21 @@ impl PartialEq for Selection {
 }
 
 impl Selection {
-    pub fn builder(name: impl Into<String>) -> SelectionBuilder {
-        SelectionBuilder {
+    pub fn with_name(name: impl Into<String>) -> Selection {
+        Selection::new(name.into(), None, Vec::new(), Vec::new())
+    }
+
+    pub fn new<T, A, N>(name: T, alias: Option<String>, arguments: A, nested_selections: N) -> Self
+    where
+        T: Into<String>,
+        A: Into<Vec<SelectionArgument>>,
+        N: Into<Vec<Selection>>,
+    {
+        Self {
             name: name.into(),
-            alias: None,
-            arguments: Vec::new(),
-            nested_selections: Vec::new(),
+            alias,
+            arguments: arguments.into(),
+            nested_selections: nested_selections.into(),
         }
     }
 
@@ -110,6 +69,22 @@ impl Selection {
         self.arguments.pop()
     }
 
+    pub fn push_argument(&mut self, key: impl Into<String>, arg: impl Into<QueryValue>) {
+        self.arguments.push((key.into(), arg.into()));
+    }
+
+    pub fn set_nested_selections(&mut self, sels: Vec<Selection>) {
+        self.nested_selections = sels;
+    }
+
+    pub fn push_nested_selection(&mut self, selection: Selection) {
+        self.nested_selections.push(selection);
+    }
+
+    pub fn contains_nested_selection(&self, name: &str) -> bool {
+        self.nested_selections.iter().any(|sel| sel.name() == name)
+    }
+
     pub fn nested_selections(&self) -> &[Self] {
         &self.nested_selections
     }
@@ -120,6 +95,10 @@ impl Selection {
 
     pub fn alias(&self) -> &Option<String> {
         &self.alias
+    }
+
+    pub fn set_alias(&mut self, alias: Option<String>) {
+        self.alias = alias
     }
 }
 

@@ -6,7 +6,8 @@ use crate::{
 };
 use async_trait::async_trait;
 use connector_interface::{
-    Connection, ConnectionLike, ReadOperations, RelAggregationSelection, Transaction, WriteArgs, WriteOperations,
+    Connection, ConnectionLike, ReadOperations, RelAggregationSelection, Transaction, UpdateType, WriteArgs,
+    WriteOperations,
 };
 use mongodb::{ClientSession, Database};
 use prisma_models::{prelude::*, SelectionResult};
@@ -75,9 +76,43 @@ impl WriteOperations for MongoDbConnection {
         record_filter: connector_interface::RecordFilter,
         args: WriteArgs,
         _trace_id: Option<String>,
-    ) -> connector_interface::Result<Vec<SelectionResult>> {
-        catch(async move { write::update_records(&self.database, &mut self.session, model, record_filter, args).await })
-            .await
+    ) -> connector_interface::Result<usize> {
+        catch(async move {
+            let result = write::update_records(
+                &self.database,
+                &mut self.session,
+                model,
+                record_filter,
+                args,
+                UpdateType::Many,
+            )
+            .await?;
+
+            Ok(result.len())
+        })
+        .await
+    }
+
+    async fn update_record(
+        &mut self,
+        model: &ModelRef,
+        record_filter: connector_interface::RecordFilter,
+        args: WriteArgs,
+        _trace_id: Option<String>,
+    ) -> connector_interface::Result<Option<SelectionResult>> {
+        catch(async move {
+            let mut res = write::update_records(
+                &self.database,
+                &mut self.session,
+                model,
+                record_filter,
+                args,
+                UpdateType::One,
+            )
+            .await?;
+            Ok(res.pop())
+        })
+        .await
     }
 
     async fn delete_records(

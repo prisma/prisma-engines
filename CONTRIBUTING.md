@@ -1,4 +1,5 @@
 # Contributing
+
 Contributions include code, documentation, answering user questions, running the
 project's infrastructure, and advocating for all types of users.
 

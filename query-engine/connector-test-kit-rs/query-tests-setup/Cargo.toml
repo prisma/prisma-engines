@@ -6,9 +6,6 @@ edition = "2021"
 
 [dependencies]
 serde_json = "1.0"
-datamodel-connector = { path = "../../../libs/datamodel/connectors/datamodel-connector" }
-mongodb-datamodel-connector = { path = "../../../libs/datamodel/connectors/mongodb-datamodel-connector" }
-sql-datamodel-connector = { path = "../../../libs/datamodel/connectors/sql-datamodel-connector" }
 prisma-models = { path = "../../prisma-models" }
 lazy_static = "1.4"
 enum_dispatch = "0.3"
@@ -17,7 +14,7 @@ request-handlers = { path = "../../request-handlers" }
 tokio = "1.0"
 query-core = { path = "../../core" }
 query-engine = { path = "../../query-engine"}
-datamodel = { path = "../../../libs/datamodel/core" }
+psl = { path = "../../../psl/psl" }
 user-facing-errors = { path = "../../../libs/user-facing-errors" }
 thiserror = "1.0"
 async-trait = "0.1"

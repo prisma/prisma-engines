@@ -5,8 +5,8 @@ use crate::{
     sql_migration::{AlterColumn, AlterEnum, AlterTable, RedefineTable, SequenceChange, SequenceChanges, TableChange},
     sql_schema_differ::{ColumnChange, ColumnChanges},
 };
-use datamodel::dml::PrismaValue;
 use native_types::{CockroachType, PostgresType};
+use psl::dml::PrismaValue;
 use sql_ddl::{postgres as ddl, IndexColumn, SortOrder};
 use sql_schema_describer::{
     postgres::{PostgresSchemaExt, SqlIndexAlgorithm},
@@ -796,14 +796,14 @@ fn render_default<'a>(default: &'a DefaultValue, full_data_type: &str) -> Cow<'a
     }
 
     match default.kind() {
-        DefaultKind::DbGenerated(val) => Cow::Borrowed(val.as_str()),
+        DefaultKind::DbGenerated(Some(val)) => Cow::Borrowed(val.as_str()),
         DefaultKind::Value(PrismaValue::String(val)) | DefaultKind::Value(PrismaValue::Enum(val)) => {
             format!("'{}'", escape_string_literal(val)).into()
         }
         DefaultKind::Now => "CURRENT_TIMESTAMP".into(),
         DefaultKind::Value(value) => render_constant_default(value, full_data_type),
         DefaultKind::UniqueRowid => "unique_rowid()".into(),
-        DefaultKind::Sequence(_) => Default::default(),
+        DefaultKind::Sequence(_) | DefaultKind::DbGenerated(None) => Default::default(),
     }
 }
 

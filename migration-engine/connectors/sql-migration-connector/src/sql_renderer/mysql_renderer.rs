@@ -5,9 +5,9 @@ use crate::{
     sql_migration::{AlterColumn, AlterEnum, AlterTable, RedefineTable, TableChange},
     sql_schema_differ::ColumnChanges,
 };
-use datamodel::dml::PrismaValue;
 use native_types::MySqlType;
 use once_cell::sync::Lazy;
+use psl::dml::PrismaValue;
 use regex::Regex;
 use sql_ddl::{mysql as ddl, IndexColumn, SortOrder};
 use sql_schema_describer::{
@@ -27,7 +27,7 @@ impl MysqlFlavour {
             default: col
                 .default()
                 .filter(|default| {
-                    !matches!(default.kind(),  DefaultKind::Sequence(_))
+                    !matches!(default.kind(),  DefaultKind::Sequence(_) | DefaultKind::DbGenerated(None))
                     // We do not want to render JSON defaults because
                     // they are not supported by MySQL.
                     && !matches!(col.column_type_family(), ColumnTypeFamily::Json)
@@ -488,8 +488,8 @@ impl MysqlAlterColumn {
         // @default(dbgenerated()) does not give us the information in the prisma schema, so we have to
         // transfer it from the introspected current state of the database.
         let new_default = match defaults {
-            (Some(DefaultKind::DbGenerated(previous)), Some(DefaultKind::DbGenerated(next)))
-                if next.is_empty() && !previous.is_empty() =>
+            (Some(DefaultKind::DbGenerated(Some(previous))), Some(DefaultKind::DbGenerated(next)))
+                if (next.is_none() || next.as_deref() == Some("")) && !previous.is_empty() =>
             {
                 Some(DefaultValue::db_generated(previous.clone()))
             }
@@ -502,7 +502,7 @@ impl MysqlAlterColumn {
 
 fn render_default<'a>(column: ColumnWalker<'a>, default: &'a DefaultValue) -> Cow<'a, str> {
     match default.kind() {
-        DefaultKind::DbGenerated(val) => val.as_str().into(),
+        DefaultKind::DbGenerated(Some(val)) => val.as_str().into(),
         DefaultKind::Value(PrismaValue::String(val)) | DefaultKind::Value(PrismaValue::Enum(val)) => {
             Quoted::mysql_string(escape_string_literal(val)).to_string().into()
         }
@@ -519,6 +519,6 @@ fn render_default<'a>(column: ColumnWalker<'a>, default: &'a DefaultValue) -> Co
             Quoted::mysql_string(dt.to_rfc3339()).to_string().into()
         }
         DefaultKind::Value(val) => val.to_string().into(),
-        DefaultKind::Sequence(_) | DefaultKind::UniqueRowid => unreachable!(),
+        DefaultKind::DbGenerated(None) | DefaultKind::Sequence(_) | DefaultKind::UniqueRowid => unreachable!(),
     }
 }

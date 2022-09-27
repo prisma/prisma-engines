@@ -1,5 +1,5 @@
 use super::*;
-use datamodel_connector::ConnectorCapability;
+use psl::datamodel_connector::ConnectorCapability;
 use serde::{Deserialize, Serialize};
 use std::{convert::TryFrom, str::FromStr};
 

@@ -4,9 +4,9 @@ use crate::{
     pair::Pair,
     sql_migration::{AlterEnum, AlterTable, RedefineTable, TableChange},
 };
-use datamodel::dml::PrismaValue;
 use indoc::formatdoc;
 use once_cell::sync::Lazy;
+use psl::dml::PrismaValue;
 use regex::Regex;
 use sql_ddl::sqlite as ddl;
 use sql_schema_describer::{walkers::*, *};
@@ -311,7 +311,12 @@ fn render_column<'a>(column: &ColumnWalker<'a>) -> ddl::Column<'a> {
         autoincrement: column.is_single_primary_key() && column.column_type_family().is_int(),
         default: column
             .default()
-            .filter(|default| !matches!(default.kind(), DefaultKind::Sequence(_)))
+            .filter(|default| {
+                !matches!(
+                    default.kind(),
+                    DefaultKind::Sequence(_) | DefaultKind::DbGenerated(None)
+                )
+            })
             .map(render_default),
         name: column.name().into(),
         not_null: !column.arity().is_nullable(),
@@ -322,7 +327,7 @@ fn render_column<'a>(column: &ColumnWalker<'a>) -> ddl::Column<'a> {
 
 fn render_default(default: &DefaultValue) -> Cow<'_, str> {
     match default.kind() {
-        DefaultKind::DbGenerated(val) => val.as_str().into(),
+        DefaultKind::DbGenerated(Some(val)) => val.as_str().into(),
         DefaultKind::Value(PrismaValue::String(val)) | DefaultKind::Value(PrismaValue::Enum(val)) => {
             Quoted::sqlite_string(escape_quotes(val)).to_string().into()
         }
@@ -334,6 +339,6 @@ fn render_default(default: &DefaultValue) -> Cow<'_, str> {
         DefaultKind::Now => "CURRENT_TIMESTAMP".into(),
         DefaultKind::Value(PrismaValue::DateTime(val)) => Quoted::sqlite_string(val).to_string().into(),
         DefaultKind::Value(val) => val.to_string().into(),
-        DefaultKind::Sequence(_) | DefaultKind::UniqueRowid => unreachable!(),
+        DefaultKind::DbGenerated(None) | DefaultKind::Sequence(_) | DefaultKind::UniqueRowid => unreachable!(),
     }
 }

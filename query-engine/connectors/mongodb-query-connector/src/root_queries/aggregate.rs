@@ -1,4 +1,5 @@
-use crate::{output_meta, query_builder::MongoReadQueryBuilder, value::value_from_bson};
+use crate::{constants::*, output_meta, query_builder::MongoReadQueryBuilder, value::value_from_bson};
+
 use connector_interface::*;
 use mongodb::{bson::Document, ClientSession, Database};
 use prisma_models::prelude::*;
@@ -84,7 +85,7 @@ fn to_aggregation_rows(
 
         // The way we query guarantees that the _id key is always either Bson::Null or a document.
         // If a field is selected, it can never be Null, hence the unwraps are safe.
-        let mut id_key_doc = doc.remove("_id").unwrap();
+        let mut id_key_doc = doc.remove(group_by::UNDERSCORE_ID).unwrap();
 
         for selection in selections.iter() {
             let selection_meta = output_meta::from_aggregation_selection(&selection);
