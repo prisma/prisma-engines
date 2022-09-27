@@ -17,7 +17,8 @@ pub enum QueryValue {
 
 impl PartialEq for QueryValue {
     fn eq(&self, other: &Self) -> bool {
-        match (self, other) {
+        eprintln!("{:?} ///=/// {:?}", self, other);
+        match dbg!((self, other)) {
             (QueryValue::Int(n1), QueryValue::Int(n2)) => n1 == n2,
             (QueryValue::Float(n1), QueryValue::Float(n2)) => n1 == n2,
             (QueryValue::String(s1), QueryValue::String(s2)) => s1 == s2,

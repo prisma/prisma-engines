@@ -58,7 +58,7 @@ mod regression {
             .query(indoc! {
                 r#"mutation {createOneArtist(data:{
                     firstName: "Michael"
-                    netWorth: 236600000.12409
+                    netWorth: 1.2
                 }){ firstName }}"#
             })
             .await?
@@ -68,7 +68,7 @@ mod regression {
             .query(indoc! {
                 r#"mutation {createOneArtist(data:{
                     firstName: "George"
-                    netWorth: -0.23660010012409
+                    netWorth: 2.4
                 }){ firstName }}"#
             })
             .await?
