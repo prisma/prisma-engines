@@ -42,7 +42,7 @@ pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderConte
             let stringified = match scalar {
                 ScalarType::Null => "Null",
                 ScalarType::String => "String",
-                ScalarType::Int(_) => "Int",
+                ScalarType::Int => "Int",
                 ScalarType::BigInt => "BigInt",
                 ScalarType::Boolean => "Boolean",
                 ScalarType::Float => "Float",

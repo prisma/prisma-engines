@@ -37,7 +37,7 @@ impl<'a> GqlTypeRenderer<'a> {
             InputType::Scalar(ref scalar) => {
                 let stringified = match scalar {
                     ScalarType::String => "String",
-                    ScalarType::Int(_) => "Int",
+                    ScalarType::Int => "Int",
                     ScalarType::BigInt => "BigInt",
                     ScalarType::Boolean => "Boolean",
                     ScalarType::Float => "Float",
@@ -77,7 +77,7 @@ impl<'a> GqlTypeRenderer<'a> {
             OutputType::Scalar(ref scalar) => {
                 let stringified = match scalar {
                     ScalarType::String => "String",
-                    ScalarType::Int(_) => "Int",
+                    ScalarType::Int => "Int",
                     ScalarType::BigInt => "BigInt",
                     ScalarType::Boolean => "Boolean",
                     ScalarType::Float => "Float",

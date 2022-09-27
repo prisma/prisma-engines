@@ -9,7 +9,6 @@ use native_types::{
 use psl_core::{
     datamodel_connector::{
         helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
-        int_type::IntType,
         Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance,
         ReferentialIntegrity, StringFilter,
     },
@@ -180,7 +179,6 @@ impl Connector for PostgresDatamodelConnector {
             //Int
             SmallInt => ScalarType::Int,
             Integer => ScalarType::Int,
-            // Unsigned 32-bit int
             Oid => ScalarType::Int,
             //BigInt
             BigInt => ScalarType::BigInt,
@@ -452,17 +450,6 @@ impl Connector for PostgresDatamodelConnector {
                 }
             }
             _ => (),
-        }
-    }
-
-    fn int_type(&self, native_type: serde_json::Value) -> Option<IntType> {
-        let nt: PostgresType = serde_json::from_value(native_type).unwrap();
-
-        match nt {
-            SmallInt => Some(IntType::Signed16),
-            Integer => Some(IntType::Signed32),
-            Oid => Some(IntType::Unsigned32),
-            _ => None,
         }
     }
 }

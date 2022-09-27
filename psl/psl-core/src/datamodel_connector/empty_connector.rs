@@ -64,10 +64,6 @@ impl Connector for EmptyDatamodelConnector {
     fn validate_url(&self, _url: &str) -> Result<(), String> {
         Ok(())
     }
-
-    fn int_type(&self, _native_type: serde_json::Value) -> Option<IntType> {
-        None
-    }
 }
 
 #[cfg(test)]

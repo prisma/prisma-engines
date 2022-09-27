@@ -68,10 +68,6 @@ impl ScalarField {
     pub fn container(&self) -> &ParentContainer {
         &self.container
     }
-
-    pub fn native_type(&self) -> Option<&NativeTypeInstance> {
-        self.native_type.as_ref()
-    }
 }
 
 impl Debug for ScalarField {

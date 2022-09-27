@@ -6,7 +6,7 @@ use mongodb_types::*;
 use native_types::{MongoDbType, NativeType};
 use psl_core::{
     datamodel_connector::{
-        int_type::IntType, Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance,
+        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance,
         ReferentialIntegrity,
     },
     diagnostics::{DatamodelError, Diagnostics, Span},
@@ -131,14 +131,5 @@ impl Connector for MongoDbDatamodelConnector {
 
     fn allowed_referential_integrity_settings(&self) -> enumflags2::BitFlags<ReferentialIntegrity> {
         ReferentialIntegrity::Prisma.into()
-    }
-
-    fn int_type(&self, native_type: serde_json::Value) -> Option<IntType> {
-        let nt: MongoDbType = serde_json::from_value(native_type).unwrap();
-
-        match nt {
-            MongoDbType::Int => Some(IntType::Signed32),
-            _ => None,
-        }
     }
 }

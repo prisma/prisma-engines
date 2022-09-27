@@ -8,7 +8,6 @@ use native_types::{
 use psl_core::{
     datamodel_connector::{
         helper::{args_vec_from_opt, parse_one_opt_u32, parse_one_u32, parse_two_opt_u32},
-        int_type::IntType,
         Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance,
         ReferentialIntegrity,
     },
@@ -405,23 +404,5 @@ impl Connector for MySqlDatamodelConnector {
         }
 
         Ok(())
-    }
-
-    fn int_type(&self, native_type: serde_json::Value) -> Option<IntType> {
-        let nt: MySqlType = serde_json::from_value(native_type).unwrap();
-
-        match nt {
-            MySqlType::TinyInt => Some(IntType::Signed8),
-            MySqlType::SmallInt => Some(IntType::Signed16),
-            MySqlType::MediumInt => Some(IntType::Signed24),
-            MySqlType::Int => Some(IntType::Signed32),
-            MySqlType::UnsignedTinyInt => Some(IntType::Unsigned8),
-            MySqlType::UnsignedSmallInt => Some(IntType::Unsigned16),
-            MySqlType::UnsignedMediumInt => Some(IntType::Unsigned24),
-            MySqlType::UnsignedInt => Some(IntType::Unsigned32),
-            // Technically stored as an Unsigned8 but with values ranging from 1901 and 2155
-            MySqlType::Year => Some(IntType::Custom(1901, 2155)),
-            _ => None,
-        }
     }
 }
