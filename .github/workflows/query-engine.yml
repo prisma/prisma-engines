@@ -31,6 +31,10 @@ jobs:
             single_threaded: false
             connector: "postgres"
             version: "15"
+          - name: "mssql_2022"
+            single_threaded: false
+            connector: "sqlserver"
+            version: "2022"
 
     env:
       LOG_LEVEL: "info"
