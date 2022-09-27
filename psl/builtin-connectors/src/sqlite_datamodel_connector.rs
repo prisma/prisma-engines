@@ -1,7 +1,7 @@
 use enumflags2::BitFlags;
 use psl_core::{
     datamodel_connector::{
-        Connector, ConnectorCapability, ConstraintScope, IntType, NativeTypeConstructor, NativeTypeInstance,
+        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance,
         ReferentialIntegrity,
     },
     diagnostics::{DatamodelError, Span},
@@ -114,9 +114,5 @@ impl Connector for SqliteDatamodelConnector {
         }
 
         Ok(())
-    }
-
-    fn int_type(&self, _native_type: serde_json::Value) -> Option<IntType> {
-        None
     }
 }

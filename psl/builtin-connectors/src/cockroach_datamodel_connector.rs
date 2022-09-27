@@ -6,7 +6,6 @@ use native_types::{CockroachType, NativeType};
 use psl_core::{
     datamodel_connector::{
         helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
-        int_type::IntType,
         Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance,
         ReferentialIntegrity, StringFilter,
     },
@@ -157,7 +156,7 @@ impl Connector for CockroachDatamodelConnector {
             // Int
             CockroachType::Int2 => ScalarType::Int,
             CockroachType::Int4 => ScalarType::Int,
-            CockroachType::Oid => ScalarType::Int, // Unsigned 32-bit int
+            CockroachType::Oid => ScalarType::Int,
             // BigInt
             CockroachType::Int8 => ScalarType::BigInt,
             // Float
@@ -378,17 +377,6 @@ impl Connector for CockroachDatamodelConnector {
                     ..Default::default()
                 });
             }
-        }
-    }
-
-    fn int_type(&self, native_type: serde_json::Value) -> Option<IntType> {
-        let nt: CockroachType = serde_json::from_value(native_type).unwrap();
-
-        match nt {
-            CockroachType::Int2 => Some(IntType::Signed16),
-            CockroachType::Int4 => Some(IntType::Signed32),
-            CockroachType::Oid => Some(IntType::Unsigned32),
-            _ => None,
         }
     }
 }

@@ -2,7 +2,6 @@ use super::*;
 use fmt::Debug;
 use once_cell::sync::OnceCell;
 use prisma_models::ModelRef;
-use psl::datamodel_connector::IntType;
 use std::{fmt, sync::Arc};
 
 #[derive(Debug, Clone)]
@@ -27,7 +26,7 @@ impl OutputType {
     }
 
     pub fn int() -> OutputType {
-        OutputType::Scalar(ScalarType::Int(IntType::Signed32))
+        OutputType::Scalar(ScalarType::Int)
     }
 
     pub fn bigint() -> OutputType {

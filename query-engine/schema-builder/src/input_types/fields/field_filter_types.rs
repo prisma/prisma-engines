@@ -40,7 +40,7 @@ pub(crate) fn get_field_filter_types(
             let mut types = vec![InputType::object(full_scalar_filter_type(
                 ctx,
                 &sf.type_identifier,
-                sf.native_type(),
+                sf.native_type.as_ref(),
                 sf.is_list(),
                 !sf.is_required(),
                 false,
@@ -217,7 +217,7 @@ fn scalar_list_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> Inp
     let object = Arc::new(object);
     ctx.cache_input_type(ident, object.clone());
 
-    let mapped_nonlist_type = map_scalar_input_type(ctx, &sf.type_identifier, false, sf.native_type());
+    let mapped_nonlist_type = map_scalar_input_type(ctx, &sf.type_identifier, false);
     let mapped_list_type = InputType::list(mapped_nonlist_type.clone());
     let mut fields: Vec<_> = equality_filters(ctx, mapped_list_type.clone(), !sf.is_required()).collect();
 
@@ -263,7 +263,7 @@ fn full_scalar_filter_type(
     let object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, object.clone());
 
-    let mapped_scalar_type = map_scalar_input_type(ctx, typ, list, native_type);
+    let mapped_scalar_type = map_scalar_input_type(ctx, typ, list);
 
     let mut fields: Vec<_> = match typ {
         TypeIdentifier::String | TypeIdentifier::UUID => equality_filters(ctx, mapped_scalar_type.clone(), nullable)
@@ -559,7 +559,6 @@ fn scalar_filter_name(typ: &str, list: bool, nullable: bool, nested: bool, inclu
     let nullable = if nullable { "Nullable" } else { "" };
     let nested = if nested { "Nested" } else { "" };
     let aggregates = if include_aggregates { "WithAggregates" } else { "" };
-
     format!("{nested}{typ}{nullable}{list}{aggregates}Filter")
 }
 

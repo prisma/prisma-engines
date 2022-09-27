@@ -540,10 +540,10 @@ fn convert_prisma_value(field: &OutputFieldRef, value: PrismaValue, st: &ScalarT
         (ScalarType::Json, PrismaValue::String(s)) => PrismaValue::Json(s),
         (ScalarType::Json, PrismaValue::Json(s)) => PrismaValue::Json(s),
 
-        (ScalarType::Int(_), PrismaValue::Float(f)) => {
+        (ScalarType::Int, PrismaValue::Float(f)) => {
             PrismaValue::Int(f.to_i64().ok_or(CoreError::decimal_conversion_error(&f, "i64"))?)
         }
-        (ScalarType::Int(_), PrismaValue::Int(i)) => PrismaValue::Int(i),
+        (ScalarType::Int, PrismaValue::Int(i)) => PrismaValue::Int(i),
 
         (ScalarType::Float, PrismaValue::Float(f)) => PrismaValue::Float(f),
         (ScalarType::Float, PrismaValue::Int(i)) => PrismaValue::Int(i),
@@ -558,7 +558,7 @@ fn convert_prisma_value(field: &OutputFieldRef, value: PrismaValue, st: &ScalarT
         }
 
         (ScalarType::Boolean, PrismaValue::Boolean(b)) => PrismaValue::Boolean(b),
-        (ScalarType::Int(_), PrismaValue::Boolean(b)) => PrismaValue::Int(b as i64),
+        (ScalarType::Int, PrismaValue::Boolean(b)) => PrismaValue::Int(b as i64),
         (ScalarType::DateTime, PrismaValue::DateTime(dt)) => PrismaValue::DateTime(dt),
         (ScalarType::UUID, PrismaValue::Uuid(u)) => PrismaValue::Uuid(u),
         (ScalarType::Bytes, PrismaValue::Bytes(b)) => PrismaValue::Bytes(b),
