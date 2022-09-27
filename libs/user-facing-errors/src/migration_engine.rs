@@ -256,7 +256,7 @@ pub struct AzureMssqlShadowDb;
 #[derive(Debug, SimpleUserFacingError)]
 #[user_facing(
     code = "P3021",
-    message = "Foreign keys cannot be created on this database. Learn more how to handle this: https://pris.ly/d/migrate-no-foreign-keys"
+    message = "Foreign keys cannot be created on this database. Learn more how to handle this: https://www.prisma.io/docs/guides/database/using-prisma-with-planetscale"
 )]
 pub struct ForeignKeyCreationNotAllowed;
 
