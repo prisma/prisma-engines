@@ -188,12 +188,10 @@
 <span id="188">188</span>
 <span id="189">189</span>
 <span id="190">190</span>
-<span id="191">191</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">fmt::Debug</span>;
 <span class="kw">use</span> <span class="ident">once_cell::sync::OnceCell</span>;
 <span class="kw">use</span> <span class="ident">prisma_models::ModelRef</span>;
-<span class="kw">use</span> <span class="ident">psl::datamodel_connector::IntType</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">sync::Arc</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
@@ -218,7 +216,7 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">int</span>() -&gt; <span class="ident">OutputType</span> {
-        <span class="ident">OutputType::Scalar</span>(<span class="ident">ScalarType::Int</span>(<span class="ident">IntType::Signed32</span>))
+        <span class="ident">OutputType::Scalar</span>(<span class="ident">ScalarType::Int</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bigint</span>() -&gt; <span class="ident">OutputType</span> {
