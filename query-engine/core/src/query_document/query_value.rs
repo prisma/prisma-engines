@@ -28,9 +28,7 @@ impl PartialEq for QueryValue {
             (QueryValue::Object(t1), QueryValue::Object(t2)) => t1 == t2,
             (QueryValue::DateTime(t1), QueryValue::DateTime(t2)) => t1 == t2,
             (QueryValue::String(t1), QueryValue::DateTime(t2)) | (QueryValue::DateTime(t2), QueryValue::String(t1)) => {
-                chrono::DateTime::parse_from_rfc3339(t1)
-                    .map(|t1| &t1 == t2)
-                    .unwrap_or_else(|_| t1 == stringify_date(t2).as_str())
+                t1 == stringify_date(t2).as_str()
             }
             _ => false,
         }
