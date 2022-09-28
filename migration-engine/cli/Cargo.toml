@@ -12,7 +12,7 @@ backtrace = "0.3.59"
 base64 = "0.13"
 json-rpc-stdio = { path = "../../libs/json-rpc-stdio" }
 structopt = "0.3.8"
-tokio = { version = "1.0", default-features = false, features = ["macros"] }
+tokio.workspace = true
 tracing = "0.1"
 tracing-error = "0.2"
 tracing-subscriber = { version = "0.3", features = [ "fmt", "json", "time", "env-filter" ] }
@@ -24,9 +24,7 @@ test-setup = { path = "../../libs/test-setup" }
 test-macros = { path = "../../libs/test-macros" }
 url = "2.1.1"
 connection-string = "0.1"
-
-[dev-dependencies.quaint]
-git = "https://github.com/prisma/quaint"
+quaint.workspace = true
 
 [[bin]]
 name = "migration-engine"

@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-psl = { path = "../../psl/psl" }
+psl.workspace = true
 mongodb-client = { path = "../../libs/mongodb-client" }
 migration-core = { path = "../core" }
 test-setup = { path = "../../libs/test-setup" }
@@ -14,12 +14,4 @@ enumflags2 = "*"
 mongodb = "2.3.0"
 tempfile = "3.3.0"
 url = "2"
-
-[dependencies.quaint]
-git = "https://github.com/prisma/quaint"
-features = [
-    "sqlite",
-    "postgresql",
-    "mysql",
-    "mssql",
-]
+quaint.workspace = true

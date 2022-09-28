@@ -16,10 +16,10 @@ rand = "0.7"
 regex = "1"
 serde_json = { version = "1.0", features = ["float_roundtrip"] }
 thiserror = "1.0"
-tokio = "1.0"
+tokio.workspace = true
 tracing = "0.1"
 tracing-futures = "0.2"
-uuid = "1"
+uuid.workspace = true
 indexmap = "1.7"
 query-engine-metrics = {path = "../../metrics"}
 

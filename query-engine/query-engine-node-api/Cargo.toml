@@ -19,7 +19,7 @@ query-core = { path = "../core" }
 request-handlers = { path = "../request-handlers" }
 query-connector = { path = "../connectors/query-connector" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
-psl = { path = "../../psl/psl" }
+psl.workspace = true
 sql-connector = { path = "../connectors/sql-query-connector", package = "sql-query-connector" }
 prisma-models = { path = "../prisma-models" }
 
@@ -29,8 +29,8 @@ napi-derive = "2"
 thiserror = "1"
 connection-string = "0.1"
 url = "2"
-serde_json = { version = "1", features = ["preserve_order", "float_roundtrip"] }
-serde = "1"
+serde_json.workspace = true
+serde.workspace = true
 
 tracing = "0.1"
 tracing-subscriber = { version = "0.3" }
@@ -38,7 +38,7 @@ tracing-futures = "0.2"
 tracing-opentelemetry = "0.17.3"
 opentelemetry = { version = "0.17"}
 
-tokio = { version = "1", features = ["sync"] }
+tokio.workspace = true
 futures = "0.3"
 query-engine-metrics = {path = "../metrics"}
 
