@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mobc-711820eed980cd14/d50fd5d/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mobc/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mobc/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mobc/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mobc-711820eed980cd14/80462c4/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mobc/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mobc/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mobc/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -729,6 +729,21 @@
 <span id="729">729</span>
 <span id="730">730</span>
 <span id="731">731</span>
+<span id="732">732</span>
+<span id="733">733</span>
+<span id="734">734</span>
+<span id="735">735</span>
+<span id="736">736</span>
+<span id="737">737</span>
+<span id="738">738</span>
+<span id="739">739</span>
+<span id="740">740</span>
+<span id="741">741</span>
+<span id="742">742</span>
+<span id="743">743</span>
+<span id="744">744</span>
+<span id="745">745</span>
+<span id="746">746</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A generic connection pool with async/await support.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Opening a new database connection every time one is needed is both</span>
@@ -836,7 +851,10 @@
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="kw">use</span> <span class="ident">std::future::Future</span>;
 <span class="kw">use</span> <span class="ident">std::ops</span>::{<span class="ident">Deref</span>, <span class="ident">DerefMut</span>};
-<span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">Arc</span>, <span class="ident">Weak</span>};
+<span class="kw">use</span> <span class="ident">std::sync</span>::{
+    <span class="ident">atomic</span>::{<span class="ident">AtomicU64</span>, <span class="ident">Ordering</span>},
+    <span class="ident">Arc</span>, <span class="ident">Weak</span>,
+};
 <span class="kw">use</span> <span class="ident">std::time</span>::{<span class="ident">Duration</span>, <span class="ident">Instant</span>};
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">time</span>::{<span class="ident">delay_for</span>, <span class="ident">interval</span>};
@@ -885,6 +903,7 @@
     <span class="ident">config</span>: <span class="ident">ShareConfig</span>,
     <span class="ident">manager</span>: <span class="ident">M</span>,
     <span class="ident">internals</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">PoolInternals</span><span class="op">&lt;</span><span class="ident">M::Connection</span>, <span class="ident">M::Error</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">state</span>: <span class="ident">PoolState</span>,
     <span class="ident">semaphore</span>: <span class="ident">Semaphore</span>,
 }
 
@@ -899,8 +918,9 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">internals</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MutexGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">PoolInternals</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
-        <span class="ident">internals</span>.<span class="ident">num_open</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">PoolState</span>) {
+        <span class="ident">state</span>.<span class="ident">num_open</span>.<span class="ident">fetch_sub</span>(<span class="number">1</span>, <span class="ident">Ordering::Relaxed</span>);
+        <span class="ident">state</span>.<span class="ident">max_idle_closed</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::Relaxed</span>);
         <span class="macro">decrement_gauge!</span>(<span class="ident">OPEN_CONNECTIONS</span>, <span class="number">1.0</span>);
         <span class="macro">increment_counter!</span>(<span class="ident">CLOSED_TOTAL</span>);
     }
@@ -939,12 +959,15 @@
 <span class="kw">struct</span> <span class="ident">PoolInternals</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span> {
     <span class="ident">config</span>: <span class="ident">InternalConfig</span>,
     <span class="ident">free_conns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">num_open</span>: <span class="ident">u64</span>,
-    <span class="ident">max_lifetime_closed</span>: <span class="ident">u64</span>,
-    <span class="ident">max_idle_closed</span>: <span class="ident">u64</span>,
-    <span class="ident">wait_count</span>: <span class="ident">u64</span>,
     <span class="ident">wait_duration</span>: <span class="ident">Duration</span>,
     <span class="ident">cleaner_ch</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Sender</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">struct</span> <span class="ident">PoolState</span> {
+    <span class="ident">num_open</span>: <span class="ident">AtomicU64</span>,
+    <span class="ident">max_lifetime_closed</span>: <span class="ident">AtomicU64</span>,
+    <span class="ident">max_idle_closed</span>: <span class="ident">AtomicU64</span>,
+    <span class="ident">wait_count</span>: <span class="ident">AtomicU64</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">PoolInternals</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span> {
@@ -1047,9 +1070,8 @@
         <span class="kw">let</span> <span class="ident">max_idle</span> <span class="op">=</span> <span class="ident">internals</span>.<span class="ident">config</span>.<span class="ident">max_idle</span> <span class="kw">as</span> <span class="ident">usize</span>;
         <span class="kw">if</span> <span class="ident">internals</span>.<span class="ident">free_conns</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">max_idle</span> {
             <span class="kw">let</span> <span class="ident">closing</span> <span class="op">=</span> <span class="ident">internals</span>.<span class="ident">free_conns</span>.<span class="ident">split_off</span>(<span class="ident">max_idle</span>);
-            <span class="ident">internals</span>.<span class="ident">max_idle_closed</span> <span class="op">+</span><span class="op">=</span> <span class="ident">closing</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
             <span class="kw">for</span> <span class="ident">conn</span> <span class="kw">in</span> <span class="ident">closing</span> {
-                <span class="ident">conn</span>.<span class="ident">close</span>(<span class="kw-2">&amp;mut</span> <span class="ident">internals</span>);
+                <span class="ident">conn</span>.<span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">state</span>);
             }
         }
     }
@@ -1082,7 +1104,10 @@
             }
         }
 
-        <span class="kw">if</span> <span class="ident">max_lifetime</span>.<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="ident">internals</span>.<span class="ident">num_open</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">internals</span>.<span class="ident">cleaner_ch</span>.<span class="ident">is_none</span>() {
+        <span class="kw">if</span> <span class="ident">max_lifetime</span>.<span class="ident">is_some</span>()
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">state</span>.<span class="ident">num_open</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>) <span class="op">&gt;</span> <span class="number">0</span>
+            <span class="op">&amp;&amp;</span> <span class="ident">internals</span>.<span class="ident">cleaner_ch</span>.<span class="ident">is_none</span>()
+        {
             <span class="macro">log::debug!</span>(<span class="string">&quot;run connection cleaner&quot;</span>);
             <span class="kw">let</span> <span class="ident">shared1</span> <span class="op">=</span> <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>);
             <span class="kw">let</span> <span class="ident">clean_rate</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">config</span>.<span class="ident">clean_rate</span>;
@@ -1106,19 +1131,24 @@
         <span class="kw">let</span> (<span class="ident">share_config</span>, <span class="ident">internal_config</span>) <span class="op">=</span> <span class="ident">config</span>.<span class="ident">split</span>();
         <span class="kw">let</span> <span class="ident">internals</span> <span class="op">=</span> <span class="ident">Mutex::new</span>(<span class="ident">PoolInternals</span> {
             <span class="ident">config</span>: <span class="ident">internal_config</span>,
-            <span class="ident">free_conns</span>: <span class="macro">vec!</span>[],
-            <span class="ident">num_open</span>: <span class="number">0</span>,
-            <span class="ident">max_lifetime_closed</span>: <span class="number">0</span>,
-            <span class="ident">wait_count</span>: <span class="number">0</span>,
-            <span class="ident">max_idle_closed</span>: <span class="number">0</span>,
+            <span class="ident">free_conns</span>: <span class="ident">Vec::new</span>(),
             <span class="ident">wait_duration</span>: <span class="ident">Duration::from_secs</span>(<span class="number">0</span>),
             <span class="ident">cleaner_ch</span>: <span class="prelude-val">None</span>,
         });
+
+        <span class="kw">let</span> <span class="ident">pool_state</span> <span class="op">=</span> <span class="ident">PoolState</span> {
+            <span class="ident">num_open</span>: <span class="ident">AtomicU64::new</span>(<span class="number">0</span>),
+            <span class="ident">max_lifetime_closed</span>: <span class="ident">AtomicU64::new</span>(<span class="number">0</span>),
+            <span class="ident">wait_count</span>: <span class="ident">AtomicU64::new</span>(<span class="number">0</span>),
+            <span class="ident">max_idle_closed</span>: <span class="ident">AtomicU64::new</span>(<span class="number">0</span>),
+        };
+
         <span class="kw">let</span> <span class="ident">shared</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">SharedPool</span> {
             <span class="ident">config</span>: <span class="ident">share_config</span>,
             <span class="ident">manager</span>,
             <span class="ident">internals</span>,
             <span class="ident">semaphore</span>: <span class="ident">Semaphore::new</span>(<span class="ident">max_open</span>),
+            <span class="ident">state</span>: <span class="ident">pool_state</span>,
         });
 
         <span class="ident">Pool</span>(<span class="ident">shared</span>)
@@ -1177,18 +1207,18 @@
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">validate_conn</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">internals</span>: <span class="kw-2">&amp;</span><span class="ident">MutexGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">PoolInternals</span><span class="op">&lt;</span><span class="ident">M::Connection</span>, <span class="ident">M::Error</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">internal_config</span>: <span class="ident">InternalConfig</span>,
         <span class="ident">conn</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">M::Connection</span>, <span class="ident">M::Error</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">bool</span> {
         <span class="kw">if</span> <span class="ident">conn</span>.<span class="ident">brand_new</span> {
             <span class="kw">return</span> <span class="bool-val">true</span>;
         }
 
-        <span class="kw">if</span> <span class="ident">conn</span>.<span class="ident">expired</span>(<span class="ident">internals</span>.<span class="ident">config</span>.<span class="ident">max_lifetime</span>) {
+        <span class="kw">if</span> <span class="ident">conn</span>.<span class="ident">expired</span>(<span class="ident">internal_config</span>.<span class="ident">max_lifetime</span>) {
             <span class="kw">return</span> <span class="bool-val">false</span>;
         }
 
-        <span class="kw">if</span> <span class="ident">conn</span>.<span class="ident">idle_expired</span>(<span class="ident">internals</span>.<span class="ident">config</span>.<span class="ident">max_idle_lifetime</span>) {
+        <span class="kw">if</span> <span class="ident">conn</span>.<span class="ident">idle_expired</span>(<span class="ident">internal_config</span>.<span class="ident">max_idle_lifetime</span>) {
             <span class="kw">return</span> <span class="bool-val">false</span>;
         }
 
@@ -1209,12 +1239,10 @@
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_or_create_conn</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">M::Connection</span>, <span class="ident">M::Error</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">M::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">internals</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">internals</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
-        <span class="ident">internals</span>.<span class="ident">wait_count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">state</span>.<span class="ident">wait_count</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::Relaxed</span>);
         <span class="macro">increment_gauge!</span>(<span class="ident">WAIT_COUNT</span>, <span class="number">1.0</span>);
         <span class="kw">let</span> <span class="ident">wait_start</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
 
-        <span class="ident">drop</span>(<span class="ident">internals</span>);
         <span class="kw">let</span> <span class="ident">permit</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="number">0</span>
             .<span class="ident">semaphore</span>
@@ -1222,23 +1250,29 @@
             .<span class="kw">await</span>
             .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::PoolClosed</span>)<span class="question-mark">?</span>;
 
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">state</span>.<span class="ident">wait_count</span>.<span class="ident">fetch_sub</span>(<span class="number">1</span>, <span class="ident">Ordering::SeqCst</span>);
+
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">internals</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">internals</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
+
         <span class="ident">internals</span>.<span class="ident">wait_duration</span> <span class="op">+</span><span class="op">=</span> <span class="ident">wait_start</span>.<span class="ident">elapsed</span>();
         <span class="macro">histogram!</span>(<span class="ident">WAIT_DURATION</span>, <span class="ident">wait_start</span>.<span class="ident">elapsed</span>());
+
         <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">internals</span>.<span class="ident">free_conns</span>.<span class="ident">pop</span>();
+        <span class="kw">let</span> <span class="ident">internal_config</span> <span class="op">=</span> <span class="ident">internals</span>.<span class="ident">config</span>.<span class="ident">clone</span>();
+        <span class="ident">drop</span>(<span class="ident">internals</span>);
 
         <span class="kw">if</span> <span class="ident">conn</span>.<span class="ident">is_some</span>() {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">unwrap</span>();
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">validate_conn</span>(<span class="kw-2">&amp;</span><span class="ident">internals</span>, <span class="kw-2">&amp;mut</span> <span class="ident">conn</span>).<span class="kw">await</span> {
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">validate_conn</span>(<span class="ident">internal_config</span>, <span class="kw-2">&amp;mut</span> <span class="ident">conn</span>).<span class="kw">await</span> {
                 <span class="macro">decrement_gauge!</span>(<span class="ident">IDLE_CONNECTIONS</span>, <span class="number">1.0</span>);
                 <span class="ident">permit</span>.<span class="ident">forget</span>();
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">conn</span>);
             } <span class="kw">else</span> {
-                <span class="ident">conn</span>.<span class="ident">close</span>(<span class="kw-2">&amp;mut</span> <span class="ident">internals</span>);
+                <span class="ident">conn</span>.<span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">state</span>);
             }
         }
 
-        <span class="kw">let</span> <span class="ident">create_r</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">open_new_connection</span>(<span class="ident">internals</span>).<span class="kw">await</span>;
+        <span class="kw">let</span> <span class="ident">create_r</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">open_new_connection</span>().<span class="kw">await</span>;
 
         <span class="kw">if</span> <span class="ident">create_r</span>.<span class="ident">is_ok</span>() {
             <span class="macro">decrement_gauge!</span>(<span class="ident">IDLE_CONNECTIONS</span>, <span class="number">1.0</span>);
@@ -1248,15 +1282,11 @@
         <span class="ident">create_r</span>
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">open_new_connection</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="kw-2">mut</span> <span class="ident">internals</span>: <span class="ident">MutexGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">PoolInternals</span><span class="op">&lt;</span><span class="ident">M::Connection</span>, <span class="ident">M::Error</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">M::Connection</span>, <span class="ident">M::Error</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">M::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">open_new_connection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">M::Connection</span>, <span class="ident">M::Error</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">M::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="macro">log::debug!</span>(<span class="string">&quot;creating new connection from manager&quot;</span>);
         <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">manager</span>.<span class="ident">connect</span>().<span class="kw">await</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">c</span>) =&gt; {
-                <span class="ident">internals</span>.<span class="ident">num_open</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="ident">drop</span>(<span class="ident">internals</span>);
+                <span class="self">self</span>.<span class="number">0</span>.<span class="ident">state</span>.<span class="ident">num_open</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::Relaxed</span>);
                 <span class="macro">increment_gauge!</span>(<span class="ident">OPENED_TOTAL</span>, <span class="number">1.0</span>);
                 <span class="macro">increment_counter!</span>(<span class="ident">OPEN_CONNECTIONS</span>);
 
@@ -1276,41 +1306,39 @@
     }
 
     <span class="doccomment">/// Returns information about the current state of the pool.</span>
+    <span class="doccomment">/// It is better to use the metrics than this method, this method</span>
+    <span class="doccomment">/// requires a lock on the internals</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">state</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">State</span> {
         <span class="kw">let</span> <span class="ident">internals</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">internals</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
+        <span class="kw">let</span> <span class="ident">num_free_conns</span> <span class="op">=</span> <span class="ident">internals</span>.<span class="ident">free_conns</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
+        <span class="kw">let</span> <span class="ident">wait_duration</span> <span class="op">=</span> <span class="ident">internals</span>.<span class="ident">wait_duration</span>;
+        <span class="kw">let</span> <span class="ident">max_open</span> <span class="op">=</span> <span class="ident">internals</span>.<span class="ident">config</span>.<span class="ident">max_open</span>;
+        <span class="ident">drop</span>(<span class="ident">internals</span>);
         <span class="ident">State</span> {
-            <span class="ident">max_open</span>: <span class="ident">internals</span>.<span class="ident">config</span>.<span class="ident">max_open</span>,
+            <span class="ident">max_open</span>,
 
-            <span class="ident">connections</span>: <span class="ident">internals</span>.<span class="ident">num_open</span>,
-            <span class="ident">in_use</span>: <span class="ident">internals</span>.<span class="ident">num_open</span> <span class="op">-</span> <span class="ident">internals</span>.<span class="ident">free_conns</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>,
-            <span class="ident">idle</span>: <span class="ident">internals</span>.<span class="ident">free_conns</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>,
+            <span class="ident">connections</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">state</span>.<span class="ident">num_open</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>),
+            <span class="ident">in_use</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">state</span>.<span class="ident">num_open</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>) <span class="op">-</span> <span class="ident">num_free_conns</span>,
+            <span class="ident">idle</span>: <span class="ident">num_free_conns</span>,
 
-            <span class="ident">wait_count</span>: <span class="ident">internals</span>.<span class="ident">wait_count</span>,
-            <span class="ident">wait_duration</span>: <span class="ident">internals</span>.<span class="ident">wait_duration</span>,
-            <span class="ident">max_idle_closed</span>: <span class="ident">internals</span>.<span class="ident">max_idle_closed</span>,
-            <span class="ident">max_lifetime_closed</span>: <span class="ident">internals</span>.<span class="ident">max_lifetime_closed</span>,
+            <span class="ident">wait_count</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">state</span>.<span class="ident">wait_count</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>),
+            <span class="ident">wait_duration</span>,
+            <span class="ident">max_idle_closed</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">state</span>.<span class="ident">max_idle_closed</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>),
+            <span class="ident">max_lifetime_closed</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">state</span>.<span class="ident">max_lifetime_closed</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>),
         }
     }
 }
 
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">recycle_conn</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Manager</span><span class="op">&gt;</span>(
     <span class="ident">shared</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">SharedPool</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">conn</span>: <span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">M::Connection</span>, <span class="ident">M::Error</span><span class="op">&gt;</span>,
-) {
-    <span class="kw">let</span> <span class="ident">internals</span> <span class="op">=</span> <span class="ident">shared</span>.<span class="ident">internals</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
-    <span class="ident">put_conn</span>(<span class="ident">shared</span>, <span class="ident">internals</span>, <span class="ident">conn</span>).<span class="kw">await</span>;
-}
-
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">put_conn</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Manager</span><span class="op">&gt;</span>(
-    <span class="ident">shared</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">SharedPool</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw-2">mut</span> <span class="ident">internals</span>: <span class="ident">MutexGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">PoolInternals</span><span class="op">&lt;</span><span class="ident">M::Connection</span>, <span class="ident">M::Error</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw-2">mut</span> <span class="ident">conn</span>: <span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">M::Connection</span>, <span class="ident">M::Error</span><span class="op">&gt;</span>,
 ) {
     <span class="kw">if</span> <span class="ident">conn_still_valid</span>(<span class="ident">shared</span>, <span class="kw-2">&amp;mut</span> <span class="ident">conn</span>) {
         <span class="ident">conn</span>.<span class="ident">brand_new</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        <span class="kw">let</span> <span class="ident">internals</span> <span class="op">=</span> <span class="ident">shared</span>.<span class="ident">internals</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
         <span class="ident">put_idle_conn</span>(<span class="ident">shared</span>, <span class="ident">internals</span>, <span class="ident">conn</span>);
     } <span class="kw">else</span> {
-        <span class="ident">conn</span>.<span class="ident">close</span>(<span class="kw-2">&amp;mut</span> <span class="ident">internals</span>);
+        <span class="ident">conn</span>.<span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="ident">shared</span>.<span class="ident">state</span>);
     }
 
     <span class="ident">shared</span>.<span class="ident">semaphore</span>.<span class="ident">add_permits</span>(<span class="number">1</span>);
@@ -1333,15 +1361,15 @@
 }
 
 <span class="kw">fn</span> <span class="ident">put_idle_conn</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Manager</span><span class="op">&gt;</span>(
-    <span class="ident">_shared</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">SharedPool</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">shared</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">SharedPool</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw-2">mut</span> <span class="ident">internals</span>: <span class="ident">MutexGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">PoolInternals</span><span class="op">&lt;</span><span class="ident">M::Connection</span>, <span class="ident">M::Error</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">conn</span>: <span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">M::Connection</span>, <span class="ident">M::Error</span><span class="op">&gt;</span>,
 ) {
     <span class="kw">if</span> <span class="ident">internals</span>.<span class="ident">config</span>.<span class="ident">max_idle</span> <span class="op">&gt;</span> <span class="ident">internals</span>.<span class="ident">free_conns</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span> {
-        <span class="ident">internals</span>.<span class="ident">free_conns</span>.<span class="ident">push</span>(<span class="ident">conn</span>)
+        <span class="ident">internals</span>.<span class="ident">free_conns</span>.<span class="ident">push</span>(<span class="ident">conn</span>);
+        <span class="ident">drop</span>(<span class="ident">internals</span>);
     } <span class="kw">else</span> {
-        <span class="ident">internals</span>.<span class="ident">max_idle_closed</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="ident">conn</span>.<span class="ident">close</span>(<span class="kw-2">&amp;mut</span> <span class="ident">internals</span>)
+        <span class="ident">conn</span>.<span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="ident">shared</span>.<span class="ident">state</span>);
     }
 }
 
@@ -1379,7 +1407,8 @@
     <span class="macro">log::debug!</span>(<span class="string">&quot;Clean connections&quot;</span>);
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">internals</span> <span class="op">=</span> <span class="ident">shared</span>.<span class="ident">internals</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
-    <span class="kw">if</span> <span class="ident">internals</span>.<span class="ident">num_open</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">internals</span>.<span class="ident">config</span>.<span class="ident">max_lifetime</span>.<span class="ident">is_none</span>() {
+    <span class="kw">if</span> <span class="ident">shared</span>.<span class="ident">state</span>.<span class="ident">num_open</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>) <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">internals</span>.<span class="ident">config</span>.<span class="ident">max_lifetime</span>.<span class="ident">is_none</span>()
+    {
         <span class="ident">internals</span>.<span class="ident">cleaner_ch</span>.<span class="ident">take</span>();
         <span class="kw">return</span> <span class="bool-val">false</span>;
     }
@@ -1405,10 +1434,14 @@
         }
         <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
     }
+    <span class="ident">drop</span>(<span class="ident">internals</span>);
 
-    <span class="ident">internals</span>.<span class="ident">max_lifetime_closed</span> <span class="op">+</span><span class="op">=</span> <span class="ident">closing</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
+    <span class="ident">shared</span>
+        .<span class="ident">state</span>
+        .<span class="ident">max_lifetime_closed</span>
+        .<span class="ident">fetch_add</span>(<span class="ident">closing</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>, <span class="ident">Ordering::Relaxed</span>);
     <span class="kw">for</span> <span class="ident">conn</span> <span class="kw">in</span> <span class="ident">closing</span> {
-        <span class="ident">conn</span>.<span class="ident">close</span>(<span class="kw-2">&amp;mut</span> <span class="ident">internals</span>);
+        <span class="ident">conn</span>.<span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="ident">shared</span>.<span class="ident">state</span>);
     }
     <span class="bool-val">true</span>
 }
@@ -1435,10 +1468,7 @@
     <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pool</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>();
-        <span class="comment">// We change the metrics here instead of in the recycle_conn</span>
-        <span class="comment">// in case there is a specific tracing dispatcher for this future</span>
-        <span class="comment">// if we change the metrics in the spawn_task the dispatcher will be</span>
-        <span class="comment">// lost</span>
+
         <span class="macro">decrement_gauge!</span>(<span class="ident">ACTIVE_CONNECTIONS</span>, <span class="number">1.0</span>);
         <span class="macro">increment_gauge!</span>(<span class="ident">IDLE_CONNECTIONS</span>, <span class="number">1.0</span>);
         <span class="comment">// FIXME: No clone!</span>
