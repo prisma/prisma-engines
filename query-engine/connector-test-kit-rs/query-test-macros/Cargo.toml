@@ -1,8 +1,6 @@
 [package]
 name = "query-test-macros"
 version = "0.1.0"
-authors = ["Dominic Petrick <dompetrick@gmail.com>"]
-edition = "2021"
 
 [lib]
 proc-macro = true

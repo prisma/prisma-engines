@@ -1,7 +1,6 @@
 [package]
 name = "user-facing-errors"
 version = "0.1.0"
-edition = "2021"
 
 [dependencies]
 user-facing-error-macros = { path = "../user-facing-error-macros" }

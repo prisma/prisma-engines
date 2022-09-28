@@ -1,7 +1,6 @@
 [package]
 name = "json-rpc-stdio"
 version = "0.1.0"
-edition = "2021"
 
 [dependencies]
 jsonrpc-core = "17"

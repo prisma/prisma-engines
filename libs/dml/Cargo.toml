@@ -1,7 +1,6 @@
 [package]
 name = "dml"
 version = "0.1.0"
-edition = "2021"
 
 [dependencies]
 prisma-value = { path = "../prisma-value" }

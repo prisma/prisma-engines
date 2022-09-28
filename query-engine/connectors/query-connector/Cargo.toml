@@ -1,5 +1,4 @@
 [package]
-edition = "2021"
 name = "query-connector"
 version = "0.1.0"
 

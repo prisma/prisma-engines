@@ -1,6 +1,4 @@
 [package]
-authors = ["Dominic Petrick <dompetrick@gmail.com>"]
-edition = "2018"
 name = "query-engine-tests"
 version = "0.1.0"
 

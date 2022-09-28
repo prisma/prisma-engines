@@ -1,8 +1,6 @@
 [package]
 name = "request-handlers"
 version = "0.1.0"
-authors = ["Julius de Bruijn <julius+github@nauk.io>"]
-edition = "2021"
 
 [dependencies]
 query-core = { path = "../core" }

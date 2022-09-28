@@ -1,7 +1,6 @@
 [package]
 name = "parser-database"
 version = "0.1.0"
-edition = "2021"
 
 [dependencies]
 diagnostics = { path = "../diagnostics" }

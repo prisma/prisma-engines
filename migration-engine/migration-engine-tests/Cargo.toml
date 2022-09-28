@@ -1,7 +1,6 @@
 [package]
 name = "migration-engine-tests"
 version = "0.1.0"
-edition = "2021"
 
 [dependencies]
 psl.workspace = true

@@ -32,6 +32,12 @@ members = [
   "psl/*",
 ]
 
+[workspace.package]
+documentation = "https://prisma.github.io/prisma-engines/"
+edition = "2021"
+homepage = "https://github.com/prisma/prisma-engines"
+repository =  "https://github.com/prisma/prisma-engines"
+
 [workspace.dependencies]
 psl = { path = "./psl/psl" }
 serde_json = { version = "1", features = ["float_roundtrip", "preserve_order"] }
@@ -55,6 +61,7 @@ features = [
   "sqlite",
   "uuid",
 ]
+
 
 [profile.dev]
 split-debuginfo = "unpacked"

@@ -1,7 +1,6 @@
 [package]
 name = "dmmf"
 version = "0.1.0"
-edition = "2021"
 
 [dependencies]
 bigdecimal = "0.3.0"

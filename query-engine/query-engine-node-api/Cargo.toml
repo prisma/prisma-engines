@@ -1,8 +1,6 @@
 [package]
 name = "query-engine-node-api"
 version = "0.1.0"
-authors = ["Julius de Bruijn <bruijn@prisma.io>"]
-edition = "2021"
 
 [lib]
 doc = false

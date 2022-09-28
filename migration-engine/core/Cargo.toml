@@ -1,5 +1,4 @@
 [package]
-edition = "2021"
 name = "migration-core"
 version = "0.1.0"
 
