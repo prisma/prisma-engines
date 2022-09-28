@@ -3,7 +3,7 @@
 use crate::{
     getters::Getter, ids::*, parsers::Parser, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue,
     DescriberError, DescriberErrorKind, DescriberResult, ForeignKeyAction, IndexColumn, Procedure, SQLSortOrder,
-    SqlMetadata, SqlSchema, UserDefinedType, View,
+    SqlSchema, SqlMetadata, UserDefinedType, View,
 };
 use enumflags2::BitFlags;
 use indexmap::IndexMap;
@@ -136,7 +136,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
         Ok(sql_schema)
     }
 
-    async fn version(&self, _schema: &str) -> DescriberResult<Option<String>> {
+    async fn version(&self) -> DescriberResult<Option<String>> {
         Ok(self.conn.version().await?)
     }
 }

@@ -2,7 +2,7 @@
 
 use crate::{
     getters::Getter, ids::*, parsers::Parser, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue,
-    DescriberResult, ForeignKeyAction, Lazy, PrismaValue, Regex, SQLSortOrder, SqlMetadata, SqlSchema,
+    DescriberResult, ForeignKeyAction, Lazy, PrismaValue, Regex, SQLSortOrder, SqlSchema, SqlMetadata,
     SqlSchemaDescriberBackend, View,
 };
 use indexmap::IndexMap;
@@ -85,7 +85,7 @@ impl SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
         self.describe_impl().await
     }
 
-    async fn version(&self, _schema: &str) -> DescriberResult<Option<String>> {
+    async fn version(&self) -> DescriberResult<Option<String>> {
         Ok(Some(quaint::connector::sqlite_version().to_owned()))
     }
 }
@@ -170,7 +170,12 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(size.try_into().unwrap())
     }
 
-    async fn push_table(&self, name: &str, table_id: TableId, schema: &mut SqlSchema) -> DescriberResult<()> {
+    async fn push_table(
+        &self,
+        name: &str,
+        table_id: TableId,
+        schema: &mut SqlSchema,
+    ) -> DescriberResult<()> {
         push_columns(name, table_id, schema, self.conn).await?;
         push_indexes(name, table_id, schema, self.conn).await
     }
