@@ -11,7 +11,6 @@ mongodb-client = { path = "../../../libs/mongodb-client" }
 psl.workspace = true
 introspection-connector = { path = "../introspection-connector" }
 user-facing-errors = { path = "../../../libs/user-facing-errors" }
-native-types = { path = "../../../libs/native-types" }
 mongodb-schema-describer = { path = "../../../libs/mongodb-schema-describer" }
 datamodel-renderer = { path = "../../datamodel-renderer" }
 enumflags2 = "0.7"

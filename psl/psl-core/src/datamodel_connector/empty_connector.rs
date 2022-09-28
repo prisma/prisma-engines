@@ -37,28 +37,35 @@ impl Connector for EmptyDatamodelConnector {
         &[]
     }
 
-    fn scalar_type_for_native_type(&self, _native_type: serde_json::Value) -> ScalarType {
+    fn scalar_type_for_native_type(&self, _native_type: &NativeTypeInstance) -> ScalarType {
         ScalarType::String
     }
 
-    fn default_native_type_for_scalar_type(&self, _scalar_type: &ScalarType) -> serde_json::Value {
-        serde_json::Value::Null
+    fn default_native_type_for_scalar_type(&self, _scalar_type: &ScalarType) -> NativeTypeInstance {
+        unreachable!()
     }
 
     fn native_type_is_default_for_scalar_type(
         &self,
-        _native_type: serde_json::Value,
+        _native_type: &NativeTypeInstance,
         _scalar_type: &ScalarType,
     ) -> bool {
         false
     }
 
-    fn parse_native_type(&self, name: &str, _: Vec<String>, span: Span) -> Result<NativeTypeInstance, DatamodelError> {
-        Err(DatamodelError::new_native_type_parser_error(name, span))
+    fn native_type_to_parts(&self, _native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
+        unreachable!("EmptyDatamodelConnector::native_type_to_string()")
     }
 
-    fn introspect_native_type(&self, _native_type: serde_json::Value) -> NativeTypeInstance {
-        unreachable!("introspect_native_type on EmptyDatamodelConnector")
+    fn parse_native_type(
+        &self,
+        name: &str,
+        _: &[String],
+        span: Span,
+        diagnostics: &mut Diagnostics,
+    ) -> Option<NativeTypeInstance> {
+        diagnostics.push_error(DatamodelError::new_native_type_parser_error(name, span));
+        None
     }
 
     fn validate_url(&self, _url: &str) -> Result<(), String> {

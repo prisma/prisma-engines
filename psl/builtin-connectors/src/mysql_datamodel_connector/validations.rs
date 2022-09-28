@@ -6,6 +6,17 @@ use psl_core::{
 
 const LENGTH_GUIDE: &str = " Please use the `length` argument to the field in the index definition to allow this.";
 
+const NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION: &[&str] = &[
+    super::TEXT_TYPE_NAME,
+    super::LONG_TEXT_TYPE_NAME,
+    super::MEDIUM_TEXT_TYPE_NAME,
+    super::TINY_TEXT_TYPE_NAME,
+    super::BLOB_TYPE_NAME,
+    super::TINY_BLOB_TYPE_NAME,
+    super::MEDIUM_BLOB_TYPE_NAME,
+    super::LONG_BLOB_TYPE_NAME,
+];
+
 pub(crate) fn field_types_can_be_used_in_an_index(
     connector: &dyn Connector,
     index: IndexWalker<'_>,
@@ -16,8 +27,9 @@ pub(crate) fn field_types_can_be_used_in_an_index(
             Some(native_type) => native_type,
             None => continue,
         };
+        let (native_type_name, _) = connector.native_type_to_parts(&native_type);
 
-        if !super::NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type.name.as_str()) {
+        if !NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
             continue;
         }
 
@@ -56,8 +68,9 @@ pub(crate) fn field_types_can_be_used_in_a_primary_key(
             Some(native_type) => native_type,
             None => continue,
         };
+        let (native_type_name, _) = connector.native_type_to_parts(&native_type);
 
-        if !super::NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type.name.as_str()) {
+        if !NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
             continue;
         }
 

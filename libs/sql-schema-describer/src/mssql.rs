@@ -8,9 +8,12 @@ use crate::{
 use enumflags2::BitFlags;
 use indexmap::IndexMap;
 use indoc::indoc;
-use native_types::{MsSqlType, MsSqlTypeParameter, NativeType};
 use once_cell::sync::Lazy;
-use prisma_value::PrismaValue;
+use psl::{
+    builtin_connectors::{MsSqlType, MsSqlTypeParameter},
+    datamodel_connector::NativeTypeInstance,
+    dml::prisma_value::PrismaValue,
+};
 use quaint::prelude::Queryable;
 use regex::Regex;
 use std::{any::type_name, borrow::Cow, collections::HashMap, convert::TryInto};
@@ -765,7 +768,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             full_data_type,
             family,
             arity,
-            native_type: native_type.map(|x| x.to_json()),
+            native_type: native_type.map(NativeTypeInstance::new::<MsSqlType>),
         }
     }
 }

@@ -27,7 +27,7 @@ impl CalculateDatamodelContext<'_> {
             .uses_foreign_keys()
     }
 
-    pub(crate) fn active_connector(&self) -> &dyn Connector {
+    pub(crate) fn active_connector(&self) -> &'static dyn Connector {
         self.config.datasources.first().unwrap().active_connector
     }
 }

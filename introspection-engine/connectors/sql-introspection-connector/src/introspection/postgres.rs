@@ -1,7 +1,5 @@
 use datamodel_renderer as render;
-use psl::{
-    builtin_connectors::postgres_datamodel_connector::PostgresDatasourceProperties, Configuration, PreviewFeature,
-};
+use psl::{builtin_connectors::PostgresDatasourceProperties, Configuration, PreviewFeature};
 use sql_schema_describer::{postgres::PostgresSchemaExt, SqlSchema};
 
 use crate::sanitize_datamodel_names::sanitize_string;

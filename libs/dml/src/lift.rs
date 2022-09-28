@@ -474,12 +474,15 @@ impl<'a> LiftAstToDml<'a> {
             db::ScalarFieldType::BuiltInScalar(scalar_type) => {
                 let native_type = scalar_field.raw_native_type().map(|(_, name, args, _)| {
                     self.connector
-                        .parse_native_type(name, args.to_owned(), scalar_field.ast_field().span())
+                        .parse_native_type(name, args, scalar_field.ast_field().span(), &mut Default::default())
                         .unwrap()
                 });
                 FieldType::Scalar(
                     parser_database_scalar_type_to_dml_scalar_type(*scalar_type),
-                    native_type.map(datamodel_connector_native_type_to_dml_native_type),
+                    native_type.map(|nt| dml::NativeTypeInstance {
+                        native_type: nt,
+                        connector: self.connector,
+                    }),
                 )
             }
         }
@@ -497,13 +500,21 @@ impl<'a> LiftAstToDml<'a> {
             db::ScalarFieldType::BuiltInScalar(scalar_type) => {
                 let native_type = composite_type_field.raw_native_type().map(|(_, name, args, _)| {
                     self.connector
-                        .parse_native_type(name, args.to_owned(), composite_type_field.ast_field().span())
+                        .parse_native_type(
+                            name,
+                            args,
+                            composite_type_field.ast_field().span(),
+                            &mut Default::default(),
+                        )
                         .unwrap()
                 });
 
                 CompositeTypeFieldType::Scalar(
                     parser_database_scalar_type_to_dml_scalar_type(*scalar_type),
-                    native_type.map(datamodel_connector_native_type_to_dml_native_type),
+                    native_type.map(|nt| dml::NativeTypeInstance {
+                        native_type: nt,
+                        connector: self.connector,
+                    }),
                 )
             }
             db::ScalarFieldType::Enum(enum_id) => {
@@ -543,18 +554,8 @@ fn parser_database_referential_action_to_dml_referential_action(ra: db::Referent
     }
 }
 
-fn parser_database_scalar_type_to_dml_scalar_type(st: ScalarType) -> dml::ScalarType {
+fn parser_database_scalar_type_to_dml_scalar_type(st: db::ScalarType) -> dml::ScalarType {
     st.as_str().parse().unwrap()
-}
-
-fn datamodel_connector_native_type_to_dml_native_type(
-    instance: psl_core::datamodel_connector::NativeTypeInstance,
-) -> NativeTypeInstance {
-    NativeTypeInstance {
-        name: instance.name,
-        args: instance.args,
-        serialized_native_type: instance.serialized_native_type,
-    }
 }
 
 fn dml_default_kind(default_value: &ast::Expression, scalar_type: Option<ScalarType>) -> DefaultKind {

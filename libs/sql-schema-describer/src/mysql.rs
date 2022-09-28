@@ -4,12 +4,11 @@ use crate::{getters::Getter, parsers::Parser, *};
 use bigdecimal::ToPrimitive;
 use indexmap::IndexMap;
 use indoc::indoc;
-use native_types::{MySqlType, NativeType};
+use psl::{builtin_connectors::MySqlType, datamodel_connector::NativeTypeInstance};
 use quaint::{
     prelude::{Queryable, ResultRow},
     Value,
 };
-use serde_json::from_str;
 use std::borrow::Cow;
 use tracing::trace;
 
@@ -648,7 +647,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             full_data_type: full_data_type.to_owned(),
             family,
             arity,
-            native_type: native_type.map(|x| x.to_json()),
+            native_type: native_type.map(NativeTypeInstance::new::<MySqlType>),
         };
 
         (tpe, enm)
@@ -657,7 +656,7 @@ impl<'a> SqlSchemaDescriber<'a> {
     fn extract_precision(input: &str) -> Option<u32> {
         static RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#".*\(([1-9])\)"#).unwrap());
         RE.captures(input)
-            .and_then(|cap| cap.get(1).map(|precision| from_str::<u32>(precision.as_str()).unwrap()))
+            .and_then(|cap| cap.get(1).map(|precision| precision.as_str().parse::<u32>().unwrap()))
     }
 
     fn extract_enum_values(full_data_type: &&str) -> Vec<String> {

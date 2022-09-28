@@ -297,11 +297,9 @@ dependencies = [
  "either",
  "enumflags2",
  "lsp-types",
- "native-types",
  "once_cell",
  "psl-core",
  "regex",
- "serde_json",
 ]
 
 [[package]]
@@ -736,7 +734,6 @@ dependencies = [
  "either",
  "enumflags2",
  "indoc",
- "native-types",
  "prisma-value",
  "psl-core",
  "schema-ast",
@@ -2124,7 +2121,6 @@ dependencies = [
  "mongodb-client",
  "mongodb-schema-describer",
  "names",
- "native-types",
  "once_cell",
  "psl",
  "regex",
@@ -2171,7 +2167,6 @@ dependencies = [
  "itertools",
  "mongodb",
  "mongodb-client",
- "native-types",
  "prisma-models",
  "prisma-value",
  "psl",
@@ -2355,14 +2350,6 @@ dependencies = [
  "security-framework",
  "security-framework-sys",
  "tempfile",
-]
-
-[[package]]
-name = "native-types"
-version = "0.1.0"
-dependencies = [
- "serde",
- "serde_json",
 ]
 
 [[package]]
@@ -3048,7 +3035,6 @@ dependencies = [
  "dml",
  "expect-test",
  "indoc",
- "native-types",
  "psl-core",
 ]
 
@@ -4040,7 +4026,6 @@ dependencies = [
  "enumflags2",
  "expect-test",
  "introspection-connector",
- "native-types",
  "once_cell",
  "pretty_assertions",
  "psl",
@@ -4065,7 +4050,6 @@ dependencies = [
  "enumflags2",
  "indoc",
  "migration-connector",
- "native-types",
  "once_cell",
  "psl",
  "quaint",
@@ -4122,14 +4106,12 @@ dependencies = [
  "expect-test",
  "indexmap",
  "indoc",
- "native-types",
  "once_cell",
  "pretty_assertions",
- "prisma-value",
+ "psl",
  "quaint",
  "regex",
  "serde",
- "serde_json",
  "test-macros",
  "test-setup",
  "tokio",

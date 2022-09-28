@@ -251,7 +251,7 @@ fn full_scalar_filter_type(
     nested: bool,
     include_aggregates: bool,
 ) -> InputObjectTypeWeakRef {
-    let native_type_name = native_type.map(|nt| nt.name.as_str());
+    let native_type_name = native_type.map(|nt| nt.name());
     let type_name = ctx.connector.scalar_filter_name(typ.to_string(), native_type_name);
     let ident = Identifier::new(
         scalar_filter_name(&type_name, list, nullable, nested, include_aggregates),
