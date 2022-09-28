@@ -126,6 +126,16 @@
 <span id="126">126</span>
 <span id="127">127</span>
 <span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">datamodel_rendering::SqlDatamodelRenderer</span>, <span class="ident">TestError</span>, <span class="ident">TestResult</span>};
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
@@ -159,6 +169,9 @@
             <span class="prelude-val">Some</span>(<span class="ident">SqlServerVersion::V2019</span>) <span class="kw">if</span> <span class="ident">is_ci</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;sqlserver://test-db-sqlserver-2019:1433;{};user=SA;password=&lt;YourStrong@Passw0rd&gt;;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED&quot;</span>, <span class="ident">database</span>),
             <span class="prelude-val">Some</span>(<span class="ident">SqlServerVersion::V2019</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;sqlserver://127.0.0.1:1433;{};user=SA;password=&lt;YourStrong@Passw0rd&gt;;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED&quot;</span>, <span class="ident">database</span>),
 
+            <span class="prelude-val">Some</span>(<span class="ident">SqlServerVersion::V2022</span>) <span class="kw">if</span> <span class="ident">is_ci</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;sqlserver://test-db-sqlserver-2022:1433;{};user=SA;password=&lt;YourStrong@Passw0rd&gt;;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED&quot;</span>, <span class="ident">database</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">SqlServerVersion::V2022</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;sqlserver://127.0.0.1:1435;{};user=SA;password=&lt;YourStrong@Passw0rd&gt;;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED&quot;</span>, <span class="ident">database</span>),
+
             <span class="prelude-val">None</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;A versioned connector must have a concrete version to run.&quot;</span>),
         }
     }
@@ -181,6 +194,7 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SqlServerVersion</span> {
     <span class="ident">V2017</span>,
     <span class="ident">V2019</span>,
+    <span class="ident">V2022</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">SqlServerConnectorTag</span> {
@@ -207,6 +221,10 @@
             },
             <span class="self">Self</span> {
                 <span class="ident">version</span>: <span class="prelude-val">Some</span>(<span class="ident">SqlServerVersion::V2019</span>),
+                <span class="ident">capabilities</span>: <span class="ident">capabilities</span>.<span class="ident">clone</span>(),
+            },
+            <span class="self">Self</span> {
+                <span class="ident">version</span>: <span class="prelude-val">Some</span>(<span class="ident">SqlServerVersion::V2022</span>),
                 <span class="ident">capabilities</span>,
             },
         ]
@@ -234,6 +252,7 @@
         <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">s</span> {
             <span class="string">&quot;2017&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::V2017</span>,
             <span class="string">&quot;2019&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::V2019</span>,
+            <span class="string">&quot;2022&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::V2022</span>,
             <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TestError::parse_error</span>(<span class="macro">format!</span>(<span class="string">&quot;Unknown SqlServer version `{}`&quot;</span>, <span class="ident">s</span>))),
         };
 
@@ -246,6 +265,7 @@
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">SqlServerVersion::V2017</span> =&gt; <span class="string">&quot;2017&quot;</span>,
             <span class="ident">SqlServerVersion::V2019</span> =&gt; <span class="string">&quot;2019&quot;</span>,
+            <span class="ident">SqlServerVersion::V2022</span> =&gt; <span class="string">&quot;2022&quot;</span>,
         }
         .<span class="ident">to_owned</span>()
     }
