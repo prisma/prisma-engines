@@ -139,6 +139,12 @@ start-mssql_2019:
 dev-mssql2019: start-mssql_2019
 	cp $(CONFIG_PATH)/sqlserver2019 $(CONFIG_FILE)
 
+start-mssql_2022:
+	docker-compose -f docker-compose.yml up -d --remove-orphans mssql-2022
+
+dev-mssql2022: start-mssql_2022
+	cp $(CONFIG_PATH)/sqlserver2022 $(CONFIG_FILE)
+
 start-mssql_edge:
 	docker-compose -f docker-compose.yml up -d --remove-orphans azure-edge
 

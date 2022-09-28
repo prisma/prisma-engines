@@ -176,9 +176,9 @@ Note that the schema handlers can be located anywhere, the only important bit is
 Mutually exclusive properties that constrain tests to run only for a set of connectors. By default (when none of the two are given), _all_ possible connectors are run for a test. `only` sets a whitelist of connectors to run, `exclude` sets a blacklist. The values used in both are identical in form: `Connector` or `Connector(Version, Version, ...)`. If no version is given, the entire connector family (all versions) is included or excluded.
 
 Connectors are at the time of writing:
-- `Postgres`: 9, 10, 11, 12, 13
+- `Postgres`: 9.6, 10, 11, 12, 13, 14, 15
 - `MySql`: 5.6, 5.7, 8, mariadb
-- `SqlServer`: 2017, 2019
+- `SqlServer`: 2017, 2019, 2022
 - `Sqlite`: No versions
 - `MongoDb`: 4
 
