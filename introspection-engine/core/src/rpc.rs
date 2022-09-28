@@ -7,7 +7,7 @@ use jsonrpc_core::BoxFuture;
 use jsonrpc_derive::rpc;
 use mongodb_introspection_connector::MongoDbIntrospectionConnector;
 use psl::{dml::Datamodel, Configuration};
-use serde_derive::*;
+use serde::*;
 use sql_introspection_connector::SqlIntrospectionConnector;
 
 type RpcError = jsonrpc_core::Error;

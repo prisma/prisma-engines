@@ -1456,7 +1456,6 @@ dependencies = [
  "mongodb-introspection-connector",
  "psl",
  "serde",
- "serde_derive",
  "serde_json",
  "sql-introspection-connector",
  "tokio",
@@ -2904,7 +2903,6 @@ dependencies = [
  "prisma-value",
  "psl",
  "serde",
- "serde_derive",
  "serde_json",
  "thiserror",
 ]

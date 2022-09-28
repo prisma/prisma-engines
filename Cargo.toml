@@ -32,6 +32,31 @@ members = [
   "psl/*",
 ]
 
+[workspace.dependencies]
+psl = { path = "./psl/psl" }
+serde_json = { version = "1", features = ["float_roundtrip", "preserve_order"] }
+serde = { version = "1", features = ["derive"] }
+tokio = { version = "1.15", features = ["rt-multi-thread", "macros", "sync", "io-std", "io-util", "parking_lot", "time"] }
+user-facing-errors = { path = "./libs/user-facing-errors" }
+uuid = { version = "1", features = ["serde"] }
+
+[workspace.dependencies.quaint]
+git = "https://github.com/prisma/quaint"
+features = [
+  "bigdecimal",
+  "chrono",
+  "expose-drivers",
+  "fmt-sql",
+  "json",
+  "mssql",
+  "mysql",
+  "pooled",
+  "postgresql",
+  "sqlite",
+  "uuid",
+  "vendored-openssl",
+]
+
 [profile.dev]
 split-debuginfo = "unpacked"
 
@@ -41,4 +66,3 @@ opt-level = 3
 [profile.release.package.introspection-core]
 codegen-units = 1
 opt-level = 'z' # Optimize for size.
-#strip="symbols"

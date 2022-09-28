@@ -7,12 +7,12 @@ edition = "2021"
 [dependencies]
 query-core = { path = "../core" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
-psl = { path = "../../psl/psl" }
+psl.workspace = true
 dmmf_crate = { path = "../dmmf", package = "dmmf" }
 itertools = "0.10"
 graphql-parser = { git = "https://github.com/prisma/graphql-parser" }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1"
+serde.workspace = true
+serde_json.workspace = true
 futures = "0.3"
 indexmap = { version = "1.7", features = ["serde-1"] }
 bigdecimal = "0.3"

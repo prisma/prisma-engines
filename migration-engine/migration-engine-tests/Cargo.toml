@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-psl = { path = "../../psl/psl" }
+psl.workspace = true
 migration-core = { path = "../core" }
 sql-migration-connector = { path = "../connectors/sql-migration-connector" }
 sql-schema-describer = { path = "../../libs/sql-schema-describer" }
@@ -22,14 +22,11 @@ indoc = "1.0.3"
 jsonrpc-core = "17.0.0"
 once_cell = "1.8.0"
 pretty_assertions = "0.6"
-serde = "1"
-serde_json = { version = "1.0", features = ["float_roundtrip"] }
+serde.workspace = true
+serde_json.workspace = true
 tempfile = "3.1.0"
-tokio = { version = "1.0" }
+tokio.workspace = true
 tracing = "0.1"
 tracing-futures = "0.2"
 url = "2.1.1"
-
-[dependencies.quaint]
-git = "https://github.com/prisma/quaint"
-features = ["vendored-openssl"]
+quaint.workspace = true
