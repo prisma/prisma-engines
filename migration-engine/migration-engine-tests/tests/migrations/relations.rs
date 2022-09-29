@@ -968,7 +968,7 @@ fn adding_mutual_references_on_existing_tables_works(api: TestApi) {
     };
 }
 
-#[test_connector(preview_features("referentialIntegrity"))]
+#[test_connector(preview_features("relationMode"))]
 fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(api: TestApi) {
     // test case for https://github.com/prisma/lift/issues/148
     let dm_1 = r#"
@@ -1029,7 +1029,7 @@ fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(api: Te
         .assert_no_steps();
 }
 
-#[test_connector(preview_features("referentialIntegrity"))]
+#[test_connector(preview_features("relationMode"))]
 fn removing_a_relation_field_must_work(api: TestApi) {
     let dm_1 = r#"
         model User {

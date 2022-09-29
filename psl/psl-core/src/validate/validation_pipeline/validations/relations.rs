@@ -5,7 +5,7 @@ pub(super) mod one_to_one;
 mod visited_relation;
 
 use super::constraint_namespace::ConstraintName;
-use crate::datamodel_connector::{walker_ext_traits::*, Connector, ConnectorCapability, ReferentialIntegrity};
+use crate::datamodel_connector::{walker_ext_traits::*, Connector, ConnectorCapability, RelationMode};
 use crate::{diagnostics::DatamodelError, validate::validation_pipeline::context::Context};
 use itertools::Itertools;
 use parser_database::{
@@ -222,7 +222,7 @@ pub(super) fn cycles(relation: CompleteInlineRelationWalker<'_>, ctx: &mut Conte
         .has_capability(ConnectorCapability::ReferenceCycleDetection)
         && ctx
             .datasource
-            .map(|ds| ds.referential_integrity().uses_foreign_keys())
+            .map(|ds| ds.relation_mode().uses_foreign_keys())
             .unwrap_or(true)
     {
         return;
@@ -239,7 +239,7 @@ pub(super) fn cycles(relation: CompleteInlineRelationWalker<'_>, ctx: &mut Conte
 
         let related_model = next_relation.referenced_model();
 
-        let on_delete = next_relation.on_delete(ctx.connector, ctx.referential_integrity);
+        let on_delete = next_relation.on_delete(ctx.connector, ctx.relation_mode);
         let on_update = next_relation.on_update();
 
         // a cycle has a meaning only if every relation in it triggers
@@ -252,7 +252,7 @@ pub(super) fn cycles(relation: CompleteInlineRelationWalker<'_>, ctx: &mut Conte
                 ctx.push_error(cascade_error_with_default_values(
                     relation,
                     ctx.connector,
-                    ctx.referential_integrity,
+                    ctx.relation_mode,
                     msg,
                 ));
 
@@ -268,7 +268,7 @@ pub(super) fn cycles(relation: CompleteInlineRelationWalker<'_>, ctx: &mut Conte
                 ctx.push_error(cascade_error_with_default_values(
                     relation,
                     ctx.connector,
-                    ctx.referential_integrity,
+                    ctx.relation_mode,
                     &msg,
                 ));
                 return;
@@ -301,14 +301,14 @@ pub(super) fn multiple_cascading_paths(relation: CompleteInlineRelationWalker<'_
     if !ctx
         .connector
         .has_capability(ConnectorCapability::ReferenceCycleDetection)
-        || ctx.referential_integrity.is_prisma()
+        || ctx.relation_mode.is_prisma()
     {
         return;
     }
 
     let triggers_modifications = |relation: &CompleteInlineRelationWalker<'_>| {
         relation
-            .on_delete(ctx.connector, ctx.referential_integrity)
+            .on_delete(ctx.connector, ctx.relation_mode)
             .triggers_modification()
             || relation.on_update().triggers_modification()
     };
@@ -423,7 +423,7 @@ pub(super) fn multiple_cascading_paths(relation: CompleteInlineRelationWalker<'_
         ctx.push_error(cascade_error_with_default_values(
             relation,
             ctx.connector,
-            ctx.referential_integrity,
+            ctx.relation_mode,
             &msg,
         ));
     } else if reachable.len() > 1 {
@@ -436,7 +436,7 @@ pub(super) fn multiple_cascading_paths(relation: CompleteInlineRelationWalker<'_
         ctx.push_error(cascade_error_with_default_values(
             relation,
             ctx.connector,
-            ctx.referential_integrity,
+            ctx.relation_mode,
             &msg,
         ));
     }
@@ -445,15 +445,12 @@ pub(super) fn multiple_cascading_paths(relation: CompleteInlineRelationWalker<'_
 fn cascade_error_with_default_values(
     relation: CompleteInlineRelationWalker<'_>,
     connector: &dyn Connector,
-    referential_integrity: ReferentialIntegrity,
+    relation_mode: RelationMode,
     msg: &str,
 ) -> DatamodelError {
     let on_delete = match relation.referencing_field().explicit_on_delete() {
-        None if relation
-            .on_delete(connector, referential_integrity)
-            .triggers_modification() =>
-        {
-            Some(relation.on_delete(connector, referential_integrity))
+        None if relation.on_delete(connector, relation_mode).triggers_modification() => {
+            Some(relation.on_delete(connector, relation_mode))
         }
         _ => None,
     };

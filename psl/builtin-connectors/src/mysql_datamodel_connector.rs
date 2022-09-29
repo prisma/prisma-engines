@@ -8,8 +8,7 @@ use native_types::{
 use psl_core::{
     datamodel_connector::{
         helper::{args_vec_from_opt, parse_one_opt_u32, parse_one_u32, parse_two_opt_u32},
-        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance,
-        ReferentialIntegrity,
+        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, RelationMode,
     },
     diagnostics::{DatamodelError, Diagnostics, Span},
     parser_database::{walkers, ReferentialAction, ScalarType},
@@ -161,10 +160,10 @@ impl Connector for MySqlDatamodelConnector {
         64
     }
 
-    fn referential_actions(&self, referential_integrity: &ReferentialIntegrity) -> BitFlags<ReferentialAction> {
+    fn referential_actions(&self, relation_mode: &RelationMode) -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
-        referential_integrity.allowed_referential_actions(Restrict | Cascade | SetNull | NoAction | SetDefault)
+        relation_mode.allowed_referential_actions(Restrict | Cascade | SetNull | NoAction | SetDefault)
     }
 
     fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {

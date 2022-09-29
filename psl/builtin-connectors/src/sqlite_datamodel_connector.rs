@@ -1,8 +1,7 @@
 use enumflags2::BitFlags;
 use psl_core::{
     datamodel_connector::{
-        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance,
-        ReferentialIntegrity,
+        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, RelationMode,
     },
     diagnostics::{DatamodelError, Span},
     parser_database::{ReferentialAction, ScalarType},
@@ -44,10 +43,10 @@ impl Connector for SqliteDatamodelConnector {
         10000
     }
 
-    fn referential_actions(&self, referential_integrity: &ReferentialIntegrity) -> BitFlags<ReferentialAction> {
+    fn referential_actions(&self, relation_mode: &RelationMode) -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
-        referential_integrity.allowed_referential_actions(SetNull | SetDefault | Cascade | Restrict | NoAction)
+        relation_mode.allowed_referential_actions(SetNull | SetDefault | Cascade | Restrict | NoAction)
     }
 
     fn scalar_type_for_native_type(&self, _native_type: serde_json::Value) -> ScalarType {

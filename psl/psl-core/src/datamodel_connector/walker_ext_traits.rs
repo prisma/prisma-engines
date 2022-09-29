@@ -1,5 +1,5 @@
 use crate::datamodel_connector::{
-    constraint_names::ConstraintNames, Connector, NativeTypeInstance, ReferentialAction, ReferentialIntegrity,
+    constraint_names::ConstraintNames, Connector, NativeTypeInstance, ReferentialAction, RelationMode,
 };
 use parser_database::{
     ast::{self, WithSpan},
@@ -74,15 +74,15 @@ impl<'db> PrimaryKeyWalkerExt<'db> for PrimaryKeyWalker<'db> {
 pub trait CompleteInlineRelationWalkerExt<'db> {
     /// Gives the onDelete referential action of the relation. If not defined
     /// explicitly, returns the default value.
-    fn on_delete(self, connector: &dyn Connector, referential_integrity: ReferentialIntegrity) -> ReferentialAction;
+    fn on_delete(self, connector: &dyn Connector, relation_mode: RelationMode) -> ReferentialAction;
 }
 
 impl<'db> CompleteInlineRelationWalkerExt<'db> for CompleteInlineRelationWalker<'db> {
-    fn on_delete(self, connector: &dyn Connector, referential_integrity: ReferentialIntegrity) -> ReferentialAction {
+    fn on_delete(self, connector: &dyn Connector, relation_mode: RelationMode) -> ReferentialAction {
         use ReferentialAction::*;
 
         self.referencing_field().explicit_on_delete().unwrap_or_else(|| {
-            let supports_restrict = connector.supports_referential_action(&referential_integrity, Restrict);
+            let supports_restrict = connector.supports_referential_action(&relation_mode, Restrict);
 
             match self.referential_arity() {
                 ast::FieldArity::Required if supports_restrict => Restrict,
@@ -149,14 +149,14 @@ impl ScalarFieldWalkerExt for IndexFieldWalker<'_> {
 }
 
 pub trait RelationFieldWalkerExt {
-    fn default_on_delete_action(self, integrity: ReferentialIntegrity, connector: &dyn Connector) -> ReferentialAction;
+    fn default_on_delete_action(self, relation_mode: RelationMode, connector: &dyn Connector) -> ReferentialAction;
 }
 
 impl RelationFieldWalkerExt for RelationFieldWalker<'_> {
-    fn default_on_delete_action(self, integrity: ReferentialIntegrity, connector: &dyn Connector) -> ReferentialAction {
+    fn default_on_delete_action(self, relation_mode: RelationMode, connector: &dyn Connector) -> ReferentialAction {
         match self.referential_arity() {
             ast::FieldArity::Required
-                if connector.supports_referential_action(&integrity, ReferentialAction::Restrict) =>
+                if connector.supports_referential_action(&relation_mode, ReferentialAction::Restrict) =>
             {
                 ReferentialAction::Restrict
             }

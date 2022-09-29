@@ -9,8 +9,8 @@ use native_types::{
 use psl_core::{
     datamodel_connector::{
         helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
-        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance,
-        ReferentialIntegrity, StringFilter,
+        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, RelationMode,
+        StringFilter,
     },
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{ast, walkers, IndexAlgorithm, OperatorClass, ParserDatabase, ReferentialAction, ScalarType},
@@ -154,10 +154,10 @@ impl Connector for PostgresDatamodelConnector {
         63
     }
 
-    fn referential_actions(&self, referential_integrity: &ReferentialIntegrity) -> BitFlags<ReferentialAction> {
+    fn referential_actions(&self, relation_mode: &RelationMode) -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
-        referential_integrity.allowed_referential_actions(NoAction | Restrict | Cascade | SetNull | SetDefault)
+        relation_mode.allowed_referential_actions(NoAction | Restrict | Cascade | SetNull | SetDefault)
     }
 
     fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {

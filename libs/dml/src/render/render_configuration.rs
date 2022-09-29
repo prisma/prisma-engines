@@ -33,12 +33,8 @@ fn render_datasource(datasource: &Datasource, out: &mut String) -> fmt::Result {
         out.push('\n');
     }
 
-    if let Some(referential_integrity) = datasource.referential_integrity {
-        writeln!(
-            out,
-            "referentialIntegrity = {}",
-            string_literal(&referential_integrity.to_string())
-        )?;
+    if let Some(relation_mode) = datasource.relation_mode {
+        writeln!(out, "relationMode = {}", string_literal(&relation_mode.to_string()))?;
     }
 
     out.write_str("}\n")

@@ -4,7 +4,7 @@ mod validations;
 use crate::{
     common::preview_features::PreviewFeature,
     configuration,
-    datamodel_connector::{Connector, EmptyDatamodelConnector, ReferentialIntegrity},
+    datamodel_connector::{Connector, EmptyDatamodelConnector, RelationMode},
     diagnostics::Diagnostics,
 };
 use enumflags2::BitFlags;
@@ -13,7 +13,7 @@ use parser_database::ParserDatabase;
 pub struct ValidateOutput {
     pub(crate) db: ParserDatabase,
     pub(crate) diagnostics: Diagnostics,
-    pub(crate) referential_integrity: ReferentialIntegrity,
+    pub(crate) relation_mode: RelationMode,
     pub(crate) connector: &'static dyn Connector,
 }
 
@@ -26,12 +26,12 @@ pub(crate) fn validate(
 ) -> ValidateOutput {
     let source = sources.first();
     let connector = source.map(|s| s.active_connector).unwrap_or(&EmptyDatamodelConnector);
-    let referential_integrity = source.map(|s| s.referential_integrity()).unwrap_or_default();
+    let relation_mode = source.map(|s| s.relation_mode()).unwrap_or_default();
 
     let mut output = ValidateOutput {
         db,
         diagnostics,
-        referential_integrity,
+        relation_mode,
         connector,
     };
 
@@ -45,7 +45,7 @@ pub(crate) fn validate(
         datasource: source,
         preview_features,
         connector,
-        referential_integrity,
+        relation_mode,
         diagnostics: &mut output.diagnostics,
     };
 

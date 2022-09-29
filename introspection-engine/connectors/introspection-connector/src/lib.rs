@@ -112,7 +112,7 @@ impl IntrospectionContext {
     }
 
     pub fn foreign_keys_enabled(&self) -> bool {
-        self.source.referential_integrity().uses_foreign_keys()
+        self.source.relation_mode().uses_foreign_keys()
     }
 
     pub fn schema_string(&self) -> &str {

@@ -28,8 +28,12 @@ pub struct ConnectorTestArgs {
     #[darling(default)]
     pub capabilities: RunOnlyForCapabilities,
 
+    #[deprecated(since = "4.5.0", note = "Use `relation_mode` instead")]
     #[darling(default)]
-    pub referential_integrity: Option<ReferentialIntegrity>,
+    pub referential_integrity: Option<RelationMode>,
+
+    #[darling(default)]
+    pub relation_mode: Option<RelationMode>,
 
     #[darling(default)]
     pub db_schemas: DbSchemas,
@@ -56,12 +60,12 @@ impl ConnectorTestArgs {
 
 #[allow(dead_code)]
 #[derive(Debug)]
-pub enum ReferentialIntegrity {
+pub enum RelationMode {
     ForeignKeys,
     Prisma,
 }
 
-impl darling::FromMeta for ReferentialIntegrity {
+impl darling::FromMeta for RelationMode {
     fn from_string(value: &str) -> darling::Result<Self> {
         match value.to_lowercase().as_str() {
             "prisma" => Ok(Self::Prisma),
@@ -71,11 +75,11 @@ impl darling::FromMeta for ReferentialIntegrity {
     }
 }
 
-impl ToString for ReferentialIntegrity {
+impl ToString for RelationMode {
     fn to_string(&self) -> String {
         match self {
-            ReferentialIntegrity::Prisma => "prisma".to_string(),
-            ReferentialIntegrity::ForeignKeys => "foreignKeys".to_string(),
+            Self::Prisma => "prisma".to_string(),
+            Self::ForeignKeys => "foreignKeys".to_string(),
         }
     }
 }

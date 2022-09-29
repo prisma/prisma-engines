@@ -15,7 +15,7 @@ pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, psl::dml::Datam
     let connector = datasource
         .map(|ds| ds.active_connector)
         .unwrap_or(&psl::datamodel_connector::EmptyDatamodelConnector);
-    let referential_integrity = datasource.map(|ds| ds.referential_integrity()).unwrap_or_default();
+    let relation_mode = datasource.map(|ds| ds.relation_mode()).unwrap_or_default();
 
     let internal_ref = prisma_models::convert(&dm, "db".to_owned());
     let schema = schema_builder::build(
@@ -23,7 +23,7 @@ pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, psl::dml::Datam
         false,
         connector,
         config.preview_features().iter().collect(),
-        referential_integrity,
+        relation_mode,
     );
 
     (schema, psl::lift(&dm))

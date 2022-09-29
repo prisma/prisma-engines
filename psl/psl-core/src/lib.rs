@@ -35,12 +35,12 @@ pub struct ValidatedSchema {
     pub db: parser_database::ParserDatabase,
     pub connector: &'static dyn datamodel_connector::Connector,
     pub diagnostics: Diagnostics,
-    referential_integrity: datamodel_connector::ReferentialIntegrity,
+    relation_mode: datamodel_connector::RelationMode,
 }
 
 impl ValidatedSchema {
-    pub fn referential_integrity(&self) -> datamodel_connector::ReferentialIntegrity {
-        self.referential_integrity
+    pub fn relation_mode(&self) -> datamodel_connector::RelationMode {
+        self.relation_mode
     }
 }
 
@@ -58,7 +58,7 @@ pub fn validate(file: SourceFile, connectors: ConnectorRegistry) -> ValidatedSch
         configuration,
         connector: out.connector,
         db: out.db,
-        referential_integrity: out.referential_integrity,
+        relation_mode: out.relation_mode,
     }
 }
 

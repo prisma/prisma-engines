@@ -6,8 +6,7 @@ use mongodb_types::*;
 use native_types::{MongoDbType, NativeType};
 use psl_core::{
     datamodel_connector::{
-        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance,
-        ReferentialIntegrity,
+        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, RelationMode,
     },
     diagnostics::{DatamodelError, Diagnostics, Span},
     parser_database::{walkers::*, ReferentialAction, ScalarType},
@@ -55,8 +54,8 @@ impl Connector for MongoDbDatamodelConnector {
         &[ConstraintScope::ModelKeyIndex]
     }
 
-    fn referential_actions(&self, referential_integrity: &ReferentialIntegrity) -> BitFlags<ReferentialAction> {
-        referential_integrity.allowed_referential_actions(BitFlags::empty())
+    fn referential_actions(&self, relation_mode: &RelationMode) -> BitFlags<ReferentialAction> {
+        relation_mode.allowed_referential_actions(BitFlags::empty())
     }
 
     fn validate_model(&self, model: ModelWalker<'_>, errors: &mut Diagnostics) {
@@ -125,11 +124,11 @@ impl Connector for MongoDbDatamodelConnector {
         Ok(())
     }
 
-    fn default_referential_integrity(&self) -> ReferentialIntegrity {
-        ReferentialIntegrity::Prisma
+    fn default_relation_mode(&self) -> RelationMode {
+        RelationMode::Prisma
     }
 
-    fn allowed_referential_integrity_settings(&self) -> enumflags2::BitFlags<ReferentialIntegrity> {
-        ReferentialIntegrity::Prisma.into()
+    fn allowed_relation_mode_settings(&self) -> enumflags2::BitFlags<RelationMode> {
+        RelationMode::Prisma.into()
     }
 }

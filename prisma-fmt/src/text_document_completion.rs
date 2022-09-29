@@ -1,7 +1,7 @@
 use log::*;
 use lsp_types::*;
 use psl::{
-    datamodel_connector::{Connector, ReferentialIntegrity},
+    datamodel_connector::{Connector, RelationMode},
     parse_configuration,
     parser_database::{ast, ParserDatabase, SourceFile},
     Diagnostics,
@@ -26,10 +26,10 @@ pub(crate) fn completion(schema: String, params: CompletionParams) -> Completion
             return empty_completion_list();
         };
 
-    let (connector, referential_integrity) = parse_configuration(source_file.as_str())
+    let (connector, relation_mode) = parse_configuration(source_file.as_str())
         .ok()
         .and_then(|conf| conf.datasources.into_iter().next())
-        .map(|datasource| (datasource.active_connector, datasource.referential_integrity()))
+        .map(|datasource| (datasource.active_connector, datasource.relation_mode()))
         .unwrap_or_else(|| (&psl::datamodel_connector::EmptyDatamodelConnector, Default::default()));
 
     let mut list = CompletionList {
@@ -42,7 +42,7 @@ pub(crate) fn completion(schema: String, params: CompletionParams) -> Completion
         ParserDatabase::new(source_file, &mut diag)
     };
 
-    push_ast_completions(&mut list, connector, referential_integrity, &db, position);
+    push_ast_completions(&mut list, connector, relation_mode, &db, position);
 
     list
 }
@@ -53,7 +53,7 @@ pub(crate) fn completion(schema: String, params: CompletionParams) -> Completion
 fn push_ast_completions(
     completion_list: &mut CompletionList,
     connector: &'static dyn Connector,
-    referential_integrity: ReferentialIntegrity,
+    relation_mode: RelationMode,
     db: &ParserDatabase,
     position: usize,
 ) {
@@ -62,7 +62,7 @@ fn push_ast_completions(
             _model_id,
             ast::ModelPosition::Field(_, ast::FieldPosition::Attribute("relation", _, Some(attr_name))),
         ) if attr_name == "onDelete" || attr_name == "onUpdate" => {
-            for referential_action in connector.referential_actions(&referential_integrity).iter() {
+            for referential_action in connector.referential_actions(&relation_mode).iter() {
                 completion_list.items.push(CompletionItem {
                     label: referential_action.as_str().to_owned(),
                     kind: Some(CompletionItemKind::ENUM),

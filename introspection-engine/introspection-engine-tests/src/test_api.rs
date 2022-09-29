@@ -250,12 +250,11 @@ impl TestApi {
     }
 
     pub fn datasource_block(&self) -> DatasourceBlock<'_> {
-        let no_foreign_keys =
-            self.is_vitess() && self.preview_features().contains(PreviewFeature::ReferentialIntegrity);
+        let no_foreign_keys = self.is_vitess() && self.preview_features().contains(PreviewFeature::RelationMode);
 
         if no_foreign_keys {
             self.args
-                .datasource_block(&self.connection_string, &[("referentialIntegrity", r#""prisma""#)])
+                .datasource_block(&self.connection_string, &[("relationMode", r#""prisma""#)])
         } else {
             self.args.datasource_block(r#"env(TEST_DATABASE_URL)"#, &[])
         }

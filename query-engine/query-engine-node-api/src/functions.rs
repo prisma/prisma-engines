@@ -39,7 +39,7 @@ pub fn dmmf(datamodel_string: String) -> napi::Result<String> {
         .map(|ds| ds.active_connector)
         .unwrap_or(&psl::datamodel_connector::EmptyDatamodelConnector);
 
-    let referential_integrity = datasource.map(|ds| ds.referential_integrity()).unwrap_or_default();
+    let relation_mode = datasource.map(|ds| ds.relation_mode()).unwrap_or_default();
 
     let internal_data_model = prisma_models::convert(&schema, "".into());
 
@@ -48,7 +48,7 @@ pub fn dmmf(datamodel_string: String) -> napi::Result<String> {
         true,
         connector,
         schema.configuration.preview_features().iter().collect(),
-        referential_integrity,
+        relation_mode,
     ));
 
     let dmmf = dmmf::render_dmmf(&datamodel, query_schema);

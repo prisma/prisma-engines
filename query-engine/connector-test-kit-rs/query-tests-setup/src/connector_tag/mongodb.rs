@@ -66,7 +66,7 @@ impl ConnectorTagInterface for MongoDbConnectorTag {
         true
     }
 
-    fn referential_integrity(&self) -> &'static str {
+    fn relation_mode(&self) -> &'static str {
         "prisma"
     }
 }
