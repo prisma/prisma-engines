@@ -357,6 +357,8 @@ struct Index {
 /// A stored procedure (like, the function inside your database).
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct Procedure {
+    // ///Namespace of the procedure
+    // namespace_id: NamespaceId,
     /// Procedure name.
     pub name: String,
     /// The definition of the procedure.
@@ -571,6 +573,8 @@ pub struct Enum {
 /// An SQL view.
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct View {
+    /// Namespace of the view
+    namespace_id: NamespaceId,
     /// Name of the view.
     pub name: String,
     /// The SQL definition of the view.

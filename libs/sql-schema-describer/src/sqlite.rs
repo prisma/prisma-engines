@@ -2,7 +2,7 @@
 
 use crate::{
     getters::Getter, ids::*, parsers::Parser, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue,
-    DescriberResult, ForeignKeyAction, Lazy, PrismaValue, Regex, SQLSortOrder, SqlSchema, SqlMetadata,
+    DescriberResult, ForeignKeyAction, Lazy, PrismaValue, Regex, SQLSortOrder, SqlMetadata, SqlSchema,
     SqlSchemaDescriberBackend, View,
 };
 use indexmap::IndexMap;
@@ -170,12 +170,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(size.try_into().unwrap())
     }
 
-    async fn push_table(
-        &self,
-        name: &str,
-        table_id: TableId,
-        schema: &mut SqlSchema,
-    ) -> DescriberResult<()> {
+    async fn push_table(&self, name: &str, table_id: TableId, schema: &mut SqlSchema) -> DescriberResult<()> {
         push_columns(name, table_id, schema, self.conn).await?;
         push_indexes(name, table_id, schema, self.conn).await
     }
@@ -187,6 +182,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for row in result_set.into_iter() {
             views.push(View {
+                namespace_id: NamespaceId(0),
                 name: row.get_expect_string("view_name"),
                 definition: row.get_string("view_sql"),
             })

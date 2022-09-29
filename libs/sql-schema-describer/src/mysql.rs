@@ -223,6 +223,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for row in result_set.into_iter() {
             views.push(View {
+                namespace_id: NamespaceId(0),
                 name: row.get_expect_string("view_name"),
                 definition: row.get_string("view_sql"),
             })

@@ -420,7 +420,7 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
     }
 
     async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema> {
-        println!("TEST SCHEMA: {}", schema);
+        //Todo(matthias) get this hardcoding removed
         let schemas = &["schema_0", "schema_1"];
 
         let mut sql_schema = SqlSchema::default();
@@ -438,9 +438,11 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
         self.get_foreign_keys(&table_names, &mut sql_schema).await?;
         self.get_indices(&table_names, &mut pg_ext, &mut sql_schema).await?;
 
-        sql_schema.views = self.get_views(schema).await?;
+        //Todo(matthias) these two need namespace information
+        self.get_views(&mut sql_schema).await?;
         sql_schema.procedures = self.get_procedures(schema).await?;
 
+        //Todo(matthias) understand this
         // Make sure the vectors we use binary search on are sorted.
         pg_ext.indexes.sort_by_key(|(id, _)| *id);
         pg_ext.opclasses.sort_by_key(|(id, _)| *id);
@@ -550,24 +552,33 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(size.try_into().expect("size is not a valid usize"))
     }
 
-    async fn get_views(&self, schema: &str) -> DescriberResult<Vec<View>> {
+    async fn get_views(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
+        let namespaces = &sql_schema.namespaces;
         let sql = indoc! {r#"
-            SELECT viewname AS view_name, definition AS view_sql
+            SELECT viewname AS view_name, definition AS view_sql, schemaname as namespace
             FROM pg_catalog.pg_views
-            WHERE schemaname = $1
+            WHERE schemaname = Any ( $1 )
         "#};
 
-        let result_set = self.conn.query_raw(sql, &[schema.into()]).await?;
+        let result_set = self
+            .conn
+            .query_raw(
+                sql,
+                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
+            )
+            .await?;
         let mut views = Vec::with_capacity(result_set.len());
 
         for row in result_set.into_iter() {
             views.push(View {
+                namespace_id: sql_schema.get_namespace_id(&row.get_expect_string("namespace")),
                 name: row.get_expect_string("view_name"),
                 definition: row.get_string("view_sql"),
             })
         }
 
-        Ok(views)
+        sql_schema.views = views;
+        Ok(())
     }
 
     async fn get_columns(

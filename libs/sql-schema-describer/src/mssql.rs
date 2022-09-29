@@ -3,7 +3,7 @@
 use crate::{
     getters::Getter, ids::*, parsers::Parser, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue,
     DescriberError, DescriberErrorKind, DescriberResult, ForeignKeyAction, IndexColumn, Procedure, SQLSortOrder,
-    SqlSchema, SqlMetadata, UserDefinedType, View,
+    SqlMetadata, SqlSchema, UserDefinedType, View,
 };
 use enumflags2::BitFlags;
 use indexmap::IndexMap;
@@ -489,6 +489,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for row in result_set.into_iter() {
             views.push(View {
+                namespace_id: NamespaceId(0),
                 name: row.get_expect_string("view_name"),
                 definition: row.get_string("view_sql"),
             })

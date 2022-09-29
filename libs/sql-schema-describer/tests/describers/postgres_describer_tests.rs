@@ -1657,6 +1657,7 @@ fn multiple_schemas_work(api: TestApi) {
            CREATE SEQUENCE "schema_0"."Sequence_0" START 1;
            CREATE TYPE "schema_0"."Type_0" AS ENUM ('happy');
            CREATE INDEX "Index_0" ON "schema_0"."Table_1"("o_id_0");
+           CREATE VIEW "schema_0"."View_0" AS SELECT 'View_0';
            
            CREATE Schema "schema_1";
            CREATE TABLE "schema_1"."Table_2" (id_2 SERIAL PRIMARY KEY);
@@ -1664,6 +1665,7 @@ fn multiple_schemas_work(api: TestApi) {
            CREATE SEQUENCE "schema_1"."Sequence_1" START 100;
            CREATE TYPE "schema_1"."Type_1" AS ENUM ('happy');
            CREATE INDEX "Index_1" ON "schema_1"."Table_3"("o_id_2");
+           CREATE VIEW "schema_1"."View_1" AS SELECT 'View_1';
     "#;
 
     api.raw_cmd(schema);
