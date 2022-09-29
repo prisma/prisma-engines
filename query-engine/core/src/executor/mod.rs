@@ -112,12 +112,19 @@ pub(crate) async fn with_request_now<F, R>(fut: F) -> R
 where
     F: std::future::Future<Output = R>,
 {
+    use chrono::{Duration, DurationRound};
+
     let is_set = REQUEST_NOW.try_with(|_| async {}).is_ok();
 
     if is_set {
         fut.await
     } else {
-        let now = prisma_value::PrismaValue::DateTime(chrono::Utc::now().into());
+        let timestamp_precision = Duration::milliseconds(1);
+        // We round because in create operations, we select after creation and we will fail to
+        // select back what we inserted if the timestamp we have is higher precision than the one
+        // the database persisted.
+        let dt = chrono::Utc::now().duration_round(timestamp_precision).unwrap();
+        let now = prisma_value::PrismaValue::DateTime(dt.into());
         REQUEST_NOW.scope(now, fut).await
     }
 }
