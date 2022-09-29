@@ -9,11 +9,13 @@ use enumflags2::BitFlags;
 use indexmap::IndexMap;
 use indoc::indoc;
 use native_types::{CockroachType, NativeType, PostgresType};
+use quaint::Value::Array;
 use quaint::{connector::ResultRow, prelude::Queryable};
 use regex::Regex;
 use std::{any::type_name, collections::BTreeMap, convert::TryInto};
 use tracing::trace;
 
+//Todo(matthias) this will need a namespace
 /// A PostgreSQL sequence.
 /// https://www.postgresql.org/docs/current/view-pg-sequences.html
 #[derive(Debug)]
@@ -408,7 +410,7 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
 
     async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata> {
         let mut sql_schema = SqlSchema::default();
-        let table_count = self.get_table_names(schema, &mut sql_schema).await?.len();
+        let table_count = self.get_table_names(&mut sql_schema).await?.len();
         let size_in_bytes = self.get_size(schema).await?;
 
         Ok(SqlMetadata {
@@ -418,12 +420,20 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
     }
 
     async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema> {
+        println!("TEST SCHEMA: {}", schema);
+        let schemas = &["schema_name", "other_name"];
+
         let mut sql_schema = SqlSchema::default();
         let mut pg_ext = PostgresSchemaExt::default();
-        let table_names = self.get_table_names(schema, &mut sql_schema).await?;
 
-        self.get_sequences(schema, &mut pg_ext).await?;
-        sql_schema.enums = self.get_enums(schema).await?;
+        for schema in schemas {
+            sql_schema.push_namespace((*schema).into());
+        }
+
+        let table_names = self.get_table_names(&mut sql_schema).await?;
+
+        self.get_sequences(schema, &mut pg_ext).await?; //Todo(matthias)
+        self.get_enums(&mut sql_schema).await?;
         self.get_columns(schema, &table_names, &mut sql_schema).await?;
         self.get_foreign_keys(schema, &table_names, &mut sql_schema).await?;
         self.get_indices(schema, &table_names, &mut pg_ext, &mut sql_schema)
@@ -499,20 +509,28 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(procedures)
     }
 
-    async fn get_table_names(
-        &self,
-        schema: &str,
-        sql_schema: &mut SqlSchema,
-    ) -> DescriberResult<IndexMap<String, TableId>> {
+    async fn get_table_names(&self, sql_schema: &mut SqlSchema) -> DescriberResult<IndexMap<String, TableId>> {
         let sql = include_str!("postgres/tables_query.sql");
+        let namespaces = &sql_schema.namespaces;
 
-        let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
-        let names = rows.into_iter().map(|row| row.get_expect_string("table_name"));
+        let rows = self
+            .conn
+            .query_raw(
+                sql,
+                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
+            )
+            .await?;
+        let names = rows
+            .into_iter()
+            .map(|row| (row.get_expect_string("table_name"), row.get_expect_string("namespace")));
         let mut map = IndexMap::default();
 
-        for name in names {
-            let cloned_name = name.clone();
-            let id = sql_schema.push_table(name, Default::default());
+        for (table_name, namespace) in names {
+            let cloned_name = table_name.clone();
+            //I'll want a helper to get the NamespaceId from the name
+            let namespace_id = sql_schema.namespaces.iter().position(|ns| ns == &namespace).unwrap();
+
+            let id = sql_schema.push_table(table_name, NamespaceId(namespace_id as u32));
             map.insert(cloned_name, id);
         }
 
@@ -1012,39 +1030,53 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(())
     }
 
-    async fn get_enums(&self, schema: &str) -> DescriberResult<Vec<Enum>> {
+    async fn get_enums(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
+        let namespaces = &sql_schema.namespaces;
+
         let sql = "
-            SELECT t.typname as name, e.enumlabel as value
+            SELECT t.typname as name, e.enumlabel as value, n.nspname as namespace
             FROM pg_type t
             JOIN pg_enum e ON t.oid = e.enumtypid
             JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
-            WHERE n.nspname = $1
+            WHERE n.nspname = Any ( $1 )
             ORDER BY e.enumsortorder";
 
-        let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
-        let mut enum_values: BTreeMap<String, Vec<String>> = BTreeMap::new();
+        let rows = self
+            .conn
+            .query_raw(
+                sql,
+                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
+            )
+            .await?;
+        let mut enum_values: BTreeMap<(String, String), Vec<String>> = BTreeMap::new();
 
         for row in rows.into_iter() {
             trace!("Got enum row: {:?}", row);
             let name = row.get_expect_string("name");
             let value = row.get_expect_string("value");
+            let namespace = row.get_expect_string("namespace");
 
-            let values = enum_values.entry(name).or_insert_with(Vec::new);
+            let values = enum_values.entry((name, namespace)).or_insert_with(Vec::new);
             values.push(value);
         }
 
         let mut enums: Vec<Enum> = enum_values
             .into_iter()
-            .map(|(k, v)| Enum {
-                namespace_id: Default::default(),
-                name: k,
-                values: v,
+            .map(|((name, namespace), values)| {
+                let namespace_id = sql_schema.namespaces.iter().position(|ns| ns == &namespace).unwrap();
+
+                Enum {
+                    namespace_id: NamespaceId(namespace_id as u32),
+                    name,
+                    values,
+                }
             })
             .collect();
 
         enums.sort_by(|a, b| Ord::cmp(&a.name, &b.name));
 
-        Ok(enums)
+        sql_schema.enums = enums;
+        Ok(())
     }
 }
 

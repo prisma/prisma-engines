@@ -1647,6 +1647,30 @@ fn int_expressions_in_defaults(api: TestApi) {
     assert!(value.is_db_generated());
 }
 
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+//Todo(matthias) seems like Sequence and Type share the same namespace
+fn multiple_schemas_work(api: TestApi) {
+    let schema = r#"
+           CREATE Schema "schema_name";
+           CREATE TABLE "schema_name"."Table_0" (id SERIAL PRIMARY KEY, data Integer);
+           CREATE SEQUENCE "schema_name"."Sequence_0" START 1;
+           CREATE TYPE "schema_name"."Type_0" AS ENUM ('sad', 'ok', 'happy');
+           CREATE Schema "other_name";
+           CREATE TABLE "other_name"."Table_1" (id SERIAL PRIMARY KEY, data Integer);
+           CREATE SEQUENCE "other_name"."Sequence_1" START 100;
+           CREATE TYPE "other_name"."Type_1" AS ENUM ('sad', 'ok', 'happy');
+    "#;
+
+    api.raw_cmd(schema);
+    let schema = api.describe();
+
+    println!("{:?}", schema);
+    let table = schema.table_walkers().next().unwrap();
+    let col = table.column("mysum").unwrap();
+    let value = col.default().unwrap();
+    assert!(value.is_db_generated());
+}
+
 fn extract_ext(schema: &SqlSchema) -> &PostgresSchemaExt {
     schema.downcast_connector_data()
 }
