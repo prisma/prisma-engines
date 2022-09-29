@@ -21,6 +21,8 @@ use tracing::trace;
 #[derive(Debug)]
 pub struct Sequence {
     /// Sequence name
+    pub namespace_id: NamespaceId,
+    /// Sequence name
     pub name: String,
     /// Start value of the sequence
     pub start_value: i64,
@@ -42,6 +44,7 @@ pub struct Sequence {
 impl Default for Sequence {
     fn default() -> Self {
         Sequence {
+            namespace_id: NamespaceId::default(),
             name: String::default(),
             start_value: 1,
             min_value: 1,
@@ -410,6 +413,8 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
 
     async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata> {
         let mut sql_schema = SqlSchema::default();
+        sql_schema.push_namespace((*schema).into());
+
         let table_count = self.get_table_names(&mut sql_schema).await?.len();
         let size_in_bytes = self.get_size(schema).await?;
 
@@ -438,8 +443,8 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
         self.get_procedures(&mut sql_schema).await?;
 
         //Todo(matthias) understand this
-        // Make sure the vectors we use binary search on are sorted.
-        self.get_sequences(schemas[0], &mut pg_ext).await?; //Todo(matthias)
+        self.get_sequences(&sql_schema, &mut pg_ext).await?; //Todo(matthias)
+                                                             // Make sure the vectors we use binary search on are sorted.
         pg_ext.indexes.sort_by_key(|(id, _)| *id);
         pg_ext.opclasses.sort_by_key(|(id, _)| *id);
 
@@ -1017,13 +1022,15 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(())
     }
 
-    async fn get_sequences(&self, schema: &str, postgres_ext: &mut PostgresSchemaExt) -> DescriberResult<()> {
+    async fn get_sequences(&self, sql_schema: &SqlSchema, postgres_ext: &mut PostgresSchemaExt) -> DescriberResult<()> {
+        let namespaces = &sql_schema.namespaces;
         // On postgres 9, pg_sequences does not exist, and the information schema view does not
         // contain the cache size.
         let sql = if self.is_cockroach() {
             r#"
               SELECT
                   sequencename AS sequence_name,
+                  schemaname AS namespace,
                   start_value,
                   min_value,
                   max_value,
@@ -1031,13 +1038,14 @@ impl<'a> SqlSchemaDescriber<'a> {
                   cycle,
                   cache_size
               FROM pg_sequences
-              WHERE schemaname = $1
+              WHERE schemaname = Any ( $1 )
               ORDER BY sequence_name
             "#
         } else {
             r#"
               SELECT
                   sequence_name,
+                  sequence_schema AS namespace,
                   start_value::INT8,
                   minimum_value::INT8 AS min_value,
                   maximum_value::INT8 AS max_value,
@@ -1045,13 +1053,20 @@ impl<'a> SqlSchemaDescriber<'a> {
                   (CASE cycle_option WHEN 'yes' THEN TRUE ELSE FALSE END) AS cycle,
                   0::INT8 AS cache_size
               FROM information_schema.sequences
-              WHERE sequence_schema = $1
+              WHERE sequence_schema = Any ( $1 )
               ORDER BY sequence_name
             "#
         };
 
-        let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
+        let rows = self
+            .conn
+            .query_raw(
+                sql,
+                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
+            )
+            .await?;
         let sequences = rows.into_iter().map(|seq| Sequence {
+            namespace_id: sql_schema.get_namespace_id(&seq.get_expect_string("namespace")),
             name: seq.get_expect_string("sequence_name"),
             start_value: seq.get_expect_i64("start_value"),
             min_value: seq.get_expect_i64("min_value"),
