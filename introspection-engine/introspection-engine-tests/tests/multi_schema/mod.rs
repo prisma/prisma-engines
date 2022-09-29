@@ -1,5 +1,5 @@
-use introspection_engine_tests::{test_api::*, TestResult};
-use test_macros::test_connector;
+// use introspection_engine_tests::{test_api::*, TestResult};
+// use test_macros::test_connector;
 
 //Todo(matthias) not there yet
 // #[test_connector(tags(Postgres), preview_features("multiSchema"))]

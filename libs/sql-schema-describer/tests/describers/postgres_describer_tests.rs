@@ -75,7 +75,9 @@ fn all_postgres_column_types_must_work(api: TestApi) {
     api.raw_cmd(sql);
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [],
+            namespaces: [
+                "prisma-tests",
+            ],
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -961,6 +963,9 @@ fn all_postgres_column_types_must_work(api: TestApi) {
             ],
             sequences: [
                 Sequence {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "User_bigserial_col_seq",
                     start_value: 1,
                     min_value: 1,
@@ -971,6 +976,9 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                     virtual: false,
                 },
                 Sequence {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "User_primary_col_seq",
                     start_value: 1,
                     min_value: 1,
@@ -981,6 +989,9 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                     virtual: false,
                 },
                 Sequence {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "User_serial_col_seq",
                     start_value: 1,
                     min_value: 1,
@@ -991,6 +1002,9 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                     virtual: false,
                 },
                 Sequence {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "User_smallserial_col_seq",
                     start_value: 1,
                     min_value: 1,
@@ -1006,32 +1020,34 @@ fn all_postgres_column_types_must_work(api: TestApi) {
     expected_ext.assert_debug_eq(&ext);
 }
 
-#[test_connector(tags(Postgres))]
-fn cross_schema_references_are_not_allowed(api: TestApi) {
-    let schema2 = format!("{}_2", api.schema_name());
-
-    let sql = format!(
-        "DROP SCHEMA IF EXISTS \"{0}\" CASCADE;
-         CREATE SCHEMA \"{0}\";
-         CREATE TABLE \"{0}\".\"City\" (id INT PRIMARY KEY);
-         CREATE TABLE \"User\" (
-            id INT PRIMARY KEY,
-            city INT REFERENCES \"{0}\".\"City\" (id) ON DELETE NO ACTION
-        );
-        ",
-        schema2,
-    );
-
-    api.raw_cmd(&sql);
-
-    let err = api.describe_error();
-    let fk_name = "User_city_fkey";
-
-    assert_eq!(
-        format!("Illegal cross schema reference from `prisma-tests.User` to `prisma-tests_2.City` in constraint `{}`. Foreign keys between database schemas are not supported in Prisma. Please follow the GitHub ticket: https://github.com/prisma/prisma/issues/1175", fk_name),
-        err.to_string()
-    );
-}
+//Todo(matthias) This should be handled on a higher level
+//preferably in the introspection engine based on the presence of the multi schema feature flag
+// #[test_connector(tags(Postgres))]
+// fn cross_schema_references_are_not_allowed(api: TestApi) {
+//     let schema2 = format!("{}_2", api.schema_name());
+//
+//     let sql = format!(
+//         "DROP SCHEMA IF EXISTS \"{0}\" CASCADE;
+//          CREATE SCHEMA \"{0}\";
+//          CREATE TABLE \"{0}\".\"City\" (id INT PRIMARY KEY);
+//          CREATE TABLE \"User\" (
+//             id INT PRIMARY KEY,
+//             city INT REFERENCES \"{0}\".\"City\" (id) ON DELETE NO ACTION
+//         );
+//         ",
+//         schema2,
+//     );
+//
+//     api.raw_cmd(&sql);
+//
+//     let err = api.describe_error();
+//     let fk_name = "User_city_fkey";
+//
+//     assert_eq!(
+//         format!("Illegal cross schema reference from `prisma-tests.User` to `prisma-tests_2.City` in constraint `{}`. Foreign keys between database schemas are not supported in Prisma. Please follow the GitHub ticket: https://github.com/prisma/prisma/issues/1175", fk_name),
+//         err.to_string()
+//     );
+// }
 
 #[test_connector(tags(Postgres))]
 fn postgres_foreign_key_on_delete_must_be_handled(api: TestApi) {
@@ -1110,6 +1126,9 @@ fn postgres_sequences_must_work(api: TestApi) {
             indexes: [],
             sequences: [
                 Sequence {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "test",
                     start_value: 1,
                     min_value: 1,
@@ -1192,7 +1211,9 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
     api.raw_cmd(create_table);
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [],
+            namespaces: [
+                "prisma-tests",
+            ],
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -1355,7 +1376,9 @@ fn seemingly_escaped_backslashes_in_string_literals_must_not_be_unescaped(api: T
     api.raw_cmd(create_table);
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [],
+            namespaces: [
+                "prisma-tests",
+            ],
             tables: [
                 Table {
                     namespace_id: NamespaceId(
