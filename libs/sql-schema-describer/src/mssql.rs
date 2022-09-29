@@ -169,6 +169,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for row in rows.into_iter() {
             procedures.push(Procedure {
+                namespace_id: NamespaceId(0),
                 name: row.get_expect_string("name"),
                 definition: row.get_string("definition"),
             });

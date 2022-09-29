@@ -438,9 +438,8 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
         self.get_foreign_keys(&table_names, &mut sql_schema).await?;
         self.get_indices(&table_names, &mut pg_ext, &mut sql_schema).await?;
 
-        //Todo(matthias) these two need namespace information
         self.get_views(&mut sql_schema).await?;
-        sql_schema.procedures = self.get_procedures(schema).await?;
+        self.get_procedures(&mut sql_schema).await?;
 
         //Todo(matthias) understand this
         // Make sure the vectors we use binary search on are sorted.
@@ -481,33 +480,45 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(names)
     }
 
-    async fn get_procedures(&self, schema: &str) -> DescriberResult<Vec<Procedure>> {
+    async fn get_procedures(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
+        let namespaces = &sql_schema.namespaces;
+
         if self.is_cockroach() {
-            return Ok(Vec::new());
+            return Ok(());
         }
 
         let sql = r#"
-            SELECT p.proname AS name,
+            SELECT p.proname AS name, n.nspname as namespace,
                 CASE WHEN l.lanname = 'internal' THEN p.prosrc
                      ELSE pg_get_functiondef(p.oid)
                      END as definition
             FROM pg_proc p
             LEFT JOIN pg_namespace n ON p.pronamespace = n.oid
             LEFT JOIN pg_language l ON p.prolang = l.oid
-            WHERE n.nspname = $1
+            WHERE n.nspname = Any ( $1 )
         "#;
 
-        let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
+        let rows = self
+            .conn
+            .query_raw(
+                sql,
+                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
+            )
+            .await?;
         let mut procedures = Vec::with_capacity(rows.len());
 
         for row in rows.into_iter() {
+            println!("{:?}", row);
             procedures.push(Procedure {
+                namespace_id: sql_schema.get_namespace_id(&row.get_expect_string("namespace")),
                 name: row.get_expect_string("name"),
                 definition: row.get_string("definition"),
             });
         }
 
-        Ok(procedures)
+        sql_schema.procedures = procedures;
+
+        Ok(())
     }
 
     async fn get_table_names(&self, sql_schema: &mut SqlSchema) -> DescriberResult<IndexMap<String, TableId>> {

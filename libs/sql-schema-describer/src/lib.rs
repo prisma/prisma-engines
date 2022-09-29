@@ -357,8 +357,8 @@ struct Index {
 /// A stored procedure (like, the function inside your database).
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct Procedure {
-    // ///Namespace of the procedure
-    // namespace_id: NamespaceId,
+    ///Namespace of the procedure
+    namespace_id: NamespaceId,
     /// Procedure name.
     pub name: String,
     /// The definition of the procedure.
