@@ -1649,7 +1649,7 @@ fn int_expressions_in_defaults(api: TestApi) {
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 //Todo(matthias) seems like Sequence and Type share the same namespace
-fn multiple_schemas_work(api: TestApi) {
+fn multiple_schemas_are_described(api: TestApi) {
     let schema = r#"
            CREATE Schema "schema_0";
            CREATE TABLE "schema_0"."Table_0" (id_0 SERIAL PRIMARY KEY);

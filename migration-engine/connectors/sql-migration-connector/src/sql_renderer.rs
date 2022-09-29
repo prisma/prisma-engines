@@ -38,12 +38,7 @@ pub(crate) trait SqlRenderer {
         unreachable!("unreachable render_alter_primary_key()")
     }
 
-    fn render_alter_sequence(
-        &self,
-        _idx: Pair<u32>,
-        _: SequenceChanges,
-        _: Pair<&SqlSchema>,
-    ) -> Vec<String> {
+    fn render_alter_sequence(&self, _idx: Pair<u32>, _: SequenceChanges, _: Pair<&SqlSchema>) -> Vec<String> {
         unreachable!("unreachable render_alter_sequence");
     }
 
