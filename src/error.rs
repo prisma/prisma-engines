@@ -250,6 +250,9 @@ pub enum ErrorKind {
     #[error("Transaction write conflict")]
     TransactionWriteConflict,
 
+    #[error("ROLLBACK statement has no corresponding BEGIN statement")]
+    RollbackWithoutBegin,
+
     #[error("Invalid isolation level: {}", _0)]
     InvalidIsolationLevel(String),
 

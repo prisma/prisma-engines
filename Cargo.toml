@@ -127,12 +127,12 @@ features = ["bundled"]
 optional = true
 
 [target.'cfg(not(any(target_os = "macos", target_os = "ios")))'.dependencies.tiberius]
-version = "0.11.0"
+version = "0.11.1"
 optional = true
 features = ["sql-browser-tokio", "chrono", "bigdecimal"]
 
 [target.'cfg(any(target_os = "macos", target_os = "ios"))'.dependencies.tiberius]
-version = "0.11.0"
+version = "0.11.1"
 optional = true
 default-features = false
 features = ["sql-browser-tokio", "vendored-openssl", "chrono", "bigdecimal", "tds73", "winauth"]
