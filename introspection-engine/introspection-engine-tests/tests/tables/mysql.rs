@@ -1,7 +1,6 @@
 use indoc::{formatdoc, indoc};
 use introspection_connector::{IntrospectionConnector, IntrospectionContext};
 use introspection_engine_tests::test_api::*;
-use psl::dml::Datamodel;
 use sql_introspection_connector::SqlIntrospectionConnector;
 use url::Url;
 
@@ -411,15 +410,11 @@ async fn missing_select_rights(api: &TestApi) -> TestResult {
     "#
     );
 
-    let config = psl::parse_configuration(&datasource).unwrap();
+    let config = psl::parse_schema(datasource).unwrap();
 
-    let ctx = IntrospectionContext {
-        source: config.datasources.into_iter().next().unwrap(),
-        composite_type_depth: Default::default(),
-        preview_features: Default::default(),
-    };
+    let ctx = IntrospectionContext::new(config, Default::default());
 
-    let res = conn.introspect(&Datamodel::new(), ctx).await.unwrap();
+    let res = conn.introspect(&ctx).await.unwrap();
     assert!(res.data_model.is_empty());
 
     Ok(())

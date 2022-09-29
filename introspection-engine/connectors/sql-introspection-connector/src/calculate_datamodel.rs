@@ -31,11 +31,11 @@ impl CalculateDatamodelContext<'_> {
 /// Calculate a data model from a database schema.
 pub fn calculate_datamodel(
     schema: &SqlSchema,
-    previous_datamodel: &Datamodel,
-    ctx: IntrospectionContext,
+    ctx: &IntrospectionContext,
 ) -> SqlIntrospectionResult<IntrospectionResult> {
     debug!("Calculating data model.");
 
+    let previous_datamodel = &ctx.previous_data_model;
     let mut datamodel = Datamodel::new();
 
     let mut context = CalculateDatamodelContext {
@@ -59,18 +59,18 @@ pub fn calculate_datamodel(
 
     let mut warnings = vec![];
     if !previous_datamodel.is_empty() {
-        enrich(previous_datamodel, &mut datamodel, &ctx, &mut warnings);
+        enrich(previous_datamodel, &mut datamodel, ctx, &mut warnings);
         debug!("Enriching datamodel is done.");
     }
 
     // commenting out models, fields, enums, enum values
-    warnings.append(&mut commenting_out_guardrails(&mut datamodel, &ctx));
+    warnings.append(&mut commenting_out_guardrails(&mut datamodel, ctx));
 
     // try to identify whether the schema was created by a previous Prisma version
-    let version = version_checker::check_prisma_version(schema, &ctx, &mut warnings);
+    let version = version_checker::check_prisma_version(schema, ctx, &mut warnings);
 
     // if based on a previous Prisma version add id default opinionations
-    add_prisma_1_id_defaults(&version, &mut datamodel, schema, &mut warnings, &ctx);
+    add_prisma_1_id_defaults(&version, &mut datamodel, schema, &mut warnings, ctx);
 
     debug!("Done calculating datamodel.");
     Ok(IntrospectionResult {

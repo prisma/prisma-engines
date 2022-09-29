@@ -396,6 +396,7 @@ impl WriteArgs {
         self.args.len()
     }
 
+    // @updatedAt
     pub fn add_datetimes(&mut self, model: &ModelRef) {
         let updated_at_fields = model.fields().updated_at();
         let value = &self.request_now;

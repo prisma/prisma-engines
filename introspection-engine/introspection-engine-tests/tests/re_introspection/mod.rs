@@ -1108,21 +1108,16 @@ async fn virtual_cuid_default(api: &TestApi) {
         .await
         .unwrap();
 
-    let input_dm = format!(
-        r#"
-        {datasource}
-
-        model User {{
+    let input_dm = r#"
+        model User {
             id        String    @id @default(cuid()) @db.VarChar(30)
             non_id    String    @default(cuid()) @db.VarChar(30)
-        }}
+        }
 
-        model User2 {{
+        model User2 {
             id        String    @id @default(uuid()) @db.VarChar(36)
-        }}
-        "#,
-        datasource = api.datasource_block()
-    );
+        }
+        "#;
 
     let final_dm = indoc! {r#"
         model User {
@@ -1139,7 +1134,7 @@ async fn virtual_cuid_default(api: &TestApi) {
         }
     "#};
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(&input_dm).await.unwrap());
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await.unwrap());
 }
 
 #[test_connector(tags(CockroachDb))]
@@ -1162,21 +1157,16 @@ async fn virtual_cuid_default_cockroach(api: &TestApi) {
         .await
         .unwrap();
 
-    let input_dm = format!(
-        r#"
-        {datasource}
-
-        model User {{
+    let input_dm = r#"
+        model User {
             id        String    @id @default(cuid()) @db.String(30)
             non_id    String    @default(cuid()) @db.String(30)
-        }}
+        }
 
-        model User2 {{
+        model User2 {
             id        String    @id @default(uuid()) @db.String(36)
-        }}
-        "#,
-        datasource = api.datasource_block()
-    );
+        }
+        "#;
 
     let final_dm = indoc! {r#"
         model User {
@@ -1193,7 +1183,7 @@ async fn virtual_cuid_default_cockroach(api: &TestApi) {
         }
     "#};
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(&input_dm).await.unwrap());
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await.unwrap());
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
@@ -1288,15 +1278,11 @@ async fn updated_at(api: &TestApi) {
         ""
     };
     let input_dm = formatdoc! {r#"
-        {datasource}
-
         model User {{
             id           Int @id @default(autoincrement())
             lastupdated  DateTime?  @updatedAt {native_datetime}
         }}
         "#,
-        native_datetime = native_datetime,
-        datasource = api.datasource_block(),
     };
 
     let final_dm = formatdoc! {r#"
@@ -1821,8 +1807,7 @@ async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult 
         })
         .await?;
 
-    let input_dm = api.dm_with_sources(
-        r#"
+    let input_dm = r#"
          model User {
              first  Int
              last   Int
@@ -1836,8 +1821,7 @@ async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult 
 
              @@id([first, last], name: "compound")
          }
-     "#,
-    );
+     "#;
 
     let final_dm = r#"
          model User {
@@ -1859,7 +1843,7 @@ async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult 
          }
      "#;
 
-    let re_introspected = api.re_introspect(&input_dm).await?;
+    let re_introspected = api.re_introspect(input_dm).await?;
 
     api.assert_eq_datamodels(final_dm, &re_introspected);
 
@@ -1872,7 +1856,7 @@ async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult 
         ]
     }]);
 
-    assert_eq_json!(expected, api.re_introspect_warnings(&input_dm).await?);
+    assert_eq_json!(expected, api.re_introspect_warnings(input_dm).await?);
 
     Ok(())
 }
@@ -1891,7 +1875,7 @@ async fn re_introspecting_custom_index_order(api: &TestApi) -> TestResult {
     api.database().raw_cmd(&create_idx_b).await?;
     api.database().raw_cmd(&create_idx_c).await?;
 
-    let dm = indoc! {r#"
+    let input_dm = indoc! {r#"
          model A {
            id Int   @id
            a  Json
@@ -1902,9 +1886,7 @@ async fn re_introspecting_custom_index_order(api: &TestApi) -> TestResult {
          }
     "#};
 
-    let input_dm = api.dm_with_sources(dm);
-    let input_dm = api.dm_with_generator_and_preview_flags(&input_dm);
-    let re_introspected = api.re_introspect_dml(&input_dm).await?;
+    let re_introspected = api.re_introspect_dml(input_dm).await?;
 
     let expected = expect![[r#"
         model A {

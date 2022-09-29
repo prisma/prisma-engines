@@ -194,9 +194,8 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// In-tro-spec-shon.
     fn introspect<'a>(
         &'a mut self,
-        schema: &'a ValidatedSchema,
-        ctx: introspection_connector::IntrospectionContext,
-    ) -> BoxFuture<'_, ConnectorResult<introspection_connector::IntrospectionResult>>;
+        ctx: &'a introspection_connector::IntrospectionContext,
+    ) -> BoxFuture<'a, ConnectorResult<introspection_connector::IntrospectionResult>>;
 
     /// If possible, check that the passed in migrations apply cleanly.
     fn validate_migrations<'a>(

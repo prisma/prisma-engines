@@ -223,18 +223,12 @@ impl MigrationConnector for SqlMigrationConnector {
 
     fn introspect<'a>(
         &'a mut self,
-        schema: &'a ValidatedSchema,
-        ctx: IntrospectionContext,
+        ctx: &'a IntrospectionContext,
     ) -> BoxFuture<'a, ConnectorResult<IntrospectionResult>> {
         Box::pin(async move {
             let sql_schema = self.flavour.describe_schema().await?;
-            let previous_datamodel = psl::lift(schema);
-            let datamodel = sql_introspection_connector::calculate_datamodel::calculate_datamodel(
-                &sql_schema,
-                &previous_datamodel,
-                ctx,
-            )
-            .map_err(|err| ConnectorError::from_source(err, "Introspection error"))?;
+            let datamodel = sql_introspection_connector::calculate_datamodel::calculate_datamodel(&sql_schema, ctx)
+                .map_err(|err| ConnectorError::from_source(err, "Introspection error"))?;
             Ok(datamodel)
         })
     }

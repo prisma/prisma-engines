@@ -1,5 +1,7 @@
 use query_engine_tests::*;
 
+// The fix for this issue caused problems with `create` operations. See the comment and tests in
+// `prisma_15581.rs`.
 #[test_suite(schema(schema))]
 mod prisma_12572 {
     fn schema() -> String {
