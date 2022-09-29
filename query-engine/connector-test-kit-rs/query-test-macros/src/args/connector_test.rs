@@ -28,7 +28,7 @@ pub struct ConnectorTestArgs {
     #[darling(default)]
     pub capabilities: RunOnlyForCapabilities,
 
-    #[deprecated(since = "4.5.0", note = "Use `relation_mode` instead")]
+    // #[deprecated(since = "4.5.0", note = "Use `relation_mode` instead")]
     #[darling(default)]
     pub referential_integrity: Option<RelationMode>,
 

@@ -21,7 +21,7 @@ pub struct Datasource {
     /// An optional user-defined shadow database URL.
     pub shadow_database_url: Option<(StringFromEnvVar, Span)>,
     /// In which layer referential actions are handled.
-    #[deprecated(since = "4.5.0", note = "Use `relation_mode` instead")]
+    // #[deprecated(since = "4.5.0", note = "Use `relation_mode` instead")]
     pub referential_integrity: Option<RelationMode>,
     /// In which layer referential actions are handled.
     pub relation_mode: Option<RelationMode>,
