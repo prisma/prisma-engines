@@ -19,11 +19,7 @@ pub trait IntrospectionConnector: Send + Sync + 'static {
 
     async fn get_database_version(&self) -> ConnectorResult<String>;
 
-    async fn introspect(
-        &self,
-        existing_data_model: &Datamodel,
-        ctx: IntrospectionContext,
-    ) -> ConnectorResult<IntrospectionResult>;
+    async fn introspect(&self, ctx: &IntrospectionContext) -> ConnectorResult<IntrospectionResult>;
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -68,14 +64,63 @@ pub struct IntrospectionResultOutput {
 }
 
 pub struct IntrospectionContext {
+    pub previous_data_model: Datamodel,
     pub source: Datasource,
     pub composite_type_depth: CompositeTypeDepth,
     pub preview_features: BitFlags<PreviewFeature>,
+    previous_schema: psl::ValidatedSchema,
 }
 
 impl IntrospectionContext {
+    pub fn new(previous_schema: psl::ValidatedSchema, composite_type_depth: CompositeTypeDepth) -> Self {
+        let mut ctx = Self::new_naive(previous_schema, composite_type_depth);
+        ctx.previous_data_model = psl::lift(&ctx.previous_schema);
+        ctx
+    }
+
+    /// Take the previous schema _but ignore all the datamodel part_, keeping just the
+    /// configuration blocks.
+    pub fn new_config_only(previous_schema: psl::ValidatedSchema, composite_type_depth: CompositeTypeDepth) -> Self {
+        let mut config_blocks = String::new();
+
+        for source in previous_schema.db.ast().sources() {
+            config_blocks.push_str(&previous_schema.db.source()[source.span.start..source.span.end]);
+            config_blocks.push('\n');
+        }
+
+        for generator in previous_schema.db.ast().generators() {
+            config_blocks.push_str(&previous_schema.db.source()[generator.span.start..generator.span.end]);
+            config_blocks.push('\n');
+        }
+
+        let previous_schema_config_only = psl::parse_schema(config_blocks).unwrap();
+
+        Self::new_naive(previous_schema_config_only, composite_type_depth)
+    }
+
+    fn new_naive(previous_schema: psl::ValidatedSchema, composite_type_depth: CompositeTypeDepth) -> Self {
+        let source = previous_schema.configuration.datasources.clone().pop().unwrap();
+        let preview_features = previous_schema.configuration.preview_features();
+
+        IntrospectionContext {
+            previous_data_model: psl::dml::Datamodel::new(),
+            previous_schema,
+            source,
+            composite_type_depth,
+            preview_features,
+        }
+    }
+
     pub fn foreign_keys_enabled(&self) -> bool {
         self.source.referential_integrity().uses_foreign_keys()
+    }
+
+    pub fn schema_string(&self) -> &str {
+        self.previous_schema.db.source()
+    }
+
+    pub fn configuration(&self) -> &psl::Configuration {
+        &self.previous_schema.configuration
     }
 }
 

@@ -250,11 +250,6 @@ async fn updated_at(api: &TestApi) {
     api.raw_cmd(&setup).await;
 
     let input_dm = indoc! {r#"
-        datasource db {
-            provider = "sqlserver"
-            url = env("TEST_DATABASE_URL")
-        }
-
         model User {
             id           Int    @id
             lastupdated  DateTime? @updatedAt
