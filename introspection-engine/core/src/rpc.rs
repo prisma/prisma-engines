@@ -6,7 +6,7 @@ use introspection_connector::{
 use jsonrpc_core::BoxFuture;
 use jsonrpc_derive::rpc;
 use mongodb_introspection_connector::MongoDbIntrospectionConnector;
-use psl::{dml::Datamodel, Configuration};
+use psl::Configuration;
 use serde::*;
 use sql_introspection_connector::SqlIntrospectionConnector;
 
@@ -103,22 +103,15 @@ impl RpcImpl {
         composite_type_depth: CompositeTypeDepth,
     ) -> RpcResult<IntrospectionResultOutput> {
         let (config, _url, connector) = RpcImpl::load_connector(&schema).await?;
+        let previous_schema = psl::parse_schema(schema.as_str()).map_err(Error::DatamodelError)?;
 
-        let input_data_model = if !force {
-            Self::parse_datamodel(&schema)?
+        let ctx = if !force {
+            IntrospectionContext::new(previous_schema, composite_type_depth)
         } else {
-            Datamodel::new()
+            IntrospectionContext::new_config_only(previous_schema, composite_type_depth)
         };
 
-        let (config2, _, _) = RpcImpl::load_connector(&schema).await?;
-
-        let ctx = IntrospectionContext {
-            preview_features: config2.preview_features(),
-            source: config2.datasources.into_iter().next().unwrap(),
-            composite_type_depth,
-        };
-
-        let result = match connector.introspect(&input_data_model, ctx).await {
+        let result = match connector.introspect(&ctx).await {
             Ok(introspection_result) => {
                 if introspection_result.data_model.is_empty() {
                     Err(Error::IntrospectionResultEmpty)
@@ -137,13 +130,6 @@ impl RpcImpl {
         };
 
         Ok(result?)
-    }
-
-    /// This function parses the provided schema and returns the contained Datamodel.
-    pub fn parse_datamodel(schema: &str) -> RpcResult<Datamodel> {
-        let final_dm = psl::parse_schema(schema).map_err(Error::DatamodelError)?;
-
-        Ok(psl::lift(&final_dm))
     }
 
     pub async fn list_databases_internal(schema: String) -> RpcResult<Vec<String>> {

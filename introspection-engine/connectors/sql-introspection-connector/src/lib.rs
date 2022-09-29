@@ -22,7 +22,7 @@ use introspection_connector::{
     ConnectorError, ConnectorResult, DatabaseMetadata, ErrorKind, IntrospectionConnector, IntrospectionContext,
     IntrospectionResult,
 };
-use psl::{common::preview_features::PreviewFeature, dml::Datamodel};
+use psl::common::preview_features::PreviewFeature;
 use quaint::prelude::SqlFamily;
 use quaint::{prelude::ConnectionInfo, single::Quaint};
 use schema_describer_loading::load_describer;
@@ -146,15 +146,11 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
         Ok(description)
     }
 
-    async fn introspect(
-        &self,
-        previous_data_model: &Datamodel,
-        ctx: IntrospectionContext,
-    ) -> ConnectorResult<IntrospectionResult> {
+    async fn introspect(&self, ctx: &IntrospectionContext) -> ConnectorResult<IntrospectionResult> {
         let sql_schema = self.catch(self.describe(Some(ctx.source.active_provider))).await?;
 
-        let introspection_result = calculate_datamodel::calculate_datamodel(&sql_schema, previous_data_model, ctx)
-            .map_err(|sql_introspection_error| {
+        let introspection_result =
+            calculate_datamodel::calculate_datamodel(&sql_schema, ctx).map_err(|sql_introspection_error| {
                 sql_introspection_error.into_connector_error(self.connection.connection_info())
             })?;
 

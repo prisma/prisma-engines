@@ -305,15 +305,12 @@ impl GenericApi for EngineState {
             &params.schema,
             None,
             Box::new(move |connector| {
-                let ctx = migration_connector::IntrospectionContext {
-                    composite_type_depth: From::from(params.composite_type_depth as isize),
-                    preview_features: schema.configuration.preview_features(),
-                    source: schema.configuration.datasources[0].clone(),
-                };
+                let composite_type_depth = From::from(params.composite_type_depth as isize);
+                let ctx = migration_connector::IntrospectionContext::new(schema, composite_type_depth);
                 Box::pin(async move {
-                    let result = connector.introspect(&schema, ctx).await?;
+                    let result = connector.introspect(&ctx).await?;
                     let rendered_result =
-                        psl::render_datamodel_and_config_to_string(&result.data_model, &schema.configuration);
+                        psl::render_datamodel_and_config_to_string(&result.data_model, ctx.configuration());
                     Ok(IntrospectResult {
                         datamodel: rendered_result,
                         version: format!("{:?}", result.version),

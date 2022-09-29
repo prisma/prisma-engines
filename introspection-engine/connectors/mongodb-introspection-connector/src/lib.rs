@@ -13,7 +13,7 @@ use introspection_connector::{
 };
 use mongodb::{Client, Database};
 use mongodb_schema_describer::MongoSchema;
-use psl::{common::preview_features::PreviewFeature, dml::Datamodel};
+use psl::common::preview_features::PreviewFeature;
 use user_facing_errors::{common::InvalidConnectionString, KnownError};
 
 #[derive(Debug)]
@@ -123,12 +123,7 @@ impl IntrospectionConnector for MongoDbIntrospectionConnector {
         Ok(self.version().await.unwrap())
     }
 
-    async fn introspect(
-        &self,
-        // TODO: Re-introspection.
-        _existing_data_model: &Datamodel,
-        ctx: IntrospectionContext,
-    ) -> ConnectorResult<IntrospectionResult> {
+    async fn introspect(&self, ctx: &IntrospectionContext) -> ConnectorResult<IntrospectionResult> {
         let schema = self.describe(ctx.preview_features).await?;
         Ok(sampler::sample(self.database(), ctx.composite_type_depth, schema).await?)
     }

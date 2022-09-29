@@ -104,12 +104,7 @@ where
     );
 
     let validated_schema = psl::parse_schema(datamodel_string).unwrap();
-
-    let ctx = IntrospectionContext {
-        source: validated_schema.configuration.datasources.clone().pop().unwrap(),
-        composite_type_depth,
-        preview_features,
-    };
+    let ctx = IntrospectionContext::new(validated_schema, composite_type_depth);
 
     RT.block_on(async move {
         let client = mongodb_client::create(&connection_string).await.unwrap();
@@ -120,14 +115,14 @@ where
             database.drop(None).await.unwrap();
         }
 
-        let res = connector.introspect(&psl::lift(&validated_schema), ctx).await;
+        let res = connector.introspect(&ctx).await;
         database.drop(None).await.unwrap();
 
         let res = res.unwrap();
-        let config = validated_schema.configuration;
+        let config = &ctx.configuration();
 
         TestResult {
-            datamodel: psl::render_datamodel_to_string(&res.data_model, Some(&config)),
+            datamodel: psl::render_datamodel_to_string(&res.data_model, Some(config)),
             warnings: res.warnings,
         }
     })
