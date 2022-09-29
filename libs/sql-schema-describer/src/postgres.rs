@@ -421,7 +421,7 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
 
     async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema> {
         println!("TEST SCHEMA: {}", schema);
-        let schemas = &["schema_name", "other_name"];
+        let schemas = &["schema_0", "schema_1"];
 
         let mut sql_schema = SqlSchema::default();
         let mut pg_ext = PostgresSchemaExt::default();
@@ -434,10 +434,9 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
 
         self.get_sequences(schema, &mut pg_ext).await?; //Todo(matthias)
         self.get_enums(&mut sql_schema).await?;
-        self.get_columns(schema, &table_names, &mut sql_schema).await?;
-        self.get_foreign_keys(schema, &table_names, &mut sql_schema).await?;
-        self.get_indices(schema, &table_names, &mut pg_ext, &mut sql_schema)
-            .await?;
+        self.get_columns(&table_names, &mut sql_schema).await?;
+        self.get_foreign_keys(&table_names, &mut sql_schema).await?;
+        self.get_indices(&table_names, &mut pg_ext, &mut sql_schema).await?;
 
         sql_schema.views = self.get_views(schema).await?;
         sql_schema.procedures = self.get_procedures(schema).await?;
@@ -527,10 +526,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for (table_name, namespace) in names {
             let cloned_name = table_name.clone();
-            //I'll want a helper to get the NamespaceId from the name
-            let namespace_id = sql_schema.namespaces.iter().position(|ns| ns == &namespace).unwrap();
-
-            let id = sql_schema.push_table(table_name, NamespaceId(namespace_id as u32));
+            let id = sql_schema.push_table(table_name, sql_schema.get_namespace_id(&namespace));
             map.insert(cloned_name, id);
         }
 
@@ -576,10 +572,11 @@ impl<'a> SqlSchemaDescriber<'a> {
 
     async fn get_columns(
         &self,
-        schema: &str,
         table_ids: &IndexMap<String, TableId>,
         sql_schema: &mut SqlSchema,
     ) -> DescriberResult<()> {
+        let namespaces = &sql_schema.namespaces;
+
         let is_visible_clause = if self.is_cockroach() {
             " AND info.is_hidden = 'NO'"
         } else {
@@ -609,16 +606,22 @@ impl<'a> SqlSchemaDescriber<'a> {
                     FROM pg_class
                     JOIN pg_namespace on pg_namespace.oid = pg_class.relnamespace
                     WHERE relname = info.table_name
-                    AND pg_namespace.nspname = $1
+                    AND pg_namespace.nspname = Any ( $1 )
                 )
             LEFT OUTER JOIN pg_attrdef attdef ON attdef.adrelid = att.attrelid AND attdef.adnum = att.attnum
-            WHERE table_schema = $1 {}
+            WHERE table_schema = Any ( $1 ) {}
             ORDER BY table_name, ordinal_position;
         "#,
             is_visible_clause,
         );
 
-        let rows = self.conn.query_raw(sql.as_str(), &[schema.into()]).await?;
+        let rows = self
+            .conn
+            .query_raw(
+                sql.as_str(),
+                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
+            )
+            .await?;
 
         for col in rows {
             let table_name = col.get_expect_string("table_name");
@@ -738,10 +741,11 @@ impl<'a> SqlSchemaDescriber<'a> {
     /// Returns a map from table name to foreign keys.
     async fn get_foreign_keys(
         &self,
-        schema: &str,
         table_ids: &IndexMap<String, TableId>,
         sql_schema: &mut SqlSchema,
     ) -> DescriberResult<()> {
+        let namespaces = &sql_schema.namespaces;
+
         // The `generate_subscripts` in the inner select is needed because the optimizer is free to reorganize the unnested rows if not explicitly ordered.
         let sql = r#"
             SELECT
@@ -771,7 +775,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                         join pg_constraint con1 on con1.conrelid = cl.oid
                         join pg_namespace ns on cl.relnamespace = ns.oid
                 WHERE
-                    ns.nspname = $1
+                    ns.nspname = Any ( $1 )
                     and con1.contype = 'f'
                 ORDER BY colidx
                 ) con
@@ -803,7 +807,13 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         // One foreign key with multiple columns will be represented here as several
         // rows with the same ID.
-        let result_set = self.conn.query_raw(sql, &[schema.into()]).await?;
+        let result_set = self
+            .conn
+            .query_raw(
+                sql,
+                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
+            )
+            .await?;
         for row in result_set.into_iter() {
             trace!("Got description FK row {:?}", row);
             let id = row.get_expect_i64("con_id");
@@ -812,15 +822,16 @@ impl<'a> SqlSchemaDescriber<'a> {
             let constraint_name = row.get_expect_string("constraint_name");
             let referenced_table = row.get_expect_string("parent_table");
             let referenced_column = row.get_expect_string("parent_column");
-            let referenced_schema_name = row.get_expect_string("referenced_schema_name");
 
-            if schema != referenced_schema_name {
-                return Err(DescriberError::from(DescriberErrorKind::CrossSchemaReference {
-                    from: format!("{}.{}", schema, table_name),
-                    to: format!("{}.{}", referenced_schema_name, referenced_table),
-                    constraint: constraint_name,
-                }));
-            }
+            //Todo(matthias) Feature flag this
+            // let referenced_schema_name = row.get_expect_string("referenced_schema_name");
+            // if schema != referenced_schema_name {
+            //     return Err(DescriberError::from(DescriberErrorKind::CrossSchemaReference {
+            //         from: format!("{}.{}", schema, table_name),
+            //         to: format!("{}.{}", referenced_schema_name, referenced_table),
+            //         constraint: constraint_name,
+            //     }));
+            // }
 
             let (table_id, column_id, referenced_table_id, referenced_column_id) = if let Some(ids) = get_ids(
                 &table_name,
@@ -882,13 +893,19 @@ impl<'a> SqlSchemaDescriber<'a> {
 
     async fn get_indices(
         &self,
-        schema: &str,
         table_ids: &IndexMap<String, TableId>,
         pg_ext: &mut PostgresSchemaExt,
         sql_schema: &mut SqlSchema,
     ) -> DescriberResult<()> {
+        let namespaces = &sql_schema.namespaces;
         let sql = include_str!("postgres/indexes_query.sql");
-        let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
+        let rows = self
+            .conn
+            .query_raw(
+                sql,
+                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
+            )
+            .await?;
         let mut current_index: Option<IndexId> = None;
 
         for row in rows {
@@ -1062,14 +1079,10 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         let mut enums: Vec<Enum> = enum_values
             .into_iter()
-            .map(|((name, namespace), values)| {
-                let namespace_id = sql_schema.namespaces.iter().position(|ns| ns == &namespace).unwrap();
-
-                Enum {
-                    namespace_id: NamespaceId(namespace_id as u32),
-                    name,
-                    values,
-                }
+            .map(|((name, namespace), values)| Enum {
+                namespace_id: sql_schema.get_namespace_id(&namespace),
+                name,
+                values,
             })
             .collect();
 

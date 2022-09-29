@@ -1651,20 +1651,25 @@ fn int_expressions_in_defaults(api: TestApi) {
 //Todo(matthias) seems like Sequence and Type share the same namespace
 fn multiple_schemas_work(api: TestApi) {
     let schema = r#"
-           CREATE Schema "schema_name";
-           CREATE TABLE "schema_name"."Table_0" (id SERIAL PRIMARY KEY, data Integer);
-           CREATE SEQUENCE "schema_name"."Sequence_0" START 1;
-           CREATE TYPE "schema_name"."Type_0" AS ENUM ('sad', 'ok', 'happy');
-           CREATE Schema "other_name";
-           CREATE TABLE "other_name"."Table_1" (id SERIAL PRIMARY KEY, data Integer);
-           CREATE SEQUENCE "other_name"."Sequence_1" START 100;
-           CREATE TYPE "other_name"."Type_1" AS ENUM ('sad', 'ok', 'happy');
+           CREATE Schema "schema_0";
+           CREATE TABLE "schema_0"."Table_0" (id_0 SERIAL PRIMARY KEY);
+           CREATE TABLE "schema_0"."Table_1" (id_1 SERIAL PRIMARY KEY, o_id_0 Integer References "schema_0"."Table_0"("id_0"));
+           CREATE SEQUENCE "schema_0"."Sequence_0" START 1;
+           CREATE TYPE "schema_0"."Type_0" AS ENUM ('happy');
+           CREATE INDEX "Index_0" ON "schema_0"."Table_1"("o_id_0");
+           
+           CREATE Schema "schema_1";
+           CREATE TABLE "schema_1"."Table_2" (id_2 SERIAL PRIMARY KEY);
+           CREATE TABLE "schema_1"."Table_3" (id_3 SERIAL PRIMARY KEY, o_id_2 Integer References "schema_1"."Table_2"("id_2"));
+           CREATE SEQUENCE "schema_1"."Sequence_1" START 100;
+           CREATE TYPE "schema_1"."Type_1" AS ENUM ('happy');
+           CREATE INDEX "Index_1" ON "schema_1"."Table_3"("o_id_2");
     "#;
 
     api.raw_cmd(schema);
     let schema = api.describe();
 
-    println!("{:?}", schema);
+    println!("{:#?}", schema);
     let table = schema.table_walkers().next().unwrap();
     let col = table.column("mysum").unwrap();
     let value = col.default().unwrap();
