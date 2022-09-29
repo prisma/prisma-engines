@@ -63,7 +63,8 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
     }
 
     #[tracing::instrument(skip(self))]
-    async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema> {
+    async fn describe(&self, schemas: &[&str]) -> DescriberResult<SqlSchema> {
+        let schema = schemas[0];
         let mut sql_schema = SqlSchema::default();
         let version = self.conn.version().await.ok().flatten();
         let flavour = version

@@ -419,10 +419,7 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
         })
     }
 
-    async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema> {
-        //Todo(matthias) get this hardcoding removed
-        let schemas = &["schema_0", "schema_1"];
-
+    async fn describe(&self, schemas: &[&str]) -> DescriberResult<SqlSchema> {
         let mut sql_schema = SqlSchema::default();
         let mut pg_ext = PostgresSchemaExt::default();
 
@@ -432,7 +429,6 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
 
         let table_names = self.get_table_names(&mut sql_schema).await?;
 
-        self.get_sequences(schema, &mut pg_ext).await?; //Todo(matthias)
         self.get_enums(&mut sql_schema).await?;
         self.get_columns(&table_names, &mut sql_schema).await?;
         self.get_foreign_keys(&table_names, &mut sql_schema).await?;
@@ -443,10 +439,11 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
 
         //Todo(matthias) understand this
         // Make sure the vectors we use binary search on are sorted.
+        self.get_sequences(schemas[0], &mut pg_ext).await?; //Todo(matthias)
         pg_ext.indexes.sort_by_key(|(id, _)| *id);
         pg_ext.opclasses.sort_by_key(|(id, _)| *id);
 
-        sql_schema.connector_data = crate::connector_data::ConnectorData {
+        sql_schema.connector_data = connector_data::ConnectorData {
             data: Some(Box::new(pg_ext)),
         };
 

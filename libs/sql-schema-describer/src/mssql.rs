@@ -115,7 +115,8 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
         })
     }
 
-    async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema> {
+    async fn describe(&self, schemas: &[&str]) -> DescriberResult<SqlSchema> {
+        let schema = schemas[0];
         let mut sql_schema = SqlSchema::default();
         let mut mssql_ext = MssqlSchemaExt::default();
 

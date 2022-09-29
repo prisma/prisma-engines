@@ -1679,7 +1679,7 @@ fn multiple_schemas_work(api: TestApi) {
     "#;
 
     api.raw_cmd(schema);
-    let schema = api.describe();
+    let schema = api.describe_with_schemas(&["schema_0", "schema_1"]);
 
     println!("{:#?}", schema);
     let table = schema.table_walkers().next().unwrap();

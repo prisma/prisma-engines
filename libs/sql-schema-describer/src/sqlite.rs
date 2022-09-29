@@ -81,7 +81,7 @@ impl SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
         })
     }
 
-    async fn describe(&self, _schema: &str) -> DescriberResult<SqlSchema> {
+    async fn describe(&self, _schemas: &[&str]) -> DescriberResult<SqlSchema> {
         self.describe_impl().await
     }
 

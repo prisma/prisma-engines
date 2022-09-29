@@ -108,7 +108,7 @@ impl SqlIntrospectionConnector {
         Ok(self
             .describer(provider)
             .await?
-            .describe(self.connection.connection_info().schema_name())
+            .describe(&[self.connection.connection_info().schema_name()])
             .await?)
     }
 
