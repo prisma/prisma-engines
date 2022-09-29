@@ -1498,3 +1498,43 @@ fn block_attribute_comments_are_preserved() {
 
     expected.assert_eq(&reformat(schema));
 }
+
+#[test]
+fn reformat_type_aliases() {
+    let schema = r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "mongodb"
+          url = env("TEST_DB_URL")
+        }
+
+        type MongoID = String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+
+        model User {
+          id           MongoID
+          email     String   @unique
+        }
+    "#;
+
+    let expected = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "mongodb"
+          url      = env("TEST_DB_URL")
+        }
+
+        type MongoID = String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+        model User {
+          id    MongoID
+          email String  @unique
+        }
+    "#]];
+
+    expected.assert_eq(&reformat(schema));
+}
