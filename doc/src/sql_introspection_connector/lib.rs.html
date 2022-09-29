@@ -180,10 +180,6 @@
 <span id="180">180</span>
 <span id="181">181</span>
 <span id="182">182</span>
-<span id="183">183</span>
-<span id="184">184</span>
-<span id="185">185</span>
-<span id="186">186</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::vec_init_then_push</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::ptr_arg</span>)]</span> <span class="comment">// remove after https://github.com/rust-lang/rust-clippy/issues/8482 is fixed and shipped</span>
 
@@ -208,7 +204,7 @@
     <span class="ident">ConnectorError</span>, <span class="ident">ConnectorResult</span>, <span class="ident">DatabaseMetadata</span>, <span class="ident">ErrorKind</span>, <span class="ident">IntrospectionConnector</span>, <span class="ident">IntrospectionContext</span>,
     <span class="ident">IntrospectionResult</span>,
 };
-<span class="kw">use</span> <span class="ident">psl</span>::{<span class="ident">common::preview_features::PreviewFeature</span>, <span class="ident">dml::Datamodel</span>};
+<span class="kw">use</span> <span class="ident">psl::common::preview_features::PreviewFeature</span>;
 <span class="kw">use</span> <span class="ident">quaint::prelude::SqlFamily</span>;
 <span class="kw">use</span> <span class="ident">quaint</span>::{<span class="ident">prelude::ConnectionInfo</span>, <span class="ident">single::Quaint</span>};
 <span class="kw">use</span> <span class="ident">schema_describer_loading::load_describer</span>;
@@ -332,15 +328,11 @@
         <span class="prelude-val">Ok</span>(<span class="ident">description</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">introspect</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">previous_data_model</span>: <span class="kw-2">&amp;</span><span class="ident">Datamodel</span>,
-        <span class="ident">ctx</span>: <span class="ident">IntrospectionContext</span>,
-    ) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">IntrospectionResult</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">introspect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">IntrospectionContext</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">IntrospectionResult</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">sql_schema</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">catch</span>(<span class="self">self</span>.<span class="ident">describe</span>(<span class="prelude-val">Some</span>(<span class="ident">ctx</span>.<span class="ident">source</span>.<span class="ident">active_provider</span>))).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">introspection_result</span> <span class="op">=</span> <span class="ident">calculate_datamodel::calculate_datamodel</span>(<span class="kw-2">&amp;</span><span class="ident">sql_schema</span>, <span class="ident">previous_data_model</span>, <span class="ident">ctx</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">sql_introspection_error</span><span class="op">|</span> {
+        <span class="kw">let</span> <span class="ident">introspection_result</span> <span class="op">=</span>
+            <span class="ident">calculate_datamodel::calculate_datamodel</span>(<span class="kw-2">&amp;</span><span class="ident">sql_schema</span>, <span class="ident">ctx</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">sql_introspection_error</span><span class="op">|</span> {
                 <span class="ident">sql_introspection_error</span>.<span class="ident">into_connector_error</span>(<span class="self">self</span>.<span class="ident">connection</span>.<span class="ident">connection_info</span>())
             })<span class="question-mark">?</span>;
 

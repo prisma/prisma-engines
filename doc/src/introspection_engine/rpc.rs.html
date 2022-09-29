@@ -170,20 +170,6 @@
 <span id="170">170</span>
 <span id="171">171</span>
 <span id="172">172</span>
-<span id="173">173</span>
-<span id="174">174</span>
-<span id="175">175</span>
-<span id="176">176</span>
-<span id="177">177</span>
-<span id="178">178</span>
-<span id="179">179</span>
-<span id="180">180</span>
-<span id="181">181</span>
-<span id="182">182</span>
-<span id="183">183</span>
-<span id="184">184</span>
-<span id="185">185</span>
-<span id="186">186</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::Error</span>;
 <span class="kw">use</span> <span class="ident">introspection_connector</span>::{
     <span class="ident">CompositeTypeDepth</span>, <span class="ident">ConnectorResult</span>, <span class="ident">DatabaseMetadata</span>, <span class="ident">IntrospectionConnector</span>, <span class="ident">IntrospectionContext</span>,
@@ -192,7 +178,7 @@
 <span class="kw">use</span> <span class="ident">jsonrpc_core::BoxFuture</span>;
 <span class="kw">use</span> <span class="ident">jsonrpc_derive::rpc</span>;
 <span class="kw">use</span> <span class="ident">mongodb_introspection_connector::MongoDbIntrospectionConnector</span>;
-<span class="kw">use</span> <span class="ident">psl</span>::{<span class="ident">dml::Datamodel</span>, <span class="ident">Configuration</span>};
+<span class="kw">use</span> <span class="ident">psl::Configuration</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">sql_introspection_connector::SqlIntrospectionConnector</span>;
 
@@ -289,22 +275,15 @@
         <span class="ident">composite_type_depth</span>: <span class="ident">CompositeTypeDepth</span>,
     ) -&gt; <span class="ident">RpcResult</span><span class="op">&lt;</span><span class="ident">IntrospectionResultOutput</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">config</span>, <span class="ident">_url</span>, <span class="ident">connector</span>) <span class="op">=</span> <span class="ident">RpcImpl::load_connector</span>(<span class="kw-2">&amp;</span><span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">previous_schema</span> <span class="op">=</span> <span class="ident">psl::parse_schema</span>(<span class="ident">schema</span>.<span class="ident">as_str</span>()).<span class="ident">map_err</span>(<span class="ident">Error::DatamodelError</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">input_data_model</span> <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">force</span> {
-            <span class="ident"><span class="self">Self</span>::parse_datamodel</span>(<span class="kw-2">&amp;</span><span class="ident">schema</span>)<span class="question-mark">?</span>
+        <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">force</span> {
+            <span class="ident">IntrospectionContext::new</span>(<span class="ident">previous_schema</span>, <span class="ident">composite_type_depth</span>)
         } <span class="kw">else</span> {
-            <span class="ident">Datamodel::new</span>()
+            <span class="ident">IntrospectionContext::new_config_only</span>(<span class="ident">previous_schema</span>, <span class="ident">composite_type_depth</span>)
         };
 
-        <span class="kw">let</span> (<span class="ident">config2</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">RpcImpl::load_connector</span>(<span class="kw-2">&amp;</span><span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">IntrospectionContext</span> {
-            <span class="ident">preview_features</span>: <span class="ident">config2</span>.<span class="ident">preview_features</span>(),
-            <span class="ident">source</span>: <span class="ident">config2</span>.<span class="ident">datasources</span>.<span class="ident">into_iter</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">composite_type_depth</span>,
-        };
-
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">connector</span>.<span class="ident">introspect</span>(<span class="kw-2">&amp;</span><span class="ident">input_data_model</span>, <span class="ident">ctx</span>).<span class="kw">await</span> {
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">connector</span>.<span class="ident">introspect</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>).<span class="kw">await</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">introspection_result</span>) =&gt; {
                 <span class="kw">if</span> <span class="ident">introspection_result</span>.<span class="ident">data_model</span>.<span class="ident">is_empty</span>() {
                     <span class="prelude-val">Err</span>(<span class="ident">Error::IntrospectionResultEmpty</span>)
@@ -323,13 +302,6 @@
         };
 
         <span class="prelude-val">Ok</span>(<span class="ident">result</span><span class="question-mark">?</span>)
-    }
-
-    <span class="doccomment">/// This function parses the provided schema and returns the contained Datamodel.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_datamodel</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">RpcResult</span><span class="op">&lt;</span><span class="ident">Datamodel</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">final_dm</span> <span class="op">=</span> <span class="ident">psl::parse_schema</span>(<span class="ident">schema</span>).<span class="ident">map_err</span>(<span class="ident">Error::DatamodelError</span>)<span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(<span class="ident">psl::lift</span>(<span class="kw-2">&amp;</span><span class="ident">final_dm</span>))
     }
 
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">list_databases_internal</span>(<span class="ident">schema</span>: <span class="ident">String</span>) -&gt; <span class="ident">RpcResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
