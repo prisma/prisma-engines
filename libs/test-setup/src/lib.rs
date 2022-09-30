@@ -27,6 +27,7 @@ pub use test_api_args::{DatasourceBlock, TestApiArgs};
 
 type AnyError = Box<dyn std::error::Error + Send + Sync + 'static>;
 
+#[inline(never)]
 pub fn should_skip_test(
     include_tagged: BitFlags<Tags>,
     exclude_tags: BitFlags<Tags>,
