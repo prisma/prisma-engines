@@ -1,7 +1,7 @@
 use crate::{self as dml, *};
 use either::Either;
 use psl_core::{
-    datamodel_connector::{walker_ext_traits::*, Connector, ReferentialIntegrity},
+    datamodel_connector::{walker_ext_traits::*, Connector, RelationMode},
     parser_database::{
         self as db,
         ast::{self, WithDocumentation, WithName, WithSpan},
@@ -30,19 +30,19 @@ use std::collections::HashMap;
 pub(crate) struct LiftAstToDml<'a> {
     db: &'a db::ParserDatabase,
     connector: &'static dyn Connector,
-    referential_integrity: ReferentialIntegrity,
+    relation_mode: RelationMode,
 }
 
 impl<'a> LiftAstToDml<'a> {
     pub(crate) fn new(
         db: &'a db::ParserDatabase,
         connector: &'static dyn Connector,
-        referential_integrity: ReferentialIntegrity,
+        relation_mode: RelationMode,
     ) -> LiftAstToDml<'a> {
         LiftAstToDml {
             db,
             connector,
-            referential_integrity,
+            relation_mode,
         }
     }
 
@@ -86,7 +86,7 @@ impl<'a> LiftAstToDml<'a> {
         field_ids_for_sorting: &mut HashMap<(&'a str, &'a str), ast::FieldId>,
     ) {
         let active_connector = self.connector;
-        let referential_integrity = self.referential_integrity;
+        let relation_mode = self.relation_mode;
         let common_dml_fields = |field: &mut dml::RelationField, relation_field: RelationFieldWalker<'_>| {
             let ast_field = relation_field.ast_field();
             field.relation_info.on_delete = relation_field
@@ -99,9 +99,9 @@ impl<'a> LiftAstToDml<'a> {
             field.documentation = ast_field.documentation().map(String::from);
             field.is_ignored = relation_field.is_ignored();
             field.supports_restrict_action(
-                active_connector.supports_referential_action(&referential_integrity, db::ReferentialAction::Restrict),
+                active_connector.supports_referential_action(&relation_mode, db::ReferentialAction::Restrict),
             );
-            field.emulates_referential_actions(referential_integrity.is_prisma());
+            field.emulates_referential_actions(relation_mode.is_prisma());
         };
 
         for relation in self.db.walk_relations() {

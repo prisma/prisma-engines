@@ -1,13 +1,14 @@
 use super::database_name::validate_db_name;
 use crate::{
+    ast,
     common::preview_features::PreviewFeature,
     datamodel_connector::{walker_ext_traits::*, ConnectorCapability},
     diagnostics::DatamodelError,
-    parser_database::ast::WithSpan,
+    parser_database::ast::{WithName, WithSpan},
     validate::validation_pipeline::context::Context,
 };
 use parser_database::walkers::{ModelWalker, PrimaryKeyWalker};
-use std::borrow::Cow;
+use std::{borrow::Cow, collections::HashMap};
 
 /// A model must have either a primary key, or a unique criteria
 /// with no optional, commented-out or unsupported fields.
@@ -296,5 +297,48 @@ pub(super) fn schema_attribute(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
             ))
         }
         _ => (),
+    }
+}
+
+pub(super) fn database_name_clashes(ctx: &mut Context<'_>) {
+    // (schema_name, model_database_name) -> ModelId
+    let mut database_names: HashMap<(Option<&str>, &str), ast::ModelId> = HashMap::with_capacity(ctx.db.models_count());
+
+    for model in ctx.db.walk_models() {
+        let key = (model.schema().map(|(name, _)| name), model.database_name());
+        match database_names.insert(key, model.model_id()) {
+            // Two branches because we want to put the error on the @@map attribute, and it can be
+            // on either model.
+            Some(existing) if model.mapped_name().is_some() => {
+                let existing_model_name = &ctx.db.ast()[existing].name();
+                let attribute = model
+                    .ast_model()
+                    .attributes
+                    .iter()
+                    .find(|attr| attr.name() == "map")
+                    .unwrap();
+
+                ctx.push_error(DatamodelError::new_duplicate_model_database_name_error(
+                    model.database_name(),
+                    existing_model_name,
+                    attribute.span(),
+                ));
+            }
+            Some(existing) => {
+                let existing_model = &ctx.db.ast()[existing];
+                let attribute = existing_model
+                    .attributes
+                    .iter()
+                    .find(|attr| attr.name() == "map")
+                    .unwrap();
+
+                ctx.push_error(DatamodelError::new_duplicate_model_database_name_error(
+                    model.database_name(),
+                    model.name(),
+                    attribute.span(),
+                ));
+            }
+            None => (),
+        }
     }
 }

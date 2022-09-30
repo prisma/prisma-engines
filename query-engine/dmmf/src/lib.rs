@@ -29,7 +29,7 @@ pub fn dmmf_from_schema(schema: &str) -> DataModelMetaFormat {
         true, // todo
         data_source.active_connector,
         preview_features,
-        data_source.referential_integrity(),
+        data_source.relation_mode(),
     ));
 
     from_precomputed_parts(&dml, query_schema)

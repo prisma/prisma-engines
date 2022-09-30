@@ -31,7 +31,7 @@ pub fn update_record(
     let read_query = read::find_unique(field, model.clone())?;
     let read_node = graph.create_node(Query::Read(read_query));
 
-    if connector_ctx.referential_integrity.is_prisma() {
+    if connector_ctx.relation_mode.is_prisma() {
         let read_parent_node = graph.create_node(utils::read_ids_infallible(
             model.clone(),
             model.primary_identifier(),
@@ -101,7 +101,7 @@ pub fn update_many_records(
     let data_argument = field.arguments.lookup(args::DATA).unwrap();
     let data_map: ParsedInputMap = data_argument.value.try_into()?;
 
-    if connector_ctx.referential_integrity.uses_foreign_keys() {
+    if connector_ctx.relation_mode.uses_foreign_keys() {
         update_many_record_node(graph, connector_ctx, filter, model, data_map)?;
     } else {
         let pre_read_node = graph.create_node(utils::read_ids_infallible(

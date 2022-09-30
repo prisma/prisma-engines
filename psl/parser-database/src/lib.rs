@@ -140,7 +140,7 @@ impl ParserDatabase {
         &self.ast
     }
 
-    /// The total number of models.
+    /// The total number of models. This is O(1).
     pub fn models_count(&self) -> usize {
         self.types.model_attributes.len()
     }

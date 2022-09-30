@@ -155,7 +155,7 @@ fn resolve_model_attributes<'db>(model_id: ast::ModelId, ast_model: &'db ast::Mo
 
     // @@map
     if ctx.visit_optional_single_attr("map") {
-        map::model(&mut model_attributes, model_id, ctx);
+        map::model(&mut model_attributes, ctx);
         ctx.validate_visited_arguments();
     }
 

@@ -45,7 +45,7 @@ use prisma_models::{
     psl::common::preview_features::PreviewFeature, CompositeTypeRef, Field as ModelField, Index, InternalDataModelRef,
     ModelRef, RelationFieldRef, TypeIdentifier,
 };
-use psl::datamodel_connector::{Connector, ConnectorCapability, ReferentialIntegrity};
+use psl::datamodel_connector::{Connector, ConnectorCapability, RelationMode};
 use schema::*;
 use std::sync::Arc;
 
@@ -177,7 +177,7 @@ pub fn build(
     enable_raw_queries: bool,
     connector: &'static dyn Connector,
     preview_features: Vec<PreviewFeature>,
-    referential_integrity: ReferentialIntegrity,
+    relation_mode: RelationMode,
 ) -> QuerySchema {
     let mut ctx = BuilderContext::new(
         internal_data_model,
@@ -213,7 +213,7 @@ pub fn build(
         ctx.internal_data_model,
         ctx.connector.capabilities().to_owned(),
         preview_features,
-        referential_integrity,
+        relation_mode,
     )
 }
 

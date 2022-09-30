@@ -139,10 +139,10 @@ pub(super) fn ignored_related_model(field: RelationFieldWalker<'_>, ctx: &mut Co
 /// Does the connector support the given referential actions.
 pub(super) fn referential_actions(field: RelationFieldWalker<'_>, ctx: &mut Context<'_>) {
     let connector = ctx.connector;
-    let referential_integrity = ctx.referential_integrity;
+    let relation_mode = ctx.relation_mode;
     let msg = |action: ReferentialAction| {
         let allowed_values = connector
-            .referential_actions(&referential_integrity)
+            .referential_actions(&relation_mode)
             .iter()
             .map(|f| format!("`{}`", f.as_str()))
             .join(", ");
@@ -155,10 +155,7 @@ pub(super) fn referential_actions(field: RelationFieldWalker<'_>, ctx: &mut Cont
     };
 
     if let Some(on_delete) = field.explicit_on_delete() {
-        if !ctx
-            .connector
-            .supports_referential_action(&ctx.referential_integrity, on_delete)
-        {
+        if !ctx.connector.supports_referential_action(&ctx.relation_mode, on_delete) {
             let span = field
                 .ast_field()
                 .span_for_argument("relation", "onDelete")
@@ -169,10 +166,7 @@ pub(super) fn referential_actions(field: RelationFieldWalker<'_>, ctx: &mut Cont
     }
 
     if let Some(on_update) = field.explicit_on_update() {
-        if !ctx
-            .connector
-            .supports_referential_action(&ctx.referential_integrity, on_update)
-        {
+        if !ctx.connector.supports_referential_action(&ctx.relation_mode, on_update) {
             let span = field
                 .ast_field()
                 .span_for_argument("relation", "onUpdate")

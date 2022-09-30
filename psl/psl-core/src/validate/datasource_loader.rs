@@ -2,7 +2,7 @@ use crate::{
     ast::{self, SourceConfig, Span},
     common::preview_features::PreviewFeature,
     configuration::StringFromEnvVar,
-    datamodel_connector::ReferentialIntegrity,
+    datamodel_connector::RelationMode,
     diagnostics::{DatamodelError, Diagnostics},
     Datasource,
 };
@@ -133,6 +133,7 @@ impl DatasourceLoader {
 
         let documentation = ast_source.documentation().map(String::from);
         let referential_integrity = get_referential_integrity(&args, preview_features, ast_source, diagnostics);
+        let relation_mode = get_relation_mode(&args, preview_features, ast_source, diagnostics);
 
         let active_connector: &'static dyn crate::datamodel_connector::Connector =
             match connectors.iter().find(|c| c.is_provider(provider)) {
@@ -147,18 +148,17 @@ impl DatasourceLoader {
                 }
             };
 
+        // TODO: deprecated, keeping here since the "referentialIntegrity" preview feature
+        // is still silently supported.
         if let Some(integrity) = referential_integrity {
-            if !active_connector
-                .allowed_referential_integrity_settings()
-                .contains(integrity)
-            {
+            if !active_connector.allowed_relation_mode_settings().contains(integrity) {
                 let span = args
                     .get("referentialIntegrity")
                     .map(|(_, v)| v.span())
                     .unwrap_or_else(Span::empty);
 
                 let supported_values = active_connector
-                    .allowed_referential_integrity_settings()
+                    .allowed_relation_mode_settings()
                     .iter()
                     .map(|v| format!(r#""{}""#, v))
                     .collect::<Vec<_>>()
@@ -170,6 +170,31 @@ impl DatasourceLoader {
                 );
 
                 let error = DatamodelError::new_source_validation_error(&message, "referentialIntegrity", span);
+
+                diagnostics.push_error(error);
+            }
+        }
+
+        if let Some(integrity) = relation_mode {
+            if !active_connector.allowed_relation_mode_settings().contains(integrity) {
+                let span = args
+                    .get("relationMode")
+                    .map(|(_, v)| v.span())
+                    .unwrap_or_else(Span::empty);
+
+                let supported_values = active_connector
+                    .allowed_relation_mode_settings()
+                    .iter()
+                    .map(|v| format!(r#""{}""#, v))
+                    .collect::<Vec<_>>()
+                    .join(", ");
+
+                let message = format!(
+                    "Invalid relation mode setting: \"{}\". Supported values: {}",
+                    integrity, supported_values,
+                );
+
+                let error = DatamodelError::new_source_validation_error(&message, "relationMode", span);
 
                 diagnostics.push_error(error);
             }
@@ -197,6 +222,7 @@ impl DatasourceLoader {
         // we handle these elsewhere
         args.remove("previewFeatures");
         args.remove("referentialIntegrity");
+        args.remove("relationMode");
         for (name, (span, _)) in args.into_iter() {
             diagnostics.push_error(DatamodelError::new_property_not_known_error(name, span));
         }
@@ -213,6 +239,7 @@ impl DatasourceLoader {
             active_connector,
             shadow_database_url,
             referential_integrity,
+            relation_mode,
         })
     }
 }
@@ -233,7 +260,7 @@ fn get_referential_integrity(
     preview_features: BitFlags<PreviewFeature>,
     source: &SourceConfig,
     diagnostics: &mut Diagnostics,
-) -> Option<ReferentialIntegrity> {
+) -> Option<RelationMode> {
     args.get("referentialIntegrity").and_then(|(span, value)| {
         if !preview_features.contains(PreviewFeature::ReferentialIntegrity) {
             diagnostics.push_error(DatamodelError::new_source_validation_error(
@@ -245,8 +272,8 @@ fn get_referential_integrity(
             None
         } else {
             match coerce::string(value, diagnostics)? {
-                "prisma" => Some(ReferentialIntegrity::Prisma),
-                "foreignKeys" => Some(ReferentialIntegrity::ForeignKeys),
+                "prisma" => Some(RelationMode::Prisma),
+                "foreignKeys" => Some(RelationMode::ForeignKeys),
                 s => {
                     let message = format!(
                         "Invalid referential integrity setting: \"{}\". Supported values: \"prisma\", \"foreignKeys\"",
@@ -255,6 +282,53 @@ fn get_referential_integrity(
 
                     let error =
                         DatamodelError::new_source_validation_error(&message, "referentialIntegrity", value.span());
+
+                    diagnostics.push_error(error);
+
+                    None
+                }
+            }
+        }
+    })
+}
+
+const RELATION_MODE_PREVIEW_FEATURE_ERR: &str = r#"
+The `relationMode` option can only be set if the preview feature is enabled in a generator block.
+
+Example:
+
+generator client {
+    provider = "prisma-client-js"
+    previewFeatures = ["relationMode"]
+}
+"#;
+
+fn get_relation_mode(
+    args: &HashMap<&str, (Span, &ast::Expression)>,
+    preview_features: BitFlags<PreviewFeature>,
+    source: &SourceConfig,
+    diagnostics: &mut Diagnostics,
+) -> Option<RelationMode> {
+    args.get("relationMode").and_then(|(span, value)| {
+        if !preview_features.contains(PreviewFeature::RelationMode) {
+            diagnostics.push_error(DatamodelError::new_source_validation_error(
+                RELATION_MODE_PREVIEW_FEATURE_ERR,
+                &source.name.name,
+                *span,
+            ));
+
+            None
+        } else {
+            match coerce::string(value, diagnostics)? {
+                "prisma" => Some(RelationMode::Prisma),
+                "foreignKeys" => Some(RelationMode::ForeignKeys),
+                s => {
+                    let message = format!(
+                        "Invalid relation mode setting: \"{}\". Supported values: \"prisma\", \"foreignKeys\"",
+                        s
+                    );
+
+                    let error = DatamodelError::new_source_validation_error(&message, "relationMode", value.span());
 
                     diagnostics.push_error(error);
 

@@ -1,6 +1,6 @@
 use crate::{
     configuration::StringFromEnvVar,
-    datamodel_connector::{Connector, ConnectorCapabilities, ReferentialIntegrity},
+    datamodel_connector::{Connector, ConnectorCapabilities, RelationMode},
     diagnostics::{DatamodelError, Diagnostics, Span},
 };
 use std::{borrow::Cow, path::Path};
@@ -21,7 +21,10 @@ pub struct Datasource {
     /// An optional user-defined shadow database URL.
     pub shadow_database_url: Option<(StringFromEnvVar, Span)>,
     /// In which layer referential actions are handled.
-    pub referential_integrity: Option<ReferentialIntegrity>,
+    // #[deprecated(since = "4.5.0", note = "Use `relation_mode` instead")]
+    pub referential_integrity: Option<RelationMode>,
+    /// In which layer referential actions are handled.
+    pub relation_mode: Option<RelationMode>,
     /// _Sorted_ vec of schemas defined in the schemas property.
     pub schemas: Vec<(String, Span)>,
     pub(crate) schemas_span: Option<Span>,
@@ -37,7 +40,8 @@ impl std::fmt::Debug for Datasource {
             .field("documentation", &self.documentation)
             .field("active_connector", &&"...")
             .field("shadow_database_url", &"<shadow_database_url>")
-            .field("referential_integrity", &self.referential_integrity)
+            .field("referential_integrity [deprecated]", &self.referential_integrity)
+            .field("relation_mode", &self.relation_mode)
             .field("schemas", &self.schemas)
             .finish()
     }
@@ -54,11 +58,12 @@ impl Datasource {
         ConnectorCapabilities::new(capabilities)
     }
 
-    /// The applicable referential integrity mode for this datasource.
+    /// The applicable relation mode for this datasource.
     #[allow(clippy::or_fun_call)] // not applicable in this case
-    pub fn referential_integrity(&self) -> ReferentialIntegrity {
-        self.referential_integrity
-            .unwrap_or(self.active_connector.default_referential_integrity())
+    pub fn relation_mode(&self) -> RelationMode {
+        self.relation_mode
+            .or(self.referential_integrity)
+            .unwrap_or(self.active_connector.default_relation_mode())
     }
 
     /// Load the database URL, validating it and resolving env vars in the

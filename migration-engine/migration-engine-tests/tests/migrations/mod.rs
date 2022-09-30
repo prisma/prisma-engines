@@ -21,7 +21,7 @@ mod migration_persistence_tests;
 mod mssql;
 mod mysql;
 mod postgres;
-mod referential_integrity;
+mod relation_mode;
 mod relations;
 mod reset_tests;
 mod shadow_database_url_configuration;

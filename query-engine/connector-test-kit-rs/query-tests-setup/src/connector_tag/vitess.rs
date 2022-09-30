@@ -38,7 +38,7 @@ impl ConnectorTagInterface for VitessConnectorTag {
         true
     }
 
-    fn referential_integrity(&self) -> &'static str {
+    fn relation_mode(&self) -> &'static str {
         "prisma"
     }
 }

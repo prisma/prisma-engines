@@ -35,7 +35,7 @@ pub fn render_test_datamodel(
     test_database: &str,
     template: String,
     excluded_features: &[&str],
-    referential_integrity_override: Option<String>,
+    relation_mode_override: Option<String>,
     db_schemas: &[&str],
 ) -> String {
     let tag = config.test_connector_tag().unwrap();
@@ -54,7 +54,7 @@ pub fn render_test_datamodel(
             datasource test {{
                 provider = "{}"
                 url = "{}"
-                referentialIntegrity = "{}"
+                relationMode = "{}"
                 {}
             }}
 
@@ -65,7 +65,7 @@ pub fn render_test_datamodel(
         "#},
         tag.datamodel_provider(),
         tag.connection_string(test_database, config.is_ci(), is_multi_schema),
-        referential_integrity_override.unwrap_or_else(|| tag.referential_integrity().to_string()),
+        relation_mode_override.unwrap_or_else(|| tag.relation_mode().to_string()),
         schema_def,
         preview_features
     );

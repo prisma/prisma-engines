@@ -1,0 +1,30 @@
+// issue: https://github.com/prisma/prisma/issues/15009
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("TEST_DATABASE_URL")
+  schemas  = ["base", "transactional"]
+}
+
+model User {
+  id    String @id
+  email String
+  posts Post[]
+
+  @@map("some_table")
+  @@schema("base")
+}
+
+model Post {
+  title    String
+  authorId String @unique
+  author   User?  @relation(fields: [authorId], references: [id])
+
+  @@map("some_table")
+  @@schema("transactional")
+}
