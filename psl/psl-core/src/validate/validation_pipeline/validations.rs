@@ -36,9 +36,11 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
         }
     }
 
-    // Model validations
     ctx.connector
         .validate_scalar_field_unknown_default_functions(ctx.db, ctx.diagnostics);
+
+    // Model validations
+    models::database_name_clashes(ctx);
 
     for model in db.walk_models() {
         models::has_a_strict_unique_criteria(model, ctx);

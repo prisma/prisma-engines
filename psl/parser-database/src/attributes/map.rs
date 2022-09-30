@@ -6,31 +6,13 @@ use crate::{
     DatamodelError, StringId,
 };
 
-pub(super) fn model(model_attributes: &mut ModelAttributes, model_id: ast::ModelId, ctx: &mut Context<'_>) {
+pub(super) fn model(model_attributes: &mut ModelAttributes, ctx: &mut Context<'_>) {
     let mapped_name = match visit_map_attribute(ctx) {
         Some(name) => name,
         None => return,
     };
 
     model_attributes.mapped_name = Some(mapped_name);
-
-    if let Some(existing_model_id) = ctx.mapped_model_names.insert(mapped_name, model_id) {
-        let existing_model_name = ctx.ast[existing_model_id].name();
-        ctx.push_error(DatamodelError::new_duplicate_model_database_name_error(
-            &ctx[mapped_name],
-            existing_model_name,
-            ctx.ast[model_id].span(),
-        ));
-    }
-
-    if let Some(existing_model_id) = ctx.names.tops.get(&mapped_name).and_then(|id| id.as_model_id()) {
-        let existing_model_name = ctx.ast[existing_model_id].name();
-        ctx.push_error(DatamodelError::new_duplicate_model_database_name_error(
-            &ctx[mapped_name],
-            existing_model_name,
-            ctx.current_attribute().span,
-        ));
-    }
 }
 
 pub(super) fn scalar_field(
