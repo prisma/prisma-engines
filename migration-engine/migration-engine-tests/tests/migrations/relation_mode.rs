@@ -8,7 +8,7 @@ fn schema_push_referential_integrity_prisma_works(api: TestApi) {
 
         generator client {{
             provider = "prisma-client-js"
-            previewFeatures = ["referentialIntegrity"]
+            previewFeatures = ["relationMode"]
         }}
 
         model Post {{
@@ -32,7 +32,7 @@ fn schema_push_referential_integrity_prisma_works(api: TestApi) {
             post        Post @relation(fields: [postId], references: [id])
         }}
         "#,
-        datasource = api.datasource_block_with(&[("referentialIntegrity", "\"prisma\"")]),
+        datasource = api.datasource_block_with(&[("relationMode", "\"prisma\"")]),
     );
 
     api.schema_push(&dm).send().assert_green();
@@ -54,7 +54,7 @@ fn create_migration_referential_integrity_prisma_works(api: TestApi) {
 
         generator client {{
             provider = "prisma-client-js"
-            previewFeatures = ["referentialIntegrity"]
+            previewFeatures = ["relationMode"]
         }}
 
         model Post {{
@@ -78,7 +78,7 @@ fn create_migration_referential_integrity_prisma_works(api: TestApi) {
             post        Post @relation(fields: [postId], references: [id])
         }}
         "#,
-        datasource = api.datasource_block_with(&[("referentialIntegrity", "\"prisma\"")]),
+        datasource = api.datasource_block_with(&[("relationMode", "\"prisma\"")]),
     );
 
     api.create_migration("01init", &dm, &migrations_directory)
@@ -117,7 +117,7 @@ fn switching_from_foreign_keys_to_prisma_integrity_drops_the_foreign_keys(api: T
 
         generator client {{
             provider = "prisma-client-js"
-            previewFeatures = ["referentialIntegrity"]
+            previewFeatures = ["relationMode"]
         }}
 
         model A {{
@@ -131,7 +131,7 @@ fn switching_from_foreign_keys_to_prisma_integrity_drops_the_foreign_keys(api: T
             as A[]
         }}
         "#,
-        datasource = api.datasource_block_with(&[("referentialIntegrity", "\"foreignKeys\"")]),
+        datasource = api.datasource_block_with(&[("relationMode", "\"foreignKeys\"")]),
     );
 
     api.schema_push(&dm).send().assert_green();
@@ -145,7 +145,7 @@ fn switching_from_foreign_keys_to_prisma_integrity_drops_the_foreign_keys(api: T
 
         generator client {{
             provider = "prisma-client-js"
-            previewFeatures = ["referentialIntegrity"]
+            previewFeatures = ["relationMode"]
         }}
 
         model A {{
@@ -159,7 +159,7 @@ fn switching_from_foreign_keys_to_prisma_integrity_drops_the_foreign_keys(api: T
             as A[]
         }}
         "#,
-        datasource = api.datasource_block_with(&[("referentialIntegrity", "\"prisma\"")]),
+        datasource = api.datasource_block_with(&[("relationMode", "\"prisma\"")]),
     );
 
     api.schema_push(&dm).send().assert_green();
@@ -176,7 +176,7 @@ fn switching_from_prisma_integrity_to_foreign_keys_drops_the_foreign_keys(api: T
 
         generator client {{
             provider = "prisma-client-js"
-            previewFeatures = ["referentialIntegrity"]
+            previewFeatures = ["relationMode"]
         }}
 
         model A {{
@@ -190,7 +190,7 @@ fn switching_from_prisma_integrity_to_foreign_keys_drops_the_foreign_keys(api: T
             as A[]
         }}
         "#,
-        datasource = api.datasource_block_with(&[("referentialIntegrity", "\"prisma\"")]),
+        datasource = api.datasource_block_with(&[("relationMode", "\"prisma\"")]),
     );
 
     api.schema_push(&dm).send().assert_green();
@@ -204,7 +204,7 @@ fn switching_from_prisma_integrity_to_foreign_keys_drops_the_foreign_keys(api: T
 
         generator client {{
             provider = "prisma-client-js"
-            previewFeatures = ["referentialIntegrity"]
+            previewFeatures = ["relationMode"]
         }}
 
         model A {{
@@ -218,7 +218,7 @@ fn switching_from_prisma_integrity_to_foreign_keys_drops_the_foreign_keys(api: T
             as A[]
         }}
         "#,
-        datasource = api.datasource_block_with(&[("referentialIntegrity", "\"foreignKeys\"")]),
+        datasource = api.datasource_block_with(&[("relationMode", "\"foreignKeys\"")]),
     );
 
     api.schema_push(&dm).send().assert_green();

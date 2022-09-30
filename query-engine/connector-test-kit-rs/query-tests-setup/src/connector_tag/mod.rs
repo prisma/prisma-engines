@@ -53,7 +53,7 @@ pub trait ConnectorTagInterface {
     /// Defines where relational constraints are handled:
     ///   - "prisma" is handled in the Query Engine core
     ///   - "foreignKeys" lets the database handle them
-    fn referential_integrity(&self) -> &'static str {
+    fn relation_mode(&self) -> &'static str {
         "foreignKeys"
     }
 }

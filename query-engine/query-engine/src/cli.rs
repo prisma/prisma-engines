@@ -85,7 +85,7 @@ impl CliCommand {
         let connector = datasource
             .map(|ds| ds.active_connector)
             .unwrap_or(&psl::datamodel_connector::EmptyDatamodelConnector);
-        let referential_integrity = datasource.map(|ds| ds.referential_integrity()).unwrap_or_default();
+        let relation_mode = datasource.map(|ds| ds.relation_mode()).unwrap_or_default();
 
         // temporary code duplication
         let internal_data_model = prisma_models::convert(&request.schema, "".into());
@@ -94,7 +94,7 @@ impl CliCommand {
             request.enable_raw_queries,
             connector,
             request.schema.configuration.preview_features().iter().collect(),
-            referential_integrity,
+            relation_mode,
         ));
 
         let dmmf = dmmf::render_dmmf(&psl::lift(&request.schema), query_schema);

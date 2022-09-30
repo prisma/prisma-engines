@@ -2,7 +2,7 @@ mod cycle_detection;
 
 use crate::common::*;
 use psl::{
-    datamodel_connector::ReferentialIntegrity,
+    datamodel_connector::RelationMode,
     dml::ReferentialAction::{self, *},
 };
 
@@ -96,7 +96,7 @@ fn actions_on_mongo() {
 }
 
 #[test]
-fn on_delete_actions_should_work_on_prisma_referential_integrity() {
+fn on_delete_actions_should_work_on_prisma_relation_mode() {
     let actions = &[Restrict, SetNull, Cascade, NoAction];
 
     for action in actions {
@@ -104,13 +104,13 @@ fn on_delete_actions_should_work_on_prisma_referential_integrity() {
             r#"
             datasource db {{
                 provider = "mysql"
-                referentialIntegrity = "prisma"
+                relationMode = "prisma"
                 url = "mysql://root:prisma@localhost:3306/mydb"
             }}
 
             generator client {{
                 provider = "prisma-client-js"
-                previewFeatures = ["referentialIntegrity"]
+                previewFeatures = ["relationMode"]
             }}
 
             model A {{
@@ -135,17 +135,17 @@ fn on_delete_actions_should_work_on_prisma_referential_integrity() {
 }
 
 #[test]
-fn on_update_no_action_should_work_on_prisma_referential_integrity() {
+fn on_update_no_action_should_work_on_prisma_relation_mode() {
     let dml = indoc! { r#"
         datasource db {
           provider = "mysql"
           url = "mysql://"
-          referentialIntegrity = "prisma"
+          relationMode = "prisma"
         }
 
         generator client {
           provider = "prisma-client-js"
-          previewFeatures = ["referentialIntegrity"]
+          previewFeatures = ["relationMode"]
         }
 
         model A {
@@ -171,13 +171,13 @@ fn foreign_keys_not_allowed_on_mongo() {
     let dml = indoc! {r#"
         datasource db {
           provider = "mongodb"
-          referentialIntegrity = "foreignKeys"
+          relationMode = "foreignKeys"
           url = "mongodb://"
         }
 
         generator client {
           provider = "prisma-client-js"
-          previewFeatures = ["referentialIntegrity"]
+          previewFeatures = ["relationMode"]
         }
 
         model A {
@@ -193,11 +193,11 @@ fn foreign_keys_not_allowed_on_mongo() {
     "#};
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError validating datasource `referentialIntegrity`: Invalid referential integrity setting: "foreignKeys". Supported values: "prisma"[0m
+        [1;91merror[0m: [1mError validating datasource `relationMode`: Invalid relation mode setting: "foreignKeys". Supported values: "prisma"[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  provider = "mongodb"
-        [1;94m 3 | [0m  referentialIntegrity = [1;91m"foreignKeys"[0m
+        [1;94m 3 | [0m  relationMode = [1;91m"foreignKeys"[0m
         [1;94m   | [0m
     "#]];
 
@@ -209,13 +209,13 @@ fn prisma_level_integrity_should_be_allowed_on_mongo() {
     let dml = indoc! {r#"
         datasource db {
           provider = "mongodb"
-          referentialIntegrity = "prisma"
+          relationMode = "prisma"
           url = "mongodb://"
         }
 
         generator client {
           provider = "prisma-client-js"
-          previewFeatures = ["referentialIntegrity"]
+          previewFeatures = ["relationMode"]
         }
 
         model A {
@@ -234,7 +234,7 @@ fn prisma_level_integrity_should_be_allowed_on_mongo() {
 }
 
 #[test]
-fn mongo_uses_prisma_referential_integrity_by_default() {
+fn mongo_uses_prisma_relation_mode_by_default() {
     let dml = indoc! {r#"
         datasource db {
           provider = "mongodb"
@@ -253,14 +253,11 @@ fn mongo_uses_prisma_referential_integrity_by_default() {
         }
     "#};
 
-    assert_eq!(
-        Some(ReferentialIntegrity::Prisma),
-        parse_config(dml).unwrap().referential_integrity()
-    );
+    assert_eq!(Some(RelationMode::Prisma), parse_config(dml).unwrap().relation_mode());
 }
 
 #[test]
-fn sql_databases_use_foreign_keys_referential_integrity_by_default() {
+fn sql_databases_use_foreign_keys_relation_mode_by_default() {
     for db in ["postgres", "mysql", "sqlserver", "sqlite"] {
         let dml = formatdoc! {r#"
             datasource db {{
@@ -281,8 +278,8 @@ fn sql_databases_use_foreign_keys_referential_integrity_by_default() {
         "#, db = db};
 
         assert_eq!(
-            Some(ReferentialIntegrity::ForeignKeys),
-            parse_config(&dml).unwrap().referential_integrity()
+            Some(RelationMode::ForeignKeys),
+            parse_config(&dml).unwrap().relation_mode()
         );
     }
 }
@@ -420,18 +417,18 @@ fn actions_should_be_defined_only_from_one_side() {
 }
 
 #[test]
-fn set_default_action_should_not_work_on_prisma_level_referential_integrity() {
+fn set_default_action_should_not_work_on_prisma_level_relation_mode() {
     let dml = indoc!(
         r#"
             datasource db {
                 provider = "mysql"
-                referentialIntegrity = "prisma"
+                relationMode = "prisma"
                 url = "mysql://root:prisma@localhost:3306/mydb"
             }
 
             generator client {
                 provider = "prisma-client-js"
-                previewFeatures = ["referentialIntegrity"]
+                previewFeatures = ["relationMode"]
             }
 
             model A {{

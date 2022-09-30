@@ -313,12 +313,12 @@ pub fn insert_emulated_on_delete(
     parent_node: &NodeRef,
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<()> {
-    // If the connector uses the `ReferentialIntegrity::ForeignKeys` mode, we do not do any checks / emulation.
-    if connector_ctx.referential_integrity.uses_foreign_keys() {
+    // If the connector uses the `RelationMode::ForeignKeys` mode, we do not do any checks / emulation.
+    if connector_ctx.relation_mode.uses_foreign_keys() {
         return Ok(());
     }
 
-    // If the connector uses the `ReferentialIntegrity::Prisma` mode, then the emulation will kick in.
+    // If the connector uses the `RelationMode::Prisma` mode, then the emulation will kick in.
     let internal_model = model_to_delete.internal_data_model();
     let relation_fields = internal_model.fields_pointing_to_model(model_to_delete, false);
 
@@ -865,12 +865,12 @@ pub fn insert_emulated_on_update_with_intermediary_node(
     parent_node: &NodeRef,
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<Option<NodeRef>> {
-    // If the connector uses the `ReferentialIntegrity::ForeignKeys` mode, we do not do any checks / emulation.
-    if connector_ctx.referential_integrity.uses_foreign_keys() {
+    // If the connector uses the `RelationMode::ForeignKeys` mode, we do not do any checks / emulation.
+    if connector_ctx.relation_mode.uses_foreign_keys() {
         return Ok(None);
     }
 
-    // If the connector uses the `ReferentialIntegrity::Prisma` mode, then the emulation will kick in.
+    // If the connector uses the `RelationMode::Prisma` mode, then the emulation will kick in.
     let internal_model = model_to_update.internal_data_model();
     let relation_fields = internal_model.fields_pointing_to_model(model_to_update, false);
 
@@ -913,12 +913,12 @@ pub fn insert_emulated_on_update(
     parent_node: &NodeRef,
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<()> {
-    // If the connector uses the `ReferentialIntegrity::ForeignKeys` mode, we do not do any checks / emulation.
-    if connector_ctx.referential_integrity.uses_foreign_keys() {
+    // If the connector uses the `RelationMode::ForeignKeys` mode, we do not do any checks / emulation.
+    if connector_ctx.relation_mode.uses_foreign_keys() {
         return Ok(());
     }
 
-    // If the connector uses the `ReferentialIntegrity::Prisma` mode, then the emulation will kick in.
+    // If the connector uses the `RelationMode::Prisma` mode, then the emulation will kick in.
     let internal_model = model_to_update.internal_data_model();
     let relation_fields = internal_model.fields_pointing_to_model(model_to_update, false);
 

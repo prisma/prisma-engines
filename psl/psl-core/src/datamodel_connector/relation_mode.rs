@@ -6,7 +6,7 @@ use std::fmt;
 #[bitflags]
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, PartialEq)]
-pub enum ReferentialIntegrity {
+pub enum RelationMode {
     /// Enforced in the database. Needs support from the underlying database
     /// server.
     ForeignKeys,
@@ -15,7 +15,7 @@ pub enum ReferentialIntegrity {
     Prisma,
 }
 
-impl ReferentialIntegrity {
+impl RelationMode {
     /// Returns either the given actions if foreign keys are used, or the
     /// allowed emulated actions if referential integrity happens in Prisma.
     pub fn allowed_referential_actions(
@@ -32,7 +32,7 @@ impl ReferentialIntegrity {
     }
 
     pub fn is_prisma(&self) -> bool {
-        matches!(self, ReferentialIntegrity::Prisma)
+        matches!(self, Self::Prisma)
     }
 
     /// True, if integrity is in database foreign keys
@@ -41,17 +41,17 @@ impl ReferentialIntegrity {
     }
 }
 
-impl Default for ReferentialIntegrity {
+impl Default for RelationMode {
     fn default() -> Self {
         Self::ForeignKeys
     }
 }
 
-impl fmt::Display for ReferentialIntegrity {
+impl fmt::Display for RelationMode {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            ReferentialIntegrity::ForeignKeys => write!(f, "foreignKeys"),
-            ReferentialIntegrity::Prisma => write!(f, "prisma"),
+            RelationMode::ForeignKeys => write!(f, "foreignKeys"),
+            RelationMode::Prisma => write!(f, "prisma"),
         }
     }
 }

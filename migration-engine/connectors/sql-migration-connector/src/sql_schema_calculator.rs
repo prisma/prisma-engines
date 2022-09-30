@@ -46,7 +46,7 @@ pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn Sq
     // Two types of tables: model tables and implicit M2M relation tables (a.k.a. join tables.).
     push_model_tables(&mut context);
 
-    if context.datamodel.referential_integrity().uses_foreign_keys() {
+    if context.datamodel.relation_mode().uses_foreign_keys() {
         push_inline_relations(&mut context);
     }
 
@@ -144,7 +144,7 @@ fn push_inline_relations(ctx: &mut Context<'_>) {
         let referenced_model = ctx.model_id_to_table_id[&relation.referenced_model().model_id()];
         let on_delete_action = relation_field.explicit_on_delete().unwrap_or_else(|| {
             relation_field.default_on_delete_action(
-                ctx.datamodel.configuration.referential_integrity().unwrap_or_default(),
+                ctx.datamodel.configuration.relation_mode().unwrap_or_default(),
                 ctx.flavour.datamodel_connector(),
             )
         });
@@ -296,7 +296,7 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
             });
         }
 
-        if ctx.datamodel.referential_integrity().uses_foreign_keys() {
+        if ctx.datamodel.relation_mode().uses_foreign_keys() {
             let fkid = ctx.schema.describer_schema.push_foreign_key(
                 Some(model_a_fk_name),
                 [table_id, ctx.model_id_to_table_id[&model_a.model_id()]],

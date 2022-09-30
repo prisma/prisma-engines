@@ -1,5 +1,5 @@
 use crate::{
-    datamodel_connector::{Connector, ReferentialIntegrity},
+    datamodel_connector::{Connector, RelationMode},
     Datasource, PreviewFeature,
 };
 use diagnostics::{DatamodelError, Diagnostics};
@@ -13,9 +13,9 @@ pub(crate) struct Context<'a> {
     pub(super) datasource: Option<&'a Datasource>,
     pub(super) preview_features: BitFlags<PreviewFeature>,
     pub(super) connector: &'static dyn Connector,
-    /// Referential integrity is a pure function of the datasource, but since there are defaults,
+    /// Relation mode is a pure function of the datasource, but since there are defaults,
     /// it's more consistent to resolve it once, here.
-    pub(super) referential_integrity: ReferentialIntegrity,
+    pub(super) relation_mode: RelationMode,
     pub(super) diagnostics: &'a mut Diagnostics,
 }
 

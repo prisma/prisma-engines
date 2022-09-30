@@ -57,7 +57,7 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
     let test_database_name = format!("{}_{}", suite_name, test_name);
     let capabilities = args.capabilities.idents;
 
-    let referential_override = match args.referential_integrity {
+    let referential_override = match args.relation_mode.or(args.referential_integrity) {
         Some(ref_override) => {
             let wat = ref_override.to_string();
             quote! { Some(#wat.to_string()) }

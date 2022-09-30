@@ -6,10 +6,10 @@ pub(crate) fn run(schema: &str) -> String {
             if validated_configuration.datasources.len() != 1 {
                 "[]".to_string()
             } else if let Some(datasource) = validated_configuration.datasources.first() {
-                let referential_integrity = datasource.referential_integrity();
+                let relation_mode = datasource.relation_mode();
                 let available_referential_actions = datasource
                     .active_connector
-                    .referential_actions(&referential_integrity)
+                    .referential_actions(&relation_mode)
                     .iter()
                     .map(|act| format!("{:?}", act))
                     .collect::<Vec<_>>();

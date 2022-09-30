@@ -52,6 +52,7 @@ features!(
     OrderByAggregateGroup,
     FilterJson,
     ReferentialIntegrity,
+    RelationMode,
     ReferentialActions,
     InteractiveTransactions,
     NamedConstraints,
@@ -72,7 +73,7 @@ features!(
 /// Generator preview features
 pub const GENERATOR: FeatureMap = FeatureMap {
     active: enumflags2::make_bitflags!(PreviewFeature::{
-         ReferentialIntegrity
+        RelationMode
          | InteractiveTransactions
          | FullTextSearch
          | FullTextIndex
@@ -107,7 +108,10 @@ pub const GENERATOR: FeatureMap = FeatureMap {
         | ImprovedQueryRaw
         | DataProxy
     }),
-    hidden: enumflags2::make_bitflags!(PreviewFeature::{MultiSchema}),
+    hidden: enumflags2::make_bitflags!(PreviewFeature::{
+        MultiSchema
+        | ReferentialIntegrity
+    }),
 };
 
 #[derive(Debug)]

@@ -13,7 +13,7 @@ pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, psl::dml::Datam
         .map(|ds| ds.capabilities())
         .unwrap_or_else(ConnectorCapabilities::empty);
 
-    let referential_integrity = datasource.map(|ds| ds.referential_integrity()).unwrap_or_default();
+    let relation_mode = datasource.map(|ds| ds.relation_mode()).unwrap_or_default();
 
     let internal_dm_template = InternalDataModelBuilder::new(datamodel_string);
     let internal_ref = internal_dm_template.build("db".to_owned());
@@ -22,7 +22,7 @@ pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, psl::dml::Datam
         false,
         capabilities,
         config.subject.preview_features().iter().collect(),
-        referential_integrity,
+        relation_mode,
     );
 
     (schema, dm)

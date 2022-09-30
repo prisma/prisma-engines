@@ -1,7 +1,7 @@
 use super::{Datasource, Generator};
 use crate::{
     common::preview_features::PreviewFeature,
-    datamodel_connector::ReferentialIntegrity,
+    datamodel_connector::RelationMode,
     diagnostics::{DatamodelError, Diagnostics},
 };
 use enumflags2::BitFlags;
@@ -26,8 +26,8 @@ impl Configuration {
         }
     }
 
-    pub fn referential_integrity(&self) -> Option<ReferentialIntegrity> {
-        self.datasources.first().map(|source| source.referential_integrity())
+    pub fn relation_mode(&self) -> Option<RelationMode> {
+        self.datasources.first().map(|source| source.relation_mode())
     }
 
     pub fn max_identifier_length(&self) -> usize {

@@ -13,7 +13,7 @@ mod empty_connector;
 mod filters;
 mod native_type_constructor;
 mod native_type_instance;
-mod referential_integrity;
+mod relation_mode;
 
 pub use self::{
     capabilities::{ConnectorCapabilities, ConnectorCapability},
@@ -21,7 +21,7 @@ pub use self::{
     filters::*,
     native_type_constructor::NativeTypeConstructor,
     native_type_instance::NativeTypeInstance,
-    referential_integrity::ReferentialIntegrity,
+    relation_mode::RelationMode,
 };
 
 use diagnostics::{DatamodelError, Diagnostics, NativeTypeErrorFactory, Span};
@@ -55,23 +55,23 @@ pub trait Connector: Send + Sync {
     /// limit should return usize::MAX.
     fn max_identifier_length(&self) -> usize;
 
-    // Referential integrity
+    // Relation mode
 
-    /// The referential integrity modes that can be set through the referentialIntegrity datasource
+    /// The relation modes that can be set through the relationMode datasource
     /// argument.
-    fn allowed_referential_integrity_settings(&self) -> BitFlags<ReferentialIntegrity> {
-        use ReferentialIntegrity::*;
+    fn allowed_relation_mode_settings(&self) -> BitFlags<RelationMode> {
+        use RelationMode::*;
 
         ForeignKeys | Prisma
     }
 
-    /// The default referential integrity mode to assume for this connector.
-    fn default_referential_integrity(&self) -> ReferentialIntegrity {
-        ReferentialIntegrity::ForeignKeys
+    /// The default relation mode to assume for this connector.
+    fn default_relation_mode(&self) -> RelationMode {
+        RelationMode::ForeignKeys
     }
 
     /// The referential actions supported by the connector.
-    fn referential_actions(&self, referential_integrity: &ReferentialIntegrity) -> BitFlags<ReferentialAction>;
+    fn referential_actions(&self, relation_mode: &RelationMode) -> BitFlags<ReferentialAction>;
 
     fn supports_composite_types(&self) -> bool {
         self.has_capability(ConnectorCapability::CompositeTypes)
@@ -89,8 +89,8 @@ pub trait Connector: Send + Sync {
         self.has_capability(ConnectorCapability::NamedDefaultValues)
     }
 
-    fn supports_referential_action(&self, integrity: &ReferentialIntegrity, action: ReferentialAction) -> bool {
-        self.referential_actions(integrity).contains(action)
+    fn supports_referential_action(&self, relation_mode: &RelationMode, action: ReferentialAction) -> bool {
+        self.referential_actions(relation_mode).contains(action)
     }
 
     /// This is used by the query engine schema builder.
