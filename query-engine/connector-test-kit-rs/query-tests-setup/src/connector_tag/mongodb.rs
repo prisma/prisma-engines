@@ -17,7 +17,13 @@ impl ConnectorTagInterface for MongoDbConnectorTag {
         Box::new(MongoDbSchemaRenderer::new())
     }
 
-    fn connection_string(&self, database: &str, is_ci: bool, _is_multi_schema: bool) -> String {
+    fn connection_string(
+        &self,
+        database: &str,
+        is_ci: bool,
+        _is_multi_schema: bool,
+        _: Option<&'static str>,
+    ) -> String {
         match self.version {
             Some(MongoDbVersion::V4_2) if is_ci => format!(
                 "mongodb://prisma:prisma@test-db-mongodb-4-2:27016/{}?authSource=admin&retryWrites=true",

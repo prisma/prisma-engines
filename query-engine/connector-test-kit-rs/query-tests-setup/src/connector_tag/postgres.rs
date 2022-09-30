@@ -16,7 +16,7 @@ impl ConnectorTagInterface for PostgresConnectorTag {
         Box::new(SqlDatamodelRenderer::new())
     }
 
-    fn connection_string(&self, database: &str, is_ci: bool, is_multi_schema: bool) -> String {
+    fn connection_string(&self, database: &str, is_ci: bool, is_multi_schema: bool, _: Option<&'static str>) -> String {
         let database = if is_multi_schema {
             database.to_string()
         } else {
