@@ -50,6 +50,7 @@
 <span id="50">50</span>
 <span id="51">51</span>
 <span id="52">52</span>
+<span id="53">53</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">unsafe_code</span>, <span class="ident">rust_2018_idioms</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::derive_partial_eq_without_eq</span>)]</span>
 
@@ -79,6 +80,7 @@
 
 <span class="kw">type</span> <span class="ident">AnyError</span> <span class="op">=</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
 
+<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">never</span>)]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">should_skip_test</span>(
     <span class="ident">include_tagged</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">Tags</span><span class="op">&gt;</span>,
     <span class="ident">exclude_tags</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">Tags</span><span class="op">&gt;</span>,
