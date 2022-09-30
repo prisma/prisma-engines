@@ -37,5 +37,5 @@ FROM
     INNER JOIN pg_am AS indexaccess ON indexaccess.oid = indexinfo.relam
     LEFT JOIN pg_opclass AS opclass -- left join because crdb has no opclasses
         ON opclass.oid = rawindex.indclass
-WHERE schemainfo.nspname = Any ( $1 )
+WHERE schemainfo.nspname = ANY ( $1 )
 ORDER BY schemainfo.nspname, tableinfo.relname, indexinfo.relname, rawindex.indkeyidx;

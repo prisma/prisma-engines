@@ -497,7 +497,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             FROM pg_proc p
             LEFT JOIN pg_namespace n ON p.pronamespace = n.oid
             LEFT JOIN pg_language l ON p.prolang = l.oid
-            WHERE n.nspname = Any ( $1 )
+            WHERE n.nspname = ANY ( $1 )
         "#;
 
         let rows = self
@@ -570,7 +570,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         let sql = indoc! {r#"
             SELECT viewname AS view_name, definition AS view_sql, schemaname as namespace
             FROM pg_catalog.pg_views
-            WHERE schemaname = Any ( $1 )
+            WHERE schemaname = ANY ( $1 )
         "#};
 
         let result_set = self
@@ -630,10 +630,10 @@ impl<'a> SqlSchemaDescriber<'a> {
                     FROM pg_class
                     JOIN pg_namespace on pg_namespace.oid = pg_class.relnamespace
                     WHERE relname = info.table_name
-                    AND pg_namespace.nspname = Any ( $1 )
+                    AND pg_namespace.nspname = ANY ( $1 )
                 )
             LEFT OUTER JOIN pg_attrdef attdef ON attdef.adrelid = att.attrelid AND attdef.adnum = att.attnum
-            WHERE table_schema = Any ( $1 ) {}
+            WHERE table_schema = ANY ( $1 ) {}
             ORDER BY table_name, ordinal_position;
         "#,
             is_visible_clause,
@@ -799,7 +799,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                         join pg_constraint con1 on con1.conrelid = cl.oid
                         join pg_namespace ns on cl.relnamespace = ns.oid
                 WHERE
-                    ns.nspname = Any ( $1 )
+                    ns.nspname = ANY ( $1 )
                     and con1.contype = 'f'
                 ORDER BY colidx
                 ) con
@@ -1038,7 +1038,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                   cycle,
                   cache_size
               FROM pg_sequences
-              WHERE schemaname = Any ( $1 )
+              WHERE schemaname = ANY ( $1 )
               ORDER BY sequence_name
             "#
         } else {
@@ -1053,7 +1053,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                   (CASE cycle_option WHEN 'yes' THEN TRUE ELSE FALSE END) AS cycle,
                   0::INT8 AS cache_size
               FROM information_schema.sequences
-              WHERE sequence_schema = Any ( $1 )
+              WHERE sequence_schema = ANY ( $1 )
               ORDER BY sequence_name
             "#
         };
@@ -1089,7 +1089,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             FROM pg_type t
             JOIN pg_enum e ON t.oid = e.enumtypid
             JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
-            WHERE n.nspname = Any ( $1 )
+            WHERE n.nspname = ANY ( $1 )
             ORDER BY e.enumsortorder";
 
         let rows = self
