@@ -42,7 +42,7 @@ fn reformat_top(target: &mut Renderer, pair: Pair<'_>) {
                     _ => target.end_line(),
                 }
             }
-            Rule::CATCH_ALL | Rule::BLOCK_LEVEL_CATCH_ALL | Rule::arbitrary_block => {
+            Rule::CATCH_ALL | Rule::BLOCK_LEVEL_CATCH_ALL | Rule::arbitrary_block | Rule::type_alias => {
                 target.write(current.as_str());
             }
             Rule::EOI => {}
