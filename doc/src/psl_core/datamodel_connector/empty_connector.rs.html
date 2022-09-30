@@ -92,7 +92,7 @@
         <span class="ident">std::any::type_name</span>::<span class="op">&lt;</span><span class="ident">EmptyDatamodelConnector</span><span class="op">&gt;</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">referential_actions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_referential_integrity</span>: <span class="kw-2">&amp;</span><span class="ident">ReferentialIntegrity</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">referential_actions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_relation_mode</span>: <span class="kw-2">&amp;</span><span class="ident">RelationMode</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
         <span class="ident">BitFlags::all</span>()
     }
 

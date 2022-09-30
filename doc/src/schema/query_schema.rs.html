@@ -254,7 +254,7 @@
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">fmt::Debug</span>;
 <span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">psl::common::preview_features::PreviewFeature</span>, <span class="ident">InternalDataModelRef</span>, <span class="ident">ModelRef</span>};
-<span class="kw">use</span> <span class="ident">psl::datamodel_connector</span>::{<span class="ident">ConnectorCapability</span>, <span class="ident">ReferentialIntegrity</span>};
+<span class="kw">use</span> <span class="ident">psl::datamodel_connector</span>::{<span class="ident">ConnectorCapability</span>, <span class="ident">RelationMode</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Borrow</span>, <span class="ident">fmt</span>};
 
 <span class="doccomment">/// The query schema.</span>
@@ -303,20 +303,20 @@
     <span class="doccomment">/// Enabled preview features.</span>
     <span class="kw">pub</span> <span class="ident">features</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
 
-    <span class="doccomment">/// Referential integrity mode of the provider</span>
-    <span class="kw">pub</span> <span class="ident">referential_integrity</span>: <span class="ident">ReferentialIntegrity</span>,
+    <span class="doccomment">/// Relation mode of the provider</span>
+    <span class="kw">pub</span> <span class="ident">relation_mode</span>: <span class="ident">RelationMode</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">ConnectorContext</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
         <span class="ident">capabilities</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorCapability</span><span class="op">&gt;</span>,
         <span class="ident">features</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
-        <span class="ident">referential_integrity</span>: <span class="ident">ReferentialIntegrity</span>,
+        <span class="ident">relation_mode</span>: <span class="ident">RelationMode</span>,
     ) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">capabilities</span>,
             <span class="ident">features</span>,
-            <span class="ident">referential_integrity</span>,
+            <span class="ident">relation_mode</span>,
         }
     }
 }
@@ -332,7 +332,7 @@
         <span class="ident">internal_data_model</span>: <span class="ident">InternalDataModelRef</span>,
         <span class="ident">capabilities</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorCapability</span><span class="op">&gt;</span>,
         <span class="ident">features</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
-        <span class="ident">referential_integrity</span>: <span class="ident">ReferentialIntegrity</span>,
+        <span class="ident">relation_mode</span>: <span class="ident">RelationMode</span>,
     ) -&gt; <span class="self">Self</span> {
         <span class="ident">QuerySchema</span> {
             <span class="ident">query</span>,
@@ -341,7 +341,7 @@
             <span class="ident">_output_object_types</span>,
             <span class="ident">_enum_types</span>,
             <span class="ident">internal_data_model</span>,
-            <span class="ident">context</span>: <span class="ident">ConnectorContext::new</span>(<span class="ident">capabilities</span>, <span class="ident">features</span>, <span class="ident">referential_integrity</span>),
+            <span class="ident">context</span>: <span class="ident">ConnectorContext::new</span>(<span class="ident">capabilities</span>, <span class="ident">features</span>, <span class="ident">relation_mode</span>),
         }
     }
 

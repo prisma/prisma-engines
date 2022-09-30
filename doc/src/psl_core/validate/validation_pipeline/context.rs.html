@@ -26,7 +26,7 @@
 <span id="26">26</span>
 <span id="27">27</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">datamodel_connector</span>::{<span class="ident">Connector</span>, <span class="ident">ReferentialIntegrity</span>},
+    <span class="ident">datamodel_connector</span>::{<span class="ident">Connector</span>, <span class="ident">RelationMode</span>},
     <span class="ident">Datasource</span>, <span class="ident">PreviewFeature</span>,
 };
 <span class="kw">use</span> <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>};
@@ -40,9 +40,9 @@
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">datasource</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Datasource</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">Connector</span>,
-    <span class="doccomment">/// Referential integrity is a pure function of the datasource, but since there are defaults,</span>
+    <span class="doccomment">/// Relation mode is a pure function of the datasource, but since there are defaults,</span>
     <span class="doccomment">/// it&#39;s more consistent to resolve it once, here.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">referential_integrity</span>: <span class="ident">ReferentialIntegrity</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">relation_mode</span>: <span class="ident">RelationMode</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">diagnostics</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Diagnostics</span>,
 }
 

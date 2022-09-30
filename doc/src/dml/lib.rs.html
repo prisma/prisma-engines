@@ -93,7 +93,7 @@
 
 <span class="doccomment">/// Validated schema -&gt; dml::Datamodel.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lift</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">ValidatedSchema</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Datamodel</span> {
-    <span class="ident">lift::LiftAstToDml::new</span>(<span class="kw-2">&amp;</span><span class="ident">schema</span>.<span class="ident">db</span>, <span class="ident">schema</span>.<span class="ident">connector</span>, <span class="ident">schema</span>.<span class="ident">referential_integrity</span>()).<span class="ident">lift</span>()
+    <span class="ident">lift::LiftAstToDml::new</span>(<span class="kw-2">&amp;</span><span class="ident">schema</span>.<span class="ident">db</span>, <span class="ident">schema</span>.<span class="ident">connector</span>, <span class="ident">schema</span>.<span class="ident">relation_mode</span>()).<span class="ident">lift</span>()
 }
 
 <span class="doccomment">/// Renders the datamodel _without configuration blocks_.</span>

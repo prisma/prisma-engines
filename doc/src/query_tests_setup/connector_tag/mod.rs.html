@@ -268,7 +268,7 @@
     <span class="doccomment">/// Defines where relational constraints are handled:</span>
     <span class="doccomment">///   - &quot;prisma&quot; is handled in the Query Engine core</span>
     <span class="doccomment">///   - &quot;foreignKeys&quot; lets the database handle them</span>
-    <span class="kw">fn</span> <span class="ident">referential_integrity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">relation_mode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="string">&quot;foreignKeys&quot;</span>
     }
 }

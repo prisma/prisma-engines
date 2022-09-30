@@ -172,9 +172,14 @@
 <span id="172">172</span>
 <span id="173">173</span>
 <span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">configuration::StringFromEnvVar</span>,
-    <span class="ident">datamodel_connector</span>::{<span class="ident">Connector</span>, <span class="ident">ConnectorCapabilities</span>, <span class="ident">ReferentialIntegrity</span>},
+    <span class="ident">datamodel_connector</span>::{<span class="ident">Connector</span>, <span class="ident">ConnectorCapabilities</span>, <span class="ident">RelationMode</span>},
     <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>, <span class="ident">Span</span>},
 };
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">path::Path</span>};
@@ -195,7 +200,10 @@
     <span class="doccomment">/// An optional user-defined shadow database URL.</span>
     <span class="kw">pub</span> <span class="ident">shadow_database_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">StringFromEnvVar</span>, <span class="ident">Span</span>)<span class="op">&gt;</span>,
     <span class="doccomment">/// In which layer referential actions are handled.</span>
-    <span class="kw">pub</span> <span class="ident">referential_integrity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReferentialIntegrity</span><span class="op">&gt;</span>,
+    <span class="comment">// #[deprecated(since = &quot;4.5.0&quot;, note = &quot;Use `relation_mode` instead&quot;)]</span>
+    <span class="kw">pub</span> <span class="ident">referential_integrity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RelationMode</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// In which layer referential actions are handled.</span>
+    <span class="kw">pub</span> <span class="ident">relation_mode</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RelationMode</span><span class="op">&gt;</span>,
     <span class="doccomment">/// _Sorted_ vec of schemas defined in the schemas property.</span>
     <span class="kw">pub</span> <span class="ident">schemas</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">Span</span>)<span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">schemas_span</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&gt;</span>,
@@ -211,7 +219,8 @@
             .<span class="ident">field</span>(<span class="string">&quot;documentation&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">documentation</span>)
             .<span class="ident">field</span>(<span class="string">&quot;active_connector&quot;</span>, <span class="op">&amp;&amp;</span><span class="string">&quot;...&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;shadow_database_url&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;&lt;shadow_database_url&gt;&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;referential_integrity&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">referential_integrity</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;referential_integrity [deprecated]&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">referential_integrity</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;relation_mode&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relation_mode</span>)
             .<span class="ident">field</span>(<span class="string">&quot;schemas&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">schemas</span>)
             .<span class="ident">finish</span>()
     }
@@ -228,11 +237,12 @@
         <span class="ident">ConnectorCapabilities::new</span>(<span class="ident">capabilities</span>)
     }
 
-    <span class="doccomment">/// The applicable referential integrity mode for this datasource.</span>
+    <span class="doccomment">/// The applicable relation mode for this datasource.</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::or_fun_call</span>)]</span> <span class="comment">// not applicable in this case</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referential_integrity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ReferentialIntegrity</span> {
-        <span class="self">self</span>.<span class="ident">referential_integrity</span>
-            .<span class="ident">unwrap_or</span>(<span class="self">self</span>.<span class="ident">active_connector</span>.<span class="ident">default_referential_integrity</span>())
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_mode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RelationMode</span> {
+        <span class="self">self</span>.<span class="ident">relation_mode</span>
+            .<span class="ident">or</span>(<span class="self">self</span>.<span class="ident">referential_integrity</span>)
+            .<span class="ident">unwrap_or</span>(<span class="self">self</span>.<span class="ident">active_connector</span>.<span class="ident">default_relation_mode</span>())
     }
 
     <span class="doccomment">/// Load the database URL, validating it and resolving env vars in the</span>

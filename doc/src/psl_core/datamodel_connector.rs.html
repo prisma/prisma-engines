@@ -354,7 +354,7 @@
 <span class="kw">mod</span> <span class="ident">filters</span>;
 <span class="kw">mod</span> <span class="ident">native_type_constructor</span>;
 <span class="kw">mod</span> <span class="ident">native_type_instance</span>;
-<span class="kw">mod</span> <span class="ident">referential_integrity</span>;
+<span class="kw">mod</span> <span class="ident">relation_mode</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::{
     <span class="ident">capabilities</span>::{<span class="ident">ConnectorCapabilities</span>, <span class="ident">ConnectorCapability</span>},
@@ -362,7 +362,7 @@
     <span class="ident">filters</span>::<span class="kw-2">*</span>,
     <span class="ident">native_type_constructor::NativeTypeConstructor</span>,
     <span class="ident">native_type_instance::NativeTypeInstance</span>,
-    <span class="ident">referential_integrity::ReferentialIntegrity</span>,
+    <span class="ident">relation_mode::RelationMode</span>,
 };
 
 <span class="kw">use</span> <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>, <span class="ident">NativeTypeErrorFactory</span>, <span class="ident">Span</span>};
@@ -396,23 +396,23 @@
     <span class="doccomment">/// limit should return usize::MAX.</span>
     <span class="kw">fn</span> <span class="ident">max_identifier_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span>;
 
-    <span class="comment">// Referential integrity</span>
+    <span class="comment">// Relation mode</span>
 
-    <span class="doccomment">/// The referential integrity modes that can be set through the referentialIntegrity datasource</span>
+    <span class="doccomment">/// The relation modes that can be set through the relationMode datasource</span>
     <span class="doccomment">/// argument.</span>
-    <span class="kw">fn</span> <span class="ident">allowed_referential_integrity_settings</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">ReferentialIntegrity</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">ReferentialIntegrity</span>::<span class="kw-2">*</span>;
+    <span class="kw">fn</span> <span class="ident">allowed_relation_mode_settings</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">RelationMode</span><span class="op">&gt;</span> {
+        <span class="kw">use</span> <span class="ident">RelationMode</span>::<span class="kw-2">*</span>;
 
         <span class="ident">ForeignKeys</span> <span class="op">|</span> <span class="ident">Prisma</span>
     }
 
-    <span class="doccomment">/// The default referential integrity mode to assume for this connector.</span>
-    <span class="kw">fn</span> <span class="ident">default_referential_integrity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ReferentialIntegrity</span> {
-        <span class="ident">ReferentialIntegrity::ForeignKeys</span>
+    <span class="doccomment">/// The default relation mode to assume for this connector.</span>
+    <span class="kw">fn</span> <span class="ident">default_relation_mode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RelationMode</span> {
+        <span class="ident">RelationMode::ForeignKeys</span>
     }
 
     <span class="doccomment">/// The referential actions supported by the connector.</span>
-    <span class="kw">fn</span> <span class="ident">referential_actions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">referential_integrity</span>: <span class="kw-2">&amp;</span><span class="ident">ReferentialIntegrity</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">referential_actions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">relation_mode</span>: <span class="kw-2">&amp;</span><span class="ident">RelationMode</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span>;
 
     <span class="kw">fn</span> <span class="ident">supports_composite_types</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::CompositeTypes</span>)
@@ -430,8 +430,8 @@
         <span class="self">self</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::NamedDefaultValues</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">supports_referential_action</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">integrity</span>: <span class="kw-2">&amp;</span><span class="ident">ReferentialIntegrity</span>, <span class="ident">action</span>: <span class="ident">ReferentialAction</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">referential_actions</span>(<span class="ident">integrity</span>).<span class="ident">contains</span>(<span class="ident">action</span>)
+    <span class="kw">fn</span> <span class="ident">supports_referential_action</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">relation_mode</span>: <span class="kw-2">&amp;</span><span class="ident">RelationMode</span>, <span class="ident">action</span>: <span class="ident">ReferentialAction</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">referential_actions</span>(<span class="ident">relation_mode</span>).<span class="ident">contains</span>(<span class="ident">action</span>)
     }
 
     <span class="doccomment">/// This is used by the query engine schema builder.</span>

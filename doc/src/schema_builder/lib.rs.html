@@ -265,7 +265,7 @@
     <span class="ident">psl::common::preview_features::PreviewFeature</span>, <span class="ident">CompositeTypeRef</span>, <span class="ident">Field</span> <span class="kw">as</span> <span class="ident">ModelField</span>, <span class="ident">Index</span>, <span class="ident">InternalDataModelRef</span>,
     <span class="ident">ModelRef</span>, <span class="ident">RelationFieldRef</span>, <span class="ident">TypeIdentifier</span>,
 };
-<span class="kw">use</span> <span class="ident">psl::datamodel_connector</span>::{<span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ReferentialIntegrity</span>};
+<span class="kw">use</span> <span class="ident">psl::datamodel_connector</span>::{<span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">RelationMode</span>};
 <span class="kw">use</span> <span class="ident">schema</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
@@ -397,7 +397,7 @@
     <span class="ident">enable_raw_queries</span>: <span class="ident">bool</span>,
     <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">Connector</span>,
     <span class="ident">preview_features</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
-    <span class="ident">referential_integrity</span>: <span class="ident">ReferentialIntegrity</span>,
+    <span class="ident">relation_mode</span>: <span class="ident">RelationMode</span>,
 ) -&gt; <span class="ident">QuerySchema</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">BuilderContext::new</span>(
         <span class="ident">internal_data_model</span>,
@@ -433,7 +433,7 @@
         <span class="ident">ctx</span>.<span class="ident">internal_data_model</span>,
         <span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">capabilities</span>().<span class="ident">to_owned</span>(),
         <span class="ident">preview_features</span>,
-        <span class="ident">referential_integrity</span>,
+        <span class="ident">relation_mode</span>,
     )
 }
 

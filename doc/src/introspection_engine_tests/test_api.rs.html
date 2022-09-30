@@ -347,7 +347,6 @@
 <span id="347">347</span>
 <span id="348">348</span>
 <span id="349">349</span>
-<span id="350">350</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::TestResult</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">expect_test::expect</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">indoc</span>::{<span class="ident">formatdoc</span>, <span class="ident">indoc</span>};
@@ -600,12 +599,11 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">datasource_block</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DatasourceBlock</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">no_foreign_keys</span> <span class="op">=</span>
-            <span class="self">self</span>.<span class="ident">is_vitess</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">preview_features</span>().<span class="ident">contains</span>(<span class="ident">PreviewFeature::ReferentialIntegrity</span>);
+        <span class="kw">let</span> <span class="ident">no_foreign_keys</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">is_vitess</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">preview_features</span>().<span class="ident">contains</span>(<span class="ident">PreviewFeature::RelationMode</span>);
 
         <span class="kw">if</span> <span class="ident">no_foreign_keys</span> {
             <span class="self">self</span>.<span class="ident">args</span>
-                .<span class="ident">datasource_block</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connection_string</span>, <span class="kw-2">&amp;</span>[(<span class="string">&quot;referentialIntegrity&quot;</span>, <span class="string">r#&quot;&quot;prisma&quot;&quot;#</span>)])
+                .<span class="ident">datasource_block</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connection_string</span>, <span class="kw-2">&amp;</span>[(<span class="string">&quot;relationMode&quot;</span>, <span class="string">r#&quot;&quot;prisma&quot;&quot;#</span>)])
         } <span class="kw">else</span> {
             <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">datasource_block</span>(<span class="string">r#&quot;env(TEST_DATABASE_URL)&quot;#</span>, <span class="kw-2">&amp;</span>[])
         }

@@ -400,10 +400,6 @@
 <span id="400">400</span>
 <span id="401">401</span>
 <span id="402">402</span>
-<span id="403">403</span>
-<span id="404">404</span>
-<span id="405">405</span>
-<span id="406">406</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::assertions</span>::{<span class="ident">MigrationsAssertions</span>, <span class="ident">ResultSetExt</span>, <span class="ident">SchemaAssertion</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">expect_test::expect</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">migration_core::json_rpc::types</span>::{
@@ -711,14 +707,10 @@
 
     <span class="doccomment">/// Render a valid datasource block, including database URL.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_datasource_block</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">std::fmt::Write</span>) {
-        <span class="kw">let</span> <span class="ident">no_foreign_keys</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">is_vitess</span>()
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>
-                .<span class="ident">root</span>
-                .<span class="ident">preview_features</span>()
-                .<span class="ident">contains</span>(<span class="ident">PreviewFeature::ReferentialIntegrity</span>);
+        <span class="kw">let</span> <span class="ident">no_foreign_keys</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">is_vitess</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">preview_features</span>().<span class="ident">contains</span>(<span class="ident">PreviewFeature::RelationMode</span>);
 
         <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">no_foreign_keys</span> {
-            <span class="macro">vec!</span>[(<span class="string">&quot;referentialIntegrity&quot;</span>, <span class="string">r#&quot;&quot;prisma&quot;&quot;#</span>)]
+            <span class="macro">vec!</span>[(<span class="string">&quot;relationMode&quot;</span>, <span class="string">r#&quot;&quot;prisma&quot;&quot;#</span>)]
         } <span class="kw">else</span> {
             <span class="ident">Vec::new</span>()
         };

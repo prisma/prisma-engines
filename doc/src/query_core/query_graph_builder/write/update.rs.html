@@ -232,7 +232,7 @@
     <span class="kw">let</span> <span class="ident">read_query</span> <span class="op">=</span> <span class="ident">read::find_unique</span>(<span class="ident">field</span>, <span class="ident">model</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">read_node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">Query::Read</span>(<span class="ident">read_query</span>));
 
-    <span class="kw">if</span> <span class="ident">connector_ctx</span>.<span class="ident">referential_integrity</span>.<span class="ident">is_prisma</span>() {
+    <span class="kw">if</span> <span class="ident">connector_ctx</span>.<span class="ident">relation_mode</span>.<span class="ident">is_prisma</span>() {
         <span class="kw">let</span> <span class="ident">read_parent_node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">utils::read_ids_infallible</span>(
             <span class="ident">model</span>.<span class="ident">clone</span>(),
             <span class="ident">model</span>.<span class="ident">primary_identifier</span>(),
@@ -302,7 +302,7 @@
     <span class="kw">let</span> <span class="ident">data_argument</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">arguments</span>.<span class="ident">lookup</span>(<span class="ident">args::DATA</span>).<span class="ident">unwrap</span>();
     <span class="kw">let</span> <span class="ident">data_map</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">data_argument</span>.<span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
 
-    <span class="kw">if</span> <span class="ident">connector_ctx</span>.<span class="ident">referential_integrity</span>.<span class="ident">uses_foreign_keys</span>() {
+    <span class="kw">if</span> <span class="ident">connector_ctx</span>.<span class="ident">relation_mode</span>.<span class="ident">uses_foreign_keys</span>() {
         <span class="ident">update_many_record_node</span>(<span class="ident">graph</span>, <span class="ident">connector_ctx</span>, <span class="ident">filter</span>, <span class="ident">model</span>, <span class="ident">data_map</span>)<span class="question-mark">?</span>;
     } <span class="kw">else</span> {
         <span class="kw">let</span> <span class="ident">pre_read_node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">utils::read_ids_infallible</span>(

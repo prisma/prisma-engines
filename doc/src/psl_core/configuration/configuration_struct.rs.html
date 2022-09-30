@@ -68,7 +68,7 @@
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Datasource</span>, <span class="ident">Generator</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">common::preview_features::PreviewFeature</span>,
-    <span class="ident">datamodel_connector::ReferentialIntegrity</span>,
+    <span class="ident">datamodel_connector::RelationMode</span>,
     <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>},
 };
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
@@ -93,8 +93,8 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referential_integrity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReferentialIntegrity</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">datasources</span>.<span class="ident">first</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">source</span><span class="op">|</span> <span class="ident">source</span>.<span class="ident">referential_integrity</span>())
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_mode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RelationMode</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">datasources</span>.<span class="ident">first</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">source</span><span class="op">|</span> <span class="ident">source</span>.<span class="ident">relation_mode</span>())
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_identifier_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {

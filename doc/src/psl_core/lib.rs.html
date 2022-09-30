@@ -125,12 +125,12 @@
     <span class="kw">pub</span> <span class="ident">db</span>: <span class="ident">parser_database::ParserDatabase</span>,
     <span class="kw">pub</span> <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">datamodel_connector::Connector</span>,
     <span class="kw">pub</span> <span class="ident">diagnostics</span>: <span class="ident">Diagnostics</span>,
-    <span class="ident">referential_integrity</span>: <span class="ident">datamodel_connector::ReferentialIntegrity</span>,
+    <span class="ident">relation_mode</span>: <span class="ident">datamodel_connector::RelationMode</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">ValidatedSchema</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referential_integrity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">datamodel_connector::ReferentialIntegrity</span> {
-        <span class="self">self</span>.<span class="ident">referential_integrity</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_mode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">datamodel_connector::RelationMode</span> {
+        <span class="self">self</span>.<span class="ident">relation_mode</span>
     }
 }
 
@@ -148,7 +148,7 @@
         <span class="ident">configuration</span>,
         <span class="ident">connector</span>: <span class="ident">out</span>.<span class="ident">connector</span>,
         <span class="ident">db</span>: <span class="ident">out</span>.<span class="ident">db</span>,
-        <span class="ident">referential_integrity</span>: <span class="ident">out</span>.<span class="ident">referential_integrity</span>,
+        <span class="ident">relation_mode</span>: <span class="ident">out</span>.<span class="ident">relation_mode</span>,
     }
 }
 

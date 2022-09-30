@@ -149,6 +149,10 @@
 <span id="149">149</span>
 <span id="150">150</span>
 <span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -203,6 +207,7 @@
     <span class="ident">OrderByAggregateGroup</span>,
     <span class="ident">FilterJson</span>,
     <span class="ident">ReferentialIntegrity</span>,
+    <span class="ident">RelationMode</span>,
     <span class="ident">ReferentialActions</span>,
     <span class="ident">InteractiveTransactions</span>,
     <span class="ident">NamedConstraints</span>,
@@ -223,7 +228,7 @@
 <span class="doccomment">/// Generator preview features</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">GENERATOR</span>: <span class="ident">FeatureMap</span> <span class="op">=</span> <span class="ident">FeatureMap</span> {
     <span class="ident">active</span>: <span class="macro">enumflags2::make_bitflags!</span>(<span class="ident">PreviewFeature</span>::{
-         <span class="ident">ReferentialIntegrity</span>
+        <span class="ident">RelationMode</span>
          <span class="op">|</span> <span class="ident">InteractiveTransactions</span>
          <span class="op">|</span> <span class="ident">FullTextSearch</span>
          <span class="op">|</span> <span class="ident">FullTextIndex</span>
@@ -258,7 +263,10 @@
         <span class="op">|</span> <span class="ident">ImprovedQueryRaw</span>
         <span class="op">|</span> <span class="ident">DataProxy</span>
     }),
-    <span class="ident">hidden</span>: <span class="macro">enumflags2::make_bitflags!</span>(<span class="ident">PreviewFeature</span>::{<span class="ident">MultiSchema</span>}),
+    <span class="ident">hidden</span>: <span class="macro">enumflags2::make_bitflags!</span>(<span class="ident">PreviewFeature</span>::{
+        <span class="ident">MultiSchema</span>
+        <span class="op">|</span> <span class="ident">ReferentialIntegrity</span>
+    }),
 };
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>

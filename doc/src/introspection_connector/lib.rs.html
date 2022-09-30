@@ -281,7 +281,7 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">foreign_keys_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">source</span>.<span class="ident">referential_integrity</span>().<span class="ident">uses_foreign_keys</span>()
+        <span class="self">self</span>.<span class="ident">source</span>.<span class="ident">relation_mode</span>().<span class="ident">uses_foreign_keys</span>()
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
