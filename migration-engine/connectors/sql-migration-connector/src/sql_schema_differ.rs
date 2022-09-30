@@ -41,7 +41,7 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlDatabaseSchema>, flavour: &dyn S
 }
 
 fn push_created_schema_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDatabase<'_>) {
-    for schema in db.schemas().next.describer_schema.walk_namespaces() {
+    for schema in db.created_namespaces() {
         steps.push(SqlMigrationStep::CreateSchema(schema.id))
     }
 }

@@ -2,7 +2,7 @@ use super::{column, enums::EnumDiffer, table::TableDiffer};
 use crate::{flavour::SqlFlavour, pair::Pair, SqlDatabaseSchema};
 use sql_schema_describer::{
     walkers::{ColumnWalker, EnumWalker, TableWalker},
-    ColumnId, TableId,
+    ColumnId, NamespaceId, NamespaceWalker, TableId,
 };
 use std::{
     borrow::Cow,
@@ -14,6 +14,8 @@ pub(crate) struct DifferDatabase<'a> {
     pub(super) flavour: &'a dyn SqlFlavour,
     /// The schemas being diffed
     schemas: Pair<&'a SqlDatabaseSchema>,
+    /// Namespace name -> namespace indexes.
+    namespaces: HashMap<Cow<'a, str>, Pair<Option<NamespaceId>>>,
     /// Table name -> table indexes.
     tables: HashMap<Cow<'a, str>, Pair<Option<TableId>>>,
     /// (table_idxs, column_name) -> column_idxs. BTreeMap because we want range
@@ -28,13 +30,19 @@ pub(crate) struct DifferDatabase<'a> {
 
 impl<'a> DifferDatabase<'a> {
     pub(crate) fn new(schemas: Pair<&'a SqlDatabaseSchema>, flavour: &'a dyn SqlFlavour) -> Self {
+        let namespace_count_lb = std::cmp::max(
+            schemas.previous.describer_schema.namespaces_count(),
+            schemas.next.describer_schema.namespaces_count(),
+        );
         let table_count_lb = std::cmp::max(
             schemas.previous.describer_schema.tables_count(),
             schemas.next.describer_schema.tables_count(),
         );
+
         let mut db = DifferDatabase {
             flavour,
             schemas,
+            namespaces: HashMap::with_capacity(namespace_count_lb),
             tables: HashMap::with_capacity(table_count_lb),
             columns: BTreeMap::new(),
             column_changes: Default::default(),
@@ -45,6 +53,28 @@ impl<'a> DifferDatabase<'a> {
         let table_is_ignored = |table_name: &str| {
             table_name == crate::MIGRATIONS_TABLE_NAME || flavour.table_should_be_ignored(table_name)
         };
+
+        // First insert all namespaces from the previous schema.
+        for namespace in schemas.previous.describer_schema.namespace_walkers() {
+            let namespace_name = if flavour.lower_cases_table_names() {
+                namespace.name().to_ascii_lowercase().into()
+            } else {
+                Cow::Borrowed(namespace.name())
+            };
+            db.namespaces
+                .insert(namespace_name, Pair::new(Some(namespace.id), None));
+        }
+
+        // Then insert all namespaces from the next schema.
+        for namespace in schemas.next.describer_schema.namespace_walkers() {
+            let namespace_name = if flavour.lower_cases_table_names() {
+                namespace.name().to_ascii_lowercase().into()
+            } else {
+                Cow::Borrowed(namespace.name())
+            };
+            db.namespaces
+                .insert(namespace_name, Pair::new(Some(namespace.id), None));
+        }
 
         // First insert all tables from the previous schema.
         for table in schemas
@@ -137,6 +167,14 @@ impl<'a> DifferDatabase<'a> {
 
     pub(crate) fn created_tables(&self) -> impl Iterator<Item = TableWalker<'_>> + '_ {
         self.tables
+            .values()
+            .filter(|p| p.previous.is_none())
+            .filter_map(|p| p.next)
+            .map(move |table_id| self.schemas.next.walk(table_id))
+    }
+
+    pub(crate) fn created_namespaces(&self) -> impl Iterator<Item = NamespaceWalker<'_>> + '_ {
+        self.namespaces
             .values()
             .filter(|p| p.previous.is_none())
             .filter_map(|p| p.next)

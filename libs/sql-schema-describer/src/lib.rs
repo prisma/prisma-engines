@@ -231,6 +231,17 @@ impl SqlSchema {
         id
     }
 
+    pub fn namespaces_count(&self) -> usize {
+        self.namespaces.len()
+    }
+
+    pub fn namespace_walkers(&self) -> impl Iterator<Item = NamespaceWalker<'_>> {
+        (0..self.namespaces.len()).map(move |namespace_index| NamespaceWalker {
+            schema: self,
+            id: NamespaceId(namespace_index as u32),
+        })
+    }
+
     pub fn tables_count(&self) -> usize {
         self.tables.len()
     }
