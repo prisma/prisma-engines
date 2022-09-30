@@ -1670,10 +1670,7 @@ fn int_expressions_in_defaults(api: TestApi) {
     assert!(value.is_db_generated());
 }
 
-#[test_connector(
-    tags(Postgres11, Postgres12, Postgres13, Postgres14, Postgres15),
-    exclude(CockroachDb)
-)]
+#[test_connector(tags(Postgres13))]
 //Todo(matthias) seems like Sequence and Type share the same namespace
 fn multiple_schemas_are_described(api: TestApi) {
     let schema = r#"
