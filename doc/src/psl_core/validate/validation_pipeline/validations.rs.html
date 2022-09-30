@@ -233,6 +233,8 @@
 <span id="233">233</span>
 <span id="234">234</span>
 <span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">autoincrement</span>;
 <span class="kw">mod</span> <span class="ident">composite_types</span>;
 <span class="kw">mod</span> <span class="ident">constraint_namespace</span>;
@@ -271,9 +273,11 @@
         }
     }
 
-    <span class="comment">// Model validations</span>
     <span class="ident">ctx</span>.<span class="ident">connector</span>
         .<span class="ident">validate_scalar_field_unknown_default_functions</span>(<span class="ident">ctx</span>.<span class="ident">db</span>, <span class="ident">ctx</span>.<span class="ident">diagnostics</span>);
+
+    <span class="comment">// Model validations</span>
+    <span class="ident">models::database_name_clashes</span>(<span class="ident">ctx</span>);
 
     <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">walk_models</span>() {
         <span class="ident">models::has_a_strict_unique_criteria</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);

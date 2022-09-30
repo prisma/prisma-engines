@@ -446,8 +446,6 @@
 <span id="446">446</span>
 <span id="447">447</span>
 <span id="448">448</span>
-<span id="449">449</span>
-<span id="450">450</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">attributes</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="self">self</span>::attributes::AttributesValidationState</span>;
@@ -480,7 +478,6 @@
     <span class="ident">attributes</span>: <span class="ident">AttributesValidationState</span>, <span class="comment">// state machine for attribute validation</span>
 
     <span class="comment">// @map&#39;ed names indexes. These are not in the db because they are only used for validation.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">mapped_model_names</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">StringId</span>, <span class="ident">ast::ModelId</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">mapped_model_scalar_field_names</span>: <span class="ident">HashMap</span><span class="op">&lt;</span>(<span class="ident">ast::ModelId</span>, <span class="ident">StringId</span>), <span class="ident">ast::FieldId</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">mapped_composite_type_names</span>: <span class="ident">HashMap</span><span class="op">&lt;</span>(<span class="ident">ast::CompositeTypeId</span>, <span class="ident">StringId</span>), <span class="ident">ast::FieldId</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">mapped_enum_names</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">StringId</span>, <span class="ident">ast::EnumId</span><span class="op">&gt;</span>,
@@ -505,7 +502,6 @@
             <span class="ident">diagnostics</span>,
             <span class="ident">attributes</span>: <span class="ident">AttributesValidationState::default</span>(),
 
-            <span class="ident">mapped_model_names</span>: <span class="ident">Default::default</span>(),
             <span class="ident">mapped_model_scalar_field_names</span>: <span class="ident">Default::default</span>(),
             <span class="ident">mapped_enum_names</span>: <span class="ident">Default::default</span>(),
             <span class="ident">mapped_enum_value_names</span>: <span class="ident">Default::default</span>(),
