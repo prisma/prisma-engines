@@ -72,8 +72,8 @@ impl<'a> DifferDatabase<'a> {
             } else {
                 Cow::Borrowed(namespace.name())
             };
-            db.namespaces
-                .insert(namespace_name, Pair::new(Some(namespace.id), None));
+            let entry = db.namespaces.entry(namespace_name).or_default();
+            entry.next = Some(namespace.id);
         }
 
         // First insert all tables from the previous schema.
@@ -178,7 +178,7 @@ impl<'a> DifferDatabase<'a> {
             .values()
             .filter(|p| p.previous.is_none())
             .filter_map(|p| p.next)
-            .map(move |table_id| self.schemas.next.walk(table_id))
+            .map(move |namespace_id| self.schemas.next.walk(namespace_id))
     }
 
     pub(crate) fn dropped_columns(&self, table: Pair<TableId>) -> impl Iterator<Item = ColumnId> + '_ {
