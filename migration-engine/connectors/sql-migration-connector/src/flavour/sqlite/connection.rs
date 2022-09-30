@@ -26,7 +26,9 @@ impl Connection {
             .describe_impl()
             .await
             .map_err(|err| match err.into_kind() {
-                DescriberErrorKind::QuaintError(err) => panic!("{}", err),
+                DescriberErrorKind::QuaintError(err) => {
+                    ConnectorError::from_source(err, "Error describing the database.")
+                }
                 DescriberErrorKind::CrossSchemaReference { .. } => {
                     unreachable!("No schemas on SQLite")
                 }
