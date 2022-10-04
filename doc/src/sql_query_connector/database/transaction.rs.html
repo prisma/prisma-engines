@@ -270,7 +270,6 @@
 <span id="270">270</span>
 <span id="271">271</span>
 <span id="272">272</span>
-<span id="273">273</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::catch</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">database::operations</span>::<span class="kw-2">*</span>, <span class="ident">sql_info::SqlInfo</span>, <span class="ident">SqlError</span>};
 <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
@@ -322,10 +321,9 @@
         <span class="ident">catch</span>(<span class="self">self</span>.<span class="ident">connection_info</span>.<span class="ident">clone</span>(), <span class="kw">async</span> <span class="kw">move</span> {
             <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">rollback</span>().<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">SqlError::from</span>);
 
-            <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">res</span>, <span class="prelude-val">Err</span>(<span class="ident">SqlError::TransactionAlreadyClosed</span>(<span class="kw">_</span>))) {
-                <span class="prelude-val">Ok</span>(())
-            } <span class="kw">else</span> {
-                <span class="ident">res</span>
+            <span class="kw">match</span> <span class="ident">res</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">SqlError::TransactionAlreadyClosed</span>(<span class="kw">_</span>)) <span class="op">|</span> <span class="prelude-val">Err</span>(<span class="ident">SqlError::RollbackWithoutBegin</span>) =&gt; <span class="prelude-val">Ok</span>(()),
+                <span class="kw">_</span> =&gt; <span class="ident">res</span>,
             }
         })
         .<span class="kw">await</span>

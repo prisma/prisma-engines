@@ -102,6 +102,7 @@
 <span id="102">102</span>
 <span id="103">103</span>
 <span id="104">104</span>
+<span id="105">105</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">mongodb_renderer</span>;
 <span class="kw">mod</span> <span class="ident">sql_renderer</span>;
 
@@ -141,6 +142,7 @@
     <span class="ident">excluded_features</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>],
     <span class="ident">relation_mode_override</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="ident">db_schemas</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>],
+    <span class="ident">isolation_level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
 ) -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">tag</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">test_connector_tag</span>().<span class="ident">unwrap</span>();
     <span class="kw">let</span> <span class="ident">preview_features</span> <span class="op">=</span> <span class="ident">render_preview_features</span>(<span class="ident">excluded_features</span>);
@@ -168,7 +170,7 @@
             }}
         &quot;#</span>},
         <span class="ident">tag</span>.<span class="ident">datamodel_provider</span>(),
-        <span class="ident">tag</span>.<span class="ident">connection_string</span>(<span class="ident">test_database</span>, <span class="ident">config</span>.<span class="ident">is_ci</span>(), <span class="ident">is_multi_schema</span>),
+        <span class="ident">tag</span>.<span class="ident">connection_string</span>(<span class="ident">test_database</span>, <span class="ident">config</span>.<span class="ident">is_ci</span>(), <span class="ident">is_multi_schema</span>, <span class="ident">isolation_level</span>),
         <span class="ident">relation_mode_override</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">tag</span>.<span class="ident">relation_mode</span>().<span class="ident">to_string</span>()),
         <span class="ident">schema_def</span>,
         <span class="ident">preview_features</span>

@@ -278,6 +278,7 @@
 <span id="278">278</span>
 <span id="279">279</span>
 <span id="280">280</span>
+<span id="281">281</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::derive_partial_eq_without_eq</span>)]</span>
 
 <span class="kw">mod</span> <span class="ident">config</span>;
@@ -431,7 +432,7 @@
     <span class="kw">let</span> <span class="ident">dm_with_params_json</span>: <span class="ident">DatamodelWithParams</span> <span class="op">=</span> <span class="ident">dm_with_params</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
 
     <span class="kw">if</span> <span class="ident">ConnectorTag::should_run</span>(<span class="ident">config</span>, <span class="ident">enabled_connectors</span>, <span class="ident">capabilities</span>, <span class="ident">test_name</span>) {
-        <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">render_test_datamodel</span>(<span class="ident">config</span>, <span class="ident">test_database</span>, <span class="ident">template</span>, <span class="kw-2">&amp;</span>[], <span class="prelude-val">None</span>, <span class="ident">Default::default</span>());
+        <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">render_test_datamodel</span>(<span class="ident">config</span>, <span class="ident">test_database</span>, <span class="ident">template</span>, <span class="kw-2">&amp;</span>[], <span class="prelude-val">None</span>, <span class="ident">Default::default</span>(), <span class="prelude-val">None</span>);
         <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">test_connector_tag</span>().<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">requires_teardown</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">requires_teardown</span>();
         <span class="kw">let</span> <span class="ident">metrics</span> <span class="op">=</span> <span class="ident">setup_metrics</span>();
@@ -535,6 +536,7 @@
         <span class="ident">excluded_features</span>,
         <span class="ident">referential_override</span>,
         <span class="ident">db_schemas</span>,
+        <span class="prelude-val">None</span>,
     );
     <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">test_connector_tag</span>().<span class="ident">unwrap</span>();
     <span class="kw">let</span> <span class="ident">metrics</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::setup_metrics</span>();

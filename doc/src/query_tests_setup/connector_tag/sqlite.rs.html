@@ -53,6 +53,12 @@
 <span id="53">53</span>
 <span id="54">54</span>
 <span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::SqlDatamodelRenderer</span>;
 
@@ -70,7 +76,13 @@
         <span class="ident">Box::new</span>(<span class="ident">SqlDatamodelRenderer::new</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">connection_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">database</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">_is_ci</span>: <span class="ident">bool</span>, <span class="ident">_is_multi_schema</span>: <span class="ident">bool</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">connection_string</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">database</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">_is_ci</span>: <span class="ident">bool</span>,
+        <span class="ident">_is_multi_schema</span>: <span class="ident">bool</span>,
+        <span class="kw">_</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="ident">workspace_root</span> <span class="op">=</span> <span class="ident">std::env::var</span>(<span class="string">&quot;WORKSPACE_ROOT&quot;</span>)
             .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="string">&quot;.&quot;</span>.<span class="ident">to_owned</span>())
             .<span class="ident">trim_end_matches</span>(<span class="string">&#39;/&#39;</span>)

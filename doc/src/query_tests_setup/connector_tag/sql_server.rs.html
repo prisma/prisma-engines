@@ -136,6 +136,14 @@
 <span id="136">136</span>
 <span id="137">137</span>
 <span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">datamodel_rendering::SqlDatamodelRenderer</span>, <span class="ident">TestError</span>, <span class="ident">TestResult</span>};
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
@@ -155,22 +163,30 @@
         <span class="ident">Box::new</span>(<span class="ident">SqlDatamodelRenderer::new</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">connection_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">database</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">is_ci</span>: <span class="ident">bool</span>, <span class="ident">is_multi_schema</span>: <span class="ident">bool</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">connection_string</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">database</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">is_ci</span>: <span class="ident">bool</span>,
+        <span class="ident">is_multi_schema</span>: <span class="ident">bool</span>,
+        <span class="ident">isolation_level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="ident">database</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">is_multi_schema</span> {
             <span class="macro">format!</span>(<span class="string">&quot;database={};schema=dbo&quot;</span>, <span class="ident">database</span>)
         } <span class="kw">else</span> {
             <span class="macro">format!</span>(<span class="string">&quot;database=master;schema={}&quot;</span>, <span class="ident">database</span>)
         };
 
+        <span class="kw">let</span> <span class="ident">isolation_level</span> <span class="op">=</span> <span class="ident">isolation_level</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;READ UNCOMMITTED&quot;</span>);
+
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">version</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">SqlServerVersion::V2017</span>) <span class="kw">if</span> <span class="ident">is_ci</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;sqlserver://test-db-sqlserver-2017:1433;{};user=SA;password=&lt;YourStrong@Passw0rd&gt;;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED&quot;</span>, <span class="ident">database</span>),
-            <span class="prelude-val">Some</span>(<span class="ident">SqlServerVersion::V2017</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;sqlserver://127.0.0.1:1434;{};user=SA;password=&lt;YourStrong@Passw0rd&gt;;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED&quot;</span>, <span class="ident">database</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">SqlServerVersion::V2017</span>) <span class="kw">if</span> <span class="ident">is_ci</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;sqlserver://test-db-sqlserver-2017:1433;{};user=SA;password=&lt;YourStrong@Passw0rd&gt;;trustServerCertificate=true;isolationLevel={isolation_level}&quot;</span>, <span class="ident">database</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">SqlServerVersion::V2017</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;sqlserver://127.0.0.1:1434;{};user=SA;password=&lt;YourStrong@Passw0rd&gt;;trustServerCertificate=true;isolationLevel={isolation_level}&quot;</span>, <span class="ident">database</span>),
 
-            <span class="prelude-val">Some</span>(<span class="ident">SqlServerVersion::V2019</span>) <span class="kw">if</span> <span class="ident">is_ci</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;sqlserver://test-db-sqlserver-2019:1433;{};user=SA;password=&lt;YourStrong@Passw0rd&gt;;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED&quot;</span>, <span class="ident">database</span>),
-            <span class="prelude-val">Some</span>(<span class="ident">SqlServerVersion::V2019</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;sqlserver://127.0.0.1:1433;{};user=SA;password=&lt;YourStrong@Passw0rd&gt;;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED&quot;</span>, <span class="ident">database</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">SqlServerVersion::V2019</span>) <span class="kw">if</span> <span class="ident">is_ci</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;sqlserver://test-db-sqlserver-2019:1433;{};user=SA;password=&lt;YourStrong@Passw0rd&gt;;trustServerCertificate=true;isolationLevel={isolation_level}&quot;</span>, <span class="ident">database</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">SqlServerVersion::V2019</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;sqlserver://127.0.0.1:1433;{};user=SA;password=&lt;YourStrong@Passw0rd&gt;;trustServerCertificate=true;isolationLevel={isolation_level}&quot;</span>, <span class="ident">database</span>),
 
-            <span class="prelude-val">Some</span>(<span class="ident">SqlServerVersion::V2022</span>) <span class="kw">if</span> <span class="ident">is_ci</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;sqlserver://test-db-sqlserver-2022:1433;{};user=SA;password=&lt;YourStrong@Passw0rd&gt;;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED&quot;</span>, <span class="ident">database</span>),
-            <span class="prelude-val">Some</span>(<span class="ident">SqlServerVersion::V2022</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;sqlserver://127.0.0.1:1435;{};user=SA;password=&lt;YourStrong@Passw0rd&gt;;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED&quot;</span>, <span class="ident">database</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">SqlServerVersion::V2022</span>) <span class="kw">if</span> <span class="ident">is_ci</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;sqlserver://test-db-sqlserver-2022:1433;{};user=SA;password=&lt;YourStrong@Passw0rd&gt;;trustServerCertificate=true;isolationLevel={isolation_level}&quot;</span>, <span class="ident">database</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">SqlServerVersion::V2022</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;sqlserver://127.0.0.1:1435;{};user=SA;password=&lt;YourStrong@Passw0rd&gt;;trustServerCertificate=true;isolationLevel={isolation_level}&quot;</span>, <span class="ident">database</span>),
 
             <span class="prelude-val">None</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;A versioned connector must have a concrete version to run.&quot;</span>),
         }

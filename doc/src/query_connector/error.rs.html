@@ -263,6 +263,9 @@
 <span id="263">263</span>
 <span id="264">264</span>
 <span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt::Display</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::filter::Filter</span>;
@@ -494,6 +497,9 @@
 
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Transaction write conflict&quot;</span>)]</span>
     <span class="ident">TransactionWriteConflict</span>,
+
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;ROLLBACK statement has no corresponding BEGIN statement&quot;</span>)]</span>
+    <span class="ident">RollbackWithoutBegin</span>,
 
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The query parameter limit supported by your database is exceeded: {0}.&quot;</span>)]</span>
     <span class="ident">QueryParameterLimitExceeded</span>(<span class="ident">String</span>),

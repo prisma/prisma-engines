@@ -89,8 +89,10 @@
 <span id="89">89</span>
 <span id="90">90</span>
 <span id="91">91</span>
+<span id="92">92</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">request_handlers</span>::{<span class="ident">GQLError</span>, <span class="ident">PrismaResponse</span>};
 
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">QueryResult</span> {
     <span class="ident">response</span>: <span class="ident">PrismaResponse</span>,
 }
