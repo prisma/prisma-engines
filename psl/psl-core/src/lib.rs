@@ -22,7 +22,7 @@ pub use parser_database::{self, is_reserved_type_name};
 
 use self::{
     common::preview_features::PreviewFeature,
-    validate::{DatasourceLoader, GeneratorLoader},
+    validate::{datasource_loader, GeneratorLoader},
 };
 use diagnostics::Diagnostics;
 use parser_database::{ast, ParserDatabase, SourceFile};
@@ -80,7 +80,9 @@ fn validate_configuration(
 ) -> Configuration {
     let generators = GeneratorLoader::load_generators_from_ast(schema_ast, diagnostics);
     let preview_features = generators.iter().filter_map(|gen| gen.preview_features).collect();
-    let datasources = DatasourceLoader.load_datasources_from_ast(schema_ast, preview_features, diagnostics, connectors);
+
+    let datasources =
+        datasource_loader::load_datasources_from_ast(schema_ast, preview_features, diagnostics, connectors);
 
     Configuration {
         generators,
