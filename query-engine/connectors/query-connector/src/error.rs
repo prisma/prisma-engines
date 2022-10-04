@@ -230,6 +230,9 @@ pub enum ErrorKind {
     #[error("Transaction write conflict")]
     TransactionWriteConflict,
 
+    #[error("ROLLBACK statement has no corresponding BEGIN statement")]
+    RollbackWithoutBegin,
+
     #[error("The query parameter limit supported by your database is exceeded: {0}.")]
     QueryParameterLimitExceeded(String),
 

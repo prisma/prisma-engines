@@ -15,7 +15,13 @@ impl ConnectorTagInterface for SqliteConnectorTag {
         Box::new(SqlDatamodelRenderer::new())
     }
 
-    fn connection_string(&self, database: &str, _is_ci: bool, _is_multi_schema: bool) -> String {
+    fn connection_string(
+        &self,
+        database: &str,
+        _is_ci: bool,
+        _is_multi_schema: bool,
+        _: Option<&'static str>,
+    ) -> String {
         let workspace_root = std::env::var("WORKSPACE_ROOT")
             .unwrap_or_else(|_| ".".to_owned())
             .trim_end_matches('/')

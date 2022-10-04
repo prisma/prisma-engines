@@ -33,7 +33,13 @@ pub trait ConnectorTagInterface {
     ///   implementing connector, like a file or a schema.
     /// - `is_ci` signals whether or not the test run is done on CI or not. May be important if local
     ///   test run connection strings and CI connection strings differ because of networking.
-    fn connection_string(&self, test_database: &str, is_ci: bool, is_multi_schema: bool) -> String;
+    fn connection_string(
+        &self,
+        test_database: &str,
+        is_ci: bool,
+        is_multi_schema: bool,
+        isolation_level: Option<&'static str>,
+    ) -> String;
 
     /// Capabilities of the implementing connector.
     fn capabilities(&self) -> &[ConnectorCapability];

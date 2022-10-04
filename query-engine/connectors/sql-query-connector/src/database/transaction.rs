@@ -49,10 +49,9 @@ impl<'tx> Transaction for SqlConnectorTransaction<'tx> {
         catch(self.connection_info.clone(), async move {
             let res = self.inner.rollback().await.map_err(SqlError::from);
 
-            if matches!(res, Err(SqlError::TransactionAlreadyClosed(_))) {
-                Ok(())
-            } else {
-                res
+            match res {
+                Err(SqlError::TransactionAlreadyClosed(_)) | Err(SqlError::RollbackWithoutBegin) => Ok(()),
+                _ => res,
             }
         })
         .await

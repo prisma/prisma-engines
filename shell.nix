@@ -20,6 +20,7 @@ mkShell {
   buildInputs = with pkgs; [
     comment-out-qe-crates
     moldy-cargo
+    cargo-insta
 
     gcc
     openssl
