@@ -68,7 +68,7 @@ pub struct IntrospectionResultOutput {
 pub struct IntrospectionContext {
     pub previous_data_model: Datamodel,
     /// This should always be true. TODO: change everything where it's
-    /// set to false to use take the config into account.
+    /// set to false to take the config into account.
     pub render_config: bool,
     pub source: Datasource,
     pub composite_type_depth: CompositeTypeDepth,
