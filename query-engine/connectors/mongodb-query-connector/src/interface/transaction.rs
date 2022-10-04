@@ -163,6 +163,14 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         .await
     }
 
+    async fn native_upsert_record(
+        &mut self,
+        _upsert: connector_interface::NativeUpsert,
+        _trace_id: Option<String>,
+    ) -> connector_interface::Result<SingleRecord> {
+        unimplemented!("Native upsert is not currently supported.")
+    }
+
     async fn m2m_connect(
         &mut self,
         field: &RelationFieldRef,

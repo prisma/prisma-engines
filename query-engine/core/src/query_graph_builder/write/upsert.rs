@@ -1,14 +1,13 @@
-use super::*;
+use super::{write_args_parser::WriteArgsParser, *};
 use crate::{
     query_ast::*,
     query_graph::{Flow, Node, QueryGraph, QueryGraphDependency},
-    ArgumentListLookup, ParsedField, ParsedInputMap,
+    ParsedField, ParsedInputMap, ParsedInputValue,
 };
 use connector::IntoFilter;
-use prisma_models::ModelRef;
+use prisma_models::{Field, ModelRef};
 use schema::ConnectorContext;
-use schema_builder::constants::args;
-use std::{convert::TryInto, sync::Arc};
+use std::sync::Arc;
 
 /// Handles a top-level upsert
 ///
@@ -58,35 +57,50 @@ pub fn upsert_record(
     model: ModelRef,
     mut field: ParsedField,
 ) -> QueryGraphBuilderResult<()> {
+    let where_argument = field.where_args().unwrap()?;
+    let create_argument = field.create_args().unwrap()?;
+    let update_argument = field.update_args().unwrap()?;
+
+    let filter = extract_unique_filter(where_argument.clone(), &model)?;
+    let read_query = read::find_unique(field.clone(), model.clone())?;
+
+    if can_use_connector_native_upsert(
+        &model,
+        where_argument.clone(),
+        create_argument.clone(),
+        update_argument.clone(),
+        connector_ctx,
+    ) {
+        let mut create_write_args = WriteArgsParser::from(&model, create_argument.clone())?.args;
+        let mut update_write_args = WriteArgsParser::from(&model, update_argument.clone())?.args;
+
+        create_write_args.add_datetimes(&model);
+        update_write_args.add_datetimes(&model);
+
+        if let ReadQuery::RecordQuery(read) = read_query {
+            graph.create_node(WriteQuery::native_upsert(
+                field.name,
+                model,
+                filter.into(),
+                create_write_args,
+                update_write_args,
+                read,
+            ));
+            return Ok(());
+        }
+    }
+
     graph.flag_transactional();
 
-    let where_arg: ParsedInputMap = field.arguments.lookup(args::WHERE).unwrap().value.try_into()?;
-
-    let filter = extract_unique_filter(where_arg, &model)?;
     let model_id = model.primary_identifier();
-
-    let create_argument = field.arguments.lookup(args::CREATE).unwrap();
-    let update_argument = field.arguments.lookup(args::UPDATE).unwrap();
 
     let read_parent_records = utils::read_ids_infallible(model.clone(), model_id.clone(), filter.clone());
     let read_parent_records_node = graph.create_node(read_parent_records);
 
-    let create_node = create::create_record_node(
-        graph,
-        connector_ctx,
-        Arc::clone(&model),
-        create_argument.value.try_into()?,
-    )?;
+    let create_node = create::create_record_node(graph, connector_ctx, Arc::clone(&model), create_argument)?;
 
-    let update_node = update::update_record_node(
-        graph,
-        connector_ctx,
-        filter,
-        Arc::clone(&model),
-        update_argument.value.try_into()?,
-    )?;
+    let update_node = update::update_record_node(graph, connector_ctx, filter, Arc::clone(&model), update_argument)?;
 
-    let read_query = read::find_unique(field, Arc::clone(&model))?;
     let read_node_create = graph.create_node(Query::Read(read_query.clone()));
     let read_node_update = graph.create_node(Query::Read(read_query));
 
@@ -176,4 +190,87 @@ pub fn upsert_record(
     )?;
 
     Ok(())
+}
+
+// This optimisation on our upserts allows us to use the `INSERT ... ON CONFLICT SET ..`
+// when the query matches the following conditions:
+// 1. The data connector supports it
+// 2. The create and update arguments do not have any nested queries
+// 3. There is only 1 unique field in the where clause
+// 4. The unique field defined in where clause has the same value as defined in the create arguments
+fn can_use_connector_native_upsert(
+    model: &ModelRef,
+    where_field: ParsedInputMap,
+    create_argument: ParsedInputMap,
+    update_argument: ParsedInputMap,
+    connector_ctx: &ConnectorContext,
+) -> bool {
+    let has_nested_create = create_argument
+        .clone()
+        .into_iter()
+        .any(|(k, _)| matches!(model.fields().find_from_all(&k), Ok(Field::Relation(_))));
+
+    let has_nested_update = update_argument
+        .into_iter()
+        .any(|(k, _)| matches!(model.fields().find_from_all(&k), Ok(Field::Relation(_))));
+
+    let uniques = where_field
+        .clone()
+        .into_iter()
+        .filter(|(field_name, input)| {
+            is_unique_field(field_name, model) && where_and_create_equal(field_name, input, &create_argument)
+        })
+        .count();
+
+    let where_values_same_as_create = where_field
+        .clone()
+        .into_iter()
+        .all(|(field_name, input)| where_and_create_equal(&field_name, &input, &create_argument));
+
+    connector_ctx.can_native_upsert()
+        && uniques == 1
+        && !has_nested_create
+        && !has_nested_update
+        && where_values_same_as_create
+}
+
+fn is_unique_field(field_name: &String, model: &ModelRef) -> bool {
+    match model.fields().find_from_scalar(&field_name) {
+        Ok(field) => field.unique(),
+        Err(_) => model
+            .unique_indexes()
+            .iter()
+            .any(|index| index.name == Some(field_name.to_string())),
+    }
+}
+
+/// Make sure the the unique fields defined in the where clause have the same values
+/// as in the create of the upsert
+fn where_and_create_equal(
+    field_name: &String,
+    where_input: &ParsedInputValue,
+    create_argument: &ParsedInputMap,
+) -> bool {
+    if let ParsedInputValue::Map(map) = where_input {
+        map.iter()
+            .all(|(field_name, map_input)| where_and_create_equal_int(field_name, map_input, &create_argument))
+    } else {
+        where_and_create_equal_int(field_name, where_input, &create_argument)
+    }
+}
+
+fn where_and_create_equal_int(
+    field_name: &String,
+    where_input: &ParsedInputValue,
+    create_argument: &ParsedInputMap,
+) -> bool {
+    let arg = create_argument
+        .iter()
+        .find(|(create_name, _)| create_name == &field_name);
+
+    if let Some((_, create_input)) = arg {
+        create_input == where_input
+    } else {
+        false
+    }
 }

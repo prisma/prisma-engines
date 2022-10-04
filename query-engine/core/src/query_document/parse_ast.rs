@@ -5,9 +5,11 @@ use prisma_models::{OrderBy, PrismaValue, ScalarFieldRef};
 use schema::{ObjectTag, OutputFieldRef};
 use std::ops::{Deref, DerefMut};
 
+use crate::QueryParserResult;
+
 pub type ParsedInputList = Vec<ParsedInputValue>;
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, PartialEq)]
 pub struct ParsedInputMap {
     pub tag: Option<ObjectTag>,
     pub map: IndexMap<String, ParsedInputValue>,
@@ -95,13 +97,34 @@ pub struct ParsedField {
     pub nested_fields: Option<ParsedObject>,
 }
 
+impl ParsedField {
+    pub fn where_args(&mut self) -> Option<QueryParserResult<ParsedInputMap>> {
+        self.look_arg("where")
+    }
+
+    pub fn create_args(&mut self) -> Option<QueryParserResult<ParsedInputMap>> {
+        self.look_arg("create")
+    }
+
+    pub fn update_args(&mut self) -> Option<QueryParserResult<ParsedInputMap>> {
+        self.look_arg("update")
+    }
+
+    fn look_arg(&mut self, arg_name: &str) -> Option<QueryParserResult<ParsedInputMap>> {
+        self.arguments
+            .lookup(arg_name)
+            .as_ref()
+            .map(|arg| arg.value.clone().try_into())
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct ParsedArgument {
     pub name: String,
     pub value: ParsedInputValue,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum ParsedInputValue {
     Single(PrismaValue),
     OrderBy(OrderBy),

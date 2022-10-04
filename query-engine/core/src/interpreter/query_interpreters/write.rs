@@ -1,9 +1,9 @@
 use crate::{
     interpreter::{InterpretationResult, InterpreterError},
     query_ast::*,
-    QueryResult,
+    QueryResult, RecordSelection,
 };
-use connector::ConnectionLike;
+use connector::{ConnectionLike, NativeUpsert, QueryArguments};
 
 pub async fn execute(
     tx: &mut dyn ConnectionLike,
@@ -21,6 +21,7 @@ pub async fn execute(
         WriteQuery::DisconnectRecords(q) => disconnect(tx, q, trace_id).await,
         WriteQuery::ExecuteRaw(q) => execute_raw(tx, q).await,
         WriteQuery::QueryRaw(q) => query_raw(tx, q).await,
+        WriteQuery::Upsert(q) => native_upsert(tx, q, trace_id).await,
     }
 }
 
@@ -65,6 +66,25 @@ async fn update_one(
     let res = tx.update_record(&q.model, q.record_filter, q.args, trace_id).await?;
 
     Ok(QueryResult::Id(res))
+}
+
+async fn native_upsert(
+    tx: &mut dyn ConnectionLike,
+    query: NativeUpsert,
+    trace_id: Option<String>,
+) -> InterpretationResult<QueryResult> {
+    let scalars = tx.native_upsert_record(query.clone(), trace_id).await?;
+
+    Ok(RecordSelection {
+        name: query.name().to_string(),
+        fields: query.selection_order().to_owned(),
+        scalars: scalars.into(),
+        nested: Vec::new(),
+        query_arguments: QueryArguments::new(query.model().clone()),
+        model: query.model().clone(),
+        aggregation_rows: None,
+    }
+    .into())
 }
 
 async fn delete_one(

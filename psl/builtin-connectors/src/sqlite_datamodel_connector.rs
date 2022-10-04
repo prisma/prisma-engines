@@ -20,6 +20,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::BackwardCompatibleQueryRaw,
     ConnectorCapability::OrderByNullsFirstLast,
     ConnectorCapability::SupportsTxIsolationSerializable,
+    ConnectorCapability::NativeUpsert,
 ];
 
 pub struct SqliteDatamodelConnector;

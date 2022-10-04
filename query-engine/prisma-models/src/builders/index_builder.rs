@@ -10,13 +10,20 @@ pub struct IndexBuilder {
 
 impl IndexBuilder {
     pub fn build(self, fields: &[ScalarFieldRef]) -> Index {
+        let name = if self.name.is_none() {
+            let fields_name = self.fields.join("_");
+            Some(fields_name)
+        } else {
+            self.name
+        };
+
         let fields = match self.typ {
             IndexType::Unique => Self::map_fields(self.fields, fields),
             IndexType::Normal => Self::map_fields(self.fields, fields),
         };
 
         Index {
-            name: self.name,
+            name,
             typ: self.typ,
             fields,
         }

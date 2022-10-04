@@ -133,4 +133,16 @@ impl ScalarFilter {
 
         fields
     }
+
+    pub fn is_unique(&self) -> bool {
+        if let Some(sf) = self.scalar_ref() {
+            sf.unique()
+        } else {
+            false
+        }
+    }
+
+    pub fn scalar_ref(&self) -> Option<&ScalarFieldRef> {
+        self.projection.as_single()
+    }
 }
