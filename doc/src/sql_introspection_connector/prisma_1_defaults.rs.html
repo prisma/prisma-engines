@@ -71,21 +71,23 @@
 <span id="71">71</span>
 <span id="72">72</span>
 <span id="73">73</span>
+<span id="74">74</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">calculate_datamodel::CalculateDatamodelContext</span>,
     <span class="ident">warnings</span>::{<span class="ident">warning_default_cuid_warning</span>, <span class="ident">warning_default_uuid_warning</span>, <span class="ident">ModelAndField</span>},
     <span class="ident">SqlFamilyTrait</span>,
 };
-<span class="kw">use</span> <span class="ident">introspection_connector</span>::{<span class="ident">IntrospectionContext</span>, <span class="ident">Version</span>, <span class="ident">Warning</span>};
+<span class="kw">use</span> <span class="ident">introspection_connector</span>::{<span class="ident">Version</span>, <span class="ident">Warning</span>};
 <span class="kw">use</span> <span class="ident">native_types</span>::{<span class="ident">MySqlType</span>, <span class="ident">PostgresType</span>};
 <span class="kw">use</span> <span class="ident">psl::dml</span>::{<span class="self">self</span>, <span class="ident">Datamodel</span>, <span class="ident">ValueGenerator</span>};
 <span class="kw">use</span> <span class="ident">sql_schema_describer::SqlSchema</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_prisma_1_id_defaults</span>(
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">add_prisma_1_id_defaults</span>(
     <span class="ident">version</span>: <span class="kw-2">&amp;</span><span class="ident">Version</span>,
     <span class="ident">data_model</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Datamodel</span>,
     <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">SqlSchema</span>,
     <span class="ident">warnings</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Warning</span><span class="op">&gt;</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">IntrospectionContext</span>,
+    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">CalculateDatamodelContext</span>,
 ) {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">needs_to_be_changed</span> <span class="op">=</span> <span class="macro">vec!</span>[];
 

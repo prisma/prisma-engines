@@ -887,22 +887,24 @@
 <span id="887">887</span>
 <span id="888">888</span>
 <span id="889">889</span>
+<span id="890">890</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">calculate_datamodel::CalculateDatamodelContext</span>,
     <span class="ident">introspection_helpers</span>::{<span class="ident">replace_index_field_names</span>, <span class="ident">replace_pk_field_names</span>, <span class="ident">replace_relation_info_field_names</span>},
     <span class="ident">warnings</span>::<span class="kw-2">*</span>,
     <span class="ident">SqlFamilyTrait</span>,
 };
-<span class="kw">use</span> <span class="ident">introspection_connector</span>::{<span class="ident">IntrospectionContext</span>, <span class="ident">Warning</span>};
+<span class="kw">use</span> <span class="ident">introspection_connector::Warning</span>;
 <span class="kw">use</span> <span class="ident">psl::dml</span>::{<span class="self">self</span>, <span class="ident">Datamodel</span>, <span class="ident">DefaultValue</span>, <span class="ident">Field</span>, <span class="ident">FieldType</span>, <span class="ident">Ignorable</span>, <span class="ident">PrismaValue</span>, <span class="ident">ValueGenerator</span>, <span class="ident">WithName</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">cmp::Ordering</span>::{<span class="self">self</span>, <span class="ident">Equal</span>, <span class="ident">Greater</span>, <span class="ident">Less</span>},
     <span class="ident">collections</span>::{<span class="ident">BTreeSet</span>, <span class="ident">HashMap</span>},
 };
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enrich</span>(
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">enrich</span>(
     <span class="ident">old_data_model</span>: <span class="kw-2">&amp;</span><span class="ident">Datamodel</span>,
     <span class="ident">new_data_model</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Datamodel</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">IntrospectionContext</span>,
+    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">CalculateDatamodelContext</span>,
     <span class="ident">warnings</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Warning</span><span class="op">&gt;</span>,
 ) {
     <span class="comment">// Keep @relation attributes even if the database doesn&#39;t use foreign keys</span>
@@ -1524,7 +1526,7 @@
 }
 
 <span class="comment">//mysql enum names</span>
-<span class="kw">fn</span> <span class="ident">merge_mysql_enum_names</span>(<span class="ident">old_data_model</span>: <span class="kw-2">&amp;</span><span class="ident">Datamodel</span>, <span class="ident">new_data_model</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Datamodel</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">IntrospectionContext</span>) {
+<span class="kw">fn</span> <span class="ident">merge_mysql_enum_names</span>(<span class="ident">old_data_model</span>: <span class="kw-2">&amp;</span><span class="ident">Datamodel</span>, <span class="ident">new_data_model</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Datamodel</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">CalculateDatamodelContext</span>) {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changed_mysql_enum_names</span> <span class="op">=</span> <span class="macro">vec!</span>[];
 
     <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">sql_family</span>().<span class="ident">is_mysql</span>() {

@@ -382,7 +382,6 @@
 <span id="382">382</span>
 <span id="383">383</span>
 <span id="384">384</span>
-<span id="385">385</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A container to manage 0 or more migration connectors, based on request contents.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Why this rather than using connectors directly? We must be able to use the migration engine</span>
@@ -694,10 +693,9 @@
                 <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">migration_connector::IntrospectionContext::new</span>(<span class="ident">schema</span>, <span class="ident">composite_type_depth</span>);
                 <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
                     <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">introspect</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-                    <span class="kw">let</span> <span class="ident">rendered_result</span> <span class="op">=</span>
-                        <span class="ident">psl::render_datamodel_and_config_to_string</span>(<span class="kw-2">&amp;</span><span class="ident">result</span>.<span class="ident">data_model</span>, <span class="ident">ctx</span>.<span class="ident">configuration</span>());
+
                     <span class="prelude-val">Ok</span>(<span class="ident">IntrospectResult</span> {
-                        <span class="ident">datamodel</span>: <span class="ident">rendered_result</span>,
+                        <span class="ident">datamodel</span>: <span class="ident">result</span>.<span class="ident">data_model</span>,
                         <span class="ident">version</span>: <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">result</span>.<span class="ident">version</span>),
                         <span class="ident">warnings</span>: <span class="ident">result</span>
                             .<span class="ident">warnings</span>

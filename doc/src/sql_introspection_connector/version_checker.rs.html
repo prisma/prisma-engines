@@ -245,20 +245,19 @@
 <span id="245">245</span>
 <span id="246">246</span>
 <span id="247">247</span>
-<span id="248">248</span>
-<span id="249">249</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::introspection_helpers</span>::{
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::calculate_datamodel::CalculateDatamodelContext</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::introspection_helpers</span>::{
     <span class="ident">has_created_at_and_updated_at</span>, <span class="ident">is_new_migration_table</span>, <span class="ident">is_old_migration_table</span>, <span class="ident">is_prisma_1_or_11_list_table</span>,
     <span class="ident">is_prisma_1_point_0_join_table</span>, <span class="ident">is_prisma_1_point_1_or_2_join_table</span>, <span class="ident">is_relay_table</span>,
 };
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::SqlFamilyTrait</span>;
-<span class="kw">use</span> <span class="ident">introspection_connector</span>::{<span class="ident">IntrospectionContext</span>, <span class="ident">Version</span>, <span class="ident">Warning</span>};
+<span class="kw">use</span> <span class="ident">introspection_connector</span>::{<span class="ident">Version</span>, <span class="ident">Warning</span>};
 <span class="kw">use</span> <span class="ident">native_types</span>::{<span class="ident">MySqlType</span>, <span class="ident">PostgresType</span>};
 <span class="kw">use</span> <span class="ident">quaint::connector::SqlFamily</span>;
 <span class="kw">use</span> <span class="ident">sql_schema_describer::ForeignKeyWalker</span>;
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
     <span class="ident">walkers</span>::{<span class="ident">ColumnWalker</span>, <span class="ident">TableWalker</span>},
-    <span class="ident">ForeignKeyAction</span>, <span class="ident">SqlSchema</span>,
+    <span class="ident">ForeignKeyAction</span>,
 };
 <span class="kw">use</span> <span class="ident">tracing::debug</span>;
 
@@ -302,18 +301,14 @@
     <span class="ident">MySqlType::Char</span>(<span class="number">36</span>),
 ];
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">check_prisma_version</span>(
-    <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">SqlSchema</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">IntrospectionContext</span>,
-    <span class="ident">warnings</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Warning</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">Version</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">check_prisma_version</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">CalculateDatamodelContext</span>, <span class="ident">warnings</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Warning</span><span class="op">&gt;</span>) -&gt; <span class="ident">Version</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">version_checker</span> <span class="op">=</span> <span class="ident">VersionChecker</span> {
         <span class="ident">sql_family</span>: <span class="ident">ctx</span>.<span class="ident">sql_family</span>(),
         <span class="ident">is_cockroachdb</span>: <span class="ident">ctx</span>.<span class="ident">source</span>.<span class="ident">active_provider</span> <span class="op">==</span> <span class="string">&quot;cockroachdb&quot;</span>,
-        <span class="ident">has_migration_table</span>: <span class="ident">schema</span>.<span class="ident">table_walkers</span>().<span class="ident">any</span>(<span class="ident">is_old_migration_table</span>),
-        <span class="ident">has_relay_table</span>: <span class="ident">schema</span>.<span class="ident">table_walkers</span>().<span class="ident">any</span>(<span class="ident">is_relay_table</span>),
-        <span class="ident">has_prisma_1_join_table</span>: <span class="ident">schema</span>.<span class="ident">table_walkers</span>().<span class="ident">any</span>(<span class="ident">is_prisma_1_point_0_join_table</span>),
-        <span class="ident">has_prisma_1_1_or_2_join_table</span>: <span class="ident">schema</span>.<span class="ident">table_walkers</span>().<span class="ident">any</span>(<span class="ident">is_prisma_1_point_1_or_2_join_table</span>),
+        <span class="ident">has_migration_table</span>: <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">table_walkers</span>().<span class="ident">any</span>(<span class="ident">is_old_migration_table</span>),
+        <span class="ident">has_relay_table</span>: <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">table_walkers</span>().<span class="ident">any</span>(<span class="ident">is_relay_table</span>),
+        <span class="ident">has_prisma_1_join_table</span>: <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">table_walkers</span>().<span class="ident">any</span>(<span class="ident">is_prisma_1_point_0_join_table</span>),
+        <span class="ident">has_prisma_1_1_or_2_join_table</span>: <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">table_walkers</span>().<span class="ident">any</span>(<span class="ident">is_prisma_1_point_1_or_2_join_table</span>),
         <span class="ident">uses_on_delete</span>: <span class="bool-val">false</span>,
         <span class="ident">uses_default_values</span>: <span class="bool-val">false</span>,
         <span class="ident">always_has_created_at_updated_at</span>: <span class="bool-val">true</span>,
@@ -322,7 +317,8 @@
         <span class="ident">has_inline_relations</span>: <span class="bool-val">false</span>,
     };
 
-    <span class="kw">for</span> <span class="ident">table</span> <span class="kw">in</span> <span class="ident">schema</span>
+    <span class="kw">for</span> <span class="ident">table</span> <span class="kw">in</span> <span class="ident">ctx</span>
+        .<span class="ident">schema</span>
         .<span class="ident">table_walkers</span>()
         .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">table</span><span class="op">|</span> <span class="op">!</span><span class="ident">is_old_migration_table</span>(<span class="kw-2">*</span><span class="ident">table</span>))
         .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">table</span><span class="op">|</span> <span class="op">!</span><span class="ident">is_new_migration_table</span>(<span class="kw-2">*</span><span class="ident">table</span>))
@@ -351,7 +347,7 @@
     <span class="macro">debug!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">version_checker</span>);
 
     <span class="kw">match</span> <span class="ident">version_checker</span>.<span class="ident">sql_family</span> {
-        <span class="kw">_</span> <span class="kw">if</span> <span class="ident">schema</span>.<span class="ident">is_empty</span>() =&gt; <span class="ident">Version::NonPrisma</span>,
+        <span class="kw">_</span> <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">is_empty</span>() =&gt; <span class="ident">Version::NonPrisma</span>,
         <span class="ident">SqlFamily::Sqlite</span> <span class="kw">if</span> <span class="ident">version_checker</span>.<span class="ident">is_prisma_2</span>(<span class="ident">warnings</span>) =&gt; <span class="ident">Version::Prisma2</span>,
         <span class="ident">SqlFamily::Sqlite</span> =&gt; <span class="ident">Version::NonPrisma</span>,
         <span class="ident">SqlFamily::Mysql</span> <span class="kw">if</span> <span class="ident">version_checker</span>.<span class="ident">is_prisma_2</span>(<span class="ident">warnings</span>) =&gt; <span class="ident">Version::Prisma2</span>,

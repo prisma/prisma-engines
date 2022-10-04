@@ -255,7 +255,7 @@
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">introspect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">IntrospectionContext</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">IntrospectionResult</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">describe</span>(<span class="ident">ctx</span>.<span class="ident">preview_features</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">sampler::sample</span>(<span class="self">self</span>.<span class="ident">database</span>(), <span class="ident">ctx</span>.<span class="ident">composite_type_depth</span>, <span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>)
+        <span class="prelude-val">Ok</span>(<span class="ident">sampler::sample</span>(<span class="self">self</span>.<span class="ident">database</span>(), <span class="ident">schema</span>, <span class="ident">ctx</span>).<span class="kw">await</span><span class="question-mark">?</span>)
     }
 }
 </code></pre></div>

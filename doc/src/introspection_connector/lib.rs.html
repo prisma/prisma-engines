@@ -167,6 +167,12 @@
 <span id="167">167</span>
 <span id="168">168</span>
 <span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">error</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ErrorKind</span>};
@@ -197,7 +203,7 @@
     <span class="kw">pub</span> <span class="ident">size_in_bytes</span>: <span class="ident">usize</span>,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Version</span> {
     <span class="ident">NonPrisma</span>,
     <span class="ident">Prisma1</span>,
@@ -208,7 +214,9 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IntrospectionResult</span> {
     <span class="doccomment">/// Datamodel</span>
-    <span class="kw">pub</span> <span class="ident">data_model</span>: <span class="ident">Datamodel</span>,
+    <span class="kw">pub</span> <span class="ident">data_model</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// The introspected data model is empty</span>
+    <span class="kw">pub</span> <span class="ident">is_empty</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// Introspection warnings</span>
     <span class="kw">pub</span> <span class="ident">warnings</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Warning</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Inferred Prisma version</span>
@@ -234,6 +242,9 @@
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IntrospectionContext</span> {
     <span class="kw">pub</span> <span class="ident">previous_data_model</span>: <span class="ident">Datamodel</span>,
+    <span class="doccomment">/// This should always be true. TODO: change everything where it&#39;s</span>
+    <span class="doccomment">/// set to false to take the config into account.</span>
+    <span class="kw">pub</span> <span class="ident">render_config</span>: <span class="ident">bool</span>,
     <span class="kw">pub</span> <span class="ident">source</span>: <span class="ident">Datasource</span>,
     <span class="kw">pub</span> <span class="ident">composite_type_depth</span>: <span class="ident">CompositeTypeDepth</span>,
     <span class="kw">pub</span> <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
@@ -277,6 +288,7 @@
             <span class="ident">source</span>,
             <span class="ident">composite_type_depth</span>,
             <span class="ident">preview_features</span>,
+            <span class="ident">render_config</span>: <span class="bool-val">true</span>,
         }
     }
 
