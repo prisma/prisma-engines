@@ -103,34 +103,26 @@ impl RpcImpl {
         force: bool,
         composite_type_depth: CompositeTypeDepth,
     ) -> RpcResult<IntrospectionResultOutput> {
-        let (config, _url, connector) = RpcImpl::load_connector(&schema).await?;
+        let (_config, _url, connector) = RpcImpl::load_connector(&schema).await?;
         let previous_schema = psl::validate(psl::SourceFile::new_allocated(Arc::from(schema.into_boxed_str())));
 
-        let ctx = if !force {
-            IntrospectionContext::new(previous_schema, composite_type_depth)
-        } else {
+        let ctx = if force {
             IntrospectionContext::new_config_only(previous_schema, composite_type_depth)
+        } else {
+            IntrospectionContext::new(previous_schema, composite_type_depth)
         };
 
-        let result = match connector.introspect(&ctx).await {
-            Ok(introspection_result) => {
-                if introspection_result.data_model.is_empty() {
-                    Err(Error::IntrospectionResultEmpty)
-                } else {
-                    Ok(IntrospectionResultOutput {
-                        datamodel: psl::render_datamodel_and_config_to_string(
-                            &introspection_result.data_model,
-                            &config,
-                        ),
-                        warnings: introspection_result.warnings,
-                        version: introspection_result.version,
-                    })
-                }
-            }
-            Err(e) => Err(Error::from(e)),
-        };
+        let introspection_result = connector.introspect(&ctx).await.map_err(Error::from)?;
 
-        Ok(result?)
+        if introspection_result.is_empty {
+            Err(RpcError::from(Error::IntrospectionResultEmpty))
+        } else {
+            Ok(IntrospectionResultOutput {
+                datamodel: introspection_result.data_model,
+                warnings: introspection_result.warnings,
+                version: introspection_result.version,
+            })
+        }
     }
 
     pub async fn list_databases_internal(schema: String) -> RpcResult<Vec<String>> {

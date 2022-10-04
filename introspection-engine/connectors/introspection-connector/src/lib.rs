@@ -28,7 +28,7 @@ pub struct DatabaseMetadata {
     pub size_in_bytes: usize,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Copy)]
 pub enum Version {
     NonPrisma,
     Prisma1,
@@ -39,7 +39,9 @@ pub enum Version {
 #[derive(Debug)]
 pub struct IntrospectionResult {
     /// Datamodel
-    pub data_model: Datamodel,
+    pub data_model: String,
+    /// The introspected data model is empty
+    pub is_empty: bool,
     /// Introspection warnings
     pub warnings: Vec<Warning>,
     /// Inferred Prisma version
@@ -65,6 +67,9 @@ pub struct IntrospectionResultOutput {
 
 pub struct IntrospectionContext {
     pub previous_data_model: Datamodel,
+    /// This should always be true. TODO: change everything where it's
+    /// set to false to take the config into account.
+    pub render_config: bool,
     pub source: Datasource,
     pub composite_type_depth: CompositeTypeDepth,
     pub preview_features: BitFlags<PreviewFeature>,
@@ -108,6 +113,7 @@ impl IntrospectionContext {
             source,
             composite_type_depth,
             preview_features,
+            render_config: true,
         }
     }
 

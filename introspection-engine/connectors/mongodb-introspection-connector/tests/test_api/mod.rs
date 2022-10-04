@@ -104,7 +104,8 @@ where
     );
 
     let validated_schema = psl::parse_schema(datamodel_string).unwrap();
-    let ctx = IntrospectionContext::new(validated_schema, composite_type_depth);
+    let mut ctx = IntrospectionContext::new(validated_schema, composite_type_depth);
+    ctx.render_config = false;
 
     RT.block_on(async move {
         let client = mongodb_client::create(&connection_string).await.unwrap();
@@ -119,10 +120,9 @@ where
         database.drop(None).await.unwrap();
 
         let res = res.unwrap();
-        let config = &ctx.configuration();
 
         TestResult {
-            datamodel: psl::render_datamodel_to_string(&res.data_model, Some(config)),
+            datamodel: res.data_model,
             warnings: res.warnings,
         }
     })
