@@ -29,15 +29,16 @@ type AnyError = Box<dyn std::error::Error + Send + Sync + 'static>;
 
 #[macro_export]
 macro_rules! only {
-    ($($tag:ident),* $(;)?) => {
-        only!($($tag,)* ; exclude: )
+    ($($tag:ident),*) => {
+        ::test_setup::only!($($tag,)* ; exclude: )
     };
 
-    ($($tag:ident),* ; exclude: $($excludeTag:ident),*) => {
+    ($($tag:ident,)* ; exclude: $($excludeTag:ident),*) => {
         {
-            let (skip, db) = only_impl(
-                enumflags2::bitflags!($($tag |)*),
-                enumflags2::bitflag!($($excludeTag |)*)
+            use ::test_setup::Tags;
+            let (skip, db) = ::test_setup::only_impl(
+                ::enumflags2::make_bitflags!(Tags::{$($tag)|*}),
+                ::enumflags2::make_bitflags!(Tags::{$($excludeTag)|*})
             );
             if skip { return }
             db

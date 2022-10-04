@@ -9,6 +9,7 @@ use mongodb_introspection_connector::MongoDbIntrospectionConnector;
 use psl::Configuration;
 use serde::*;
 use sql_introspection_connector::SqlIntrospectionConnector;
+use std::sync::Arc;
 
 type RpcError = jsonrpc_core::Error;
 type RpcResult<T> = Result<T, RpcError>;
@@ -103,7 +104,7 @@ impl RpcImpl {
         composite_type_depth: CompositeTypeDepth,
     ) -> RpcResult<IntrospectionResultOutput> {
         let (config, _url, connector) = RpcImpl::load_connector(&schema).await?;
-        let previous_schema = psl::parse_schema(schema.as_str()).map_err(Error::DatamodelError)?;
+        let previous_schema = psl::validate(psl::SourceFile::new_allocated(Arc::from(schema.into_boxed_str())));
 
         let ctx = if !force {
             IntrospectionContext::new(previous_schema, composite_type_depth)
