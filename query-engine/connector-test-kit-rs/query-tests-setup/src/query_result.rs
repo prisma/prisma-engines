@@ -1,5 +1,6 @@
 use request_handlers::{GQLError, PrismaResponse};
 
+#[derive(Debug)]
 pub struct QueryResult {
     response: PrismaResponse,
 }

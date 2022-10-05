@@ -151,7 +151,7 @@ fn run_relation_link_test_impl(
     let dm_with_params_json: DatamodelWithParams = dm_with_params.parse().unwrap();
 
     if ConnectorTag::should_run(config, enabled_connectors, capabilities, test_name) {
-        let datamodel = render_test_datamodel(config, test_database, template, &[], None, Default::default());
+        let datamodel = render_test_datamodel(config, test_database, template, &[], None, Default::default(), None);
         let connector = config.test_connector_tag().unwrap();
         let requires_teardown = connector.requires_teardown();
         let metrics = setup_metrics();
@@ -255,6 +255,7 @@ pub fn run_connector_test_impl(
         excluded_features,
         referential_override,
         db_schemas,
+        None,
     );
     let connector = config.test_connector_tag().unwrap();
     let metrics = crate::setup_metrics();

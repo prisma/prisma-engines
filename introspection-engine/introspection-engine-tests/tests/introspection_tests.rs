@@ -4,6 +4,7 @@ mod commenting_out;
 mod enums;
 mod errors;
 mod identify_version;
+mod introspect;
 mod lists;
 mod model_renames;
 mod mssql;

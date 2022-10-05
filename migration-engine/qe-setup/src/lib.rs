@@ -87,12 +87,12 @@ pub async fn teardown(prisma_schema: &str, db_schemas: &[&str]) -> ConnectorResu
 
 #[derive(Default)]
 struct LoggingHost {
-    printed: std::sync::Mutex<Vec<String>>,
+    printed: parking_lot::Mutex<Vec<String>>,
 }
 
 impl migration_core::migration_connector::ConnectorHost for LoggingHost {
     fn print(&self, text: &str) -> BoxFuture<'_, ConnectorResult<()>> {
-        let mut msgs = self.printed.lock().unwrap();
+        let mut msgs = self.printed.lock();
         msgs.push(text.to_owned());
         Box::pin(std::future::ready(Ok(())))
     }
@@ -117,7 +117,7 @@ async fn diff_and_apply(schema: &str) {
     })
     .await
     .unwrap();
-    let migrations = host.printed.lock().unwrap();
+    let migrations = host.printed.lock();
     let migration = migrations[0].clone();
     drop(migrations);
 

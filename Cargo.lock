@@ -2436,9 +2436,9 @@ dependencies = [
 
 [[package]]
 name = "once_cell"
-version = "1.14.0"
+version = "1.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2f7254b99e31cad77da24b08ebf628882739a608578bb1bcdfc1f9c21260d7c0"
+checksum = "e82dad04139b71a90c080c8463fe0dc7902db5192d939bd0950f074d014339e1"
 
 [[package]]
 name = "opaque-debug"
@@ -3065,6 +3065,7 @@ dependencies = [
  "migration-core",
  "mongodb",
  "mongodb-client",
+ "parking_lot 0.12.1",
  "psl",
  "quaint",
  "tempfile",
@@ -3075,7 +3076,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#0895b68669f76cc18bbcbe5e9aa126a8a12bf775"
+source = "git+https://github.com/prisma/quaint#17a57f1fd60043d82a965685c2148bf8ccbbb423"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
@@ -3295,6 +3296,7 @@ dependencies = [
  "colored",
  "indoc",
  "insta",
+ "once_cell",
  "prisma-value",
  "psl",
  "query-engine-metrics",
@@ -3304,6 +3306,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-futures",
+ "user-facing-errors",
  "uuid 1.1.2",
 ]
 
@@ -4329,9 +4332,9 @@ dependencies = [
 
 [[package]]
 name = "tiberius"
-version = "0.11.0"
+version = "0.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6f9232bb2d5c2e28c922c1247c9e8cf0bec361ae1865300308387ced5d0a922d"
+checksum = "0b01df772356f892073752d7e9d5b42798cd330477ce6d18b92b4a82d98d31a2"
 dependencies = [
  "async-native-tls",
  "async-trait",

@@ -1,19 +1,20 @@
 use crate::{
+    calculate_datamodel::CalculateDatamodelContext,
     introspection_helpers::{replace_index_field_names, replace_pk_field_names, replace_relation_info_field_names},
     warnings::*,
     SqlFamilyTrait,
 };
-use introspection_connector::{IntrospectionContext, Warning};
+use introspection_connector::Warning;
 use psl::dml::{self, Datamodel, DefaultValue, Field, FieldType, Ignorable, PrismaValue, ValueGenerator, WithName};
 use std::{
     cmp::Ordering::{self, Equal, Greater, Less},
     collections::{BTreeSet, HashMap},
 };
 
-pub fn enrich(
+pub(crate) fn enrich(
     old_data_model: &Datamodel,
     new_data_model: &mut Datamodel,
-    ctx: &IntrospectionContext,
+    ctx: &CalculateDatamodelContext,
     warnings: &mut Vec<Warning>,
 ) {
     // Keep @relation attributes even if the database doesn't use foreign keys
@@ -635,7 +636,7 @@ fn merge_changed_enum_values(old_data_model: &Datamodel, new_data_model: &mut Da
 }
 
 //mysql enum names
-fn merge_mysql_enum_names(old_data_model: &Datamodel, new_data_model: &mut Datamodel, ctx: &IntrospectionContext) {
+fn merge_mysql_enum_names(old_data_model: &Datamodel, new_data_model: &mut Datamodel, ctx: &CalculateDatamodelContext) {
     let mut changed_mysql_enum_names = vec![];
 
     if ctx.sql_family().is_mysql() {

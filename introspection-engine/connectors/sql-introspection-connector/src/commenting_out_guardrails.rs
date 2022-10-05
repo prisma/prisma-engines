@@ -1,13 +1,14 @@
+use crate::calculate_datamodel::CalculateDatamodelContext;
 use crate::warnings::{
     warning_enum_values_with_empty_names, warning_fields_with_empty_names, warning_models_without_columns,
     warning_models_without_identifier, warning_unsupported_types, EnumAndValue, Model, ModelAndField,
     ModelAndFieldAndType,
 };
 use crate::SqlFamilyTrait;
-use introspection_connector::{IntrospectionContext, Warning};
+use introspection_connector::Warning;
 use psl::dml::{Datamodel, FieldType};
 
-pub fn commenting_out_guardrails(datamodel: &mut Datamodel, ctx: &IntrospectionContext) -> Vec<Warning> {
+pub(crate) fn commenting_out_guardrails(datamodel: &mut Datamodel, ctx: &CalculateDatamodelContext) -> Vec<Warning> {
     let mut warnings = vec![];
 
     // order matters...
@@ -42,7 +43,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel, ctx: &IntrospectionC
 
 // on postgres this is allowed, on the other dbs, this could be a symptom of
 // missing privileges
-fn models_without_columns(datamodel: &mut Datamodel, ctx: &IntrospectionContext) -> Vec<Model> {
+fn models_without_columns(datamodel: &mut Datamodel, ctx: &CalculateDatamodelContext) -> Vec<Model> {
     let mut models_without_columns = vec![];
 
     for model in datamodel.models_mut() {

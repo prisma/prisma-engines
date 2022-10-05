@@ -15,7 +15,13 @@ impl ConnectorTagInterface for CockroachDbConnectorTag {
         Box::new(SqlDatamodelRenderer::new())
     }
 
-    fn connection_string(&self, database: &str, is_ci: bool, _is_multi_schema: bool) -> String {
+    fn connection_string(
+        &self,
+        database: &str,
+        is_ci: bool,
+        _is_multi_schema: bool,
+        _: Option<&'static str>,
+    ) -> String {
         // Use the same database and schema name for CockroachDB - unfortunately CockroachDB
         // can't handle 1 schema per test in a database well at this point in time.
         if is_ci {
