@@ -215,25 +215,23 @@ fn lift_datasource(
         .unwrap_or_default();
 
     let (extensions, extensions_span) = args
-                .remove(EXTENSIONS_KEY)
-                // TODO: add diagnostics here, or merge the following two lines somehow
-                .and_then(|x| if !preview_features.contains(PreviewFeature::PostgresExtensions) {None} else {Some(x)})
-                .and_then(|(_, expr)| coerce_array(expr, &coerce::constant_with_span, diagnostics).map(|b| (b, expr.span())))
-                .map(|(mut extensions, span)| {
-                    extensions.sort_by(|(a, _), (b, _)| a.cmp(b));
+        .remove(EXTENSIONS_KEY)
+        .and_then(|(_, expr)| coerce_array(expr, &coerce::constant_with_span, diagnostics).map(|b| (b, expr.span())))
+        .map(|(mut extensions, span)| {
+            extensions.sort_by(|(a, _), (b, _)| a.cmp(b));
 
-                    for pair in extensions.windows(2) {
-                        if pair[0].0 == pair[1].0 {
-                            diagnostics.push_error(DatamodelError::new_static(
-                                "Duplicated extension names are not allowed",
-                                pair[0].1,
-                            ))
-                        }
-                    }
+            for pair in extensions.windows(2) {
+                if pair[0].0 == pair[1].0 {
+                    diagnostics.push_error(DatamodelError::new_static(
+                        "Duplicated extension names are not allowed",
+                        pair[0].1,
+                    ))
+                }
+            }
 
-                    (extensions, Some(span))
-                })
-                .unwrap_or_default();
+            (extensions, Some(span))
+        })
+        .unwrap_or_default();
 
     // we handle these elsewhere
     args.remove("previewFeatures");

@@ -184,6 +184,17 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
         }
     }
 
+    if !ctx.preview_features.contains(crate::PreviewFeature::PostgresExtensions) {
+        if let Some(ds) = ctx.datasource {
+            if let Some(span) = ds.extensions_span {
+                ctx.push_error(DatamodelError::new_static(
+                    "The `extensions` property is only availably with the `postgresExtensions` preview feature.",
+                    span,
+                ));
+            }
+        }
+    }
+
     for relation in db.walk_relations() {
         match relation.refine() {
             // 1:1, 1:n
