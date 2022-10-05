@@ -248,7 +248,7 @@ impl TestApi {
             self.is_vitess() && self.preview_features().contains(PreviewFeature::ReferentialIntegrity);
 
         let (url, relation_mode) = if no_foreign_keys {
-            ((&self.connection_string).to_string(), r#"\nrelationMode = "prisma""#)
+            (self.connection_string.to_string(), r#"\nrelationMode = "prisma""#)
         } else {
             (r#"env(TEST_DATABASE_URL)"#.to_string(), "")
         };

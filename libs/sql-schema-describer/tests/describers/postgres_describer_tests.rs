@@ -1847,7 +1847,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
     expected_schema.assert_debug_eq(&schema);
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres11))]
 //Todo(matthias) seems like Sequence and Type share the same namespace
 fn multiple_schemas_are_described(api: TestApi) {
     let schema = r#"
