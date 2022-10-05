@@ -213,10 +213,13 @@ fn lift_datasource(
         })
         .unwrap_or_default();
 
+    let connector_data = active_connector.parse_datasource_properties(&mut args, diagnostics);
+
     // we handle these elsewhere
     args.remove("previewFeatures");
     args.remove("referentialIntegrity");
     args.remove("relationMode");
+
     for (name, (span, _)) in args.into_iter() {
         diagnostics.push_error(DatamodelError::new_property_not_known_error(name, span));
     }
@@ -234,6 +237,7 @@ fn lift_datasource(
         shadow_database_url,
         referential_integrity,
         relation_mode,
+        connector_data,
     })
 }
 

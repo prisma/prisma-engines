@@ -275,30 +275,84 @@ pub(super) fn id_client_name_does_not_clash_with_field(model: ModelWalker<'_>, c
     }
 }
 
-pub(super) fn schema_attribute(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
-    match (model.schema(), ctx.datasource) {
-        (Some((_, span)), _) if !ctx.connector.has_capability(ConnectorCapability::MultiSchema) => ctx.push_error(
-            DatamodelError::new_static("@@schema is not supported on the current datasource provider", span),
-        ),
-        (Some((schema_name, span)), Some(ds)) if !ds.has_schema(schema_name) => {
+pub(super) fn schema_is_defined_in_the_datasource(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
+    if !ctx.preview_features.contains(crate::PreviewFeature::MultiSchema) {
+        return;
+    }
+
+    if !ctx.connector.has_capability(ConnectorCapability::MultiSchema) {
+        return;
+    }
+
+    let datasource = match ctx.datasource {
+        Some(ds) => ds,
+        None => return,
+    };
+
+    let (schema_name, span) = match model.schema() {
+        Some(tuple) => tuple,
+        None => return,
+    };
+
+    if datasource.has_schema(schema_name) {
+        return;
+    }
+
     ctx.push_error(DatamodelError::new_static(
         "This schema is not defined in the datasource. Read more on `@@schema` at https://pris.ly/d/multi-schema",
         span,
     ))
-        },
-        (None, _)
-            if ctx
-                .db
-                .schema_flags()
-                .contains(parser_database::SchemaFlags::UsesSchemaAttribute) =>
-        {
-            ctx.push_error(DatamodelError::new_static(
-                "This model is missing an `@@schema` attribute.",
-                model.ast_model().span(),
-            ))
-        }
-        _ => (),
+}
+
+pub(super) fn schema_attribute_supported_in_connector(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
+    if !ctx.preview_features.contains(crate::PreviewFeature::MultiSchema) {
+        return;
     }
+
+    if ctx.connector.has_capability(ConnectorCapability::MultiSchema) {
+        return;
+    }
+
+    let (_, span) = match model.schema() {
+        Some(tuple) => tuple,
+        None => return,
+    };
+
+    ctx.push_error(DatamodelError::new_static(
+        "@@schema is not supported on the current datasource provider",
+        span,
+    ));
+}
+
+pub(super) fn schema_attribute_missing(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
+    if !ctx.preview_features.contains(crate::PreviewFeature::MultiSchema) {
+        return;
+    }
+
+    if !ctx.connector.has_capability(ConnectorCapability::MultiSchema) {
+        return;
+    }
+
+    if !ctx
+        .db
+        .schema_flags()
+        .contains(parser_database::SchemaFlags::UsesSchemaAttribute)
+    {
+        return;
+    }
+
+    if ctx.connector.is_provider("mysql") {
+        return;
+    }
+
+    if model.schema().is_some() {
+        return;
+    }
+
+    ctx.push_error(DatamodelError::new_static(
+        "This model is missing an `@@schema` attribute.",
+        model.ast_model().span(),
+    ))
 }
 
 pub(super) fn database_name_clashes(ctx: &mut Context<'_>) {
@@ -341,5 +395,18 @@ pub(super) fn database_name_clashes(ctx: &mut Context<'_>) {
             }
             None => (),
         }
+    }
+}
+
+pub(super) fn multischema_feature_flag_needed(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
+    if ctx.preview_features.contains(crate::PreviewFeature::MultiSchema) {
+        return;
+    }
+
+    if let Some((_, span)) = model.schema() {
+        ctx.push_error(DatamodelError::new_static(
+            "@@schema is only available with the `multiSchema` preview feature.",
+            span,
+        ));
     }
 }

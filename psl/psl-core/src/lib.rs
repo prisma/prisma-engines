@@ -14,7 +14,7 @@ mod reformat;
 mod validate;
 
 pub use crate::{
-    configuration::{Configuration, Datasource, Generator, StringFromEnvVar},
+    configuration::{Configuration, Datasource, DatasourceConnectorData, Generator, StringFromEnvVar},
     reformat::reformat,
 };
 pub use diagnostics;

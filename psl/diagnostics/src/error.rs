@@ -284,6 +284,10 @@ impl DatamodelError {
         Self::new(format!("Property not known: \"{property_name}\"."), span)
     }
 
+    pub fn new_argument_not_known_error(property_name: &str, span: Span) -> DatamodelError {
+        Self::new(format!("Argument not known: \"{property_name}\"."), span)
+    }
+
     pub fn new_default_unknown_function(function_name: &str, span: Span) -> DatamodelError {
         DatamodelError::new(format!(
                 "Unknown function in @default(): `{function_name}` is not known. You can read about the available functions here: https://pris.ly/d/attribute-functions"

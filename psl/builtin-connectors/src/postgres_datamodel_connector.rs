@@ -1,3 +1,4 @@
+mod datasource;
 mod validations;
 
 use enumflags2::BitFlags;
@@ -7,6 +8,7 @@ use native_types::{
     PostgresType::{self, *},
 };
 use psl_core::{
+    common::preview_features::PreviewFeature,
     datamodel_connector::{
         helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
         Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, RelationMode,
@@ -14,8 +16,9 @@ use psl_core::{
     },
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{ast, walkers, IndexAlgorithm, OperatorClass, ParserDatabase, ReferentialAction, ScalarType},
+    Datasource, DatasourceConnectorData,
 };
-use std::borrow::Cow;
+use std::{borrow::Cow, collections::HashMap, fmt};
 
 const SMALL_INT_TYPE_NAME: &str = "SmallInt";
 const INTEGER_TYPE_NAME: &str = "Integer";
@@ -129,6 +132,107 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, PostgresType)] = &[
     (ScalarType::Bytes, PostgresType::ByteA),
     (ScalarType::Json, PostgresType::JsonB),
 ];
+
+/// Postgres-specific properties in the datasource block.
+pub struct PostgresDatasourceProperties {
+    extensions: Option<PostgresExtensions>,
+}
+
+impl PostgresDatasourceProperties {
+    /// Database extensions.
+    pub fn extensions(&self) -> Option<&PostgresExtensions> {
+        self.extensions.as_ref()
+    }
+}
+
+/// An extension defined in the extensions array of the datasource.
+///
+/// ```ignore
+/// datasource db {
+///   extensions = [postgis, foobar]
+///   //            ^^^^^^^
+/// }
+/// ```
+pub struct PostgresExtension {
+    name: String,
+    span: ast::Span,
+    schema: Option<String>,
+    version: Option<String>,
+    db_name: Option<String>,
+}
+
+impl PostgresExtension {
+    /// The name of the extension in the datasource.
+    ///
+    /// ```ignore
+    /// extensions = [bar]
+    /// //            ^^^ this
+    /// ```
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    /// The name of the extension in the database, defined in the
+    /// `map` argument.
+    ///
+    /// ```ignore
+    /// extensions = [bar(map: "foo")]
+    /// //                     ^^^^^ this
+    /// ```
+    pub fn db_name(&self) -> Option<&str> {
+        self.db_name.as_deref()
+    }
+
+    /// The span of the extension definition in the datamodel.
+    pub fn span(&self) -> ast::Span {
+        self.span
+    }
+
+    /// The schema where the extension tables are stored.
+    ///
+    /// ```ignore
+    /// extensions = [postgis(schema: "public")]
+    /// //                            ^^^^^^^^ this
+    /// ```
+    pub fn schema(&self) -> Option<&str> {
+        self.schema.as_deref()
+    }
+
+    /// The version of the extension to be used in the database.
+    ///
+    /// ```ignore
+    /// extensions = [postgis(version: "2.1")]
+    /// //                             ^^^^^ this
+    /// ```
+    pub fn version(&self) -> Option<&str> {
+        self.version.as_deref()
+    }
+}
+
+/// The extensions defined in the extensions array of the datrasource.
+///
+/// ```ignore
+/// datasource db {
+///   extensions = [postgis, foobar]
+///   //           ^^^^^^^^^^^^^^^^^
+/// }
+/// ```
+pub struct PostgresExtensions {
+    pub(crate) extensions: Vec<PostgresExtension>,
+    pub(crate) span: ast::Span,
+}
+
+impl PostgresExtensions {
+    /// The span of the extensions in the datamodel.
+    pub fn span(&self) -> ast::Span {
+        self.span
+    }
+
+    /// The extension definitions.
+    pub fn extensions(&self) -> &[PostgresExtension] {
+        &self.extensions
+    }
+}
 
 impl Connector for PostgresDatamodelConnector {
     fn is_provider(&self, name: &str) -> bool {
@@ -257,6 +361,17 @@ impl Connector for PostgresDatamodelConnector {
             validations::compatible_native_types(index, self, errors);
             validations::generalized_index_validations(index, self, errors);
             validations::spgist_indexed_column_count(index, errors);
+        }
+    }
+
+    fn validate_datasource(
+        &self,
+        preview_features: BitFlags<PreviewFeature>,
+        ds: &Datasource,
+        errors: &mut Diagnostics,
+    ) {
+        if let Some(props) = ds.downcast_connector_data::<PostgresDatasourceProperties>() {
+            validations::extensions_preview_flag_must_be_set(preview_features, props, errors);
         }
     }
 
@@ -451,6 +566,80 @@ impl Connector for PostgresDatamodelConnector {
             }
             _ => (),
         }
+    }
+
+    fn parse_datasource_properties(
+        &self,
+        args: &mut HashMap<&str, (ast::Span, &ast::Expression)>,
+        diagnostics: &mut Diagnostics,
+    ) -> DatasourceConnectorData {
+        let extensions = datasource::parse_extensions(args, diagnostics);
+        let properties = PostgresDatasourceProperties { extensions };
+
+        DatasourceConnectorData::new(Box::new(properties))
+    }
+
+    fn render_datasource_properties(&self, properties: &DatasourceConnectorData, out: &mut String) -> fmt::Result {
+        let properties = match properties.downcast_ref::<PostgresDatasourceProperties>() {
+            Some(properties) => properties,
+            None => return Ok(()),
+        };
+
+        let extensions = match properties.extensions() {
+            Some(extensions) => extensions.extensions(),
+            None => return Ok(()),
+        };
+
+        out.push_str("extensions = [");
+
+        for (i, extension) in extensions.iter().enumerate() {
+            out.push_str(extension.name());
+
+            if extension.db_name().is_none() && extension.version().is_none() && extension.schema().is_none() {
+                if extensions.len() > 1 {
+                    out.push(',');
+                }
+                continue;
+            }
+
+            out.push('(');
+
+            if let Some(db_name) = extension.db_name() {
+                out.push_str(r#"map: ""#);
+                out.push_str(db_name);
+                out.push('"');
+
+                if extension.schema().is_some() || extension.version().is_some() {
+                    out.push_str(", ");
+                }
+            }
+
+            if let Some(schema) = extension.schema() {
+                out.push_str(r#"schema: ""#);
+                out.push_str(schema);
+                out.push('"');
+
+                if extension.version.is_some() {
+                    out.push_str(", ");
+                }
+            }
+
+            if let Some(version) = extension.version() {
+                out.push_str(r#"version: ""#);
+                out.push_str(version);
+                out.push('"');
+            }
+
+            out.push(')');
+
+            if i < extensions.len() - 1 {
+                out.push_str(", ");
+            }
+        }
+
+        out.push_str("]\n");
+
+        Ok(())
     }
 }
 
