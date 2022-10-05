@@ -52,7 +52,6 @@ features!(
     OrderByAggregateGroup,
     FilterJson,
     ReferentialIntegrity,
-    RelationMode,
     ReferentialActions,
     InteractiveTransactions,
     NamedConstraints,
@@ -73,7 +72,7 @@ features!(
 /// Generator preview features
 pub const GENERATOR: FeatureMap = FeatureMap {
     active: enumflags2::make_bitflags!(PreviewFeature::{
-        RelationMode
+        ReferentialIntegrity
          | InteractiveTransactions
          | FullTextSearch
          | FullTextIndex
