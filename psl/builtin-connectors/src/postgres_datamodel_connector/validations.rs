@@ -1,8 +1,11 @@
+use enumflags2::BitFlags;
 use native_types::PostgresType;
 use psl_core::{
-    datamodel_connector::{walker_ext_traits::*, Connector},
-    diagnostics::{DatamodelError, Diagnostics},
-    parser_database::{ast::WithSpan, walkers::IndexWalker, IndexAlgorithm, OperatorClass},
+    common::preview_features::PreviewFeature,
+    datamodel_connector::{walker_ext_traits::*, Connector, EXTENSIONS_KEY},
+    diagnostics::{DatamodelError, Diagnostics, Span},
+    parser_database::{ast::WithSpan, coerce, coerce_array, walkers::IndexWalker, IndexAlgorithm, OperatorClass},
+    Datasource,
 };
 
 pub(super) fn compatible_native_types(index: IndexWalker<'_>, connector: &dyn Connector, errors: &mut Diagnostics) {
@@ -448,5 +451,43 @@ pub(super) fn generalized_index_validations(
                 _ => err_f(native_type_instance.as_ref().map(|i| i.name.as_str()), opclass),
             }
         }
+    }
+}
+
+pub(super) fn extensions_preview_flag_must_be_set(
+    preview_features: BitFlags<PreviewFeature>,
+    ds: &Datasource,
+    errors: &mut Diagnostics,
+) {
+    if preview_features.contains(PreviewFeature::PostgresExtensions) {
+        return;
+    }
+
+    let span = match ds.extra_properties.iter().find(|(key, _)| key == EXTENSIONS_KEY) {
+        Some((_, (span, _))) => span,
+        None => return,
+    };
+
+    errors.push_error(DatamodelError::new_static(
+        "The `extensions` property is only available with the `postgresExtensions` preview feature.",
+        *span,
+    ));
+}
+
+pub(super) fn extensions_must_be_an_array_of_constants<'a>(
+    preview_features: BitFlags<PreviewFeature>,
+    ds: &'a Datasource,
+    errors: &mut Diagnostics,
+) {
+    if !preview_features.contains(PreviewFeature::PostgresExtensions) {
+        return;
+    }
+
+    for (key, (_, expr)) in ds.extra_properties.iter() {
+        if key != EXTENSIONS_KEY {
+            continue;
+        }
+
+        coerce_array(expr, &coerce::constant_with_span, errors).map(|b| (b, expr.span()));
     }
 }

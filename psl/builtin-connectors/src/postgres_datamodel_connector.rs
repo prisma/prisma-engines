@@ -271,22 +271,8 @@ impl Connector for PostgresDatamodelConnector {
         ds: &Datasource,
         errors: &mut Diagnostics,
     ) {
-        let (span, _extensions) = match ds.extra_properties.iter().find(|(key, _)| key == EXTENSIONS_KEY) {
-            Some((_, (span, expr))) => {
-                let extensions = coerce_array(expr, &coerce::constant_with_span, errors).map(|b| (b, expr.span()));
-                (span, extensions)
-            }
-            None => return,
-        };
-
-        if preview_features.contains(PreviewFeature::PostgresExtensions) {
-            return;
-        }
-
-        errors.push_error(DatamodelError::new_static(
-            "The `extensions` property is only available with the `postgresExtensions` preview feature.",
-            *span,
-        ));
+        validations::extensions_preview_flag_must_be_set(preview_features, ds, errors);
+        validations::extensions_must_be_an_array_of_constants(preview_features, ds, errors);
     }
 
     fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {
