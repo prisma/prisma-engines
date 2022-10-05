@@ -108,10 +108,7 @@ pub const GENERATOR: FeatureMap = FeatureMap {
         | ImprovedQueryRaw
         | DataProxy
     }),
-    hidden: enumflags2::make_bitflags!(PreviewFeature::{
-        MultiSchema
-        | ReferentialIntegrity
-    }),
+    hidden: enumflags2::make_bitflags!(PreviewFeature::{MultiSchema}),
 };
 
 #[derive(Debug)]

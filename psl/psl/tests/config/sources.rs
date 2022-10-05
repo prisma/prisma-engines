@@ -647,7 +647,7 @@ fn relation_mode_without_preview_feature_errors() {
 
         generator client {
             provider = "prisma-client-js"
-            previewFeatures = ["relationMode"]
+            previewFeatures = ["referentialIntegrity"]
         }
         [0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
@@ -692,7 +692,7 @@ fn relation_mode_with_preview_feature_works() {
 
         generator client {
           provider = "prisma-client-js"
-          previewFeatures = ["relationMode"]
+          previewFeatures = ["referentialIntegrity"]
         }
     "#};
 
@@ -730,73 +730,13 @@ fn relation_mode_default() {
 
         generator client {
           provider = "prisma-client-js"
-          previewFeatures = ["relationMode"]
+          previewFeatures = ["referentialIntegrity"]
         }
     "#};
 
     let config = parse_configuration(schema);
 
     assert_eq!(config.relation_mode(), Some(RelationMode::ForeignKeys));
-}
-
-#[test]
-fn relation_mode_and_referential_integrity_can_coexist() {
-    let schema = indoc! {r#"
-        datasource ps {
-          provider = "sqlserver"
-          url = "mysql://root:prisma@localhost:3306/mydb"
-        }
-
-        generator client {
-          provider = "prisma-client-js"
-          previewFeatures = ["referentialIntegrity", "relationMode"]
-        }
-    "#};
-
-    let config = parse_configuration(schema);
-
-    assert_eq!(config.relation_mode(), Some(RelationMode::ForeignKeys));
-}
-
-#[test]
-fn relation_mode_prisma_has_precedence_over_referential_integrity() {
-    let schema = indoc! {r#"
-        datasource ps {
-          provider = "sqlserver"
-          url = "mysql://root:prisma@localhost:3306/mydb"
-          relationMode = "prisma"
-          referentialIntegrity = "foreignKeys"
-        }
-
-        generator client {
-          provider = "prisma-client-js"
-          previewFeatures = ["referentialIntegrity", "relationMode"]
-        }
-    "#};
-
-    let config = parse_configuration(schema);
-
-    assert_eq!(config.relation_mode(), Some(RelationMode::Prisma));
-}
-
-#[test]
-fn referential_integrity_is_used_if_relation_mode_is_default() {
-    let schema = indoc! {r#"
-        datasource ps {
-          provider = "sqlserver"
-          url = "mysql://root:prisma@localhost:3306/mydb"
-          referentialIntegrity = "prisma"
-        }
-
-        generator client {
-          provider = "prisma-client-js"
-          previewFeatures = ["referentialIntegrity", "relationMode"]
-        }
-    "#};
-
-    let config = parse_configuration(schema);
-
-    assert_eq!(config.relation_mode(), Some(RelationMode::Prisma));
 }
 
 fn load_env_var(key: &str) -> Option<String> {

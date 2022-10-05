@@ -142,7 +142,7 @@ fn lift_datasource(
             }
         };
 
-    // TODO: deprecated, keeping here since the "referentialIntegrity" preview feature
+    // TODO: deprecated, keeping here since the "referentialIntegrity" datasource property
     // is still silently supported.
     if let Some(integrity) = referential_integrity {
         if !active_connector.allowed_relation_mode_settings().contains(integrity) {
@@ -292,7 +292,7 @@ Example:
 
 generator client {
     provider = "prisma-client-js"
-    previewFeatures = ["relationMode"]
+    previewFeatures = ["referentialIntegrity"]
 }
 "#;
 
@@ -303,7 +303,7 @@ fn get_relation_mode(
     diagnostics: &mut Diagnostics,
 ) -> Option<RelationMode> {
     args.get("relationMode").and_then(|(span, value)| {
-        if !preview_features.contains(PreviewFeature::RelationMode) {
+        if !preview_features.contains(PreviewFeature::ReferentialIntegrity) {
             diagnostics.push_error(DatamodelError::new_source_validation_error(
                 RELATION_MODE_PREVIEW_FEATURE_ERR,
                 &source.name.name,

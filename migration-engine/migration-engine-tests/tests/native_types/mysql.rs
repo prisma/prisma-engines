@@ -909,7 +909,7 @@ fn impossible_casts_with_existing_data_should_warn(api: TestApi) {
     }
 }
 
-#[test_connector(tags(Mysql), preview_features("relationMode"))]
+#[test_connector(tags(Mysql), preview_features("referentialIntegrity"))]
 fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
     let dm = r#"
         model Post {
@@ -965,7 +965,7 @@ fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
         .assert_no_steps();
 }
 
-#[test_connector(tags(Mysql), preview_features("relationMode"))]
+#[test_connector(tags(Mysql), preview_features("referentialIntegrity"))]
 fn typescript_starter_schema_with_different_native_types_is_idempotent(api: TestApi) {
     let dm = r#"
         model Post {

@@ -82,7 +82,7 @@ fn adding_an_enum_field_must_work_with_native_types_off(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(capabilities(Enums), preview_features("relationMode"))]
+#[test_connector(capabilities(Enums), preview_features("referentialIntegrity"))]
 fn an_enum_can_be_turned_into_a_model(api: TestApi) {
     api.schema_push_w_datasource(BASIC_ENUM_DM).send().assert_green();
 

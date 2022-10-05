@@ -236,7 +236,7 @@ impl TestApi {
     }
 
     pub fn datasource_block(&self) -> DatasourceBlock<'_> {
-        let no_foreign_keys = self.is_vitess() && self.preview_features().contains(PreviewFeature::RelationMode);
+        let no_foreign_keys = self.is_vitess() && self.preview_features().contains(PreviewFeature::ReferentialIntegrity);
 
         if no_foreign_keys {
             self.args

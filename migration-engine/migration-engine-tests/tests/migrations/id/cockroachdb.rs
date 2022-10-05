@@ -23,7 +23,7 @@ fn flipping_autoincrement_on_and_off_works(api: TestApi) {
     }
 }
 
-#[test_connector(tags(CockroachDb), preview_features("relationMode"))]
+#[test_connector(tags(CockroachDb), preview_features("referentialIntegrity"))]
 fn models_with_an_autoincrement_field_as_part_of_a_multi_field_id_can_be_created(api: TestApi) {
     let dm = r#"
         model List {
