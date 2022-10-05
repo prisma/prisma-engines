@@ -1,7 +1,12 @@
 use introspection_engine_tests::{test_api::*, TestResult};
 use test_macros::test_connector;
 
-#[test_connector(tags(Postgres), preview_features("multiSchema"), db_schemas("first", "second"))]
+#[test_connector(
+    tags(Postgres),
+    exclude(CockroachDb),
+    preview_features("multiSchema"),
+    db_schemas("first", "second")
+)]
 async fn multiple_schemas_are_introspected(api: &TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
