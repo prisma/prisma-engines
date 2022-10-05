@@ -55,10 +55,6 @@ impl Datasource {
         self.schemas.binary_search_by_key(&name, |(s, _)| s).is_ok()
     }
 
-    pub(crate) fn has_extension(&self, name: &str) -> bool {
-        self.extensions.binary_search_by_key(&name, |(s, _)| s).is_ok()
-    }
-
     pub fn capabilities(&self) -> ConnectorCapabilities {
         let capabilities = self.active_connector.capabilities().to_owned();
 

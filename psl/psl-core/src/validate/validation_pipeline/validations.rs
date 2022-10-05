@@ -13,7 +13,6 @@ mod relation_fields;
 mod relations;
 
 use super::context::Context;
-use diagnostics::DatamodelError;
 use names::Names;
 use parser_database::walkers::RefinedRelationWalker;
 
