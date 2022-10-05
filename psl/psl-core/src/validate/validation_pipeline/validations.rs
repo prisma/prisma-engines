@@ -44,6 +44,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
         datasource::schemas_property_without_preview_feature(ds, ctx);
         datasource::schemas_property_with_no_connector_support(ds, ctx);
         datasource::extensions_property_without_preview_feature(ds, ctx);
+        datasource::extensions_property_with_no_connector_support(ds, ctx)
     }
 
     // Model validations
