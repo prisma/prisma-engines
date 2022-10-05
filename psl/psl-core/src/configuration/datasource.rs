@@ -27,7 +27,10 @@ pub struct Datasource {
     pub relation_mode: Option<RelationMode>,
     /// _Sorted_ vec of schemas defined in the schemas property.
     pub schemas: Vec<(String, Span)>,
+    /// _Sorted_ vec of extensions defined in the extensions property.
+    pub extensions: Vec<(String, Span)>,
     pub(crate) schemas_span: Option<Span>,
+    pub(crate) extensions_span: Option<Span>,
 }
 
 impl std::fmt::Debug for Datasource {
@@ -50,6 +53,10 @@ impl std::fmt::Debug for Datasource {
 impl Datasource {
     pub(crate) fn has_schema(&self, name: &str) -> bool {
         self.schemas.binary_search_by_key(&name, |(s, _)| s).is_ok()
+    }
+
+    pub(crate) fn has_extension(&self, name: &str) -> bool {
+        self.extensions.binary_search_by_key(&name, |(s, _)| s).is_ok()
     }
 
     pub fn capabilities(&self) -> ConnectorCapabilities {
