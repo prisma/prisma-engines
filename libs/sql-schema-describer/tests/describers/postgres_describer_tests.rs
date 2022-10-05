@@ -1672,7 +1672,7 @@ fn int_expressions_in_defaults(api: TestApi) {
 
 // multi schema
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
     let schema = r#"
            CREATE Schema "schema_0";
