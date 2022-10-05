@@ -702,7 +702,7 @@ fn relation_mode_with_preview_feature_works() {
 }
 
 #[test]
-fn referential_integrity_default() {
+fn relation_mode_default() {
     let schema = indoc! {r#"
         datasource ps {
           provider = "sqlserver"
@@ -721,13 +721,14 @@ fn referential_integrity_default() {
 }
 
 #[test]
-fn relation_mode_default() {
+fn relation_mode_prisma_has_precedence_over_referential_integrity() {
     let schema = indoc! {r#"
         datasource ps {
           provider = "sqlserver"
           url = "mysql://root:prisma@localhost:3306/mydb"
+          relationMode = "prisma"
+          referentialIntegrity = "foreignKeys"
         }
-
         generator client {
           provider = "prisma-client-js"
           previewFeatures = ["referentialIntegrity"]
@@ -736,7 +737,7 @@ fn relation_mode_default() {
 
     let config = parse_configuration(schema);
 
-    assert_eq!(config.relation_mode(), Some(RelationMode::ForeignKeys));
+    assert_eq!(config.relation_mode(), Some(RelationMode::Prisma));
 }
 
 fn load_env_var(key: &str) -> Option<String> {
