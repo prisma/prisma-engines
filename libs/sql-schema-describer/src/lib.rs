@@ -235,6 +235,11 @@ impl SqlSchema {
         self.namespaces.len()
     }
 
+    pub fn namespace_walker<'a>(&'a self, name: &str) -> Option<NamespaceWalker<'a>> {
+        let namespace_idx = self.namespaces.iter().position(|ns| ns == name)?;
+        Some(self.walk(NamespaceId(namespace_idx as u32)))
+    }
+
     pub fn namespace_walkers(&self) -> impl Iterator<Item = NamespaceWalker<'_>> {
         (0..self.namespaces.len()).map(move |namespace_index| NamespaceWalker {
             schema: self,
@@ -248,6 +253,16 @@ impl SqlSchema {
 
     pub fn table_walker<'a>(&'a self, name: &str) -> Option<TableWalker<'a>> {
         let table_idx = self.tables.iter().position(|table| table.name == name)?;
+        Some(self.walk(TableId(table_idx as u32)))
+    }
+
+    pub fn table_walker_ns<'a>(&'a self, namespace: &str, name: &str) -> Option<TableWalker<'a>> {
+        let namespace_idx = self.namespace_walker(namespace)?.id;
+
+        let table_idx = self
+            .tables
+            .iter()
+            .position(|table| table.name == name && table.namespace_id == namespace_idx)?;
         Some(self.walk(TableId(table_idx as u32)))
     }
 

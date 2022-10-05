@@ -432,10 +432,11 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
             sql_schema.push_namespace((*schema).into());
         }
 
+        //TODO(matthias) can we get rid of the table names map and instead just use tablewalker_ns everywhere like in get_columns?
         let table_names = self.get_table_names(&mut sql_schema).await?;
 
         self.get_enums(&mut sql_schema).await?;
-        self.get_columns(&table_names, &mut sql_schema).await?;
+        self.get_columns(&mut sql_schema).await?;
         self.get_foreign_keys(&table_names, &mut sql_schema).await?;
         self.get_indices(&table_names, &mut pg_ext, &mut sql_schema).await?;
 
@@ -443,8 +444,8 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
         self.get_procedures(&mut sql_schema).await?;
 
         //Todo(matthias) understand this
-        self.get_sequences(&sql_schema, &mut pg_ext).await?; //Todo(matthias)
-                                                             // Make sure the vectors we use binary search on are sorted.
+        self.get_sequences(&sql_schema, &mut pg_ext).await?;
+        // Make sure the vectors we use binary search on are sorted.
         pg_ext.indexes.sort_by_key(|(id, _)| *id);
         pg_ext.opclasses.sort_by_key(|(id, _)| *id);
 
@@ -510,7 +511,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         let mut procedures = Vec::with_capacity(rows.len());
 
         for row in rows.into_iter() {
-            println!("{:?}", row);
             procedures.push(Procedure {
                 namespace_id: sql_schema.get_namespace_id(&row.get_expect_string("namespace")),
                 name: row.get_expect_string("name"),
@@ -594,11 +594,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(())
     }
 
-    async fn get_columns(
-        &self,
-        table_ids: &IndexMap<String, TableId>,
-        sql_schema: &mut SqlSchema,
-    ) -> DescriberResult<()> {
+    async fn get_columns(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
         let namespaces = &sql_schema.namespaces;
 
         let is_visible_clause = if self.is_cockroach() {
@@ -610,6 +606,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         let sql = format!(
             r#"
             SELECT
+                oid.namespace,
                 info.table_name,
                 info.column_name,
                 format_type(att.atttypid, att.atttypmod) as formatted_type,
@@ -625,16 +622,15 @@ impl<'a> SqlSchemaDescriber<'a> {
                 info.character_maximum_length
             FROM information_schema.columns info
             JOIN pg_attribute att ON att.attname = info.column_name
-                AND att.attrelid = (
-                    SELECT pg_class.oid
-                    FROM pg_class
-                    JOIN pg_namespace on pg_namespace.oid = pg_class.relnamespace
-                    WHERE relname = info.table_name
-                    AND pg_namespace.nspname = ANY ( $1 )
-                )
-            LEFT OUTER JOIN pg_attrdef attdef ON attdef.adrelid = att.attrelid AND attdef.adnum = att.attnum
+            JOIN (
+                 SELECT pg_class.oid, relname, pg_namespace.nspname as namespace
+                 FROM pg_class
+                 JOIN pg_namespace on pg_namespace.oid = pg_class.relnamespace
+                 AND pg_namespace.nspname = ANY ( $1 )
+                ) as oid on oid.oid = att.attrelid and relname = info.table_name
+            LEFT OUTER JOIN pg_attrdef attdef ON attdef.adrelid = att.attrelid AND attdef.adnum = att.attnum AND table_schema = namespace
             WHERE table_schema = ANY ( $1 ) {}
-            ORDER BY table_name, ordinal_position;
+            ORDER BY namespace, table_name, ordinal_position;
         "#,
             is_visible_clause,
         );
@@ -648,11 +644,13 @@ impl<'a> SqlSchemaDescriber<'a> {
             .await?;
 
         for col in rows {
+            let namespace = col.get_expect_string("namespace");
             let table_name = col.get_expect_string("table_name");
-            let table_id = match table_ids.get(&table_name) {
-                Some(table_id) => table_id,
+            let table_id = match sql_schema.table_walker_ns(&namespace, &table_name) {
+                Some(t_walker) => t_walker.id,
                 None => continue, // we only care about columns in tables we have access to
             };
+
             let name = col.get_expect_string("column_name");
 
             let is_identity = match col.get_string("is_identity") {
@@ -691,7 +689,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 auto_increment,
             };
 
-            sql_schema.columns.push((*table_id, col));
+            sql_schema.columns.push((table_id, col));
         }
 
         // We need to sort because the collation in the system tables (pg_class) is different from
@@ -847,7 +845,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             let referenced_table = row.get_expect_string("parent_table");
             let referenced_column = row.get_expect_string("parent_column");
 
-            //Todo(matthias) Feature flag this
+            //Todo(matthias) Feature flag this at a higher level
             // let referenced_schema_name = row.get_expect_string("referenced_schema_name");
             // if schema != referenced_schema_name {
             //     return Err(DescriberError::from(DescriberErrorKind::CrossSchemaReference {

@@ -58,6 +58,7 @@ impl<'a> LiftAstToDml<'a> {
 
         for model in self.db.walk_models() {
             schema.add_model(self.lift_model(model, &mut field_ids_for_sorting));
+            //Todo(matthias) retrieve schema here / or validate here?
         }
 
         for composite_type in self.db.walk_composite_types() {
@@ -66,6 +67,7 @@ impl<'a> LiftAstToDml<'a> {
 
         for r#enum in self.db.walk_enums() {
             schema.add_enum(self.lift_enum(r#enum))
+            //Todo(matthias) retrieve schema here / or validate here?
         }
 
         self.lift_relations(&mut schema, &mut field_ids_for_sorting);

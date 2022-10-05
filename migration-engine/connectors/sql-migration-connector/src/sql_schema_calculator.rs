@@ -33,7 +33,7 @@ pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn Sq
         .contains(psl::common::preview_features::PreviewFeature::MultiSchema)
     {
         if let Some(ds) = context.datamodel.configuration.datasources.get(0) {
-            for (schema, _) in &ds.schemas {
+            for (schema, _) in &ds.namespaces {
                 context
                     .schemas
                     .insert(schema, context.schema.describer_schema.push_namespace(schema.clone()));

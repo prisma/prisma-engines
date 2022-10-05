@@ -1670,7 +1670,131 @@ fn int_expressions_in_defaults(api: TestApi) {
     assert!(value.is_db_generated());
 }
 
-#[test_connector(tags(Postgres13))]
+// multi schema
+
+#[test_connector(tags(Postgres))]
+//Todo(matthias) seems like Sequence and Type share the same namespace
+fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
+    let schema = r#"
+           CREATE Schema "schema_0";
+           CREATE TABLE "schema_0"."Table_0" ("id_0" SERIAL PRIMARY KEY);
+
+           CREATE Schema "schema_1";
+           CREATE TABLE "schema_1"."Table_0" ("id_1" SERIAL PRIMARY KEY);
+    "#;
+
+    api.raw_cmd(schema);
+    let schema = api.describe_with_schemas(&["schema_0", "schema_1"]);
+
+    let expected_schema = expect![[r#"
+        SqlSchema {
+            namespaces: [
+                "schema_0",
+                "schema_1",
+            ],
+            tables: [
+                Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
+                    name: "Table_0",
+                },
+                Table {
+                    namespace_id: NamespaceId(
+                        1,
+                    ),
+                    name: "Table_0",
+                },
+            ],
+            enums: [],
+            columns: [
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "id_0",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Sequence(
+                                    "Table_0_id_0_seq",
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: true,
+                    },
+                ),
+                (
+                    TableId(
+                        1,
+                    ),
+                    Column {
+                        name: "id_1",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Sequence(
+                                    "Table_0_id_1_seq",
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: true,
+                    },
+                ),
+            ],
+            foreign_keys: [],
+            foreign_key_columns: [],
+            indexes: [
+                Index {
+                    table_id: TableId(
+                        1,
+                    ),
+                    index_name: "Table_0_pkey",
+                    tpe: PrimaryKey,
+                },
+            ],
+            index_columns: [
+                IndexColumn {
+                    index_id: IndexId(
+                        0,
+                    ),
+                    column_id: ColumnId(
+                        1,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+            ],
+            views: [],
+            procedures: [],
+            user_defined_types: [],
+            connector_data: <ConnectorData>,
+        }
+    "#]];
+
+    expected_schema.assert_debug_eq(&schema);
+}
+
+#[test_connector(tags(Postgres))]
 //Todo(matthias) seems like Sequence and Type share the same namespace
 fn multiple_schemas_are_described(api: TestApi) {
     let schema = r#"

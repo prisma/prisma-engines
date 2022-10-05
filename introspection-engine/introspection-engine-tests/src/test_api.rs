@@ -26,6 +26,7 @@ pub struct TestApi {
     args: TestApiArgs,
     connection_string: String,
     preview_features: BitFlags<PreviewFeature>,
+    namespaces: Vec<String>,
 }
 
 impl TestApi {
@@ -38,6 +39,8 @@ impl TestApi {
             .iter()
             .flat_map(|f| PreviewFeature::parse_opt(f))
             .collect();
+
+        let namespaces = args.namespaces().iter().map(|ns| ns.to_string()).collect();
 
         let (database, connection_string): (Quaint, String) = if tags.intersects(Tags::Vitess) {
             let params = ConnectorParams {
@@ -88,6 +91,7 @@ impl TestApi {
             args,
             connection_string,
             preview_features,
+            namespaces,
         }
     }
 
@@ -115,6 +119,7 @@ impl TestApi {
 
     pub async fn introspect_dml(&self) -> Result<String> {
         let previous_schema = psl::validate(self.pure_config().into());
+
         let introspection_result = self.test_introspect_internal(previous_schema).await?;
 
         Ok(psl::render_datamodel_to_string(
@@ -138,6 +143,10 @@ impl TestApi {
 
     pub fn preview_features(&self) -> BitFlags<PreviewFeature> {
         self.preview_features
+    }
+
+    pub fn namespaces(&self) -> &[String] {
+        &self.namespaces
     }
 
     #[track_caller]
@@ -249,6 +258,36 @@ impl TestApi {
         self.args.tags()
     }
 
+    //make this a function returning a string
+
+    pub fn datasource_block_string(&self) -> String {
+        let no_foreign_keys = self.is_vitess() && self.preview_features().contains(PreviewFeature::RelationMode);
+
+        let (url, relation_mode) = if no_foreign_keys {
+            ((&self.connection_string).to_string(), r#"\nrelationMode = "prisma""#)
+        } else {
+            (r#"env(TEST_DATABASE_URL)"#.to_string(), "")
+        };
+
+        let namespaces: Vec<String> = self.namespaces().iter().map(|ns| format!(r#""{}""#, ns)).collect();
+
+        let namespaces = if namespaces.is_empty() {
+            "".to_string()
+        } else {
+            format!("\nschemas = [{}]", namespaces.join(", "))
+        };
+
+        let provider = &self.args.provider();
+        let datasource_block = format!(
+            r#"datasource db {{
+                 provider = "{}"
+                 url = "{}"{}{}
+               }}"#,
+            provider, url, namespaces, relation_mode
+        );
+        datasource_block
+    }
+
     pub fn datasource_block(&self) -> DatasourceBlock<'_> {
         let no_foreign_keys = self.is_vitess() && self.preview_features().contains(PreviewFeature::RelationMode);
 
@@ -261,7 +300,8 @@ impl TestApi {
     }
 
     fn pure_config(&self) -> String {
-        format!("{}\n{}", &self.datasource_block(), &self.generator_block())
+        let a = format!("{}\n{}", &self.datasource_block_string(), &self.generator_block());
+        a
     }
 
     pub fn configuration(&self) -> Configuration {
@@ -302,7 +342,7 @@ impl TestApi {
     fn dm_with_sources(&self, schema: &str) -> String {
         let mut out = String::with_capacity(320 + schema.len());
 
-        write!(out, "{}\n{}", self.datasource_block(), schema).unwrap();
+        write!(out, "{}\n{}", self.datasource_block_string(), schema).unwrap();
 
         out
     }
