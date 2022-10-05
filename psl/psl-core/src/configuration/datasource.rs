@@ -1,3 +1,5 @@
+use parser_database::ast;
+
 use crate::{
     configuration::StringFromEnvVar,
     datamodel_connector::{Connector, ConnectorCapabilities, RelationMode},
@@ -28,9 +30,8 @@ pub struct Datasource {
     /// _Sorted_ vec of schemas defined in the schemas property.
     pub schemas: Vec<(String, Span)>,
     /// _Sorted_ vec of extensions defined in the extensions property.
-    pub extensions: Vec<(String, Span)>,
+    pub extra_properties: Vec<(String, (Span, ast::Expression))>,
     pub(crate) schemas_span: Option<Span>,
-    pub(crate) extensions_span: Option<Span>,
 }
 
 impl std::fmt::Debug for Datasource {

@@ -7,13 +7,18 @@ use native_types::{
     PostgresType::{self, *},
 };
 use psl_core::{
+    common::preview_features::PreviewFeature,
     datamodel_connector::{
         helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
         Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, RelationMode,
-        StringFilter,
+        StringFilter, EXTENSIONS_KEY,
     },
     diagnostics::{DatamodelError, Diagnostics},
-    parser_database::{ast, walkers, IndexAlgorithm, OperatorClass, ParserDatabase, ReferentialAction, ScalarType},
+    parser_database::{
+        ast, coerce, coerce_array, walkers, IndexAlgorithm, OperatorClass, ParserDatabase, ReferentialAction,
+        ScalarType,
+    },
+    Datasource,
 };
 use std::borrow::Cow;
 
@@ -258,6 +263,30 @@ impl Connector for PostgresDatamodelConnector {
             validations::generalized_index_validations(index, self, errors);
             validations::spgist_indexed_column_count(index, errors);
         }
+    }
+
+    fn validate_datasource(
+        &self,
+        preview_features: BitFlags<PreviewFeature>,
+        ds: &Datasource,
+        errors: &mut Diagnostics,
+    ) {
+        let (span, _extensions) = match ds.extra_properties.iter().find(|(key, _)| key == EXTENSIONS_KEY) {
+            Some((_, (span, expr))) => {
+                let extensions = coerce_array(expr, &coerce::constant_with_span, errors).map(|b| (b, expr.span()));
+                (span, extensions)
+            }
+            None => return,
+        };
+
+        if preview_features.contains(PreviewFeature::PostgresExtensions) {
+            return;
+        }
+
+        errors.push_error(DatamodelError::new_static(
+            "The `extensions` property is only available with the `postgresExtensions` preview feature.",
+            *span,
+        ));
     }
 
     fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {

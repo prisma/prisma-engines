@@ -34,33 +34,3 @@ pub(super) fn schemas_property_with_no_connector_support(datasource: &Datasource
         ))
     }
 }
-
-pub(super) fn extensions_property_without_preview_feature(datasource: &Datasource, ctx: &mut Context<'_>) {
-    if ctx.preview_features.contains(crate::PreviewFeature::PostgresExtensions) {
-        return;
-    }
-
-    if let Some(span) = datasource.extensions_span {
-        ctx.push_error(DatamodelError::new_static(
-            "The `extensions` property is only available with the `postgresExtensions` preview feature.",
-            span,
-        ));
-    }
-}
-
-pub(crate) fn extensions_property_with_no_connector_support(ds: &Datasource, ctx: &mut Context<'_>) {
-    if !ctx.preview_features.contains(crate::PreviewFeature::PostgresExtensions) {
-        return;
-    }
-
-    if ctx.connector.is_provider("postgresql") {
-        return;
-    }
-
-    if let Some(span) = ds.extensions_span {
-        ctx.push_error(DatamodelError::new_static(
-            "The `extensions` property is only available with the `postgresql` connector.",
-            span,
-        ));
-    }
-}

@@ -214,24 +214,10 @@ fn lift_datasource(
         })
         .unwrap_or_default();
 
-    let (extensions, extensions_span) = args
-        .remove(EXTENSIONS_KEY)
-        .and_then(|(_, expr)| coerce_array(expr, &coerce::constant_with_span, diagnostics).map(|b| (b, expr.span())))
-        .map(|(mut extensions, span)| {
-            extensions.sort_by(|(a, _), (b, _)| a.cmp(b));
-
-            for pair in extensions.windows(2) {
-                if pair[0].0 == pair[1].0 {
-                    diagnostics.push_error(DatamodelError::new_static(
-                        "Duplicated extension names are not allowed",
-                        pair[0].1,
-                    ))
-                }
-            }
-
-            (extensions, Some(span))
-        })
-        .unwrap_or_default();
+    let mut extra_properties = Vec::new();
+    if let Some((span, expr)) = args.remove(EXTENSIONS_KEY) {
+        extra_properties.push((EXTENSIONS_KEY.to_owned(), (span, expr.clone())));
+    }
 
     // we handle these elsewhere
     args.remove("previewFeatures");
@@ -243,9 +229,7 @@ fn lift_datasource(
 
     Some(Datasource {
         schemas: schemas.into_iter().map(|(s, span)| (s.to_owned(), span)).collect(),
-        extensions: extensions.into_iter().map(|(s, span)| (s.to_owned(), span)).collect(),
         schemas_span,
-        extensions_span,
         name: source_name.to_string(),
         provider: provider.to_owned(),
         active_provider: active_connector.provider_name(),
@@ -256,6 +240,7 @@ fn lift_datasource(
         shadow_database_url,
         referential_integrity,
         relation_mode,
+        extra_properties,
     })
 }
 

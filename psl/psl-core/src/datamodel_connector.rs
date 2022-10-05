@@ -15,6 +15,8 @@ mod native_type_constructor;
 mod native_type_instance;
 mod relation_mode;
 
+use crate::{common::preview_features::PreviewFeature, Datasource};
+
 pub use self::{
     capabilities::{ConnectorCapabilities, ConnectorCapability},
     empty_connector::EmptyDatamodelConnector,
@@ -29,6 +31,8 @@ use enumflags2::BitFlags;
 use lsp_types::CompletionList;
 use parser_database::{ast::SchemaPosition, walkers, IndexAlgorithm, ParserDatabase, ReferentialAction, ScalarType};
 use std::{borrow::Cow, collections::BTreeMap};
+
+pub const EXTENSIONS_KEY: &str = "extensions";
 
 /// The datamodel connector API.
 pub trait Connector: Send + Sync {
@@ -131,6 +135,17 @@ pub trait Connector: Send + Sync {
 
     fn validate_enum(&self, _enum: walkers::EnumWalker<'_>, _: &mut Diagnostics) {}
     fn validate_model(&self, _model: walkers::ModelWalker<'_>, _: &mut Diagnostics) {}
+    fn validate_datasource(&self, preview: BitFlags<PreviewFeature>, ds: &Datasource, errors: &mut Diagnostics) {
+        let (span, expr) = match ds.extra_properties.iter().find(|(key, _)| key == EXTENSIONS_KEY) {
+            Some((_, tuple)) => tuple,
+            None => return,
+        };
+
+        errors.push_error(DatamodelError::new_static(
+            "The `extensions` property is only available with the `postgresql` connector.",
+            *span,
+        ));
+    }
 
     fn validate_scalar_field_unknown_default_functions(
         &self,
