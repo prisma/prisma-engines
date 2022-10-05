@@ -3,10 +3,12 @@ use native_types::PostgresType;
 use psl_core::{
     common::preview_features::PreviewFeature,
     datamodel_connector::{walker_ext_traits::*, Connector, EXTENSIONS_KEY},
-    diagnostics::{DatamodelError, Diagnostics, Span},
-    parser_database::{ast::WithSpan, coerce, coerce_array, walkers::IndexWalker, IndexAlgorithm, OperatorClass},
+    diagnostics::{DatamodelError, Diagnostics},
+    parser_database::{ast::WithSpan, walkers::IndexWalker, IndexAlgorithm, OperatorClass},
     Datasource,
 };
+
+use super::PostgresExtensions;
 
 pub(super) fn compatible_native_types(index: IndexWalker<'_>, connector: &dyn Connector, errors: &mut Diagnostics) {
     for field in index.fields() {
@@ -483,11 +485,7 @@ pub(super) fn extensions_must_be_an_array_of_constants<'a>(
         return;
     }
 
-    for (key, (_, expr)) in ds.extra_properties.iter() {
-        if key != EXTENSIONS_KEY {
-            continue;
-        }
-
-        coerce_array(expr, &coerce::constant_with_span, errors).map(|b| (b, expr.span()));
+    if let Some((_, (_, expr))) = ds.extra_properties.iter().find(|(k, _)| *k == EXTENSIONS_KEY) {
+        PostgresExtensions::validate(expr, errors);
     }
 }

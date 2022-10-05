@@ -135,9 +135,9 @@ pub trait Connector: Send + Sync {
 
     fn validate_enum(&self, _enum: walkers::EnumWalker<'_>, _: &mut Diagnostics) {}
     fn validate_model(&self, _model: walkers::ModelWalker<'_>, _: &mut Diagnostics) {}
-    fn validate_datasource(&self, preview: BitFlags<PreviewFeature>, ds: &Datasource, errors: &mut Diagnostics) {
-        let (span, expr) = match ds.extra_properties.iter().find(|(key, _)| key == EXTENSIONS_KEY) {
-            Some((_, tuple)) => tuple,
+    fn validate_datasource(&self, _: BitFlags<PreviewFeature>, ds: &Datasource, errors: &mut Diagnostics) {
+        let span = match ds.extra_properties.iter().find(|(key, _)| key == EXTENSIONS_KEY) {
+            Some((_, (span, _))) => span,
             None => return,
         };
 
