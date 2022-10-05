@@ -3,14 +3,10 @@
 <span id="3">3</span>
 <span id="4">4</span>
 <span id="5">5</span>
-<span id="6">6</span>
-<span id="7">7</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">datasource_loader</span>;
-<span class="kw">mod</span> <span class="ident">generator_loader</span>;
+</pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">datasource_loader</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">generator_loader</span>;
 <span class="kw">mod</span> <span class="ident">validation_pipeline</span>;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">datasource_loader::DatasourceLoader</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">generator_loader::GeneratorLoader</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">validation_pipeline::validate</span>;
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
