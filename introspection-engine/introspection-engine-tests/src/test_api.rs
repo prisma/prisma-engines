@@ -243,8 +243,6 @@ impl TestApi {
         self.args.tags()
     }
 
-    //make this a function returning a string
-
     pub fn datasource_block_string(&self) -> String {
         let no_foreign_keys =
             self.is_vitess() && self.preview_features().contains(PreviewFeature::ReferentialIntegrity);
@@ -287,8 +285,7 @@ impl TestApi {
     }
 
     fn pure_config(&self) -> String {
-        let a = format!("{}\n{}", &self.datasource_block_string(), &self.generator_block());
-        a
+        format!("{}\n{}", &self.datasource_block_string(), &self.generator_block())
     }
 
     pub fn configuration(&self) -> Configuration {
