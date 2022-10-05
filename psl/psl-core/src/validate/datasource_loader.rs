@@ -18,7 +18,7 @@ const URL_KEY: &str = "url";
 /// Loads all datasources from the provided schema AST.
 /// - `ignore_datasource_urls`: datasource URLs are not parsed. They are replaced with dummy values.
 /// - `datasource_url_overrides`: datasource URLs are not parsed and overridden with the provided ones.
-pub fn load_datasources_from_ast(
+pub(crate) fn load_datasources_from_ast(
     ast_schema: &ast::SchemaAst,
     preview_features: BitFlags<PreviewFeature>,
     diagnostics: &mut Diagnostics,
