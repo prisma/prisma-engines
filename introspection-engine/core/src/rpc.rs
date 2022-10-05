@@ -104,11 +104,13 @@ impl RpcImpl {
         composite_type_depth: CompositeTypeDepth,
     ) -> RpcResult<IntrospectionResultOutput> {
         let (_config, _url, connector) = RpcImpl::load_connector(&schema).await?;
-        let previous_schema = psl::validate(psl::SourceFile::new_allocated(Arc::from(schema.into_boxed_str())));
+        let source = psl::SourceFile::new_allocated(Arc::from(schema.into_boxed_str()));
 
         let ctx = if force {
+            let previous_schema = psl::validate(source);
             IntrospectionContext::new_config_only(previous_schema, composite_type_depth)
         } else {
+            let previous_schema = psl::parse_schema(source).map_err(Error::DatamodelError)?;
             IntrospectionContext::new(previous_schema, composite_type_depth)
         };
 
