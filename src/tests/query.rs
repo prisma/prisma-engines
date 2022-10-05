@@ -5,6 +5,7 @@ use super::test_api::*;
 use crate::ast::JsonPath;
 use crate::{
     connector::{IsolationLevel, Queryable, TransactionCapable},
+    error::ErrorKind,
     prelude::*,
 };
 use test_macros::test_each_connector;
@@ -3498,6 +3499,30 @@ async fn update_with_subselect_using_main_table_does_not_throw_error(api: &mut d
     api.delete_table(&table_2).await?;
 
     assert_eq!(res?, 1);
+
+    Ok(())
+}
+
+#[test_each_connector(tags("mssql"))]
+async fn double_rollback_error(api: &mut dyn TestApi) -> crate::Result<()> {
+    api.conn().raw_cmd("BEGIN TRAN").await?;
+    api.conn().raw_cmd("ROLLBACK").await?;
+
+    let err = api.conn().raw_cmd("ROLLBACK").await.unwrap_err();
+
+    assert!(matches!(err.kind(), ErrorKind::TransactionAlreadyClosed(_)));
+
+    Ok(())
+}
+
+#[test_each_connector(tags("mssql"))]
+async fn double_commit_error(api: &mut dyn TestApi) -> crate::Result<()> {
+    api.conn().raw_cmd("BEGIN TRAN").await?;
+    api.conn().raw_cmd("COMMIT").await?;
+
+    let err = api.conn().raw_cmd("COMMIT").await.unwrap_err();
+
+    assert!(matches!(err.kind(), ErrorKind::TransactionAlreadyClosed(_)));
 
     Ok(())
 }

@@ -107,7 +107,7 @@ impl TransactionCapable for Mssql {
 
         let opts = TransactionOptions::new(isolation, self.requires_isolation_first());
 
-        Transaction::new(self, "BEGIN TRAN", opts).await
+        Transaction::new(self, self.begin_statement(), opts).await
     }
 }
 

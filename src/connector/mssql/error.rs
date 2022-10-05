@@ -18,7 +18,7 @@ impl From<tiberius::error::Error> for Error {
 
                 Error::builder(ErrorKind::TlsError { message }).build()
             }
-            tiberius::error::Error::Server(e) if e.code() == 3971 => {
+            tiberius::error::Error::Server(e) if [3902u32, 3903u32, 3971u32].iter().any(|code| e.code() == *code) => {
                 let kind = ErrorKind::TransactionAlreadyClosed(e.message().to_string());
 
                 let mut builder = Error::builder(kind);
