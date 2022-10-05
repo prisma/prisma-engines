@@ -345,7 +345,7 @@ fn remapped_multi_field_id_as_part_of_relation_must_work(api: TestApi) {
     });
 }
 
-#[test_connector(preview_features("relationMode"))]
+#[test_connector(preview_features("referentialIntegrity"))]
 fn unique_constraints_on_composite_relation_fields(api: TestApi) {
     let dm = r##"
         model Parent {
@@ -374,7 +374,7 @@ fn unique_constraints_on_composite_relation_fields(api: TestApi) {
     });
 }
 
-#[test_connector(preview_features("relationMode"))]
+#[test_connector(preview_features("referentialIntegrity"))]
 fn indexes_on_composite_relation_fields(api: TestApi) {
     let dm = r##"
         model User {
@@ -403,7 +403,7 @@ fn indexes_on_composite_relation_fields(api: TestApi) {
     });
 }
 
-#[test_connector(exclude(Vitess), preview_features("relationMode"))]
+#[test_connector(exclude(Vitess), preview_features("referentialIntegrity"))]
 fn dropping_mutually_referencing_tables_works(api: TestApi) {
     let dm1 = r#"
     model A {

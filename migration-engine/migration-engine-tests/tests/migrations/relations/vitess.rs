@@ -1,6 +1,6 @@
 use migration_engine_tests::test_api::*;
 
-#[test_connector(tags(Vitess), preview_features("relationMode"))]
+#[test_connector(tags(Vitess), preview_features("referentialIntegrity"))]
 fn adding_mutual_references_on_existing_tables_works(api: TestApi) {
     let dm1 = r#"
         model A {
