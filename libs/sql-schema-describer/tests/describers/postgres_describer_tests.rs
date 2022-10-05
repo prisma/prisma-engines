@@ -1673,14 +1673,13 @@ fn int_expressions_in_defaults(api: TestApi) {
 // multi schema
 
 #[test_connector(tags(Postgres))]
-//Todo(matthias) seems like Sequence and Type share the same namespace
 fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
     let schema = r#"
            CREATE Schema "schema_0";
-           CREATE TABLE "schema_0"."Table_0" ("id_0" SERIAL PRIMARY KEY);
+           CREATE TABLE "schema_0"."Table_0" ("id_0" SERIAL PRIMARY KEY, int Integer Default 0);
 
            CREATE Schema "schema_1";
-           CREATE TABLE "schema_1"."Table_0" ("id_1" SERIAL PRIMARY KEY);
+           CREATE TABLE "schema_1"."Table_0" ("id_1" SERIAL PRIMARY KEY, int Integer Default 1);
     "#;
 
     api.raw_cmd(schema);
@@ -1735,6 +1734,33 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                 ),
                 (
                     TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "int",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Nullable,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Value(
+                                    Int(
+                                        0,
+                                    ),
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
                         1,
                     ),
                     Column {
@@ -1758,6 +1784,33 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                         auto_increment: true,
                     },
                 ),
+                (
+                    TableId(
+                        1,
+                    ),
+                    Column {
+                        name: "int",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Nullable,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Value(
+                                    Int(
+                                        1,
+                                    ),
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: false,
+                    },
+                ),
             ],
             foreign_keys: [],
             foreign_key_columns: [],
@@ -1776,7 +1829,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                         0,
                     ),
                     column_id: ColumnId(
-                        1,
+                        2,
                     ),
                     sort_order: Some(
                         Asc,

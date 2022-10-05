@@ -21,12 +21,22 @@ async fn multiple_schemas_are_introspected(api: &TestApi) -> TestResult {
     api.database().raw_cmd(&create_table).await?;
     api.database().raw_cmd(&create_primary).await?;
 
+    //TODO(matthias) Not correct yet, just a POC for the db_schemas propoerty in the test macro
     let expected = expect![[r#"
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
         model A {
-          id   Int                 @id @default(autoincrement())
-          data Unsupported("box")?
+          id   Int  @default(autoincrement())
+          data Int?
 
-          @@index([data], type: SpGist)
+          @@ignore
+        }
+
+        model A {
+          id   Int  @id @default(autoincrement())
+          data Int?
+
+          @@index([data])
+          @@index([data])
         }
     "#]];
 

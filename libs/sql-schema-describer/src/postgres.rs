@@ -627,7 +627,9 @@ impl<'a> SqlSchemaDescriber<'a> {
                  FROM pg_class
                  JOIN pg_namespace on pg_namespace.oid = pg_class.relnamespace
                  AND pg_namespace.nspname = ANY ( $1 )
-                ) as oid on oid.oid = att.attrelid and relname = info.table_name
+                ) as oid on oid.oid = att.attrelid 
+                  AND relname = info.table_name
+                  AND namespace = info.table_schema
             LEFT OUTER JOIN pg_attrdef attdef ON attdef.adrelid = att.attrelid AND attdef.adnum = att.attnum AND table_schema = namespace
             WHERE table_schema = ANY ( $1 ) {}
             ORDER BY namespace, table_name, ordinal_position;

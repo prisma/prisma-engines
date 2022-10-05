@@ -145,17 +145,18 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
     }
 
     async fn introspect(&self, ctx: &IntrospectionContext) -> ConnectorResult<IntrospectionResult> {
+        let namespaces = &mut ctx
+            .source
+            .namespaces
+            .iter()
+            .map(|(ns, _)| ns.as_ref())
+            .collect::<Vec<&str>>();
+        if namespaces.is_empty() {
+            namespaces.push(self.connection.connection_info().schema_name())
+        }
+
         let sql_schema = self
-            .catch(
-                self.describe(
-                    Some(ctx.source.active_provider),
-                    &ctx.source
-                        .namespaces
-                        .iter()
-                        .map(|(ns, _)| ns.as_ref())
-                        .collect::<Vec<&str>>(),
-                ),
-            )
+            .catch(self.describe(Some(ctx.source.active_provider), namespaces))
             .await?;
 
         let introspection_result =
