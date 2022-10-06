@@ -21,7 +21,7 @@
           overlays = [
             rust-overlay.overlays.default
             (self: super:
-              let toolchain = pkgs.rust-bin.stable.latest.minimal; in
+              let toolchain = pkgs.rust-bin.stable.latest.default; in
               { cargo = toolchain; rustc = toolchain; })
           ];
           pkgs = import nixpkgs { inherit system overlays; };
@@ -69,16 +69,9 @@
                 protobuf # for tonic
               ];
 
-              # https://github.com/ipetkov/crane/discussions/115
-              postConfigure = "find . -name 'build.rs' -exec touch '{}' ';'";
-
               cargoBuildCommand = "cargo build --release ${builtins.toString excludeFlags}";
               cargoCheckCommand = "cargo check --all-features ${builtins.toString excludeFlags}";
-              cargoTestCommand = "cargo test ${builtins.toString excludeFlags}";
-
-              # Env vars for the check phase. No db connection so we use sqlite.
-              TEST_DATABASE_URL = "sqlite";
-              RUST_LOG = "debug";
+              cargoTestCommand = "TEST_DATABASE_URL=sqlite RUST_LOG=debug cargo test ${builtins.toString excludeFlags}";
             };
 
           prisma-engines-deps = craneLib.buildDepsOnly prismaEnginesCommonArgs;
