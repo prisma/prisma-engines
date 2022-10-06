@@ -122,6 +122,11 @@ impl DatamodelError {
         Self::new(msg, span)
     }
 
+    pub fn new_duplicate_enum_database_name_error(span: Span) -> DatamodelError {
+        let msg = "An enum with the same database name is already defined.";
+        Self::new(msg, span)
+    }
+
     pub fn new_duplicate_model_database_name_error(
         model_database_name: &str,
         existing_model_name: &str,

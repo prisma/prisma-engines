@@ -76,6 +76,7 @@ pub(super) fn has_a_unique_primary_key_name(model: ModelWalker<'_>, names: &supe
     for violation in names.constraint_namespace.constraint_name_scope_violations(
         model.model_id(),
         super::constraint_namespace::ConstraintName::PrimaryKey(name.as_ref()),
+        ctx,
     ) {
         let message = format!(
             "The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.",

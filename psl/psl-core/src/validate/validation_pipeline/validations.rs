@@ -17,13 +17,10 @@ use names::Names;
 use parser_database::walkers::RefinedRelationWalker;
 
 pub(super) fn validate(ctx: &mut Context<'_>) {
-    let db = ctx.db;
-    let connector = ctx.connector;
-
-    let names = Names::new(db, connector);
+    let names = Names::new(ctx);
 
     composite_types::detect_composite_cycles(ctx);
-    for composite_type in db.walk_composite_types() {
+    for composite_type in ctx.db.walk_composite_types() {
         composite_types::composite_types_support(composite_type, ctx);
 
         if !ctx.diagnostics.has_errors() {
@@ -42,7 +39,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
     // Model validations
     models::database_name_clashes(ctx);
 
-    for model in db.walk_models() {
+    for model in ctx.db.walk_models() {
         models::has_a_strict_unique_criteria(model, ctx);
         models::has_a_unique_primary_key_name(model, &names, ctx);
         models::has_a_unique_custom_primary_key_name_per_model(model, &names, ctx);
@@ -117,8 +114,8 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
         }
     }
 
-    if !connector.supports_enums() {
-        for r#enum in db.ast().iter_tops().filter_map(|(_, top)| top.as_enum()) {
+    if !ctx.connector.supports_enums() {
+        for r#enum in ctx.db.ast().iter_tops().filter_map(|(_, top)| top.as_enum()) {
             ctx.push_error(DatamodelError::new_validation_error(
                 &format!(
                     "You defined the enum `{}`. But the current connector does not support enums.",
@@ -128,7 +125,8 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
             ));
         }
     } else {
-        for r#enum in db.walk_enums() {
+        enums::database_name_clashes(ctx);
+        for r#enum in ctx.db.walk_enums() {
             ctx.connector.validate_enum(r#enum, ctx.diagnostics);
         }
     }
@@ -184,7 +182,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
         }
     }
 
-    for relation in db.walk_relations() {
+    for relation in ctx.db.walk_relations() {
         match relation.refine() {
             // 1:1, 1:n
             RefinedRelationWalker::Inline(relation) => {

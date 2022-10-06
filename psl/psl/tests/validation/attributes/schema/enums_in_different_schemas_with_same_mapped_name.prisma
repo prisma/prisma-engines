@@ -1,0 +1,29 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("TEST_DATABASE_URL")
+  schemas  = ["base", "transactional"]
+}
+
+enum Color {
+    RED
+    GREEN
+    BLUE
+
+    @@map("attribute")
+    @@schema("base")
+}
+
+enum Size {
+    SMALL
+    MEDIUM
+    LARGE
+    VENTI
+
+    @@map("attribute")
+    @@schema("transactional")
+}

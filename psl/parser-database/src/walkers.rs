@@ -29,11 +29,18 @@ use crate::{ast, ParserDatabase};
 /// A generic walker. Only walkers intantiated with a concrete ID type (`I`) are useful.
 #[derive(Clone, Copy)]
 pub struct Walker<'db, I> {
-    db: &'db crate::ParserDatabase,
-    id: I,
+    /// The parser database being traversed.
+    pub db: &'db crate::ParserDatabase,
+    /// The identifier of the focused element.
+    pub id: I,
 }
 
 impl ParserDatabase {
+    /// Traverse a schema element by id.
+    pub fn walk<I>(&self, id: I) -> Walker<'_, I> {
+        Walker { db: self, id }
+    }
+
     /// Walk all enums in the schema.
     pub fn walk_enums(&self) -> impl Iterator<Item = EnumWalker<'_>> {
         self.ast()
@@ -44,11 +51,7 @@ impl ParserDatabase {
 
     /// Find a model by ID.
     pub(crate) fn walk_model(&self, model_id: ast::ModelId) -> ModelWalker<'_> {
-        ModelWalker {
-            model_id,
-            db: self,
-            model_attributes: &self.types.model_attributes[&model_id],
-        }
+        self.walk(model_id)
     }
 
     /// Find an enum by ID.
