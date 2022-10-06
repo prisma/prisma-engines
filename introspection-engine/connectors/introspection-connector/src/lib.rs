@@ -1,8 +1,8 @@
 mod error;
 
-use enumflags2::BitFlags;
 pub use error::{ConnectorError, ErrorKind};
 
+use enumflags2::BitFlags;
 use psl::{common::preview_features::PreviewFeature, dml::Datamodel, Datasource};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
