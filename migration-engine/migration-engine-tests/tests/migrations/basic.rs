@@ -52,7 +52,7 @@ fn adding_multiple_optional_fields_to_an_existing_model_works(api: TestApi) {
     });
 }
 
-#[test_connector(preview_features("relationMode"))]
+#[test_connector(preview_features("referentialIntegrity"))]
 fn a_model_can_be_removed(api: TestApi) {
     let directory = api.create_migrations_directory();
 

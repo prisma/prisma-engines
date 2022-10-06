@@ -152,7 +152,7 @@ pub fn calculate_many_to_many_field(
     RelationField::new(&name, FieldArity::List, FieldArity::List, relation_info)
 }
 
-pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &mut Context) -> Option<IndexDefinition> {
+pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &Context) -> Option<IndexDefinition> {
     let tpe = match index.index_type() {
         IndexType::Unique => psl::dml::IndexType::Unique,
         IndexType::Normal => psl::dml::IndexType::Normal,
@@ -196,7 +196,7 @@ pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &mut Co
     })
 }
 
-pub(crate) fn calculate_scalar_field(column: ColumnWalker<'_>, ctx: &mut Context) -> ScalarField {
+pub(crate) fn calculate_scalar_field(column: ColumnWalker<'_>, ctx: &Context) -> ScalarField {
     debug!("Handling column {:?}", column);
 
     let field_type = calculate_scalar_field_type_with_native_types(column, ctx);
@@ -376,10 +376,7 @@ pub(crate) fn calculate_scalar_field_type_for_native_type(column: ColumnWalker<'
     }
 }
 
-pub(crate) fn calculate_scalar_field_type_with_native_types(
-    column: sql::ColumnWalker<'_>,
-    ctx: &mut Context,
-) -> FieldType {
+pub(crate) fn calculate_scalar_field_type_with_native_types(column: sql::ColumnWalker<'_>, ctx: &Context) -> FieldType {
     debug!("Calculating native field type for '{}'", column.name());
     let scalar_type = calculate_scalar_field_type_for_native_type(column);
 
@@ -451,7 +448,7 @@ pub(crate) fn replace_index_field_names(target: &mut Vec<IndexField>, old_name: 
     }
 }
 
-fn index_algorithm(index: sql::walkers::IndexWalker<'_>, ctx: &mut Context) -> Option<IndexAlgorithm> {
+fn index_algorithm(index: sql::walkers::IndexWalker<'_>, ctx: &Context) -> Option<IndexAlgorithm> {
     if !ctx.sql_family().is_postgres() {
         return None;
     }
@@ -468,7 +465,7 @@ fn index_algorithm(index: sql::walkers::IndexWalker<'_>, ctx: &mut Context) -> O
     })
 }
 
-fn index_is_clustered(index_id: sql::IndexId, schema: &SqlSchema, ctx: &mut Context) -> Option<bool> {
+fn index_is_clustered(index_id: sql::IndexId, schema: &SqlSchema, ctx: &Context) -> Option<bool> {
     if !ctx.sql_family().is_mssql() {
         return None;
     }
@@ -478,7 +475,7 @@ fn index_is_clustered(index_id: sql::IndexId, schema: &SqlSchema, ctx: &mut Cont
     Some(ext.index_is_clustered(index_id))
 }
 
-pub(crate) fn primary_key_is_clustered(pkid: sql::IndexId, ctx: &mut Context) -> Option<bool> {
+pub(crate) fn primary_key_is_clustered(pkid: sql::IndexId, ctx: &Context) -> Option<bool> {
     if !ctx.sql_family().is_mssql() {
         return None;
     }
@@ -488,7 +485,7 @@ pub(crate) fn primary_key_is_clustered(pkid: sql::IndexId, ctx: &mut Context) ->
     Some(ext.index_is_clustered(pkid))
 }
 
-fn get_opclass(index_field_id: sql::IndexColumnId, schema: &SqlSchema, ctx: &mut Context) -> Option<OperatorClass> {
+fn get_opclass(index_field_id: sql::IndexColumnId, schema: &SqlSchema, ctx: &Context) -> Option<OperatorClass> {
     if !ctx.sql_family().is_postgres() {
         return None;
     }

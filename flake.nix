@@ -1,77 +1,100 @@
 {
   inputs = {
+    crane = {
+      url = "github:ipetkov/crane";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
     flake-utils.url = "github:numtide/flake-utils";
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
+    nixpkgs.url = "nixpkgs/nixos-unstable";
   };
 
-  outputs = { self, nixpkgs, rust-overlay, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
-      let
-        overlays = [ (import rust-overlay) ];
-        pkgs = import nixpkgs { inherit system overlays; };
-        shell = import ./shell.nix { inherit pkgs; };
-        inherit (pkgs) lib rustPlatform;
-      in
-      {
-        packages = {
-          prisma-engines = rustPlatform.buildRustPackage
-            {
-              name = "prisma-engines";
+  outputs = { self, nixpkgs, rust-overlay, flake-utils, crane }:
+    flake-utils.lib.eachDefaultSystem
+      (system:
+        let
+          overlays = [
+            rust-overlay.overlays.default
+            (self: super:
+              let toolchain = pkgs.rust-bin.stable.latest.minimal; in
+              { cargo = toolchain; rustc = toolchain; })
+          ];
+          pkgs = import nixpkgs { inherit system overlays; };
+          craneLib = crane.mkLib pkgs;
+
+          src =
+            let
+              enginesSourceFilter = path: type: (builtins.match "\\.pest$" path != null) ||
+                (builtins.match "\\.README.md$" path != null) ||
+                (builtins.match "^\\.git/HEAD" path != null) ||
+                (builtins.match "^\\.git/refs" path != null) ||
+                (craneLib.filterCargoSources path type != null);
+            in
+            lib.cleanSourceWith {
+              filter = enginesSourceFilter;
               src = builtins.path {
                 path = ./.;
                 name = "prisma-engines-workspace-root-path";
               };
-              cargoLock = {
-                lockFile = ./Cargo.lock;
-                # Hashes are required for git dependencies.
-                outputHashes = {
-                  "barrel-0.6.6-alpha.0" = "sha256-USh0lQ1z+3Spgc69bRFySUzhuY79qprLlEExTmYWFN8=";
-                  "graphql-parser-0.3.0" = "sha256-0ZAsj2mW6fCLhwTETucjbu4rPNzfbNiHu2wVTBlTNe4=";
-                  "mobc-0.7.3" = "sha256-88jSFqOyMy2E7TP1HtMcE4CQXoKhBpO8XuSFKGtfgqA=";
-                  "mysql_async-0.30.0" = "sha256-I1Q9G3H3BW/Paq9aOYGcxQf4JVwN/ZNhGuHwTqbuxWc=";
-                  "postgres-native-tls-0.5.0" = "sha256-kwqHalfwrvNQYUdAqObTAab3oWzBLl6hab2JGXVyJ3k=";
-                  "quaint-0.2.0-alpha.13" = "sha256-gsTvnn6RGkhiMQVNXDZWTbWoHEiD9TdSduivkWFHFIE=";
-                  "tokio-native-tls-0.3.0" = "sha256-ayH3TJ1iUQeZicR2nrsuxLykMoPL1fYBqRb21ValR5Q=";
-                };
-              };
+            };
 
-              cargoBuildFlags = ''
-                --package introspection-core
-                --package migration-engine-cli
-                --package prisma-fmt
-                --package query-engine
-                --package query-engine-node-api
-              '';
-
-              # Exclude the test suites that rely on a live database.
-              cargoTestFlags = ''
-                --workspace
-                --exclude query-engine-tests
-                --exclude migration-engine-tests
-                --exclude introspection-engine-tests
-                --exclude migration-engine-cli
-                --exclude mongodb-introspection-connector
-                --exclude mongodb-migration-connector
-                --exclude sql-schema-describer
-              '';
-
-              buildInputs = with pkgs; [
-                openssl
+          prismaEnginesCommonArgs =
+            let
+              excludeFlags = [
+                "--workspace"
+                "--exclude mongodb-introspection-connector" # requires running mongo
+                "--exclude mongodb-migration-connector" # requires running mongo
+                "--exclude query-engine-tests" # too slow to compile
+                "--exclude query-tests-setup" # too slow to compile
+                "--exclude query-test-macros" # too slow to compile
               ];
+            in
+            {
+              pname = "prisma-engines";
+              version = "0.1.0";
+
+              inherit src;
+
+              buildInputs = [ pkgs.openssl ];
 
               nativeBuildInputs = with pkgs; [
+                git # for our build scripts that bake in the git hash
+                perl # for openssl-sys
                 pkg-config
-                protobuf
-                rust-bin.stable.latest.minimal
+                protobuf # for tonic
               ];
-            };
-        };
 
-        devShell = shell;
-      }
-    );
+              # https://github.com/ipetkov/crane/discussions/115
+              postConfigure = "find . -name 'build.rs' -exec touch '{}' ';'";
+
+              cargoBuildCommand = "cargo build --release ${builtins.toString excludeFlags}";
+              cargoCheckCommand = "cargo check --all-features ${builtins.toString excludeFlags}";
+              cargoTestCommand = "cargo test ${builtins.toString excludeFlags}";
+
+              # Env vars for the check phase. No db connection so we use sqlite.
+              TEST_DATABASE_URL = "sqlite";
+              RUST_LOG = "debug";
+            };
+
+          prisma-engines-deps = craneLib.buildDepsOnly prismaEnginesCommonArgs;
+
+          prisma-fmt-wasm = import ./prisma-fmt-wasm { inherit crane nixpkgs rust-overlay system src; };
+
+          inherit (pkgs) lib;
+        in
+        {
+          packages = {
+            prisma-engines = craneLib.buildPackage (prismaEnginesCommonArgs // { cargoArtifacts = prisma-engines-deps; });
+          } // prisma-fmt-wasm.packages;
+
+          checks = prisma-fmt-wasm.checks;
+
+          devShells.default = pkgs.mkShell { inputsFrom = [ prisma-engines-deps ]; };
+        }
+      );
 }

@@ -305,7 +305,11 @@ impl TestApi {
 
     /// Render a valid datasource block, including database URL.
     pub fn write_datasource_block(&self, out: &mut dyn std::fmt::Write) {
-        let no_foreign_keys = self.is_vitess() && self.root.preview_features().contains(PreviewFeature::RelationMode);
+        let no_foreign_keys = self.is_vitess()
+            && self
+                .root
+                .preview_features()
+                .contains(PreviewFeature::ReferentialIntegrity);
 
         let params = if no_foreign_keys {
             vec![("relationMode", r#""prisma""#)]

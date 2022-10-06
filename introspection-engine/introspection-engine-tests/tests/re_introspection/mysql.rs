@@ -2,7 +2,7 @@ use barrel::types;
 use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 
-#[test_connector(tags(Mysql), exclude(Vitess), preview_features("relationMode"))]
+#[test_connector(tags(Mysql), exclude(Vitess), preview_features("referentialIntegrity"))]
 async fn relation_mode_parameter_is_not_added(api: &TestApi) -> TestResult {
     let result = api.re_introspect("").await?;
     assert!(!result.contains(r#"relationMode = "#));

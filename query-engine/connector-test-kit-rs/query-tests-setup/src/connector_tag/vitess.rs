@@ -17,7 +17,13 @@ impl ConnectorTagInterface for VitessConnectorTag {
         Box::new(SqlDatamodelRenderer::new())
     }
 
-    fn connection_string(&self, _database: &str, _is_ci: bool, _is_multi_schema: bool) -> String {
+    fn connection_string(
+        &self,
+        _database: &str,
+        _is_ci: bool,
+        _is_multi_schema: bool,
+        _: Option<&'static str>,
+    ) -> String {
         match self.version {
             Some(VitessVersion::V5_7) => "mysql://root@localhost:33577/test".into(),
             Some(VitessVersion::V8_0) => "mysql://root@localhost:33807/test".into(),

@@ -30,7 +30,6 @@ pub(crate) struct Context<'db> {
     attributes: AttributesValidationState, // state machine for attribute validation
 
     // @map'ed names indexes. These are not in the db because they are only used for validation.
-    pub(super) mapped_model_names: HashMap<StringId, ast::ModelId>,
     pub(super) mapped_model_scalar_field_names: HashMap<(ast::ModelId, StringId), ast::FieldId>,
     pub(super) mapped_composite_type_names: HashMap<(ast::CompositeTypeId, StringId), ast::FieldId>,
     pub(super) mapped_enum_names: HashMap<StringId, ast::EnumId>,
@@ -55,7 +54,6 @@ impl<'db> Context<'db> {
             diagnostics,
             attributes: AttributesValidationState::default(),
 
-            mapped_model_names: Default::default(),
             mapped_model_scalar_field_names: Default::default(),
             mapped_enum_names: Default::default(),
             mapped_enum_value_names: Default::default(),

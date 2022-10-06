@@ -10,6 +10,8 @@ CREATE TABLE test (
 );
 
 CREATE INDEX futureproof ON test(big_data);
+
+
 /*
 generator client {
   provider = "prisma-client-js"

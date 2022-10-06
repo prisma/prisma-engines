@@ -37,6 +37,7 @@ pub fn render_test_datamodel(
     excluded_features: &[&str],
     relation_mode_override: Option<String>,
     db_schemas: &[&str],
+    isolation_level: Option<&'static str>,
 ) -> String {
     let tag = config.test_connector_tag().unwrap();
     let preview_features = render_preview_features(excluded_features);
@@ -64,7 +65,7 @@ pub fn render_test_datamodel(
             }}
         "#},
         tag.datamodel_provider(),
-        tag.connection_string(test_database, config.is_ci(), is_multi_schema),
+        tag.connection_string(test_database, config.is_ci(), is_multi_schema, isolation_level),
         relation_mode_override.unwrap_or_else(|| tag.relation_mode().to_string()),
         schema_def,
         preview_features

@@ -1,18 +1,19 @@
 use crate::{
+    calculate_datamodel::CalculateDatamodelContext,
     warnings::{warning_default_cuid_warning, warning_default_uuid_warning, ModelAndField},
     SqlFamilyTrait,
 };
-use introspection_connector::{IntrospectionContext, Version, Warning};
+use introspection_connector::{Version, Warning};
 use native_types::{MySqlType, PostgresType};
 use psl::dml::{self, Datamodel, ValueGenerator};
 use sql_schema_describer::SqlSchema;
 
-pub fn add_prisma_1_id_defaults(
+pub(crate) fn add_prisma_1_id_defaults(
     version: &Version,
     data_model: &mut Datamodel,
     schema: &SqlSchema,
     warnings: &mut Vec<Warning>,
-    ctx: &IntrospectionContext,
+    ctx: &CalculateDatamodelContext,
 ) {
     let mut needs_to_be_changed = vec![];
 
