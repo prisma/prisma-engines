@@ -15,7 +15,7 @@ mod native_type_constructor;
 mod native_type_instance;
 mod relation_mode;
 
-use crate::{common::preview_features::PreviewFeature, Datasource};
+use crate::{common::preview_features::PreviewFeature, configuration::DatasourceConnectorData, Datasource};
 
 pub use self::{
     capabilities::{ConnectorCapabilities, ConnectorCapability},
@@ -29,8 +29,14 @@ pub use self::{
 use diagnostics::{DatamodelError, Diagnostics, NativeTypeErrorFactory, Span};
 use enumflags2::BitFlags;
 use lsp_types::CompletionList;
-use parser_database::{ast::SchemaPosition, walkers, IndexAlgorithm, ParserDatabase, ReferentialAction, ScalarType};
-use std::{borrow::Cow, collections::BTreeMap};
+use parser_database::{
+    ast::{self, SchemaPosition},
+    walkers, IndexAlgorithm, ParserDatabase, ReferentialAction, ScalarType,
+};
+use std::{
+    borrow::Cow,
+    collections::{BTreeMap, HashMap},
+};
 
 pub const EXTENSIONS_KEY: &str = "extensions";
 
@@ -135,17 +141,7 @@ pub trait Connector: Send + Sync {
 
     fn validate_enum(&self, _enum: walkers::EnumWalker<'_>, _: &mut Diagnostics) {}
     fn validate_model(&self, _model: walkers::ModelWalker<'_>, _: &mut Diagnostics) {}
-    fn validate_datasource(&self, _: BitFlags<PreviewFeature>, ds: &Datasource, errors: &mut Diagnostics) {
-        let span = match ds.extra_properties.iter().find(|(key, _)| key == EXTENSIONS_KEY) {
-            Some((_, (span, _))) => span,
-            None => return,
-        };
-
-        errors.push_error(DatamodelError::new_static(
-            "The `extensions` property is only available with the `postgresql` connector.",
-            *span,
-        ));
-    }
+    fn validate_datasource(&self, _: BitFlags<PreviewFeature>, _: &Datasource, _: &mut Diagnostics) {}
 
     fn validate_scalar_field_unknown_default_functions(
         &self,
@@ -298,6 +294,21 @@ pub trait Connector: Send + Sync {
     fn validate_url(&self, url: &str) -> Result<(), String>;
 
     fn push_completions(&self, _db: &ParserDatabase, _position: SchemaPosition<'_>, _completions: &mut CompletionList) {
+    }
+
+    fn parse_datasource_properties(
+        &self,
+        args: &mut HashMap<&str, (Span, &ast::Expression)>,
+        diagnostics: &mut Diagnostics,
+    ) -> DatasourceConnectorData {
+        if let Some((span, _)) = args.remove(EXTENSIONS_KEY) {
+            diagnostics.push_error(DatamodelError::new_static(
+                "The `extensions` property is only available with the `postgresql` connector.",
+                span,
+            ));
+        }
+
+        Default::default()
     }
 }
 

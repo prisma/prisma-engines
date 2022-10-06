@@ -2,13 +2,12 @@ use enumflags2::BitFlags;
 use native_types::PostgresType;
 use psl_core::{
     common::preview_features::PreviewFeature,
-    datamodel_connector::{walker_ext_traits::*, Connector, EXTENSIONS_KEY},
+    datamodel_connector::{walker_ext_traits::*, Connector},
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{ast::WithSpan, walkers::IndexWalker, IndexAlgorithm, OperatorClass},
-    Datasource,
 };
 
-use super::PostgresExtensions;
+use super::PostgresDatasourceProperties;
 
 pub(super) fn compatible_native_types(index: IndexWalker<'_>, connector: &dyn Connector, errors: &mut Diagnostics) {
     for field in index.fields() {
@@ -458,34 +457,20 @@ pub(super) fn generalized_index_validations(
 
 pub(super) fn extensions_preview_flag_must_be_set(
     preview_features: BitFlags<PreviewFeature>,
-    ds: &Datasource,
+    props: &PostgresDatasourceProperties,
     errors: &mut Diagnostics,
 ) {
     if preview_features.contains(PreviewFeature::PostgresExtensions) {
         return;
     }
 
-    let span = match ds.extra_properties.iter().find(|(key, _)| key == EXTENSIONS_KEY) {
-        Some((_, (span, _))) => span,
+    let span = match props.extensions() {
+        Some(extensions) => extensions.span,
         None => return,
     };
 
     errors.push_error(DatamodelError::new_static(
         "The `extensions` property is only available with the `postgresExtensions` preview feature.",
-        *span,
+        span,
     ));
-}
-
-pub(super) fn extensions_must_be_an_array_of_constants<'a>(
-    preview_features: BitFlags<PreviewFeature>,
-    ds: &'a Datasource,
-    errors: &mut Diagnostics,
-) {
-    if !preview_features.contains(PreviewFeature::PostgresExtensions) {
-        return;
-    }
-
-    if let Some((_, (_, expr))) = ds.extra_properties.iter().find(|(k, _)| *k == EXTENSIONS_KEY) {
-        PostgresExtensions::validate(expr, errors);
-    }
 }

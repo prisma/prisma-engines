@@ -14,7 +14,6 @@ const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
 const SCHEMAS_KEY: &str = "schemas";
 const SHADOW_DATABASE_URL_KEY: &str = "shadowDatabaseUrl";
 const URL_KEY: &str = "url";
-const EXTENSIONS_KEY: &str = "extensions";
 
 /// Loads all datasources from the provided schema AST.
 /// - `ignore_datasource_urls`: datasource URLs are not parsed. They are replaced with dummy values.
@@ -214,15 +213,13 @@ fn lift_datasource(
         })
         .unwrap_or_default();
 
-    let mut extra_properties = Vec::new();
-    if let Some((span, expr)) = args.remove(EXTENSIONS_KEY) {
-        extra_properties.push((EXTENSIONS_KEY.to_owned(), (span, expr.clone())));
-    }
+    let connector_data = active_connector.parse_datasource_properties(&mut args, diagnostics);
 
     // we handle these elsewhere
     args.remove("previewFeatures");
     args.remove("referentialIntegrity");
     args.remove("relationMode");
+
     for (name, (span, _)) in args.into_iter() {
         diagnostics.push_error(DatamodelError::new_property_not_known_error(name, span));
     }
@@ -240,7 +237,7 @@ fn lift_datasource(
         shadow_database_url,
         referential_integrity,
         relation_mode,
-        extra_properties,
+        connector_data,
     })
 }
 

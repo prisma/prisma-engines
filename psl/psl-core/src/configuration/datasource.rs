@@ -1,14 +1,11 @@
-use parser_database::ast;
-
 use crate::{
     configuration::StringFromEnvVar,
     datamodel_connector::{Connector, ConnectorCapabilities, RelationMode},
     diagnostics::{DatamodelError, Diagnostics, Span},
 };
-use std::{borrow::Cow, path::Path};
+use std::{any::Any, borrow::Cow, path::Path};
 
 /// a `datasource` from the prisma schema.
-#[derive(Clone)]
 pub struct Datasource {
     pub name: String,
     /// The provider string
@@ -29,9 +26,19 @@ pub struct Datasource {
     pub relation_mode: Option<RelationMode>,
     /// _Sorted_ vec of schemas defined in the schemas property.
     pub schemas: Vec<(String, Span)>,
-    /// _Sorted_ vec of extensions defined in the extensions property.
-    pub extra_properties: Vec<(String, (Span, ast::Expression))>,
     pub(crate) schemas_span: Option<Span>,
+    pub connector_data: DatasourceConnectorData,
+}
+
+#[derive(Default)]
+pub struct DatasourceConnectorData {
+    pub(crate) data: Option<Box<dyn Any + Send + Sync + 'static>>,
+}
+
+impl DatasourceConnectorData {
+    pub fn new(data: Box<dyn Any + Send + Sync + 'static>) -> Self {
+        Self { data: Some(data) }
+    }
 }
 
 impl std::fmt::Debug for Datasource {
@@ -52,6 +59,12 @@ impl std::fmt::Debug for Datasource {
 }
 
 impl Datasource {
+    /// Extract connector-specific constructs. The type parameter must be the right one.
+    #[track_caller]
+    pub fn downcast_connector_data<T: 'static>(&self) -> &T {
+        self.connector_data.data.as_ref().unwrap().downcast_ref().unwrap()
+    }
+
     pub(crate) fn has_schema(&self, name: &str) -> bool {
         self.schemas.binary_search_by_key(&name, |(s, _)| s).is_ok()
     }

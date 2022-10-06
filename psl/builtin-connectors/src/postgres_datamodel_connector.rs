@@ -11,16 +11,16 @@ use psl_core::{
     datamodel_connector::{
         helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
         Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, RelationMode,
-        StringFilter,
+        StringFilter, EXTENSIONS_KEY,
     },
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{
         ast, coerce, coerce_array, walkers, IndexAlgorithm, OperatorClass, ParserDatabase, ReferentialAction,
         ScalarType,
     },
-    Datasource,
+    Datasource, DatasourceConnectorData,
 };
-use std::borrow::Cow;
+use std::{borrow::Cow, collections::HashMap};
 
 const SMALL_INT_TYPE_NAME: &str = "SmallInt";
 const INTEGER_TYPE_NAME: &str = "Integer";
@@ -134,6 +134,44 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, PostgresType)] = &[
     (ScalarType::Bytes, PostgresType::ByteA),
     (ScalarType::Json, PostgresType::JsonB),
 ];
+
+/// Postgres-specific properties in the datasource block.
+pub struct PostgresDatasourceProperties {
+    extensions: Option<PostgresExtensions>,
+}
+
+impl PostgresDatasourceProperties {
+    /// Database extensions.
+    pub fn extensions(&self) -> Option<&PostgresExtensions> {
+        self.extensions.as_ref()
+    }
+}
+
+/// An extension defined in the extensions array of the datasource.
+///
+/// ```ignore
+/// datasource db {
+///   extensions = [postgis, foobar]
+///   //            ^^^^^^^
+/// }
+/// ```
+pub struct PostgresExtension {
+    pub name: String,
+    pub span: ast::Span,
+}
+
+/// The extensions defined in the extensions array of the datrasource.
+///
+/// ```ignore
+/// datasource db {
+///   extensions = [postgis, foobar]
+///   //           ^^^^^^^^^^^^^^^^^
+/// }
+/// ```
+pub struct PostgresExtensions {
+    pub extensions: Vec<PostgresExtension>,
+    pub span: ast::Span,
+}
 
 impl Connector for PostgresDatamodelConnector {
     fn is_provider(&self, name: &str) -> bool {
@@ -271,8 +309,8 @@ impl Connector for PostgresDatamodelConnector {
         ds: &Datasource,
         errors: &mut Diagnostics,
     ) {
-        validations::extensions_preview_flag_must_be_set(preview_features, ds, errors);
-        validations::extensions_must_be_an_array_of_constants(preview_features, ds, errors);
+        let props: &PostgresDatasourceProperties = ds.downcast_connector_data();
+        validations::extensions_preview_flag_must_be_set(preview_features, props, errors);
     }
 
     fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {
@@ -467,6 +505,28 @@ impl Connector for PostgresDatamodelConnector {
             _ => (),
         }
     }
+
+    fn parse_datasource_properties(
+        &self,
+        args: &mut HashMap<&str, (ast::Span, &ast::Expression)>,
+        diagnostics: &mut Diagnostics,
+    ) -> DatasourceConnectorData {
+        let extensions = args.remove(EXTENSIONS_KEY).and_then(|(span, expr)| {
+            let extensions = coerce_array(expr, &coerce::constant_with_span, diagnostics)?
+                .into_iter()
+                .map(|(name, span)| PostgresExtension {
+                    name: name.to_string(),
+                    span,
+                })
+                .collect();
+
+            Some(PostgresExtensions { extensions, span })
+        });
+
+        let properties = PostgresDatasourceProperties { extensions };
+
+        DatasourceConnectorData::new(Box::new(properties))
+    }
 }
 
 fn allowed_index_operator_classes(algo: IndexAlgorithm, field: walkers::ScalarFieldWalker<'_>) -> Vec<OperatorClass> {
@@ -589,46 +649,4 @@ fn allowed_index_operator_classes(algo: IndexAlgorithm, field: walkers::ScalarFi
     }
 
     classes
-}
-
-/// An extension defined in the extensions array of the datasource.
-///
-/// ```ignore
-/// datasource db {
-///   extensions = [postgis, foobar]
-///   //            ^^^^^^^
-/// }
-/// ```
-pub struct PostgresExtension<'a> {
-    pub name: &'a str,
-    pub span: ast::Span,
-}
-
-/// The extensions defined in the extensions array of the datrasource.
-///
-/// ```ignore
-/// datasource db {
-///   extensions = [postgis, foobar]
-///   //           ^^^^^^^^^^^^^^^^^
-/// }
-/// ```
-pub struct PostgresExtensions<'a> {
-    pub extensions: Vec<PostgresExtension<'a>>,
-}
-
-impl<'a> PostgresExtensions<'a> {
-    /// Build the extensions array from the AST, dismissing errors.
-    pub fn build_unchecked(expr: &'a ast::Expression, diagnostics: &mut Diagnostics) -> Option<Self> {
-        Self::validate(expr, diagnostics)
-    }
-
-    /// Build and validate the extensions array from the AST.
-    pub(super) fn validate(expr: &'a ast::Expression, diagnostics: &mut Diagnostics) -> Option<Self> {
-        let extensions = coerce_array(expr, &coerce::constant_with_span, diagnostics)?
-            .into_iter()
-            .map(|(name, span)| PostgresExtension { name, span })
-            .collect();
-
-        Some(Self { extensions })
-    }
 }
