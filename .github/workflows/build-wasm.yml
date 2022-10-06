@@ -10,27 +10,15 @@ on:
       - 'LICENSE'
       - 'CODEOWNERS'
       - 'renovate.json'
+      - 'query-engine/**'
 
 jobs:
   build:
-    name: "WebAssembly build ${{ github.event.ref }} for commit ${{ github.event.inputs.commit }}"
+    name: "prisma-fmt-wasm build ${{ github.event.ref }} for commit ${{ github.event.inputs.commit }}"
     runs-on: buildjet-16vcpu-ubuntu-2004
     steps:
       - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          target: wasm32-unknown-unknown
-          default: true
+      - uses: cachix/install-nix-action@v16
 
-      - name: Build the migration-connector crate with default features
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: -p migration-connector --release --target=wasm32-unknown-unknown
-
-      - name: Build the prisma-fmt crate
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: -p prisma-fmt --lib --release --target=wasm32-unknown-unknown
+      - run: nix build .#prisma-fmt-wasm
+      - run: nix flake check
