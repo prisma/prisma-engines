@@ -124,7 +124,7 @@ impl IntrospectionConnector for MongoDbIntrospectionConnector {
     }
 
     async fn introspect(&self, ctx: &IntrospectionContext) -> ConnectorResult<IntrospectionResult> {
-        let schema = self.describe(ctx.preview_features).await?;
+        let schema = self.describe(ctx.preview_features()).await?;
         Ok(sampler::sample(self.database(), schema, ctx).await?)
     }
 }

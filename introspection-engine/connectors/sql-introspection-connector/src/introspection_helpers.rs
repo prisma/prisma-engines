@@ -156,7 +156,7 @@ pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &Contex
     let tpe = match index.index_type() {
         IndexType::Unique => psl::dml::IndexType::Unique,
         IndexType::Normal => psl::dml::IndexType::Normal,
-        IndexType::Fulltext if ctx.preview_features.contains(PreviewFeature::FullTextIndex) => {
+        IndexType::Fulltext if ctx.config.preview_features().contains(PreviewFeature::FullTextIndex) => {
             psl::dml::IndexType::Fulltext
         }
         IndexType::Fulltext => psl::dml::IndexType::Normal,
@@ -384,7 +384,7 @@ pub(crate) fn calculate_scalar_field_type_with_native_types(column: sql::ColumnW
         FieldType::Scalar(scal_type, _) => match &column.column_type().native_type {
             None => scalar_type,
             Some(native_type) => {
-                let native_type_instance = ctx.source.active_connector.introspect_native_type(native_type.clone());
+                let native_type_instance = ctx.active_connector().introspect_native_type(native_type.clone());
                 FieldType::Scalar(
                     scal_type,
                     Some(psl::dml::NativeTypeInstance {
