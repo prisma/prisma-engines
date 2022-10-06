@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["Closure","A handle to both a closure in Rust as well as JS closure which will invoke the Rust closure."]]};

@@ -25,6 +25,7 @@ var sourcesIndex = JSON.parse('{\
 "block_buffer":["",[],["lib.rs","sealed.rs"]],\
 "bson":["",[["datetime",[],["builder.rs"]],["de",[],["error.rs","mod.rs","raw.rs","serde.rs"]],["extjson",[],["de.rs","mod.rs","models.rs"]],["raw",[],["array.rs","array_buf.rs","bson.rs","bson_ref.rs","document.rs","document_buf.rs","error.rs","iter.rs","mod.rs","serde.rs"]],["ser",[["raw",[],["document_serializer.rs","mod.rs","value_serializer.rs"]]],["error.rs","mod.rs","serde.rs"]],["uuid",[],["mod.rs"]]],["bson.rs","datetime.rs","decimal128.rs","document.rs","lib.rs","macros.rs","oid.rs","serde_helpers.rs","spec.rs"]],\
 "builtin_psl_connectors":["",[["cockroach_datamodel_connector",[],["validations.rs"]],["mongodb",[],["mongodb_types.rs","validations.rs"]],["mssql_datamodel_connector",[],["validations.rs"]],["mysql_datamodel_connector",[],["validations.rs"]],["postgres_datamodel_connector",[],["validations.rs"]]],["cockroach_datamodel_connector.rs","lib.rs","mongodb.rs","mssql_datamodel_connector.rs","mysql_datamodel_connector.rs","postgres_datamodel_connector.rs","sqlite_datamodel_connector.rs"]],\
+"bumpalo":["",[],["alloc.rs","lib.rs"]],\
 "byteorder":["",[],["io.rs","lib.rs"]],\
 "bytes":["",[["buf",[],["buf_impl.rs","buf_mut.rs","chain.rs","iter.rs","limit.rs","mod.rs","reader.rs","take.rs","uninit_slice.rs","vec_deque.rs","writer.rs"]],["fmt",[],["debug.rs","hex.rs","mod.rs"]]],["bytes.rs","bytes_mut.rs","lib.rs","loom.rs"]],\
 "cfg_if":["",[],["lib.rs"]],\
@@ -210,6 +211,7 @@ var sourcesIndex = JSON.parse('{\
 "pretty_assertions":["",[],["format_changeset.rs","lib.rs"]],\
 "pretty_hex":["",[],["lib.rs","pretty_hex.rs"]],\
 "prisma_fmt":["",[["code_actions",[],["relations.rs"]]],["actions.rs","code_actions.rs","get_config.rs","lib.rs","lint.rs","native.rs","preview.rs","text_document_completion.rs"]],\
+"prisma_fmt_build":["",[],["lib.rs"]],\
 "prisma_models":["",[["builders",[["field_builders",[],["composite_field_builder.rs","mod.rs","relation_field_builder.rs","scalar_field_builder.rs"]]],["composite_type_builder.rs","index_builder.rs","internal_dm_builder.rs","mod.rs","model_builder.rs","primary_key_builder.rs","relation_builder.rs"]],["field",[],["composite.rs","mod.rs","relation.rs","scalar.rs"]],["projections",[],["mod.rs","model_projection.rs"]]],["composite_type.rs","convert.rs","error.rs","extensions.rs","field_selection.rs","fields.rs","index.rs","internal_data_model.rs","internal_enum.rs","lib.rs","model.rs","order_by.rs","parent_container.rs","pk.rs","prelude.rs","prisma_value_ext.rs","record.rs","relation.rs","selection_result.rs"]],\
 "prisma_value":["",[],["arithmetic.rs","error.rs","lib.rs"]],\
 "proc_macro2":["",[],["detection.rs","fallback.rs","lib.rs","marker.rs","parse.rs","rcvec.rs","wrapper.rs"]],\
@@ -354,6 +356,11 @@ var sourcesIndex = JSON.parse('{\
 "vec_map":["",[],["lib.rs"]],\
 "void":["",[],["lib.rs"]],\
 "want":["",[],["lib.rs"]],\
+"wasm_bindgen":["",[["cache",[],["intern.rs","mod.rs"]],["convert",[],["closures.rs","impls.rs","mod.rs","slices.rs","traits.rs"]]],["cast.rs","closure.rs","describe.rs","externref.rs","lib.rs"]],\
+"wasm_bindgen_backend":["",[],["ast.rs","codegen.rs","encode.rs","error.rs","lib.rs","util.rs"]],\
+"wasm_bindgen_macro":["",[],["lib.rs"]],\
+"wasm_bindgen_macro_support":["",[],["lib.rs","parser.rs"]],\
+"wasm_bindgen_shared":["",[],["lib.rs"]],\
 "webpki":["",[["name",[],["dns_name.rs","ip_address.rs","verify.rs"]]],["calendar.rs","cert.rs","der.rs","end_entity.rs","error.rs","lib.rs","name.rs","signed_data.rs","time.rs","trust_anchor.rs","verify_cert.rs"]],\
 "webpki_roots":["",[],["lib.rs"]],\
 "wyz":["",[],["bidi.rs","comu.rs","fmt.rs","lib.rs","range.rs"]]\
