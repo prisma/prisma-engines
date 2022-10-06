@@ -19,11 +19,16 @@ impl CalculateDatamodelContext<'_> {
     }
 
     pub(crate) fn foreign_keys_enabled(&self) -> bool {
-        self.config.datasource().relation_mode().uses_foreign_keys()
+        self.config
+            .datasources
+            .first()
+            .unwrap()
+            .relation_mode()
+            .uses_foreign_keys()
     }
 
     pub(crate) fn active_connector(&self) -> &dyn Connector {
-        self.config.datasource().active_connector
+        self.config.datasources.first().unwrap().active_connector
     }
 }
 

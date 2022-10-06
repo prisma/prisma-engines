@@ -26,10 +26,6 @@ impl Configuration {
         }
     }
 
-    pub fn datasource(&self) -> &Datasource {
-        self.datasources.first().unwrap()
-    }
-
     pub fn relation_mode(&self) -> Option<RelationMode> {
         self.datasources.first().map(|source| source.relation_mode())
     }
