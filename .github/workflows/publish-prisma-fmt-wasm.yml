@@ -3,6 +3,7 @@ name: Build and publish @prisma/prisma-fmt-wasm
 concurrency: build-prisma-fmt-wasm
 
 on:
+  # usually triggered via GH Actions Workflow in prisma/engines-wrapper repo
   workflow_dispatch:
     inputs:
       enginesWrapperVersion:
@@ -65,4 +66,4 @@ jobs:
         env:
           SLACK_TITLE: 'prisma-fmt-wasm publishing failed :x:'
           SLACK_COLOR: '#FF0000'
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_WASM_FAILING }}
