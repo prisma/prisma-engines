@@ -592,7 +592,7 @@ impl Connector for PostgresDatamodelConnector {
 
         out.push_str("extensions = [");
 
-        for (i, extension) in extensions.into_iter().enumerate() {
+        for (i, extension) in extensions.iter().enumerate() {
             out.push_str(extension.name());
 
             if extension.db_name().is_none() && extension.version().is_none() && extension.schema().is_none() {
@@ -602,7 +602,7 @@ impl Connector for PostgresDatamodelConnector {
                 continue;
             }
 
-            out.push_str("(");
+            out.push('(');
 
             if let Some(db_name) = extension.db_name() {
                 out.push_str(r#"map: ""#);
