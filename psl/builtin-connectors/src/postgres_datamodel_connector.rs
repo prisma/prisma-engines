@@ -154,11 +154,11 @@ impl PostgresDatasourceProperties {
 /// }
 /// ```
 pub struct PostgresExtension {
-    pub(crate) name: String,
-    pub(crate) span: ast::Span,
-    pub(crate) schema: Option<String>,
-    pub(crate) version: Option<String>,
-    pub(crate) db_name: Option<String>,
+    name: String,
+    span: ast::Span,
+    schema: Option<String>,
+    version: Option<String>,
+    db_name: Option<String>,
 }
 
 impl PostgresExtension {
