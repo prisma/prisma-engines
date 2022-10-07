@@ -8,7 +8,7 @@ datasource mypg {
   url        = env("TEST_DATABASE_URL")
   extensions = [ "postgis" ]
 }
-// [1;91merror[0m: [1mExpected a constant value, but received string value `"postgis"`.[0m
+// [1;91merror[0m: [1mExpected a constant or function value, but received string value `"postgis"`.[0m
 //   [1;94m-->[0m  [4mschema.prisma:9[0m
 // [1;94m   | [0m
 // [1;94m 8 | [0m  url        = env("TEST_DATABASE_URL")

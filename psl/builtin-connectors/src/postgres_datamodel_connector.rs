@@ -1,3 +1,4 @@
+mod datasource;
 mod validations;
 
 use enumflags2::BitFlags;
@@ -11,13 +12,10 @@ use psl_core::{
     datamodel_connector::{
         helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
         Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, RelationMode,
-        StringFilter, EXTENSIONS_KEY,
+        StringFilter,
     },
     diagnostics::{DatamodelError, Diagnostics},
-    parser_database::{
-        ast, coerce, coerce_array, walkers, IndexAlgorithm, OperatorClass, ParserDatabase, ReferentialAction,
-        ScalarType,
-    },
+    parser_database::{ast, walkers, IndexAlgorithm, OperatorClass, ParserDatabase, ReferentialAction, ScalarType},
     Datasource, DatasourceConnectorData,
 };
 use std::{borrow::Cow, collections::HashMap};
@@ -156,8 +154,67 @@ impl PostgresDatasourceProperties {
 /// }
 /// ```
 pub struct PostgresExtension {
-    pub name: String,
-    pub span: ast::Span,
+    pub(crate) name: String,
+    pub(crate) span: ast::Span,
+    pub(crate) schema: Option<String>,
+    pub(crate) version: Option<String>,
+    pub(crate) db_name: Option<String>,
+}
+
+impl PostgresExtension {
+    /// The name of the extension in the datasource.
+    ///
+    /// ```ignore
+    /// extensions = [bar]
+    /// //            ^^^ this
+    /// ```
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    /// How the extension is named in the database.
+    ///
+    /// Either:
+    ///
+    /// ```ignore
+    /// extensions = [bar(map: "foo")]
+    /// //                     ^^^^^ this
+    /// ```
+    ///
+    /// or if not defined:
+    ///
+    /// ```ignore
+    /// extensions = [bar]
+    /// //            ^^^ this
+    /// ```
+    pub fn db_name(&self) -> &str {
+        self.db_name.as_ref().unwrap_or(&self.name)
+    }
+
+    /// The span of the extension definition in the datamodel.
+    pub fn span(&self) -> ast::Span {
+        self.span
+    }
+
+    /// The schema where the extension tables are stored.
+    ///
+    /// ```ignore
+    /// extensions = [postgis(schema: "public")]
+    /// //                            ^^^^^^^^ this
+    /// ```
+    pub fn schema(&self) -> Option<&str> {
+        self.schema.as_deref()
+    }
+
+    /// The version of the extension to be used in the database.
+    ///
+    /// ```ignore
+    /// extensions = [postgis(version: "2.1")]
+    /// //                             ^^^^^ this
+    /// ```
+    pub fn version(&self) -> Option<&str> {
+        self.version.as_deref()
+    }
 }
 
 /// The extensions defined in the extensions array of the datrasource.
@@ -169,8 +226,20 @@ pub struct PostgresExtension {
 /// }
 /// ```
 pub struct PostgresExtensions {
-    pub extensions: Vec<PostgresExtension>,
-    pub span: ast::Span,
+    pub(crate) extensions: Vec<PostgresExtension>,
+    pub(crate) span: ast::Span,
+}
+
+impl PostgresExtensions {
+    /// The span of the extensions in the datamodel.
+    pub fn span(&self) -> ast::Span {
+        self.span
+    }
+
+    /// The extension definitions.
+    pub fn extensions(&self) -> &[PostgresExtension] {
+        &self.extensions
+    }
 }
 
 impl Connector for PostgresDatamodelConnector {
@@ -511,18 +580,7 @@ impl Connector for PostgresDatamodelConnector {
         args: &mut HashMap<&str, (ast::Span, &ast::Expression)>,
         diagnostics: &mut Diagnostics,
     ) -> DatasourceConnectorData {
-        let extensions = args.remove(EXTENSIONS_KEY).and_then(|(span, expr)| {
-            let extensions = coerce_array(expr, &coerce::constant_with_span, diagnostics)?
-                .into_iter()
-                .map(|(name, span)| PostgresExtension {
-                    name: name.to_string(),
-                    span,
-                })
-                .collect();
-
-            Some(PostgresExtensions { extensions, span })
-        });
-
+        let extensions = datasource::parse_extensions(args, diagnostics);
         let properties = PostgresDatasourceProperties { extensions };
 
         DatasourceConnectorData::new(Box::new(properties))

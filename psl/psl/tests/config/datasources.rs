@@ -1,3 +1,5 @@
+use builtin_psl_connectors::postgres_datamodel_connector::PostgresDatasourceProperties;
+
 use crate::common::*;
 
 #[test]
@@ -170,6 +172,44 @@ fn escaped_windows_paths_should_work() {
     "#};
 
     assert_valid(schema)
+}
+
+#[test]
+fn postgresql_extension_parsing() {
+    let schema = indoc! {r#"
+        datasource ds {
+          provider = "postgres"
+          url = env("DATABASE_URL")
+          extensions = [postgis(version: "2.1", schema: "public"), uuidOssp(map: "uuid-ossp"), meow]
+        }
+
+        generator js {
+          provider = "prisma-client-js"
+          previewFeatures = ["postgresExtensions"]
+        }
+    "#};
+
+    let config = psl::parse_configuration(schema).unwrap();
+    let properties: &PostgresDatasourceProperties = config.datasources.first().unwrap().downcast_connector_data();
+
+    assert!(properties.extensions().is_some());
+
+    let mut extensions = properties.extensions().unwrap().extensions().into_iter();
+
+    let meow = extensions.next().unwrap();
+    assert_eq!("meow", meow.db_name());
+    assert_eq!(None, meow.version());
+    assert_eq!(None, meow.schema());
+
+    let postgis = extensions.next().unwrap();
+    assert_eq!("postgis", postgis.db_name());
+    assert_eq!(Some("2.1"), postgis.version());
+    assert_eq!(Some("public"), postgis.schema());
+
+    let uuid_ossp = extensions.next().unwrap();
+    assert_eq!("uuid-ossp", uuid_ossp.db_name());
+    assert_eq!(None, uuid_ossp.version());
+    assert_eq!(None, uuid_ossp.schema());
 }
 
 fn render_schema_json(schema: &str) -> String {

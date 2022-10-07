@@ -14,6 +14,25 @@ macro_rules! impl_coercions {
                 coerce::<$lt>(super::coerce_opt::$name, $expected_type)(expr, diagnostics)
             }
             )*
+
+            pub fn function_or_constant_with_span<'a>(
+                expr: &'a ast::Expression,
+                diagnostics: &mut Diagnostics,
+            ) -> Option<(&'a str, &'a [ast::Argument], ast::Span)> {
+                match super::coerce_opt::function_or_constant_with_span(expr) {
+                    Some(val) => Some(val),
+                    None => {
+                        diagnostics.push_error(DatamodelError::new_type_mismatch_error(
+                            "constant or function",
+                            expr.describe_value_type(),
+                            &expr.to_string(),
+                            expr.span(),
+                        ));
+
+                        None
+                    }
+                }
+            }
         }
     }
 }
@@ -28,6 +47,7 @@ impl_coercions! {
     integer : "numeric" => i64;
     float : "float" => f64;
     function : "function" => (&'a str, &'a [ast::Argument]);
+    function_with_span : "function" => (&'a str, &'a [ast::Argument], ast::Span);
 }
 
 /// Fallible coercions of PSL expressions to more specific types.
@@ -64,9 +84,22 @@ pub mod coerce_opt {
         expr.as_numeric_value().and_then(|(num, _)| num.parse().ok())
     }
 
+    pub fn function_or_constant_with_span<'a>(
+        expr: &'a ast::Expression,
+    ) -> Option<(&'a str, &'a [ast::Argument], ast::Span)> {
+        match function_with_span(expr) {
+            Some((name, params, span)) => Some((name, params, span)),
+            None => constant_with_span(expr).map(|(name, span)| (name, &[] as &[ast::Argument], span)),
+        }
+    }
+
     pub fn function<'a>(expr: &'a ast::Expression) -> Option<(&'a str, &'a [ast::Argument])> {
+        function_with_span(expr).map(|(name, args, _)| (name, args))
+    }
+
+    pub fn function_with_span<'a>(expr: &'a ast::Expression) -> Option<(&'a str, &'a [ast::Argument], ast::Span)> {
         expr.as_function()
-            .map(|(name, args, _)| (name, args.arguments.as_slice()))
+            .map(|(name, args, span)| (name, args.arguments.as_slice(), span))
     }
 }
 
