@@ -64,7 +64,7 @@ fn filter_args<'a>(
             }
             None => {
                 diagnostics.push_error(DatamodelError::new_validation_error(
-                    &format!("The argument must have a name"),
+                    "The argument must have a name",
                     arg.span,
                 ));
 
