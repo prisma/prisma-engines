@@ -18,7 +18,7 @@ use psl_core::{
     parser_database::{ast, walkers, IndexAlgorithm, OperatorClass, ParserDatabase, ReferentialAction, ScalarType},
     Datasource, DatasourceConnectorData,
 };
-use std::{borrow::Cow, collections::HashMap};
+use std::{borrow::Cow, collections::HashMap, fmt};
 
 const SMALL_INT_TYPE_NAME: &str = "SmallInt";
 const INTEGER_TYPE_NAME: &str = "Integer";
@@ -172,23 +172,15 @@ impl PostgresExtension {
         &self.name
     }
 
-    /// How the extension is named in the database.
-    ///
-    /// Either:
+    /// The name of the extension in the database, defined in the
+    /// `map` argument.
     ///
     /// ```ignore
     /// extensions = [bar(map: "foo")]
     /// //                     ^^^^^ this
     /// ```
-    ///
-    /// or if not defined:
-    ///
-    /// ```ignore
-    /// extensions = [bar]
-    /// //            ^^^ this
-    /// ```
-    pub fn db_name(&self) -> &str {
-        self.db_name.as_ref().unwrap_or(&self.name)
+    pub fn db_name(&self) -> Option<&str> {
+        self.db_name.as_deref()
     }
 
     /// The span of the extension definition in the datamodel.
@@ -378,8 +370,9 @@ impl Connector for PostgresDatamodelConnector {
         ds: &Datasource,
         errors: &mut Diagnostics,
     ) {
-        let props: &PostgresDatasourceProperties = ds.downcast_connector_data();
-        validations::extensions_preview_flag_must_be_set(preview_features, props, errors);
+        if let Some(props) = ds.downcast_connector_data::<PostgresDatasourceProperties>() {
+            validations::extensions_preview_flag_must_be_set(preview_features, props, errors);
+        }
     }
 
     fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {
@@ -584,6 +577,69 @@ impl Connector for PostgresDatamodelConnector {
         let properties = PostgresDatasourceProperties { extensions };
 
         DatasourceConnectorData::new(Box::new(properties))
+    }
+
+    fn render_datasource_properties(&self, properties: &DatasourceConnectorData, out: &mut String) -> fmt::Result {
+        let properties = match properties.downcast_ref::<PostgresDatasourceProperties>() {
+            Some(properties) => properties,
+            None => return Ok(()),
+        };
+
+        let extensions = match properties.extensions() {
+            Some(extensions) => extensions.extensions(),
+            None => return Ok(()),
+        };
+
+        out.push_str("extensions = [");
+
+        for (i, extension) in extensions.into_iter().enumerate() {
+            out.push_str(extension.name());
+
+            if extension.db_name().is_none() && extension.version().is_none() && extension.schema().is_none() {
+                if extensions.len() > 1 {
+                    out.push(',');
+                }
+                continue;
+            }
+
+            out.push_str("(");
+
+            if let Some(db_name) = extension.db_name() {
+                out.push_str(r#"map: ""#);
+                out.push_str(db_name);
+                out.push('"');
+
+                if extension.schema().is_some() || extension.version().is_some() {
+                    out.push_str(", ");
+                }
+            }
+
+            if let Some(schema) = extension.schema() {
+                out.push_str(r#"schema: ""#);
+                out.push_str(schema);
+                out.push('"');
+
+                if extension.version.is_some() {
+                    out.push_str(", ");
+                }
+            }
+
+            if let Some(version) = extension.version() {
+                out.push_str(r#"version: ""#);
+                out.push_str(version);
+                out.push('"');
+            }
+
+            out.push(')');
+
+            if i < extensions.len() - 1 {
+                out.push_str(", ");
+            }
+        }
+
+        out.push_str("]\n");
+
+        Ok(())
     }
 }
 

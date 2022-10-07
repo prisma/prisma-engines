@@ -32,12 +32,17 @@ pub struct Datasource {
 
 #[derive(Default)]
 pub struct DatasourceConnectorData {
-    pub(crate) data: Option<Box<dyn Any + Send + Sync + 'static>>,
+    data: Option<Box<dyn Any + Send + Sync + 'static>>,
 }
 
 impl DatasourceConnectorData {
     pub fn new(data: Box<dyn Any + Send + Sync + 'static>) -> Self {
         Self { data: Some(data) }
+    }
+
+    #[track_caller]
+    pub fn downcast_ref<T: 'static>(&self) -> Option<&T> {
+        self.data.as_ref().map(|data| data.downcast_ref().unwrap())
     }
 }
 
@@ -61,8 +66,8 @@ impl std::fmt::Debug for Datasource {
 impl Datasource {
     /// Extract connector-specific constructs. The type parameter must be the right one.
     #[track_caller]
-    pub fn downcast_connector_data<T: 'static>(&self) -> &T {
-        self.connector_data.data.as_ref().unwrap().downcast_ref().unwrap()
+    pub fn downcast_connector_data<T: 'static>(&self) -> Option<&T> {
+        self.connector_data.downcast_ref()
     }
 
     pub(crate) fn has_schema(&self, name: &str) -> bool {
