@@ -29,7 +29,7 @@ pub(super) fn parse_extensions(
             extensions.push(extension)
         }
 
-        extensions.sort_by(|a, b| a.name().cmp(&b.name()));
+        extensions.sort_by(|a, b| a.name().cmp(b.name()));
 
         Some(PostgresExtensions::new(extensions, span))
     })

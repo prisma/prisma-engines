@@ -272,7 +272,7 @@ impl Connector for PostgresDatamodelConnector {
     ) {
         match &ds.connector_data {
             DatasourceConnectorData::PostgresData(props) => {
-                validations::extensions_preview_flag_must_be_set(preview_features, &props, errors)
+                validations::extensions_preview_flag_must_be_set(preview_features, props, errors)
             }
             DatasourceConnectorData::NoData => (),
         }
@@ -484,7 +484,6 @@ impl Connector for PostgresDatamodelConnector {
 
     fn render_datasource_properties(&self, properties: &DatasourceConnectorData, out: &mut String) -> fmt::Result {
         let properties = match properties {
-            // TODO: understand how to fix this
             DatasourceConnectorData::PostgresData(properties) => properties,
             DatasourceConnectorData::NoData => return Ok(()),
         };
