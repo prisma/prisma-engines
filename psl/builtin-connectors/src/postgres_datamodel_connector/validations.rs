@@ -4,7 +4,8 @@ use psl_core::{
     common::preview_features::PreviewFeature,
     datamodel_connector::{walker_ext_traits::*, Connector},
     diagnostics::{DatamodelError, Diagnostics},
-    parser_database::{ast::WithSpan, walkers::IndexWalker, IndexAlgorithm, OperatorClass}, PostgresDatasourceProperties,
+    parser_database::{ast::WithSpan, walkers::IndexWalker, IndexAlgorithm, OperatorClass},
+    PostgresDatasourceProperties,
 };
 
 pub(super) fn compatible_native_types(index: IndexWalker<'_>, connector: &dyn Connector, errors: &mut Diagnostics) {

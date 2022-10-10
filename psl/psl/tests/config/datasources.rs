@@ -1,4 +1,3 @@
-
 use psl_core::PostgresDatasourceProperties;
 
 use crate::common::*;
@@ -193,8 +192,8 @@ fn postgresql_extension_parsing() {
     let config = psl::parse_configuration(schema).unwrap();
     let properties: &PostgresDatasourceProperties = match config.datasources.first().unwrap().connector_data {
         // TODO: understand how to fix this
-        psl_core::DatasourceConnectorData::PostgresData(props) => props,
-        psl_core::DatasourceConnectorData::NoData => todo!("how do I fail the test here?")
+        psl_core::DatasourceConnectorData::PostgresData(ref props) => props,
+        psl_core::DatasourceConnectorData::NoData => panic!("Expected postgres data to be set."),
     };
 
     assert!(properties.extensions().is_some());

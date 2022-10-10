@@ -1,13 +1,13 @@
 mod datasource;
 mod validations;
 
-use psl_core::PostgresDatasourceProperties;
 use enumflags2::BitFlags;
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList, InsertTextFormat};
 use native_types::{
     NativeType,
     PostgresType::{self, *},
 };
+use psl_core::PostgresDatasourceProperties;
 use psl_core::{
     common::preview_features::PreviewFeature,
     datamodel_connector::{
@@ -271,7 +271,9 @@ impl Connector for PostgresDatamodelConnector {
         errors: &mut Diagnostics,
     ) {
         match &ds.connector_data {
-            DatasourceConnectorData::PostgresData(props) => validations::extensions_preview_flag_must_be_set(preview_features, &props, errors),
+            DatasourceConnectorData::PostgresData(props) => {
+                validations::extensions_preview_flag_must_be_set(preview_features, &props, errors)
+            }
             DatasourceConnectorData::NoData => (),
         }
     }
@@ -484,7 +486,7 @@ impl Connector for PostgresDatamodelConnector {
         let properties = match properties {
             // TODO: understand how to fix this
             DatasourceConnectorData::PostgresData(properties) => properties,
-            DatasourceConnectorData::NoData => Ok(()),
+            DatasourceConnectorData::NoData => return Ok(()),
         };
 
         let extensions = match properties.extensions() {
@@ -521,7 +523,7 @@ impl Connector for PostgresDatamodelConnector {
                 out.push_str(schema);
                 out.push('"');
 
-                if extension.version.is_some() {
+                if extension.version().is_some() {
                     out.push_str(", ");
                 }
             }
