@@ -1,4 +1,5 @@
-use builtin_psl_connectors::postgres_datamodel_connector::PostgresDatasourceProperties;
+
+use psl_core::PostgresDatasourceProperties;
 
 use crate::common::*;
 
@@ -190,8 +191,11 @@ fn postgresql_extension_parsing() {
     "#};
 
     let config = psl::parse_configuration(schema).unwrap();
-    let properties: &PostgresDatasourceProperties =
-        config.datasources.first().unwrap().downcast_connector_data().unwrap();
+    let properties: &PostgresDatasourceProperties = match config.datasources.first().unwrap().connector_data {
+        // TODO: understand how to fix this
+        psl_core::DatasourceConnectorData::PostgresData(props) => props,
+        psl_core::DatasourceConnectorData::NoData => todo!("how do I fail the test here?")
+    };
 
     assert!(properties.extensions().is_some());
 

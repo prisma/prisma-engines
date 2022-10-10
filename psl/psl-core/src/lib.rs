@@ -14,7 +14,7 @@ mod reformat;
 mod validate;
 
 pub use crate::{
-    configuration::{Configuration, Datasource, DatasourceConnectorData, Generator, StringFromEnvVar},
+    configuration::{Configuration, Datasource, DatasourceConnectorData, Generator, StringFromEnvVar, postgres_datamodel_properties::*},
     reformat::reformat,
 };
 pub use diagnostics;

@@ -1,6 +1,7 @@
 mod datasource;
 mod validations;
 
+use psl_core::PostgresDatasourceProperties;
 use enumflags2::BitFlags;
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList, InsertTextFormat};
 use native_types::{
@@ -132,107 +133,6 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, PostgresType)] = &[
     (ScalarType::Bytes, PostgresType::ByteA),
     (ScalarType::Json, PostgresType::JsonB),
 ];
-
-/// Postgres-specific properties in the datasource block.
-pub struct PostgresDatasourceProperties {
-    extensions: Option<PostgresExtensions>,
-}
-
-impl PostgresDatasourceProperties {
-    /// Database extensions.
-    pub fn extensions(&self) -> Option<&PostgresExtensions> {
-        self.extensions.as_ref()
-    }
-}
-
-/// An extension defined in the extensions array of the datasource.
-///
-/// ```ignore
-/// datasource db {
-///   extensions = [postgis, foobar]
-///   //            ^^^^^^^
-/// }
-/// ```
-pub struct PostgresExtension {
-    name: String,
-    span: ast::Span,
-    schema: Option<String>,
-    version: Option<String>,
-    db_name: Option<String>,
-}
-
-impl PostgresExtension {
-    /// The name of the extension in the datasource.
-    ///
-    /// ```ignore
-    /// extensions = [bar]
-    /// //            ^^^ this
-    /// ```
-    pub fn name(&self) -> &str {
-        &self.name
-    }
-
-    /// The name of the extension in the database, defined in the
-    /// `map` argument.
-    ///
-    /// ```ignore
-    /// extensions = [bar(map: "foo")]
-    /// //                     ^^^^^ this
-    /// ```
-    pub fn db_name(&self) -> Option<&str> {
-        self.db_name.as_deref()
-    }
-
-    /// The span of the extension definition in the datamodel.
-    pub fn span(&self) -> ast::Span {
-        self.span
-    }
-
-    /// The schema where the extension tables are stored.
-    ///
-    /// ```ignore
-    /// extensions = [postgis(schema: "public")]
-    /// //                            ^^^^^^^^ this
-    /// ```
-    pub fn schema(&self) -> Option<&str> {
-        self.schema.as_deref()
-    }
-
-    /// The version of the extension to be used in the database.
-    ///
-    /// ```ignore
-    /// extensions = [postgis(version: "2.1")]
-    /// //                             ^^^^^ this
-    /// ```
-    pub fn version(&self) -> Option<&str> {
-        self.version.as_deref()
-    }
-}
-
-/// The extensions defined in the extensions array of the datrasource.
-///
-/// ```ignore
-/// datasource db {
-///   extensions = [postgis, foobar]
-///   //           ^^^^^^^^^^^^^^^^^
-/// }
-/// ```
-pub struct PostgresExtensions {
-    pub(crate) extensions: Vec<PostgresExtension>,
-    pub(crate) span: ast::Span,
-}
-
-impl PostgresExtensions {
-    /// The span of the extensions in the datamodel.
-    pub fn span(&self) -> ast::Span {
-        self.span
-    }
-
-    /// The extension definitions.
-    pub fn extensions(&self) -> &[PostgresExtension] {
-        &self.extensions
-    }
-}
 
 impl Connector for PostgresDatamodelConnector {
     fn is_provider(&self, name: &str) -> bool {
@@ -370,8 +270,9 @@ impl Connector for PostgresDatamodelConnector {
         ds: &Datasource,
         errors: &mut Diagnostics,
     ) {
-        if let Some(props) = ds.downcast_connector_data::<PostgresDatasourceProperties>() {
-            validations::extensions_preview_flag_must_be_set(preview_features, props, errors);
+        match &ds.connector_data {
+            DatasourceConnectorData::PostgresData(props) => validations::extensions_preview_flag_must_be_set(preview_features, &props, errors),
+            DatasourceConnectorData::NoData => (),
         }
     }
 
@@ -574,15 +475,16 @@ impl Connector for PostgresDatamodelConnector {
         diagnostics: &mut Diagnostics,
     ) -> DatasourceConnectorData {
         let extensions = datasource::parse_extensions(args, diagnostics);
-        let properties = PostgresDatasourceProperties { extensions };
+        let properties = PostgresDatasourceProperties::new(extensions);
 
-        DatasourceConnectorData::new(Box::new(properties))
+        DatasourceConnectorData::PostgresData(properties)
     }
 
     fn render_datasource_properties(&self, properties: &DatasourceConnectorData, out: &mut String) -> fmt::Result {
-        let properties = match properties.downcast_ref::<PostgresDatasourceProperties>() {
-            Some(properties) => properties,
-            None => return Ok(()),
+        let properties = match properties {
+            // TODO: understand how to fix this
+            DatasourceConnectorData::PostgresData(properties) => properties,
+            DatasourceConnectorData::NoData => Ok(()),
         };
 
         let extensions = match properties.extensions() {

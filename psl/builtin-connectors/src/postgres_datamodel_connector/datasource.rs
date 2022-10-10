@@ -1,9 +1,8 @@
-use super::PostgresExtensions;
-use crate::postgres_datamodel_connector::PostgresExtension;
 use psl_core::{
     datamodel_connector::EXTENSIONS_KEY,
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{ast, coerce, coerce_array},
+    PostgresExtension, PostgresExtensions,
 };
 use std::collections::{HashMap, HashSet};
 
@@ -25,20 +24,14 @@ pub(super) fn parse_extensions(
                 diagnostics.push_error(DatamodelError::new_argument_not_known_error(name, span));
             }
 
-            let extension = PostgresExtension {
-                name: name.to_string(),
-                span,
-                db_name,
-                schema,
-                version,
-            };
+            let extension = PostgresExtension::new(name.to_string(), span, db_name, schema, version);
 
             extensions.push(extension)
         }
 
-        extensions.sort_by(|a, b| a.name.cmp(&b.name));
+        extensions.sort_by(|a, b| a.name().cmp(&b.name()));
 
-        Some(PostgresExtensions { extensions, span })
+        Some(PostgresExtensions::new(extensions, span))
     })
 }
 

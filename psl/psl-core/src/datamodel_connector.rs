@@ -309,7 +309,7 @@ pub trait Connector: Send + Sync {
             ));
         }
 
-        Default::default()
+        DatasourceConnectorData::NoData
     }
 
     fn render_datasource_properties(&self, _: &DatasourceConnectorData, _: &mut String) -> fmt::Result {

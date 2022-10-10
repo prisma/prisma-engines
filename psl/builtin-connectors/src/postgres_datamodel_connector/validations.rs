@@ -4,10 +4,8 @@ use psl_core::{
     common::preview_features::PreviewFeature,
     datamodel_connector::{walker_ext_traits::*, Connector},
     diagnostics::{DatamodelError, Diagnostics},
-    parser_database::{ast::WithSpan, walkers::IndexWalker, IndexAlgorithm, OperatorClass},
+    parser_database::{ast::WithSpan, walkers::IndexWalker, IndexAlgorithm, OperatorClass}, PostgresDatasourceProperties,
 };
-
-use super::PostgresDatasourceProperties;
 
 pub(super) fn compatible_native_types(index: IndexWalker<'_>, connector: &dyn Connector, errors: &mut Diagnostics) {
     for field in index.fields() {
@@ -465,7 +463,7 @@ pub(super) fn extensions_preview_flag_must_be_set(
     }
 
     let span = match props.extensions() {
-        Some(extensions) => extensions.span,
+        Some(extensions) => extensions.span(),
         None => return,
     };
 
