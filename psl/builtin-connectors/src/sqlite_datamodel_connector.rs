@@ -49,7 +49,7 @@ impl Connector for SqliteDatamodelConnector {
         SetNull | SetDefault | Cascade | Restrict | NoAction
     }
 
-    fn simulated_referential_actions(&self, _relation_mode: &RelationMode) -> BitFlags<ReferentialAction> {
+    fn emulated_referential_actions(&self, _relation_mode: &RelationMode) -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
         Restrict | SetNull | Cascade
