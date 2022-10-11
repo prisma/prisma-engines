@@ -160,7 +160,7 @@ pub(super) fn referential_actions(field: RelationFieldWalker<'_>, ctx: &mut Cont
 
     // validation template for relationMode = "prisma"
     let msg_prisma = |action: ReferentialAction| {
-        let allowed_actions = connector.simulated_referential_actions(&relation_mode);
+        let allowed_actions = connector.emulated_referential_actions(&relation_mode);
 
         let additional_info = match action {
             ReferentialAction::NoAction => {
@@ -169,7 +169,7 @@ pub(super) fn referential_actions(field: RelationFieldWalker<'_>, ctx: &mut Cont
                     .supports_referential_action(&relation_mode, ReferentialAction::Restrict)
                 {
                     Some(format!(
-                        ". `{}` is not implemented for {}, you could try using `{}`, which behaves the same if you do not need to defer constraint checks in a transaction",
+                        ". `{}` is not implemented for {} when using `relationMode = \"prisma\"`, you could try using `{}`, which behaves the same if you do not need to defer constraint checks in a transaction. Learn more at https://pris.ly/d/relationMode",
                         ReferentialAction::NoAction.as_str(),
                         connector.name(),
                         ReferentialAction::Restrict.as_str(),

@@ -16,7 +16,7 @@ pub enum RelationMode {
 }
 
 impl RelationMode {
-    pub fn allowed_simulated_referential_actions_default(self) -> BitFlags<ReferentialAction> {
+    pub fn allowed_emulated_referential_actions_default(self) -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
         Restrict | SetNull | NoAction | Cascade
