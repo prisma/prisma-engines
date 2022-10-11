@@ -140,7 +140,12 @@ impl ParserDatabase {
         &self.ast
     }
 
-    /// The total number of models. This is O(1).
+    /// The total number of enums in the schema. This is O(1).
+    pub fn enums_count(&self) -> usize {
+        self.types.enum_attributes.len()
+    }
+
+    /// The total number of models in the schema. This is O(1).
     pub fn models_count(&self) -> usize {
         self.types.model_attributes.len()
     }

@@ -110,11 +110,7 @@ impl<'db> ScalarFieldWalker<'db> {
 
     /// The model that contains the field.
     pub fn model(self) -> ModelWalker<'db> {
-        ModelWalker {
-            model_id: self.model_id,
-            db: self.db,
-            model_attributes: &self.db.types.model_attributes[&self.model_id],
-        }
+        self.db.walk(self.model_id)
     }
 
     /// (attribute scope, native type name, arguments, span)
