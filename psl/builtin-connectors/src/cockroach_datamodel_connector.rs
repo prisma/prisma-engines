@@ -6,8 +6,7 @@ use native_types::{CockroachType, NativeType};
 use psl_core::{
     datamodel_connector::{
         helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
-        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, RelationMode,
-        StringFilter,
+        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, StringFilter,
     },
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{
