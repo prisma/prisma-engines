@@ -1,9 +1,11 @@
 use super::{database_name::validate_db_name, names::Names};
 use crate::{
     ast::{self, WithName, WithSpan},
+    datamodel_connector::RelationMode,
     diagnostics::DatamodelError,
     validate::validation_pipeline::context::Context,
 };
+use enumflags2::BitFlags;
 use itertools::Itertools;
 use parser_database::{
     walkers::{ModelWalker, RelationFieldWalker, RelationName},
@@ -140,39 +142,77 @@ pub(super) fn ignored_related_model(field: RelationFieldWalker<'_>, ctx: &mut Co
 pub(super) fn referential_actions(field: RelationFieldWalker<'_>, ctx: &mut Context<'_>) {
     let connector = ctx.connector;
     let relation_mode = ctx.relation_mode;
-    let msg = |action: ReferentialAction| {
-        let allowed_values = connector
-            .referential_actions(&relation_mode)
-            .iter()
-            .map(|f| format!("`{}`", f.as_str()))
-            .join(", ");
+
+    fn fmt_allowed_actions(allowed_actions: BitFlags<ReferentialAction>) -> String {
+        allowed_actions.iter().map(|f| format!("`{}`", f.as_str())).join(", ")
+    }
+
+    // validation template for relationMode = "foreignKeys"
+    let msg_foreign_keys = |action: ReferentialAction| {
+        let allowed_actions = connector.referential_actions(&relation_mode);
 
         format!(
             "Invalid referential action: `{}`. Allowed values: ({})",
             action.as_str(),
-            allowed_values,
+            fmt_allowed_actions(allowed_actions),
         )
     };
 
-    if let Some(on_delete) = field.explicit_on_delete() {
-        if !ctx.connector.supports_referential_action(&ctx.relation_mode, on_delete) {
-            let span = field
-                .ast_field()
-                .span_for_argument("relation", "onDelete")
-                .unwrap_or_else(|| field.ast_field().span());
+    // validation template for relationMode = "prisma"
+    let msg_prisma = |action: ReferentialAction| {
+        let allowed_actions = connector.simulated_referential_actions(&relation_mode);
 
-            ctx.push_error(DatamodelError::new_validation_error(&msg(on_delete), span));
+        let additional_info = match action {
+            ReferentialAction::NoAction => {
+                if ctx
+                    .connector
+                    .supports_referential_action(&relation_mode, ReferentialAction::Restrict)
+                {
+                    Some(format!(
+                        ". NoAction is not implemented for {}, you could try using Restrict, which behaves the same if you do not need to defer constraint checks in a transaction",
+                        connector.name(),
+                    ))
+                } else {
+                    None
+                }
+            }
+            _ => None,
+        };
+        let additional_info = additional_info.unwrap_or_else(|| String::new());
+
+        format!(
+            "Invalid referential action: `{}`. Allowed values: ({}){additional_info}",
+            action.as_str(),
+            fmt_allowed_actions(allowed_actions),
+        )
+    };
+
+    let msg_template = |action: ReferentialAction| -> String {
+        match relation_mode {
+            RelationMode::ForeignKeys => msg_foreign_keys(action),
+            RelationMode::Prisma => msg_prisma(action),
+        }
+    };
+
+    if let Some(on_delete) = field.explicit_on_delete() {
+        let span = field
+            .ast_field()
+            .span_for_argument("relation", "onDelete")
+            .unwrap_or_else(|| field.ast_field().span());
+
+        if !ctx.connector.supports_referential_action(&ctx.relation_mode, on_delete) {
+            ctx.push_error(DatamodelError::new_validation_error(&msg_template(on_delete), span));
         }
     }
 
     if let Some(on_update) = field.explicit_on_update() {
-        if !ctx.connector.supports_referential_action(&ctx.relation_mode, on_update) {
-            let span = field
-                .ast_field()
-                .span_for_argument("relation", "onUpdate")
-                .unwrap_or_else(|| field.ast_field().span());
+        let span = field
+            .ast_field()
+            .span_for_argument("relation", "onUpdate")
+            .unwrap_or_else(|| field.ast_field().span());
 
-            ctx.push_error(DatamodelError::new_validation_error(&msg(on_update), span));
+        if !ctx.connector.supports_referential_action(&ctx.relation_mode, on_update) {
+            ctx.push_error(DatamodelError::new_validation_error(&msg_template(on_update), span));
         }
     }
 }
