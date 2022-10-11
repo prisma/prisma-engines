@@ -164,13 +164,14 @@ pub(super) fn referential_actions(field: RelationFieldWalker<'_>, ctx: &mut Cont
 
         let additional_info = match action {
             ReferentialAction::NoAction => {
+                // we don't want to suggest the users to use Restrict instead, if the connector doesn't support it
                 if ctx
                     .connector
                     .emulated_referential_actions()
                     .contains(ReferentialAction::Restrict)
                 {
                     Some(format!(
-                        ". `{}` is not implemented for {} when using `relationMode = \"prisma\"`, you could try using `{}`, which behaves the same if you do not need to defer constraint checks in a transaction. Learn more at https://pris.ly/d/relationMode",
+                        ". `{}` is not implemented for {} when using `relationMode = \"prisma\"`, you could try using `{}` instead. Learn more at https://pris.ly/d/relationMode",
                         ReferentialAction::NoAction.as_str(),
                         connector.name(),
                         ReferentialAction::Restrict.as_str(),
