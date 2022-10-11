@@ -19,6 +19,10 @@ impl Connector for EmptyDatamodelConnector {
         BitFlags::all()
     }
 
+    fn simulated_referential_actions(&self, relation_mode: &RelationMode) -> BitFlags<ReferentialAction> {
+        relation_mode.allowed_simulated_referential_actions_default()
+    }
+
     fn capabilities(&self) -> &'static [ConnectorCapability] {
         &[
             ConnectorCapability::AutoIncrement,

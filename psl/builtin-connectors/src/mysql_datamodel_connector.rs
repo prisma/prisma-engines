@@ -160,10 +160,14 @@ impl Connector for MySqlDatamodelConnector {
         64
     }
 
-    fn referential_actions(&self, relation_mode: &RelationMode) -> BitFlags<ReferentialAction> {
+    fn referential_actions(&self, _relation_mode: &RelationMode) -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
-        relation_mode.allowed_referential_actions(Restrict | Cascade | SetNull | NoAction | SetDefault)
+        Restrict | Cascade | SetNull | NoAction | SetDefault
+    }
+
+    fn simulated_referential_actions(&self, relation_mode: &RelationMode) -> BitFlags<ReferentialAction> {
+        relation_mode.allowed_simulated_referential_actions_default()
     }
 
     fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {

@@ -43,10 +43,16 @@ impl Connector for SqliteDatamodelConnector {
         10000
     }
 
-    fn referential_actions(&self, relation_mode: &RelationMode) -> BitFlags<ReferentialAction> {
+    fn referential_actions(&self, _relation_mode: &RelationMode) -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
-        relation_mode.allowed_referential_actions(SetNull | SetDefault | Cascade | Restrict | NoAction)
+        SetNull | SetDefault | Cascade | Restrict | NoAction
+    }
+
+    fn simulated_referential_actions(&self, _relation_mode: &RelationMode) -> BitFlags<ReferentialAction> {
+        use ReferentialAction::*;
+
+        Restrict | SetNull | Cascade
     }
 
     fn scalar_type_for_native_type(&self, _native_type: serde_json::Value) -> ScalarType {
