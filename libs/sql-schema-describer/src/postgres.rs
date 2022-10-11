@@ -56,6 +56,51 @@ impl Default for Sequence {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct DatabaseExtension {
+    pub(crate) name: String,
+    pub(crate) schema: String,
+    pub(crate) version: String,
+    pub(crate) relocatable: bool,
+}
+
+/// The identifier for an extension in a Postgres database.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct ExtensionId(pub(crate) u32);
+
+/// Traverse an extension
+#[derive(Clone, Copy)]
+pub struct ExtensionWalker<'a> {
+    id: ExtensionId,
+    schema_ext: &'a PostgresSchemaExt,
+}
+
+impl<'a> ExtensionWalker<'a> {
+    /// The name of the extension.
+    pub fn name(&self) -> &str {
+        &self.extension().name
+    }
+
+    /// The schema where the extension data is located.
+    pub fn schema(&self) -> &str {
+        &self.extension().schema
+    }
+
+    /// The version of the extension.
+    pub fn version(&self) -> &str {
+        &self.extension().version
+    }
+
+    /// Can the extension data be relocated to a different schema.
+    pub fn relocatable(&self) -> bool {
+        self.extension().relocatable
+    }
+
+    fn extension(&self) -> &DatabaseExtension {
+        &self.schema_ext.extensions[self.id.0 as usize]
+    }
+}
+
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum SqlIndexAlgorithm {
     BTree,
@@ -118,6 +163,8 @@ pub struct PostgresSchemaExt {
     pub indexes: Vec<(IndexId, SqlIndexAlgorithm)>,
     /// The schema's sequences.
     pub sequences: Vec<Sequence>,
+    /// The extensions included in the schema(s).
+    extensions: Vec<DatabaseExtension>,
 }
 
 impl PostgresSchemaExt {
@@ -142,6 +189,17 @@ impl PostgresSchemaExt {
             .binary_search_by_key(&name, |s| &s.name)
             .map(|idx| (idx, &self.sequences[idx]))
             .ok()
+    }
+
+    pub fn extension_walkers(&self) -> impl Iterator<Item = ExtensionWalker<'_>> {
+        (0..self.extensions.len()).map(move |idx| ExtensionWalker {
+            schema_ext: self,
+            id: ExtensionId(idx as u32),
+        })
+    }
+
+    pub fn extension_walker<'a>(&'a self, name: &str) -> Option<ExtensionWalker<'a>> {
+        self.extension_walkers().find(|ext| ext.name() == name)
     }
 }
 
@@ -441,6 +499,7 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
 
         self.get_views(&mut sql_schema).await?;
         self.get_procedures(&mut sql_schema).await?;
+        self.get_extensions(&mut pg_ext).await?;
 
         //Todo(matthias) understand this
         self.get_sequences(&sql_schema, &mut pg_ext).await?;
@@ -467,6 +526,40 @@ impl<'a> SqlSchemaDescriber<'a> {
 
     fn is_cockroach(&self) -> bool {
         self.circumstances.contains(Circumstances::Cockroach)
+    }
+
+    async fn get_extensions(&self, pg_ext: &mut PostgresSchemaExt) -> DescriberResult<()> {
+        // CockroachDB does not support extensions.
+        if self.is_cockroach() {
+            return Ok(());
+        }
+
+        let sql = indoc! {r#"
+            SELECT
+                ext.extname AS extension_name,
+                ext.extversion AS extension_version,
+                ext.extrelocatable AS extension_relocatable,
+                pn.nspname AS extension_schema
+            FROM pg_extension ext
+            INNER JOIN pg_namespace pn ON ext.extnamespace = pn.oid
+            ORDER BY ext.extname ASC
+        "#};
+
+        let rows = self.conn.query_raw(sql, &[]).await?;
+        let mut extensions = Vec::with_capacity(rows.len());
+
+        for row in rows.into_iter() {
+            extensions.push(DatabaseExtension {
+                name: row.get_expect_string("extension_name"),
+                schema: row.get_expect_string("extension_schema"),
+                version: row.get_expect_string("extension_version"),
+                relocatable: row.get_expect_bool("extension_relocatable"),
+            });
+        }
+
+        pg_ext.extensions = extensions;
+
+        Ok(())
     }
 
     async fn get_databases(&self) -> DescriberResult<Vec<String>> {
