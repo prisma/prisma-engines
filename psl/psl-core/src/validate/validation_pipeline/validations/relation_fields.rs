@@ -169,8 +169,10 @@ pub(super) fn referential_actions(field: RelationFieldWalker<'_>, ctx: &mut Cont
                     .supports_referential_action(&relation_mode, ReferentialAction::Restrict)
                 {
                     Some(format!(
-                        ". NoAction is not implemented for {}, you could try using Restrict, which behaves the same if you do not need to defer constraint checks in a transaction",
+                        ". `{}` is not implemented for {}, you could try using `{}`, which behaves the same if you do not need to defer constraint checks in a transaction",
+                        ReferentialAction::NoAction.as_str(),
                         connector.name(),
+                        ReferentialAction::Restrict.as_str(),
                     ))
                 } else {
                     None
