@@ -4,6 +4,7 @@ use crate::common::*;
 use psl::{
     datamodel_connector::RelationMode,
     dml::ReferentialAction::{self, *},
+    parse_schema,
 };
 
 #[test]
@@ -569,6 +570,158 @@ fn restrict_should_not_work_on_sql_server() {
     "#]];
 
     expected.assert_eq(&parse_unwrap_err(dml));
+}
+
+#[test]
+fn on_update_no_action_should_not_work_on_postgres_with_prisma_relation_mode() {
+    let dml = indoc! { r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialIntegrity"]
+        }
+
+        datasource db {
+            provider = "postgres"
+            url = "postgres://"
+            relationMode = "prisma"
+        }
+
+        model A {
+            id Int @id
+            bs B[]
+        }
+
+        model B {
+            id Int @id
+            aId Int
+            a A @relation(fields: [aId], references: [id], onUpdate: NoAction, onDelete: Cascade)
+        }
+    "#};
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating: Invalid referential action: `NoAction`. Allowed values: (`Cascade`, `Restrict`, `SetNull`). NoAction is not implemented for Postgres, you could try using Restrict, which behaves the same if you do not need to defer constraint checks in a transaction[0m
+          [1;94m-->[0m  [4mschema.prisma:20[0m
+        [1;94m   | [0m
+        [1;94m19 | [0m    aId Int
+        [1;94m20 | [0m    a A @relation(fields: [aId], references: [id], [1;91monUpdate: NoAction[0m, onDelete: Cascade)
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&parse_schema(dml).map(drop).unwrap_err())
+}
+
+#[test]
+fn on_delete_no_action_should_not_work_on_postgres_with_prisma_relation_mode() {
+    let dml = indoc! { r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialIntegrity"]
+        }
+
+        datasource db {
+            provider = "postgres"
+            url = "postgres://"
+            relationMode = "prisma"
+        }
+
+        model A {
+            id Int @id
+            bs B[]
+        }
+
+        model B {
+            id Int @id
+            aId Int
+            a A @relation(fields: [aId], references: [id], onUpdate: Cascade, onDelete: NoAction)
+        }
+    "#};
+
+    let expected = expect!([r#"
+        [1;91merror[0m: [1mError validating: Invalid referential action: `NoAction`. Allowed values: (`Cascade`, `Restrict`, `SetNull`). NoAction is not implemented for Postgres, you could try using Restrict, which behaves the same if you do not need to defer constraint checks in a transaction[0m
+          [1;94m-->[0m  [4mschema.prisma:20[0m
+        [1;94m   | [0m
+        [1;94m19 | [0m    aId Int
+        [1;94m20 | [0m    a A @relation(fields: [aId], references: [id], onUpdate: Cascade, [1;91monDelete: NoAction[0m)
+        [1;94m   | [0m
+    "#]);
+
+    expected.assert_eq(&parse_schema(dml).map(drop).unwrap_err())
+}
+
+#[test]
+fn on_update_no_action_should_not_work_on_sqlite_with_prisma_relation_mode() {
+    let dml = indoc! { r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialIntegrity"]
+        }
+
+        datasource db {
+            provider = "sqlite"
+            url = "./dev.db"
+            relationMode = "prisma"
+        }
+
+        model A {
+            id Int @id
+            bs B[]
+        }
+
+        model B {
+            id Int @id
+            aId Int
+            a A @relation(fields: [aId], references: [id], onUpdate: NoAction, onDelete: Cascade)
+        }
+    "#};
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating: Invalid referential action: `NoAction`. Allowed values: (`Cascade`, `Restrict`, `SetNull`). NoAction is not implemented for sqlite, you could try using Restrict, which behaves the same if you do not need to defer constraint checks in a transaction[0m
+          [1;94m-->[0m  [4mschema.prisma:20[0m
+        [1;94m   | [0m
+        [1;94m19 | [0m    aId Int
+        [1;94m20 | [0m    a A @relation(fields: [aId], references: [id], [1;91monUpdate: NoAction[0m, onDelete: Cascade)
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&parse_schema(dml).map(drop).unwrap_err())
+}
+
+#[test]
+fn on_delete_no_action_should_not_work_on_sqlite_with_prisma_relation_mode() {
+    let dml = indoc! { r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialIntegrity"]
+        }
+
+        datasource db {
+            provider = "sqlite"
+            url = "./dev.db"
+            relationMode = "prisma"
+        }
+
+        model A {
+            id Int @id
+            bs B[]
+        }
+
+        model B {
+            id Int @id
+            aId Int
+            a A @relation(fields: [aId], references: [id], onUpdate: Cascade, onDelete: NoAction)
+        }
+    "#};
+
+    let expected = expect!([r#"
+        [1;91merror[0m: [1mError validating: Invalid referential action: `NoAction`. Allowed values: (`Cascade`, `Restrict`, `SetNull`). NoAction is not implemented for sqlite, you could try using Restrict, which behaves the same if you do not need to defer constraint checks in a transaction[0m
+          [1;94m-->[0m  [4mschema.prisma:20[0m
+        [1;94m   | [0m
+        [1;94m19 | [0m    aId Int
+        [1;94m20 | [0m    a A @relation(fields: [aId], references: [id], onUpdate: Cascade, [1;91monDelete: NoAction[0m)
+        [1;94m   | [0m
+    "#]);
+
+    expected.assert_eq(&parse_schema(dml).map(drop).unwrap_err())
 }
 
 #[test]
