@@ -70,9 +70,7 @@ pub struct IntrospectionContext {
     /// This should always be true. TODO: change everything where it's
     /// set to false to take the config into account.
     pub render_config: bool,
-    pub source: Datasource,
     pub composite_type_depth: CompositeTypeDepth,
-    pub preview_features: BitFlags<PreviewFeature>,
     previous_schema: psl::ValidatedSchema,
 }
 
@@ -104,21 +102,20 @@ impl IntrospectionContext {
     }
 
     fn new_naive(previous_schema: psl::ValidatedSchema, composite_type_depth: CompositeTypeDepth) -> Self {
-        let source = previous_schema.configuration.datasources.clone().pop().unwrap();
-        let preview_features = previous_schema.configuration.preview_features();
-
         IntrospectionContext {
             previous_data_model: psl::dml::Datamodel::new(),
             previous_schema,
-            source,
             composite_type_depth,
-            preview_features,
             render_config: true,
         }
     }
 
+    pub fn datasource(&self) -> &Datasource {
+        self.previous_schema.configuration.datasources.first().unwrap()
+    }
+
     pub fn foreign_keys_enabled(&self) -> bool {
-        self.source.relation_mode().uses_foreign_keys()
+        self.datasource().relation_mode().uses_foreign_keys()
     }
 
     pub fn schema_string(&self) -> &str {
@@ -127,6 +124,10 @@ impl IntrospectionContext {
 
     pub fn configuration(&self) -> &psl::Configuration {
         &self.previous_schema.configuration
+    }
+
+    pub fn preview_features(&self) -> BitFlags<PreviewFeature> {
+        self.previous_schema.configuration.preview_features()
     }
 }
 

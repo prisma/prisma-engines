@@ -1,7 +1,6 @@
 use crate::{introspection::introspect, SqlFamilyTrait, SqlIntrospectionResult};
-use enumflags2::BitFlags;
 use introspection_connector::{IntrospectionContext, IntrospectionResult};
-use psl::{builtin_connectors::*, common::preview_features::PreviewFeature, dml::Datamodel, Configuration, Datasource};
+use psl::{builtin_connectors::*, datamodel_connector::Connector, dml::Datamodel, Configuration};
 use quaint::prelude::SqlFamily;
 use sql_schema_describer::SqlSchema;
 use tracing::debug;
@@ -9,8 +8,6 @@ use tracing::debug;
 pub(crate) struct CalculateDatamodelContext<'a> {
     pub config: &'a Configuration,
     pub render_config: bool,
-    pub source: &'a Datasource,
-    pub preview_features: BitFlags<PreviewFeature>,
     pub previous_datamodel: &'a Datamodel,
     pub schema: &'a SqlSchema,
     pub sql_family: SqlFamily,
@@ -18,11 +15,20 @@ pub(crate) struct CalculateDatamodelContext<'a> {
 
 impl CalculateDatamodelContext<'_> {
     pub(crate) fn is_cockroach(&self) -> bool {
-        self.source.active_connector.provider_name() == COCKROACH.provider_name()
+        self.active_connector().provider_name() == COCKROACH.provider_name()
     }
 
     pub(crate) fn foreign_keys_enabled(&self) -> bool {
-        self.source.relation_mode().uses_foreign_keys()
+        self.config
+            .datasources
+            .first()
+            .unwrap()
+            .relation_mode()
+            .uses_foreign_keys()
+    }
+
+    pub(crate) fn active_connector(&self) -> &dyn Connector {
+        self.config.datasources.first().unwrap().active_connector
     }
 }
 
@@ -37,8 +43,6 @@ pub fn calculate_datamodel(
     let context = CalculateDatamodelContext {
         config: ctx.configuration(),
         render_config: ctx.render_config,
-        source: &ctx.source,
-        preview_features: ctx.preview_features,
         previous_datamodel,
         schema,
         sql_family: ctx.sql_family(),

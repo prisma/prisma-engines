@@ -1,9 +1,13 @@
+use enumflags2::BitFlags;
 use native_types::PostgresType;
 use psl_core::{
+    common::preview_features::PreviewFeature,
     datamodel_connector::{walker_ext_traits::*, Connector},
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{ast::WithSpan, walkers::IndexWalker, IndexAlgorithm, OperatorClass},
 };
+
+use super::PostgresDatasourceProperties;
 
 pub(super) fn compatible_native_types(index: IndexWalker<'_>, connector: &dyn Connector, errors: &mut Diagnostics) {
     for field in index.fields() {
@@ -449,4 +453,24 @@ pub(super) fn generalized_index_validations(
             }
         }
     }
+}
+
+pub(super) fn extensions_preview_flag_must_be_set(
+    preview_features: BitFlags<PreviewFeature>,
+    props: &PostgresDatasourceProperties,
+    errors: &mut Diagnostics,
+) {
+    if preview_features.contains(PreviewFeature::PostgresExtensions) {
+        return;
+    }
+
+    let span = match props.extensions() {
+        Some(extensions) => extensions.span,
+        None => return,
+    };
+
+    errors.push_error(DatamodelError::new_static(
+        "The `extensions` property is only available with the `postgresExtensions` preview feature.",
+        span,
+    ));
 }

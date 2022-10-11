@@ -37,6 +37,10 @@ fn render_datasource(datasource: &Datasource, out: &mut String) -> fmt::Result {
         writeln!(out, "relationMode = {}", string_literal(&relation_mode.to_string()))?;
     }
 
+    datasource
+        .active_connector
+        .render_datasource_properties(&datasource.connector_data, out)?;
+
     out.write_str("}\n")
 }
 

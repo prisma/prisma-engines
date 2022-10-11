@@ -66,7 +66,8 @@ features!(
     OrderByNulls,
     MultiSchema,
     FilteredRelationCount,
-    FieldReference
+    FieldReference,
+    PostgresExtensions,
 );
 
 /// Generator preview features
@@ -107,7 +108,10 @@ pub const GENERATOR: FeatureMap = FeatureMap {
         | ImprovedQueryRaw
         | DataProxy
     }),
-    hidden: enumflags2::make_bitflags!(PreviewFeature::{MultiSchema}),
+    hidden: enumflags2::make_bitflags!(PreviewFeature::{
+        MultiSchema
+        | PostgresExtensions
+    }),
 };
 
 #[derive(Debug)]
