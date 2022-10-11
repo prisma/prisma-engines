@@ -76,8 +76,8 @@
 
 <span class="doccomment">/// Docs: https://prisma.github.io/prisma-engines/doc/prisma_fmt/fn.get_config.html</span>
 <span class="attribute">#[<span class="ident">wasm_bindgen</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_config</span>(<span class="ident">params</span>: <span class="ident">String</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">JsError</span><span class="op">&gt;</span> {
-    <span class="ident">prisma_fmt::get_config</span>(<span class="ident">params</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">JsError::new</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>))
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_config</span>(<span class="ident">params</span>: <span class="ident">String</span>) -&gt; <span class="ident">String</span> {
+    <span class="ident">prisma_fmt::get_config</span>(<span class="ident">params</span>)
 }
 
 <span class="attribute">#[<span class="ident">wasm_bindgen</span>]</span>
