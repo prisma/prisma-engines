@@ -180,7 +180,7 @@ pub(super) fn referential_actions(field: RelationFieldWalker<'_>, ctx: &mut Cont
             }
             _ => None,
         };
-        let additional_info = additional_info.unwrap_or("".to_owned());
+        let additional_info = additional_info.unwrap_or_else(String::new);
 
         format!(
             "Invalid referential action: `{}`. Allowed values: ({}){additional_info}",
