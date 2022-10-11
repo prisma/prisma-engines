@@ -6,8 +6,7 @@ use native_types::{CockroachType, NativeType};
 use psl_core::{
     datamodel_connector::{
         helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
-        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, RelationMode,
-        StringFilter,
+        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, StringFilter,
     },
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{
@@ -133,14 +132,10 @@ impl Connector for CockroachDatamodelConnector {
         63
     }
 
-    fn referential_actions(&self, _relation_mode: &RelationMode) -> BitFlags<ReferentialAction> {
+    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
         NoAction | Restrict | Cascade | SetNull | SetDefault
-    }
-
-    fn emulated_referential_actions(&self, relation_mode: &RelationMode) -> BitFlags<ReferentialAction> {
-        relation_mode.allowed_emulated_referential_actions_default()
     }
 
     fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {

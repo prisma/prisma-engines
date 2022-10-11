@@ -71,10 +71,17 @@ pub trait Connector: Send + Sync {
     }
 
     /// The referential actions supported by the connector.
-    fn referential_actions(&self, relation_mode: &RelationMode) -> BitFlags<ReferentialAction>;
+    fn referential_actions(&self) -> BitFlags<ReferentialAction>;
 
     /// The referential actions supported when using relationMode = "prisma" by the connector.
-    fn emulated_referential_actions(&self, relation_mode: &RelationMode) -> BitFlags<ReferentialAction>;
+    /// There are in fact scenarios in which the set of emulated referential actions supported may change
+    /// depending on the connector. For example, Postgres' NoAction mode behaves similarly to Restrict
+    /// (raising an error if any referencing rows still exist when the constraint is checked), but with
+    /// a subtle twist we decided not to emulate: NO ACTION allows the check to be deferred until later
+    /// in the transaction, whereas RESTRICT does not.
+    fn emulated_referential_actions(&self) -> BitFlags<ReferentialAction> {
+        RelationMode::allowed_emulated_referential_actions_default()
+    }
 
     fn supports_composite_types(&self) -> bool {
         self.has_capability(ConnectorCapability::CompositeTypes)
@@ -94,8 +101,8 @@ pub trait Connector: Send + Sync {
 
     fn supports_referential_action(&self, relation_mode: &RelationMode, action: ReferentialAction) -> bool {
         match relation_mode {
-            RelationMode::ForeignKeys => self.referential_actions(relation_mode).contains(action),
-            RelationMode::Prisma => self.emulated_referential_actions(relation_mode).contains(action),
+            RelationMode::ForeignKeys => self.referential_actions().contains(action),
+            RelationMode::Prisma => self.emulated_referential_actions().contains(action),
         }
     }
 

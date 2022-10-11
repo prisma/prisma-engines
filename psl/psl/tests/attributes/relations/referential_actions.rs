@@ -4,7 +4,6 @@ use crate::common::*;
 use psl::{
     datamodel_connector::RelationMode,
     dml::ReferentialAction::{self, *},
-    parse_schema,
 };
 
 #[test]
@@ -599,7 +598,7 @@ fn on_update_no_action_should_not_work_on_postgres_with_prisma_relation_mode() {
     "#};
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError validating: Invalid referential action: `NoAction`. Allowed values: (`Cascade`, `Restrict`, `SetNull`). `NoAction` is not implemented for Postgres when using `relationMode = "prisma"`, you could try using `Restrict`, which behaves the same if you do not need to defer constraint checks in a transaction. Learn more at https://pris.ly/d/relationMode[0m
+        [1;91merror[0m: [1mError validating: Invalid referential action: `NoAction`. Allowed values: (`Cascade`, `Restrict`, `SetNull`). `NoAction` is not implemented for Postgres when using `relationMode = "prisma"`, you could try using `Restrict` instead. Learn more at https://pris.ly/d/relationMode[0m
           [1;94m-->[0m  [4mschema.prisma:20[0m
         [1;94m   | [0m
         [1;94m19 | [0m    aId Int
@@ -607,7 +606,7 @@ fn on_update_no_action_should_not_work_on_postgres_with_prisma_relation_mode() {
         [1;94m   | [0m
     "#]];
 
-    expected.assert_eq(&parse_schema(dml).map(drop).unwrap_err())
+    expect_error(dml, &expected);
 }
 
 #[test]
@@ -637,7 +636,7 @@ fn on_delete_no_action_should_not_work_on_postgres_with_prisma_relation_mode() {
     "#};
 
     let expected = expect!([r#"
-        [1;91merror[0m: [1mError validating: Invalid referential action: `NoAction`. Allowed values: (`Cascade`, `Restrict`, `SetNull`). `NoAction` is not implemented for Postgres when using `relationMode = "prisma"`, you could try using `Restrict`, which behaves the same if you do not need to defer constraint checks in a transaction. Learn more at https://pris.ly/d/relationMode[0m
+        [1;91merror[0m: [1mError validating: Invalid referential action: `NoAction`. Allowed values: (`Cascade`, `Restrict`, `SetNull`). `NoAction` is not implemented for Postgres when using `relationMode = "prisma"`, you could try using `Restrict` instead. Learn more at https://pris.ly/d/relationMode[0m
           [1;94m-->[0m  [4mschema.prisma:20[0m
         [1;94m   | [0m
         [1;94m19 | [0m    aId Int
@@ -645,7 +644,7 @@ fn on_delete_no_action_should_not_work_on_postgres_with_prisma_relation_mode() {
         [1;94m   | [0m
     "#]);
 
-    expected.assert_eq(&parse_schema(dml).map(drop).unwrap_err())
+    expect_error(dml, &expected);
 }
 
 #[test]
@@ -675,7 +674,7 @@ fn on_update_no_action_should_not_work_on_sqlite_with_prisma_relation_mode() {
     "#};
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError validating: Invalid referential action: `NoAction`. Allowed values: (`Cascade`, `Restrict`, `SetNull`). `NoAction` is not implemented for sqlite when using `relationMode = "prisma"`, you could try using `Restrict`, which behaves the same if you do not need to defer constraint checks in a transaction. Learn more at https://pris.ly/d/relationMode[0m
+        [1;91merror[0m: [1mError validating: Invalid referential action: `NoAction`. Allowed values: (`Cascade`, `Restrict`, `SetNull`). `NoAction` is not implemented for sqlite when using `relationMode = "prisma"`, you could try using `Restrict` instead. Learn more at https://pris.ly/d/relationMode[0m
           [1;94m-->[0m  [4mschema.prisma:20[0m
         [1;94m   | [0m
         [1;94m19 | [0m    aId Int
@@ -683,7 +682,7 @@ fn on_update_no_action_should_not_work_on_sqlite_with_prisma_relation_mode() {
         [1;94m   | [0m
     "#]];
 
-    expected.assert_eq(&parse_schema(dml).map(drop).unwrap_err())
+    expect_error(dml, &expected);
 }
 
 #[test]
@@ -713,7 +712,7 @@ fn on_delete_no_action_should_not_work_on_sqlite_with_prisma_relation_mode() {
     "#};
 
     let expected = expect!([r#"
-        [1;91merror[0m: [1mError validating: Invalid referential action: `NoAction`. Allowed values: (`Cascade`, `Restrict`, `SetNull`). `NoAction` is not implemented for sqlite when using `relationMode = "prisma"`, you could try using `Restrict`, which behaves the same if you do not need to defer constraint checks in a transaction. Learn more at https://pris.ly/d/relationMode[0m
+        [1;91merror[0m: [1mError validating: Invalid referential action: `NoAction`. Allowed values: (`Cascade`, `Restrict`, `SetNull`). `NoAction` is not implemented for sqlite when using `relationMode = "prisma"`, you could try using `Restrict` instead. Learn more at https://pris.ly/d/relationMode[0m
           [1;94m-->[0m  [4mschema.prisma:20[0m
         [1;94m   | [0m
         [1;94m19 | [0m    aId Int
@@ -721,7 +720,7 @@ fn on_delete_no_action_should_not_work_on_sqlite_with_prisma_relation_mode() {
         [1;94m   | [0m
     "#]);
 
-    expected.assert_eq(&parse_schema(dml).map(drop).unwrap_err())
+    expect_error(dml, &expected);
 }
 
 #[test]

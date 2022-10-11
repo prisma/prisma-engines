@@ -54,12 +54,8 @@ impl Connector for MongoDbDatamodelConnector {
         &[ConstraintScope::ModelKeyIndex]
     }
 
-    fn referential_actions(&self, _relation_mode: &RelationMode) -> BitFlags<ReferentialAction> {
+    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
         BitFlags::empty()
-    }
-
-    fn emulated_referential_actions(&self, relation_mode: &RelationMode) -> BitFlags<ReferentialAction> {
-        relation_mode.allowed_emulated_referential_actions_default()
     }
 
     fn validate_model(&self, model: ModelWalker<'_>, errors: &mut Diagnostics) {

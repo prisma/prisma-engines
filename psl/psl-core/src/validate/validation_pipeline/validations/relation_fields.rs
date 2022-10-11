@@ -149,7 +149,7 @@ pub(super) fn referential_actions(field: RelationFieldWalker<'_>, ctx: &mut Cont
 
     // validation template for relationMode = "foreignKeys"
     let msg_foreign_keys = |action: ReferentialAction| {
-        let allowed_actions = connector.referential_actions(&relation_mode);
+        let allowed_actions = connector.referential_actions();
 
         format!(
             "Invalid referential action: `{}`. Allowed values: ({})",
@@ -160,16 +160,18 @@ pub(super) fn referential_actions(field: RelationFieldWalker<'_>, ctx: &mut Cont
 
     // validation template for relationMode = "prisma"
     let msg_prisma = |action: ReferentialAction| {
-        let allowed_actions = connector.emulated_referential_actions(&relation_mode);
+        let allowed_actions = connector.emulated_referential_actions();
 
         let additional_info = match action {
             ReferentialAction::NoAction => {
+                // we don't want to suggest the users to use Restrict instead, if the connector doesn't support it
                 if ctx
                     .connector
-                    .supports_referential_action(&relation_mode, ReferentialAction::Restrict)
+                    .emulated_referential_actions()
+                    .contains(ReferentialAction::Restrict)
                 {
                     Some(format!(
-                        ". `{}` is not implemented for {} when using `relationMode = \"prisma\"`, you could try using `{}`, which behaves the same if you do not need to defer constraint checks in a transaction. Learn more at https://pris.ly/d/relationMode",
+                        ". `{}` is not implemented for {} when using `relationMode = \"prisma\"`, you could try using `{}` instead. Learn more at https://pris.ly/d/relationMode",
                         ReferentialAction::NoAction.as_str(),
                         connector.name(),
                         ReferentialAction::Restrict.as_str(),
