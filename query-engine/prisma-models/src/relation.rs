@@ -1,6 +1,7 @@
 use crate::prelude::*;
 use dml::ReferentialAction;
 use once_cell::sync::OnceCell;
+use psl::datamodel_connector::RelationMode;
 use std::{
     fmt::Debug,
     sync::{Arc, Weak},
@@ -25,6 +26,7 @@ pub struct Relation {
 
     pub manifestation: RelationLinkManifestation,
     pub internal_data_model: InternalDataModelWeakRef,
+    pub relation_mode: RelationMode,
 }
 
 impl Relation {
@@ -124,20 +126,34 @@ impl Relation {
 
     /// Retrieves the onDelete policy for this relation.
     pub fn on_delete(&self) -> ReferentialAction {
-        self.field_a()
+        let action = self
+            .field_a()
             .on_delete()
             .cloned()
             .or_else(|| self.field_b().on_delete().cloned())
-            .unwrap_or(self.field_a().on_delete_default)
+            .unwrap_or(self.field_a().on_delete_default);
+
+        match (action, self.relation_mode) {
+            // NoAction is an alias for Restrict when relationMode = "prisma"
+            (ReferentialAction::NoAction, RelationMode::Prisma) => ReferentialAction::Restrict,
+            (action, _) => action,
+        }
     }
 
     /// Retrieves the onUpdate policy for this relation.
     pub fn on_update(&self) -> ReferentialAction {
-        self.field_a()
+        let action = self
+            .field_a()
             .on_update()
             .cloned()
             .or_else(|| self.field_b().on_update().cloned())
-            .unwrap_or(self.field_a().on_update_default)
+            .unwrap_or(self.field_a().on_update_default);
+
+        match (action, self.relation_mode) {
+            // NoAction is an alias for Restrict when relationMode = "prisma"
+            (ReferentialAction::NoAction, RelationMode::Prisma) => ReferentialAction::Restrict,
+            (action, _) => action,
+        }
     }
 }
 
