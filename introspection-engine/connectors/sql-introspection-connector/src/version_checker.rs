@@ -57,7 +57,7 @@ const MYSQL_TYPES: &[MySqlType] = &[
 pub(crate) fn check_prisma_version(ctx: &CalculateDatamodelContext, warnings: &mut Vec<Warning>) -> Version {
     let mut version_checker = VersionChecker {
         sql_family: ctx.sql_family(),
-        is_cockroachdb: ctx.source.active_provider == "cockroachdb",
+        is_cockroachdb: ctx.is_cockroach(),
         has_migration_table: ctx.schema.table_walkers().any(is_old_migration_table),
         has_relay_table: ctx.schema.table_walkers().any(is_relay_table),
         has_prisma_1_join_table: ctx.schema.table_walkers().any(is_prisma_1_point_0_join_table),

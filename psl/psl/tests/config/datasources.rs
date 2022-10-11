@@ -1,3 +1,5 @@
+use builtin_psl_connectors::postgres_datamodel_connector::PostgresDatasourceProperties;
+
 use crate::common::*;
 
 #[test]
@@ -170,6 +172,153 @@ fn escaped_windows_paths_should_work() {
     "#};
 
     assert_valid(schema)
+}
+
+#[test]
+fn postgresql_extension_parsing() {
+    let schema = indoc! {r#"
+        datasource ds {
+          provider = "postgres"
+          url = env("DATABASE_URL")
+          extensions = [postgis(version: "2.1", schema: "public"), uuidOssp(map: "uuid-ossp"), meow]
+        }
+
+        generator js {
+          provider = "prisma-client-js"
+          previewFeatures = ["postgresExtensions"]
+        }
+    "#};
+
+    let config = psl::parse_configuration(schema).unwrap();
+    let properties: &PostgresDatasourceProperties =
+        config.datasources.first().unwrap().downcast_connector_data().unwrap();
+
+    assert!(properties.extensions().is_some());
+
+    let mut extensions = properties.extensions().unwrap().extensions().into_iter();
+
+    let meow = extensions.next().unwrap();
+    assert_eq!("meow", meow.name());
+    assert_eq!(None, meow.db_name());
+    assert_eq!(None, meow.version());
+    assert_eq!(None, meow.schema());
+
+    let postgis = extensions.next().unwrap();
+    assert_eq!("postgis", postgis.name());
+    assert_eq!(None, postgis.db_name());
+    assert_eq!(Some("2.1"), postgis.version());
+    assert_eq!(Some("public"), postgis.schema());
+
+    let uuid_ossp = extensions.next().unwrap();
+    assert_eq!("uuidOssp", uuid_ossp.name());
+    assert_eq!(Some("uuid-ossp"), uuid_ossp.db_name());
+    assert_eq!(None, uuid_ossp.version());
+    assert_eq!(None, uuid_ossp.schema());
+}
+
+#[test]
+fn postgresql_extension_rendering() {
+    let schema = indoc! {r#"
+        generator js {
+          provider        = "prisma-client-js"
+          previewFeatures = ["postgresExtensions"]
+        }
+
+        datasource ds {
+          provider   = "postgres"
+          url        = env("DATABASE_URL")
+          extensions = [postgis(version: "2.1", schema: "public"), uuidOssp(map: "uuid-ossp"), meow]
+        }
+    "#};
+
+    let schema = psl::parse_schema(schema).unwrap();
+    let lifted = dml::lift(&schema);
+    let rendered = dml::render_datamodel_and_config_to_string(&lifted, &schema.configuration);
+
+    let expected = expect![[r#"
+        generator js {
+          provider        = "prisma-client-js"
+          previewFeatures = ["postgresExtensions"]
+        }
+
+        datasource ds {
+          provider   = "postgresql"
+          url        = env("DATABASE_URL")
+          extensions = [meow, postgis(schema: "public", version: "2.1"), uuidOssp(map: "uuid-ossp")]
+        }
+    "#]];
+
+    expected.assert_eq(&rendered);
+}
+
+#[test]
+fn postgresql_single_extension_rendering() {
+    let schema = indoc! {r#"
+        generator js {
+          provider        = "prisma-client-js"
+          previewFeatures = ["postgresExtensions"]
+        }
+
+        datasource ds {
+          provider   = "postgres"
+          url        = env("DATABASE_URL")
+          extensions = [meow]
+        }
+    "#};
+
+    let schema = psl::parse_schema(schema).unwrap();
+    let lifted = dml::lift(&schema);
+    let rendered = dml::render_datamodel_and_config_to_string(&lifted, &schema.configuration);
+
+    let expected = expect![[r#"
+        generator js {
+          provider        = "prisma-client-js"
+          previewFeatures = ["postgresExtensions"]
+        }
+
+        datasource ds {
+          provider   = "postgresql"
+          url        = env("DATABASE_URL")
+          extensions = [meow]
+        }
+    "#]];
+
+    expected.assert_eq(&rendered);
+}
+
+#[test]
+fn postgresql_single_complex_extension_rendering() {
+    let schema = indoc! {r#"
+        generator js {
+          provider        = "prisma-client-js"
+          previewFeatures = ["postgresExtensions"]
+        }
+
+        datasource ds {
+          provider   = "postgres"
+          url        = env("DATABASE_URL")
+          extensions = [meow(version: "2.1")]
+        }
+    "#};
+
+    let schema = psl::parse_schema(schema).unwrap();
+    let lifted = dml::lift(&schema);
+    let rendered = dml::render_datamodel_and_config_to_string(&lifted, &schema.configuration);
+
+    let expected = expect![[r#"
+        generator js {
+          provider        = "prisma-client-js"
+          previewFeatures = ["postgresExtensions"]
+        }
+
+        datasource ds {
+          provider   = "postgresql"
+          url        = env("DATABASE_URL")
+          extensions = [meow(version: "2.1")]
+        }
+    "#]];
+
+    expected.assert_eq(&rendered);
 }
 
 fn render_schema_json(schema: &str) -> String {

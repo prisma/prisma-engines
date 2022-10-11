@@ -21,20 +21,30 @@
           overlays = [
             rust-overlay.overlays.default
             (self: super:
-              let toolchain = pkgs.rust-bin.stable.latest.minimal; in
+              let toolchain = pkgs.rust-bin.stable.latest.default; in
               { cargo = toolchain; rustc = toolchain; })
           ];
           pkgs = import nixpkgs { inherit system overlays; };
           craneLib = crane.mkLib pkgs;
 
-          prismaEnginesCommonArgs =
+          src =
             let
               enginesSourceFilter = path: type: (builtins.match "\\.pest$" path != null) ||
                 (builtins.match "\\.README.md$" path != null) ||
                 (builtins.match "^\\.git/HEAD" path != null) ||
                 (builtins.match "^\\.git/refs" path != null) ||
                 (craneLib.filterCargoSources path type != null);
+            in
+            lib.cleanSourceWith {
+              filter = enginesSourceFilter;
+              src = builtins.path {
+                path = ./.;
+                name = "prisma-engines-workspace-root-path";
+              };
+            };
 
+          prismaEnginesCommonArgs =
+            let
               excludeFlags = [
                 "--workspace"
                 "--exclude mongodb-introspection-connector" # requires running mongo
@@ -48,13 +58,7 @@
               pname = "prisma-engines";
               version = "0.1.0";
 
-              src = lib.cleanSourceWith {
-                filter = enginesSourceFilter;
-                src = builtins.path {
-                  path = ./.;
-                  name = "prisma-engines-workspace-root-path";
-                };
-              };
+              inherit src;
 
               buildInputs = [ pkgs.openssl ];
 
@@ -65,25 +69,23 @@
                 protobuf # for tonic
               ];
 
-              # https://github.com/ipetkov/crane/discussions/115
-              postConfigure = "find . -name 'build.rs' -exec touch '{}' ';'";
-
               cargoBuildCommand = "cargo build --release ${builtins.toString excludeFlags}";
               cargoCheckCommand = "cargo check --all-features ${builtins.toString excludeFlags}";
-              cargoTestCommand = "cargo test ${builtins.toString excludeFlags}";
-
-              # Env vars for the check phase. No db connection so we use sqlite.
-              TEST_DATABASE_URL = "sqlite";
-              RUST_LOG = "debug";
+              cargoTestCommand = "TEST_DATABASE_URL=sqlite RUST_LOG=debug cargo test ${builtins.toString excludeFlags}";
             };
 
           prisma-engines-deps = craneLib.buildDepsOnly prismaEnginesCommonArgs;
+
+          prisma-fmt-wasm = import ./prisma-fmt-wasm { inherit crane nixpkgs rust-overlay system src; };
+
           inherit (pkgs) lib;
         in
         {
           packages = {
             prisma-engines = craneLib.buildPackage (prismaEnginesCommonArgs // { cargoArtifacts = prisma-engines-deps; });
-          };
+          } // prisma-fmt-wasm.packages;
+
+          checks = prisma-fmt-wasm.checks;
 
           devShells.default = pkgs.mkShell { inputsFrom = [ prisma-engines-deps ]; };
         }

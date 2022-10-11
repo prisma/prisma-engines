@@ -122,6 +122,11 @@ impl DatamodelError {
         Self::new(msg, span)
     }
 
+    pub fn new_duplicate_enum_database_name_error(span: Span) -> DatamodelError {
+        let msg = "An enum with the same database name is already defined.";
+        Self::new(msg, span)
+    }
+
     pub fn new_duplicate_model_database_name_error(
         model_database_name: &str,
         existing_model_name: &str,
@@ -277,6 +282,10 @@ impl DatamodelError {
 
     pub fn new_property_not_known_error(property_name: &str, span: Span) -> DatamodelError {
         Self::new(format!("Property not known: \"{property_name}\"."), span)
+    }
+
+    pub fn new_argument_not_known_error(property_name: &str, span: Span) -> DatamodelError {
+        Self::new(format!("Argument not known: \"{property_name}\"."), span)
     }
 
     pub fn new_default_unknown_function(function_name: &str, span: Span) -> DatamodelError {

@@ -15,6 +15,8 @@ mod native_type_constructor;
 mod native_type_instance;
 mod relation_mode;
 
+use crate::{common::preview_features::PreviewFeature, configuration::DatasourceConnectorData, Datasource};
+
 pub use self::{
     capabilities::{ConnectorCapabilities, ConnectorCapability},
     empty_connector::EmptyDatamodelConnector,
@@ -27,8 +29,17 @@ pub use self::{
 use diagnostics::{DatamodelError, Diagnostics, NativeTypeErrorFactory, Span};
 use enumflags2::BitFlags;
 use lsp_types::CompletionList;
-use parser_database::{ast::SchemaPosition, walkers, IndexAlgorithm, ParserDatabase, ReferentialAction, ScalarType};
-use std::{borrow::Cow, collections::BTreeMap};
+use parser_database::{
+    ast::{self, SchemaPosition},
+    walkers, IndexAlgorithm, ParserDatabase, ReferentialAction, ScalarType,
+};
+use std::{
+    borrow::Cow,
+    collections::{BTreeMap, HashMap},
+    fmt,
+};
+
+pub const EXTENSIONS_KEY: &str = "extensions";
 
 /// The datamodel connector API.
 pub trait Connector: Send + Sync {
@@ -131,6 +142,7 @@ pub trait Connector: Send + Sync {
 
     fn validate_enum(&self, _enum: walkers::EnumWalker<'_>, _: &mut Diagnostics) {}
     fn validate_model(&self, _model: walkers::ModelWalker<'_>, _: &mut Diagnostics) {}
+    fn validate_datasource(&self, _: BitFlags<PreviewFeature>, _: &Datasource, _: &mut Diagnostics) {}
 
     fn validate_scalar_field_unknown_default_functions(
         &self,
@@ -283,6 +295,18 @@ pub trait Connector: Send + Sync {
     fn validate_url(&self, url: &str) -> Result<(), String>;
 
     fn push_completions(&self, _db: &ParserDatabase, _position: SchemaPosition<'_>, _completions: &mut CompletionList) {
+    }
+
+    fn parse_datasource_properties(
+        &self,
+        _args: &mut HashMap<&str, (Span, &ast::Expression)>,
+        _diagnostics: &mut Diagnostics,
+    ) -> DatasourceConnectorData {
+        Default::default()
+    }
+
+    fn render_datasource_properties(&self, _: &DatasourceConnectorData, _: &mut String) -> fmt::Result {
+        Ok(())
     }
 }
 

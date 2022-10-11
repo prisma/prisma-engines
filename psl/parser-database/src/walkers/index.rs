@@ -183,11 +183,7 @@ impl<'db> IndexWalker<'db> {
 
     /// The model the index is defined on.
     pub fn model(self) -> ModelWalker<'db> {
-        ModelWalker {
-            model_id: self.model_id,
-            db: self.db,
-            model_attributes: &self.db.types.model_attributes[&self.model_id],
-        }
+        self.db.walk(self.model_id)
     }
 
     /// The field the model was defined on, if any.

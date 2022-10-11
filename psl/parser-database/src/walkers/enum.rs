@@ -43,10 +43,7 @@ impl<'db> EnumWalker<'db> {
 
     /// The values of the enum.
     pub fn values(self) -> impl Iterator<Item = EnumValueWalker<'db>> {
-        (0..self.ast_enum().values.len()).map(move |idx| Walker {
-            db: self.db,
-            id: (self.id, idx),
-        })
+        (0..self.ast_enum().values.len()).map(move |idx| self.db.walk((self.id, idx)))
     }
 
     /// The name of the schema the enum belongs to.
@@ -62,10 +59,7 @@ impl<'db> EnumWalker<'db> {
 
 impl<'db> EnumValueWalker<'db> {
     fn r#enum(self) -> EnumWalker<'db> {
-        Walker {
-            db: self.db,
-            id: self.id.0,
-        }
+        self.db.walk(self.id.0)
     }
 
     /// The enum documentation

@@ -146,7 +146,7 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
 
     async fn introspect(&self, ctx: &IntrospectionContext) -> ConnectorResult<IntrospectionResult> {
         let namespaces = &mut ctx
-            .source
+            .datasource()
             .namespaces
             .iter()
             .map(|(ns, _)| ns.as_ref())
@@ -156,7 +156,7 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
         }
 
         let sql_schema = self
-            .catch(self.describe(Some(ctx.source.active_provider), namespaces))
+            .catch(self.describe(Some(ctx.datasource().active_provider), namespaces))
             .await?;
 
         let introspection_result =
@@ -174,7 +174,7 @@ trait SqlFamilyTrait {
 
 impl SqlFamilyTrait for IntrospectionContext {
     fn sql_family(&self) -> SqlFamily {
-        match self.source.active_provider {
+        match self.datasource().active_provider {
             "postgresql" => SqlFamily::Postgres,
             "cockroachdb" => SqlFamily::Postgres,
             "sqlite" => SqlFamily::Sqlite,

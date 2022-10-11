@@ -29,6 +29,7 @@ members = [
   "query-engine/schema-builder",
   "libs/*",
   "prisma-fmt",
+  "prisma-fmt-wasm",
   "psl/*",
 ]
 

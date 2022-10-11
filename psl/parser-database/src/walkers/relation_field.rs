@@ -96,11 +96,7 @@ impl<'db> RelationFieldWalker<'db> {
 
     /// The model containing the field.
     pub fn model(self) -> ModelWalker<'db> {
-        ModelWalker {
-            model_id: self.model_id,
-            db: self.db,
-            model_attributes: &self.db.types.model_attributes[&self.model_id],
-        }
+        self.db.walk(self.model_id)
     }
 
     /// The `@relation` attribute in the field AST.
@@ -115,13 +111,7 @@ impl<'db> RelationFieldWalker<'db> {
 
     /// The model referenced by the relation.
     pub fn related_model(self) -> ModelWalker<'db> {
-        let model_id = self.relation_field.referenced_model;
-
-        ModelWalker {
-            model_id,
-            db: self.db,
-            model_attributes: &self.db.types.model_attributes[&model_id],
-        }
+        self.db.walk(self.relation_field.referenced_model)
     }
 
     /// The fields in the `@relation(references: ...)` argument.

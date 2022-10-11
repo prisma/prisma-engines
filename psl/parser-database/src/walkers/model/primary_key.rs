@@ -51,11 +51,7 @@ impl<'db> PrimaryKeyWalker<'db> {
 
     /// The model the id is deined on.
     pub fn model(self) -> ModelWalker<'db> {
-        ModelWalker {
-            db: self.db,
-            model_attributes: &self.db.types.model_attributes[&self.model_id],
-            model_id: self.model_id,
-        }
+        self.db.walk(self.model_id)
     }
 
     /// The `name` argument of the id attribute. The client name.
