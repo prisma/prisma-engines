@@ -143,7 +143,7 @@ impl TestApi {
     }
 
     #[track_caller]
-    async fn test_introspect_internal(
+    pub async fn test_introspect_internal(
         &self,
         previous_schema: psl::ValidatedSchema,
         render_config: bool,
@@ -172,6 +172,15 @@ impl TestApi {
     pub async fn re_introspect_dml(&self, data_model_string: &str) -> Result<String> {
         let data_model = parse_datamodel(&format!("{}{}", self.pure_config(), data_model_string));
         let introspection_result = self.test_introspect_internal(data_model, false).await?;
+
+        Ok(introspection_result.data_model)
+    }
+
+    #[tracing::instrument(skip(self, data_model_string))]
+    #[track_caller]
+    pub async fn re_introspect_config(&self, data_model_string: &str) -> Result<String> {
+        let data_model = parse_datamodel(data_model_string);
+        let introspection_result = self.test_introspect_internal(data_model, true).await?;
 
         Ok(introspection_result.data_model)
     }

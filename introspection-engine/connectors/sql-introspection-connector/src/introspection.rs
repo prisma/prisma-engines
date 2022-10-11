@@ -1,3 +1,5 @@
+mod postgres;
+
 use crate::{
     calculate_datamodel::CalculateDatamodelContext as Context,
     commenting_out_guardrails::commenting_out_guardrails,
@@ -8,8 +10,11 @@ use crate::{
     version_checker, SqlError, SqlFamilyTrait,
 };
 use introspection_connector::{Version, Warning};
-use psl::dml::{self, Datamodel, Field, Model, PrimaryKeyDefinition, PrimaryKeyField, RelationField, SortOrder};
-use sql_schema_describer::{walkers::TableWalker, ForeignKeyId, SQLSortOrder};
+use psl::{
+    dml::{self, Datamodel, Field, Model, PrimaryKeyDefinition, PrimaryKeyField, RelationField, SortOrder},
+    Configuration,
+};
+use sql_schema_describer::{walkers::TableWalker, ForeignKeyId, SQLSortOrder, SqlSchema};
 use std::collections::HashSet;
 use tracing::debug;
 
@@ -167,12 +172,25 @@ pub(crate) fn introspect(ctx: &Context, warnings: &mut Vec<Warning>) -> Result<(
     let is_empty = datamodel.is_empty();
 
     let data_model = if ctx.render_config {
-        psl::render_datamodel_and_config_to_string(&datamodel, ctx.config)
+        match calculate_configuration(&ctx.config, &schema) {
+            Some(config) => psl::render_datamodel_and_config_to_string(&datamodel, &config),
+            None => psl::render_datamodel_and_config_to_string(&datamodel, &ctx.config),
+        }
     } else {
         psl::render_datamodel_to_string(&datamodel, Some(ctx.config))
     };
 
     Ok((version, data_model, is_empty))
+}
+
+fn calculate_configuration(previous_config: &Configuration, schema: &SqlSchema) -> Option<Configuration> {
+    let datasource = previous_config.datasources.first().unwrap();
+
+    if datasource.active_connector.is_provider("postgres") {
+        postgres::calculate_configuration(previous_config, schema)
+    } else {
+        None
+    }
 }
 
 fn calculate_fields_for_prisma_join_table(
