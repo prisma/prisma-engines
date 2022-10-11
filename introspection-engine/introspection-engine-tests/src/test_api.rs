@@ -265,14 +265,14 @@ impl TestApi {
                  provider = "{}"
                  url = "{}"{}{}
                }}"#,
-            provider, self.connection_string, namespaces, relation_mode
+            provider, "env(TEST_DATABASE_URL)", namespaces, relation_mode
         );
         datasource_block
     }
 
     pub fn datasource_block(&self) -> DatasourceBlock<'_> {
         self.args.datasource_block(
-            &self.connection_string,
+            "env(TEST_DATABASE_URL)",
             if self.is_vitess() && self.preview_features().contains(PreviewFeature::ReferentialIntegrity) {
                 &[("relationMode", r#""prisma""#)]
             } else {
