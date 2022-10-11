@@ -20,29 +20,25 @@ struct GetConfigError {
     message: String,
 }
 
-pub(crate) fn get_config(params: &str) -> String {
+pub(crate) fn get_config(params: &str) -> Result<String, String> {
     let params: GetConfigParams = match serde_json::from_str(params) {
         Ok(params) => params,
         Err(serde_err) => {
-            return json!({
-                "error": {
-                    "message": serde_err.to_string(),
-                }
-            })
-            .to_string();
+            panic!("Failed to deserialize GetConfigParams: {}", serde_err,);
         }
     };
 
-    match get_config_impl(params) {
-        Err(err) => json!({
-            "error": {
-                "message": err.message,
-                "error_code": err.error_code,
-            }
-        }),
-        Ok(value) => value,
-    }
-    .to_string()
+    get_config_impl(params)
+        .map_err(|err| {
+            json!({
+                "error": {
+                    "message": err.message,
+                    "error_code": err.error_code,
+                }
+            })
+            .to_string()
+        })
+        .map(|value| value.to_string())
 }
 
 fn get_config_impl(params: GetConfigParams) -> Result<serde_json::Value, GetConfigError> {
@@ -91,8 +87,8 @@ mod tests {
         let expected = expect![[
             r#"{"error":{"message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:5\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 4 | \u001b[0m\n\u001b[1;94m 5 | \u001b[0m            \u001b[1;91mdatasøurce yolo {\u001b[0m\n\u001b[1;94m 6 | \u001b[0m            }\n\u001b[1;94m   | \u001b[0m\n\u001b[1;91merror\u001b[0m: \u001b[1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:6\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 5 | \u001b[0m            datasøurce yolo {\n\u001b[1;94m 6 | \u001b[0m            \u001b[1;91m}\u001b[0m\n\u001b[1;94m 7 | \u001b[0m        \n\u001b[1;94m   | \u001b[0m\n\u001b[1;91merror\u001b[0m: \u001b[1mArgument \"provider\" is missing in generator block \"js\".\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:2\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 1 | \u001b[0m\n\u001b[1;94m 2 | \u001b[0m            \u001b[1;91mgenerator js {\u001b[0m\n\u001b[1;94m 3 | \u001b[0m            }\n\u001b[1;94m   | \u001b[0m\n","error_code":null}}"#
         ]];
-        let response = get_config(&request.to_string());
 
+        let response = get_config(&request.to_string()).unwrap_err();
         expected.assert_eq(&response);
     }
 
@@ -111,7 +107,7 @@ mod tests {
         let expected = expect![[
             r#"{"error":{"message":"\u001b[1;91merror\u001b[0m: \u001b[1mEnvironment variable not found: NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:4\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 3 | \u001b[0m                provider = \"postgresql\"\n\u001b[1;94m 4 | \u001b[0m                url = \u001b[1;91menv(\"NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST\")\u001b[0m\n\u001b[1;94m   | \u001b[0m\n","error_code":null}}"#
         ]];
-        let response = get_config(&request.to_string());
+        let response = get_config(&request.to_string()).unwrap_err();
         expected.assert_eq(&response);
     }
 
@@ -131,7 +127,7 @@ mod tests {
         let expected = expect![[
             r#"{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST","value":null}}],"warnings":[]}"#
         ]];
-        let response = get_config(&request.to_string());
+        let response = get_config(&request.to_string()).unwrap();
         expected.assert_eq(&response);
     }
 
@@ -153,7 +149,7 @@ mod tests {
         let expected = expect![[
             r#"{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"DBURL","value":"postgresql://example.com/mydb"}}],"warnings":[]}"#
         ]];
-        let response = get_config(&request.to_string());
+        let response = get_config(&request.to_string()).unwrap();
         expected.assert_eq(&response);
     }
 }
