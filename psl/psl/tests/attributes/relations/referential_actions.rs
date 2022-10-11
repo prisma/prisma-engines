@@ -96,6 +96,201 @@ fn actions_on_mongo() {
 }
 
 #[test]
+fn actions_on_mysql_with_prisma_relation_mode() {
+    let actions = &[Cascade, Restrict, NoAction, SetNull];
+
+    for action in actions {
+        let dml = formatdoc!(
+            r#"
+            generator client {{
+                provider = "prisma-client-js"
+                previewFeatures = ["referentialIntegrity"]
+            }}
+    
+            datasource db {{
+                provider = "mysql"
+                url = "mysql://"
+                relationMode = "prisma"
+            }}
+
+            model A {{
+                id Int @id
+                bs B[]
+            }}
+
+            model B {{
+                id Int @id
+                aId Int
+                a A @relation(fields: [aId], references: [id], onDelete: {action})
+            }}
+        "#,
+            action = action
+        );
+
+        parse(&dml)
+            .assert_has_model("B")
+            .assert_has_relation_field("a")
+            .assert_relation_delete_strategy(*action);
+    }
+}
+
+#[test]
+fn actions_on_sqlserver_with_prisma_relation_mode() {
+    let actions = &[Cascade, NoAction, SetNull];
+
+    for action in actions {
+        let dml = formatdoc!(
+            r#"
+            generator client {{
+                provider = "prisma-client-js"
+                previewFeatures = ["referentialIntegrity"]
+            }}
+    
+            datasource db {{
+                provider = "sqlserver"
+                url = "sqlserver://"
+                relationMode = "prisma"
+            }}
+
+            model A {{
+                id Int @id
+                bs B[]
+            }}
+
+            model B {{
+                id Int @id
+                aId Int
+                a A @relation(fields: [aId], references: [id], onDelete: {action})
+            }}
+        "#,
+            action = action
+        );
+
+        parse(&dml)
+            .assert_has_model("B")
+            .assert_has_relation_field("a")
+            .assert_relation_delete_strategy(*action);
+    }
+}
+
+#[test]
+fn actions_on_cockroachdb_with_prisma_relation_mode() {
+    let actions = &[Cascade, Restrict, NoAction, SetNull];
+
+    for action in actions {
+        let dml = formatdoc!(
+            r#"
+            generator client {{
+                provider = "prisma-client-js"
+                previewFeatures = ["referentialIntegrity"]
+            }}
+    
+            datasource db {{
+                provider = "cockroachdb"
+                url = "sqlserver://"
+                relationMode = "prisma"
+            }}
+
+            model A {{
+                id Int @id
+                bs B[]
+            }}
+
+            model B {{
+                id Int @id
+                aId Int
+                a A @relation(fields: [aId], references: [id], onDelete: {action})
+            }}
+        "#,
+            action = action
+        );
+
+        parse(&dml)
+            .assert_has_model("B")
+            .assert_has_relation_field("a")
+            .assert_relation_delete_strategy(*action);
+    }
+}
+
+#[test]
+fn actions_on_postgres_with_prisma_relation_mode() {
+    let actions = &[Cascade, Restrict, SetNull];
+
+    for action in actions {
+        let dml = formatdoc!(
+            r#"
+            generator client {{
+                provider = "prisma-client-js"
+                previewFeatures = ["referentialIntegrity"]
+            }}
+    
+            datasource db {{
+                provider = "postgres"
+                url = "postgres://"
+                relationMode = "prisma"
+            }}
+
+            model A {{
+                id Int @id
+                bs B[]
+            }}
+
+            model B {{
+                id Int @id
+                aId Int
+                a A @relation(fields: [aId], references: [id], onDelete: {action})
+            }}
+        "#,
+            action = action
+        );
+
+        parse(&dml)
+            .assert_has_model("B")
+            .assert_has_relation_field("a")
+            .assert_relation_delete_strategy(*action);
+    }
+}
+
+#[test]
+fn actions_on_sqlite_with_prisma_relation_mode() {
+    let actions = &[Cascade, Restrict, SetNull];
+
+    for action in actions {
+        let dml = formatdoc!(
+            r#"
+            generator client {{
+                provider = "prisma-client-js"
+                previewFeatures = ["referentialIntegrity"]
+            }}
+    
+            datasource db {{
+                provider = "sqlite"
+                url = "./dev.db"
+                relationMode = "prisma"
+            }}
+
+            model A {{
+                id Int @id
+                bs B[]
+            }}
+
+            model B {{
+                id Int @id
+                aId Int
+                a A @relation(fields: [aId], references: [id], onDelete: {action})
+            }}
+        "#,
+            action = action
+        );
+
+        parse(&dml)
+            .assert_has_model("B")
+            .assert_has_relation_field("a")
+            .assert_relation_delete_strategy(*action);
+    }
+}
+
+#[test]
 fn on_delete_actions_should_work_on_prisma_relation_mode() {
     let actions = &[Restrict, SetNull, Cascade, NoAction];
 
@@ -374,6 +569,158 @@ fn restrict_should_not_work_on_sql_server() {
     "#]];
 
     expected.assert_eq(&parse_unwrap_err(dml));
+}
+
+#[test]
+fn on_update_no_action_should_not_work_on_postgres_with_prisma_relation_mode() {
+    let dml = indoc! { r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialIntegrity"]
+        }
+
+        datasource db {
+            provider = "postgres"
+            url = "postgres://"
+            relationMode = "prisma"
+        }
+
+        model A {
+            id Int @id
+            bs B[]
+        }
+
+        model B {
+            id Int @id
+            aId Int
+            a A @relation(fields: [aId], references: [id], onUpdate: NoAction, onDelete: Cascade)
+        }
+    "#};
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating: Invalid referential action: `NoAction`. Allowed values: (`Cascade`, `Restrict`, `SetNull`). `NoAction` is not implemented for Postgres when using `relationMode = "prisma"`, you could try using `Restrict` instead. Learn more at https://pris.ly/d/relationMode[0m
+          [1;94m-->[0m  [4mschema.prisma:20[0m
+        [1;94m   | [0m
+        [1;94m19 | [0m    aId Int
+        [1;94m20 | [0m    a A @relation(fields: [aId], references: [id], [1;91monUpdate: NoAction[0m, onDelete: Cascade)
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(dml, &expected);
+}
+
+#[test]
+fn on_delete_no_action_should_not_work_on_postgres_with_prisma_relation_mode() {
+    let dml = indoc! { r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialIntegrity"]
+        }
+
+        datasource db {
+            provider = "postgres"
+            url = "postgres://"
+            relationMode = "prisma"
+        }
+
+        model A {
+            id Int @id
+            bs B[]
+        }
+
+        model B {
+            id Int @id
+            aId Int
+            a A @relation(fields: [aId], references: [id], onUpdate: Cascade, onDelete: NoAction)
+        }
+    "#};
+
+    let expected = expect!([r#"
+        [1;91merror[0m: [1mError validating: Invalid referential action: `NoAction`. Allowed values: (`Cascade`, `Restrict`, `SetNull`). `NoAction` is not implemented for Postgres when using `relationMode = "prisma"`, you could try using `Restrict` instead. Learn more at https://pris.ly/d/relationMode[0m
+          [1;94m-->[0m  [4mschema.prisma:20[0m
+        [1;94m   | [0m
+        [1;94m19 | [0m    aId Int
+        [1;94m20 | [0m    a A @relation(fields: [aId], references: [id], onUpdate: Cascade, [1;91monDelete: NoAction[0m)
+        [1;94m   | [0m
+    "#]);
+
+    expect_error(dml, &expected);
+}
+
+#[test]
+fn on_update_no_action_should_not_work_on_sqlite_with_prisma_relation_mode() {
+    let dml = indoc! { r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialIntegrity"]
+        }
+
+        datasource db {
+            provider = "sqlite"
+            url = "./dev.db"
+            relationMode = "prisma"
+        }
+
+        model A {
+            id Int @id
+            bs B[]
+        }
+
+        model B {
+            id Int @id
+            aId Int
+            a A @relation(fields: [aId], references: [id], onUpdate: NoAction, onDelete: Cascade)
+        }
+    "#};
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating: Invalid referential action: `NoAction`. Allowed values: (`Cascade`, `Restrict`, `SetNull`). `NoAction` is not implemented for sqlite when using `relationMode = "prisma"`, you could try using `Restrict` instead. Learn more at https://pris.ly/d/relationMode[0m
+          [1;94m-->[0m  [4mschema.prisma:20[0m
+        [1;94m   | [0m
+        [1;94m19 | [0m    aId Int
+        [1;94m20 | [0m    a A @relation(fields: [aId], references: [id], [1;91monUpdate: NoAction[0m, onDelete: Cascade)
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(dml, &expected);
+}
+
+#[test]
+fn on_delete_no_action_should_not_work_on_sqlite_with_prisma_relation_mode() {
+    let dml = indoc! { r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialIntegrity"]
+        }
+
+        datasource db {
+            provider = "sqlite"
+            url = "./dev.db"
+            relationMode = "prisma"
+        }
+
+        model A {
+            id Int @id
+            bs B[]
+        }
+
+        model B {
+            id Int @id
+            aId Int
+            a A @relation(fields: [aId], references: [id], onUpdate: Cascade, onDelete: NoAction)
+        }
+    "#};
+
+    let expected = expect!([r#"
+        [1;91merror[0m: [1mError validating: Invalid referential action: `NoAction`. Allowed values: (`Cascade`, `Restrict`, `SetNull`). `NoAction` is not implemented for sqlite when using `relationMode = "prisma"`, you could try using `Restrict` instead. Learn more at https://pris.ly/d/relationMode[0m
+          [1;94m-->[0m  [4mschema.prisma:20[0m
+        [1;94m   | [0m
+        [1;94m19 | [0m    aId Int
+        [1;94m20 | [0m    a A @relation(fields: [aId], references: [id], onUpdate: Cascade, [1;91monDelete: NoAction[0m)
+        [1;94m   | [0m
+    "#]);
+
+    expect_error(dml, &expected);
 }
 
 #[test]

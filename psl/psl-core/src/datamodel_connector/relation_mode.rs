@@ -16,19 +16,10 @@ pub enum RelationMode {
 }
 
 impl RelationMode {
-    /// Returns either the given actions if foreign keys are used, or the
-    /// allowed emulated actions if referential integrity happens in Prisma.
-    pub fn allowed_referential_actions(
-        &self,
-        from_connector: BitFlags<ReferentialAction>,
-    ) -> BitFlags<ReferentialAction> {
+    pub fn allowed_emulated_referential_actions_default() -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
-        match self {
-            Self::ForeignKeys => from_connector,
-            // The emulated modes should be listed here.
-            Self::Prisma => Restrict | SetNull | NoAction | Cascade,
-        }
+        Restrict | SetNull | NoAction | Cascade
     }
 
     pub fn is_prisma(&self) -> bool {
