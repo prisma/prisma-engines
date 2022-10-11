@@ -363,6 +363,19 @@
 <span id="363">363</span>
 <span id="364">364</span>
 <span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The interface implemented by connectors for Prisma schema validation and interpretation.</span>
 
 <span class="doccomment">/// Connector capabilities</span>
@@ -447,7 +460,17 @@
     }
 
     <span class="doccomment">/// The referential actions supported by the connector.</span>
-    <span class="kw">fn</span> <span class="ident">referential_actions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">relation_mode</span>: <span class="kw-2">&amp;</span><span class="ident">RelationMode</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">referential_actions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span>;
+
+    <span class="doccomment">/// The referential actions supported when using relationMode = &quot;prisma&quot; by the connector.</span>
+    <span class="doccomment">/// There are in fact scenarios in which the set of emulated referential actions supported may change</span>
+    <span class="doccomment">/// depending on the connector. For example, Postgres&#39; NoAction mode behaves similarly to Restrict</span>
+    <span class="doccomment">/// (raising an error if any referencing rows still exist when the constraint is checked), but with</span>
+    <span class="doccomment">/// a subtle twist we decided not to emulate: NO ACTION allows the check to be deferred until later</span>
+    <span class="doccomment">/// in the transaction, whereas RESTRICT does not.</span>
+    <span class="kw">fn</span> <span class="ident">emulated_referential_actions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
+        <span class="ident">RelationMode::allowed_emulated_referential_actions_default</span>()
+    }
 
     <span class="kw">fn</span> <span class="ident">supports_composite_types</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::CompositeTypes</span>)
@@ -466,7 +489,10 @@
     }
 
     <span class="kw">fn</span> <span class="ident">supports_referential_action</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">relation_mode</span>: <span class="kw-2">&amp;</span><span class="ident">RelationMode</span>, <span class="ident">action</span>: <span class="ident">ReferentialAction</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">referential_actions</span>(<span class="ident">relation_mode</span>).<span class="ident">contains</span>(<span class="ident">action</span>)
+        <span class="kw">match</span> <span class="ident">relation_mode</span> {
+            <span class="ident">RelationMode::ForeignKeys</span> =&gt; <span class="self">self</span>.<span class="ident">referential_actions</span>().<span class="ident">contains</span>(<span class="ident">action</span>),
+            <span class="ident">RelationMode::Prisma</span> =&gt; <span class="self">self</span>.<span class="ident">emulated_referential_actions</span>().<span class="ident">contains</span>(<span class="ident">action</span>),
+        }
     }
 
     <span class="doccomment">/// This is used by the query engine schema builder.</span>

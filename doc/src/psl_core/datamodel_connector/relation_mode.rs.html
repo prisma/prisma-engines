@@ -46,15 +46,6 @@
 <span id="46">46</span>
 <span id="47">47</span>
 <span id="48">48</span>
-<span id="49">49</span>
-<span id="50">50</span>
-<span id="51">51</span>
-<span id="52">52</span>
-<span id="53">53</span>
-<span id="54">54</span>
-<span id="55">55</span>
-<span id="56">56</span>
-<span id="57">57</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::datamodel_connector::ReferentialAction</span>;
 <span class="kw">use</span> <span class="ident">enumflags2</span>::{<span class="ident">bitflags</span>, <span class="ident">BitFlags</span>};
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -73,19 +64,10 @@
 }
 
 <span class="kw">impl</span> <span class="ident">RelationMode</span> {
-    <span class="doccomment">/// Returns either the given actions if foreign keys are used, or the</span>
-    <span class="doccomment">/// allowed emulated actions if referential integrity happens in Prisma.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allowed_referential_actions</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">from_connector</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allowed_emulated_referential_actions_default</span>() -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">ReferentialAction</span>::<span class="kw-2">*</span>;
 
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::ForeignKeys</span> =&gt; <span class="ident">from_connector</span>,
-            <span class="comment">// The emulated modes should be listed here.</span>
-            <span class="ident"><span class="self">Self</span>::Prisma</span> =&gt; <span class="ident">Restrict</span> <span class="op">|</span> <span class="ident">SetNull</span> <span class="op">|</span> <span class="ident">NoAction</span> <span class="op">|</span> <span class="ident">Cascade</span>,
-        }
+        <span class="ident">Restrict</span> <span class="op">|</span> <span class="ident">SetNull</span> <span class="op">|</span> <span class="ident">NoAction</span> <span class="op">|</span> <span class="ident">Cascade</span>
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_prisma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
