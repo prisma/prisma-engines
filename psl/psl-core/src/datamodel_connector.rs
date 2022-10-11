@@ -79,8 +79,8 @@ pub trait Connector: Send + Sync {
     /// (raising an error if any referencing rows still exist when the constraint is checked), but with
     /// a subtle twist we decided not to emulate: NO ACTION allows the check to be deferred until later
     /// in the transaction, whereas RESTRICT does not.
-    fn emulated_referential_actions(&self, relation_mode: &RelationMode) -> BitFlags<ReferentialAction> {
-        relation_mode.allowed_emulated_referential_actions_default()
+    fn emulated_referential_actions(&self) -> BitFlags<ReferentialAction> {
+        RelationMode::allowed_emulated_referential_actions_default()
     }
 
     fn supports_composite_types(&self) -> bool {
@@ -102,7 +102,7 @@ pub trait Connector: Send + Sync {
     fn supports_referential_action(&self, relation_mode: &RelationMode, action: ReferentialAction) -> bool {
         match relation_mode {
             RelationMode::ForeignKeys => self.referential_actions().contains(action),
-            RelationMode::Prisma => self.emulated_referential_actions(relation_mode).contains(action),
+            RelationMode::Prisma => self.emulated_referential_actions().contains(action),
         }
     }
 

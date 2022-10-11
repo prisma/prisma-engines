@@ -1,8 +1,6 @@
 use enumflags2::BitFlags;
 use psl_core::{
-    datamodel_connector::{
-        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, RelationMode,
-    },
+    datamodel_connector::{Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance},
     diagnostics::{DatamodelError, Span},
     parser_database::{ReferentialAction, ScalarType},
 };
@@ -49,7 +47,7 @@ impl Connector for SqliteDatamodelConnector {
         SetNull | SetDefault | Cascade | Restrict | NoAction
     }
 
-    fn emulated_referential_actions(&self, _relation_mode: &RelationMode) -> BitFlags<ReferentialAction> {
+    fn emulated_referential_actions(&self) -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
         Restrict | SetNull | Cascade

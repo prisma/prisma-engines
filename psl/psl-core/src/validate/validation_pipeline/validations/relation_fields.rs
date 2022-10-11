@@ -160,13 +160,13 @@ pub(super) fn referential_actions(field: RelationFieldWalker<'_>, ctx: &mut Cont
 
     // validation template for relationMode = "prisma"
     let msg_prisma = |action: ReferentialAction| {
-        let allowed_actions = connector.emulated_referential_actions(&relation_mode);
+        let allowed_actions = connector.emulated_referential_actions();
 
         let additional_info = match action {
             ReferentialAction::NoAction => {
                 if ctx
                     .connector
-                    .emulated_referential_actions(&relation_mode)
+                    .emulated_referential_actions()
                     .contains(ReferentialAction::Restrict)
                 {
                     Some(format!(
