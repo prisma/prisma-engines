@@ -1020,34 +1020,32 @@ fn all_postgres_column_types_must_work(api: TestApi) {
     expected_ext.assert_debug_eq(&ext);
 }
 
-//Todo(matthias) This should be handled on a higher level
-//preferably in the introspection engine based on the presence of the multi schema feature flag
-// #[test_connector(tags(Postgres))]
-// fn cross_schema_references_are_not_allowed(api: TestApi) {
-//     let schema2 = format!("{}_2", api.schema_name());
-//
-//     let sql = format!(
-//         "DROP SCHEMA IF EXISTS \"{0}\" CASCADE;
-//          CREATE SCHEMA \"{0}\";
-//          CREATE TABLE \"{0}\".\"City\" (id INT PRIMARY KEY);
-//          CREATE TABLE \"User\" (
-//             id INT PRIMARY KEY,
-//             city INT REFERENCES \"{0}\".\"City\" (id) ON DELETE NO ACTION
-//         );
-//         ",
-//         schema2,
-//     );
-//
-//     api.raw_cmd(&sql);
-//
-//     let err = api.describe_error();
-//     let fk_name = "User_city_fkey";
-//
-//     assert_eq!(
-//         format!("Illegal cross schema reference from `prisma-tests.User` to `prisma-tests_2.City` in constraint `{}`. Foreign keys between database schemas are not supported in Prisma. Please follow the GitHub ticket: https://github.com/prisma/prisma/issues/1175", fk_name),
-//         err.to_string()
-//     );
-// }
+#[test_connector(tags(Postgres))]
+fn cross_schema_references_are_not_allowed(api: TestApi) {
+    let schema2 = format!("{}_2", api.schema_name());
+
+    let sql = format!(
+        "DROP SCHEMA IF EXISTS \"{0}\" CASCADE;
+         CREATE SCHEMA \"{0}\";
+         CREATE TABLE \"{0}\".\"City\" (id INT PRIMARY KEY);
+         CREATE TABLE \"User\" (
+            id INT PRIMARY KEY,
+            city INT REFERENCES \"{0}\".\"City\" (id) ON DELETE NO ACTION
+        );
+        ",
+        schema2,
+    );
+
+    api.raw_cmd(&sql);
+
+    let err = api.describe_error();
+    let fk_name = "User_city_fkey";
+
+    assert_eq!(
+        format!("Illegal cross schema reference from `prisma-tests.User` to `prisma-tests_2.City` in constraint `{}`. Foreign keys between database schemas are not supported in Prisma. Please follow the GitHub ticket: https://github.com/prisma/prisma/issues/1175", fk_name),
+        err.to_string()
+    );
+}
 
 #[test_connector(tags(Postgres))]
 fn postgres_foreign_key_on_delete_must_be_handled(api: TestApi) {
@@ -1847,8 +1845,450 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
     expected_schema.assert_debug_eq(&schema);
 }
 
+#[test_connector(tags(Postgres))]
+fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
+    let schema = r#"
+           CREATE Schema "schema_0";
+           CREATE TABLE "schema_0"."Table_0" ("other" Integer, "id_0" SERIAL PRIMARY KEY);
+           CREATE TABLE "schema_0"."Table_1" ("id_1" SERIAL PRIMARY KEY, o_id_0 Integer);
+           ALTER TABLE "schema_0"."Table_1" ADD CONSTRAINT "fk_0" FOREIGN KEY ("o_id_0") REFERENCES "schema_0"."Table_0" ("id_0");
+
+           CREATE Schema "schema_1";
+           CREATE TABLE "schema_1"."Table_0" ("id_2" SERIAL PRIMARY KEY);
+           CREATE TABLE "schema_1"."Table_1" ("id_3" SERIAL PRIMARY KEY, o_id_0 Integer);
+           ALTER TABLE "schema_1"."Table_1" ADD CONSTRAINT "fk_0" FOREIGN KEY ("o_id_0") REFERENCES "schema_1"."Table_0" ("id_2");
+           
+           CREATE TABLE "schema_1"."Table_2" ("id_4" SERIAL PRIMARY KEY, o_id_0 Integer);
+           ALTER TABLE "schema_1"."Table_2" ADD CONSTRAINT "fk_1" FOREIGN KEY ("o_id_0") REFERENCES "schema_0"."Table_0" ("id_0");
+    "#;
+
+    api.raw_cmd(schema);
+    let schema = api.describe_with_schemas(&["schema_0", "schema_1"]);
+
+    let expected_schema = expect![[r#"
+        SqlSchema {
+            namespaces: [
+                "schema_0",
+                "schema_1",
+            ],
+            tables: [
+                Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
+                    name: "Table_0",
+                },
+                Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
+                    name: "Table_1",
+                },
+                Table {
+                    namespace_id: NamespaceId(
+                        1,
+                    ),
+                    name: "Table_0",
+                },
+                Table {
+                    namespace_id: NamespaceId(
+                        1,
+                    ),
+                    name: "Table_1",
+                },
+                Table {
+                    namespace_id: NamespaceId(
+                        1,
+                    ),
+                    name: "Table_2",
+                },
+            ],
+            enums: [],
+            columns: [
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "other",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Nullable,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "id_0",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Sequence(
+                                    "Table_0_id_0_seq",
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: true,
+                    },
+                ),
+                (
+                    TableId(
+                        1,
+                    ),
+                    Column {
+                        name: "id_1",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Sequence(
+                                    "Table_1_id_1_seq",
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: true,
+                    },
+                ),
+                (
+                    TableId(
+                        1,
+                    ),
+                    Column {
+                        name: "o_id_0",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Nullable,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        2,
+                    ),
+                    Column {
+                        name: "id_2",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Sequence(
+                                    "Table_0_id_2_seq",
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: true,
+                    },
+                ),
+                (
+                    TableId(
+                        3,
+                    ),
+                    Column {
+                        name: "id_3",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Sequence(
+                                    "Table_1_id_3_seq",
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: true,
+                    },
+                ),
+                (
+                    TableId(
+                        3,
+                    ),
+                    Column {
+                        name: "o_id_0",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Nullable,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        4,
+                    ),
+                    Column {
+                        name: "id_4",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Sequence(
+                                    "Table_2_id_4_seq",
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: true,
+                    },
+                ),
+                (
+                    TableId(
+                        4,
+                    ),
+                    Column {
+                        name: "o_id_0",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Nullable,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+            ],
+            foreign_keys: [
+                ForeignKey {
+                    constrained_table: TableId(
+                        1,
+                    ),
+                    referenced_table: TableId(
+                        0,
+                    ),
+                    constraint_name: Some(
+                        "fk_0",
+                    ),
+                    on_delete_action: NoAction,
+                    on_update_action: NoAction,
+                },
+                ForeignKey {
+                    constrained_table: TableId(
+                        3,
+                    ),
+                    referenced_table: TableId(
+                        2,
+                    ),
+                    constraint_name: Some(
+                        "fk_0",
+                    ),
+                    on_delete_action: NoAction,
+                    on_update_action: NoAction,
+                },
+                ForeignKey {
+                    constrained_table: TableId(
+                        4,
+                    ),
+                    referenced_table: TableId(
+                        0,
+                    ),
+                    constraint_name: Some(
+                        "fk_1",
+                    ),
+                    on_delete_action: NoAction,
+                    on_update_action: NoAction,
+                },
+            ],
+            foreign_key_columns: [
+                ForeignKeyColumn {
+                    foreign_key_id: ForeignKeyId(
+                        0,
+                    ),
+                    constrained_column: ColumnId(
+                        3,
+                    ),
+                    referenced_column: ColumnId(
+                        1,
+                    ),
+                },
+                ForeignKeyColumn {
+                    foreign_key_id: ForeignKeyId(
+                        1,
+                    ),
+                    constrained_column: ColumnId(
+                        6,
+                    ),
+                    referenced_column: ColumnId(
+                        4,
+                    ),
+                },
+                ForeignKeyColumn {
+                    foreign_key_id: ForeignKeyId(
+                        2,
+                    ),
+                    constrained_column: ColumnId(
+                        8,
+                    ),
+                    referenced_column: ColumnId(
+                        1,
+                    ),
+                },
+            ],
+            indexes: [
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "Table_0_pkey",
+                    tpe: PrimaryKey,
+                },
+                Index {
+                    table_id: TableId(
+                        1,
+                    ),
+                    index_name: "Table_1_pkey",
+                    tpe: PrimaryKey,
+                },
+                Index {
+                    table_id: TableId(
+                        2,
+                    ),
+                    index_name: "Table_0_pkey",
+                    tpe: PrimaryKey,
+                },
+                Index {
+                    table_id: TableId(
+                        3,
+                    ),
+                    index_name: "Table_1_pkey",
+                    tpe: PrimaryKey,
+                },
+                Index {
+                    table_id: TableId(
+                        4,
+                    ),
+                    index_name: "Table_2_pkey",
+                    tpe: PrimaryKey,
+                },
+            ],
+            index_columns: [
+                IndexColumn {
+                    index_id: IndexId(
+                        0,
+                    ),
+                    column_id: ColumnId(
+                        1,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        1,
+                    ),
+                    column_id: ColumnId(
+                        2,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        2,
+                    ),
+                    column_id: ColumnId(
+                        4,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        3,
+                    ),
+                    column_id: ColumnId(
+                        5,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        4,
+                    ),
+                    column_id: ColumnId(
+                        7,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+            ],
+            views: [],
+            procedures: [],
+            user_defined_types: [],
+            connector_data: <ConnectorData>,
+        }
+    "#]];
+
+    expected_schema.assert_debug_eq(&schema);
+}
+
 #[test_connector(tags(Postgres11))]
-//Todo(matthias) seems like Sequence and Type share the same namespace
 fn multiple_schemas_are_described(api: TestApi) {
     let schema = r#"
            CREATE Schema "schema_0";

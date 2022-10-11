@@ -13,7 +13,8 @@ WITH rawindex AS (
         indpred IS NULL -- filter out partial indexes
         AND array_position(indkey::int2[], 0::int2) IS NULL -- filter out expression indexes
 )
-SELECT 
+SELECT
+    schemainfo.nspname AS namespace,
     indexinfo.relname AS index_name,
     tableinfo.relname AS table_name,
     columninfo.attname AS column_name,
@@ -38,4 +39,4 @@ FROM
     LEFT JOIN pg_opclass AS opclass -- left join because crdb has no opclasses
         ON opclass.oid = rawindex.indclass
 WHERE schemainfo.nspname = ANY ( $1 )
-ORDER BY schemainfo.nspname, tableinfo.relname, indexinfo.relname, rawindex.indkeyidx;
+ORDER BY namespace, table_name, index_name, column_index;

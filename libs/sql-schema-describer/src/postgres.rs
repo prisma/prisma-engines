@@ -15,7 +15,6 @@ use regex::Regex;
 use std::{any::type_name, collections::BTreeMap, convert::TryInto};
 use tracing::trace;
 
-//Todo(matthias) this will need a namespace
 /// A PostgreSQL sequence.
 /// https://www.postgresql.org/docs/current/view-pg-sequences.html
 #[derive(Debug)]
@@ -523,7 +522,10 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(())
     }
 
-    async fn get_table_names(&self, sql_schema: &mut SqlSchema) -> DescriberResult<IndexMap<String, TableId>> {
+    async fn get_table_names(
+        &self,
+        sql_schema: &mut SqlSchema,
+    ) -> DescriberResult<IndexMap<(String, String), TableId>> {
         let sql = include_str!("postgres/tables_query.sql");
         let namespaces = &sql_schema.namespaces;
 
@@ -542,7 +544,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         for (table_name, namespace) in names {
             let cloned_name = table_name.clone();
             let id = sql_schema.push_table(table_name, sql_schema.get_namespace_id(&namespace));
-            map.insert(cloned_name, id);
+            map.insert((namespace, cloned_name), id);
         }
 
         Ok(map)
@@ -765,7 +767,7 @@ impl<'a> SqlSchemaDescriber<'a> {
     /// Returns a map from table name to foreign keys.
     async fn get_foreign_keys(
         &self,
-        table_ids: &IndexMap<String, TableId>,
+        table_ids: &IndexMap<(String, String), TableId>,
         sql_schema: &mut SqlSchema,
     ) -> DescriberResult<()> {
         let namespaces = &sql_schema.namespaces;
@@ -783,8 +785,11 @@ impl<'a> SqlSchemaDescriber<'a> {
                 conname         AS constraint_name,
                 child,
                 parent,
-                table_name
-            FROM (SELECT unnest(con1.conkey)                AS "parent",
+                table_name, 
+                namespace
+            FROM (SELECT 
+                        ns.nspname AS "namespace",
+                        unnest(con1.conkey)                AS "parent",
                         unnest(con1.confkey)                AS "child",
                         cl.relname                          AS table_name,
                         ns.nspname                          AS schema_name,
@@ -808,21 +813,23 @@ impl<'a> SqlSchemaDescriber<'a> {
                     JOIN pg_attribute att2 on att2.attrelid = con.conrelid and att2.attnum = con.parent
                     JOIN pg_class rel_cl on con.confrelid = rel_cl.oid
                     JOIN pg_namespace rel_ns on rel_cl.relnamespace = rel_ns.oid
-            ORDER BY table_name, constraint_name, con_id, con.colidx;
+            ORDER BY namespace, table_name, constraint_name, con_id, con.colidx;
         "#;
 
         let mut current_fk: Option<(i64, ForeignKeyId)> = None;
 
         fn get_ids(
-            table_name: &str,
+            namespace: String,
+            table_name: String,
             column_name: &str,
-            referenced_table_name: &str,
+            referenced_schema_name: String,
+            referenced_table_name: String,
             referenced_column_name: &str,
-            table_ids: &IndexMap<String, TableId>,
+            table_ids: &IndexMap<(String, String), TableId>,
             sql_schema: &SqlSchema,
         ) -> Option<(TableId, ColumnId, TableId, ColumnId)> {
-            let table_id = *table_ids.get(table_name)?;
-            let referenced_table_id = *table_ids.get(referenced_table_name)?;
+            let table_id = *table_ids.get(&(namespace, table_name))?;
+            let referenced_table_id = *table_ids.get(&(referenced_schema_name, referenced_table_name))?;
             let column_id = sql_schema.walk(table_id).column(column_name)?.id;
             let referenced_column_id = sql_schema.walk(referenced_table_id).column(referenced_column_name)?.id;
 
@@ -838,29 +845,32 @@ impl<'a> SqlSchemaDescriber<'a> {
                 &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
             )
             .await?;
+
         for row in result_set.into_iter() {
             trace!("Got description FK row {:?}", row);
             let id = row.get_expect_i64("con_id");
-            let column_name = row.get_expect_string("child_column");
+            let namespace = row.get_expect_string("namespace");
             let table_name = row.get_expect_string("table_name");
+            let column_name = row.get_expect_string("child_column");
             let constraint_name = row.get_expect_string("constraint_name");
             let referenced_table = row.get_expect_string("parent_table");
             let referenced_column = row.get_expect_string("parent_column");
 
-            //Todo(matthias) Feature flag this at a higher level
-            // let referenced_schema_name = row.get_expect_string("referenced_schema_name");
-            // if schema != referenced_schema_name {
-            //     return Err(DescriberError::from(DescriberErrorKind::CrossSchemaReference {
-            //         from: format!("{}.{}", schema, table_name),
-            //         to: format!("{}.{}", referenced_schema_name, referenced_table),
-            //         constraint: constraint_name,
-            //     }));
-            // }
+            let referenced_schema_name = row.get_expect_string("referenced_schema_name");
+            if !sql_schema.namespaces.contains(&referenced_schema_name) {
+                return Err(DescriberError::from(DescriberErrorKind::CrossSchemaReference {
+                    from: format!("{}.{}", sql_schema.namespaces[0], table_name), //TODO(matthias)
+                    to: format!("{}.{}", referenced_schema_name, referenced_table),
+                    constraint: constraint_name,
+                }));
+            }
 
             let (table_id, column_id, referenced_table_id, referenced_column_id) = if let Some(ids) = get_ids(
-                &table_name,
+                namespace,
+                table_name,
                 &column_name,
-                &referenced_table,
+                referenced_schema_name,
+                referenced_table,
                 &referenced_column,
                 table_ids,
                 sql_schema,
@@ -917,7 +927,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
     async fn get_indices(
         &self,
-        table_ids: &IndexMap<String, TableId>,
+        table_ids: &IndexMap<(String, String), TableId>,
         pg_ext: &mut PostgresSchemaExt,
         sql_schema: &mut SqlSchema,
     ) -> DescriberResult<()> {
@@ -933,8 +943,9 @@ impl<'a> SqlSchemaDescriber<'a> {
         let mut current_index: Option<IndexId> = None;
 
         for row in rows {
+            let namespace = row.get_expect_string("namespace");
             let table_name = row.get_expect_string("table_name");
-            let table_id: TableId = match table_ids.get(&table_name) {
+            let table_id: TableId = match table_ids.get(&(namespace, table_name)) {
                 Some(id) => *id,
                 None => continue,
             };
