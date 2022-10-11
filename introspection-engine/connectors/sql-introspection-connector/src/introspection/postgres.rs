@@ -18,7 +18,7 @@ pub(super) fn calculate_configuration(previous_config: &Configuration, schema: &
     }
 
     let pg_schema_ext: &PostgresSchemaExt = schema.downcast_connector_data();
-    let previous_datasource = previous_config.datasources.iter().next().unwrap();
+    let previous_datasource = previous_config.datasources.first().unwrap();
 
     let previous_connector_data = previous_datasource
         .connector_data
@@ -79,14 +79,14 @@ pub(super) fn calculate_configuration(previous_config: &Configuration, schema: &
         provider: previous_datasource.provider.clone(),
         active_provider: previous_datasource.active_provider,
         url: previous_datasource.url.clone(),
-        url_span: previous_datasource.url_span.clone(),
+        url_span: previous_datasource.url_span,
         documentation: previous_datasource.documentation.clone(),
         active_connector: previous_datasource.active_connector,
         shadow_database_url: previous_datasource.shadow_database_url.clone(),
         referential_integrity: previous_datasource.referential_integrity,
         relation_mode: previous_datasource.relation_mode,
         schemas: previous_datasource.schemas.clone(),
-        schemas_span: previous_datasource.schemas_span.clone(),
+        schemas_span: previous_datasource.schemas_span,
         connector_data: DatasourceConnectorData::new(Box::new(pg_datasource_ext)),
     };
 

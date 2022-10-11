@@ -172,9 +172,9 @@ pub(crate) fn introspect(ctx: &Context, warnings: &mut Vec<Warning>) -> Result<(
     let is_empty = datamodel.is_empty();
 
     let data_model = if ctx.render_config {
-        match calculate_configuration(&ctx.config, &schema) {
+        match calculate_configuration(ctx.config, schema) {
             Some(config) => psl::render_datamodel_and_config_to_string(&datamodel, &config),
-            None => psl::render_datamodel_and_config_to_string(&datamodel, &ctx.config),
+            None => psl::render_datamodel_and_config_to_string(&datamodel, ctx.config),
         }
     } else {
         psl::render_datamodel_to_string(&datamodel, Some(ctx.config))
