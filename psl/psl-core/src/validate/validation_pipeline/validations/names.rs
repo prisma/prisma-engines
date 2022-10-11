@@ -1,7 +1,6 @@
 use super::constraint_namespace::ConstraintNamespace;
 use crate::ast::{FieldId, ModelId};
-use crate::datamodel_connector::Connector;
-use parser_database::{walkers::RelationName, ParserDatabase};
+use parser_database::walkers::RelationName;
 use std::collections::{HashMap, HashSet};
 
 type RelationIdentifier<'db> = (ModelId, ModelId, RelationName<'db>);
@@ -22,13 +21,13 @@ pub(super) struct Names<'db> {
 }
 
 impl<'db> Names<'db> {
-    pub(super) fn new(db: &'db ParserDatabase, connector: &dyn Connector) -> Self {
+    pub(super) fn new(ctx: &super::Context<'db>) -> Self {
         let mut relation_names: HashMap<RelationIdentifier<'db>, Vec<FieldId>> = HashMap::new();
         let mut index_names: HashSet<(ModelId, &'db str)> = HashSet::new();
         let mut unique_names: HashSet<(ModelId, &'db str)> = HashSet::new();
         let mut primary_key_names: HashMap<ModelId, &'db str> = HashMap::new();
 
-        for model in db.walk_models() {
+        for model in ctx.db.walk_models() {
             let model_id = model.model_id();
 
             for field in model.relation_fields() {
@@ -61,7 +60,7 @@ impl<'db> Names<'db> {
             index_names,
             unique_names,
             primary_key_names,
-            constraint_namespace: infer_namespaces(db, connector),
+            constraint_namespace: infer_namespaces(ctx),
         }
     }
 
@@ -91,44 +90,44 @@ impl<'db> Names<'db> {
 
 /// Generate namespaces per database requirements, and add the names to it from the constraints
 /// part of the namespace.
-fn infer_namespaces<'db>(db: &'db ParserDatabase, connector: &dyn Connector) -> ConstraintNamespace<'db> {
+fn infer_namespaces<'a>(ctx: &super::Context<'a>) -> ConstraintNamespace<'a> {
     use crate::datamodel_connector::ConstraintScope;
 
     let mut namespaces = ConstraintNamespace::default();
 
-    for scope in connector.constraint_violation_scopes() {
+    for scope in ctx.connector.constraint_violation_scopes() {
         match scope {
             ConstraintScope::GlobalKeyIndex => {
-                namespaces.add_global_indexes(db, connector, *scope);
+                namespaces.add_global_indexes(*scope, ctx);
             }
             ConstraintScope::GlobalForeignKey => {
-                namespaces.add_global_relations(db, connector, *scope);
+                namespaces.add_global_relations(*scope, ctx);
             }
             ConstraintScope::GlobalPrimaryKeyKeyIndex => {
-                namespaces.add_global_primary_keys(db, connector, *scope);
-                namespaces.add_global_indexes(db, connector, *scope);
+                namespaces.add_global_primary_keys(*scope, ctx);
+                namespaces.add_global_indexes(*scope, ctx);
             }
             ConstraintScope::GlobalPrimaryKeyForeignKeyDefault => {
-                namespaces.add_global_primary_keys(db, connector, *scope);
-                namespaces.add_global_relations(db, connector, *scope);
-                namespaces.add_global_default_constraints(db, connector, *scope);
+                namespaces.add_global_primary_keys(*scope, ctx);
+                namespaces.add_global_relations(*scope, ctx);
+                namespaces.add_global_default_constraints(*scope, ctx);
             }
             ConstraintScope::ModelKeyIndex => {
-                namespaces.add_local_indexes(db, connector, *scope);
+                namespaces.add_local_indexes(*scope, ctx);
             }
             ConstraintScope::ModelPrimaryKeyKeyIndex => {
-                namespaces.add_local_primary_keys(db, connector, *scope);
-                namespaces.add_local_indexes(db, connector, *scope);
+                namespaces.add_local_primary_keys(*scope, ctx);
+                namespaces.add_local_indexes(*scope, ctx);
             }
             ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey => {
-                namespaces.add_local_primary_keys(db, connector, *scope);
-                namespaces.add_local_indexes(db, connector, *scope);
-                namespaces.add_local_relations(db, connector, *scope);
+                namespaces.add_local_primary_keys(*scope, ctx);
+                namespaces.add_local_indexes(*scope, ctx);
+                namespaces.add_local_relations(*scope, ctx);
             }
         }
     }
 
-    namespaces.add_local_custom_names_for_primary_keys_and_uniques(db);
+    namespaces.add_local_custom_names_for_primary_keys_and_uniques(ctx);
 
     namespaces
 }

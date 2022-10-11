@@ -1,9 +1,22 @@
 use crate::{
     datamodel_connector::ConnectorCapability,
     diagnostics::DatamodelError,
-    parser_database::{self, walkers::EnumWalker},
+    parser_database::{self, ast::WithSpan, walkers::EnumWalker},
     validate::validation_pipeline::context::Context,
 };
+use std::collections::HashSet;
+
+pub(super) fn database_name_clashes(ctx: &mut Context<'_>) {
+    let mut database_names: HashSet<(Option<&str>, &str)> = HashSet::with_capacity(ctx.db.enums_count());
+
+    for enm in ctx.db.walk_enums() {
+        if !database_names.insert((enm.schema().map(|(n, _)| n), enm.database_name())) {
+            ctx.push_error(DatamodelError::new_duplicate_enum_database_name_error(
+                enm.ast_enum().span(),
+            ));
+        }
+    }
+}
 
 pub(super) fn schema_attribute(enm: EnumWalker<'_>, ctx: &mut Context<'_>) {
     match (enm.schema(), ctx.datasource) {

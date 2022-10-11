@@ -62,7 +62,7 @@ pub(super) fn ambiguity(field: RelationFieldWalker<'_>, names: &Names<'_>) -> Re
         Some(fields) if fields.len() > 1 => {
             let field_names = Fields::new(fields, model);
             let relation_name = identifier.2;
-            let is_self_relation = model == related_model;
+            let is_self_relation = model.id == related_model.id;
 
             let message = match relation_name {
                 RelationName::Generated(_) if is_self_relation && fields.len() == 2 => {
