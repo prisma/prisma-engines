@@ -428,6 +428,7 @@ impl Connector for PostgresDatamodelConnector {
     ) {
         if let Some(props) = ds.downcast_connector_data::<PostgresDatasourceProperties>() {
             validations::extensions_preview_flag_must_be_set(preview_features, props, errors);
+            validations::extension_names_follow_prisma_syntax_rules(preview_features, props, errors);
         }
     }
 
