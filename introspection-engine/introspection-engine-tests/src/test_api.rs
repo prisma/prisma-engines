@@ -244,14 +244,12 @@ impl TestApi {
     }
 
     pub fn datasource_block_string(&self) -> String {
-        let no_foreign_keys =
-            self.is_vitess() && self.preview_features().contains(PreviewFeature::ReferentialIntegrity);
-
-        let (url, relation_mode) = if no_foreign_keys {
-            (self.connection_string.to_string(), "\nrelationMode = \"prisma\"")
-        } else {
-            (r#"env(TEST_DATABASE_URL)"#.to_string(), "")
-        };
+        let relation_mode =
+            if self.is_vitess() && self.preview_features().contains(PreviewFeature::ReferentialIntegrity) {
+                "\nrelationMode = \"prisma\""
+            } else {
+                ""
+            };
 
         let namespaces: Vec<String> = self.namespaces().iter().map(|ns| format!(r#""{}""#, ns)).collect();
 
@@ -267,21 +265,20 @@ impl TestApi {
                  provider = "{}"
                  url = "{}"{}{}
                }}"#,
-            provider, url, namespaces, relation_mode
+            provider, self.connection_string, namespaces, relation_mode
         );
         datasource_block
     }
 
     pub fn datasource_block(&self) -> DatasourceBlock<'_> {
-        let no_foreign_keys =
-            self.is_vitess() && self.preview_features().contains(PreviewFeature::ReferentialIntegrity);
-
-        if no_foreign_keys {
-            self.args
-                .datasource_block(&self.connection_string, &[("relationMode", r#""prisma""#)])
-        } else {
-            self.args.datasource_block(r#"env(TEST_DATABASE_URL)"#, &[])
-        }
+        self.args.datasource_block(
+            &self.connection_string,
+            if self.is_vitess() && self.preview_features().contains(PreviewFeature::ReferentialIntegrity) {
+                &[("relationMode", r#""prisma""#)]
+            } else {
+                &[]
+            },
+        )
     }
 
     fn pure_config(&self) -> String {
