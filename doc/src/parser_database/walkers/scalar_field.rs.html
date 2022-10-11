@@ -432,10 +432,6 @@
 <span id="432">432</span>
 <span id="433">433</span>
 <span id="434">434</span>
-<span id="435">435</span>
-<span id="436">436</span>
-<span id="437">437</span>
-<span id="438">438</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::IndexFieldWalker</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">WithName</span>},
@@ -548,11 +544,7 @@
 
     <span class="doccomment">/// The model that contains the field.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-        <span class="ident">ModelWalker</span> {
-            <span class="ident">model_id</span>: <span class="self">self</span>.<span class="ident">model_id</span>,
-            <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
-            <span class="ident">model_attributes</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">model_attributes</span>[<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">model_id</span>],
-        }
+        <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk</span>(<span class="self">self</span>.<span class="ident">model_id</span>)
     }
 
     <span class="doccomment">/// (attribute scope, native type name, arguments, span)</span>

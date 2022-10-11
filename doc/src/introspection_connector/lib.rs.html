@@ -173,6 +173,7 @@
 <span id="173">173</span>
 <span id="174">174</span>
 <span id="175">175</span>
+<span id="176">176</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">error</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ErrorKind</span>};
@@ -245,9 +246,7 @@
     <span class="doccomment">/// This should always be true. TODO: change everything where it&#39;s</span>
     <span class="doccomment">/// set to false to take the config into account.</span>
     <span class="kw">pub</span> <span class="ident">render_config</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">source</span>: <span class="ident">Datasource</span>,
     <span class="kw">pub</span> <span class="ident">composite_type_depth</span>: <span class="ident">CompositeTypeDepth</span>,
-    <span class="kw">pub</span> <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
     <span class="ident">previous_schema</span>: <span class="ident">psl::ValidatedSchema</span>,
 }
 
@@ -279,21 +278,20 @@
     }
 
     <span class="kw">fn</span> <span class="ident">new_naive</span>(<span class="ident">previous_schema</span>: <span class="ident">psl::ValidatedSchema</span>, <span class="ident">composite_type_depth</span>: <span class="ident">CompositeTypeDepth</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">source</span> <span class="op">=</span> <span class="ident">previous_schema</span>.<span class="ident">configuration</span>.<span class="ident">datasources</span>.<span class="ident">clone</span>().<span class="ident">pop</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">preview_features</span> <span class="op">=</span> <span class="ident">previous_schema</span>.<span class="ident">configuration</span>.<span class="ident">preview_features</span>();
-
         <span class="ident">IntrospectionContext</span> {
             <span class="ident">previous_data_model</span>: <span class="ident">psl::dml::Datamodel::new</span>(),
             <span class="ident">previous_schema</span>,
-            <span class="ident">source</span>,
             <span class="ident">composite_type_depth</span>,
-            <span class="ident">preview_features</span>,
             <span class="ident">render_config</span>: <span class="bool-val">true</span>,
         }
     }
 
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">datasource</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Datasource</span> {
+        <span class="self">self</span>.<span class="ident">previous_schema</span>.<span class="ident">configuration</span>.<span class="ident">datasources</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>()
+    }
+
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">foreign_keys_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">source</span>.<span class="ident">relation_mode</span>().<span class="ident">uses_foreign_keys</span>()
+        <span class="self">self</span>.<span class="ident">datasource</span>().<span class="ident">relation_mode</span>().<span class="ident">uses_foreign_keys</span>()
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
@@ -302,6 +300,10 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">configuration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">psl::Configuration</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">previous_schema</span>.<span class="ident">configuration</span>
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">preview_features</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">previous_schema</span>.<span class="ident">configuration</span>.<span class="ident">preview_features</span>()
     }
 }
 

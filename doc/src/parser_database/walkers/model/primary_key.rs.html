@@ -102,10 +102,6 @@
 <span id="102">102</span>
 <span id="103">103</span>
 <span id="104">104</span>
-<span id="105">105</span>
-<span id="106">106</span>
-<span id="107">107</span>
-<span id="108">108</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">types::IdAttribute</span>,
@@ -159,11 +155,7 @@
 
     <span class="doccomment">/// The model the id is deined on.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-        <span class="ident">ModelWalker</span> {
-            <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
-            <span class="ident">model_attributes</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">model_attributes</span>[<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">model_id</span>],
-            <span class="ident">model_id</span>: <span class="self">self</span>.<span class="ident">model_id</span>,
-        }
+        <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk</span>(<span class="self">self</span>.<span class="ident">model_id</span>)
     }
 
     <span class="doccomment">/// The `name` argument of the id attribute. The client name.</span>

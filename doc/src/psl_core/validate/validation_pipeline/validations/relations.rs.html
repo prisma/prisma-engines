@@ -524,6 +524,7 @@
 <span id="524">524</span>
 <span id="525">525</span>
 <span id="526">526</span>
+<span id="527">527</span>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">many_to_many</span>;
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">one_to_many</span>;
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">one_to_one</span>;
@@ -559,10 +560,11 @@
     <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">constraint_name</span>(<span class="ident">ctx</span>.<span class="ident">connector</span>);
     <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">referencing_model</span>();
 
-    <span class="kw">for</span> <span class="ident">violation</span> <span class="kw">in</span> <span class="ident">names</span>
-        .<span class="ident">constraint_namespace</span>
-        .<span class="ident">constraint_name_scope_violations</span>(<span class="ident">model</span>.<span class="ident">model_id</span>(), <span class="ident">ConstraintName::Relation</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>()))
-    {
+    <span class="kw">for</span> <span class="ident">violation</span> <span class="kw">in</span> <span class="ident">names</span>.<span class="ident">constraint_namespace</span>.<span class="ident">constraint_name_scope_violations</span>(
+        <span class="ident">model</span>.<span class="ident">model_id</span>(),
+        <span class="ident">ConstraintName::Relation</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>()),
+        <span class="ident">ctx</span>,
+    ) {
         <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">relation</span>
             .<span class="ident">forward_relation_field</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> {
@@ -773,7 +775,7 @@
         <span class="kw">if</span> <span class="ident">on_update</span>.<span class="ident">triggers_modification</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">on_delete</span>.<span class="ident">triggers_modification</span>() {
             <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">next_relation</span>.<span class="ident">referencing_model</span>();
 
-            <span class="kw">if</span> <span class="ident">model</span> <span class="op">==</span> <span class="ident">related_model</span> {
+            <span class="kw">if</span> <span class="ident">model</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">related_model</span>.<span class="ident">id</span> {
                 <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes.&quot;</span>;
                 <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">cascade_error_with_default_values</span>(
                     <span class="ident">relation</span>,
@@ -785,7 +787,7 @@
                 <span class="kw">return</span>;
             }
 
-            <span class="kw">if</span> <span class="ident">related_model</span> <span class="op">==</span> <span class="ident">parent_model</span> {
+            <span class="kw">if</span> <span class="ident">related_model</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">parent_model</span>.<span class="ident">id</span> {
                 <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(
                     <span class="string">&quot;Reference causes a cycle. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: {}.&quot;</span>,
                     <span class="ident">visited_relations</span>
@@ -873,12 +875,12 @@
         <span class="ident">current_path</span>.<span class="ident">insert</span>(<span class="ident">next_relation</span>.<span class="ident">referencing_field</span>());
 
         <span class="comment">// Self-relations are detected elsewhere.</span>
-        <span class="kw">if</span> <span class="ident">model</span> <span class="op">==</span> <span class="ident">related_model</span> {
+        <span class="kw">if</span> <span class="ident">model</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">related_model</span>.<span class="ident">id</span> {
             <span class="kw">continue</span>;
         }
 
         <span class="comment">// Cycles are detected elsewhere.</span>
-        <span class="kw">if</span> <span class="ident">related_model</span> <span class="op">==</span> <span class="ident">parent_model</span> {
+        <span class="kw">if</span> <span class="ident">related_model</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">parent_model</span>.<span class="ident">id</span> {
             <span class="kw">continue</span>;
         }
 

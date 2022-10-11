@@ -180,6 +180,8 @@
 <span id="180">180</span>
 <span id="181">181</span>
 <span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::vec_init_then_push</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::ptr_arg</span>)]</span> <span class="comment">// remove after https://github.com/rust-lang/rust-clippy/issues/8482 is fixed and shipped</span>
 
@@ -329,7 +331,9 @@
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">introspect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">IntrospectionContext</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">IntrospectionResult</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">sql_schema</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">catch</span>(<span class="self">self</span>.<span class="ident">describe</span>(<span class="prelude-val">Some</span>(<span class="ident">ctx</span>.<span class="ident">source</span>.<span class="ident">active_provider</span>))).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">sql_schema</span> <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">catch</span>(<span class="self">self</span>.<span class="ident">describe</span>(<span class="prelude-val">Some</span>(<span class="ident">ctx</span>.<span class="ident">datasource</span>().<span class="ident">active_provider</span>)))
+            .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">introspection_result</span> <span class="op">=</span>
             <span class="ident">calculate_datamodel::calculate_datamodel</span>(<span class="kw-2">&amp;</span><span class="ident">sql_schema</span>, <span class="ident">ctx</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">sql_introspection_error</span><span class="op">|</span> {
@@ -346,7 +350,7 @@
 
 <span class="kw">impl</span> <span class="ident">SqlFamilyTrait</span> <span class="kw">for</span> <span class="ident">IntrospectionContext</span> {
     <span class="kw">fn</span> <span class="ident">sql_family</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SqlFamily</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">source</span>.<span class="ident">active_provider</span> {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">datasource</span>().<span class="ident">active_provider</span> {
             <span class="string">&quot;postgresql&quot;</span> =&gt; <span class="ident">SqlFamily::Postgres</span>,
             <span class="string">&quot;cockroachdb&quot;</span> =&gt; <span class="ident">SqlFamily::Postgres</span>,
             <span class="string">&quot;sqlite&quot;</span> =&gt; <span class="ident">SqlFamily::Sqlite</span>,

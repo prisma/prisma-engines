@@ -94,12 +94,6 @@
 <span id="94">94</span>
 <span id="95">95</span>
 <span id="96">96</span>
-<span id="97">97</span>
-<span id="98">98</span>
-<span id="99">99</span>
-<span id="100">100</span>
-<span id="101">101</span>
-<span id="102">102</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast</span>, <span class="ident">ast::WithDocumentation</span>, <span class="ident">types</span>, <span class="ident">walkers::Walker</span>};
 
 <span class="doccomment">/// An `enum` declaration in the schema.</span>
@@ -145,10 +139,7 @@
 
     <span class="doccomment">/// The values of the enum.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">values</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">EnumValueWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        (<span class="number">0</span>..<span class="self">self</span>.<span class="ident">ast_enum</span>().<span class="ident">values</span>.<span class="ident">len</span>()).<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">Walker</span> {
-            <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
-            <span class="ident">id</span>: (<span class="self">self</span>.<span class="ident">id</span>, <span class="ident">idx</span>),
-        })
+        (<span class="number">0</span>..<span class="self">self</span>.<span class="ident">ast_enum</span>().<span class="ident">values</span>.<span class="ident">len</span>()).<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk</span>((<span class="self">self</span>.<span class="ident">id</span>, <span class="ident">idx</span>)))
     }
 
     <span class="doccomment">/// The name of the schema the enum belongs to.</span>
@@ -164,10 +155,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">EnumValueWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">r#enum</span>(<span class="self">self</span>) -&gt; <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-        <span class="ident">Walker</span> {
-            <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
-            <span class="ident">id</span>: <span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>,
-        }
+        <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>)
     }
 
     <span class="doccomment">/// The enum documentation</span>

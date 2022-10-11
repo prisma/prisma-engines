@@ -377,6 +377,7 @@
 <span id="377">377</span>
 <span id="378">378</span>
 <span id="379">379</span>
+<span id="380">380</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">constraint_namespace::ConstraintName</span>,
     <span class="ident">database_name::validate_db_name</span>,
@@ -442,10 +443,11 @@
         <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
     };
 
-    <span class="kw">for</span> <span class="ident">violation</span> <span class="kw">in</span> <span class="ident">names</span>
-        .<span class="ident">constraint_namespace</span>
-        .<span class="ident">constraint_name_scope_violations</span>(<span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">model_id</span>(), <span class="ident">ConstraintName::Default</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>()))
-    {
+    <span class="kw">for</span> <span class="ident">violation</span> <span class="kw">in</span> <span class="ident">names</span>.<span class="ident">constraint_namespace</span>.<span class="ident">constraint_name_scope_violations</span>(
+        <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">model_id</span>(),
+        <span class="ident">ConstraintName::Default</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>()),
+        <span class="ident">ctx</span>,
+    ) {
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
             <span class="string">&quot;The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.&quot;</span>,
             <span class="ident">name</span>,

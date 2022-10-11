@@ -163,8 +163,8 @@
         <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">forward_relation_field</span>(), <span class="self">self</span>.<span class="ident">back_relation_field</span>()) {
             (<span class="prelude-val">Some</span>(<span class="ident">field_a</span>), <span class="prelude-val">Some</span>(<span class="ident">field_b</span>)) =&gt; {
                 <span class="kw">let</span> <span class="ident">walker</span> <span class="op">=</span> <span class="ident">CompleteInlineRelationWalker</span> {
-                    <span class="ident">side_a</span>: (<span class="self">self</span>.<span class="ident">referencing_model</span>().<span class="ident">model_id</span>, <span class="ident">field_a</span>.<span class="ident">field_id</span>),
-                    <span class="ident">side_b</span>: (<span class="self">self</span>.<span class="ident">referenced_model</span>().<span class="ident">model_id</span>, <span class="ident">field_b</span>.<span class="ident">field_id</span>),
+                    <span class="ident">side_a</span>: (<span class="self">self</span>.<span class="ident">referencing_model</span>().<span class="ident">id</span>, <span class="ident">field_a</span>.<span class="ident">field_id</span>),
+                    <span class="ident">side_b</span>: (<span class="self">self</span>.<span class="ident">referenced_model</span>().<span class="ident">id</span>, <span class="ident">field_b</span>.<span class="ident">field_id</span>),
                     <span class="ident">db</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">db</span>,
                 };
 

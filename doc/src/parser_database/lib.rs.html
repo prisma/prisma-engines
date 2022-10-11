@@ -169,6 +169,11 @@
 <span id="169">169</span>
 <span id="170">170</span>
 <span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">unsafe_code</span>, <span class="ident">rust_2018_idioms</span>, <span class="ident">missing_docs</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::derive_partial_eq_without_eq</span>)]</span>
 
@@ -311,7 +316,12 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ast</span>
     }
 
-    <span class="doccomment">/// The total number of models. This is O(1).</span>
+    <span class="doccomment">/// The total number of enums in the schema. This is O(1).</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enums_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
+        <span class="self">self</span>.<span class="ident">types</span>.<span class="ident">enum_attributes</span>.<span class="ident">len</span>()
+    }
+
+    <span class="doccomment">/// The total number of models in the schema. This is O(1).</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">models_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">types</span>.<span class="ident">model_attributes</span>.<span class="ident">len</span>()
     }

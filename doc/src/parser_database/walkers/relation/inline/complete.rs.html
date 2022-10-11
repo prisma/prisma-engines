@@ -102,14 +102,6 @@
 <span id="102">102</span>
 <span id="103">103</span>
 <span id="104">104</span>
-<span id="105">105</span>
-<span id="106">106</span>
-<span id="107">107</span>
-<span id="108">108</span>
-<span id="109">109</span>
-<span id="110">110</span>
-<span id="111">111</span>
-<span id="112">112</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">schema_ast::ast</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -130,20 +122,12 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">CompleteInlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="doccomment">/// The model that defines the relation fields and actions.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referencing_model</span>(<span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-        <span class="ident">ModelWalker</span> {
-            <span class="ident">model_id</span>: <span class="self">self</span>.<span class="ident">side_a</span>.<span class="number">0</span>,
-            <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
-            <span class="ident">model_attributes</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">model_attributes</span>[<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">side_a</span>.<span class="number">0</span>],
-        }
+        <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk</span>(<span class="self">self</span>.<span class="ident">side_a</span>.<span class="number">0</span>)
     }
 
     <span class="doccomment">/// The implicit relation side.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referenced_model</span>(<span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-        <span class="ident">ModelWalker</span> {
-            <span class="ident">model_id</span>: <span class="self">self</span>.<span class="ident">side_b</span>.<span class="number">0</span>,
-            <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
-            <span class="ident">model_attributes</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">model_attributes</span>[<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">side_b</span>.<span class="number">0</span>],
-        }
+        <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk</span>(<span class="self">self</span>.<span class="ident">side_b</span>.<span class="number">0</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referencing_field</span>(<span class="self">self</span>) -&gt; <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
@@ -167,7 +151,7 @@
     <span class="doccomment">/// The scalar fields defining the relation on the referenced model.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referenced_fields</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span> {
         <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="kw">move</span> <span class="op">|</span><span class="ident">field_id</span>: <span class="kw-2">&amp;</span><span class="ident">ast::FieldId</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">model_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">referenced_model</span>().<span class="ident">model_id</span>;
+            <span class="kw">let</span> <span class="ident">model_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">referenced_model</span>().<span class="ident">id</span>;
 
             <span class="ident">ScalarFieldWalker</span> {
                 <span class="ident">model_id</span>,
@@ -186,7 +170,7 @@
     <span class="doccomment">/// The scalar fields on the defining the relation on the referencing model.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referencing_fields</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span> {
         <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="kw">move</span> <span class="op">|</span><span class="ident">field_id</span>: <span class="kw-2">&amp;</span><span class="ident">ast::FieldId</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">model_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">referencing_model</span>().<span class="ident">model_id</span>;
+            <span class="kw">let</span> <span class="ident">model_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">referencing_model</span>().<span class="ident">id</span>;
 
             <span class="ident">ScalarFieldWalker</span> {
                 <span class="ident">model_id</span>,

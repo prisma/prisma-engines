@@ -100,6 +100,10 @@
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">psl_core</span>::{<span class="ident">Configuration</span>, <span class="ident">Datasource</span>, <span class="ident">Generator</span>, <span class="ident">StringFromEnvVar</span>};
 <span class="kw">use</span> <span class="ident">schema_ast::string_literal</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="self">self</span>, <span class="ident">Write</span> <span class="kw">as</span> <span class="kw">_</span>};
@@ -138,6 +142,10 @@
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">relation_mode</span>) <span class="op">=</span> <span class="ident">datasource</span>.<span class="ident">relation_mode</span> {
         <span class="macro">writeln!</span>(<span class="ident">out</span>, <span class="string">&quot;relationMode = {}&quot;</span>, <span class="ident">string_literal</span>(<span class="kw-2">&amp;</span><span class="ident">relation_mode</span>.<span class="ident">to_string</span>()))<span class="question-mark">?</span>;
     }
+
+    <span class="ident">datasource</span>
+        .<span class="ident">active_connector</span>
+        .<span class="ident">render_datasource_properties</span>(<span class="kw-2">&amp;</span><span class="ident">datasource</span>.<span class="ident">connector_data</span>, <span class="ident">out</span>)<span class="question-mark">?</span>;
 
     <span class="ident">out</span>.<span class="ident">write_str</span>(<span class="string">&quot;}\n&quot;</span>)
 }

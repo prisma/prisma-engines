@@ -326,10 +326,6 @@
 <span id="326">326</span>
 <span id="327">327</span>
 <span id="328">328</span>
-<span id="329">329</span>
-<span id="330">330</span>
-<span id="331">331</span>
-<span id="332">332</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">types</span>::{<span class="ident">IndexAlgorithm</span>, <span class="ident">IndexAttribute</span>},
@@ -515,11 +511,7 @@
 
     <span class="doccomment">/// The model the index is defined on.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-        <span class="ident">ModelWalker</span> {
-            <span class="ident">model_id</span>: <span class="self">self</span>.<span class="ident">model_id</span>,
-            <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
-            <span class="ident">model_attributes</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">model_attributes</span>[<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">model_id</span>],
-        }
+        <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk</span>(<span class="self">self</span>.<span class="ident">model_id</span>)
     }
 
     <span class="doccomment">/// The field the model was defined on, if any.</span>

@@ -177,15 +177,36 @@
 <span id="177">177</span>
 <span id="178">178</span>
 <span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">configuration::StringFromEnvVar</span>,
     <span class="ident">datamodel_connector</span>::{<span class="ident">Connector</span>, <span class="ident">ConnectorCapabilities</span>, <span class="ident">RelationMode</span>},
     <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>, <span class="ident">Span</span>},
 };
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">path::Path</span>};
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">any::Any</span>, <span class="ident">borrow::Cow</span>, <span class="ident">path::Path</span>};
 
 <span class="doccomment">/// a `datasource` from the prisma schema.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Datasource</span> {
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="doccomment">/// The provider string</span>
@@ -207,6 +228,23 @@
     <span class="doccomment">/// _Sorted_ vec of schemas defined in the schemas property.</span>
     <span class="kw">pub</span> <span class="ident">schemas</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">Span</span>)<span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">schemas_span</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">connector_data</span>: <span class="ident">DatasourceConnectorData</span>,
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DatasourceConnectorData</span> {
+    <span class="ident">data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Any</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">DatasourceConnectorData</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">data</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Any</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> { <span class="ident">data</span>: <span class="prelude-val">Some</span>(<span class="ident">data</span>) }
+    }
+
+    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">downcast_ref</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">data</span><span class="op">|</span> <span class="ident">data</span>.<span class="ident">downcast_ref</span>().<span class="ident">unwrap</span>())
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">Datasource</span> {
@@ -227,6 +265,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Datasource</span> {
+    <span class="doccomment">/// Extract connector-specific constructs. The type parameter must be the right one.</span>
+    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">downcast_connector_data</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">connector_data</span>.<span class="ident">downcast_ref</span>()
+    }
+
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">has_schema</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">schemas</span>.<span class="ident">binary_search_by_key</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>, <span class="op">|</span>(<span class="ident">s</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">s</span>).<span class="ident">is_ok</span>()
     }
