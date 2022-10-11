@@ -492,6 +492,7 @@ fn cockroachdb_sequences_must_work(api: TestApi) {
                     virtual: false,
                 },
             ],
+            extensions: [],
         }
     "#]];
     expected_ext.assert_debug_eq(&ext);

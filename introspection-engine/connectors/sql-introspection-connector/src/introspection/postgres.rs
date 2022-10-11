@@ -85,7 +85,7 @@ pub(super) fn calculate_configuration(previous_config: &Configuration, schema: &
         shadow_database_url: previous_datasource.shadow_database_url.clone(),
         referential_integrity: previous_datasource.referential_integrity,
         relation_mode: previous_datasource.relation_mode,
-        schemas: previous_datasource.schemas.clone(),
+        namespaces: previous_datasource.namespaces.clone(),
         schemas_span: previous_datasource.schemas_span,
         connector_data: DatasourceConnectorData::new(Box::new(pg_datasource_ext)),
     };

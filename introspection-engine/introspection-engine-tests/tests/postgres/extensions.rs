@@ -54,7 +54,11 @@ async fn sanitizes_problematic_extension_names(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("postgresExtensions"))]
+#[test_connector(
+    tags(Postgres),
+    exclude(CockroachDb, Postgres9),
+    preview_features("postgresExtensions")
+)]
 async fn should_not_list_any_extensions_outside_of_allow_list(api: &TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE EXTENSION IF NOT EXISTS amcheck;
@@ -79,7 +83,11 @@ async fn should_not_list_any_extensions_outside_of_allow_list(api: &TestApi) -> 
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("postgresExtensions"))]
+#[test_connector(
+    tags(Postgres),
+    exclude(CockroachDb, Postgres9),
+    preview_features("postgresExtensions")
+)]
 async fn should_not_remove_any_extensions_outside_of_allow_list(api: &TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE EXTENSION IF NOT EXISTS amcheck;
