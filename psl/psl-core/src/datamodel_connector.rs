@@ -73,6 +73,9 @@ pub trait Connector: Send + Sync {
     /// The referential actions supported by the connector.
     fn referential_actions(&self, relation_mode: &RelationMode) -> BitFlags<ReferentialAction>;
 
+    /// The referential actions supported when using relationMode = "prisma" by the connector.
+    fn simulated_referential_actions(&self, relation_mode: &RelationMode) -> BitFlags<ReferentialAction>;
+
     fn supports_composite_types(&self) -> bool {
         self.has_capability(ConnectorCapability::CompositeTypes)
     }
@@ -90,7 +93,10 @@ pub trait Connector: Send + Sync {
     }
 
     fn supports_referential_action(&self, relation_mode: &RelationMode, action: ReferentialAction) -> bool {
-        self.referential_actions(relation_mode).contains(action)
+        match relation_mode {
+            RelationMode::ForeignKeys => self.referential_actions(relation_mode).contains(action),
+            RelationMode::Prisma => self.simulated_referential_actions(relation_mode).contains(action),
+        }
     }
 
     /// This is used by the query engine schema builder.
