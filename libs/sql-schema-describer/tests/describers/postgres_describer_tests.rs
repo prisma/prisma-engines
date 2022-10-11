@@ -1815,6 +1815,13 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
             indexes: [
                 Index {
                     table_id: TableId(
+                        0,
+                    ),
+                    index_name: "Table_0_pkey",
+                    tpe: PrimaryKey,
+                },
+                Index {
+                    table_id: TableId(
                         1,
                     ),
                     index_name: "Table_0_pkey",
@@ -1825,6 +1832,18 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                 IndexColumn {
                     index_id: IndexId(
                         0,
+                    ),
+                    column_id: ColumnId(
+                        0,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        1,
                     ),
                     column_id: ColumnId(
                         2,
@@ -1845,7 +1864,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
     expected_schema.assert_debug_eq(&schema);
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
     let schema = r#"
            CREATE Schema "schema_0";
