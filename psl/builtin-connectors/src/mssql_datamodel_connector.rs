@@ -177,10 +177,6 @@ impl Connector for MsSqlDatamodelConnector {
         NoAction | Cascade | SetNull | SetDefault
     }
 
-    fn emulated_referential_actions(&self, relation_mode: &RelationMode) -> BitFlags<ReferentialAction> {
-        relation_mode.allowed_emulated_referential_actions_default()
-    }
-
     fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {
         let native_type: MsSqlType = serde_json::from_value(native_type).unwrap();
 

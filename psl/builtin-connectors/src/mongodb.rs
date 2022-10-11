@@ -58,10 +58,6 @@ impl Connector for MongoDbDatamodelConnector {
         BitFlags::empty()
     }
 
-    fn emulated_referential_actions(&self, relation_mode: &RelationMode) -> BitFlags<ReferentialAction> {
-        relation_mode.allowed_emulated_referential_actions_default()
-    }
-
     fn validate_model(&self, model: ModelWalker<'_>, errors: &mut Diagnostics) {
         validations::id_must_be_defined(model, errors);
 
