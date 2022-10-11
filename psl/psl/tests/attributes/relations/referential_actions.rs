@@ -4,7 +4,6 @@ use crate::common::*;
 use psl::{
     datamodel_connector::RelationMode,
     dml::ReferentialAction::{self, *},
-    parse_schema,
 };
 
 #[test]
@@ -607,7 +606,7 @@ fn on_update_no_action_should_not_work_on_postgres_with_prisma_relation_mode() {
         [1;94m   | [0m
     "#]];
 
-    expected.assert_eq(&parse_schema(dml).map(drop).unwrap_err())
+    expect_error(dml, &expected);
 }
 
 #[test]
@@ -645,7 +644,7 @@ fn on_delete_no_action_should_not_work_on_postgres_with_prisma_relation_mode() {
         [1;94m   | [0m
     "#]);
 
-    expected.assert_eq(&parse_schema(dml).map(drop).unwrap_err())
+    expect_error(dml, &expected);
 }
 
 #[test]
@@ -683,7 +682,7 @@ fn on_update_no_action_should_not_work_on_sqlite_with_prisma_relation_mode() {
         [1;94m   | [0m
     "#]];
 
-    expected.assert_eq(&parse_schema(dml).map(drop).unwrap_err())
+    expect_error(dml, &expected);
 }
 
 #[test]
@@ -721,7 +720,7 @@ fn on_delete_no_action_should_not_work_on_sqlite_with_prisma_relation_mode() {
         [1;94m   | [0m
     "#]);
 
-    expected.assert_eq(&parse_schema(dml).map(drop).unwrap_err())
+    expect_error(dml, &expected);
 }
 
 #[test]

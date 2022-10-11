@@ -133,7 +133,7 @@ impl Connector for CockroachDatamodelConnector {
         63
     }
 
-    fn referential_actions(&self, _relation_mode: &RelationMode) -> BitFlags<ReferentialAction> {
+    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
         NoAction | Restrict | Cascade | SetNull | SetDefault

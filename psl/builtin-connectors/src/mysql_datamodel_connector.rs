@@ -160,7 +160,7 @@ impl Connector for MySqlDatamodelConnector {
         64
     }
 
-    fn referential_actions(&self, _relation_mode: &RelationMode) -> BitFlags<ReferentialAction> {
+    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
         Restrict | Cascade | SetNull | NoAction | SetDefault

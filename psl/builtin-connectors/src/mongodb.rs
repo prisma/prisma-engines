@@ -54,7 +54,7 @@ impl Connector for MongoDbDatamodelConnector {
         &[ConstraintScope::ModelKeyIndex]
     }
 
-    fn referential_actions(&self, _relation_mode: &RelationMode) -> BitFlags<ReferentialAction> {
+    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
         BitFlags::empty()
     }
 
