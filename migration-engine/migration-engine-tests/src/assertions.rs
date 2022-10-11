@@ -8,7 +8,7 @@ use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
 use psl::datamodel_connector::Connector;
 use sql::{
-    postgres::PostgresSchemaExt,
+    postgres::{ExtensionWalker, PostgresSchemaExt},
     walkers::{ColumnWalker, ForeignKeyWalker, IndexWalker, TableWalker},
 };
 use sql_schema_describer::{
@@ -54,6 +54,21 @@ impl SchemaAssertion {
                     .map(|table| table.name())
                     .collect::<Vec<_>>()
             ),
+        }
+    }
+
+    #[track_caller]
+    pub fn assert_has_extension<'a>(&'a self, name: &str) -> PostgresExtensionAssertion<'a> {
+        if self.tags.contains(Tags::Postgres) {
+            let ext: &PostgresSchemaExt = self.schema.downcast_connector_data();
+
+            let extension = ext
+                .extension_walker(name)
+                .expect("Could not find extension with name {name}");
+
+            PostgresExtensionAssertion { extension }
+        } else {
+            panic!("PostgreSQL extensions are only allowed on PostgreSQL.")
         }
     }
 
@@ -843,6 +858,33 @@ impl<'a> IndexAssertion<'a> {
             length: col.length(),
             operator_class,
         });
+
+        self
+    }
+}
+
+#[derive(Clone, Copy)]
+pub struct PostgresExtensionAssertion<'a> {
+    extension: ExtensionWalker<'a>,
+}
+
+impl<'a> PostgresExtensionAssertion<'a> {
+    pub fn assert_schema(self, expected_schema: &str) -> Self {
+        assert_eq!(
+            self.extension.schema(), expected_schema,
+            "Assertion failed. Expected the extension to be in the {expected_schema} schema, but was in {} schema instead.",
+            self.extension.schema()
+        );
+
+        self
+    }
+
+    pub fn assert_version(self, expected_version: &str) -> Self {
+        assert_eq!(
+            self.extension.version(), expected_version,
+            "Assertion failed. Expected the extension to be of version {expected_version}, but was of version {} instead.",
+            self.extension.version()
+        );
 
         self
     }

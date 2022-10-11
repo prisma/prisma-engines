@@ -2,10 +2,13 @@ use super::{super::Context, SqlSchemaCalculatorFlavour};
 use crate::flavour::{PostgresFlavour, SqlFlavour};
 use either::Either;
 use psl::{
-    builtin_connectors::cockroach_datamodel_connector::SequenceFunction,
+    builtin_connectors::{
+        cockroach_datamodel_connector::SequenceFunction, postgres_datamodel_connector::PostgresDatasourceProperties,
+    },
     datamodel_connector::walker_ext_traits::IndexWalkerExt,
     parser_database::{walkers::*, IndexAlgorithm, OperatorClass},
 };
+use sql::postgres::DatabaseExtension;
 use sql_schema_describer::{self as sql, postgres::PostgresSchemaExt};
 
 impl SqlSchemaCalculatorFlavour for PostgresFlavour {
@@ -41,6 +44,34 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
     fn push_connector_data(&self, context: &mut super::super::Context<'_>) {
         let mut postgres_ext = PostgresSchemaExt::default();
         let db = &context.datamodel.db;
+
+        let postgres_psl: Option<&PostgresDatasourceProperties> = context
+            .datamodel
+            .configuration
+            .datasources
+            .first()
+            .unwrap()
+            .downcast_connector_data();
+
+        if let Some(extensions) = postgres_psl.and_then(|props| props.extensions()) {
+            for extension in extensions.extensions() {
+                let name = extension
+                    .db_name()
+                    .to_owned()
+                    .unwrap_or_else(|| extension.name())
+                    .to_owned();
+
+                let schema = extension.schema().map(|s| s.to_owned()).unwrap_or_default();
+                let version = extension.version().map(|s| s.to_owned()).unwrap_or_default();
+
+                postgres_ext.push_extension(DatabaseExtension {
+                    name,
+                    schema,
+                    version,
+                    relocatable: Default::default(),
+                });
+            }
+        }
 
         for model in db.walk_models() {
             let table_id = context.model_id_to_table_id[&model.model_id()];

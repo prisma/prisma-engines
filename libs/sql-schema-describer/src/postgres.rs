@@ -158,6 +158,14 @@ impl PostgresSchemaExt {
     pub fn extension_walker<'a>(&'a self, name: &str) -> Option<ExtensionWalker<'a>> {
         self.extension_walkers().find(|ext| ext.name() == name)
     }
+
+    pub fn push_extension(&mut self, extension: DatabaseExtension) {
+        self.extensions.push(extension);
+    }
+
+    pub fn get_extension(&self, id: ExtensionId) -> &DatabaseExtension {
+        &self.extensions[id.0 as usize]
+    }
 }
 
 #[derive(Clone, Debug)]

@@ -3,7 +3,10 @@ use crate::{
     database_schema::SqlDatabaseSchema,
     flavour::PostgresFlavour,
     pair::Pair,
-    sql_migration::{AlterEnum, SequenceChange, SequenceChanges, SqlMigrationStep},
+    sql_migration::{
+        AlterEnum, AlterExtension, CreateExtension, DropExtension, ExtensionChange, SequenceChange, SequenceChanges,
+        SqlMigrationStep,
+    },
     sql_schema_differ::{column::ColumnTypeChange, differ_database::DifferDatabase},
 };
 use enumflags2::BitFlags;
@@ -230,6 +233,56 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
 
     fn view_should_be_ignored(&self, view_name: &str) -> bool {
         POSTGIS_TABLES_OR_VIEWS.is_match(view_name) || EXTENSION_VIEWS.is_match(view_name)
+    }
+
+    fn push_extension_steps(&self, steps: &mut Vec<SqlMigrationStep>, db: &DifferDatabase<'_>) {
+        for ext in db.non_relocatable_extension_pairs() {
+            steps.push(SqlMigrationStep::DropExtension(DropExtension { id: ext.previous.id }));
+            steps.push(SqlMigrationStep::CreateExtension(CreateExtension { id: ext.next.id }));
+        }
+
+        for ext in db.relocatable_extension_pairs() {
+            let mut changes = Vec::new();
+
+            match (ext.previous.version(), ext.next.version()) {
+                (prev, next) if !prev.is_empty() && !next.is_empty() && prev != next => {
+                    changes.push(ExtensionChange::AlterVersion);
+                }
+                _ => {}
+            }
+
+            match (ext.previous.schema(), ext.next.schema()) {
+                (prev, next) if !prev.is_empty() && !next.is_empty() && prev != next => {
+                    changes.push(ExtensionChange::AlterSchema);
+                }
+                _ => {}
+            }
+
+            steps.push(SqlMigrationStep::AlterExtension(AlterExtension {
+                ids: Pair::new(ext.previous.id, ext.next.id),
+                changes,
+            }));
+        }
+
+        for id in db.created_extensions() {
+            steps.push(SqlMigrationStep::CreateExtension(CreateExtension { id }));
+        }
+    }
+
+    fn define_extensions(&self, db: &mut DifferDatabase<'_>) {
+        let schemas: Pair<(&SqlDatabaseSchema, &PostgresSchemaExt)> = db
+            .schemas()
+            .map(|schema| (schema, schema.describer_schema.downcast_connector_data()));
+
+        for extension in schemas.previous.1.extension_walkers() {
+            db.extensions
+                .insert(extension.name(), Pair::new(Some(extension.id), None));
+        }
+
+        for extension in schemas.next.1.extension_walkers() {
+            let entry = db.extensions.entry(extension.name()).or_default();
+            entry.next = Some(extension.id);
+        }
     }
 }
 
