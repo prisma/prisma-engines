@@ -1,6 +1,8 @@
 use core::fmt;
 
-use crate::{Commented, Env, RelationMode, Text, Value};
+use psl::datamodel_connector::RelationMode;
+
+use crate::{Commented, Env, Text, Value};
 
 /// The datasource block in a PSL file.
 #[derive(Debug)]
@@ -48,6 +50,21 @@ impl<'a> Datasource<'a> {
     pub fn documentation(&mut self, documentation: &'a str) {
         self.documentation = Some(Commented::Documentation(documentation));
     }
+
+    /// Create a rendering from a PSL datasource.
+    pub fn from_psl(psl_ds: &'a psl::Datasource) -> Self {
+        let shadow_database_url = psl_ds.shadow_database_url.as_ref().map(|(url, _)| Env::from(url));
+
+        Self {
+            name: &psl_ds.name,
+            provider: Text(&psl_ds.provider),
+            url: Env::from(&psl_ds.url),
+            shadow_database_url,
+            relation_mode: psl_ds.relation_mode,
+            documentation: psl_ds.documentation.as_deref().map(Commented::Documentation),
+            custom_properties: Default::default(),
+        }
+    }
 }
 
 impl<'a> fmt::Display for Datasource<'a> {
@@ -65,7 +82,7 @@ impl<'a> fmt::Display for Datasource<'a> {
         }
 
         if let Some(relation_mode) = self.relation_mode {
-            writeln!(f, "relationMode = {}", relation_mode)?;
+            writeln!(f, "relationMode = \"{}\"", relation_mode)?;
         }
 
         for (key, value) in self.custom_properties.iter() {
@@ -82,6 +99,7 @@ impl<'a> fmt::Display for Datasource<'a> {
 mod tests {
     use crate::*;
     use expect_test::expect;
+    use psl::datamodel_connector::RelationMode;
 
     #[test]
     fn kitchen_sink() {

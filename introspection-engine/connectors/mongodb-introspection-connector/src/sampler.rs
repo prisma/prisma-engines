@@ -1,6 +1,7 @@
 mod field_type;
 mod statistics;
 
+use datamodel_renderer as render;
 use futures::TryStreamExt;
 use introspection_connector::{CompositeTypeDepth, IntrospectionContext, IntrospectionResult, Version};
 use mongodb::{
@@ -52,13 +53,25 @@ pub(super) async fn sample(
     let is_empty = data_model.is_empty();
 
     let data_model = if ctx.render_config {
-        psl::render_datamodel_and_config_to_string(&data_model, ctx.configuration())
+        let mut config = render::Configuration::default();
+
+        for generator in ctx.configuration().generators.iter() {
+            config.push_generator(render::Generator::from_psl(&generator));
+        }
+
+        for datasource in ctx.configuration().datasources.iter() {
+            config.push_datasource(render::Datasource::from_psl(&datasource));
+        }
+
+        let datamodel = psl::render_datamodel_to_string(&data_model, Some(ctx.configuration()));
+
+        format!("{}\n{}", config, datamodel)
     } else {
         psl::render_datamodel_to_string(&data_model, Some(ctx.configuration()))
     };
 
     Ok(IntrospectionResult {
-        data_model,
+        data_model: psl::reformat(&data_model, 2).unwrap(),
         is_empty,
         warnings,
         version: Version::NonPrisma,

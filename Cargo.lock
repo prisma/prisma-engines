@@ -2114,6 +2114,7 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "convert_case",
+ "datamodel-renderer",
  "enumflags2",
  "expect-test",
  "futures",

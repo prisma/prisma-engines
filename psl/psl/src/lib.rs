@@ -11,6 +11,7 @@ pub use psl_core::{
     mcf::{generators_to_json, render_sources_to_json}, // for tests
     parser_database::{self, SourceFile},
     reformat,
+    schema_ast,
     Configuration,
     Datasource,
     DatasourceConnectorData,

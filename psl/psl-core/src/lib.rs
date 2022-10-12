@@ -20,6 +20,7 @@ pub use crate::{
 };
 pub use diagnostics;
 pub use parser_database::{self, is_reserved_type_name};
+pub use schema_ast;
 
 use self::validate::{datasource_loader, generator_loader};
 use diagnostics::Diagnostics;

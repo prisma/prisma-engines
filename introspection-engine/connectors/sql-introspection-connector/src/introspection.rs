@@ -170,49 +170,35 @@ pub(crate) fn introspect(ctx: &Context, warnings: &mut Vec<Warning>) -> Result<(
     // if based on a previous Prisma version add id default opinionations
     add_prisma_1_id_defaults(&version, &mut datamodel, schema, warnings, ctx);
 
-    let data_model = format!(
-        "{}\n{}",
-        render_configuration(ctx.config, schema),
+    let data_model = if ctx.render_config {
+        format!(
+            "{}\n{}",
+            render_configuration(ctx.config, schema),
+            psl::render_datamodel_to_string(&datamodel, Some(ctx.config))
+        )
+    } else {
         psl::render_datamodel_to_string(&datamodel, Some(ctx.config))
-    );
+    };
 
-    Ok((version, data_model, datamodel.is_empty()))
+    Ok((version, psl::reformat(&data_model, 2).unwrap(), datamodel.is_empty()))
 }
 
-fn render_configuration<'a>(previous_config: &'a Configuration, schema: &'a SqlSchema) -> render::Configuration<'a> {
-    let mut config = render::Configuration::default();
-    config.push_datasource(render_datasource(previous_config, schema));
-
-    config
-}
-
-fn render_datasource<'a>(config: &'a Configuration, schema: &'a SqlSchema) -> render::Datasource<'a> {
+fn render_configuration<'a>(config: &'a Configuration, schema: &'a SqlSchema) -> render::Configuration<'a> {
+    let mut output = render::Configuration::default();
     let prev_ds = config.datasources.first().unwrap();
-
-    let mut datasource = render::Datasource::new(&prev_ds.name, &prev_ds.provider, &prev_ds.url);
-
-    if let Some((ref url, _)) = &prev_ds.shadow_database_url {
-        datasource.shadow_database_url(url);
-    }
-
-    if let Some(mode) = prev_ds.relation_mode {
-        match mode {
-            psl::datamodel_connector::RelationMode::ForeignKeys => {
-                datasource.relation_mode(render::RelationMode::ForeignKeys)
-            }
-            psl::datamodel_connector::RelationMode::Prisma => datasource.relation_mode(render::RelationMode::Prisma),
-        }
-    }
-
-    if let Some(ref doc) = prev_ds.documentation {
-        datasource.documentation(doc);
-    }
+    let mut datasource = render::Datasource::from_psl(&prev_ds);
 
     if prev_ds.active_connector.is_provider("postgres") {
         postgres::add_extensions(&mut datasource, schema, config);
     }
 
-    datasource
+    output.push_datasource(datasource);
+
+    for prev in config.generators.iter() {
+        output.push_generator(render::Generator::from_psl(&prev));
+    }
+
+    output
 }
 
 fn calculate_fields_for_prisma_join_table(

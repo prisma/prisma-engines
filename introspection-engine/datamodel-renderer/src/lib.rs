@@ -14,4 +14,4 @@ mod value;
 pub use configuration::Configuration;
 pub use datasource::Datasource;
 pub use generator::Generator;
-pub use value::{Array, Commented, Env, Function, FunctionParam, RelationMode, Text, Value};
+pub use value::{Array, Commented, Env, Function, FunctionParam, Text, Value};

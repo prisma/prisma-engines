@@ -1,6 +1,8 @@
 use std::fmt;
 
-use crate::{value::Array, Commented, Env, Text};
+use psl::common::preview_features::PreviewFeature;
+
+use crate::{value::Array, Commented, Env, Text, Value};
 
 /// The generator block of the datasource.
 #[derive(Debug)]
@@ -16,10 +18,10 @@ pub struct Generator<'a> {
 
 impl<'a> Generator<'a> {
     /// A new generator with the required values set.
-    pub fn new(name: &'a str, provider: Env<'a>) -> Self {
+    pub fn new(name: &'a str, provider: impl Into<Env<'a>>) -> Self {
         Self {
             name,
-            provider,
+            provider: provider.into(),
             output: None,
             preview_features: Array::default(),
             binary_targets: Array::default(),
@@ -29,18 +31,18 @@ impl<'a> Generator<'a> {
     }
 
     /// Sets an output target.
-    pub fn output(&mut self, output: Env<'a>) {
-        self.output = Some(output);
+    pub fn output(&mut self, output: impl Into<Env<'a>>) {
+        self.output = Some(output.into());
     }
 
     /// Add a new preview feature to the generator block.
-    pub fn push_preview_feature(&mut self, feature: &'a str) {
-        self.preview_features.push(Text(feature));
+    pub fn push_preview_feature(&mut self, feature: PreviewFeature) {
+        self.preview_features.push(feature);
     }
 
     /// Add a new binary target to the generator block.
-    pub fn push_binary_target(&mut self, target: Env<'a>) {
-        self.binary_targets.push(target)
+    pub fn push_binary_target(&mut self, target: impl Into<Env<'a>>) {
+        self.binary_targets.push(target.into())
     }
 
     /// Set the generator block documentation.
@@ -51,6 +53,34 @@ impl<'a> Generator<'a> {
     /// Add a custom config value to the block.
     pub fn push_config_value(&mut self, key: &'a str, val: &'a str) {
         self.config.push((key, Text(val)));
+    }
+
+    /// Create a rendering from a PSL generator.
+    pub fn from_psl(psl_gen: &'a psl::Generator) -> Self {
+        let preview_features = psl_gen
+            .preview_features
+            .unwrap_or_default()
+            .iter()
+            .map(Value::Feature)
+            .collect();
+
+        let binary_targets = psl_gen.binary_targets.iter().map(Env::from).map(Value::from).collect();
+
+        let config = psl_gen
+            .config
+            .iter()
+            .map(|(k, v)| (k.as_str(), Text(v.as_str())))
+            .collect();
+
+        Self {
+            name: &psl_gen.name,
+            provider: Env::from(&psl_gen.provider),
+            output: psl_gen.output.as_ref().map(Env::from),
+            preview_features: Array(preview_features),
+            binary_targets: Array(binary_targets),
+            documentation: psl_gen.documentation.as_deref().map(Commented::Documentation),
+            config,
+        }
     }
 }
 
@@ -89,17 +119,20 @@ impl<'a> fmt::Display for Generator<'a> {
 mod tests {
     use crate::*;
     use expect_test::expect;
+    use psl::common::preview_features::PreviewFeature;
 
     #[test]
     fn kitchen_sink() {
         let mut generator = Generator::new("client", Env::value("prisma-client-js"));
 
         generator.documentation("Here comes the sun.\n\nAnd I say,\nIt's alright.");
-        generator.output(Env::value("/dev/null"));
 
-        generator.push_preview_feature("multiSchema");
-        generator.push_preview_feature("postgresExtensions");
+        generator.output(Env::value("/dev/null"));
         generator.push_binary_target(Env::variable("BINARY TARGET"));
+
+        generator.push_preview_feature(PreviewFeature::MultiSchema);
+        generator.push_preview_feature(PreviewFeature::PostgresExtensions);
+
         generator.push_config_value("customValue", "meow");
         generator.push_config_value("otherValue", "purr");
 

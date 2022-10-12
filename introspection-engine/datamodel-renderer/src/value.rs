@@ -1,6 +1,6 @@
 use std::{borrow::Cow, fmt};
 
-use psl::StringFromEnvVar;
+use psl::{common::preview_features::PreviewFeature, StringFromEnvVar};
 
 /// Represents a string value in the PSL.
 #[derive(Debug, Clone, Copy)]
@@ -8,28 +8,7 @@ pub struct Text<'a>(pub &'a str);
 
 impl<'a> fmt::Display for Text<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str("\"")?;
-
-        for c in self.0.char_indices() {
-            match c {
-                (_, '\t') => f.write_str("\\t")?,
-                (_, '\n') => f.write_str("\\n")?,
-                (_, '"') => f.write_str("\\\"")?,
-                (_, '\r') => f.write_str("\\r")?,
-                (_, '\\') => f.write_str("\\\\")?,
-                // Control characters
-                (_, c) if c.is_ascii_control() => {
-                    let mut b = [0];
-                    c.encode_utf8(&mut b);
-                    f.write_fmt(format_args!("\\u{:04x}", b[0]))?;
-                }
-                (start, other) => f.write_str(&self.0[start..(start + other.len_utf8())])?,
-            }
-        }
-
-        f.write_str("\"")?;
-
-        Ok(())
+        fmt::Display::fmt(&psl::schema_ast::string_literal(self.0), f)
     }
 }
 
@@ -116,24 +95,6 @@ impl<'a> fmt::Display for Env<'a> {
                 write!(f, "env({var})")
             }
             Env::Value(val) => val.fmt(f),
-        }
-    }
-}
-
-/// Where referential integrity is handled.
-#[derive(Debug, Clone, Copy)]
-pub enum RelationMode {
-    /// In the query engine.
-    Prisma,
-    /// In the database with foreign keys.
-    ForeignKeys,
-}
-
-impl fmt::Display for RelationMode {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            RelationMode::Prisma => write!(f, "{}", Text("prisma")),
-            RelationMode::ForeignKeys => write!(f, "{}", Text("foreignKeys")),
         }
     }
 }
@@ -272,6 +233,8 @@ pub enum Value<'a> {
     Function(Function<'a>),
     /// A value can be read from the environment.
     Env(Env<'a>),
+    /// Prisma preview feature
+    Feature(PreviewFeature),
 }
 
 impl<'a> From<Text<'a>> for Value<'a> {
@@ -304,6 +267,12 @@ impl<'a> From<Env<'a>> for Value<'a> {
     }
 }
 
+impl From<PreviewFeature> for Value<'_> {
+    fn from(feat: PreviewFeature) -> Self {
+        Self::Feature(feat)
+    }
+}
+
 impl<'a> fmt::Display for Value<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -321,6 +290,11 @@ impl<'a> fmt::Display for Value<'a> {
             }
             Value::Env(env) => {
                 env.fmt(f)?;
+            }
+            Value::Feature(feat) => {
+                f.write_str("\"")?;
+                feat.fmt(f)?;
+                f.write_str("\"")?;
             }
         }
 
