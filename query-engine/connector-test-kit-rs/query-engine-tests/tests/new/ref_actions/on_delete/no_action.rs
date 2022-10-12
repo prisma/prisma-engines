@@ -45,7 +45,7 @@ mod one2one_req {
         Ok(())
     }
 
-    /// Deleting the parent leaves the data in a integrity-violating state.
+    /// Deleting the parent must fail if a child is connected.
     #[connector_test(only(MongoDb))]
     async fn delete_parent_violation(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
@@ -53,14 +53,18 @@ mod one2one_req {
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { deleteOneParent(where: { id: 1 }) { id }}"#),
-          @r###"{"data":{"deleteOneParent":{"id":1}}}"###
+        assert_error!(
+            runner,
+            "mutation { deleteOneParent(where: { id: 1 }) { id }}",
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyChild { parent_id }}"#),
-          @r###"{"data":{"findManyChild":[{"parent_id":1}]}}"###
+        assert_error!(
+            runner,
+            "mutation { deleteManyParent(where: { id: 1 }) { count }}",
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         Ok(())
@@ -145,9 +149,11 @@ mod one2one_opt {
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { deleteOneParent(where: { id: 1 }) { id }}"#),
-          @r###"{"data":{"deleteOneParent":{"id":1}}}"###
+        assert_error!(
+            runner,
+            "mutation { deleteOneParent(where: { id: 1 }) { id }}",
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         insta::assert_snapshot!(
@@ -237,9 +243,11 @@ mod one2many_req {
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { deleteOneParent(where: { id: 1 }) { id }}"#),
-          @r###"{"data":{"deleteOneParent":{"id":1}}}"###
+        assert_error!(
+            runner,
+            "mutation { deleteOneParent(where: { id: 1 }) { id }}",
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         insta::assert_snapshot!(
@@ -329,9 +337,11 @@ mod one2many_opt {
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { deleteOneParent(where: { id: 1 }) { id }}"#),
-          @r###"{"data":{"deleteOneParent":{"id":1}}}"###
+        assert_error!(
+            runner,
+            "mutation { deleteOneParent(where: { id: 1 }) { id }}",
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         insta::assert_snapshot!(
