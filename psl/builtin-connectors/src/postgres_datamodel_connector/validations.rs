@@ -460,7 +460,7 @@ pub(super) fn extensions_preview_flag_must_be_set(
     props: &PostgresDatasourceProperties,
     errors: &mut Diagnostics,
 ) {
-    if preview_features.contains(PreviewFeature::PostgresExtensions) {
+    if preview_features.contains(PreviewFeature::PostgresqlExtensions) {
         return;
     }
 
@@ -470,7 +470,7 @@ pub(super) fn extensions_preview_flag_must_be_set(
     };
 
     errors.push_error(DatamodelError::new_static(
-        "The `extensions` property is only available with the `postgresExtensions` preview feature.",
+        "The `extensions` property is only available with the `postgresqlExtensions` preview feature.",
         span,
     ));
 }
