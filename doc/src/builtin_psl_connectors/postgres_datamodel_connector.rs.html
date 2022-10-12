@@ -903,12 +903,12 @@
 
 <span class="doccomment">/// Postgres-specific properties in the datasource block.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PostgresDatasourceProperties</span> {
-    <span class="ident">extensions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PostgresExtensions</span><span class="op">&gt;</span>,
+    <span class="ident">extensions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PostgresqlExtensions</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">PostgresDatasourceProperties</span> {
     <span class="doccomment">/// Database extensions.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extensions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PostgresExtensions</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extensions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PostgresqlExtensions</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">extensions</span>.<span class="ident">as_ref</span>()
     }
 }
@@ -985,12 +985,12 @@
 <span class="doccomment">///   //           ^^^^^^^^^^^^^^^^^</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PostgresExtensions</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PostgresqlExtensions</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">extensions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PostgresExtension</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">span</span>: <span class="ident">ast::Span</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">PostgresExtensions</span> {
+<span class="kw">impl</span> <span class="ident">PostgresqlExtensions</span> {
     <span class="doccomment">/// The span of the extensions in the datamodel.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ast::Span</span> {
         <span class="self">self</span>.<span class="ident">span</span>
