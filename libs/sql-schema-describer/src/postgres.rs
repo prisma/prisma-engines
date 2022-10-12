@@ -818,6 +818,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         let mut current_fk: Option<(i64, ForeignKeyId)> = None;
 
+        #[allow(clippy::too_many_arguments)]
         fn get_ids(
             namespace: String,
             table_name: String,
