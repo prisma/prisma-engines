@@ -119,7 +119,7 @@ pub(crate) fn introspect(ctx: &Context, warnings: &mut Vec<Warning>) -> Result<(
         } else {
             None
         };
-        datamodel.add_enum(dml::Enum::new(&e.name(), values, schema));
+        datamodel.add_enum(dml::Enum::new(e.name(), values, schema));
     }
 
     let mut fields_to_be_added = Vec::new();
@@ -159,7 +159,7 @@ pub(crate) fn introspect(ctx: &Context, warnings: &mut Vec<Warning>) -> Result<(
 
     //TODO(matthias) deduplication w. schema name
     // deduplicate model names
-
+    deduplicate_model_names(&mut datamodel);
     // deduplicate enum names
     deduplicate_enum_names(&mut datamodel);
 

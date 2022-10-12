@@ -118,6 +118,13 @@ impl Datamodel {
             .expect("We assume an internally valid datamodel before mutating.")
     }
 
+    /// Finds a model by schema and name and returns a mutable reference.
+    pub fn find_model_schema_mut(&mut self, name: &str, schema: &Option<String>) -> &mut Model {
+        self.models_mut()
+            .find(|m| m.name == *name && &m.schema == schema)
+            .expect("We assume an internally valid datamodel before mutating.")
+    }
+
     /// Finds an enum by name and returns a mutable reference.
     pub fn find_enum_mut(&mut self, name: &str) -> &mut Enum {
         self.enums_mut()

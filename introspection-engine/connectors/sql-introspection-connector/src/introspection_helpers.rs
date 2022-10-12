@@ -420,6 +420,25 @@ pub fn deduplicate_enum_names(datamodel: &mut Datamodel) {
     });
 }
 
+pub fn deduplicate_model_names(datamodel: &mut Datamodel) {
+    //TODO(matthias) this needs to track down the usages and change the names there
+    let mut duplicated_models = vec![];
+
+    for model in datamodel.models() {
+        if datamodel.models().filter(|m| m.name == model.name).count() > 1 {
+            duplicated_models.push((model.name.clone(), model.schema.clone()));
+        }
+    }
+
+    duplicated_models.iter().for_each(|(model, schema)| {
+        let mut found_model = datamodel.find_model_schema_mut(model, schema);
+        found_model.name = format!("{}_{}", schema.as_ref().unwrap(), model);
+        if found_model.database_name.is_none() {
+            found_model.database_name = Some(model.to_string());
+        }
+    });
+}
+
 pub fn deduplicate_relation_field_names(datamodel: &mut Datamodel) {
     let mut duplicated_relation_fields = vec![];
 
