@@ -20,6 +20,21 @@ impl<'a> Configuration<'a> {
     pub fn push_datasource(&mut self, datasource: Datasource<'a>) {
         self.datasources.push(datasource);
     }
+
+    /// Create a rendering from a PSL datasource.
+    pub fn from_psl(psl_cfg: &'a psl::Configuration) -> Self {
+        let mut config = Self::default();
+
+        for generator in psl_cfg.generators.iter() {
+            config.push_generator(Generator::from_psl(&generator));
+        }
+
+        for datasource in psl_cfg.datasources.iter() {
+            config.push_datasource(Datasource::from_psl(&datasource));
+        }
+
+        config
+    }
 }
 
 impl<'a> fmt::Display for Configuration<'a> {

@@ -53,16 +53,7 @@ pub(super) async fn sample(
     let is_empty = data_model.is_empty();
 
     let data_model = if ctx.render_config {
-        let mut config = render::Configuration::default();
-
-        for generator in ctx.configuration().generators.iter() {
-            config.push_generator(render::Generator::from_psl(&generator));
-        }
-
-        for datasource in ctx.configuration().datasources.iter() {
-            config.push_datasource(render::Datasource::from_psl(&datasource));
-        }
-
+        let config = render::Configuration::from_psl(ctx.configuration());
         let datamodel = psl::render_datamodel_to_string(&data_model, Some(ctx.configuration()));
 
         format!("{}\n{}", config, datamodel)
