@@ -295,6 +295,10 @@
 <span id="295">295</span>
 <span id="296">296</span>
 <span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
 </pre><pre class="rust"><code><span class="doccomment">//! SQL flavours implement behaviour specific to a given SQL implementation (PostgreSQL, SQLite...),</span>
 <span class="doccomment">//! in order to avoid cluttering the connector with conditionals. This is a private implementation</span>
 <span class="doccomment">//! detail of the SQL connector.</span>
@@ -577,6 +581,10 @@
     <span class="comment">// Remove this when the feature is GA</span>
     <span class="kw">if</span> <span class="op">!</span><span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::FullTextIndex</span>) {
         <span class="ident">sql_schema</span>.<span class="ident">make_fulltext_indexes_normal</span>();
+    }
+
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::MultiSchema</span>) {
+        <span class="ident">sql_schema</span>.<span class="ident">clear_namespaces</span>();
     }
 }
 
