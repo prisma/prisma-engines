@@ -26,11 +26,11 @@ impl<'a> Configuration<'a> {
         let mut config = Self::default();
 
         for generator in psl_cfg.generators.iter() {
-            config.push_generator(Generator::from_psl(&generator));
+            config.push_generator(Generator::from_psl(generator));
         }
 
         for datasource in psl_cfg.datasources.iter() {
-            config.push_datasource(Datasource::from_psl(&datasource));
+            config.push_datasource(Datasource::from_psl(datasource));
         }
 
         config

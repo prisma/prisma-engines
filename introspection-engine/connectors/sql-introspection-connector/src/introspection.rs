@@ -186,7 +186,7 @@ pub(crate) fn introspect(ctx: &Context, warnings: &mut Vec<Warning>) -> Result<(
 fn render_configuration<'a>(config: &'a Configuration, schema: &'a SqlSchema) -> render::Configuration<'a> {
     let mut output = render::Configuration::default();
     let prev_ds = config.datasources.first().unwrap();
-    let mut datasource = render::Datasource::from_psl(&prev_ds);
+    let mut datasource = render::Datasource::from_psl(prev_ds);
 
     if prev_ds.active_connector.is_provider("postgres") {
         postgres::add_extensions(&mut datasource, schema, config);
@@ -195,7 +195,7 @@ fn render_configuration<'a>(config: &'a Configuration, schema: &'a SqlSchema) ->
     output.push_datasource(datasource);
 
     for prev in config.generators.iter() {
-        output.push_generator(render::Generator::from_psl(&prev));
+        output.push_generator(render::Generator::from_psl(prev));
     }
 
     output
