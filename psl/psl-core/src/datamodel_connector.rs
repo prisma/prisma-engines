@@ -35,7 +35,6 @@ use parser_database::{
 use std::{
     borrow::Cow,
     collections::{BTreeMap, HashMap},
-    fmt,
 };
 
 pub const EXTENSIONS_KEY: &str = "extensions";
@@ -315,10 +314,6 @@ pub trait Connector: Send + Sync {
         _diagnostics: &mut Diagnostics,
     ) -> DatasourceConnectorData {
         Default::default()
-    }
-
-    fn render_datasource_properties(&self, _: &DatasourceConnectorData, _: &mut String) -> fmt::Result {
-        Ok(())
     }
 }
 

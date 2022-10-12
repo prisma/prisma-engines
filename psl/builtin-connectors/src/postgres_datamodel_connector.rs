@@ -16,7 +16,7 @@ use psl_core::{
     parser_database::{ast, walkers, IndexAlgorithm, OperatorClass, ParserDatabase, ReferentialAction, ScalarType},
     Datasource, DatasourceConnectorData, PreviewFeature,
 };
-use std::{borrow::Cow, collections::HashMap, fmt};
+use std::{borrow::Cow, collections::HashMap};
 
 const SMALL_INT_TYPE_NAME: &str = "SmallInt";
 const INTEGER_TYPE_NAME: &str = "Integer";
@@ -634,69 +634,6 @@ impl Connector for PostgresDatamodelConnector {
         let properties = PostgresDatasourceProperties { extensions };
 
         DatasourceConnectorData::new(Box::new(properties))
-    }
-
-    fn render_datasource_properties(&self, properties: &DatasourceConnectorData, out: &mut String) -> fmt::Result {
-        let properties = match properties.downcast_ref::<PostgresDatasourceProperties>() {
-            Some(properties) => properties,
-            None => return Ok(()),
-        };
-
-        let extensions = match properties.extensions() {
-            Some(extensions) if !extensions.extensions().is_empty() => extensions.extensions(),
-            _ => return Ok(()),
-        };
-
-        out.push_str("extensions = [");
-
-        for (i, extension) in extensions.iter().enumerate() {
-            out.push_str(extension.name());
-
-            if extension.db_name().is_none() && extension.version().is_none() && extension.schema().is_none() {
-                if extensions.len() > 1 {
-                    out.push(',');
-                }
-                continue;
-            }
-
-            out.push('(');
-
-            if let Some(db_name) = extension.db_name() {
-                out.push_str(r#"map: ""#);
-                out.push_str(db_name);
-                out.push('"');
-
-                if extension.schema().is_some() || extension.version().is_some() {
-                    out.push_str(", ");
-                }
-            }
-
-            if let Some(schema) = extension.schema() {
-                out.push_str(r#"schema: ""#);
-                out.push_str(schema);
-                out.push('"');
-
-                if extension.version.is_some() {
-                    out.push_str(", ");
-                }
-            }
-
-            if let Some(version) = extension.version() {
-                out.push_str(r#"version: ""#);
-                out.push_str(version);
-                out.push('"');
-            }
-
-            out.push(')');
-
-            if i < extensions.len() - 1 {
-                out.push_str(", ");
-            }
-        }
-
-        out.push_str("]\n");
-
-        Ok(())
     }
 }
 
