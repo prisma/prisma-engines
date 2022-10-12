@@ -63,11 +63,21 @@ fn render_enum(enm: &Enum, out: &mut String) {
         out.push('\n');
     }
 
+    // @@schema
+    if let Some(schema_name) = &enm.schema {
+        render_schema_attribute(schema_name, "@@", out);
+        out.push('\n');
+    }
+
     out.push_str("}\n");
 }
 
 fn render_map_attribute(mapped_name: &str, owl: &str, out: &mut String) {
     write!(out, " {owl}map({})", string_literal(mapped_name)).unwrap()
+}
+
+fn render_schema_attribute(schema_name: &str, owl: &str, out: &mut String) {
+    write!(out, " {owl}schema({})", string_literal(schema_name)).unwrap()
 }
 
 fn render_model(model: &Model, params: RenderParams<'_>, out: &mut String) {
@@ -411,7 +421,7 @@ fn render_composite_field_type(field_type: &CompositeTypeFieldType, out: &mut St
     }
 }
 
-fn render_field_type(field_type: &crate::FieldType, out: &mut String) {
+fn render_field_type(field_type: &FieldType, out: &mut String) {
     match field_type {
         FieldType::CompositeType(name) | FieldType::Enum(name) => out.push_str(name),
         FieldType::Unsupported(name) => {
@@ -424,7 +434,7 @@ fn render_field_type(field_type: &crate::FieldType, out: &mut String) {
     }
 }
 
-fn render_model_attributes(model: &crate::Model, params: RenderParams<'_>, out: &mut String) {
+fn render_model_attributes(model: &Model, params: RenderParams<'_>, out: &mut String) {
     // @@id
     if let Some(pk) = &model.primary_key {
         if !pk.defined_on_field {
@@ -477,9 +487,15 @@ fn render_model_attributes(model: &crate::Model, params: RenderParams<'_>, out: 
     if model.is_ignored() {
         out.push_str("@@ignore\n");
     }
+
+    // @@schema
+    if let Some(schema_name) = &model.schema {
+        render_schema_attribute(schema_name, "@@", out);
+        out.push('\n');
+    }
 }
 
-fn render_field_arity(arity: &crate::FieldArity, out: &mut String) {
+fn render_field_arity(arity: &FieldArity, out: &mut String) {
     match arity {
         FieldArity::Required => (),
         FieldArity::Optional => out.push('?'),
@@ -487,24 +503,24 @@ fn render_field_arity(arity: &crate::FieldArity, out: &mut String) {
     }
 }
 
-fn dml_scalar_type_to_parser_database_scalar_type(st: crate::ScalarType) -> db::ScalarType {
+fn dml_scalar_type_to_parser_database_scalar_type(st: ScalarType) -> db::ScalarType {
     match st {
-        crate::ScalarType::Int => db::ScalarType::Int,
-        crate::ScalarType::BigInt => db::ScalarType::BigInt,
-        crate::ScalarType::Float => db::ScalarType::Float,
-        crate::ScalarType::Boolean => db::ScalarType::Boolean,
-        crate::ScalarType::String => db::ScalarType::String,
-        crate::ScalarType::DateTime => db::ScalarType::DateTime,
-        crate::ScalarType::Json => db::ScalarType::Json,
-        crate::ScalarType::Bytes => db::ScalarType::Bytes,
-        crate::ScalarType::Decimal => db::ScalarType::Decimal,
+        ScalarType::Int => db::ScalarType::Int,
+        ScalarType::BigInt => db::ScalarType::BigInt,
+        ScalarType::Float => db::ScalarType::Float,
+        ScalarType::Boolean => db::ScalarType::Boolean,
+        ScalarType::String => db::ScalarType::String,
+        ScalarType::DateTime => db::ScalarType::DateTime,
+        ScalarType::Json => db::ScalarType::Json,
+        ScalarType::Bytes => db::ScalarType::Bytes,
+        ScalarType::Decimal => db::ScalarType::Decimal,
     }
 }
 
-fn render_default_value(dv: &crate::DefaultValue, out: &mut String) {
+fn render_default_value(dv: &DefaultValue, out: &mut String) {
     match dv.kind() {
-        crate::DefaultKind::Single(v) => render_prisma_value(v, out),
-        crate::DefaultKind::Expression(e) => {
+        DefaultKind::Single(v) => render_prisma_value(v, out),
+        DefaultKind::Expression(e) => {
             out.push_str(e.name());
             out.push('(');
             let mut args = e.args().iter().peekable();

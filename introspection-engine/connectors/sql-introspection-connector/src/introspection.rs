@@ -104,12 +104,15 @@ pub(crate) fn introspect(ctx: &Context, warnings: &mut Vec<Warning>) -> Result<(
             });
         }
 
+        model.schema = table.namespace().map(|n| n.to_string());
+
         datamodel.add_model(model);
     }
 
-    for e in schema.enums.iter() {
-        let values = e.values.iter().map(|v| dml::EnumValue::new(v)).collect();
-        datamodel.add_enum(dml::Enum::new(&e.name, values));
+    for e in schema.enum_walkers() {
+        let values = e.values().iter().map(|v| dml::EnumValue::new(v)).collect();
+        let schema = e.namespace().map(|n| n.to_string());
+        datamodel.add_enum(dml::Enum::new(&e.name(), values, schema));
     }
 
     let mut fields_to_be_added = Vec::new();

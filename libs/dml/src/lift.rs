@@ -427,7 +427,7 @@ impl<'a> LiftAstToDml<'a> {
 
     /// Internal: Validates an enum AST node.
     fn lift_enum(&self, r#enum: EnumWalker<'_>) -> dml::Enum {
-        let mut en = dml::Enum::new(r#enum.name(), vec![]);
+        let mut en = dml::Enum::new(r#enum.name(), vec![], None);
 
         for value in r#enum.values() {
             en.add_value(self.lift_enum_value(value));
