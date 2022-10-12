@@ -39,6 +39,15 @@ impl WriteQuery {
         args.update_datetimes(&model);
     }
 
+    pub fn set_selectors(&mut self, selectors: Vec<SelectionResult>) {
+        match self {
+            Self::UpdateManyRecords(x) => x.set_selectors(selectors),
+            Self::UpdateRecord(x) => x.set_selectors(selectors),
+            Self::DeleteRecord(x) => x.set_selectors(selectors),
+            _ => return,
+        }
+    }
+
     pub fn returns(&self, field_selection: &FieldSelection) -> bool {
         let returns_id = &self.model().primary_identifier() == field_selection;
 
@@ -151,6 +160,12 @@ pub struct UpdateRecord {
     pub args: WriteArgs,
 }
 
+impl UpdateRecord {
+    pub fn set_selectors(&mut self, selectors: Vec<SelectionResult>) {
+        self.record_filter.selectors = Some(selectors);
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct UpdateManyRecords {
     pub model: ModelRef,
@@ -158,10 +173,26 @@ pub struct UpdateManyRecords {
     pub args: WriteArgs,
 }
 
+impl UpdateManyRecords {
+    pub fn set_selectors(&mut self, selectors: Vec<SelectionResult>) {
+        self.record_filter.selectors = Some(selectors);
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct DeleteRecord {
     pub model: ModelRef,
     pub record_filter: Option<RecordFilter>,
+}
+
+impl DeleteRecord {
+    pub fn set_selectors(&mut self, selectors: Vec<SelectionResult>) {
+        if let Some(ref mut rf) = self.record_filter {
+            rf.selectors = Some(selectors);
+        } else {
+            self.record_filter = Some(selectors.into())
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -234,7 +265,5 @@ impl FilteredQuery for DeleteRecord {
             Some(ref mut rf) => rf.filter = filter,
             None => self.record_filter = Some(filter.into()),
         }
-
-        //.filter = Some(filter)
     }
 }

@@ -1,4 +1,5 @@
 use crate::constants::args;
+use crate::input_types::fields::arguments::where_argument;
 use crate::mutations::create_one;
 
 use super::*;
@@ -83,6 +84,7 @@ fn nested_upsert_nonlist_input_object(
             ctx.cache_input_type(ident, input_object.clone());
 
             let fields = vec![
+                where_argument(ctx, &related_model),
                 input_field(args::UPDATE, update_types, None),
                 input_field(args::CREATE, create_types, None),
             ];

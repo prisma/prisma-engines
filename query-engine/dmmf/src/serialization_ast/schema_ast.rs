@@ -38,6 +38,7 @@ pub struct DmmfInputType {
 pub struct DmmfInputTypeConstraints {
     pub max_num_fields: Option<usize>,
     pub min_num_fields: Option<usize>,
+    pub fields: Option<Vec<String>>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

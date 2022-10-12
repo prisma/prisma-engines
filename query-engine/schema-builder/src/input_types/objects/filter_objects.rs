@@ -96,27 +96,11 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
     let ident = Identifier::new(format!("{}WhereUniqueInput", model.name), PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
 
-    let mut x = init_input_object_type(ident.clone());
-    x.require_exactly_one_field();
-
-    let input_object = Arc::new(x);
-    ctx.cache_input_type(ident, input_object.clone());
-
-    // TODO (dom): This can probably be collapsed into just uniques and pks
-    // Single unique or ID fields.
-    let unique_fields = model.fields().scalar().into_iter().filter(|f| f.unique());
-
-    let mut fields: Vec<InputField> = unique_fields
-        .map(|sf| {
-            let name = sf.name.clone();
-            let typ = map_scalar_input_type_for_field(ctx, &sf);
-
-            input_field(name, typ, None).optional()
-        })
-        .collect();
-
+    // Split unique & ID fields vs all the other fields
+    let (unique_fields, rest_fields): (Vec<_>, Vec<_>) =
+        model.fields().all.iter().partition(|f| f.is_scalar() && f.is_unique());
     // @@unique compound fields.
-    let compound_unique_fields: Vec<InputField> = model
+    let compound_uniques: Vec<_> = model
         .unique_indexes()
         .into_iter()
         .filter(|index| index.fields.len() > 1)
@@ -124,20 +108,83 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
             let typ = compound_field_unique_object_type(ctx, model, index.name.as_ref(), index.fields());
             let name = compound_index_field_name(index);
 
-            input_field(name, InputType::object(typ), None).optional()
+            (name, typ)
         })
         .collect();
-
     // @@id compound field (there can be only one per model).
-    let compound_id_field = model.fields().compound_id().map(|pk| {
+    let compound_id = model.fields().compound_id().map(|pk| {
         let name = compound_id_field_name(pk);
         let typ = compound_field_unique_object_type(ctx, model, pk.alias.as_ref(), pk.fields());
 
-        input_field(name, InputType::object(typ), None).optional()
+        (name, typ)
     });
+
+    // Concatenated list of uniques/@@unique/@@id fields on which the input type constraints should be applied (that at least one of them is set).
+    let constrained_fields: Vec<_> = {
+        let unique_names = unique_fields.iter().map(|f| f.name().to_owned());
+        let compound_unique_names = compound_uniques.iter().map(|(name, _)| name.to_owned());
+        let compound_id_name = compound_id.iter().map(|(name, _)| name.to_owned());
+
+        unique_names
+            .chain(compound_unique_names)
+            .chain(compound_id_name)
+            .collect()
+    };
+
+    let mut x = init_input_object_type(ident.clone());
+    x.require_at_least_one_field();
+    x.apply_constraints_on_fields(constrained_fields);
+
+    let input_object = Arc::new(x);
+    ctx.cache_input_type(ident, input_object.clone());
+
+    let mut fields: Vec<InputField> = unique_fields
+        .into_iter()
+        .map(|f| {
+            let sf = f.as_scalar().unwrap();
+            let name = sf.name.clone();
+            let typ = map_scalar_input_type_for_field(ctx, sf);
+
+            input_field(name, typ, None).optional()
+        })
+        .collect();
+
+    // @@unique compound fields.
+    let compound_unique_fields: Vec<InputField> = compound_uniques
+        .into_iter()
+        .map(|(name, typ)| input_field(name, InputType::object(typ), None).optional())
+        .collect();
+
+    // @@id compound field (there can be only one per model).
+    let compound_id_field = compound_id.map(|(name, typ)| input_field(name, InputType::object(typ), None).optional());
+
+    // Boolean operators AND/OR/NOT, which are _not_ where unique inputs
+    let where_input_type = InputType::object(where_object_type(ctx, ParentContainer::Model(Arc::downgrade(model))));
+    let boolean_operators = vec![
+        input_field(
+            filters::AND,
+            vec![where_input_type.clone(), InputType::list(where_input_type.clone())],
+            None,
+        )
+        .optional(),
+        input_field(filters::OR, vec![InputType::list(where_input_type.clone())], None).optional(),
+        input_field(
+            filters::NOT,
+            vec![where_input_type.clone(), InputType::list(where_input_type)],
+            None,
+        )
+        .optional(),
+    ];
+
+    let rest_fields: Vec<_> = rest_fields
+        .into_iter()
+        .map(|f| input_fields::filter_input_field(ctx, f, false))
+        .collect();
 
     fields.extend(compound_unique_fields);
     fields.extend(compound_id_field);
+    fields.extend(boolean_operators);
+    fields.extend(rest_fields);
 
     input_object.set_fields(fields);
 

@@ -125,6 +125,14 @@ impl Field {
             None
         }
     }
+
+    pub fn as_scalar(&self) -> Option<&ScalarFieldRef> {
+        if let Self::Scalar(v) = self {
+            Some(v)
+        } else {
+            None
+        }
+    }
 }
 
 #[derive(Debug, Clone)]

@@ -53,24 +53,36 @@ pub fn nested_update(
             let mut map: ParsedInputMap = value.try_into()?;
             let where_arg: ParsedInputMap = map.remove(args::WHERE).unwrap().try_into()?;
 
-            let filter = extract_unique_filter(where_arg, &child_model)?;
+            let filter = extract_unique_filter(where_arg, child_model)?;
             let data_value = map.remove(args::DATA).unwrap();
 
             (data_value, filter)
         } else {
-            (value, Filter::empty())
+            match value {
+                // If the update input is of shape { where?: WhereInput, data: DataInput }
+                ParsedInputValue::Map(mut map) if map.is_nested_to_one_update_enveloppe() => {
+                    let filter = if let Some(where_arg) = map.remove(args::WHERE) {
+                        let where_arg: ParsedInputMap = where_arg.try_into()?;
+
+                        extract_filter(where_arg, child_model)?
+                    } else {
+                        Filter::empty()
+                    };
+
+                    let data_value = map.remove(args::DATA).unwrap();
+
+                    (data_value, filter)
+                }
+                // If the update input is the shorthand shape which directly updates data
+                x => (x, Filter::empty()),
+            }
         };
 
         let find_child_records_node =
-            utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter)?;
+            utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone())?;
 
-        let update_node = update::update_record_node(
-            graph,
-            connector_ctx,
-            Filter::empty(),
-            Arc::clone(child_model),
-            data.try_into()?,
-        )?;
+        let update_node =
+            update::update_record_node(graph, connector_ctx, filter, Arc::clone(child_model), data.try_into()?)?;
 
         let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
@@ -88,7 +100,7 @@ pub fn nested_update(
                     }?;
 
                     if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = update_node {
-                        ur.record_filter = child_id.into();
+                        ur.set_selectors(vec![child_id]);
                     }
 
                     Ok(update_node)

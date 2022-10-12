@@ -36,7 +36,7 @@ impl QueryDocumentParser {
         if selections.is_empty() {
             return Err(QueryParserError {
                 path,
-                error_kind: QueryParserErrorKind::FieldCountError(FieldCountError::new(Some(1), None, 0)),
+                error_kind: QueryParserErrorKind::FieldCountError(FieldCountError::new(Some(1), None, None, 0)),
             });
         }
 
@@ -484,8 +484,24 @@ impl QueryDocumentParser {
 
         map.extend(defaults.into_iter());
 
-        // Ensure the constraints are upheld.
-        let num_fields = map.len();
+        // Ensure the constraints are upheld. If any `fields` are specified, then the constraints should be upheld against those only.
+        // If no `fields` are specified, then the constraints should be upheld against all fields of the object.
+        let num_fields = schema_object
+            .constraints
+            .fields
+            .as_ref()
+            .cloned()
+            .map(|fields| {
+                fields.iter().fold(0, |mut acc, field| {
+                    if map.contains_key(field) {
+                        acc += 1;
+                    }
+
+                    acc
+                })
+            })
+            .unwrap_or(map.len());
+
         let too_many = schema_object
             .constraints
             .max_num_fields
@@ -502,7 +518,8 @@ impl QueryDocumentParser {
             let error_kind = QueryParserErrorKind::FieldCountError(FieldCountError::new(
                 schema_object.constraints.min_num_fields,
                 schema_object.constraints.max_num_fields,
-                map.len(),
+                schema_object.constraints.fields.as_ref().cloned(),
+                num_fields,
             ));
             return Err(QueryParserError::new(path, error_kind));
         }
