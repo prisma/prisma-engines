@@ -401,6 +401,25 @@ pub(crate) fn calculate_scalar_field_type_with_native_types(column: sql::ColumnW
 
 // misc
 
+pub fn deduplicate_enum_names(datamodel: &mut Datamodel) {
+    //TODO(matthias) this needs to track down the usages and change the names there
+    let mut duplicated_enums = vec![];
+
+    for enm in datamodel.enums() {
+        if datamodel.enums().filter(|e| e.name == enm.name).count() > 1 {
+            duplicated_enums.push((enm.name.clone(), enm.schema.clone()));
+        }
+    }
+
+    duplicated_enums.iter().for_each(|(enm, schema)| {
+        let mut found_enum = datamodel.find_enum_schema_mut(enm, schema);
+        found_enum.name = format!("{}_{}", schema.as_ref().unwrap(), enm);
+        if found_enum.database_name.is_none() {
+            found_enum.database_name = Some(enm.to_string());
+        }
+    });
+}
+
 pub fn deduplicate_relation_field_names(datamodel: &mut Datamodel) {
     let mut duplicated_relation_fields = vec![];
 

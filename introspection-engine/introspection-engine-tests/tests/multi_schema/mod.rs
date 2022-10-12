@@ -180,6 +180,66 @@ async fn multiple_schemas_w_enums_are_introspected(api: &TestApi) -> TestResult 
     Ok(())
 }
 
+#[test_connector(tags(Postgres), preview_features("multiSchema"), db_schemas("first", "second"))]
+async fn multiple_schemas_w_duplicate_enums_are_introspected(api: &TestApi) -> TestResult {
+    let schema_name = "first";
+    let other_name = "second";
+    let create_schema = format!("CREATE Schema \"{schema_name}\"",);
+    let create_type = format!("CREATE TYPE \"{schema_name}\".\"HappyMood\" AS ENUM ('happy')",);
+    let create_table =
+        format!("CREATE TABLE \"{schema_name}\".\"HappyPerson\" (mood \"{schema_name}\".\"HappyMood\" PRIMARY KEY)",);
+
+    api.database().raw_cmd(&create_schema).await?;
+    api.database().raw_cmd(&create_type).await?;
+    api.database().raw_cmd(&create_table).await?;
+
+    let create_schema = format!("CREATE Schema \"{other_name}\"",);
+    let create_type = format!("CREATE TYPE \"{other_name}\".\"HappyMood\" AS ENUM ('veryHappy')",);
+    let create_table =
+        format!("CREATE TABLE \"{other_name}\".\"VeryHappyPerson\" (mood \"{other_name}\".\"HappyMood\" PRIMARY KEY)",);
+
+    let create_table_2 =
+        format!("CREATE TABLE \"{other_name}\".\"HappyPerson\" (mood \"{schema_name}\".\"HappyMood\" PRIMARY KEY)",);
+
+    api.database().raw_cmd(&create_schema).await?;
+    api.database().raw_cmd(&create_type).await?;
+    api.database().raw_cmd(&create_table).await?;
+    api.database().raw_cmd(&create_table_2).await?;
+
+    let expected = expect![[r#"
+        model HappyPerson {
+          mood first_HappyMood @id
+
+          @@schema("first")
+        }
+
+        model VeryHappyPerson {
+          mood second_HappyMood @id
+
+          @@schema("second")
+        }
+
+        enum first_HappyMood {
+          happy
+
+          @@map("HappyMood")
+          @@schema("first")
+        }
+
+        enum second_HappyMood {
+          veryHappy
+
+          @@map("HappyMood")
+          @@schema("second")
+        }
+    "#]];
+
+    let result = api.introspect_dml().await?;
+    expected.assert_eq(&result);
+
+    Ok(())
+}
+
 #[test_connector(tags(Postgres))]
 async fn multiple_schemas_w_enums_without_schemas_are_not_introspected(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
@@ -212,7 +272,9 @@ async fn multiple_schemas_w_enums_without_schemas_are_not_introspected(api: &Tes
 //preview flagging
 //cross schema fks
 
+//Edge cases
 //name conflicts
+// what if the names are used somewhere???
 // table
 // enum
 //invalid names

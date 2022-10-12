@@ -161,6 +161,7 @@ pub(crate) fn introspect(ctx: &Context, warnings: &mut Vec<Warning>) -> Result<(
     // deduplicate model names
 
     // deduplicate enum names
+    deduplicate_enum_names(&mut datamodel);
 
     // deduplicating relation field names
     deduplicate_relation_field_names(&mut datamodel);

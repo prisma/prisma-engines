@@ -125,6 +125,13 @@ impl Datamodel {
             .expect("We assume an internally valid datamodel before mutating.")
     }
 
+    /// Finds an enum by name and schema and returns a mutable reference.
+    pub fn find_enum_schema_mut(&mut self, name: &str, schema: &Option<String>) -> &mut Enum {
+        self.enums_mut()
+            .find(|m| m.name == *name && &m.schema == schema)
+            .expect("We assume an internally valid datamodel before mutating.")
+    }
+
     /// Returns (model_name, field_name) for all fields using a specific enum.
     pub fn find_enum_fields(&self, enum_name: &str) -> Vec<(String, String)> {
         let mut fields = vec![];
