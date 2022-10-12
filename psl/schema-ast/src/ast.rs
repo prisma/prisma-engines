@@ -18,6 +18,7 @@ mod traits;
 
 pub(crate) use self::comment::Comment;
 
+pub use crate::string_literal;
 pub use argument::{Argument, ArgumentsList, EmptyArgument};
 pub use attribute::{Attribute, AttributeContainer, AttributeId};
 pub use composite_type::{CompositeType, CompositeTypeId};

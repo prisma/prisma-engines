@@ -9,6 +9,7 @@ use crate::{
     sanitize_datamodel_names::{sanitization_leads_to_duplicate_names, sanitize_datamodel_names},
     version_checker, SqlError, SqlFamilyTrait,
 };
+use datamodel_renderer as render;
 use introspection_connector::{Version, Warning};
 use psl::{
     dml::{self, Datamodel, Field, Model, PrimaryKeyDefinition, PrimaryKeyField, RelationField, SortOrder},
@@ -169,28 +170,49 @@ pub(crate) fn introspect(ctx: &Context, warnings: &mut Vec<Warning>) -> Result<(
     // if based on a previous Prisma version add id default opinionations
     add_prisma_1_id_defaults(&version, &mut datamodel, schema, warnings, ctx);
 
-    let is_empty = datamodel.is_empty();
-
-    let data_model = if ctx.render_config {
-        match calculate_configuration(ctx.config, schema) {
-            Some(config) => psl::render_datamodel_and_config_to_string(&datamodel, &config),
-            None => psl::render_datamodel_and_config_to_string(&datamodel, ctx.config),
-        }
-    } else {
+    let data_model = format!(
+        "{}\n{}",
+        render_configuration(ctx.config, schema),
         psl::render_datamodel_to_string(&datamodel, Some(ctx.config))
-    };
+    );
 
-    Ok((version, data_model, is_empty))
+    Ok((version, data_model, datamodel.is_empty()))
 }
 
-fn calculate_configuration(previous_config: &Configuration, schema: &SqlSchema) -> Option<Configuration> {
-    let datasource = previous_config.datasources.first().unwrap();
+fn render_configuration<'a>(previous_config: &'a Configuration, schema: &'a SqlSchema) -> render::Configuration<'a> {
+    let mut config = render::Configuration::default();
+    config.push_datasource(render_datasource(previous_config, schema));
 
-    if datasource.active_connector.is_provider("postgres") {
-        postgres::calculate_configuration(previous_config, schema)
-    } else {
-        None
+    config
+}
+
+fn render_datasource<'a>(config: &'a Configuration, schema: &'a SqlSchema) -> render::Datasource<'a> {
+    let prev_ds = config.datasources.first().unwrap();
+
+    let mut datasource = render::Datasource::new(&prev_ds.name, &prev_ds.provider, &prev_ds.url);
+
+    if let Some((ref url, _)) = &prev_ds.shadow_database_url {
+        datasource.shadow_database_url(url);
     }
+
+    if let Some(mode) = prev_ds.relation_mode {
+        match mode {
+            psl::datamodel_connector::RelationMode::ForeignKeys => {
+                datasource.relation_mode(render::RelationMode::ForeignKeys)
+            }
+            psl::datamodel_connector::RelationMode::Prisma => datasource.relation_mode(render::RelationMode::Prisma),
+        }
+    }
+
+    if let Some(ref doc) = prev_ds.documentation {
+        datasource.documentation(doc);
+    }
+
+    if prev_ds.active_connector.is_provider("postgres") {
+        postgres::add_extensions(&mut datasource, schema, config);
+    }
+
+    datasource
 }
 
 fn calculate_fields_for_prisma_join_table(
