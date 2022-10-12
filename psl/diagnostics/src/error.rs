@@ -354,6 +354,11 @@ impl DatamodelError {
         Self::new(msg, span)
     }
 
+    pub fn new_schemas_array_empty_error(span: Span) -> DatamodelError {
+        let msg = format!("If provided, the schemas array can not be empty.");
+        Self::new(msg, span)
+    }
+
     pub fn span(&self) -> Span {
         self.span
     }

@@ -321,6 +321,59 @@ fn postgresql_single_complex_extension_rendering() {
     expected.assert_eq(&rendered);
 }
 
+#[test]
+fn empty_schema_property_should_error() {
+    let schema = indoc! {r#"
+        generator js {
+          provider        = "prisma-client-js"
+          previewFeatures = ["multiSchema"]
+        }
+
+        datasource ds {
+          provider   = "postgres"
+          url        = env("DATABASE_URL")
+          schemas = []
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mIf provided, the schemas array can not be empty.[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
+        [1;94m   | [0m
+        [1;94m 8 | [0m  url        = env("DATABASE_URL")
+        [1;94m 9 | [0m  schemas = [1;91m[][0m
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&parse_unwrap_err(schema));
+}
+
+#[test]
+fn schemas_array_without_preview_feature_should_error() {
+    let schema = indoc! {r#"
+        generator js {
+          provider        = "prisma-client-js"
+        }
+
+        datasource ds {
+          provider   = "postgres"
+          url        = env("DATABASE_URL")
+          schemas = ["test"]
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mThe `schemas` property is only availably with the `multiSchema` preview feature.[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
+        [1;94m   | [0m
+        [1;94m 7 | [0m  url        = env("DATABASE_URL")
+        [1;94m 8 | [0m  schemas = [1;91m["test"][0m
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&parse_unwrap_err(schema));
+}
+
 fn render_schema_json(schema: &str) -> String {
     let config = parse_configuration(schema);
     psl::get_config::render_sources_to_json(&config.datasources)
