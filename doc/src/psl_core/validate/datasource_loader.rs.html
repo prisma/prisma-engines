@@ -571,7 +571,7 @@
     }
 
     <span class="prelude-val">Some</span>(<span class="ident">Datasource</span> {
-        <span class="ident">schemas</span>: <span class="ident">schemas</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">s</span>, <span class="ident">span</span>)<span class="op">|</span> (<span class="ident">s</span>.<span class="ident">to_owned</span>(), <span class="ident">span</span>)).<span class="ident">collect</span>(),
+        <span class="ident">namespaces</span>: <span class="ident">schemas</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">s</span>, <span class="ident">span</span>)<span class="op">|</span> (<span class="ident">s</span>.<span class="ident">to_owned</span>(), <span class="ident">span</span>)).<span class="ident">collect</span>(),
         <span class="ident">schemas_span</span>,
         <span class="ident">name</span>: <span class="ident">source_name</span>.<span class="ident">to_string</span>(),
         <span class="ident">provider</span>: <span class="ident">provider</span>.<span class="ident">to_owned</span>(),

@@ -1217,6 +1217,97 @@
 <span id="1217">1217</span>
 <span id="1218">1218</span>
 <span id="1219">1219</span>
+<span id="1220">1220</span>
+<span id="1221">1221</span>
+<span id="1222">1222</span>
+<span id="1223">1223</span>
+<span id="1224">1224</span>
+<span id="1225">1225</span>
+<span id="1226">1226</span>
+<span id="1227">1227</span>
+<span id="1228">1228</span>
+<span id="1229">1229</span>
+<span id="1230">1230</span>
+<span id="1231">1231</span>
+<span id="1232">1232</span>
+<span id="1233">1233</span>
+<span id="1234">1234</span>
+<span id="1235">1235</span>
+<span id="1236">1236</span>
+<span id="1237">1237</span>
+<span id="1238">1238</span>
+<span id="1239">1239</span>
+<span id="1240">1240</span>
+<span id="1241">1241</span>
+<span id="1242">1242</span>
+<span id="1243">1243</span>
+<span id="1244">1244</span>
+<span id="1245">1245</span>
+<span id="1246">1246</span>
+<span id="1247">1247</span>
+<span id="1248">1248</span>
+<span id="1249">1249</span>
+<span id="1250">1250</span>
+<span id="1251">1251</span>
+<span id="1252">1252</span>
+<span id="1253">1253</span>
+<span id="1254">1254</span>
+<span id="1255">1255</span>
+<span id="1256">1256</span>
+<span id="1257">1257</span>
+<span id="1258">1258</span>
+<span id="1259">1259</span>
+<span id="1260">1260</span>
+<span id="1261">1261</span>
+<span id="1262">1262</span>
+<span id="1263">1263</span>
+<span id="1264">1264</span>
+<span id="1265">1265</span>
+<span id="1266">1266</span>
+<span id="1267">1267</span>
+<span id="1268">1268</span>
+<span id="1269">1269</span>
+<span id="1270">1270</span>
+<span id="1271">1271</span>
+<span id="1272">1272</span>
+<span id="1273">1273</span>
+<span id="1274">1274</span>
+<span id="1275">1275</span>
+<span id="1276">1276</span>
+<span id="1277">1277</span>
+<span id="1278">1278</span>
+<span id="1279">1279</span>
+<span id="1280">1280</span>
+<span id="1281">1281</span>
+<span id="1282">1282</span>
+<span id="1283">1283</span>
+<span id="1284">1284</span>
+<span id="1285">1285</span>
+<span id="1286">1286</span>
+<span id="1287">1287</span>
+<span id="1288">1288</span>
+<span id="1289">1289</span>
+<span id="1290">1290</span>
+<span id="1291">1291</span>
+<span id="1292">1292</span>
+<span id="1293">1293</span>
+<span id="1294">1294</span>
+<span id="1295">1295</span>
+<span id="1296">1296</span>
+<span id="1297">1297</span>
+<span id="1298">1298</span>
+<span id="1299">1299</span>
+<span id="1300">1300</span>
+<span id="1301">1301</span>
+<span id="1302">1302</span>
+<span id="1303">1303</span>
+<span id="1304">1304</span>
+<span id="1305">1305</span>
+<span id="1306">1306</span>
+<span id="1307">1307</span>
+<span id="1308">1308</span>
+<span id="1309">1309</span>
+<span id="1310">1310</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Postgres schema description.</span>
 
 <span class="kw">mod</span> <span class="ident">default</span>;
@@ -1228,6 +1319,7 @@
 <span class="kw">use</span> <span class="ident">indexmap::IndexMap</span>;
 <span class="kw">use</span> <span class="ident">indoc::indoc</span>;
 <span class="kw">use</span> <span class="ident">native_types</span>::{<span class="ident">CockroachType</span>, <span class="ident">NativeType</span>, <span class="ident">PostgresType</span>};
+<span class="kw">use</span> <span class="ident">quaint::Value::Array</span>;
 <span class="kw">use</span> <span class="ident">quaint</span>::{<span class="ident">connector::ResultRow</span>, <span class="ident">prelude::Queryable</span>};
 <span class="kw">use</span> <span class="ident">regex::Regex</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">any::type_name</span>, <span class="ident">collections::BTreeMap</span>, <span class="ident">convert::TryInto</span>};
@@ -1237,6 +1329,8 @@
 <span class="doccomment">/// https://www.postgresql.org/docs/current/view-pg-sequences.html</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Sequence</span> {
+    <span class="doccomment">/// Sequence name</span>
+    <span class="kw">pub</span> <span class="ident">namespace_id</span>: <span class="ident">NamespaceId</span>,
     <span class="doccomment">/// Sequence name</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="doccomment">/// Start value of the sequence</span>
@@ -1259,6 +1353,7 @@
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Sequence</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">Sequence</span> {
+            <span class="ident">namespace_id</span>: <span class="ident">NamespaceId::default</span>(),
             <span class="ident">name</span>: <span class="ident">String::default</span>(),
             <span class="ident">start_value</span>: <span class="number">1</span>,
             <span class="ident">min_value</span>: <span class="number">1</span>,
@@ -1627,7 +1722,9 @@
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_metadata</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">SqlMetadata</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sql_schema</span> <span class="op">=</span> <span class="ident">SqlSchema::default</span>();
-        <span class="kw">let</span> <span class="ident">table_count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_table_names</span>(<span class="ident">schema</span>, <span class="kw-2">&amp;mut</span> <span class="ident">sql_schema</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">len</span>();
+        <span class="ident">sql_schema</span>.<span class="ident">push_namespace</span>((<span class="kw-2">*</span><span class="ident">schema</span>).<span class="ident">into</span>());
+
+        <span class="kw">let</span> <span class="ident">table_count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_table_names</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sql_schema</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">len</span>();
         <span class="kw">let</span> <span class="ident">size_in_bytes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_size</span>(<span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">SqlMetadata</span> {
@@ -1636,33 +1733,39 @@
         })
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">describe</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">describe</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schemas</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>]) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sql_schema</span> <span class="op">=</span> <span class="ident">SqlSchema::default</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pg_ext</span> <span class="op">=</span> <span class="ident">PostgresSchemaExt::default</span>();
-        <span class="kw">let</span> <span class="ident">table_names</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_table_names</span>(<span class="ident">schema</span>, <span class="kw-2">&amp;mut</span> <span class="ident">sql_schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="self">self</span>.<span class="ident">get_sequences</span>(<span class="ident">schema</span>, <span class="kw-2">&amp;mut</span> <span class="ident">pg_ext</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="ident">sql_schema</span>.<span class="ident">enums</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_enums</span>(<span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">get_columns</span>(<span class="ident">schema</span>, <span class="kw-2">&amp;</span><span class="ident">table_names</span>, <span class="kw-2">&amp;mut</span> <span class="ident">sql_schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">get_foreign_keys</span>(<span class="ident">schema</span>, <span class="kw-2">&amp;</span><span class="ident">table_names</span>, <span class="kw-2">&amp;mut</span> <span class="ident">sql_schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">get_indices</span>(<span class="ident">schema</span>, <span class="kw-2">&amp;</span><span class="ident">table_names</span>, <span class="kw-2">&amp;mut</span> <span class="ident">pg_ext</span>, <span class="kw-2">&amp;mut</span> <span class="ident">sql_schema</span>)
-            .<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">for</span> <span class="ident">schema</span> <span class="kw">in</span> <span class="ident">schemas</span> {
+            <span class="ident">sql_schema</span>.<span class="ident">push_namespace</span>((<span class="kw-2">*</span><span class="ident">schema</span>).<span class="ident">into</span>());
+        }
 
-        <span class="ident">sql_schema</span>.<span class="ident">views</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_views</span>(<span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="ident">sql_schema</span>.<span class="ident">procedures</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_procedures</span>(<span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="comment">//TODO(matthias) can we get rid of the table names map and instead just use tablewalker_ns everywhere like in get_columns?</span>
+        <span class="kw">let</span> <span class="ident">table_names</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_table_names</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sql_schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
+        <span class="self">self</span>.<span class="ident">get_enums</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sql_schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">get_columns</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sql_schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">get_foreign_keys</span>(<span class="kw-2">&amp;</span><span class="ident">table_names</span>, <span class="kw-2">&amp;mut</span> <span class="ident">sql_schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">get_indices</span>(<span class="kw-2">&amp;</span><span class="ident">table_names</span>, <span class="kw-2">&amp;mut</span> <span class="ident">pg_ext</span>, <span class="kw-2">&amp;mut</span> <span class="ident">sql_schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="self">self</span>.<span class="ident">get_views</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sql_schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">get_procedures</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sql_schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="comment">//Todo(matthias) understand this</span>
+        <span class="self">self</span>.<span class="ident">get_sequences</span>(<span class="kw-2">&amp;</span><span class="ident">sql_schema</span>, <span class="kw-2">&amp;mut</span> <span class="ident">pg_ext</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="comment">// Make sure the vectors we use binary search on are sorted.</span>
         <span class="ident">pg_ext</span>.<span class="ident">indexes</span>.<span class="ident">sort_by_key</span>(<span class="op">|</span>(<span class="ident">id</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">id</span>);
         <span class="ident">pg_ext</span>.<span class="ident">opclasses</span>.<span class="ident">sort_by_key</span>(<span class="op">|</span>(<span class="ident">id</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">id</span>);
 
-        <span class="ident">sql_schema</span>.<span class="ident">connector_data</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::connector_data::ConnectorData</span> {
+        <span class="ident">sql_schema</span>.<span class="ident">connector_data</span> <span class="op">=</span> <span class="ident">connector_data::ConnectorData</span> {
             <span class="ident">data</span>: <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">pg_ext</span>)),
         };
 
         <span class="prelude-val">Ok</span>(<span class="ident">sql_schema</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::DescriberResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::DescriberResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">version</span>().<span class="kw">await</span><span class="question-mark">?</span>)
     }
 }
@@ -1689,50 +1792,69 @@
         <span class="prelude-val">Ok</span>(<span class="ident">names</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_procedures</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Procedure</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_procedures</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql_schema</span>: <span class="kw-2">&amp;mut</span> <span class="ident">SqlSchema</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">namespaces</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">sql_schema</span>.<span class="ident">namespaces</span>;
+
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_cockroach</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Vec::new</span>());
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
         }
 
         <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="string">r#&quot;
-            SELECT p.proname AS name,
+            SELECT p.proname AS name, n.nspname as namespace,
                 CASE WHEN l.lanname = &#39;internal&#39; THEN p.prosrc
                      ELSE pg_get_functiondef(p.oid)
                      END as definition
             FROM pg_proc p
             LEFT JOIN pg_namespace n ON p.pronamespace = n.oid
             LEFT JOIN pg_language l ON p.prolang = l.oid
-            WHERE n.nspname = $1
+            WHERE n.nspname = ANY ( $1 )
         &quot;#</span>;
 
-        <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">query_raw</span>(<span class="ident">sql</span>, <span class="kw-2">&amp;</span>[<span class="ident">schema</span>.<span class="ident">into</span>()]).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">conn</span>
+            .<span class="ident">query_raw</span>(
+                <span class="ident">sql</span>,
+                <span class="kw-2">&amp;</span>[<span class="ident">Array</span>(<span class="prelude-val">Some</span>(<span class="ident">namespaces</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_str</span>().<span class="ident">into</span>()).<span class="ident">collect</span>()))],
+            )
+            .<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">procedures</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">rows</span>.<span class="ident">len</span>());
 
         <span class="kw">for</span> <span class="ident">row</span> <span class="kw">in</span> <span class="ident">rows</span>.<span class="ident">into_iter</span>() {
             <span class="ident">procedures</span>.<span class="ident">push</span>(<span class="ident">Procedure</span> {
+                <span class="ident">namespace_id</span>: <span class="ident">sql_schema</span>.<span class="ident">get_namespace_id</span>(<span class="kw-2">&amp;</span><span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;namespace&quot;</span>)),
                 <span class="ident">name</span>: <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;name&quot;</span>),
                 <span class="ident">definition</span>: <span class="ident">row</span>.<span class="ident">get_string</span>(<span class="string">&quot;definition&quot;</span>),
             });
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">procedures</span>)
+        <span class="ident">sql_schema</span>.<span class="ident">procedures</span> <span class="op">=</span> <span class="ident">procedures</span>;
+
+        <span class="prelude-val">Ok</span>(())
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_table_names</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">sql_schema</span>: <span class="kw-2">&amp;mut</span> <span class="ident">SqlSchema</span>,
-    ) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">TableId</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">IndexMap</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">String</span>), <span class="ident">TableId</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;postgres/tables_query.sql&quot;</span>);
+        <span class="kw">let</span> <span class="ident">namespaces</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">sql_schema</span>.<span class="ident">namespaces</span>;
 
-        <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">query_raw</span>(<span class="ident">sql</span>, <span class="kw-2">&amp;</span>[<span class="ident">schema</span>.<span class="ident">into</span>()]).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">names</span> <span class="op">=</span> <span class="ident">rows</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">row</span><span class="op">|</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;table_name&quot;</span>));
+        <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">conn</span>
+            .<span class="ident">query_raw</span>(
+                <span class="ident">sql</span>,
+                <span class="kw-2">&amp;</span>[<span class="ident">Array</span>(<span class="prelude-val">Some</span>(<span class="ident">namespaces</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_str</span>().<span class="ident">into</span>()).<span class="ident">collect</span>()))],
+            )
+            .<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">names</span> <span class="op">=</span> <span class="ident">rows</span>
+            .<span class="ident">into_iter</span>()
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">row</span><span class="op">|</span> (<span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;table_name&quot;</span>), <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;namespace&quot;</span>)));
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">IndexMap::default</span>();
 
-        <span class="kw">for</span> <span class="ident">name</span> <span class="kw">in</span> <span class="ident">names</span> {
-            <span class="kw">let</span> <span class="ident">cloned_name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">clone</span>();
-            <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">sql_schema</span>.<span class="ident">push_table</span>(<span class="ident">name</span>, <span class="ident">Default::default</span>());
-            <span class="ident">map</span>.<span class="ident">insert</span>(<span class="ident">cloned_name</span>, <span class="ident">id</span>);
+        <span class="kw">for</span> (<span class="ident">table_name</span>, <span class="ident">namespace</span>) <span class="kw">in</span> <span class="ident">names</span> {
+            <span class="kw">let</span> <span class="ident">cloned_name</span> <span class="op">=</span> <span class="ident">table_name</span>.<span class="ident">clone</span>();
+            <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">sql_schema</span>.<span class="ident">push_table</span>(<span class="ident">table_name</span>, <span class="ident">sql_schema</span>.<span class="ident">get_namespace_id</span>(<span class="kw-2">&amp;</span><span class="ident">namespace</span>));
+            <span class="ident">map</span>.<span class="ident">insert</span>((<span class="ident">namespace</span>, <span class="ident">cloned_name</span>), <span class="ident">id</span>);
         }
 
         <span class="prelude-val">Ok</span>(<span class="ident">map</span>)
@@ -1755,32 +1877,38 @@
         <span class="prelude-val">Ok</span>(<span class="ident">size</span>.<span class="ident">try_into</span>().<span class="ident">expect</span>(<span class="string">&quot;size is not a valid usize&quot;</span>))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_views</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">View</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_views</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql_schema</span>: <span class="kw-2">&amp;mut</span> <span class="ident">SqlSchema</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">namespaces</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">sql_schema</span>.<span class="ident">namespaces</span>;
         <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="macro">indoc!</span> {<span class="string">r#&quot;
-            SELECT viewname AS view_name, definition AS view_sql
+            SELECT viewname AS view_name, definition AS view_sql, schemaname as namespace
             FROM pg_catalog.pg_views
-            WHERE schemaname = $1
+            WHERE schemaname = ANY ( $1 )
         &quot;#</span>};
 
-        <span class="kw">let</span> <span class="ident">result_set</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">query_raw</span>(<span class="ident">sql</span>, <span class="kw-2">&amp;</span>[<span class="ident">schema</span>.<span class="ident">into</span>()]).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">result_set</span> <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">conn</span>
+            .<span class="ident">query_raw</span>(
+                <span class="ident">sql</span>,
+                <span class="kw-2">&amp;</span>[<span class="ident">Array</span>(<span class="prelude-val">Some</span>(<span class="ident">namespaces</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_str</span>().<span class="ident">into</span>()).<span class="ident">collect</span>()))],
+            )
+            .<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">views</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">result_set</span>.<span class="ident">len</span>());
 
         <span class="kw">for</span> <span class="ident">row</span> <span class="kw">in</span> <span class="ident">result_set</span>.<span class="ident">into_iter</span>() {
             <span class="ident">views</span>.<span class="ident">push</span>(<span class="ident">View</span> {
+                <span class="ident">namespace_id</span>: <span class="ident">sql_schema</span>.<span class="ident">get_namespace_id</span>(<span class="kw-2">&amp;</span><span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;namespace&quot;</span>)),
                 <span class="ident">name</span>: <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;view_name&quot;</span>),
                 <span class="ident">definition</span>: <span class="ident">row</span>.<span class="ident">get_string</span>(<span class="string">&quot;view_sql&quot;</span>),
             })
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">views</span>)
+        <span class="ident">sql_schema</span>.<span class="ident">views</span> <span class="op">=</span> <span class="ident">views</span>;
+        <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_columns</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">table_ids</span>: <span class="kw-2">&amp;</span><span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">TableId</span><span class="op">&gt;</span>,
-        <span class="ident">sql_schema</span>: <span class="kw-2">&amp;mut</span> <span class="ident">SqlSchema</span>,
-    ) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql_schema</span>: <span class="kw-2">&amp;mut</span> <span class="ident">SqlSchema</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">namespaces</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">sql_schema</span>.<span class="ident">namespaces</span>;
+
         <span class="kw">let</span> <span class="ident">is_visible_clause</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_cockroach</span>() {
             <span class="string">&quot; AND info.is_hidden = &#39;NO&#39;&quot;</span>
         } <span class="kw">else</span> {
@@ -1790,6 +1918,7 @@
         <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="macro">format!</span>(
             <span class="string">r#&quot;
             SELECT
+                oid.namespace,
                 info.table_name,
                 info.column_name,
                 format_type(att.atttypid, att.atttypmod) as formatted_type,
@@ -1805,28 +1934,37 @@
                 info.character_maximum_length
             FROM information_schema.columns info
             JOIN pg_attribute att ON att.attname = info.column_name
-                AND att.attrelid = (
-                    SELECT pg_class.oid
-                    FROM pg_class
-                    JOIN pg_namespace on pg_namespace.oid = pg_class.relnamespace
-                    WHERE relname = info.table_name
-                    AND pg_namespace.nspname = $1
-                )
-            LEFT OUTER JOIN pg_attrdef attdef ON attdef.adrelid = att.attrelid AND attdef.adnum = att.attnum
-            WHERE table_schema = $1 {}
-            ORDER BY table_name, ordinal_position;
+            JOIN (
+                 SELECT pg_class.oid, relname, pg_namespace.nspname as namespace
+                 FROM pg_class
+                 JOIN pg_namespace on pg_namespace.oid = pg_class.relnamespace
+                 AND pg_namespace.nspname = ANY ( $1 )
+                ) as oid on oid.oid = att.attrelid 
+                  AND relname = info.table_name
+                  AND namespace = info.table_schema
+            LEFT OUTER JOIN pg_attrdef attdef ON attdef.adrelid = att.attrelid AND attdef.adnum = att.attnum AND table_schema = namespace
+            WHERE table_schema = ANY ( $1 ) {}
+            ORDER BY namespace, table_name, ordinal_position;
         &quot;#</span>,
             <span class="ident">is_visible_clause</span>,
         );
 
-        <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">query_raw</span>(<span class="ident">sql</span>.<span class="ident">as_str</span>(), <span class="kw-2">&amp;</span>[<span class="ident">schema</span>.<span class="ident">into</span>()]).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">conn</span>
+            .<span class="ident">query_raw</span>(
+                <span class="ident">sql</span>.<span class="ident">as_str</span>(),
+                <span class="kw-2">&amp;</span>[<span class="ident">Array</span>(<span class="prelude-val">Some</span>(<span class="ident">namespaces</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_str</span>().<span class="ident">into</span>()).<span class="ident">collect</span>()))],
+            )
+            .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">for</span> <span class="ident">col</span> <span class="kw">in</span> <span class="ident">rows</span> {
+            <span class="kw">let</span> <span class="ident">namespace</span> <span class="op">=</span> <span class="ident">col</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;namespace&quot;</span>);
             <span class="kw">let</span> <span class="ident">table_name</span> <span class="op">=</span> <span class="ident">col</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;table_name&quot;</span>);
-            <span class="kw">let</span> <span class="ident">table_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">table_ids</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">table_name</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">table_id</span>) =&gt; <span class="ident">table_id</span>,
+            <span class="kw">let</span> <span class="ident">table_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">sql_schema</span>.<span class="ident">table_walker_ns</span>(<span class="kw-2">&amp;</span><span class="ident">namespace</span>, <span class="kw-2">&amp;</span><span class="ident">table_name</span>) {
+                <span class="prelude-val">Some</span>(<span class="ident">t_walker</span>) =&gt; <span class="ident">t_walker</span>.<span class="ident">id</span>,
                 <span class="prelude-val">None</span> =&gt; <span class="kw">continue</span>, <span class="comment">// we only care about columns in tables we have access to</span>
             };
+
             <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">col</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;column_name&quot;</span>);
 
             <span class="kw">let</span> <span class="ident">is_identity</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">col</span>.<span class="ident">get_string</span>(<span class="string">&quot;is_identity&quot;</span>) {
@@ -1865,7 +2003,7 @@
                 <span class="ident">auto_increment</span>,
             };
 
-            <span class="ident">sql_schema</span>.<span class="ident">columns</span>.<span class="ident">push</span>((<span class="kw-2">*</span><span class="ident">table_id</span>, <span class="ident">col</span>));
+            <span class="ident">sql_schema</span>.<span class="ident">columns</span>.<span class="ident">push</span>((<span class="ident">table_id</span>, <span class="ident">col</span>));
         }
 
         <span class="comment">// We need to sort because the collation in the system tables (pg_class) is different from</span>
@@ -1939,10 +2077,11 @@
     <span class="doccomment">/// Returns a map from table name to foreign keys.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_foreign_keys</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">table_ids</span>: <span class="kw-2">&amp;</span><span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">TableId</span><span class="op">&gt;</span>,
+        <span class="ident">table_ids</span>: <span class="kw-2">&amp;</span><span class="ident">IndexMap</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">String</span>), <span class="ident">TableId</span><span class="op">&gt;</span>,
         <span class="ident">sql_schema</span>: <span class="kw-2">&amp;mut</span> <span class="ident">SqlSchema</span>,
     ) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">namespaces</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">sql_schema</span>.<span class="ident">namespaces</span>;
+
         <span class="comment">// The `generate_subscripts` in the inner select is needed because the optimizer is free to reorganize the unnested rows if not explicitly ordered.</span>
         <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="string">r#&quot;
             SELECT
@@ -1956,8 +2095,11 @@
                 conname         AS constraint_name,
                 child,
                 parent,
-                table_name
-            FROM (SELECT unnest(con1.conkey)                AS &quot;parent&quot;,
+                table_name, 
+                namespace
+            FROM (SELECT 
+                        ns.nspname AS &quot;namespace&quot;,
+                        unnest(con1.conkey)                AS &quot;parent&quot;,
                         unnest(con1.confkey)                AS &quot;child&quot;,
                         cl.relname                          AS table_name,
                         ns.nspname                          AS schema_name,
@@ -1972,7 +2114,7 @@
                         join pg_constraint con1 on con1.conrelid = cl.oid
                         join pg_namespace ns on cl.relnamespace = ns.oid
                 WHERE
-                    ns.nspname = $1
+                    ns.nspname = ANY ( $1 )
                     and con1.contype = &#39;f&#39;
                 ORDER BY colidx
                 ) con
@@ -1981,21 +2123,24 @@
                     JOIN pg_attribute att2 on att2.attrelid = con.conrelid and att2.attnum = con.parent
                     JOIN pg_class rel_cl on con.confrelid = rel_cl.oid
                     JOIN pg_namespace rel_ns on rel_cl.relnamespace = rel_ns.oid
-            ORDER BY table_name, constraint_name, con_id, con.colidx;
+            ORDER BY namespace, table_name, constraint_name, con_id, con.colidx;
         &quot;#</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">current_fk</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">i64</span>, <span class="ident">ForeignKeyId</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::too_many_arguments</span>)]</span>
         <span class="kw">fn</span> <span class="ident">get_ids</span>(
-            <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+            <span class="ident">namespace</span>: <span class="ident">String</span>,
+            <span class="ident">table_name</span>: <span class="ident">String</span>,
             <span class="ident">column_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-            <span class="ident">referenced_table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+            <span class="ident">referenced_schema_name</span>: <span class="ident">String</span>,
+            <span class="ident">referenced_table_name</span>: <span class="ident">String</span>,
             <span class="ident">referenced_column_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-            <span class="ident">table_ids</span>: <span class="kw-2">&amp;</span><span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">TableId</span><span class="op">&gt;</span>,
+            <span class="ident">table_ids</span>: <span class="kw-2">&amp;</span><span class="ident">IndexMap</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">String</span>), <span class="ident">TableId</span><span class="op">&gt;</span>,
             <span class="ident">sql_schema</span>: <span class="kw-2">&amp;</span><span class="ident">SqlSchema</span>,
         ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">TableId</span>, <span class="ident">ColumnId</span>, <span class="ident">TableId</span>, <span class="ident">ColumnId</span>)<span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">table_id</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">table_ids</span>.<span class="ident">get</span>(<span class="ident">table_name</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">referenced_table_id</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">table_ids</span>.<span class="ident">get</span>(<span class="ident">referenced_table_name</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">table_id</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">table_ids</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span>(<span class="ident">namespace</span>, <span class="ident">table_name</span>))<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">referenced_table_id</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">table_ids</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span>(<span class="ident">referenced_schema_name</span>, <span class="ident">referenced_table_name</span>))<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">column_id</span> <span class="op">=</span> <span class="ident">sql_schema</span>.<span class="ident">walk</span>(<span class="ident">table_id</span>).<span class="ident">column</span>(<span class="ident">column_name</span>)<span class="question-mark">?</span>.<span class="ident">id</span>;
             <span class="kw">let</span> <span class="ident">referenced_column_id</span> <span class="op">=</span> <span class="ident">sql_schema</span>.<span class="ident">walk</span>(<span class="ident">referenced_table_id</span>).<span class="ident">column</span>(<span class="ident">referenced_column_name</span>)<span class="question-mark">?</span>.<span class="ident">id</span>;
 
@@ -2004,29 +2149,39 @@
 
         <span class="comment">// One foreign key with multiple columns will be represented here as several</span>
         <span class="comment">// rows with the same ID.</span>
-        <span class="kw">let</span> <span class="ident">result_set</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">query_raw</span>(<span class="ident">sql</span>, <span class="kw-2">&amp;</span>[<span class="ident">schema</span>.<span class="ident">into</span>()]).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">result_set</span> <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">conn</span>
+            .<span class="ident">query_raw</span>(
+                <span class="ident">sql</span>,
+                <span class="kw-2">&amp;</span>[<span class="ident">Array</span>(<span class="prelude-val">Some</span>(<span class="ident">namespaces</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_str</span>().<span class="ident">into</span>()).<span class="ident">collect</span>()))],
+            )
+            .<span class="kw">await</span><span class="question-mark">?</span>;
+
         <span class="kw">for</span> <span class="ident">row</span> <span class="kw">in</span> <span class="ident">result_set</span>.<span class="ident">into_iter</span>() {
             <span class="macro">trace!</span>(<span class="string">&quot;Got description FK row {:?}&quot;</span>, <span class="ident">row</span>);
             <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_i64</span>(<span class="string">&quot;con_id&quot;</span>);
-            <span class="kw">let</span> <span class="ident">column_name</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;child_column&quot;</span>);
+            <span class="kw">let</span> <span class="ident">namespace</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;namespace&quot;</span>);
             <span class="kw">let</span> <span class="ident">table_name</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;table_name&quot;</span>);
+            <span class="kw">let</span> <span class="ident">column_name</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;child_column&quot;</span>);
             <span class="kw">let</span> <span class="ident">constraint_name</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;constraint_name&quot;</span>);
             <span class="kw">let</span> <span class="ident">referenced_table</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;parent_table&quot;</span>);
             <span class="kw">let</span> <span class="ident">referenced_column</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;parent_column&quot;</span>);
-            <span class="kw">let</span> <span class="ident">referenced_schema_name</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;referenced_schema_name&quot;</span>);
 
-            <span class="kw">if</span> <span class="ident">schema</span> <span class="op">!</span><span class="op">=</span> <span class="ident">referenced_schema_name</span> {
+            <span class="kw">let</span> <span class="ident">referenced_schema_name</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;referenced_schema_name&quot;</span>);
+            <span class="kw">if</span> <span class="op">!</span><span class="ident">sql_schema</span>.<span class="ident">namespaces</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">referenced_schema_name</span>) {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DescriberError::from</span>(<span class="ident">DescriberErrorKind::CrossSchemaReference</span> {
-                    <span class="ident">from</span>: <span class="macro">format!</span>(<span class="string">&quot;{}.{}&quot;</span>, <span class="ident">schema</span>, <span class="ident">table_name</span>),
+                    <span class="ident">from</span>: <span class="macro">format!</span>(<span class="string">&quot;{}.{}&quot;</span>, <span class="ident">sql_schema</span>.<span class="ident">namespaces</span>[<span class="number">0</span>], <span class="ident">table_name</span>), <span class="comment">//TODO(matthias)</span>
                     <span class="ident">to</span>: <span class="macro">format!</span>(<span class="string">&quot;{}.{}&quot;</span>, <span class="ident">referenced_schema_name</span>, <span class="ident">referenced_table</span>),
                     <span class="ident">constraint</span>: <span class="ident">constraint_name</span>,
                 }));
             }
 
             <span class="kw">let</span> (<span class="ident">table_id</span>, <span class="ident">column_id</span>, <span class="ident">referenced_table_id</span>, <span class="ident">referenced_column_id</span>) <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ids</span>) <span class="op">=</span> <span class="ident">get_ids</span>(
-                <span class="kw-2">&amp;</span><span class="ident">table_name</span>,
+                <span class="ident">namespace</span>,
+                <span class="ident">table_name</span>,
                 <span class="kw-2">&amp;</span><span class="ident">column_name</span>,
-                <span class="kw-2">&amp;</span><span class="ident">referenced_table</span>,
+                <span class="ident">referenced_schema_name</span>,
+                <span class="ident">referenced_table</span>,
                 <span class="kw-2">&amp;</span><span class="ident">referenced_column</span>,
                 <span class="ident">table_ids</span>,
                 <span class="ident">sql_schema</span>,
@@ -2083,18 +2238,25 @@
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_indices</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">table_ids</span>: <span class="kw-2">&amp;</span><span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">TableId</span><span class="op">&gt;</span>,
+        <span class="ident">table_ids</span>: <span class="kw-2">&amp;</span><span class="ident">IndexMap</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">String</span>), <span class="ident">TableId</span><span class="op">&gt;</span>,
         <span class="ident">pg_ext</span>: <span class="kw-2">&amp;mut</span> <span class="ident">PostgresSchemaExt</span>,
         <span class="ident">sql_schema</span>: <span class="kw-2">&amp;mut</span> <span class="ident">SqlSchema</span>,
     ) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">namespaces</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">sql_schema</span>.<span class="ident">namespaces</span>;
         <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;postgres/indexes_query.sql&quot;</span>);
-        <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">query_raw</span>(<span class="ident">sql</span>, <span class="kw-2">&amp;</span>[<span class="ident">schema</span>.<span class="ident">into</span>()]).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">conn</span>
+            .<span class="ident">query_raw</span>(
+                <span class="ident">sql</span>,
+                <span class="kw-2">&amp;</span>[<span class="ident">Array</span>(<span class="prelude-val">Some</span>(<span class="ident">namespaces</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_str</span>().<span class="ident">into</span>()).<span class="ident">collect</span>()))],
+            )
+            .<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">current_index</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IndexId</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
         <span class="kw">for</span> <span class="ident">row</span> <span class="kw">in</span> <span class="ident">rows</span> {
+            <span class="kw">let</span> <span class="ident">namespace</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;namespace&quot;</span>);
             <span class="kw">let</span> <span class="ident">table_name</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;table_name&quot;</span>);
-            <span class="kw">let</span> <span class="ident">table_id</span>: <span class="ident">TableId</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">table_ids</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">table_name</span>) {
+            <span class="kw">let</span> <span class="ident">table_id</span>: <span class="ident">TableId</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">table_ids</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span>(<span class="ident">namespace</span>, <span class="ident">table_name</span>)) {
                 <span class="prelude-val">Some</span>(<span class="ident">id</span>) =&gt; <span class="kw-2">*</span><span class="ident">id</span>,
                 <span class="prelude-val">None</span> =&gt; <span class="kw">continue</span>,
             };
@@ -2182,13 +2344,15 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_sequences</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">postgres_ext</span>: <span class="kw-2">&amp;mut</span> <span class="ident">PostgresSchemaExt</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_sequences</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql_schema</span>: <span class="kw-2">&amp;</span><span class="ident">SqlSchema</span>, <span class="ident">postgres_ext</span>: <span class="kw-2">&amp;mut</span> <span class="ident">PostgresSchemaExt</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">namespaces</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">sql_schema</span>.<span class="ident">namespaces</span>;
         <span class="comment">// On postgres 9, pg_sequences does not exist, and the information schema view does not</span>
         <span class="comment">// contain the cache size.</span>
         <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_cockroach</span>() {
             <span class="string">r#&quot;
               SELECT
                   sequencename AS sequence_name,
+                  schemaname AS namespace,
                   start_value,
                   min_value,
                   max_value,
@@ -2196,13 +2360,14 @@
                   cycle,
                   cache_size
               FROM pg_sequences
-              WHERE schemaname = $1
+              WHERE schemaname = ANY ( $1 )
               ORDER BY sequence_name
             &quot;#</span>
         } <span class="kw">else</span> {
             <span class="string">r#&quot;
               SELECT
                   sequence_name,
+                  sequence_schema AS namespace,
                   start_value::INT8,
                   minimum_value::INT8 AS min_value,
                   maximum_value::INT8 AS max_value,
@@ -2210,13 +2375,20 @@
                   (CASE cycle_option WHEN &#39;yes&#39; THEN TRUE ELSE FALSE END) AS cycle,
                   0::INT8 AS cache_size
               FROM information_schema.sequences
-              WHERE sequence_schema = $1
+              WHERE sequence_schema = ANY ( $1 )
               ORDER BY sequence_name
             &quot;#</span>
         };
 
-        <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">query_raw</span>(<span class="ident">sql</span>, <span class="kw-2">&amp;</span>[<span class="ident">schema</span>.<span class="ident">into</span>()]).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">conn</span>
+            .<span class="ident">query_raw</span>(
+                <span class="ident">sql</span>,
+                <span class="kw-2">&amp;</span>[<span class="ident">Array</span>(<span class="prelude-val">Some</span>(<span class="ident">namespaces</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_str</span>().<span class="ident">into</span>()).<span class="ident">collect</span>()))],
+            )
+            .<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">sequences</span> <span class="op">=</span> <span class="ident">rows</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">seq</span><span class="op">|</span> <span class="ident">Sequence</span> {
+            <span class="ident">namespace_id</span>: <span class="ident">sql_schema</span>.<span class="ident">get_namespace_id</span>(<span class="kw-2">&amp;</span><span class="ident">seq</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;namespace&quot;</span>)),
             <span class="ident">name</span>: <span class="ident">seq</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;sequence_name&quot;</span>),
             <span class="ident">start_value</span>: <span class="ident">seq</span>.<span class="ident">get_expect_i64</span>(<span class="string">&quot;start_value&quot;</span>),
             <span class="ident">min_value</span>: <span class="ident">seq</span>.<span class="ident">get_expect_i64</span>(<span class="string">&quot;min_value&quot;</span>),
@@ -2231,39 +2403,49 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_enums</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Enum</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_enums</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql_schema</span>: <span class="kw-2">&amp;mut</span> <span class="ident">SqlSchema</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">namespaces</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">sql_schema</span>.<span class="ident">namespaces</span>;
+
         <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="string">&quot;
-            SELECT t.typname as name, e.enumlabel as value
+            SELECT t.typname as name, e.enumlabel as value, n.nspname as namespace
             FROM pg_type t
             JOIN pg_enum e ON t.oid = e.enumtypid
             JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
-            WHERE n.nspname = $1
+            WHERE n.nspname = ANY ( $1 )
             ORDER BY e.enumsortorder&quot;</span>;
 
-        <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">query_raw</span>(<span class="ident">sql</span>, <span class="kw-2">&amp;</span>[<span class="ident">schema</span>.<span class="ident">into</span>()]).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">enum_values</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
+        <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">conn</span>
+            .<span class="ident">query_raw</span>(
+                <span class="ident">sql</span>,
+                <span class="kw-2">&amp;</span>[<span class="ident">Array</span>(<span class="prelude-val">Some</span>(<span class="ident">namespaces</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_str</span>().<span class="ident">into</span>()).<span class="ident">collect</span>()))],
+            )
+            .<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">enum_values</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">String</span>), <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
 
         <span class="kw">for</span> <span class="ident">row</span> <span class="kw">in</span> <span class="ident">rows</span>.<span class="ident">into_iter</span>() {
             <span class="macro">trace!</span>(<span class="string">&quot;Got enum row: {:?}&quot;</span>, <span class="ident">row</span>);
             <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;name&quot;</span>);
             <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;value&quot;</span>);
+            <span class="kw">let</span> <span class="ident">namespace</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;namespace&quot;</span>);
 
-            <span class="kw">let</span> <span class="ident">values</span> <span class="op">=</span> <span class="ident">enum_values</span>.<span class="ident">entry</span>(<span class="ident">name</span>).<span class="ident">or_insert_with</span>(<span class="ident">Vec::new</span>);
+            <span class="kw">let</span> <span class="ident">values</span> <span class="op">=</span> <span class="ident">enum_values</span>.<span class="ident">entry</span>((<span class="ident">name</span>, <span class="ident">namespace</span>)).<span class="ident">or_insert_with</span>(<span class="ident">Vec::new</span>);
             <span class="ident">values</span>.<span class="ident">push</span>(<span class="ident">value</span>);
         }
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">enums</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Enum</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">enum_values</span>
             .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> <span class="ident">Enum</span> {
-                <span class="ident">namespace_id</span>: <span class="ident">Default::default</span>(),
-                <span class="ident">name</span>: <span class="ident">k</span>,
-                <span class="ident">values</span>: <span class="ident">v</span>,
+            .<span class="ident">map</span>(<span class="op">|</span>((<span class="ident">name</span>, <span class="ident">namespace</span>), <span class="ident">values</span>)<span class="op">|</span> <span class="ident">Enum</span> {
+                <span class="ident">namespace_id</span>: <span class="ident">sql_schema</span>.<span class="ident">get_namespace_id</span>(<span class="kw-2">&amp;</span><span class="ident">namespace</span>),
+                <span class="ident">name</span>,
+                <span class="ident">values</span>,
             })
             .<span class="ident">collect</span>();
 
         <span class="ident">enums</span>.<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">Ord::cmp</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="ident">name</span>));
 
-        <span class="prelude-val">Ok</span>(<span class="ident">enums</span>)
+        <span class="ident">sql_schema</span>.<span class="ident">enums</span> <span class="op">=</span> <span class="ident">enums</span>;
+        <span class="prelude-val">Ok</span>(())
     }
 }
 

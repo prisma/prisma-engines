@@ -153,10 +153,6 @@
 <span id="153">153</span>
 <span id="154">154</span>
 <span id="155">155</span>
-<span id="156">156</span>
-<span id="157">157</span>
-<span id="158">158</span>
-<span id="159">159</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::Deserialize</span>;
 <span class="kw">use</span> <span class="ident">serde_json::json</span>;
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
@@ -179,29 +175,25 @@
     <span class="ident">message</span>: <span class="ident">String</span>,
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_config</span>(<span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_config</span>(<span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">params</span>: <span class="ident">GetConfigParams</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">serde_json::from_str</span>(<span class="ident">params</span>) {
         <span class="prelude-val">Ok</span>(<span class="ident">params</span>) =&gt; <span class="ident">params</span>,
         <span class="prelude-val">Err</span>(<span class="ident">serde_err</span>) =&gt; {
-            <span class="kw">return</span> <span class="macro">json!</span>({
-                <span class="string">&quot;error&quot;</span>: {
-                    <span class="string">&quot;message&quot;</span>: <span class="ident">serde_err</span>.<span class="ident">to_string</span>(),
-                }
-            })
-            .<span class="ident">to_string</span>();
+            <span class="macro">panic!</span>(<span class="string">&quot;Failed to deserialize GetConfigParams: {}&quot;</span>, <span class="ident">serde_err</span>,);
         }
     };
 
-    <span class="kw">match</span> <span class="ident">get_config_impl</span>(<span class="ident">params</span>) {
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="macro">json!</span>({
-            <span class="string">&quot;error&quot;</span>: {
-                <span class="string">&quot;message&quot;</span>: <span class="ident">err</span>.<span class="ident">message</span>,
-                <span class="string">&quot;error_code&quot;</span>: <span class="ident">err</span>.<span class="ident">error_code</span>,
-            }
-        }),
-        <span class="prelude-val">Ok</span>(<span class="ident">value</span>) =&gt; <span class="ident">value</span>,
-    }
-    .<span class="ident">to_string</span>()
+    <span class="ident">get_config_impl</span>(<span class="ident">params</span>)
+        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> {
+            <span class="macro">json!</span>({
+                <span class="string">&quot;error&quot;</span>: {
+                    <span class="string">&quot;message&quot;</span>: <span class="ident">err</span>.<span class="ident">message</span>,
+                    <span class="string">&quot;error_code&quot;</span>: <span class="ident">err</span>.<span class="ident">error_code</span>,
+                }
+            })
+            .<span class="ident">to_string</span>()
+        })
+        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">to_string</span>())
 }
 
 <span class="kw">fn</span> <span class="ident">get_config_impl</span>(<span class="ident">params</span>: <span class="ident">GetConfigParams</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">serde_json::Value</span>, <span class="ident">GetConfigError</span><span class="op">&gt;</span> {
@@ -250,8 +242,8 @@
         <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">expect!</span>[[
             <span class="string">r#&quot;{&quot;error&quot;:{&quot;message&quot;:&quot;\u001b[1;91merror\u001b[0m: \u001b[1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.\u001b[0m\n  \u001b[1;94m--&gt;\u001b[0m  \u001b[4mschema.prisma:5\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 4 | \u001b[0m\n\u001b[1;94m 5 | \u001b[0m            \u001b[1;91mdatasøurce yolo {\u001b[0m\n\u001b[1;94m 6 | \u001b[0m            }\n\u001b[1;94m   | \u001b[0m\n\u001b[1;91merror\u001b[0m: \u001b[1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.\u001b[0m\n  \u001b[1;94m--&gt;\u001b[0m  \u001b[4mschema.prisma:6\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 5 | \u001b[0m            datasøurce yolo {\n\u001b[1;94m 6 | \u001b[0m            \u001b[1;91m}\u001b[0m\n\u001b[1;94m 7 | \u001b[0m        \n\u001b[1;94m   | \u001b[0m\n\u001b[1;91merror\u001b[0m: \u001b[1mArgument \&quot;provider\&quot; is missing in generator block \&quot;js\&quot;.\u001b[0m\n  \u001b[1;94m--&gt;\u001b[0m  \u001b[4mschema.prisma:2\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 1 | \u001b[0m\n\u001b[1;94m 2 | \u001b[0m            \u001b[1;91mgenerator js {\u001b[0m\n\u001b[1;94m 3 | \u001b[0m            }\n\u001b[1;94m   | \u001b[0m\n&quot;,&quot;error_code&quot;:null}}&quot;#</span>
         ]];
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">get_config</span>(<span class="kw-2">&amp;</span><span class="ident">request</span>.<span class="ident">to_string</span>());
 
+        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">get_config</span>(<span class="kw-2">&amp;</span><span class="ident">request</span>.<span class="ident">to_string</span>()).<span class="ident">unwrap_err</span>();
         <span class="ident">expected</span>.<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">response</span>);
     }
 
@@ -270,7 +262,7 @@
         <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">expect!</span>[[
             <span class="string">r#&quot;{&quot;error&quot;:{&quot;message&quot;:&quot;\u001b[1;91merror\u001b[0m: \u001b[1mEnvironment variable not found: NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST.\u001b[0m\n  \u001b[1;94m--&gt;\u001b[0m  \u001b[4mschema.prisma:4\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 3 | \u001b[0m                provider = \&quot;postgresql\&quot;\n\u001b[1;94m 4 | \u001b[0m                url = \u001b[1;91menv(\&quot;NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST\&quot;)\u001b[0m\n\u001b[1;94m   | \u001b[0m\n&quot;,&quot;error_code&quot;:null}}&quot;#</span>
         ]];
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">get_config</span>(<span class="kw-2">&amp;</span><span class="ident">request</span>.<span class="ident">to_string</span>());
+        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">get_config</span>(<span class="kw-2">&amp;</span><span class="ident">request</span>.<span class="ident">to_string</span>()).<span class="ident">unwrap_err</span>();
         <span class="ident">expected</span>.<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">response</span>);
     }
 
@@ -290,7 +282,7 @@
         <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">expect!</span>[[
             <span class="string">r#&quot;{&quot;generators&quot;:[],&quot;datasources&quot;:[{&quot;name&quot;:&quot;thedb&quot;,&quot;provider&quot;:&quot;postgresql&quot;,&quot;activeProvider&quot;:&quot;postgresql&quot;,&quot;url&quot;:{&quot;fromEnvVar&quot;:&quot;NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST&quot;,&quot;value&quot;:null}}],&quot;warnings&quot;:[]}&quot;#</span>
         ]];
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">get_config</span>(<span class="kw-2">&amp;</span><span class="ident">request</span>.<span class="ident">to_string</span>());
+        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">get_config</span>(<span class="kw-2">&amp;</span><span class="ident">request</span>.<span class="ident">to_string</span>()).<span class="ident">unwrap</span>();
         <span class="ident">expected</span>.<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">response</span>);
     }
 
@@ -312,7 +304,7 @@
         <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">expect!</span>[[
             <span class="string">r#&quot;{&quot;generators&quot;:[],&quot;datasources&quot;:[{&quot;name&quot;:&quot;thedb&quot;,&quot;provider&quot;:&quot;postgresql&quot;,&quot;activeProvider&quot;:&quot;postgresql&quot;,&quot;url&quot;:{&quot;fromEnvVar&quot;:&quot;DBURL&quot;,&quot;value&quot;:&quot;postgresql://example.com/mydb&quot;}}],&quot;warnings&quot;:[]}&quot;#</span>
         ]];
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">get_config</span>(<span class="kw-2">&amp;</span><span class="ident">request</span>.<span class="ident">to_string</span>());
+        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">get_config</span>(<span class="kw-2">&amp;</span><span class="ident">request</span>.<span class="ident">to_string</span>()).<span class="ident">unwrap</span>();
         <span class="ident">expected</span>.<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">response</span>);
     }
 }
