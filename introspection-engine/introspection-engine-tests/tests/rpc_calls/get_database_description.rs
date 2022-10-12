@@ -166,7 +166,9 @@ async fn database_description_for_postgres_should_work(api: &TestApi) -> TestRes
 
     let expected = expect![[r#"
         {
-          "namespaces": [],
+          "namespaces": [
+            "prisma-tests"
+          ],
           "tables": [
             {
               "namespace_id": 0,

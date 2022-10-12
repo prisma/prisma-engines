@@ -225,7 +225,7 @@ fn lift_datasource(
     }
 
     Some(Datasource {
-        schemas: schemas.into_iter().map(|(s, span)| (s.to_owned(), span)).collect(),
+        namespaces: schemas.into_iter().map(|(s, span)| (s.to_owned(), span)).collect(),
         schemas_span,
         name: source_name.to_string(),
         provider: provider.to_owned(),

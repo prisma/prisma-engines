@@ -66,7 +66,7 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
         return;
     }
 
-    let test_api_args = TestApiArgs::new(test_function_name, &[]);
+    let test_api_args = TestApiArgs::new(test_function_name, &[], &[]);
     let mut test_api = TestApi::new(test_api_args);
 
     let migration: String = test_api.connector_diff(

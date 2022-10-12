@@ -40,7 +40,7 @@ impl Connection {
         }
 
         let mut schema = sql_schema_describer::postgres::SqlSchemaDescriber::new(&self.0, describer_circumstances)
-            .describe(params.url.schema())
+            .describe(&[params.url.schema()])
             .await
             .map_err(|err| match err.into_kind() {
                 DescriberErrorKind::QuaintError(err) => quaint_err(&params.url)(err),

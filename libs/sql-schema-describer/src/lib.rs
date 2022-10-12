@@ -40,10 +40,10 @@ pub trait SqlSchemaDescriberBackend: Send + Sync {
     async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata>;
 
     /// Describe a database schema.
-    async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema>;
+    async fn describe(&self, schemas: &[&str]) -> DescriberResult<SqlSchema>;
 
     /// Get the database version.
-    async fn version(&self, schema: &str) -> DescriberResult<Option<String>>;
+    async fn version(&self) -> DescriberResult<Option<String>>;
 }
 
 /// The return type of get_metadata().
@@ -111,6 +111,12 @@ impl SqlSchema {
     /// Get a user defined type by name.
     pub fn get_user_defined_type(&self, name: &str) -> Option<&UserDefinedType> {
         self.user_defined_types.iter().find(|x| x.name == name)
+    }
+
+    /// Get a namespaceId by name
+    pub fn get_namespace_id(&self, name: &str) -> NamespaceId {
+        let id = self.namespaces.iter().position(|ns| ns == name).unwrap();
+        NamespaceId(id as u32)
     }
 
     /// The total number of indexes in the schema.
@@ -225,12 +231,38 @@ impl SqlSchema {
         id
     }
 
+    pub fn namespaces_count(&self) -> usize {
+        self.namespaces.len()
+    }
+
+    pub fn namespace_walker<'a>(&'a self, name: &str) -> Option<NamespaceWalker<'a>> {
+        let namespace_idx = self.namespaces.iter().position(|ns| ns == name)?;
+        Some(self.walk(NamespaceId(namespace_idx as u32)))
+    }
+
+    pub fn namespace_walkers(&self) -> impl Iterator<Item = NamespaceWalker<'_>> {
+        (0..self.namespaces.len()).map(move |namespace_index| NamespaceWalker {
+            schema: self,
+            id: NamespaceId(namespace_index as u32),
+        })
+    }
+
     pub fn tables_count(&self) -> usize {
         self.tables.len()
     }
 
     pub fn table_walker<'a>(&'a self, name: &str) -> Option<TableWalker<'a>> {
         let table_idx = self.tables.iter().position(|table| table.name == name)?;
+        Some(self.walk(TableId(table_idx as u32)))
+    }
+
+    pub fn table_walker_ns<'a>(&'a self, namespace: &str, name: &str) -> Option<TableWalker<'a>> {
+        let namespace_idx = self.namespace_walker(namespace)?.id;
+
+        let table_idx = self
+            .tables
+            .iter()
+            .position(|table| table.name == name && table.namespace_id == namespace_idx)?;
         Some(self.walk(TableId(table_idx as u32)))
     }
 
@@ -351,6 +383,8 @@ struct Index {
 /// A stored procedure (like, the function inside your database).
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct Procedure {
+    ///Namespace of the procedure
+    namespace_id: NamespaceId,
     /// Procedure name.
     pub name: String,
     /// The definition of the procedure.
@@ -565,6 +599,8 @@ pub struct Enum {
 /// An SQL view.
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct View {
+    /// Namespace of the view
+    namespace_id: NamespaceId,
     /// Name of the view.
     pub name: String,
     /// The SQL definition of the view.

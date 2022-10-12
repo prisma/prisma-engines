@@ -104,19 +104,15 @@ impl SqlIntrospectionConnector {
     }
 
     /// Exported for tests
-    pub async fn describe(&self, provider: Option<&str>) -> SqlIntrospectionResult<SqlSchema> {
-        Ok(self
-            .describer(provider)
-            .await?
-            .describe(self.connection.connection_info().schema_name())
-            .await?)
+    pub async fn describe(&self, provider: Option<&str>, namespaces: &[&str]) -> SqlIntrospectionResult<SqlSchema> {
+        Ok(self.describer(provider).await?.describe(namespaces).await?)
     }
 
     async fn version(&self) -> SqlIntrospectionResult<String> {
         Ok(self
             .describer(None)
             .await?
-            .version(self.connection.connection_info().schema_name())
+            .version()
             .await?
             .unwrap_or_else(|| "Database version information not available.".into()))
     }
@@ -133,7 +129,9 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
     }
 
     async fn get_database_description(&self) -> ConnectorResult<String> {
-        let sql_schema = self.catch(self.describe(None)).await?;
+        let sql_schema = self
+            .catch(self.describe(None, &[self.connection.connection_info().schema_name()]))
+            .await?;
         tracing::debug!("SQL Schema Describer is done: {:?}", sql_schema);
         let description = serde_json::to_string_pretty(&sql_schema).unwrap();
         Ok(description)
@@ -147,8 +145,18 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
     }
 
     async fn introspect(&self, ctx: &IntrospectionContext) -> ConnectorResult<IntrospectionResult> {
+        let namespaces = &mut ctx
+            .datasource()
+            .namespaces
+            .iter()
+            .map(|(ns, _)| ns.as_ref())
+            .collect::<Vec<&str>>();
+        if namespaces.is_empty() {
+            namespaces.push(self.connection.connection_info().schema_name())
+        }
+
         let sql_schema = self
-            .catch(self.describe(Some(ctx.datasource().active_provider)))
+            .catch(self.describe(Some(ctx.datasource().active_provider), namespaces))
             .await?;
 
         let introspection_result =

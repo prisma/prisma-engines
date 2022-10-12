@@ -8,6 +8,7 @@ mod introspect;
 mod lists;
 mod model_renames;
 mod mssql;
+mod multi_schema;
 mod named_constraints;
 mod native_types;
 mod postgres;

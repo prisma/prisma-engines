@@ -115,7 +115,8 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
         })
     }
 
-    async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema> {
+    async fn describe(&self, schemas: &[&str]) -> DescriberResult<SqlSchema> {
+        let schema = schemas[0];
         let mut sql_schema = SqlSchema::default();
         let mut mssql_ext = MssqlSchemaExt::default();
 
@@ -136,7 +137,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
         Ok(sql_schema)
     }
 
-    async fn version(&self, _schema: &str) -> DescriberResult<Option<String>> {
+    async fn version(&self) -> DescriberResult<Option<String>> {
         Ok(self.conn.version().await?)
     }
 }
@@ -169,6 +170,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for row in rows.into_iter() {
             procedures.push(Procedure {
+                namespace_id: NamespaceId(0),
                 name: row.get_expect_string("name"),
                 definition: row.get_string("definition"),
             });
@@ -489,6 +491,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for row in result_set.into_iter() {
             views.push(View {
+                namespace_id: NamespaceId(0),
                 name: row.get_expect_string("view_name"),
                 definition: row.get_string("view_sql"),
             })

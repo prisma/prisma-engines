@@ -36,6 +36,8 @@ tags![
     Postgres14 = 1 << 14,
     Postgres9 = 1 << 15,
     Postgres15 = 1 << 16,
+    Postgres11 = 1 << 17,
+    Postgres13 = 1 << 18,
 ];
 
 pub fn tags_from_comma_separated_list(input: &str) -> BitFlags<Tags> {

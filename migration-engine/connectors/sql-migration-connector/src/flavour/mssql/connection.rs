@@ -27,7 +27,7 @@ impl Connection {
     #[tracing::instrument(skip(self, params))]
     pub(super) async fn describe_schema(&mut self, params: &super::Params) -> ConnectorResult<SqlSchema> {
         let mut schema = describer::SqlSchemaDescriber::new(&self.0)
-            .describe(params.url.schema())
+            .describe(&[params.url.schema()])
             .await
             .map_err(|err| match err.into_kind() {
                 DescriberErrorKind::QuaintError(err) => quaint_err_url(&params.url)(err),
