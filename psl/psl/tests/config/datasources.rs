@@ -185,7 +185,7 @@ fn postgresql_extension_parsing() {
 
         generator js {
           provider = "prisma-client-js"
-          previewFeatures = ["postgresExtensions"]
+          previewFeatures = ["postgresqlExtensions"]
         }
     "#};
 
@@ -221,7 +221,7 @@ fn postgresql_extension_rendering() {
     let schema = indoc! {r#"
         generator js {
           provider        = "prisma-client-js"
-          previewFeatures = ["postgresExtensions"]
+          previewFeatures = ["postgresqlExtensions"]
         }
 
         datasource ds {
@@ -238,7 +238,7 @@ fn postgresql_extension_rendering() {
     let expected = expect![[r#"
         generator js {
           provider        = "prisma-client-js"
-          previewFeatures = ["postgresExtensions"]
+          previewFeatures = ["postgresqlExtensions"]
         }
 
         datasource ds {
@@ -256,7 +256,7 @@ fn postgresql_single_extension_rendering() {
     let schema = indoc! {r#"
         generator js {
           provider        = "prisma-client-js"
-          previewFeatures = ["postgresExtensions"]
+          previewFeatures = ["postgresqlExtensions"]
         }
 
         datasource ds {
@@ -273,7 +273,7 @@ fn postgresql_single_extension_rendering() {
     let expected = expect![[r#"
         generator js {
           provider        = "prisma-client-js"
-          previewFeatures = ["postgresExtensions"]
+          previewFeatures = ["postgresqlExtensions"]
         }
 
         datasource ds {
@@ -291,7 +291,7 @@ fn postgresql_single_complex_extension_rendering() {
     let schema = indoc! {r#"
         generator js {
           provider        = "prisma-client-js"
-          previewFeatures = ["postgresExtensions"]
+          previewFeatures = ["postgresqlExtensions"]
         }
 
         datasource ds {
@@ -308,7 +308,7 @@ fn postgresql_single_complex_extension_rendering() {
     let expected = expect![[r#"
         generator js {
           provider        = "prisma-client-js"
-          previewFeatures = ["postgresExtensions"]
+          previewFeatures = ["postgresqlExtensions"]
         }
 
         datasource ds {

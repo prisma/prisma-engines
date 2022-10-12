@@ -67,7 +67,7 @@ features!(
     MultiSchema,
     FilteredRelationCount,
     FieldReference,
-    PostgresExtensions,
+    PostgresqlExtensions,
 );
 
 /// Generator preview features
@@ -110,7 +110,7 @@ pub const GENERATOR: FeatureMap = FeatureMap {
     }),
     hidden: enumflags2::make_bitflags!(PreviewFeature::{
         MultiSchema
-        | PostgresExtensions
+        | PostgresqlExtensions
     }),
 };
 

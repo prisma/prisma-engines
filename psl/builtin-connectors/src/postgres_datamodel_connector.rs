@@ -134,12 +134,12 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, PostgresType)] = &[
 
 /// Postgres-specific properties in the datasource block.
 pub struct PostgresDatasourceProperties {
-    extensions: Option<PostgresExtensions>,
+    extensions: Option<PostgresqlExtensions>,
 }
 
 impl PostgresDatasourceProperties {
     /// Database extensions.
-    pub fn extensions(&self) -> Option<&PostgresExtensions> {
+    pub fn extensions(&self) -> Option<&PostgresqlExtensions> {
         self.extensions.as_ref()
     }
 }
@@ -216,12 +216,12 @@ impl PostgresExtension {
 ///   //           ^^^^^^^^^^^^^^^^^
 /// }
 /// ```
-pub struct PostgresExtensions {
+pub struct PostgresqlExtensions {
     pub(crate) extensions: Vec<PostgresExtension>,
     pub(crate) span: ast::Span,
 }
 
-impl PostgresExtensions {
+impl PostgresqlExtensions {
     /// The span of the extensions in the datamodel.
     pub fn span(&self) -> ast::Span {
         self.span
