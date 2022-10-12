@@ -1,7 +1,6 @@
 use datamodel_renderer as render;
 use psl::{
-    builtin_connectors::postgres_datamodel_connector::PostgresDatasourceProperties,
-    common::preview_features::PreviewFeature, Configuration,
+    builtin_connectors::postgres_datamodel_connector::PostgresDatasourceProperties, Configuration, PreviewFeature,
 };
 use sql_schema_describer::{postgres::PostgresSchemaExt, SqlSchema};
 
@@ -14,7 +13,7 @@ pub(super) fn add_extensions<'a>(
     schema: &'a SqlSchema,
     config: &'a Configuration,
 ) {
-    if !config.preview_features().contains(PreviewFeature::PostgresExtensions) {
+    if !config.preview_features().contains(PreviewFeature::PostgresqlExtensions) {
         return;
     }
 

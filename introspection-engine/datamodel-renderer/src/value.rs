@@ -1,6 +1,6 @@
 use std::{borrow::Cow, fmt};
 
-use psl::{common::preview_features::PreviewFeature, StringFromEnvVar};
+use psl::{PreviewFeature, StringFromEnvVar};
 
 /// Represents a string value in the PSL.
 #[derive(Debug, Clone, Copy)]

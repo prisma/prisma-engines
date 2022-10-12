@@ -1,6 +1,6 @@
 use std::fmt;
 
-use psl::common::preview_features::PreviewFeature;
+use psl::PreviewFeature;
 
 use crate::{value::Array, Commented, Env, Text, Value};
 
@@ -119,7 +119,7 @@ impl<'a> fmt::Display for Generator<'a> {
 mod tests {
     use crate::*;
     use expect_test::expect;
-    use psl::common::preview_features::PreviewFeature;
+    use psl::PreviewFeature;
 
     #[test]
     fn kitchen_sink() {
@@ -131,7 +131,7 @@ mod tests {
         generator.push_binary_target(Env::variable("BINARY TARGET"));
 
         generator.push_preview_feature(PreviewFeature::MultiSchema);
-        generator.push_preview_feature(PreviewFeature::PostgresExtensions);
+        generator.push_preview_feature(PreviewFeature::PostgresqlExtensions);
 
         generator.push_config_value("customValue", "meow");
         generator.push_config_value("otherValue", "purr");
@@ -144,7 +144,7 @@ mod tests {
             generator client {
               provider        = "prisma-client-js"
               output          = "/dev/null"
-              previewFeatures = ["multiSchema", "postgresExtensions"]
+              previewFeatures = ["multiSchema", "postgresqlExtensions"]
               binaryTargets   = [env("BINARY TARGET")]
               customValue     = "meow"
               otherValue      = "purr"

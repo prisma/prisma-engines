@@ -480,7 +480,7 @@ pub(super) fn extension_names_follow_prisma_syntax_rules(
     props: &PostgresDatasourceProperties,
     errors: &mut Diagnostics,
 ) {
-    if !preview_features.contains(PreviewFeature::PostgresExtensions) {
+    if !preview_features.contains(PreviewFeature::PostgresqlExtensions) {
         return;
     }
 
