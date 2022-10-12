@@ -562,11 +562,11 @@
 <span id="562">562</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">calculate_datamodel::CalculateDatamodelContext</span> <span class="kw">as</span> <span class="ident">Context</span>, <span class="ident">SqlError</span>, <span class="ident">SqlFamilyTrait</span>};
 <span class="kw">use</span> <span class="ident">psl</span>::{
-    <span class="ident">common</span>::{<span class="ident">preview_features::PreviewFeature</span>, <span class="ident">RelationNames</span>},
     <span class="ident">dml</span>::{
         <span class="ident">Datamodel</span>, <span class="ident">FieldArity</span>, <span class="ident">FieldType</span>, <span class="ident">IndexAlgorithm</span>, <span class="ident">IndexDefinition</span>, <span class="ident">IndexField</span>, <span class="ident">Model</span>, <span class="ident">OperatorClass</span>,
         <span class="ident">PrimaryKeyField</span>, <span class="ident">ReferentialAction</span>, <span class="ident">RelationField</span>, <span class="ident">RelationInfo</span>, <span class="ident">ScalarField</span>, <span class="ident">ScalarType</span>, <span class="ident">SortOrder</span>,
     },
+    <span class="ident">PreviewFeature</span>, <span class="ident">RelationNames</span>,
 };
 <span class="kw">use</span> <span class="ident">sql::walkers</span>::{<span class="ident">ColumnWalker</span>, <span class="ident">ForeignKeyWalker</span>, <span class="ident">TableWalker</span>};
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{

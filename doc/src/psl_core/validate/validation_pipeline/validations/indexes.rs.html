@@ -411,10 +411,10 @@
 <span id="411">411</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">constraint_namespace::ConstraintName</span>, <span class="ident">database_name::validate_db_name</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">common::preview_features::PreviewFeature</span>,
     <span class="ident">datamodel_connector</span>::{<span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>, <span class="ident">ConnectorCapability</span>},
     <span class="ident">diagnostics::DatamodelError</span>,
     <span class="ident">validate::validation_pipeline::context::Context</span>,
+    <span class="ident">PreviewFeature</span>,
 };
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 <span class="kw">use</span> <span class="ident">parser_database</span>::{<span class="ident">walkers::IndexWalker</span>, <span class="ident">IndexAlgorithm</span>};

@@ -45,13 +45,14 @@
 <span id="45">45</span>
 <span id="46">46</span>
 <span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../README.md&quot;</span>)]</span>
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>, <span class="ident">missing_docs</span>)]</span>
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">builtin_psl_connectors</span> <span class="kw">as</span> <span class="ident">builtin_connectors</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">dml</span>::{<span class="self">self</span>, <span class="ident">lift</span>, <span class="ident">render_datamodel_and_config_to_string</span>, <span class="ident">render_datamodel_to_string</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">psl_core</span>::{
-    <span class="ident">common</span>,
     <span class="ident">datamodel_connector</span>,
     <span class="ident">diagnostics</span>::{<span class="self">self</span>, <span class="ident">Diagnostics</span>},
     <span class="ident">is_reserved_type_name</span>,
@@ -62,8 +63,11 @@
     <span class="ident">Configuration</span>,
     <span class="ident">Datasource</span>,
     <span class="ident">Generator</span>,
+    <span class="ident">PreviewFeature</span>,
+    <span class="ident">RelationNames</span>,
     <span class="ident">StringFromEnvVar</span>,
     <span class="ident">ValidatedSchema</span>,
+    <span class="ident">ALL_PREVIEW_FEATURES</span>,
 };
 
 <span class="doccomment">/// The implementation of the CLI getConfig() utility and its JSON format.</span>

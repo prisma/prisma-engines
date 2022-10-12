@@ -343,14 +343,12 @@
 <span id="343">343</span>
 <span id="344">344</span>
 <span id="345">345</span>
-<span id="346">346</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">SourceConfig</span>, <span class="ident">Span</span>},
-    <span class="ident">common::preview_features::PreviewFeature</span>,
     <span class="ident">configuration::StringFromEnvVar</span>,
     <span class="ident">datamodel_connector::RelationMode</span>,
     <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>},
-    <span class="ident">Datasource</span>,
+    <span class="ident">Datasource</span>, <span class="ident">PreviewFeature</span>,
 };
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">parser_database</span>::{<span class="ident">ast::WithDocumentation</span>, <span class="ident">coerce</span>, <span class="ident">coerce_array</span>, <span class="ident">coerce_opt</span>};

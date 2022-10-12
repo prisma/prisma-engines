@@ -477,10 +477,10 @@
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">native_types::PostgresType</span>;
 <span class="kw">use</span> <span class="ident">psl_core</span>::{
-    <span class="ident">common::preview_features::PreviewFeature</span>,
     <span class="ident">datamodel_connector</span>::{<span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>, <span class="ident">Connector</span>},
     <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>},
     <span class="ident">parser_database</span>::{<span class="ident">ast::WithSpan</span>, <span class="ident">walkers::IndexWalker</span>, <span class="ident">IndexAlgorithm</span>, <span class="ident">OperatorClass</span>},
+    <span class="ident">PreviewFeature</span>,
 };
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::PostgresDatasourceProperties</span>;

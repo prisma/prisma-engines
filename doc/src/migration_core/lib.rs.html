@@ -198,9 +198,6 @@
 <span id="198">198</span>
 <span id="199">199</span>
 <span id="200">200</span>
-<span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>, <span class="ident">missing_docs</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::needless_collect</span>)]</span> <span class="comment">// the implementation of that rule is way too eager, it rejects necessary collects</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::derive_partial_eq_without_eq</span>)]</span>
@@ -225,10 +222,7 @@
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">migration_connector::ConnectorParams</span>;
 <span class="kw">use</span> <span class="ident">mongodb_migration_connector::MongoDbMigrationConnector</span>;
-<span class="kw">use</span> <span class="ident">psl</span>::{
-    <span class="ident">builtin_connectors</span>::<span class="kw-2">*</span>, <span class="ident">common::preview_features::PreviewFeature</span>, <span class="ident">parser_database::SourceFile</span>, <span class="ident">Datasource</span>,
-    <span class="ident">ValidatedSchema</span>,
-};
+<span class="kw">use</span> <span class="ident">psl</span>::{<span class="ident">builtin_connectors</span>::<span class="kw-2">*</span>, <span class="ident">parser_database::SourceFile</span>, <span class="ident">Datasource</span>, <span class="ident">PreviewFeature</span>, <span class="ident">ValidatedSchema</span>};
 <span class="kw">use</span> <span class="ident">sql_migration_connector::SqlMigrationConnector</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">env</span>, <span class="ident">path::Path</span>};
 <span class="kw">use</span> <span class="ident">user_facing_errors::common::InvalidConnectionString</span>;

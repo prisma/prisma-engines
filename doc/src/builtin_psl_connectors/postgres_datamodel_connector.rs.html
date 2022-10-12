@@ -768,7 +768,6 @@
 <span id="768">768</span>
 <span id="769">769</span>
 <span id="770">770</span>
-<span id="771">771</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">datasource</span>;
 <span class="kw">mod</span> <span class="ident">validations</span>;
 
@@ -779,14 +778,13 @@
     <span class="ident">PostgresType</span>::{<span class="self">self</span>, <span class="kw-2">*</span>},
 };
 <span class="kw">use</span> <span class="ident">psl_core</span>::{
-    <span class="ident">common::preview_features::PreviewFeature</span>,
     <span class="ident">datamodel_connector</span>::{
         <span class="ident">helper</span>::{<span class="ident">arg_vec_from_opt</span>, <span class="ident">args_vec_from_opt</span>, <span class="ident">parse_one_opt_u32</span>, <span class="ident">parse_two_opt_u32</span>},
         <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ConstraintScope</span>, <span class="ident">NativeTypeConstructor</span>, <span class="ident">NativeTypeInstance</span>, <span class="ident">StringFilter</span>,
     },
     <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>},
     <span class="ident">parser_database</span>::{<span class="ident">ast</span>, <span class="ident">walkers</span>, <span class="ident">IndexAlgorithm</span>, <span class="ident">OperatorClass</span>, <span class="ident">ParserDatabase</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ScalarType</span>},
-    <span class="ident">Datasource</span>, <span class="ident">DatasourceConnectorData</span>,
+    <span class="ident">Datasource</span>, <span class="ident">DatasourceConnectorData</span>, <span class="ident">PreviewFeature</span>,
 };
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">collections::HashMap</span>, <span class="ident">fmt</span>};
 

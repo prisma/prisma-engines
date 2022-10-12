@@ -154,7 +154,7 @@
 <span id="154">154</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast::WithSpan</span>,
-    <span class="ident">common::preview_features</span>::{<span class="ident">FeatureMap</span>, <span class="ident">PreviewFeature</span>, <span class="ident">GENERATOR</span>},
+    <span class="ident">common</span>::{<span class="ident">FeatureMap</span>, <span class="ident">PreviewFeature</span>, <span class="ident">ALL_PREVIEW_FEATURES</span>},
     <span class="ident">configuration</span>::{<span class="ident">Generator</span>, <span class="ident">StringFromEnvVar</span>},
     <span class="ident">diagnostics</span>::<span class="kw-2">*</span>,
 };
@@ -240,7 +240,7 @@
         .<span class="ident">get</span>(<span class="ident">PREVIEW_FEATURES_KEY</span>)
         .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">args</span>.<span class="ident">get</span>(<span class="ident">EXPERIMENTAL_FEATURES_KEY</span>))
         .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">coerce_array</span>(<span class="ident">v</span>, <span class="kw-2">&amp;</span><span class="ident">coerce::string</span>, <span class="ident">diagnostics</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">arr</span><span class="op">|</span> (<span class="ident">arr</span>, <span class="ident">v</span>.<span class="ident">span</span>())))
-        .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">arr</span>, <span class="ident">span</span>)<span class="op">|</span> <span class="ident">parse_and_validate_preview_features</span>(<span class="ident">arr</span>, <span class="kw-2">&amp;</span><span class="ident">GENERATOR</span>, <span class="ident">span</span>, <span class="ident">diagnostics</span>));
+        .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">arr</span>, <span class="ident">span</span>)<span class="op">|</span> <span class="ident">parse_and_validate_preview_features</span>(<span class="ident">arr</span>, <span class="kw-2">&amp;</span><span class="ident">ALL_PREVIEW_FEATURES</span>, <span class="ident">span</span>, <span class="ident">diagnostics</span>));
 
     <span class="kw">for</span> <span class="ident">prop</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">ast_generator</span>.<span class="ident">properties</span> {
         <span class="kw">let</span> <span class="ident">is_first_class_prop</span> <span class="op">=</span> <span class="ident">FIRST_CLASS_PROPERTIES</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">k</span> <span class="op">==</span> <span class="ident">prop</span>.<span class="ident">name</span>.<span class="ident">name</span>);

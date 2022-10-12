@@ -88,34 +88,30 @@
 <span id="88">88</span>
 <span id="89">89</span>
 <span id="90">90</span>
-<span id="91">91</span>
-<span id="92">92</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../README.md&quot;</span>)]</span>
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::derive_partial_eq_without_eq</span>)]</span>
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">common</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">datamodel_connector</span>;
 
 <span class="doccomment">/// `mcf`: Turns a collection of `configuration::Datasource` and `configuration::Generator` into a</span>
 <span class="doccomment">/// JSON representation. This is the `get_config()` representation.</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">mcf</span>;
 
+<span class="kw">mod</span> <span class="ident">common</span>;
 <span class="kw">mod</span> <span class="ident">configuration</span>;
 <span class="kw">mod</span> <span class="ident">reformat</span>;
 <span class="kw">mod</span> <span class="ident">validate</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">common</span>::{<span class="ident">PreviewFeature</span>, <span class="ident">RelationNames</span>, <span class="ident">ALL_PREVIEW_FEATURES</span>},
     <span class="ident">configuration</span>::{<span class="ident">Configuration</span>, <span class="ident">Datasource</span>, <span class="ident">DatasourceConnectorData</span>, <span class="ident">Generator</span>, <span class="ident">StringFromEnvVar</span>},
     <span class="ident">reformat::reformat</span>,
 };
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">diagnostics</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">parser_database</span>::{<span class="self">self</span>, <span class="ident">is_reserved_type_name</span>};
 
-<span class="kw">use</span> <span class="self">self</span>::{
-    <span class="ident">common::preview_features::PreviewFeature</span>,
-    <span class="ident">validate</span>::{<span class="ident">datasource_loader</span>, <span class="ident">generator_loader</span>},
-};
+<span class="kw">use</span> <span class="ident"><span class="self">self</span>::validate</span>::{<span class="ident">datasource_loader</span>, <span class="ident">generator_loader</span>};
 <span class="kw">use</span> <span class="ident">diagnostics::Diagnostics</span>;
 <span class="kw">use</span> <span class="ident">parser_database</span>::{<span class="ident">ast</span>, <span class="ident">ParserDatabase</span>, <span class="ident">SourceFile</span>};
 
