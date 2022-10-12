@@ -1,8 +1,8 @@
 use super::{Datasource, Generator};
 use crate::{
-    common::preview_features::PreviewFeature,
     datamodel_connector::RelationMode,
     diagnostics::{DatamodelError, Diagnostics},
+    PreviewFeature,
 };
 use enumflags2::BitFlags;
 

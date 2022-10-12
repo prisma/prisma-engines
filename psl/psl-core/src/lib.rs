@@ -2,28 +2,26 @@
 #![deny(rust_2018_idioms, unsafe_code)]
 #![allow(clippy::derive_partial_eq_without_eq)]
 
-pub mod common;
 pub mod datamodel_connector;
 
 /// `mcf`: Turns a collection of `configuration::Datasource` and `configuration::Generator` into a
 /// JSON representation. This is the `get_config()` representation.
 pub mod mcf;
 
+mod common;
 mod configuration;
 mod reformat;
 mod validate;
 
 pub use crate::{
+    common::{PreviewFeature, RelationNames, ALL_PREVIEW_FEATURES},
     configuration::{Configuration, Datasource, DatasourceConnectorData, Generator, StringFromEnvVar},
     reformat::reformat,
 };
 pub use diagnostics;
 pub use parser_database::{self, is_reserved_type_name};
 
-use self::{
-    common::preview_features::PreviewFeature,
-    validate::{datasource_loader, generator_loader},
-};
+use self::validate::{datasource_loader, generator_loader};
 use diagnostics::Diagnostics;
 use parser_database::{ast, ParserDatabase, SourceFile};
 

@@ -30,7 +30,7 @@ pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn Sq
     if datamodel
         .configuration
         .preview_features()
-        .contains(psl::common::preview_features::PreviewFeature::MultiSchema)
+        .contains(psl::PreviewFeature::MultiSchema)
     {
         if let Some(ds) = context.datamodel.configuration.datasources.get(0) {
             for (schema, _) in &ds.namespaces {

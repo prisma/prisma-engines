@@ -4,7 +4,7 @@ use migration_connector::{ConnectorParams, DiffTarget, MigrationConnector};
 use mongodb::bson::{self, doc};
 use mongodb_migration_connector::MongoDbMigrationConnector;
 use once_cell::sync::Lazy;
-use psl::{common::preview_features::PreviewFeature, parser_database::SourceFile};
+use psl::{parser_database::SourceFile, PreviewFeature};
 use std::{
     collections::BTreeMap,
     fmt::Write as _,

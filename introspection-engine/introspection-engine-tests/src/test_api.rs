@@ -11,8 +11,8 @@ use introspection_connector::{
     IntrospectionResult, Version,
 };
 use migration_connector::{ConnectorParams, MigrationConnector};
-use psl::common::preview_features::PreviewFeature;
 use psl::Configuration;
+use psl::PreviewFeature;
 use quaint::{prelude::SqlFamily, single::Quaint};
 use sql_introspection_connector::SqlIntrospectionConnector;
 use sql_migration_connector::SqlMigrationConnector;

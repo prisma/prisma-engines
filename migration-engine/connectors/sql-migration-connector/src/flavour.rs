@@ -21,7 +21,7 @@ use migration_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult,
     MigrationRecord, PersistenceNotInitializedError,
 };
-use psl::{common::preview_features::PreviewFeature, ValidatedSchema};
+use psl::{PreviewFeature, ValidatedSchema};
 use quaint::prelude::{ConnectionInfo, Table};
 use sql_schema_describer::SqlSchema;
 use std::fmt::Debug;

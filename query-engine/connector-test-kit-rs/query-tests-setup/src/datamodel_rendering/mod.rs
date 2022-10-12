@@ -8,7 +8,7 @@ use crate::{templating, ConnectorTagInterface, DatamodelFragment, IdFragment, M2
 use indoc::indoc;
 use itertools::Itertools;
 use lazy_static::lazy_static;
-use psl::common::preview_features::GENERATOR;
+use psl::ALL_PREVIEW_FEATURES;
 use regex::Regex;
 
 lazy_static! {
@@ -95,10 +95,10 @@ fn process_template(template: String, renderer: Box<dyn DatamodelRenderer>) -> S
 fn render_preview_features(excluded_features: &[&str]) -> String {
     let excluded_features: Vec<_> = excluded_features.iter().map(|f| format!(r#""{}""#, f)).collect();
 
-    GENERATOR
+    ALL_PREVIEW_FEATURES
         .active_features()
         .iter()
-        .chain(GENERATOR.hidden_features())
+        .chain(ALL_PREVIEW_FEATURES.hidden_features())
         .map(|f| format!(r#""{}""#, f))
         .filter(|f| !excluded_features.contains(f))
         .join(", ")

@@ -71,7 +71,7 @@ features!(
 );
 
 /// Generator preview features
-pub const GENERATOR: FeatureMap = FeatureMap {
+pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
     active: enumflags2::make_bitflags!(PreviewFeature::{
         ReferentialIntegrity
          | InteractiveTransactions

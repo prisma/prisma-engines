@@ -42,8 +42,8 @@ mod utils;
 
 use cache::TypeRefCache;
 use prisma_models::{
-    psl::common::preview_features::PreviewFeature, CompositeTypeRef, Field as ModelField, Index, InternalDataModelRef,
-    ModelRef, RelationFieldRef, TypeIdentifier,
+    psl::PreviewFeature, CompositeTypeRef, Field as ModelField, Index, InternalDataModelRef, ModelRef,
+    RelationFieldRef, TypeIdentifier,
 };
 use psl::datamodel_connector::{Connector, ConnectorCapability, RelationMode};
 use schema::*;

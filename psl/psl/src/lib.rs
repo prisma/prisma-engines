@@ -4,7 +4,6 @@
 pub use builtin_psl_connectors as builtin_connectors;
 pub use dml::{self, lift, render_datamodel_and_config_to_string, render_datamodel_to_string};
 pub use psl_core::{
-    common,
     datamodel_connector,
     diagnostics::{self, Diagnostics},
     is_reserved_type_name,
@@ -15,8 +14,11 @@ pub use psl_core::{
     Configuration,
     Datasource,
     Generator,
+    PreviewFeature,
+    RelationNames,
     StringFromEnvVar,
     ValidatedSchema,
+    ALL_PREVIEW_FEATURES,
 };
 
 /// The implementation of the CLI getConfig() utility and its JSON format.

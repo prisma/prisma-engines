@@ -1,11 +1,11 @@
 use super::database_name::validate_db_name;
 use crate::{
     ast,
-    common::preview_features::PreviewFeature,
     datamodel_connector::{walker_ext_traits::*, ConnectorCapability},
     diagnostics::DatamodelError,
     parser_database::ast::{WithName, WithSpan},
     validate::validation_pipeline::context::Context,
+    PreviewFeature,
 };
 use parser_database::walkers::{ModelWalker, PrimaryKeyWalker};
 use std::{borrow::Cow, collections::HashMap};
