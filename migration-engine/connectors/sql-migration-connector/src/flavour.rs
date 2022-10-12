@@ -281,6 +281,10 @@ fn normalize_sql_schema(sql_schema: &mut SqlSchema, preview_features: BitFlags<P
     if !preview_features.contains(PreviewFeature::FullTextIndex) {
         sql_schema.make_fulltext_indexes_normal();
     }
+
+    if !preview_features.contains(PreviewFeature::MultiSchema) {
+        sql_schema.clear_namespaces();
+    }
 }
 
 fn quaint_error_to_connector_error(error: quaint::error::Error, connection_info: &ConnectionInfo) -> ConnectorError {

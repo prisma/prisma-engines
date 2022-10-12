@@ -117,7 +117,7 @@ fn from_empty_to_migrations_directory(mut api: TestApi) {
 
     let expected_printed_messages = expect![[r#"
         [
-            "-- CreateSchema\nCREATE SCHEMA IF NOT EXISTS \"prisma-tests\";\n\n-- CreateTable\nCREATE TABLE \"prisma-tests\".\"cats\" (\n    \"id\" INTEGER NOT NULL,\n    \"moos\" BOOLEAN DEFAULT false,\n\n    CONSTRAINT \"cats_pkey\" PRIMARY KEY (\"id\")\n);\n",
+            "-- CreateTable\nCREATE TABLE \"cats\" (\n    \"id\" INTEGER NOT NULL,\n    \"moos\" BOOLEAN DEFAULT false,\n\n    CONSTRAINT \"cats_pkey\" PRIMARY KEY (\"id\")\n);\n",
         ]
     "#]];
     expected_printed_messages.assert_debug_eq(&host.printed_messages.lock().unwrap());
