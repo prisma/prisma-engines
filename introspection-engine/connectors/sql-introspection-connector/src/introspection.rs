@@ -104,14 +104,21 @@ pub(crate) fn introspect(ctx: &Context, warnings: &mut Vec<Warning>) -> Result<(
             });
         }
 
-        model.schema = table.namespace().map(|n| n.to_string());
+        if matches!(ctx.config.datasources.first(), Some(ds) if !ds.namespaces.is_empty()) {
+            model.schema = table.namespace().map(|n| n.to_string());
+        }
 
         datamodel.add_model(model);
     }
 
     for e in schema.enum_walkers() {
         let values = e.values().iter().map(|v| dml::EnumValue::new(v)).collect();
-        let schema = e.namespace().map(|n| n.to_string());
+
+        let schema = if matches!(ctx.config.datasources.first(), Some(ds) if !ds.namespaces.is_empty()) {
+            e.namespace().map(|n| n.to_string())
+        } else {
+            None
+        };
         datamodel.add_enum(dml::Enum::new(&e.name(), values, schema));
     }
 
@@ -149,6 +156,11 @@ pub(crate) fn introspect(ctx: &Context, warnings: &mut Vec<Warning>) -> Result<(
         // our opinionation about valid names
         sanitize_datamodel_names(ctx, &mut datamodel);
     }
+
+    //TODO(matthias) deduplication w. schema name
+    // deduplicate model names
+
+    // deduplicate enum names
 
     // deduplicating relation field names
     deduplicate_relation_field_names(&mut datamodel);

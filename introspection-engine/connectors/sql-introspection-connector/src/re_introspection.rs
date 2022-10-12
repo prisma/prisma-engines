@@ -22,14 +22,14 @@ pub(crate) fn enrich(
         merge_relation_fields(old_data_model, new_data_model, warnings);
     }
 
-    merge_map_attributes_on_models(old_data_model, new_data_model, warnings);
+    merge_map_attributes_on_models(old_data_model, new_data_model, warnings); //TODO
     merge_pre_3_0_index_names(old_data_model, new_data_model, warnings);
     merge_custom_index_names(old_data_model, new_data_model, warnings);
     merge_changed_primary_key_names(old_data_model, new_data_model, warnings);
     merge_changed_scalar_key_names(old_data_model, new_data_model, warnings);
     merge_changed_relation_field_names(old_data_model, new_data_model);
     merge_changed_relation_names(old_data_model, new_data_model);
-    merge_changed_enum_names(old_data_model, new_data_model, warnings);
+    merge_changed_enum_names(old_data_model, new_data_model, warnings); //TODO
     merge_changed_enum_values(old_data_model, new_data_model, warnings);
     merge_changed_enum_defaults(old_data_model, new_data_model, warnings);
     merge_mysql_enum_names(old_data_model, new_data_model, ctx);
