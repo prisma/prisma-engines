@@ -9,7 +9,7 @@ use crate::sanitize_datamodel_names::sanitize_string;
 
 const EXTENSION_ALLOW_LIST: &[&str] = &["citext", "postgis", "pg_crypto", "uuid-ossp"];
 
-pub(super) fn add_extensions(datasource: &mut render::Datasource<'_>, schema: &SqlSchema, config: &Configuration) {
+pub(super) fn add_extensions<'a>(datasource: &mut render::Datasource<'a>, schema: &'a SqlSchema, config: &'a Configuration) {
     if !config.preview_features().contains(PreviewFeature::PostgresExtensions) {
         return;
     }
