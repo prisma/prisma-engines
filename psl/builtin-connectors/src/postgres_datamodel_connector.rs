@@ -8,14 +8,13 @@ use native_types::{
     PostgresType::{self, *},
 };
 use psl_core::{
-    common::preview_features::PreviewFeature,
     datamodel_connector::{
         helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
         Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, StringFilter,
     },
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{ast, walkers, IndexAlgorithm, OperatorClass, ParserDatabase, ReferentialAction, ScalarType},
-    Datasource, DatasourceConnectorData,
+    Datasource, DatasourceConnectorData, PreviewFeature,
 };
 use std::{borrow::Cow, collections::HashMap, fmt};
 

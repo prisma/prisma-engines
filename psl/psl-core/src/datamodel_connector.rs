@@ -15,8 +15,6 @@ mod native_type_constructor;
 mod native_type_instance;
 mod relation_mode;
 
-use crate::{common::preview_features::PreviewFeature, configuration::DatasourceConnectorData, Datasource};
-
 pub use self::{
     capabilities::{ConnectorCapabilities, ConnectorCapability},
     empty_connector::EmptyDatamodelConnector,
@@ -26,6 +24,7 @@ pub use self::{
     relation_mode::RelationMode,
 };
 
+use crate::{configuration::DatasourceConnectorData, Datasource, PreviewFeature};
 use diagnostics::{DatamodelError, Diagnostics, NativeTypeErrorFactory, Span};
 use enumflags2::BitFlags;
 use lsp_types::CompletionList;

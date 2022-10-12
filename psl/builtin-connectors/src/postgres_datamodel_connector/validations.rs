@@ -1,10 +1,10 @@
 use enumflags2::BitFlags;
 use native_types::PostgresType;
 use psl_core::{
-    common::preview_features::PreviewFeature,
     datamodel_connector::{walker_ext_traits::*, Connector},
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{ast::WithSpan, walkers::IndexWalker, IndexAlgorithm, OperatorClass},
+    PreviewFeature,
 };
 
 use super::PostgresDatasourceProperties;

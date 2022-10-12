@@ -1,6 +1,6 @@
 use crate::{
     ast::WithSpan,
-    common::preview_features::{FeatureMap, PreviewFeature, GENERATOR},
+    common::{FeatureMap, PreviewFeature, ALL_PREVIEW_FEATURES},
     configuration::{Generator, StringFromEnvVar},
     diagnostics::*,
 };
@@ -86,7 +86,7 @@ fn lift_generator(ast_generator: &ast::GeneratorConfig, diagnostics: &mut Diagno
         .get(PREVIEW_FEATURES_KEY)
         .or_else(|| args.get(EXPERIMENTAL_FEATURES_KEY))
         .and_then(|v| coerce_array(v, &coerce::string, diagnostics).map(|arr| (arr, v.span())))
-        .map(|(arr, span)| parse_and_validate_preview_features(arr, &GENERATOR, span, diagnostics));
+        .map(|(arr, span)| parse_and_validate_preview_features(arr, &ALL_PREVIEW_FEATURES, span, diagnostics));
 
     for prop in &ast_generator.properties {
         let is_first_class_prop = FIRST_CLASS_PROPERTIES.iter().any(|k| *k == prop.name.name);

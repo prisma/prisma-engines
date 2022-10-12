@@ -2,10 +2,10 @@ mod context;
 mod validations;
 
 use crate::{
-    common::preview_features::PreviewFeature,
     configuration,
     datamodel_connector::{Connector, EmptyDatamodelConnector, RelationMode},
     diagnostics::Diagnostics,
+    PreviewFeature,
 };
 use enumflags2::BitFlags;
 use parser_database::ParserDatabase;
