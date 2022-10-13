@@ -86,7 +86,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RelationInfo</span> {
     <span class="doccomment">/// The target model of the relation.</span>
-    <span class="kw">pub</span> <span class="ident">to</span>: <span class="ident">String</span>,
+    <span class="kw">pub</span> <span class="ident">referenced_model</span>: <span class="ident">String</span>,
     <span class="doccomment">/// The fields forming the relation.</span>
     <span class="kw">pub</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The target field of the relation a.k.a. `references`</span>
@@ -106,9 +106,9 @@
 <span class="kw">impl</span> <span class="ident">RelationInfo</span> {
     <span class="doccomment">/// Creates a new relation info for the</span>
     <span class="doccomment">/// given target model.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">to</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">RelationInfo</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">RelationInfo</span> {
         <span class="ident">RelationInfo</span> {
-            <span class="ident">to</span>: <span class="ident">String::from</span>(<span class="ident">to</span>),
+            <span class="ident">referenced_model</span>: <span class="ident">String::from</span>(<span class="ident">model</span>),
             <span class="ident">fields</span>: <span class="ident">Vec::new</span>(),
             <span class="ident">references</span>: <span class="ident">Vec::new</span>(),
             <span class="ident">name</span>: <span class="ident">String::new</span>(),

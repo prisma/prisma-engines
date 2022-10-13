@@ -934,7 +934,7 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">points_to_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">relation_info</span>.<span class="ident">to</span> <span class="op">==</span> <span class="ident">name</span>
+        <span class="self">self</span>.<span class="ident">relation_info</span>.<span class="ident">referenced_model</span> <span class="op">==</span> <span class="ident">name</span>
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_required</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {

@@ -408,6 +408,9 @@
 <span id="408">408</span>
 <span id="409">409</span>
 <span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">field_builders::RelationFieldBuilder</span>, <span class="ident">relation_builder::RelationBuilder</span>, <span class="ident">CompositeTypeBuilder</span>, <span class="ident">FieldBuilder</span>,
     <span class="ident">IndexBuilder</span>, <span class="ident">ModelBuilder</span>, <span class="ident">PrimaryKeyBuilder</span>,
@@ -627,7 +630,10 @@
     <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="ident">datamodel</span>.<span class="ident">models</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="op">!</span><span class="ident">model</span>.<span class="ident">is_ignored</span>) {
         <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">relation_fields</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="op">!</span><span class="ident">field</span>.<span class="ident">is_ignored</span>) {
             <span class="kw">let</span> <span class="ident">dml::RelationInfo</span> {
-                <span class="ident">to</span>, <span class="ident">references</span>, <span class="ident">name</span>, ..
+                <span class="ident">referenced_model</span>: <span class="ident">to</span>,
+                <span class="ident">references</span>,
+                <span class="ident">name</span>,
+                ..
             } <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">relation_info</span>;
 
             <span class="kw">let</span> <span class="ident">related_model</span> <span class="op">=</span> <span class="ident">datamodel</span>

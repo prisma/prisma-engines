@@ -238,7 +238,7 @@
 
                 <span class="self">self</span>.<span class="ident">relation_fields</span>()
                     .<span class="ident">iter</span>()
-                    .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">rf</span>.<span class="ident">relation_info</span>.<span class="ident">to</span> <span class="op">==</span> <span class="ident">model_name</span>)
+                    .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">rf</span>.<span class="ident">relation_info</span>.<span class="ident">referenced_model</span> <span class="op">==</span> <span class="ident">model_name</span>)
                     .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> <span class="ident">rf</span>.<span class="ident">relation_info</span>.<span class="ident">references</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">name</span>))
                     .<span class="ident">map</span>(<span class="ident">Arc::clone</span>)
                     .<span class="ident">collect</span>()

@@ -261,7 +261,7 @@
 
     <span class="doccomment">/// Finds parent  model for a field reference.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_model_by_relation_field_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationField</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Model</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">find_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">find_related_field_bang</span>(<span class="ident">field</span>).<span class="number">1</span>.<span class="ident">relation_info</span>.<span class="ident">to</span>)
+        <span class="self">self</span>.<span class="ident">find_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">find_related_field_bang</span>(<span class="ident">field</span>).<span class="number">1</span>.<span class="ident">relation_info</span>.<span class="ident">referenced_model</span>)
     }
 
     <span class="doccomment">/// Finds a mutable field reference by a model and field name.</span>
@@ -323,7 +323,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span> <span class="op">=</span> <span class="macro">vec!</span>[];
         <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">models</span>() {
             <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">relation_fields</span>() {
-                <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">to</span> <span class="op">==</span> <span class="ident">model_name</span> {
+                <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">referenced_model</span> <span class="op">==</span> <span class="ident">model_name</span> {
                     <span class="ident">fields</span>.<span class="ident">push</span>((<span class="ident">model</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">clone</span>()))
                 }
             }
@@ -333,7 +333,7 @@
 
     <span class="doccomment">/// Finds a relation field related to a relation info. Returns a tuple (index_of_relation_field_in_model, relation_field).</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_related_field_for_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">info</span>: <span class="kw-2">&amp;</span><span class="ident">RelationInfo</span>, <span class="ident">exclude</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="ident">RelationField</span>)<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">find_model</span>(<span class="kw-2">&amp;</span><span class="ident">info</span>.<span class="ident">to</span>)
+        <span class="self">self</span>.<span class="ident">find_model</span>(<span class="kw-2">&amp;</span><span class="ident">info</span>.<span class="ident">referenced_model</span>)
             .<span class="ident">expect</span>(<span class="string">&quot;The model referred to by a RelationInfo should always exist.&quot;</span>)
             .<span class="ident">fields</span>
             .<span class="ident">iter</span>()
@@ -341,7 +341,7 @@
             .<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">idx</span>, <span class="ident">field</span>)<span class="op">|</span> <span class="ident">field</span>.<span class="ident">as_relation_field</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> (<span class="ident">idx</span>, <span class="ident">f</span>)))
             .<span class="ident">find</span>(<span class="op">|</span>(<span class="ident">_idx</span>, <span class="ident">f</span>)<span class="op">|</span> {
                 <span class="ident">f</span>.<span class="ident">relation_info</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">info</span>.<span class="ident">name</span>
-                    <span class="op">&amp;&amp;</span> (<span class="ident">f</span>.<span class="ident">relation_info</span>.<span class="ident">to</span> <span class="op">!</span><span class="op">=</span> <span class="ident">info</span>.<span class="ident">to</span> <span class="op">|</span><span class="op">|</span>
+                    <span class="op">&amp;&amp;</span> (<span class="ident">f</span>.<span class="ident">relation_info</span>.<span class="ident">referenced_model</span> <span class="op">!</span><span class="op">=</span> <span class="ident">info</span>.<span class="ident">referenced_model</span> <span class="op">|</span><span class="op">|</span>
           <span class="comment">// This is to differentiate the opposite field from self in the self relation case.</span>
           <span class="ident">f</span>.<span class="ident">name</span> <span class="op">!</span><span class="op">=</span> <span class="ident">exclude</span>)
             })

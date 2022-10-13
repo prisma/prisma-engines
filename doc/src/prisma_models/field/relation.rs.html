@@ -298,6 +298,9 @@
 <span id="298">298</span>
 <span id="299">299</span>
 <span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">dml</span>::{<span class="ident">FieldArity</span>, <span class="ident">ReferentialAction</span>, <span class="ident">RelationInfo</span>};
 <span class="kw">use</span> <span class="ident">once_cell::sync::OnceCell</span>;
@@ -411,7 +414,10 @@
             .<span class="ident">get_or_init</span>(<span class="op">|</span><span class="op">|</span> {
                 <span class="self">self</span>.<span class="ident">model</span>()
                     .<span class="ident">internal_data_model</span>()
-                    .<span class="ident">find_relation</span>((<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">model</span>().<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relation_info</span>.<span class="ident">to</span>), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relation_name</span>)
+                    .<span class="ident">find_relation</span>(
+                        (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">model</span>().<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relation_info</span>.<span class="ident">referenced_model</span>),
+                        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relation_name</span>,
+                    )
                     .<span class="ident">unwrap</span>()
             })
             .<span class="ident">upgrade</span>()
