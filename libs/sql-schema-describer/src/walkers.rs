@@ -481,6 +481,12 @@ impl<'a> NamespaceWalker<'a> {
     pub fn name(self) -> &'a str {
         &self.schema.namespaces[self.id.0 as usize]
     }
+
+    /// Traverse all the tables in the namespace.
+    pub fn tables(self) -> impl Iterator<Item = TableWalker<'a>> {
+        range_for_key(&self.schema.tables, self.id, |table: &Table| table.namespace_id)
+            .map(|table_id| self.schema.walk(TableId(table_id as u32)))
+    }
 }
 
 /// For a slice sorted by a key K, return the contiguous range of items matching the key.
