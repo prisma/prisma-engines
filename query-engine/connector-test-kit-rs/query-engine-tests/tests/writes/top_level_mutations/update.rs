@@ -654,6 +654,27 @@ mod update {
         Ok(res)
     }
 
+    #[connector_test(schema(generic))]
+    async fn update_fails_if_filter_dont_match(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation { createOneTestModel(data: { id: 1, field: "hello" }) { id } }"#
+        );
+
+        assert_error!(
+            &runner,
+            r#"mutation {
+                  updateOneTestModel(where: { id: 1, field: "bonjour" }, data: { field: "updated" }) {
+                    id
+                  }
+                }"#,
+            2025,
+            "An operation failed because it depends on one or more records that were required but not found. Record to update not found."
+        );
+
+        Ok(())
+    }
+
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
             .query(format!("mutation {{ createOneTestModel(data: {}) {{ id }} }}", data))
