@@ -197,6 +197,12 @@ fn lift_datasource(
         .remove(SCHEMAS_KEY)
         .and_then(|(_, expr)| coerce_array(expr, &coerce::string_with_span, diagnostics).map(|b| (b, expr.span())))
         .map(|(mut schemas, span)| {
+            if schemas.is_empty() {
+                let error = DatamodelError::new_schemas_array_empty_error(span);
+
+                diagnostics.push_error(error);
+            }
+
             schemas.sort_by(|(a, _), (b, _)| a.cmp(b));
 
             for pair in schemas.windows(2) {

@@ -18,15 +18,15 @@ pub struct Enum {
 }
 
 impl Enum {
-    /// Creates a new enum with the given name and values.
-    pub fn new(name: &str, values: Vec<EnumValue>) -> Enum {
+    /// Creates a new enum with the given schema, name and values.
+    pub fn new(name: &str, values: Vec<EnumValue>, schema: Option<String>) -> Enum {
         Enum {
             name: String::from(name),
             values,
             documentation: None,
             database_name: None,
             commented_out: false,
-            schema: None,
+            schema,
         }
     }
 

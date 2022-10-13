@@ -145,6 +145,7 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
     }
 
     async fn introspect(&self, ctx: &IntrospectionContext) -> ConnectorResult<IntrospectionResult> {
+        //TODO(matthias) do we even need extra preview flagging here?
         let namespaces = &mut ctx
             .datasource()
             .namespaces
