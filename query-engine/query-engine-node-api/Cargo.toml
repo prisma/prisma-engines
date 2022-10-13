@@ -23,8 +23,8 @@ psl.workspace = true
 sql-connector = { path = "../connectors/sql-query-connector", package = "sql-query-connector" }
 prisma-models = { path = "../prisma-models" }
 
-napi = { version = "2.9.0", default-features = false, features = ["napi8", "tokio_rt", "serde-json"] }
-napi-derive = "2.9.0"
+napi = { version = "=2.9.0", default-features = false, features = ["napi8", "tokio_rt", "serde-json"] }
+napi-derive = "=2.9.0"
 
 thiserror = "1"
 connection-string = "0.1"
