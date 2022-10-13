@@ -251,10 +251,11 @@ fn render_field_attributes(field: &Field, model: &Model, params: RenderParams<'_
         let mut args = Vec::new();
         let relation_info = &rf.relation_info;
         let parent_model = params.datamodel.find_model_by_relation_field_ref(rf).unwrap();
-        let is_self_relation = relation_info.to.as_str() == model.name();
+        let is_self_relation = relation_info.referenced_model.as_str() == model.name();
 
         if is_self_relation
-            || relation_info.name != RelationNames::name_for_unambiguous_relation(&relation_info.to, &parent_model.name)
+            || relation_info.name
+                != RelationNames::name_for_unambiguous_relation(&relation_info.referenced_model, &parent_model.name)
         {
             args.push((None, string_literal(&relation_info.name).to_string()));
         }
@@ -430,7 +431,7 @@ fn render_field_type(field_type: &FieldType, out: &mut String) {
         FieldType::Scalar(tpe, _) => {
             out.push_str(&tpe.to_string());
         }
-        FieldType::Relation(rel) => out.push_str(&rel.to),
+        FieldType::Relation(rel) => out.push_str(&rel.referenced_model),
     }
 }
 

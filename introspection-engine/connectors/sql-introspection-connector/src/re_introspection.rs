@@ -173,7 +173,10 @@ fn merge_relation_fields(old_data_model: &Datamodel, new_data_model: &mut Datamo
                 let mut fields = Vec::new();
 
                 for field in old_model.relation_fields() {
-                    if new_data_model.models().any(|m| m.name == field.relation_info.to) {
+                    if new_data_model
+                        .models()
+                        .any(|m| m.name == field.relation_info.referenced_model)
+                    {
                         fields.push(Field::RelationField(field.clone()));
                     }
                 }
@@ -233,7 +236,7 @@ fn merge_map_attributes_on_models(
 
         for relation_field in fields_to_be_changed {
             let field = new_data_model.find_relation_field_mut(&relation_field.0, &relation_field.1);
-            field.relation_info.to = changed_model_name.1.model.clone();
+            field.relation_info.referenced_model = changed_model_name.1.model.clone();
         }
     }
 
@@ -461,7 +464,8 @@ fn merge_changed_relation_field_names(old_data_model: &Datamodel, new_data_model
             for old_field in old_model.relation_fields() {
                 let (_, old_related_field) = &old_data_model.find_related_field_bang(old_field);
                 let is_many_to_many = old_field.is_list() && old_related_field.is_list();
-                let is_self_relation = old_field.relation_info.to == old_related_field.relation_info.to;
+                let is_self_relation =
+                    old_field.relation_info.referenced_model == old_related_field.relation_info.referenced_model;
 
                 let (_, related_field) = &new_data_model.find_related_field_bang(new_field);
 
@@ -521,7 +525,7 @@ fn merge_changed_relation_names(old_data_model: &Datamodel, new_data_model: &mut
 
                 if match_as_inline && !many_to_many {
                     let mf = ModelAndField::new(&model.name, &field.name);
-                    let other_mf = ModelAndField::new(&field.relation_info.to, &related_field.name);
+                    let other_mf = ModelAndField::new(&field.relation_info.referenced_model, &related_field.name);
 
                     changed_relation_names.push((mf, old_field.relation_info.name.clone()));
                     changed_relation_names.push((other_mf, old_field.relation_info.name.clone()))
@@ -886,5 +890,5 @@ fn merge_comments(old_data_model: &Datamodel, new_data_model: &mut Datamodel) {
 }
 
 fn inline_relation_infos_match(a: &dml::RelationInfo, b: &dml::RelationInfo) -> bool {
-    a.to == b.to && a.fields == b.fields && a.references == b.references
+    a.referenced_model == b.referenced_model && a.fields == b.fields && a.references == b.references
 }

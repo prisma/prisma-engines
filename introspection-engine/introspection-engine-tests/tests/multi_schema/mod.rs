@@ -78,34 +78,76 @@ async fn multiple_schemas_w_tables_are_introspected(api: &TestApi) -> TestResult
     Ok(())
 }
 
+//TODO(matthias) this is not working yet, but this is what it would look like if done ;-)
+// #[test_connector(tags(Postgres), preview_features("multiSchema"), db_schemas("first", "second"))]
+// async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &TestApi) -> TestResult {
+//     let schema_name = "first";
+//     let other_name = "second";
+//     let create_schema = format!("CREATE Schema \"{schema_name}\"",);
+//     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id Text PRIMARY KEY)",);
+//
+//     api.database().raw_cmd(&create_schema).await?;
+//     api.database().raw_cmd(&create_table).await?;
+//
+//     let create_schema = format!("CREATE Schema \"{other_name}\"",);
+//     let create_table = format!("CREATE TABLE \"{other_name}\".\"A\" (id Text PRIMARY KEY)",);
+//
+//     api.database().raw_cmd(&create_schema).await?;
+//     api.database().raw_cmd(&create_table).await?;
+//
+//     let expected = expect![[r#"
+//         model first_A {
+//           id String @id
+//
+//           @@map("A")
+//           @@schema("first")
+//         }
+//
+//         model second_A {
+//           id String @id
+//
+//           @@map("A")
+//           @@schema("second")
+//         }
+//     "#]];
+//
+//     let result = api.introspect_dml().await?;
+//     expected.assert_eq(&result);
+//
+//     Ok(())
+// }
+
 #[test_connector(tags(Postgres), preview_features("multiSchema"), db_schemas("first", "second"))]
-async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &TestApi) -> TestResult {
+async fn multiple_schemas_w_cross_schema_are_introspected(api: &TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
     let create_schema = format!("CREATE Schema \"{schema_name}\"",);
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id Text PRIMARY KEY)",);
-
+    //Todo
     api.database().raw_cmd(&create_schema).await?;
     api.database().raw_cmd(&create_table).await?;
 
     let create_schema = format!("CREATE Schema \"{other_name}\"",);
-    let create_table = format!("CREATE TABLE \"{other_name}\".\"A\" (id Text PRIMARY KEY)",);
+    let create_table = format!(
+        "CREATE TABLE \"{other_name}\".\"B\" (id Text PRIMARY KEY, fk Text References \"{schema_name}\".\"A\"(\"id\"))",
+    );
 
     api.database().raw_cmd(&create_schema).await?;
     api.database().raw_cmd(&create_table).await?;
 
     let expected = expect![[r#"
-        model first_A {
+        model A {
           id String @id
+          B  B[]
 
-          @@map("A")
           @@schema("first")
         }
 
-        model second_A {
-          id String @id
+        model B {
+          id String  @id
+          fk String?
+          A  A?      @relation(fields: [fk], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-          @@map("A")
           @@schema("second")
         }
     "#]];
@@ -115,6 +157,50 @@ async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &TestApi
 
     Ok(())
 }
+
+//TODO(matthias) this is not working yet, but this is what it would look like if done ;-)
+// #[test_connector(tags(Postgres), preview_features("multiSchema"), db_schemas("first", "second"))]
+// async fn multiple_schemas_w_cross_schema_fks_w_duplicate_names_are_introspected(api: &TestApi) -> TestResult {
+//     let schema_name = "first";
+//     let other_name = "second";
+//     let create_schema = format!("CREATE Schema \"{schema_name}\"",);
+//     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id Text PRIMARY KEY)",);
+//     //Todo
+//     api.database().raw_cmd(&create_schema).await?;
+//     api.database().raw_cmd(&create_table).await?;
+//
+//     let create_schema = format!("CREATE Schema \"{other_name}\"",);
+//     let create_table = format!(
+//         "CREATE TABLE \"{other_name}\".\"A\" (id Text PRIMARY KEY, fk Text References \"{schema_name}\".\"A\"(\"id\"))",
+//     );
+//
+//     api.database().raw_cmd(&create_schema).await?;
+//     api.database().raw_cmd(&create_table).await?;
+//
+//     let expected = expect![[r#"
+//         model first_A {
+//           id String @id
+//           second_A  second_A[]
+//
+//           @@map("A")
+//           @@schema("first")
+//         }
+//
+//         model second_A {
+//           id String  @id
+//           fk String?
+//           first_A  first_A?      @relation(fields: [fk], references: [id], onDelete: NoAction, onUpdate: NoAction)
+//
+//           @@map("A")
+//           @@schema("second")
+//         }
+//     "#]];
+//
+//     let result = api.introspect_dml().await?;
+//     expected.assert_eq(&result);
+//
+//     Ok(())
+// }
 
 #[test_connector(tags(Postgres), preview_features("multiSchema"), db_schemas("first", "second"))]
 async fn multiple_schemas_w_enums_are_introspected(api: &TestApi) -> TestResult {

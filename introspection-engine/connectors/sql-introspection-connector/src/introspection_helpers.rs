@@ -132,7 +132,7 @@ pub fn calculate_many_to_many_field(
         name: relation_name,
         fk_name: None,
         fields: Vec::new(),
-        to: opposite_foreign_key.referenced_table_name().to_owned(),
+        referenced_model: opposite_foreign_key.referenced_table_name().to_owned(),
         references: Vec::new(),
         on_delete: None,
         on_update: None,
@@ -244,7 +244,7 @@ pub(crate) fn calculate_relation_field(
         name: calculate_relation_name(foreign_key, m2m_table_names, duplicated_foreign_keys),
         fk_name: foreign_key.constraint_name().map(String::from),
         fields: foreign_key.constrained_columns().map(|c| c.name().to_owned()).collect(),
-        to: foreign_key.referenced_table().name().to_owned(),
+        referenced_model: foreign_key.referenced_table().name().to_owned(),
         references: foreign_key.referenced_columns().map(|c| c.name().to_owned()).collect(),
         on_delete: Some(map_action(foreign_key.on_delete_action())),
         on_update: Some(map_action(foreign_key.on_update_action())),
@@ -283,7 +283,7 @@ pub(crate) fn calculate_backrelation_field(
             let new_relation_info = RelationInfo {
                 name: relation_info.name.clone(),
                 fk_name: None,
-                to: model.name.clone(),
+                referenced_model: model.name.clone(),
                 fields: vec![],
                 references: vec![],
                 on_delete: None,
@@ -400,44 +400,6 @@ pub(crate) fn calculate_scalar_field_type_with_native_types(column: sql::ColumnW
 }
 
 // misc
-
-pub fn deduplicate_enum_names(datamodel: &mut Datamodel) {
-    //TODO(matthias) this needs to track down the usages and change the names there
-    let mut duplicated_enums = vec![];
-
-    for enm in datamodel.enums() {
-        if datamodel.enums().filter(|e| e.name == enm.name).count() > 1 {
-            duplicated_enums.push((enm.name.clone(), enm.schema.clone()));
-        }
-    }
-
-    duplicated_enums.iter().for_each(|(enm, schema)| {
-        let mut found_enum = datamodel.find_enum_schema_mut(enm, schema);
-        found_enum.name = format!("{}_{}", schema.as_ref().unwrap(), enm);
-        if found_enum.database_name.is_none() {
-            found_enum.database_name = Some(enm.to_string());
-        }
-    });
-}
-
-pub fn deduplicate_model_names(datamodel: &mut Datamodel) {
-    //TODO(matthias) this needs to track down the usages and change the names there
-    let mut duplicated_models = vec![];
-
-    for model in datamodel.models() {
-        if datamodel.models().filter(|m| m.name == model.name).count() > 1 {
-            duplicated_models.push((model.name.clone(), model.schema.clone()));
-        }
-    }
-
-    duplicated_models.iter().for_each(|(model, schema)| {
-        let mut found_model = datamodel.find_model_schema_mut(model, schema);
-        found_model.name = format!("{}_{}", schema.as_ref().unwrap(), model);
-        if found_model.database_name.is_none() {
-            found_model.database_name = Some(model.to_string());
-        }
-    });
-}
 
 pub fn deduplicate_relation_field_names(datamodel: &mut Datamodel) {
     let mut duplicated_relation_fields = vec![];

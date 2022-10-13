@@ -46,11 +46,11 @@ impl<'a> LiftAstToDml<'a> {
         }
     }
 
-    pub(crate) fn lift(&self) -> dml::Datamodel {
-        let mut schema = dml::Datamodel::new();
+    pub(crate) fn lift(&self) -> Datamodel {
+        let mut schema = Datamodel::new();
 
         // We iterate over scalar fields, then relations, but we want the
-        // order of fields in the dml::Model to match the order of the fields in
+        // order of fields in the Model to match the order of the fields in
         // the AST, so we need this bit of extra bookkeeping.
         //
         // (model_idx, field_name) -> sort_key
@@ -82,12 +82,12 @@ impl<'a> LiftAstToDml<'a> {
 
     fn lift_relations(
         &self,
-        schema: &mut dml::Datamodel,
+        schema: &mut Datamodel,
         field_ids_for_sorting: &mut HashMap<(&'a str, &'a str), ast::FieldId>,
     ) {
         let active_connector = self.connector;
         let relation_mode = self.relation_mode;
-        let common_dml_fields = |field: &mut dml::RelationField, relation_field: RelationFieldWalker<'_>| {
+        let common_dml_fields = |field: &mut RelationField, relation_field: RelationFieldWalker<'_>| {
             let ast_field = relation_field.ast_field();
             field.relation_info.on_delete = relation_field
                 .explicit_on_delete()
@@ -126,18 +126,16 @@ impl<'a> LiftAstToDml<'a> {
                             continue;
                         }
 
-                        let relation_info = dml::RelationInfo::new(relation.referenced_model().name());
+                        let referenced_model = relation.referenced_model();
+
+                        let relation_info = RelationInfo::new(referenced_model.name());
 
                         let forward_field_walker = relation.forward_relation_field().unwrap();
                         // Construct a relation field in the DML for an existing relation field in the source.
                         let arity = self.lift_arity(&forward_field_walker.ast_field().arity);
                         let referential_arity = self.lift_arity(&forward_field_walker.referential_arity());
-                        let mut relation_field = dml::RelationField::new(
-                            forward_field_walker.name(),
-                            arity,
-                            referential_arity,
-                            relation_info,
-                        );
+                        let mut relation_field =
+                            RelationField::new(forward_field_walker.name(), arity, referential_arity, relation_info);
 
                         relation_field.relation_info.fk_name =
                             Some(relation.constraint_name(active_connector).into_owned());
@@ -161,12 +159,12 @@ impl<'a> LiftAstToDml<'a> {
                             .collect();
 
                         let model = schema.find_model_mut(relation.referencing_model().name());
-                        model.add_field(dml::Field::RelationField(relation_field));
+                        model.add_field(Field::RelationField(relation_field));
                     };
 
                     // Back field
                     {
-                        let relation_info = dml::RelationInfo::new(relation.referencing_model().name());
+                        let relation_info = RelationInfo::new(relation.referencing_model().name());
                         let model = schema.find_model_mut(relation.referenced_model().name());
 
                         let mut field = if let Some(relation_field) = relation.back_relation_field() {
@@ -174,7 +172,7 @@ impl<'a> LiftAstToDml<'a> {
                             let arity = self.lift_arity(&ast_field.arity);
                             let referential_arity = self.lift_arity(&relation_field.referential_arity());
                             let mut field =
-                                dml::RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
+                                RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
 
                             common_dml_fields(&mut field, relation_field);
 
@@ -186,9 +184,9 @@ impl<'a> LiftAstToDml<'a> {
                             field
                         } else {
                             // This is part of reformatting.
-                            let arity = dml::FieldArity::List;
-                            let referential_arity = dml::FieldArity::List;
-                            let mut field = dml::RelationField::new(
+                            let arity = FieldArity::List;
+                            let referential_arity = FieldArity::List;
+                            let mut field = RelationField::new(
                                 relation.referencing_model().name(),
                                 arity,
                                 referential_arity,
@@ -199,17 +197,17 @@ impl<'a> LiftAstToDml<'a> {
                         };
 
                         field.relation_info.name = relation.relation_name().to_string();
-                        model.add_field(dml::Field::RelationField(field));
+                        model.add_field(Field::RelationField(field));
                     };
                 }
                 RefinedRelationWalker::ImplicitManyToMany(relation) => {
                     for relation_field in [relation.field_a(), relation.field_b()] {
                         let ast_field = relation_field.ast_field();
                         let arity = self.lift_arity(&ast_field.arity);
-                        let relation_info = dml::RelationInfo::new(relation_field.related_model().name());
+                        let relation_info = RelationInfo::new(relation_field.related_model().name());
                         let referential_arity = self.lift_arity(&relation_field.referential_arity());
                         let mut field =
-                            dml::RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
+                            RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
 
                         common_dml_fields(&mut field, relation_field);
 
@@ -225,7 +223,7 @@ impl<'a> LiftAstToDml<'a> {
                             .collect();
 
                         let model = schema.find_model_mut(relation_field.model().name());
-                        model.add_field(dml::Field::RelationField(field));
+                        model.add_field(Field::RelationField(field));
                         field_ids_for_sorting.insert(
                             (relation_field.model().name(), relation_field.name()),
                             relation_field.field_id(),
@@ -236,11 +234,11 @@ impl<'a> LiftAstToDml<'a> {
                     for relation_field in [relation.field_a(), relation.field_b()] {
                         let ast_field = relation_field.ast_field();
                         let arity = self.lift_arity(&ast_field.arity);
-                        let relation_info = dml::RelationInfo::new(relation_field.related_model().name());
+                        let relation_info = RelationInfo::new(relation_field.related_model().name());
                         let referential_arity = self.lift_arity(&relation_field.referential_arity());
 
                         let mut field =
-                            dml::RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
+                            RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
 
                         common_dml_fields(&mut field, relation_field);
 
@@ -259,7 +257,7 @@ impl<'a> LiftAstToDml<'a> {
                             .collect();
 
                         let model = schema.find_model_mut(relation_field.model().name());
-                        model.add_field(dml::Field::RelationField(field));
+                        model.add_field(Field::RelationField(field));
                         field_ids_for_sorting.insert(
                             (relation_field.model().name(), relation_field.name()),
                             relation_field.field_id(),
@@ -280,7 +278,7 @@ impl<'a> LiftAstToDml<'a> {
                 arity: self.lift_arity(&field.arity()),
                 database_name: field.mapped_name().map(String::from),
                 documentation: field.documentation().map(ToString::to_string),
-                default_value: field.default_value().map(|value| dml::DefaultValue {
+                default_value: field.default_value().map(|value| DefaultValue {
                     kind: dml_default_kind(value, field.r#type().as_builtin_scalar()),
                     db_name: None,
                 }),
@@ -301,16 +299,16 @@ impl<'a> LiftAstToDml<'a> {
         &self,
         walker: ModelWalker<'a>,
         field_ids_for_sorting: &mut HashMap<(&'a str, &'a str), ast::FieldId>,
-    ) -> dml::Model {
+    ) -> Model {
         let ast_model = walker.ast_model();
-        let mut model = dml::Model::new(ast_model.name().to_owned(), None);
+        let mut model = Model::new(ast_model.name().to_owned(), None);
 
         model.documentation = ast_model.documentation().map(String::from);
         model.database_name = walker.mapped_name().map(String::from);
         model.is_ignored = walker.is_ignored();
         model.schema = walker.schema().map(|(s, _)| s.to_owned());
 
-        model.primary_key = walker.primary_key().map(|pk| dml::PrimaryKeyDefinition {
+        model.primary_key = walker.primary_key().map(|pk| PrimaryKeyDefinition {
             name: pk.name().map(String::from),
             db_name: pk.constraint_name(self.connector).map(|c| c.into_owned()),
             fields: pk
@@ -357,21 +355,21 @@ impl<'a> LiftAstToDml<'a> {
                     .collect();
 
                 let tpe = match idx.index_type() {
-                    db::IndexType::Unique => dml::IndexType::Unique,
-                    db::IndexType::Normal => dml::IndexType::Normal,
-                    db::IndexType::Fulltext => dml::IndexType::Fulltext,
+                    db::IndexType::Unique => IndexType::Unique,
+                    db::IndexType::Normal => IndexType::Normal,
+                    db::IndexType::Fulltext => IndexType::Fulltext,
                 };
 
                 let algorithm = idx.algorithm().map(|using| match using {
-                    IndexAlgorithm::BTree => dml::IndexAlgorithm::BTree,
-                    IndexAlgorithm::Hash => dml::IndexAlgorithm::Hash,
-                    IndexAlgorithm::Gist => dml::IndexAlgorithm::Gist,
-                    IndexAlgorithm::Gin => dml::IndexAlgorithm::Gin,
-                    IndexAlgorithm::SpGist => dml::IndexAlgorithm::SpGist,
-                    IndexAlgorithm::Brin => dml::IndexAlgorithm::Brin,
+                    IndexAlgorithm::BTree => model::IndexAlgorithm::BTree,
+                    IndexAlgorithm::Hash => model::IndexAlgorithm::Hash,
+                    IndexAlgorithm::Gist => model::IndexAlgorithm::Gist,
+                    IndexAlgorithm::Gin => model::IndexAlgorithm::Gin,
+                    IndexAlgorithm::SpGist => model::IndexAlgorithm::SpGist,
+                    IndexAlgorithm::Brin => model::IndexAlgorithm::Brin,
                 });
 
-                dml::IndexDefinition {
+                IndexDefinition {
                     name: idx.name().map(String::from),
                     db_name: Some(idx.constraint_name(self.connector).into_owned()),
                     fields,
@@ -393,7 +391,7 @@ impl<'a> LiftAstToDml<'a> {
 
             let field_type = match &scalar_field.scalar_field_type() {
                 db::ScalarFieldType::CompositeType(ctid) => {
-                    let mut field = dml::CompositeField::new();
+                    let mut field = CompositeField::new();
                     field.name = scalar_field.name().to_owned();
                     field.composite_type = self.db.ast()[*ctid].name().to_owned();
                     field.documentation = ast_field.documentation().map(String::from);
@@ -401,33 +399,33 @@ impl<'a> LiftAstToDml<'a> {
                     field.database_name = scalar_field.mapped_name().map(String::from);
                     field.arity = arity;
 
-                    model.add_field(dml::Field::CompositeField(field));
+                    model.add_field(Field::CompositeField(field));
                     continue;
                 }
                 _ => self.lift_scalar_field_type(ast_field, &scalar_field.scalar_field_type(), scalar_field),
             };
 
-            let mut field = dml::ScalarField::new(ast_field.name(), arity, field_type);
+            let mut field = ScalarField::new(ast_field.name(), arity, field_type);
 
             field.documentation = ast_field.documentation().map(String::from);
             field.is_ignored = scalar_field.is_ignored();
             field.is_updated_at = scalar_field.is_updated_at();
             field.database_name = scalar_field.mapped_name().map(String::from);
-            field.default_value = scalar_field.default_value().map(|d| dml::DefaultValue {
+            field.default_value = scalar_field.default_value().map(|d| DefaultValue {
                 kind: dml_default_kind(d.value(), scalar_field.scalar_type()),
                 db_name: Some(d.constraint_name(self.connector).into())
                     .filter(|_| self.connector.supports_named_default_values()),
             });
 
-            model.add_field(dml::Field::ScalarField(field));
+            model.add_field(Field::ScalarField(field));
         }
 
         model
     }
 
     /// Internal: Validates an enum AST node.
-    fn lift_enum(&self, r#enum: EnumWalker<'_>) -> dml::Enum {
-        let mut en = dml::Enum::new(r#enum.name(), vec![], None);
+    fn lift_enum(&self, r#enum: EnumWalker<'_>) -> Enum {
+        let mut en = Enum::new(r#enum.name(), vec![], None);
 
         for value in r#enum.values() {
             en.add_value(self.lift_enum_value(value));
@@ -440,19 +438,19 @@ impl<'a> LiftAstToDml<'a> {
     }
 
     /// Internal: Lifts an enum value AST node.
-    fn lift_enum_value(&self, value: EnumValueWalker<'_>) -> dml::EnumValue {
-        let mut enum_value = dml::EnumValue::new(value.name());
+    fn lift_enum_value(&self, value: EnumValueWalker<'_>) -> EnumValue {
+        let mut enum_value = EnumValue::new(value.name());
         enum_value.documentation = value.documentation().map(String::from);
         enum_value.database_name = value.mapped_name().map(String::from);
         enum_value
     }
 
     /// Internal: Lift a field's arity.
-    fn lift_arity(&self, field_arity: &ast::FieldArity) -> dml::FieldArity {
+    fn lift_arity(&self, field_arity: &ast::FieldArity) -> FieldArity {
         match field_arity {
-            ast::FieldArity::Required => dml::FieldArity::Required,
-            ast::FieldArity::Optional => dml::FieldArity::Optional,
-            ast::FieldArity::List => dml::FieldArity::List,
+            ast::FieldArity::Required => FieldArity::Required,
+            ast::FieldArity::Optional => FieldArity::Optional,
+            ast::FieldArity::List => FieldArity::List,
         }
     }
 
@@ -461,17 +459,17 @@ impl<'a> LiftAstToDml<'a> {
         ast_field: &ast::Field,
         scalar_field_type: &db::ScalarFieldType,
         scalar_field: ScalarFieldWalker<'_>,
-    ) -> dml::FieldType {
+    ) -> FieldType {
         match scalar_field_type {
             db::ScalarFieldType::CompositeType(_) => {
                 unreachable!();
             }
             db::ScalarFieldType::Enum(enum_id) => {
                 let enum_name = &self.db.ast()[*enum_id].name.name;
-                dml::FieldType::Enum(enum_name.to_owned())
+                FieldType::Enum(enum_name.to_owned())
             }
             db::ScalarFieldType::Unsupported(_) => {
-                dml::FieldType::Unsupported(ast_field.field_type.as_unsupported().unwrap().0.to_owned())
+                FieldType::Unsupported(ast_field.field_type.as_unsupported().unwrap().0.to_owned())
             }
             db::ScalarFieldType::BuiltInScalar(scalar_type) => {
                 let native_type = scalar_field.raw_native_type().map(|(_, name, args, _)| {
@@ -479,7 +477,7 @@ impl<'a> LiftAstToDml<'a> {
                         .parse_native_type(name, args.to_owned(), scalar_field.ast_field().span())
                         .unwrap()
                 });
-                dml::FieldType::Scalar(
+                FieldType::Scalar(
                     parser_database_scalar_type_to_dml_scalar_type(*scalar_type),
                     native_type.map(datamodel_connector_native_type_to_dml_native_type),
                 )
@@ -528,38 +526,38 @@ impl<'a> LiftAstToDml<'a> {
     }
 }
 
-fn parser_database_sort_order_to_dml_sort_order(sort_order: db::SortOrder) -> dml::SortOrder {
+fn parser_database_sort_order_to_dml_sort_order(sort_order: db::SortOrder) -> SortOrder {
     match sort_order {
-        db::SortOrder::Asc => dml::SortOrder::Asc,
-        db::SortOrder::Desc => dml::SortOrder::Desc,
+        db::SortOrder::Asc => SortOrder::Asc,
+        db::SortOrder::Desc => SortOrder::Desc,
     }
 }
 
-fn parser_database_referential_action_to_dml_referential_action(ra: db::ReferentialAction) -> dml::ReferentialAction {
+fn parser_database_referential_action_to_dml_referential_action(ra: db::ReferentialAction) -> ReferentialAction {
     match ra {
-        db::ReferentialAction::Cascade => dml::ReferentialAction::Cascade,
-        db::ReferentialAction::SetNull => dml::ReferentialAction::SetNull,
-        db::ReferentialAction::SetDefault => dml::ReferentialAction::SetDefault,
-        db::ReferentialAction::Restrict => dml::ReferentialAction::Restrict,
-        db::ReferentialAction::NoAction => dml::ReferentialAction::NoAction,
+        db::ReferentialAction::Cascade => ReferentialAction::Cascade,
+        db::ReferentialAction::SetNull => ReferentialAction::SetNull,
+        db::ReferentialAction::SetDefault => ReferentialAction::SetDefault,
+        db::ReferentialAction::Restrict => ReferentialAction::Restrict,
+        db::ReferentialAction::NoAction => ReferentialAction::NoAction,
     }
 }
 
-fn parser_database_scalar_type_to_dml_scalar_type(st: db::ScalarType) -> dml::ScalarType {
+fn parser_database_scalar_type_to_dml_scalar_type(st: ScalarType) -> dml::ScalarType {
     st.as_str().parse().unwrap()
 }
 
 fn datamodel_connector_native_type_to_dml_native_type(
     instance: psl_core::datamodel_connector::NativeTypeInstance,
-) -> dml::NativeTypeInstance {
-    dml::NativeTypeInstance {
+) -> NativeTypeInstance {
+    NativeTypeInstance {
         name: instance.name,
         args: instance.args,
         serialized_native_type: instance.serialized_native_type,
     }
 }
 
-fn dml_default_kind(default_value: &ast::Expression, scalar_type: Option<ScalarType>) -> dml::DefaultKind {
+fn dml_default_kind(default_value: &ast::Expression, scalar_type: Option<ScalarType>) -> DefaultKind {
     // This has all been validated in parser-database, so unwrapping is always safe.
     match default_value {
         ast::Expression::Function(funcname, args, _) if funcname == "dbgenerated" => {
@@ -621,72 +619,72 @@ fn dml_default_kind(default_value: &ast::Expression, scalar_type: Option<ScalarT
     }
 }
 
-fn convert_op_class(from_db: OperatorClassWalker<'_>) -> dml::OperatorClass {
+fn convert_op_class(from_db: OperatorClassWalker<'_>) -> OperatorClass {
     match from_db.get() {
         // gist
-        Either::Left(db::OperatorClass::InetOps) => dml::OperatorClass::InetOps,
+        Either::Left(db::OperatorClass::InetOps) => OperatorClass::InetOps,
 
         // gin
-        Either::Left(db::OperatorClass::JsonbOps) => dml::OperatorClass::JsonbOps,
-        Either::Left(db::OperatorClass::JsonbPathOps) => dml::OperatorClass::JsonbPathOps,
-        Either::Left(db::OperatorClass::ArrayOps) => dml::OperatorClass::ArrayOps,
+        Either::Left(db::OperatorClass::JsonbOps) => OperatorClass::JsonbOps,
+        Either::Left(db::OperatorClass::JsonbPathOps) => OperatorClass::JsonbPathOps,
+        Either::Left(db::OperatorClass::ArrayOps) => OperatorClass::ArrayOps,
 
         // sp-gist
-        Either::Left(db::OperatorClass::TextOps) => dml::OperatorClass::TextOps,
+        Either::Left(db::OperatorClass::TextOps) => OperatorClass::TextOps,
 
         // brin
-        Either::Left(db::OperatorClass::BitMinMaxOps) => dml::OperatorClass::BitMinMaxOps,
-        Either::Left(db::OperatorClass::VarBitMinMaxOps) => dml::OperatorClass::VarBitMinMaxOps,
-        Either::Left(db::OperatorClass::BpcharBloomOps) => dml::OperatorClass::BpcharBloomOps,
-        Either::Left(db::OperatorClass::BpcharMinMaxOps) => dml::OperatorClass::BpcharMinMaxOps,
-        Either::Left(db::OperatorClass::ByteaBloomOps) => dml::OperatorClass::ByteaBloomOps,
-        Either::Left(db::OperatorClass::ByteaMinMaxOps) => dml::OperatorClass::ByteaMinMaxOps,
-        Either::Left(db::OperatorClass::DateBloomOps) => dml::OperatorClass::DateBloomOps,
-        Either::Left(db::OperatorClass::DateMinMaxOps) => dml::OperatorClass::DateMinMaxOps,
-        Either::Left(db::OperatorClass::DateMinMaxMultiOps) => dml::OperatorClass::DateMinMaxMultiOps,
-        Either::Left(db::OperatorClass::Float4BloomOps) => dml::OperatorClass::Float4BloomOps,
-        Either::Left(db::OperatorClass::Float4MinMaxOps) => dml::OperatorClass::Float4MinMaxOps,
-        Either::Left(db::OperatorClass::Float4MinMaxMultiOps) => dml::OperatorClass::Float4MinMaxMultiOps,
-        Either::Left(db::OperatorClass::Float8BloomOps) => dml::OperatorClass::Float8BloomOps,
-        Either::Left(db::OperatorClass::Float8MinMaxOps) => dml::OperatorClass::Float8MinMaxOps,
-        Either::Left(db::OperatorClass::Float8MinMaxMultiOps) => dml::OperatorClass::Float8MinMaxMultiOps,
-        Either::Left(db::OperatorClass::InetInclusionOps) => dml::OperatorClass::InetInclusionOps,
-        Either::Left(db::OperatorClass::InetBloomOps) => dml::OperatorClass::InetBloomOps,
-        Either::Left(db::OperatorClass::InetMinMaxOps) => dml::OperatorClass::InetMinMaxOps,
-        Either::Left(db::OperatorClass::InetMinMaxMultiOps) => dml::OperatorClass::InetMinMaxMultiOps,
-        Either::Left(db::OperatorClass::Int2BloomOps) => dml::OperatorClass::Int2BloomOps,
-        Either::Left(db::OperatorClass::Int2MinMaxOps) => dml::OperatorClass::Int2MinMaxOps,
-        Either::Left(db::OperatorClass::Int2MinMaxMultiOps) => dml::OperatorClass::Int2MinMaxMultiOps,
-        Either::Left(db::OperatorClass::Int4BloomOps) => dml::OperatorClass::Int4BloomOps,
-        Either::Left(db::OperatorClass::Int4MinMaxOps) => dml::OperatorClass::Int4MinMaxOps,
-        Either::Left(db::OperatorClass::Int4MinMaxMultiOps) => dml::OperatorClass::Int4MinMaxMultiOps,
-        Either::Left(db::OperatorClass::Int8BloomOps) => dml::OperatorClass::Int8BloomOps,
-        Either::Left(db::OperatorClass::Int8MinMaxOps) => dml::OperatorClass::Int8MinMaxOps,
-        Either::Left(db::OperatorClass::Int8MinMaxMultiOps) => dml::OperatorClass::Int8MinMaxMultiOps,
-        Either::Left(db::OperatorClass::NumericBloomOps) => dml::OperatorClass::NumericBloomOps,
-        Either::Left(db::OperatorClass::NumericMinMaxOps) => dml::OperatorClass::NumericMinMaxOps,
-        Either::Left(db::OperatorClass::NumericMinMaxMultiOps) => dml::OperatorClass::NumericMinMaxMultiOps,
-        Either::Left(db::OperatorClass::OidBloomOps) => dml::OperatorClass::OidBloomOps,
-        Either::Left(db::OperatorClass::OidMinMaxOps) => dml::OperatorClass::OidMinMaxOps,
-        Either::Left(db::OperatorClass::OidMinMaxMultiOps) => dml::OperatorClass::OidMinMaxMultiOps,
-        Either::Left(db::OperatorClass::TextBloomOps) => dml::OperatorClass::TextBloomOps,
-        Either::Left(db::OperatorClass::TextMinMaxOps) => dml::OperatorClass::TextMinMaxOps,
-        Either::Left(db::OperatorClass::TimestampBloomOps) => dml::OperatorClass::TimestampBloomOps,
-        Either::Left(db::OperatorClass::TimestampMinMaxOps) => dml::OperatorClass::TimestampMinMaxOps,
-        Either::Left(db::OperatorClass::TimestampMinMaxMultiOps) => dml::OperatorClass::TimestampMinMaxMultiOps,
-        Either::Left(db::OperatorClass::TimestampTzBloomOps) => dml::OperatorClass::TimestampTzBloomOps,
-        Either::Left(db::OperatorClass::TimestampTzMinMaxOps) => dml::OperatorClass::TimestampTzMinMaxOps,
-        Either::Left(db::OperatorClass::TimestampTzMinMaxMultiOps) => dml::OperatorClass::TimestampTzMinMaxMultiOps,
-        Either::Left(db::OperatorClass::TimeBloomOps) => dml::OperatorClass::TimeBloomOps,
-        Either::Left(db::OperatorClass::TimeMinMaxOps) => dml::OperatorClass::TimeMinMaxOps,
-        Either::Left(db::OperatorClass::TimeMinMaxMultiOps) => dml::OperatorClass::TimeMinMaxMultiOps,
-        Either::Left(db::OperatorClass::TimeTzBloomOps) => dml::OperatorClass::TimeTzBloomOps,
-        Either::Left(db::OperatorClass::TimeTzMinMaxOps) => dml::OperatorClass::TimeTzMinMaxOps,
-        Either::Left(db::OperatorClass::TimeTzMinMaxMultiOps) => dml::OperatorClass::TimeTzMinMaxMultiOps,
-        Either::Left(db::OperatorClass::UuidBloomOps) => dml::OperatorClass::UuidBloomOps,
-        Either::Left(db::OperatorClass::UuidMinMaxOps) => dml::OperatorClass::UuidMinMaxOps,
-        Either::Left(db::OperatorClass::UuidMinMaxMultiOps) => dml::OperatorClass::UuidMinMaxMultiOps,
+        Either::Left(db::OperatorClass::BitMinMaxOps) => OperatorClass::BitMinMaxOps,
+        Either::Left(db::OperatorClass::VarBitMinMaxOps) => OperatorClass::VarBitMinMaxOps,
+        Either::Left(db::OperatorClass::BpcharBloomOps) => OperatorClass::BpcharBloomOps,
+        Either::Left(db::OperatorClass::BpcharMinMaxOps) => OperatorClass::BpcharMinMaxOps,
+        Either::Left(db::OperatorClass::ByteaBloomOps) => OperatorClass::ByteaBloomOps,
+        Either::Left(db::OperatorClass::ByteaMinMaxOps) => OperatorClass::ByteaMinMaxOps,
+        Either::Left(db::OperatorClass::DateBloomOps) => OperatorClass::DateBloomOps,
+        Either::Left(db::OperatorClass::DateMinMaxOps) => OperatorClass::DateMinMaxOps,
+        Either::Left(db::OperatorClass::DateMinMaxMultiOps) => OperatorClass::DateMinMaxMultiOps,
+        Either::Left(db::OperatorClass::Float4BloomOps) => OperatorClass::Float4BloomOps,
+        Either::Left(db::OperatorClass::Float4MinMaxOps) => OperatorClass::Float4MinMaxOps,
+        Either::Left(db::OperatorClass::Float4MinMaxMultiOps) => OperatorClass::Float4MinMaxMultiOps,
+        Either::Left(db::OperatorClass::Float8BloomOps) => OperatorClass::Float8BloomOps,
+        Either::Left(db::OperatorClass::Float8MinMaxOps) => OperatorClass::Float8MinMaxOps,
+        Either::Left(db::OperatorClass::Float8MinMaxMultiOps) => OperatorClass::Float8MinMaxMultiOps,
+        Either::Left(db::OperatorClass::InetInclusionOps) => OperatorClass::InetInclusionOps,
+        Either::Left(db::OperatorClass::InetBloomOps) => OperatorClass::InetBloomOps,
+        Either::Left(db::OperatorClass::InetMinMaxOps) => OperatorClass::InetMinMaxOps,
+        Either::Left(db::OperatorClass::InetMinMaxMultiOps) => OperatorClass::InetMinMaxMultiOps,
+        Either::Left(db::OperatorClass::Int2BloomOps) => OperatorClass::Int2BloomOps,
+        Either::Left(db::OperatorClass::Int2MinMaxOps) => OperatorClass::Int2MinMaxOps,
+        Either::Left(db::OperatorClass::Int2MinMaxMultiOps) => OperatorClass::Int2MinMaxMultiOps,
+        Either::Left(db::OperatorClass::Int4BloomOps) => OperatorClass::Int4BloomOps,
+        Either::Left(db::OperatorClass::Int4MinMaxOps) => OperatorClass::Int4MinMaxOps,
+        Either::Left(db::OperatorClass::Int4MinMaxMultiOps) => OperatorClass::Int4MinMaxMultiOps,
+        Either::Left(db::OperatorClass::Int8BloomOps) => OperatorClass::Int8BloomOps,
+        Either::Left(db::OperatorClass::Int8MinMaxOps) => OperatorClass::Int8MinMaxOps,
+        Either::Left(db::OperatorClass::Int8MinMaxMultiOps) => OperatorClass::Int8MinMaxMultiOps,
+        Either::Left(db::OperatorClass::NumericBloomOps) => OperatorClass::NumericBloomOps,
+        Either::Left(db::OperatorClass::NumericMinMaxOps) => OperatorClass::NumericMinMaxOps,
+        Either::Left(db::OperatorClass::NumericMinMaxMultiOps) => OperatorClass::NumericMinMaxMultiOps,
+        Either::Left(db::OperatorClass::OidBloomOps) => OperatorClass::OidBloomOps,
+        Either::Left(db::OperatorClass::OidMinMaxOps) => OperatorClass::OidMinMaxOps,
+        Either::Left(db::OperatorClass::OidMinMaxMultiOps) => OperatorClass::OidMinMaxMultiOps,
+        Either::Left(db::OperatorClass::TextBloomOps) => OperatorClass::TextBloomOps,
+        Either::Left(db::OperatorClass::TextMinMaxOps) => OperatorClass::TextMinMaxOps,
+        Either::Left(db::OperatorClass::TimestampBloomOps) => OperatorClass::TimestampBloomOps,
+        Either::Left(db::OperatorClass::TimestampMinMaxOps) => OperatorClass::TimestampMinMaxOps,
+        Either::Left(db::OperatorClass::TimestampMinMaxMultiOps) => OperatorClass::TimestampMinMaxMultiOps,
+        Either::Left(db::OperatorClass::TimestampTzBloomOps) => OperatorClass::TimestampTzBloomOps,
+        Either::Left(db::OperatorClass::TimestampTzMinMaxOps) => OperatorClass::TimestampTzMinMaxOps,
+        Either::Left(db::OperatorClass::TimestampTzMinMaxMultiOps) => OperatorClass::TimestampTzMinMaxMultiOps,
+        Either::Left(db::OperatorClass::TimeBloomOps) => OperatorClass::TimeBloomOps,
+        Either::Left(db::OperatorClass::TimeMinMaxOps) => OperatorClass::TimeMinMaxOps,
+        Either::Left(db::OperatorClass::TimeMinMaxMultiOps) => OperatorClass::TimeMinMaxMultiOps,
+        Either::Left(db::OperatorClass::TimeTzBloomOps) => OperatorClass::TimeTzBloomOps,
+        Either::Left(db::OperatorClass::TimeTzMinMaxOps) => OperatorClass::TimeTzMinMaxOps,
+        Either::Left(db::OperatorClass::TimeTzMinMaxMultiOps) => OperatorClass::TimeTzMinMaxMultiOps,
+        Either::Left(db::OperatorClass::UuidBloomOps) => OperatorClass::UuidBloomOps,
+        Either::Left(db::OperatorClass::UuidMinMaxOps) => OperatorClass::UuidMinMaxOps,
+        Either::Left(db::OperatorClass::UuidMinMaxMultiOps) => OperatorClass::UuidMinMaxMultiOps,
 
-        Either::Right(raw) => dml::OperatorClass::Raw(raw.to_string().into()),
+        Either::Right(raw) => OperatorClass::Raw(raw.to_string().into()),
     }
 }

@@ -231,7 +231,7 @@ impl RelationFieldAsserts for dml::RelationField {
     }
 
     fn assert_relation_to(&self, t: &str) -> &Self {
-        assert_eq!(self.relation_info.to, t);
+        assert_eq!(self.relation_info.referenced_model, t);
         self
     }
 

@@ -81,7 +81,7 @@ impl Datamodel {
 
     /// Finds parent  model for a field reference.
     pub fn find_model_by_relation_field_ref(&self, field: &RelationField) -> Option<&Model> {
-        self.find_model(&self.find_related_field_bang(field).1.relation_info.to)
+        self.find_model(&self.find_related_field_bang(field).1.relation_info.referenced_model)
     }
 
     /// Finds a mutable field reference by a model and field name.
@@ -157,7 +157,7 @@ impl Datamodel {
         let mut fields = vec![];
         for model in self.models() {
             for field in model.relation_fields() {
-                if field.relation_info.to == model_name {
+                if field.relation_info.referenced_model == model_name {
                     fields.push((model.name.clone(), field.name.clone()))
                 }
             }
@@ -167,7 +167,7 @@ impl Datamodel {
 
     /// Finds a relation field related to a relation info. Returns a tuple (index_of_relation_field_in_model, relation_field).
     pub fn find_related_field_for_info(&self, info: &RelationInfo, exclude: &str) -> Option<(usize, &RelationField)> {
-        self.find_model(&info.to)
+        self.find_model(&info.referenced_model)
             .expect("The model referred to by a RelationInfo should always exist.")
             .fields
             .iter()
@@ -175,7 +175,7 @@ impl Datamodel {
             .filter_map(|(idx, field)| field.as_relation_field().map(|f| (idx, f)))
             .find(|(_idx, f)| {
                 f.relation_info.name == info.name
-                    && (f.relation_info.to != info.to ||
+                    && (f.relation_info.referenced_model != info.referenced_model ||
           // This is to differentiate the opposite field from self in the self relation case.
           f.name != exclude)
             })

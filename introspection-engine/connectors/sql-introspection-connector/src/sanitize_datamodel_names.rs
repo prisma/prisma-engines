@@ -65,7 +65,7 @@ fn sanitize_models(ctx: &Context, datamodel: &mut Datamodel) -> HashMap<String, 
                     let info = &mut rf.relation_info;
 
                     info.name = sanitize_string(&info.name);
-                    info.to = sanitize_string(&reformat_reserved_string(&info.to));
+                    info.referenced_model = sanitize_string(&reformat_reserved_string(&info.referenced_model));
 
                     info.references = sanitize_strings(&info.references);
                     info.fields = sanitize_strings(&info.fields);

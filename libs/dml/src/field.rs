@@ -353,7 +353,7 @@ impl RelationField {
     }
 
     pub fn points_to_model(&self, name: &str) -> bool {
-        self.relation_info.to == name
+        self.relation_info.referenced_model == name
     }
 
     pub fn is_required(&self) -> bool {
