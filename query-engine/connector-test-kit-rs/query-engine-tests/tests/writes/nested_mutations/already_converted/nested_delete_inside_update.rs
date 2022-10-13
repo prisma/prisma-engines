@@ -871,7 +871,7 @@ mod delete_inside_update {
         Ok(())
     }
 
-    // "a P1 to C1  relation" should "error if the nodes are not connected"
+    // "a P1 to CM  relation" should "error if the nodes are not connected"
     #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToMany", exclude(SqlServer))]
     async fn p1_cm_error_if_not_connected(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
@@ -909,7 +909,7 @@ mod delete_inside_update {
         Ok(())
     }
 
-    // "a P1 to C1  relation" should "error if the node is connected but the additional filters don't match it"
+    // "a P1 to CM  relation" should "error if the node is connected but the additional filters don't match it"
     #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToMany", exclude(SqlServer))]
     async fn p1_cm_error_if_filter_not_match(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
