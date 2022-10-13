@@ -153,6 +153,8 @@
 <span id="153">153</span>
 <span id="154">154</span>
 <span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -223,6 +225,7 @@
     <span class="ident">FilteredRelationCount</span>,
     <span class="ident">FieldReference</span>,
     <span class="ident">PostgresqlExtensions</span>,
+    <span class="ident">ClientExtensions</span>
 );
 
 <span class="doccomment">/// Generator preview features</span>
@@ -266,6 +269,7 @@
     <span class="ident">hidden</span>: <span class="macro">enumflags2::make_bitflags!</span>(<span class="ident">PreviewFeature</span>::{
         <span class="ident">MultiSchema</span>
         <span class="op">|</span> <span class="ident">PostgresqlExtensions</span>
+        <span class="op">|</span> <span class="ident">ClientExtensions</span>
     }),
 };
 
