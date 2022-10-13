@@ -183,8 +183,11 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
 
     fields.extend(compound_unique_fields);
     fields.extend(compound_id_field);
-    fields.extend(boolean_operators);
-    fields.extend(rest_fields);
+
+    if ctx.has_feature(&PreviewFeature::ExtendedWhereUnique) {
+        fields.extend(boolean_operators);
+        fields.extend(rest_fields);
+    }
 
     input_object.set_fields(fields);
 
