@@ -240,7 +240,7 @@ fn empty_schema_property_should_error() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&parse_unwrap_err(schema));
+    expect_error(schema, &expect);
 }
 
 #[test]
@@ -266,7 +266,7 @@ fn schemas_array_without_preview_feature_should_error() {
         [1;94m   | [0m
     "#]];
 
-    expect.assert_eq(&parse_unwrap_err(schema));
+    expect_error(schema, &expect);
 }
 
 fn render_schema_json(schema: &str) -> String {
