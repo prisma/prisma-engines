@@ -1,11 +1,10 @@
-use crate::flavour::*;
+use crate::{flavour::*, SqlDatabaseSchema};
 use migration_connector::{migrations_directory::MigrationDirectory, ConnectorResult};
-use sql_schema_describer::SqlSchema;
 
 pub(super) async fn sql_schema_from_migrations_history(
     migrations: &[MigrationDirectory],
     mut shadow_db: MssqlFlavour,
-) -> ConnectorResult<SqlSchema> {
+) -> ConnectorResult<SqlDatabaseSchema> {
     for migration in migrations {
         let script = migration.read_migration_script()?;
 

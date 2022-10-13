@@ -4,7 +4,7 @@ pub(crate) use quaint::connector::rusqlite;
 
 use migration_connector::{ConnectorError, ConnectorResult};
 use quaint::connector::{GetRow, ToColumnNames};
-use sql_schema_describer::{sqlite as describer, DescriberErrorKind, SqlSchema};
+use sql_schema_describer::{sqlite as describer, DescriberErrorKind};
 use std::sync::Mutex;
 use user_facing_errors::migration_engine::ApplyMigrationError;
 
@@ -21,8 +21,8 @@ impl Connection {
         Connection(Mutex::new(rusqlite::Connection::open_in_memory().unwrap()))
     }
 
-    pub(super) async fn describe_schema(&mut self) -> ConnectorResult<SqlSchema> {
-        describer::SqlSchemaDescriber::new(&self.0)
+    pub(super) async fn describe_schema(&mut self) -> ConnectorResult<crate::SqlDatabaseSchema> {
+        let describer_schema = describer::SqlSchemaDescriber::new(&self.0)
             .describe_impl()
             .await
             .map_err(|err| match err.into_kind() {
@@ -32,7 +32,12 @@ impl Connection {
                 DescriberErrorKind::CrossSchemaReference { .. } => {
                     unreachable!("No schemas on SQLite")
                 }
-            })
+            })?;
+        Ok(crate::SqlDatabaseSchema {
+            describer_schema,
+            prisma_level_defaults: Vec::new(),
+            relevant_namespaces: crate::database_schema::RelevantNamespaces::NotApplicable,
+        })
     }
 
     pub(super) fn raw_cmd(&mut self, sql: &str) -> ConnectorResult<()> {

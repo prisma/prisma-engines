@@ -139,7 +139,7 @@ pub(crate) trait SqlFlavour:
     /// The datamodel connector corresponding to the flavour
     fn datamodel_connector(&self) -> &'static dyn psl::datamodel_connector::Connector;
 
-    fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<SqlSchema>>;
+    fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<crate::SqlDatabaseSchema>>;
 
     /// Drop the database.
     fn drop_database(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
@@ -149,8 +149,12 @@ pub(crate) trait SqlFlavour:
 
     /// Return an empty database schema. This happens in the flavour, because we need
     /// SqlSchema::connector_data to be set.
-    fn empty_database_schema(&self) -> SqlSchema {
-        SqlSchema::default()
+    fn empty_database_schema(&self) -> crate::SqlDatabaseSchema {
+        crate::SqlDatabaseSchema {
+            describer_schema: SqlSchema::default(),
+            relevant_namespaces: crate::database_schema::RelevantNamespaces::All,
+            prisma_level_defaults: Vec::new(),
+        }
     }
 
     /// Check a connection to make sure it is usable by the migration engine.
@@ -253,7 +257,7 @@ pub(crate) trait SqlFlavour:
         &'a mut self,
         migrations: &'a [MigrationDirectory],
         shadow_database_url: Option<String>,
-    ) -> BoxFuture<'a, ConnectorResult<SqlSchema>>;
+    ) -> BoxFuture<'a, ConnectorResult<crate::SqlDatabaseSchema>>;
 
     /// Receive and validate connector params.
     fn set_params(&mut self, connector_params: ConnectorParams) -> ConnectorResult<()>;

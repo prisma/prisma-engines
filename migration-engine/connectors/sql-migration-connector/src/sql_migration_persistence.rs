@@ -12,7 +12,7 @@ impl MigrationPersistence for SqlMigrationConnector {
 
     fn initialize(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         Box::pin(async move {
-            let schema = self.flavour.describe_schema().await?;
+            let schema = self.flavour.describe_schema().await?.describer_schema;
 
             if schema
                 .table_walkers()

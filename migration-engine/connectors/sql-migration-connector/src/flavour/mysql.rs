@@ -12,7 +12,6 @@ use once_cell::sync::Lazy;
 use psl::{datamodel_connector, parser_database::ScalarType, ValidatedSchema};
 use quaint::connector::MysqlUrl;
 use regex::{Regex, RegexSet};
-use sql_schema_describer::SqlSchema;
 use std::future;
 use url::Url;
 
@@ -91,7 +90,7 @@ impl SqlFlavour for MysqlFlavour {
         psl::builtin_connectors::MYSQL
     }
 
-    fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
+    fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<crate::SqlDatabaseSchema>> {
         with_connection(&mut self.state, |params, _c, connection| async move {
             connection.describe_schema(params).await
         })
@@ -275,7 +274,7 @@ impl SqlFlavour for MysqlFlavour {
         &'a mut self,
         migrations: &'a [MigrationDirectory],
         shadow_database_connection_string: Option<String>,
-    ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
+    ) -> BoxFuture<'a, ConnectorResult<crate::SqlDatabaseSchema>> {
         let shadow_database_connection_string = shadow_database_connection_string.or_else(|| {
             self.state
                 .params()

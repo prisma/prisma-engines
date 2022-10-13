@@ -17,7 +17,11 @@ use sql_schema_describer as sql;
 use std::collections::HashMap;
 
 pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn SqlFlavour) -> SqlDatabaseSchema {
-    let mut schema = SqlDatabaseSchema::default();
+    let mut schema = SqlDatabaseSchema {
+        describer_schema: Default::default(),
+        prisma_level_defaults: Default::default(),
+        relevant_namespaces: crate::database_schema::RelevantNamespaces::NotApplicable,
+    };
 
     let mut context = Context {
         datamodel,
@@ -27,15 +31,27 @@ pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn Sq
         schemas: Default::default(),
     };
 
-    if datamodel.db.schema_flags().contains(SchemaFlags::UsesSchemaAttribute) {
-        if let Some(ds) = context.datamodel.configuration.datasources.get(0) {
-            for (schema, _) in &ds.namespaces {
-                context
-                    .schemas
-                    .insert(schema, context.schema.describer_schema.push_namespace(schema.clone()));
+    context.schema.relevant_namespaces = if datamodel.db.schema_flags().contains(SchemaFlags::UsesSchemaAttribute) {
+        // safety: the @@schema attribute cannot be used without a datasource with a schemas array in it
+        let ds = &context.datamodel.configuration.datasources[0];
+
+        if ds.namespaces.len() > 0 {
+            let mut namespaces = Vec::with_capacity(ds.namespaces.len());
+            for (schema, _) in ds.namespaces.iter().rev() {
+                let namespace_id = context.schema.describer_schema.push_namespace(schema.clone());
+                context.schemas.insert(schema, namespace_id);
+                namespaces.push(namespace_id)
             }
+
+            let first_namespace = namespaces.pop().unwrap();
+            namespaces.reverse();
+            crate::database_schema::RelevantNamespaces::Some(first_namespace, namespaces)
+        } else {
+            crate::database_schema::RelevantNamespaces::All
         }
-    }
+    } else {
+        crate::database_schema::RelevantNamespaces::NotApplicable
+    };
 
     context.schema.describer_schema.enums = flavour.calculate_enums(&context);
 

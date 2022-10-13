@@ -79,7 +79,7 @@ impl SqlMigrationConnector {
 
     /// Made public for tests.
     pub fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<sql::SqlSchema>> {
-        self.flavour.describe_schema()
+        Box::pin(async move { Ok(self.flavour.describe_schema().await?.describer_schema) })
     }
 
     /// For tests
@@ -122,11 +122,11 @@ impl SqlMigrationConnector {
                     self.flavour.as_ref(),
                 ))
             }
-            DiffTarget::Migrations(migrations) => self
-                .flavour
-                .sql_schema_from_migration_history(migrations, shadow_database_connection_string)
-                .await
-                .map(From::from),
+            DiffTarget::Migrations(migrations) => {
+                self.flavour
+                    .sql_schema_from_migration_history(migrations, shadow_database_connection_string)
+                    .await
+            }
             DiffTarget::Database => self.flavour.describe_schema().await.map(From::from),
             DiffTarget::Empty => Ok(self.flavour.empty_database_schema().into()),
         }
@@ -226,7 +226,7 @@ impl MigrationConnector for SqlMigrationConnector {
         ctx: &'a IntrospectionContext,
     ) -> BoxFuture<'a, ConnectorResult<IntrospectionResult>> {
         Box::pin(async move {
-            let sql_schema = self.flavour.describe_schema().await?;
+            let sql_schema = self.flavour.describe_schema().await?.describer_schema;
             let datamodel = sql_introspection_connector::calculate_datamodel::calculate_datamodel(&sql_schema, ctx)
                 .map_err(|err| ConnectorError::from_source(err, "Introspection error"))?;
             Ok(datamodel)
@@ -315,6 +315,7 @@ async fn best_effort_reset_impl(flavour: &mut (dyn SqlFlavour + Send + Sync)) ->
     // We drop views here, not in the normal migration process to not
     // accidentally drop something we can't describe in the data model.
     let drop_views = source_schema
+        .describer_schema
         .view_walkers()
         .filter(|view| !flavour.view_should_be_ignored(view.name()))
         .map(|vw| DropView::new(vw.id))
@@ -322,7 +323,7 @@ async fn best_effort_reset_impl(flavour: &mut (dyn SqlFlavour + Send + Sync)) ->
 
     steps.extend(drop_views);
 
-    let diffables: Pair<SqlDatabaseSchema> = Pair::new(source_schema, target_schema).map(From::from);
+    let diffables: Pair<SqlDatabaseSchema> = Pair::new(source_schema, target_schema);
     steps.extend(sql_schema_differ::calculate_steps(diffables.as_ref(), flavour));
     let (source_schema, target_schema) = diffables.map(|s| s.describer_schema).into_tuple();
 

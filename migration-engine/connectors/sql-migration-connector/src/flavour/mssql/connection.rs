@@ -5,7 +5,7 @@ use quaint::{
     connector::{self, MssqlUrl},
     prelude::{ConnectionInfo, Queryable},
 };
-use sql_schema_describer::{mssql as describer, DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
+use sql_schema_describer::{mssql as describer, DescriberErrorKind, SqlSchemaDescriberBackend};
 use user_facing_errors::{
     introspection_engine::DatabaseSchemaInconsistent, migration_engine::ApplyMigrationError, KnownError,
 };
@@ -25,9 +25,13 @@ impl Connection {
     }
 
     #[tracing::instrument(skip(self, params))]
-    pub(super) async fn describe_schema(&mut self, params: &super::Params) -> ConnectorResult<SqlSchema> {
+    pub(super) async fn describe_schema(
+        &mut self,
+        params: &super::Params,
+    ) -> ConnectorResult<crate::SqlDatabaseSchema> {
+        let namespace_name = params.url.schema();
         let mut schema = describer::SqlSchemaDescriber::new(&self.0)
-            .describe(&[params.url.schema()])
+            .describe(&[namespace_name])
             .await
             .map_err(|err| match err.into_kind() {
                 DescriberErrorKind::QuaintError(err) => quaint_err_url(&params.url)(err),
@@ -42,7 +46,13 @@ impl Connection {
 
         crate::flavour::normalize_sql_schema(&mut schema, params.connector_params.preview_features);
 
-        Ok(schema)
+        let inspected_namespace = schema.namespace_walker(namespace_name).unwrap().id;
+
+        Ok(crate::SqlDatabaseSchema {
+            describer_schema: schema,
+            prisma_level_defaults: Vec::new(),
+            relevant_namespaces: crate::database_schema::RelevantNamespaces::Some(inspected_namespace, Vec::new()),
+        })
     }
 
     pub(super) async fn raw_cmd(&mut self, sql: &str, params: &super::Params) -> ConnectorResult<()> {

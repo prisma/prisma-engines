@@ -6,7 +6,6 @@ use quaint::{
     connector::{self, tokio_postgres::error::ErrorPosition, PostgresUrl},
     prelude::{ConnectionInfo, Queryable},
 };
-use sql_schema_describer::SqlSchema;
 use user_facing_errors::{introspection_engine::DatabaseSchemaInconsistent, migration_engine::ApplyMigrationError};
 
 use crate::sql_renderer::IteratorJoin;
@@ -32,15 +31,16 @@ impl Connection {
         &mut self,
         circumstances: BitFlags<super::Circumstances>,
         params: &super::Params,
-    ) -> ConnectorResult<SqlSchema> {
+    ) -> ConnectorResult<crate::SqlDatabaseSchema> {
         use sql_schema_describer::{postgres as describer, DescriberErrorKind, SqlSchemaDescriberBackend};
+        let namespace_name = params.url.schema();
         let mut describer_circumstances: BitFlags<describer::Circumstances> = Default::default();
         if circumstances.contains(super::Circumstances::IsCockroachDb) {
             describer_circumstances |= describer::Circumstances::Cockroach;
         }
 
         let mut schema = sql_schema_describer::postgres::SqlSchemaDescriber::new(&self.0, describer_circumstances)
-            .describe(&[params.url.schema()])
+            .describe(&[namespace_name])
             .await
             .map_err(|err| match err.into_kind() {
                 DescriberErrorKind::QuaintError(err) => quaint_err(&params.url)(err),
@@ -53,8 +53,13 @@ impl Connection {
             })?;
 
         crate::flavour::normalize_sql_schema(&mut schema, params.connector_params.preview_features);
+        let inspected_namespace = schema.namespace_walker(namespace_name).unwrap().id;
 
-        Ok(schema)
+        Ok(crate::SqlDatabaseSchema {
+            describer_schema: schema,
+            prisma_level_defaults: Vec::new(),
+            relevant_namespaces: crate::database_schema::RelevantNamespaces::Some(inspected_namespace, Vec::new()),
+        })
     }
 
     pub(super) async fn raw_cmd(&mut self, sql: &str, url: &PostgresUrl) -> ConnectorResult<()> {

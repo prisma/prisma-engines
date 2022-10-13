@@ -6,7 +6,6 @@ use indoc::indoc;
 use migration_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult,
 };
-use sql_schema_describer::SqlSchema;
 use std::path::Path;
 
 type State = super::State<Params, Connection>;
@@ -100,11 +99,8 @@ impl SqlFlavour for SqliteFlavour {
         psl::builtin_connectors::SQLITE
     }
 
-    fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
-        Box::pin(async move {
-            let schema = with_connection(&mut self.state, |_, conn| Ok(Box::pin(conn.describe_schema())))?.await?;
-            Ok(schema)
-        })
+    fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<crate::SqlDatabaseSchema>> {
+        Box::pin(async move { with_connection(&mut self.state, |_, conn| Ok(Box::pin(conn.describe_schema())))?.await })
     }
 
     fn drop_database(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
@@ -284,7 +280,7 @@ impl SqlFlavour for SqliteFlavour {
         &'a mut self,
         migrations: &'a [MigrationDirectory],
         _shadow_database_connection_string: Option<String>,
-    ) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
+    ) -> BoxFuture<'_, ConnectorResult<crate::SqlDatabaseSchema>> {
         Box::pin(async move {
             tracing::debug!("Applying migrations to temporary in-memory SQLite database.");
             let mut shadow_db_conn = Connection::new_in_memory();

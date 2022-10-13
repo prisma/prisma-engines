@@ -126,7 +126,7 @@ impl SqlFlavour for PostgresFlavour {
         }
     }
 
-    fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
+    fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<crate::SqlDatabaseSchema>> {
         with_connection(self, |params, circumstances, conn| async move {
             conn.describe_schema(circumstances, params).await
         })
@@ -248,10 +248,14 @@ impl SqlFlavour for PostgresFlavour {
         Box::pin(self.raw_cmd("DROP TABLE _prisma_migrations"))
     }
 
-    fn empty_database_schema(&self) -> SqlSchema {
-        let mut schema = SqlSchema::default();
-        schema.set_connector_data(Box::new(sql_schema_describer::postgres::PostgresSchemaExt::default()));
-        schema
+    fn empty_database_schema(&self) -> crate::SqlDatabaseSchema {
+        let mut describer_schema = SqlSchema::default();
+        describer_schema.set_connector_data(Box::new(sql_schema_describer::postgres::PostgresSchemaExt::default()));
+        crate::SqlDatabaseSchema {
+            describer_schema,
+            prisma_level_defaults: Vec::new(),
+            relevant_namespaces: crate::database_schema::RelevantNamespaces::All,
+        }
     }
 
     fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
@@ -296,7 +300,7 @@ impl SqlFlavour for PostgresFlavour {
         &'a mut self,
         migrations: &'a [MigrationDirectory],
         shadow_database_connection_string: Option<String>,
-    ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
+    ) -> BoxFuture<'a, ConnectorResult<crate::SqlDatabaseSchema>> {
         let shadow_database_connection_string = shadow_database_connection_string.or_else(|| {
             self.state
                 .params()

@@ -10,7 +10,7 @@ use quaint::{
     },
     prelude::{ConnectionInfo, Queryable},
 };
-use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
+use sql_schema_describer::{DescriberErrorKind, SqlSchemaDescriberBackend};
 use user_facing_errors::{
     introspection_engine::DatabaseSchemaInconsistent,
     migration_engine::{ApplyMigrationError, DirectDdlNotAllowed, ForeignKeyCreationNotAllowed},
@@ -32,7 +32,10 @@ impl Connection {
     }
 
     #[tracing::instrument(skip(self, params))]
-    pub(super) async fn describe_schema(&mut self, params: &super::Params) -> ConnectorResult<SqlSchema> {
+    pub(super) async fn describe_schema(
+        &mut self,
+        params: &super::Params,
+    ) -> ConnectorResult<crate::SqlDatabaseSchema> {
         let mut schema = sql_schema_describer::mysql::SqlSchemaDescriber::new(&self.0)
             .describe(&[params.url.dbname()])
             .await
@@ -48,7 +51,11 @@ impl Connection {
 
         crate::flavour::normalize_sql_schema(&mut schema, params.connector_params.preview_features);
 
-        Ok(schema)
+        Ok(crate::SqlDatabaseSchema {
+            describer_schema: schema,
+            prisma_level_defaults: Vec::new(),
+            relevant_namespaces: crate::database_schema::RelevantNamespaces::NotApplicable,
+        })
     }
 
     pub(super) async fn raw_cmd(&mut self, sql: &str, url: &MysqlUrl) -> ConnectorResult<()> {

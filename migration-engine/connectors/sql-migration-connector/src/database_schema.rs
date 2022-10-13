@@ -1,11 +1,20 @@
 use migration_connector::DatabaseSchema;
 use sql_schema_describer::{self as sql, SqlSchema};
 
-#[derive(Default, Debug)]
+#[derive(Debug)]
 pub(crate) struct SqlDatabaseSchema {
     pub(crate) describer_schema: SqlSchema,
     /// A _sorted_ array of column ids with prisma-level defaults.
     pub(crate) prisma_level_defaults: Vec<sql::ColumnId>,
+    /// Namespaces considered relevant for this particular schema.
+    pub(crate) relevant_namespaces: RelevantNamespaces,
+}
+
+#[derive(Debug)]
+pub(crate) enum RelevantNamespaces {
+    All,
+    NotApplicable,
+    Some(sql::NamespaceId, Vec<sql::NamespaceId>),
 }
 
 impl SqlDatabaseSchema {
@@ -15,15 +24,6 @@ impl SqlDatabaseSchema {
 
     pub(crate) fn walk<I>(&self, id: I) -> sql::Walker<'_, I> {
         self.describer_schema.walk(id)
-    }
-}
-
-impl From<SqlSchema> for SqlDatabaseSchema {
-    fn from(describer_schema: SqlSchema) -> Self {
-        SqlDatabaseSchema {
-            describer_schema,
-            ..Default::default()
-        }
     }
 }
 
