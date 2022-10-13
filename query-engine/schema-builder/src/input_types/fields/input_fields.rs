@@ -233,6 +233,7 @@ where
     T: Into<String>,
 {
     let input_object_type = filter_objects::where_unique_object_type(ctx, &field.related_model());
+
     input_field(
         name.into(),
         list_union_object_type(input_object_type, field.is_list()),
