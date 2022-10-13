@@ -1,10 +1,10 @@
 use crate::{calculate_datamodel::CalculateDatamodelContext as Context, SqlError, SqlFamilyTrait};
 use psl::{
-    common::{preview_features::PreviewFeature, RelationNames},
     dml::{
         Datamodel, FieldArity, FieldType, IndexAlgorithm, IndexDefinition, IndexField, Model, OperatorClass,
         PrimaryKeyField, ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, SortOrder,
     },
+    PreviewFeature, RelationNames,
 };
 use sql::walkers::{ColumnWalker, ForeignKeyWalker, TableWalker};
 use sql_schema_describer::{

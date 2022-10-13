@@ -1,6 +1,6 @@
 use crate::{error::ApiError, log_callback::LogCallback, logger::Logger};
 use futures::FutureExt;
-use psl::common::preview_features::PreviewFeature;
+use psl::PreviewFeature;
 use query_core::{
     executor,
     schema::{QuerySchema, QuerySchemaRenderer},

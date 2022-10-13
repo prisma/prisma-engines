@@ -67,11 +67,11 @@ features!(
     MultiSchema,
     FilteredRelationCount,
     FieldReference,
-    PostgresExtensions,
+    PostgresqlExtensions,
 );
 
 /// Generator preview features
-pub const GENERATOR: FeatureMap = FeatureMap {
+pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
     active: enumflags2::make_bitflags!(PreviewFeature::{
         ReferentialIntegrity
          | InteractiveTransactions
@@ -110,7 +110,7 @@ pub const GENERATOR: FeatureMap = FeatureMap {
     }),
     hidden: enumflags2::make_bitflags!(PreviewFeature::{
         MultiSchema
-        | PostgresExtensions
+        | PostgresqlExtensions
     }),
 };
 

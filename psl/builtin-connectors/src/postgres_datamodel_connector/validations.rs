@@ -1,10 +1,10 @@
 use enumflags2::BitFlags;
 use native_types::PostgresType;
 use psl_core::{
-    common::preview_features::PreviewFeature,
     datamodel_connector::{walker_ext_traits::*, Connector},
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{ast::WithSpan, walkers::IndexWalker, IndexAlgorithm, OperatorClass},
+    PreviewFeature,
 };
 
 use super::PostgresDatasourceProperties;
@@ -460,7 +460,7 @@ pub(super) fn extensions_preview_flag_must_be_set(
     props: &PostgresDatasourceProperties,
     errors: &mut Diagnostics,
 ) {
-    if preview_features.contains(PreviewFeature::PostgresExtensions) {
+    if preview_features.contains(PreviewFeature::PostgresqlExtensions) {
         return;
     }
 
@@ -470,7 +470,44 @@ pub(super) fn extensions_preview_flag_must_be_set(
     };
 
     errors.push_error(DatamodelError::new_static(
-        "The `extensions` property is only available with the `postgresExtensions` preview feature.",
+        "The `extensions` property is only available with the `postgresqlExtensions` preview feature.",
         span,
     ));
+}
+
+pub(super) fn extension_names_follow_prisma_syntax_rules(
+    preview_features: BitFlags<PreviewFeature>,
+    props: &PostgresDatasourceProperties,
+    errors: &mut Diagnostics,
+) {
+    if !preview_features.contains(PreviewFeature::PostgresqlExtensions) {
+        return;
+    }
+
+    let extensions = match props.extensions() {
+        Some(extensions) => extensions,
+        None => return,
+    };
+
+    // Sadly these rules are already in identifier validation. It is
+    // not easy to share those rules here due to the code
+    // organization. TODO: organize the code better!
+    for extension in extensions.extensions() {
+        if extension.name.is_empty() {
+            errors.push_error(DatamodelError::new_validation_error(
+                "The name of an extension must not be empty.",
+                extension.span,
+            ));
+        } else if extension.name.chars().next().unwrap().is_numeric() {
+            errors.push_error(DatamodelError::new_validation_error(
+                "The name of an extension must not start with a number.",
+                extension.span,
+            ));
+        } else if extension.name.contains('-') {
+            errors.push_error(DatamodelError::new_validation_error(
+                "The character `-` is not allowed in extension names.",
+                extension.span,
+            ))
+        }
+    }
 }

@@ -3,7 +3,7 @@ mod error;
 pub use error::{ConnectorError, ErrorKind};
 
 use enumflags2::BitFlags;
-use psl::{common::preview_features::PreviewFeature, dml::Datamodel, Datasource};
+use psl::{dml::Datamodel, Datasource, PreviewFeature};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 

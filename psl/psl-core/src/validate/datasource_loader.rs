@@ -1,10 +1,9 @@
 use crate::{
     ast::{self, SourceConfig, Span},
-    common::preview_features::PreviewFeature,
     configuration::StringFromEnvVar,
     datamodel_connector::RelationMode,
     diagnostics::{DatamodelError, Diagnostics},
-    Datasource,
+    Datasource, PreviewFeature,
 };
 use enumflags2::BitFlags;
 use parser_database::{ast::WithDocumentation, coerce, coerce_array, coerce_opt};

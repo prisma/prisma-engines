@@ -1,3 +1,5 @@
+mod postgres;
+
 use crate::{
     calculate_datamodel::CalculateDatamodelContext as Context,
     commenting_out_guardrails::commenting_out_guardrails,
@@ -7,9 +9,13 @@ use crate::{
     sanitize_datamodel_names::{sanitization_leads_to_duplicate_names, sanitize_datamodel_names},
     version_checker, SqlError, SqlFamilyTrait,
 };
+use datamodel_renderer as render;
 use introspection_connector::{Version, Warning};
-use psl::dml::{self, Datamodel, Field, Model, PrimaryKeyDefinition, PrimaryKeyField, RelationField, SortOrder};
-use sql_schema_describer::{walkers::TableWalker, ForeignKeyId, SQLSortOrder};
+use psl::{
+    dml::{self, Datamodel, Field, Model, PrimaryKeyDefinition, PrimaryKeyField, RelationField, SortOrder},
+    Configuration,
+};
+use sql_schema_describer::{walkers::TableWalker, ForeignKeyId, SQLSortOrder, SqlSchema};
 use std::collections::HashSet;
 use tracing::debug;
 
@@ -179,15 +185,35 @@ pub(crate) fn introspect(ctx: &Context, warnings: &mut Vec<Warning>) -> Result<(
     // if based on a previous Prisma version add id default opinionations
     add_prisma_1_id_defaults(&version, &mut datamodel, schema, warnings, ctx);
 
-    let is_empty = datamodel.is_empty();
-
     let data_model = if ctx.render_config {
-        psl::render_datamodel_and_config_to_string(&datamodel, ctx.config)
+        format!(
+            "{}\n{}",
+            render_configuration(ctx.config, schema),
+            psl::render_datamodel_to_string(&datamodel, Some(ctx.config))
+        )
     } else {
         psl::render_datamodel_to_string(&datamodel, Some(ctx.config))
     };
 
-    Ok((version, data_model, is_empty))
+    Ok((version, psl::reformat(&data_model, 2).unwrap(), datamodel.is_empty()))
+}
+
+fn render_configuration<'a>(config: &'a Configuration, schema: &'a SqlSchema) -> render::Configuration<'a> {
+    let mut output = render::Configuration::default();
+    let prev_ds = config.datasources.first().unwrap();
+    let mut datasource = render::Datasource::from_psl(prev_ds);
+
+    if prev_ds.active_connector.is_provider("postgres") {
+        postgres::add_extensions(&mut datasource, schema, config);
+    }
+
+    output.push_datasource(datasource);
+
+    for prev in config.generators.iter() {
+        output.push_generator(render::Generator::from_psl(prev));
+    }
+
+    output
 }
 
 fn calculate_fields_for_prisma_join_table(

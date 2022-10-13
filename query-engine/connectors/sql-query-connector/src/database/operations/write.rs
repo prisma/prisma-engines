@@ -5,8 +5,8 @@ use crate::{error::SqlError, model_extensions::*, query_builder::write, sql_info
 use connector_interface::*;
 use itertools::Itertools;
 use prisma_models::*;
-use psl::common::preview_features::PreviewFeature;
 use psl::dml::prisma_value::PrismaValue;
+use psl::PreviewFeature;
 use quaint::{
     error::ErrorKind,
     prelude::{native_uuid, uuid_to_bin, uuid_to_bin_swapped, Aliasable, Select, SqlFamily},

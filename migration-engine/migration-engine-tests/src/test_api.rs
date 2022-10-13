@@ -13,7 +13,7 @@ use migration_core::{
         BoxFuture, ConnectorHost, ConnectorResult, DiffTarget, MigrationConnector, MigrationPersistence,
     },
 };
-use psl::{common::preview_features::PreviewFeature, parser_database::SourceFile};
+use psl::{parser_database::SourceFile, PreviewFeature};
 use quaint::{
     prelude::{ConnectionInfo, ResultSet},
     Value,

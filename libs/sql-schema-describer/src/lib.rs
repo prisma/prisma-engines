@@ -88,6 +88,11 @@ impl SqlSchema {
         self.connector_data.data.as_ref().unwrap().downcast_ref().unwrap()
     }
 
+    /// Remove all namespaces from the schema.
+    pub fn clear_namespaces(&mut self) {
+        self.namespaces.clear();
+    }
+
     /// Insert connector-specific data into the schema. This will replace existing connector data.
     pub fn set_connector_data(&mut self, data: Box<dyn Any + Send + Sync>) {
         self.connector_data.data = Some(data);

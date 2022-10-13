@@ -21,7 +21,7 @@ use migration_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult,
     MigrationRecord, PersistenceNotInitializedError,
 };
-use psl::{common::preview_features::PreviewFeature, ValidatedSchema};
+use psl::{PreviewFeature, ValidatedSchema};
 use quaint::prelude::{ConnectionInfo, Table};
 use sql_schema_describer::SqlSchema;
 use std::fmt::Debug;
@@ -280,6 +280,10 @@ fn normalize_sql_schema(sql_schema: &mut SqlSchema, preview_features: BitFlags<P
     // Remove this when the feature is GA
     if !preview_features.contains(PreviewFeature::FullTextIndex) {
         sql_schema.make_fulltext_indexes_normal();
+    }
+
+    if !preview_features.contains(PreviewFeature::MultiSchema) {
+        sql_schema.clear_namespaces();
     }
 }
 

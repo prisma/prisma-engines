@@ -185,7 +185,7 @@ fn postgresql_extension_parsing() {
 
         generator js {
           provider = "prisma-client-js"
-          previewFeatures = ["postgresExtensions"]
+          previewFeatures = ["postgresqlExtensions"]
         }
     "#};
 

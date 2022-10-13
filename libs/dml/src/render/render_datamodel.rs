@@ -1,6 +1,6 @@
 use crate::*;
 use psl_core::datamodel_connector::{constraint_names::ConstraintNames, Connector, EmptyDatamodelConnector};
-use psl_core::{common::RelationNames, parser_database as db, Datasource};
+use psl_core::{parser_database as db, Datasource, RelationNames};
 use schema_ast::string_literal;
 use std::fmt::Write;
 

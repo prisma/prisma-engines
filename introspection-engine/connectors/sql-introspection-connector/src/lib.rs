@@ -22,7 +22,7 @@ use introspection_connector::{
     ConnectorError, ConnectorResult, DatabaseMetadata, ErrorKind, IntrospectionConnector, IntrospectionContext,
     IntrospectionResult,
 };
-use psl::common::preview_features::PreviewFeature;
+use psl::PreviewFeature;
 use quaint::prelude::SqlFamily;
 use quaint::{prelude::ConnectionInfo, single::Quaint};
 use schema_describer_loading::load_describer;

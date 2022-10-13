@@ -16,7 +16,7 @@ use enumflags2::BitFlags;
 use migration::MongoDbMigration;
 use migration_connector::{migrations_directory::MigrationDirectory, *};
 use mongodb_schema_describer::MongoSchema;
-use psl::common::preview_features::PreviewFeature;
+use psl::PreviewFeature;
 use std::{future, sync::Arc};
 use tokio::sync::OnceCell;
 

@@ -4,7 +4,7 @@ use mongodb::Database;
 use mongodb_introspection_connector::MongoDbIntrospectionConnector;
 use names::Generator;
 use once_cell::sync::Lazy;
-use psl::common::preview_features::PreviewFeature;
+use psl::PreviewFeature;
 use std::{future::Future, io::Write};
 use tokio::runtime::Runtime;
 
