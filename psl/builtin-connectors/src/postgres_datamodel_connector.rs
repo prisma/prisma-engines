@@ -278,9 +278,11 @@ impl PostgresExtensions {
 
     /// Finds the extension with the given database name.
     pub fn find_by_name(&self, name: &str) -> Option<&PostgresExtension> {
-        self.extensions()
-            .iter()
-            .find(|ext| ext.db_name() == Some(name) || ext.name() == name)
+        self.extensions().iter().find(|ext| {
+            ext.db_name()
+                .map(|db_name| db_name == name)
+                .unwrap_or_else(|| ext.name() == name)
+        })
     }
 }
 

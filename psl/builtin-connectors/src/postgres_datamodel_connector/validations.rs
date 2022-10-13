@@ -489,6 +489,9 @@ pub(super) fn extension_names_follow_prisma_syntax_rules(
         None => return,
     };
 
+    // Sadly these rules are already in identifier validation. It is
+    // not easy to share those rules here due to the code
+    // organization. TODO: organize the code better!
     for extension in extensions.extensions() {
         if extension.name.is_empty() {
             errors.push_error(DatamodelError::new_validation_error(
@@ -500,7 +503,7 @@ pub(super) fn extension_names_follow_prisma_syntax_rules(
                 "The name of an extension must not start with a number.",
                 extension.span,
             ));
-        } else if extension.name.contains('_') {
+        } else if extension.name.contains('-') {
             errors.push_error(DatamodelError::new_validation_error(
                 "The character `-` is not allowed in extension names.",
                 extension.span,

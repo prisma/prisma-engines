@@ -143,7 +143,7 @@ impl TestApi {
     }
 
     #[track_caller]
-    pub async fn test_introspect_internal(
+    async fn test_introspect_internal(
         &self,
         previous_schema: psl::ValidatedSchema,
         render_config: bool,
