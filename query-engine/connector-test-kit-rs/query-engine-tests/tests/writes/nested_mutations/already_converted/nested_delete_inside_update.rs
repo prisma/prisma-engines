@@ -470,7 +470,7 @@ mod delete_inside_update {
 
     // "a P1 to C1! relation " should "work"
     #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneReq")]
-    async fn p1_c1_req_by_id_and_filters_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+    async fn p1_c1_req_by_filters_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
             run_query_json!(
                 runner,
