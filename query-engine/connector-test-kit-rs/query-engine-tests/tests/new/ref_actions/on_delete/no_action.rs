@@ -170,15 +170,15 @@ mod one2many_req {
         assert_error!(
             runner,
             "mutation { deleteOneParent(where: { id: 1 }) { id }}",
-            2003,
-            "Foreign key constraint failed on the field"
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         assert_error!(
             runner,
             "mutation { deleteManyParent(where: { id: 1 }) { count }}",
-            2003,
-            "Foreign key constraint failed on the field"
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         Ok(())
