@@ -1,7 +1,7 @@
 use indoc::indoc;
 use migration_engine_tests::test_api::*;
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn extensions_can_be_created(api: TestApi) {
     let dm = indoc! {r#"
         datasource db {
@@ -21,7 +21,7 @@ fn extensions_can_be_created(api: TestApi) {
     api.assert_schema().assert_has_extension("citext");
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn multiple_extensions_can_be_created(api: TestApi) {
     let dm = indoc! {r#"
         datasource db {
@@ -42,7 +42,7 @@ fn multiple_extensions_can_be_created(api: TestApi) {
     api.assert_schema().assert_has_extension("pg_trgm");
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn mapped_extensions_can_be_created(api: TestApi) {
     let dm = indoc! {r#"
         datasource db {
@@ -62,7 +62,7 @@ fn mapped_extensions_can_be_created(api: TestApi) {
     api.assert_schema().assert_has_extension("uuid-ossp");
 }
 
-#[test_connector(tags(Postgres14))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn extensions_can_be_created_with_a_version(api: TestApi) {
     let dm = indoc! {r#"
         datasource db {
@@ -82,7 +82,7 @@ fn extensions_can_be_created_with_a_version(api: TestApi) {
     api.assert_schema().assert_has_extension("citext").assert_version("1.5");
 }
 
-#[test_connector(tags(Postgres14))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn extension_version_can_be_changed(api: TestApi) {
     let dm = indoc! {r#"
         datasource db {
@@ -119,7 +119,7 @@ fn extension_version_can_be_changed(api: TestApi) {
     api.assert_schema().assert_has_extension("citext").assert_version("1.6");
 }
 
-#[test_connector(tags(Postgres14))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn extension_version_does_not_change_on_empty(api: TestApi) {
     let dm = indoc! {r#"
         datasource db {
@@ -156,7 +156,7 @@ fn extension_version_does_not_change_on_empty(api: TestApi) {
     api.assert_schema().assert_has_extension("citext").assert_version("1.5");
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn extension_schema_can_be_defined(api: TestApi) {
     api.raw_cmd("CREATE SCHEMA \"prisma-tests-temp\"");
 
@@ -180,7 +180,7 @@ fn extension_schema_can_be_defined(api: TestApi) {
         .assert_schema("prisma-tests-temp");
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn relocatable_extension_can_be_relocated(api: TestApi) {
     api.raw_cmd("CREATE SCHEMA \"prisma-tests-temp\"");
 
@@ -223,7 +223,7 @@ fn relocatable_extension_can_be_relocated(api: TestApi) {
         .assert_schema("prisma-tests-temp");
 }
 
-#[test_connector(tags(Postgres14))]
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
 fn non_relocatable_extension_can_be_relocated(api: TestApi) {
     api.raw_cmd("CREATE SCHEMA \"prisma-tests-temp\"");
 
@@ -266,7 +266,7 @@ fn non_relocatable_extension_can_be_relocated(api: TestApi) {
         .assert_schema("prisma-tests-temp");
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn removing_schema_definition_does_nothing(api: TestApi) {
     let dm = indoc! {r#"
         datasource db {
