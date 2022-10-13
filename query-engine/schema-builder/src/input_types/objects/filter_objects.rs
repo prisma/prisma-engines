@@ -132,8 +132,13 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
     };
 
     let mut x = init_input_object_type(ident.clone());
-    x.require_at_least_one_field();
-    x.apply_constraints_on_fields(constrained_fields);
+
+    if ctx.has_feature(&PreviewFeature::ExtendedWhereUnique) {
+        x.require_at_least_one_field();
+        x.apply_constraints_on_fields(constrained_fields);
+    } else {
+        x.require_exactly_one_field();
+    }
 
     let input_object = Arc::new(x);
     ctx.cache_input_type(ident, input_object.clone());

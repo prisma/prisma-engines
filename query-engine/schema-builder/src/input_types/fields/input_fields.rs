@@ -162,17 +162,18 @@ pub(crate) fn nested_disconnect_input_field(
 ) -> Option<InputField> {
     match (parent_field.is_list(), parent_field.is_required()) {
         (true, _) => Some(where_unique_input_field(ctx, operations::DISCONNECT, parent_field)),
-        (false, false) => Some(
-            input_field(
-                operations::DISCONNECT,
-                vec![
-                    InputType::boolean(),
-                    InputType::object(filter_objects::where_object_type(ctx, &parent_field.related_model())),
-                ],
-                None,
-            )
-            .optional(),
-        ),
+        (false, false) => {
+            let mut types = vec![InputType::boolean()];
+
+            if ctx.has_feature(&PreviewFeature::ExtendedWhereUnique) {
+                types.push(InputType::object(filter_objects::where_object_type(
+                    ctx,
+                    &parent_field.related_model(),
+                )));
+            }
+
+            Some(input_field(operations::DISCONNECT, types, None).optional())
+        }
         (false, true) => None,
     }
 }
@@ -184,17 +185,18 @@ pub(crate) fn nested_delete_input_field(
 ) -> Option<InputField> {
     match (parent_field.is_list(), parent_field.is_required()) {
         (true, _) => Some(where_unique_input_field(ctx, operations::DELETE, parent_field)),
-        (false, false) => Some(
-            input_field(
-                operations::DELETE,
-                vec![
-                    InputType::boolean(),
-                    InputType::object(filter_objects::where_object_type(ctx, &parent_field.related_model())),
-                ],
-                None,
-            )
-            .optional(),
-        ),
+        (false, false) => {
+            let mut types = vec![InputType::boolean()];
+
+            if ctx.has_feature(&PreviewFeature::ExtendedWhereUnique) {
+                types.push(InputType::object(filter_objects::where_object_type(
+                    ctx,
+                    &parent_field.related_model(),
+                )));
+            }
+
+            Some(input_field(operations::DELETE, types, None).optional())
+        }
         (false, true) => None,
     }
 }
@@ -214,15 +216,20 @@ pub(crate) fn nested_update_input_field(ctx: &mut BuilderContext, parent_field: 
 
         list_union_object_type(to_many_update_full_type, true)
     } else {
-        let to_one_update_full_type = update_one_objects::update_to_one_rel_where_combination_object(
-            ctx,
-            update_shorthand_types.clone(),
-            parent_field,
-        );
-        let mut to_one_types = vec![InputType::object(to_one_update_full_type)];
-        to_one_types.append(&mut update_shorthand_types);
+        if ctx.has_feature(&PreviewFeature::ExtendedWhereUnique) {
+            let to_one_update_full_type = update_one_objects::update_to_one_rel_where_combination_object(
+                ctx,
+                update_shorthand_types.clone(),
+                parent_field,
+            );
 
-        to_one_types
+            let mut to_one_types = vec![InputType::object(to_one_update_full_type)];
+            to_one_types.append(&mut update_shorthand_types);
+
+            to_one_types
+        } else {
+            update_shorthand_types
+        }
     };
 
     input_field(operations::UPDATE, update_types, None).optional()
