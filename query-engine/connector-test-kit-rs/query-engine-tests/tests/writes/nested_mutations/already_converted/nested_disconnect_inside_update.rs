@@ -58,7 +58,7 @@ mod disconnect_inside_update {
             run_query_json!(
                 runner,
                 format!(
-                  r#"mutation {{
+                    r#"mutation {{
                       createOneParent(data: {{
                         p: "p1", p_1: "p", p_2: "1"
                         childOpt: {{
@@ -105,7 +105,7 @@ mod disconnect_inside_update {
             run_query_json!(
                 runner,
                 format!(
-                  r#"mutation {{
+                    r#"mutation {{
                       createOneParent(data: {{
                         p: "p1", p_1: "p", p_2: "1"
                         childOpt: {{
