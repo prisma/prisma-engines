@@ -16,7 +16,7 @@ use psl_core::{
     parser_database::{ast, walkers, IndexAlgorithm, OperatorClass, ParserDatabase, ReferentialAction, ScalarType},
     Datasource, DatasourceConnectorData, PreviewFeature,
 };
-use std::{borrow::Cow, collections::HashMap, fmt};
+use std::{borrow::Cow, collections::HashMap};
 
 const SMALL_INT_TYPE_NAME: &str = "SmallInt";
 const INTEGER_TYPE_NAME: &str = "Integer";
@@ -132,14 +132,22 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, PostgresType)] = &[
 ];
 
 /// Postgres-specific properties in the datasource block.
+#[derive(Default, Debug)]
 pub struct PostgresDatasourceProperties {
-    extensions: Option<PostgresqlExtensions>,
+    extensions: Option<PostgresExtensions>,
 }
 
 impl PostgresDatasourceProperties {
     /// Database extensions.
-    pub fn extensions(&self) -> Option<&PostgresqlExtensions> {
+    pub fn extensions(&self) -> Option<&PostgresExtensions> {
         self.extensions.as_ref()
+    }
+
+    pub fn set_extensions(&mut self, extensions: Vec<PostgresExtension>) {
+        self.extensions = Some(PostgresExtensions {
+            extensions,
+            span: ast::Span::empty(),
+        });
     }
 }
 
@@ -151,6 +159,7 @@ impl PostgresDatasourceProperties {
 ///   //            ^^^^^^^
 /// }
 /// ```
+#[derive(Debug, Clone)]
 pub struct PostgresExtension {
     name: String,
     span: ast::Span,
@@ -160,6 +169,32 @@ pub struct PostgresExtension {
 }
 
 impl PostgresExtension {
+    pub fn new(name: String) -> Self {
+        Self {
+            name,
+            span: ast::Span::empty(),
+            schema: None,
+            version: None,
+            db_name: None,
+        }
+    }
+
+    pub fn set_span(&mut self, span: ast::Span) {
+        self.span = span;
+    }
+
+    pub fn set_schema(&mut self, schema: String) {
+        self.schema = Some(schema);
+    }
+
+    pub fn set_version(&mut self, version: String) {
+        self.version = Some(version);
+    }
+
+    pub fn set_db_name(&mut self, db_name: String) {
+        self.db_name = Some(db_name);
+    }
+
     /// The name of the extension in the datasource.
     ///
     /// ```ignore
@@ -215,12 +250,22 @@ impl PostgresExtension {
 ///   //           ^^^^^^^^^^^^^^^^^
 /// }
 /// ```
-pub struct PostgresqlExtensions {
+#[derive(Debug, Clone)]
+pub struct PostgresExtensions {
     pub(crate) extensions: Vec<PostgresExtension>,
     pub(crate) span: ast::Span,
 }
 
-impl PostgresqlExtensions {
+impl Default for PostgresExtensions {
+    fn default() -> Self {
+        Self {
+            extensions: Vec::new(),
+            span: ast::Span::empty(),
+        }
+    }
+}
+
+impl PostgresExtensions {
     /// The span of the extensions in the datamodel.
     pub fn span(&self) -> ast::Span {
         self.span
@@ -229,6 +274,15 @@ impl PostgresqlExtensions {
     /// The extension definitions.
     pub fn extensions(&self) -> &[PostgresExtension] {
         &self.extensions
+    }
+
+    /// Finds the extension with the given database name.
+    pub fn find_by_name(&self, name: &str) -> Option<&PostgresExtension> {
+        self.extensions().iter().find(|ext| {
+            ext.db_name()
+                .map(|db_name| db_name == name)
+                .unwrap_or_else(|| ext.name() == name)
+        })
     }
 }
 
@@ -376,6 +430,7 @@ impl Connector for PostgresDatamodelConnector {
     ) {
         if let Some(props) = ds.downcast_connector_data::<PostgresDatasourceProperties>() {
             validations::extensions_preview_flag_must_be_set(preview_features, props, errors);
+            validations::extension_names_follow_prisma_syntax_rules(preview_features, props, errors);
         }
     }
 
@@ -581,69 +636,6 @@ impl Connector for PostgresDatamodelConnector {
         let properties = PostgresDatasourceProperties { extensions };
 
         DatasourceConnectorData::new(Box::new(properties))
-    }
-
-    fn render_datasource_properties(&self, properties: &DatasourceConnectorData, out: &mut String) -> fmt::Result {
-        let properties = match properties.downcast_ref::<PostgresDatasourceProperties>() {
-            Some(properties) => properties,
-            None => return Ok(()),
-        };
-
-        let extensions = match properties.extensions() {
-            Some(extensions) => extensions.extensions(),
-            None => return Ok(()),
-        };
-
-        out.push_str("extensions = [");
-
-        for (i, extension) in extensions.iter().enumerate() {
-            out.push_str(extension.name());
-
-            if extension.db_name().is_none() && extension.version().is_none() && extension.schema().is_none() {
-                if extensions.len() > 1 {
-                    out.push(',');
-                }
-                continue;
-            }
-
-            out.push('(');
-
-            if let Some(db_name) = extension.db_name() {
-                out.push_str(r#"map: ""#);
-                out.push_str(db_name);
-                out.push('"');
-
-                if extension.schema().is_some() || extension.version().is_some() {
-                    out.push_str(", ");
-                }
-            }
-
-            if let Some(schema) = extension.schema() {
-                out.push_str(r#"schema: ""#);
-                out.push_str(schema);
-                out.push('"');
-
-                if extension.version.is_some() {
-                    out.push_str(", ");
-                }
-            }
-
-            if let Some(version) = extension.version() {
-                out.push_str(r#"version: ""#);
-                out.push_str(version);
-                out.push('"');
-            }
-
-            out.push(')');
-
-            if i < extensions.len() - 1 {
-                out.push_str(", ");
-            }
-        }
-
-        out.push_str("]\n");
-
-        Ok(())
     }
 }
 

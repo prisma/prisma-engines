@@ -26,7 +26,7 @@ pub struct Datasource {
     pub relation_mode: Option<RelationMode>,
     /// _Sorted_ vec of schemas defined in the schemas property.
     pub namespaces: Vec<(String, Span)>,
-    pub(crate) schemas_span: Option<Span>,
+    pub schemas_span: Option<Span>,
     pub connector_data: DatasourceConnectorData,
 }
 

@@ -1015,6 +1015,14 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                     virtual: false,
                 },
             ],
+            extensions: [
+                DatabaseExtension {
+                    name: "plpgsql",
+                    schema: "pg_catalog",
+                    version: "1.0",
+                    relocatable: false,
+                },
+            ],
         }
     "#]];
     expected_ext.assert_debug_eq(&ext);
@@ -1135,6 +1143,14 @@ fn postgres_sequences_must_work(api: TestApi) {
                     cycle: false,
                     cache_size: 0,
                     virtual: false,
+                },
+            ],
+            extensions: [
+                DatabaseExtension {
+                    name: "plpgsql",
+                    schema: "pg_catalog",
+                    version: "1.0",
+                    relocatable: false,
                 },
             ],
         }
@@ -1666,6 +1682,39 @@ fn int_expressions_in_defaults(api: TestApi) {
     let col = table.column("mysum").unwrap();
     let value = col.default().unwrap();
     assert!(value.is_db_generated());
+}
+
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
+fn extensions_are_described_correctly(api: TestApi) {
+    let schema = r#"CREATE EXTENSION IF NOT EXISTS citext;"#;
+
+    api.raw_cmd(schema);
+
+    let result = api.describe();
+    let ext = extract_ext(&result);
+    let expected_ext = expect![[r#"
+        PostgresSchemaExt {
+            opclasses: [],
+            indexes: [],
+            sequences: [],
+            extensions: [
+                DatabaseExtension {
+                    name: "citext",
+                    schema: "prisma-tests",
+                    version: "1.6",
+                    relocatable: true,
+                },
+                DatabaseExtension {
+                    name: "plpgsql",
+                    schema: "pg_catalog",
+                    version: "1.0",
+                    relocatable: false,
+                },
+            ],
+        }
+    "#]];
+
+    expected_ext.assert_debug_eq(&ext);
 }
 
 // multi schema

@@ -474,3 +474,40 @@ pub(super) fn extensions_preview_flag_must_be_set(
         span,
     ));
 }
+
+pub(super) fn extension_names_follow_prisma_syntax_rules(
+    preview_features: BitFlags<PreviewFeature>,
+    props: &PostgresDatasourceProperties,
+    errors: &mut Diagnostics,
+) {
+    if !preview_features.contains(PreviewFeature::PostgresqlExtensions) {
+        return;
+    }
+
+    let extensions = match props.extensions() {
+        Some(extensions) => extensions,
+        None => return,
+    };
+
+    // Sadly these rules are already in identifier validation. It is
+    // not easy to share those rules here due to the code
+    // organization. TODO: organize the code better!
+    for extension in extensions.extensions() {
+        if extension.name.is_empty() {
+            errors.push_error(DatamodelError::new_validation_error(
+                "The name of an extension must not be empty.",
+                extension.span,
+            ));
+        } else if extension.name.chars().next().unwrap().is_numeric() {
+            errors.push_error(DatamodelError::new_validation_error(
+                "The name of an extension must not start with a number.",
+                extension.span,
+            ));
+        } else if extension.name.contains('-') {
+            errors.push_error(DatamodelError::new_validation_error(
+                "The character `-` is not allowed in extension names.",
+                extension.span,
+            ))
+        }
+    }
+}

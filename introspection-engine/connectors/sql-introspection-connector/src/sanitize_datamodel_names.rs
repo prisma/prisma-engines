@@ -202,7 +202,7 @@ where
     };
 }
 
-fn sanitize_string(s: &str) -> String {
+pub(super) fn sanitize_string(s: &str) -> String {
     let needs_sanitation = RE_START.is_match(s) || RE.is_match(s);
 
     if needs_sanitation {

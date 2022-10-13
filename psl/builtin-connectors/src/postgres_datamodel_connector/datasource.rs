@@ -1,4 +1,4 @@
-use super::PostgresqlExtensions;
+use super::PostgresExtensions;
 use crate::postgres_datamodel_connector::PostgresExtension;
 use psl_core::{
     datamodel_connector::EXTENSIONS_KEY,
@@ -10,7 +10,7 @@ use std::collections::{HashMap, HashSet};
 pub(super) fn parse_extensions(
     args: &mut HashMap<&str, (ast::Span, &ast::Expression)>,
     diagnostics: &mut Diagnostics,
-) -> Option<PostgresqlExtensions> {
+) -> Option<PostgresExtensions> {
     args.remove(EXTENSIONS_KEY).and_then(|(span, expr)| {
         let mut extensions = Vec::new();
 
@@ -38,7 +38,7 @@ pub(super) fn parse_extensions(
 
         extensions.sort_by(|a, b| a.name.cmp(&b.name));
 
-        Some(PostgresqlExtensions { extensions, span })
+        Some(PostgresExtensions { extensions, span })
     })
 }
 
