@@ -173,13 +173,13 @@ fn render_raw_sql(
             vec![renderer.render_rename_foreign_key(fks)]
         }
         SqlMigrationStep::CreateExtension(create_extension) => {
-            renderer.render_create_extension(create_extension, &schemas.next)
+            renderer.render_create_extension(create_extension, schemas.next)
         }
         SqlMigrationStep::AlterExtension(alter_extension) => {
-            renderer.render_alter_extension(alter_extension, Pair::new(&schemas.previous, &schemas.next))
+            renderer.render_alter_extension(alter_extension, Pair::new(schemas.previous, schemas.next))
         }
         SqlMigrationStep::DropExtension(drop_extension) => {
-            renderer.render_drop_extension(drop_extension, &schemas.previous)
+            renderer.render_drop_extension(drop_extension, schemas.previous)
         }
     }
 }

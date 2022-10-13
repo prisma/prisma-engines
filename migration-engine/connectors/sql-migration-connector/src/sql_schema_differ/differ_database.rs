@@ -259,7 +259,7 @@ impl<'a> DifferDatabase<'a> {
     }
 
     /// Extensions not present in the previous schema.
-    pub(crate) fn created_extensions<'db>(&'db self) -> impl Iterator<Item = ExtensionId> + 'db {
+    pub(crate) fn created_extensions(&self) -> impl Iterator<Item = ExtensionId> + '_ {
         self.next_extensions()
             .filter(move |next| !self.previous_extensions().any(|prev| next.name() == prev.name()))
             .map(|w| w.id)
