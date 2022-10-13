@@ -86,6 +86,9 @@ pub fn nested_update(
 
         let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
+        let relation_name = parent_relation_field.relation().name.clone();
+        let child_model_name = child_model.name.clone();
+
         graph.create_edge(
             &find_child_records_node,
             &update_node,
@@ -94,9 +97,10 @@ pub fn nested_update(
                 Box::new(move |mut update_node, mut child_ids| {
                     let child_id = match child_ids.pop() {
                         Some(pid) => Ok(pid),
-                        None => Err(QueryGraphBuilderError::AssertionError(
-                            "Expected a valid parent ID to be present for nested update to-one case.".to_string(),
-                        )),
+                        None => Err(QueryGraphBuilderError::RecordNotFound(format!(
+                            "No '{}' record was found for a nested update on relation '{}'.",
+                            child_model_name, relation_name
+                        ))),
                     }?;
 
                     if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = update_node {
