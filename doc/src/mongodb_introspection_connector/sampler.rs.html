@@ -64,9 +64,14 @@
 <span id="64">64</span>
 <span id="65">65</span>
 <span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">field_type</span>;
 <span class="kw">mod</span> <span class="ident">statistics</span>;
 
+<span class="kw">use</span> <span class="ident">datamodel_renderer</span> <span class="kw">as</span> <span class="ident">render</span>;
 <span class="kw">use</span> <span class="ident">futures::TryStreamExt</span>;
 <span class="kw">use</span> <span class="ident">introspection_connector</span>::{<span class="ident">CompositeTypeDepth</span>, <span class="ident">IntrospectionContext</span>, <span class="ident">IntrospectionResult</span>, <span class="ident">Version</span>};
 <span class="kw">use</span> <span class="ident">mongodb</span>::{
@@ -118,13 +123,16 @@
     <span class="kw">let</span> <span class="ident">is_empty</span> <span class="op">=</span> <span class="ident">data_model</span>.<span class="ident">is_empty</span>();
 
     <span class="kw">let</span> <span class="ident">data_model</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">render_config</span> {
-        <span class="ident">psl::render_datamodel_and_config_to_string</span>(<span class="kw-2">&amp;</span><span class="ident">data_model</span>, <span class="ident">ctx</span>.<span class="ident">configuration</span>())
+        <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">render::Configuration::from_psl</span>(<span class="ident">ctx</span>.<span class="ident">configuration</span>());
+        <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">psl::render_datamodel_to_string</span>(<span class="kw-2">&amp;</span><span class="ident">data_model</span>, <span class="prelude-val">Some</span>(<span class="ident">ctx</span>.<span class="ident">configuration</span>()));
+
+        <span class="macro">format!</span>(<span class="string">&quot;{}\n{}&quot;</span>, <span class="ident">config</span>, <span class="ident">datamodel</span>)
     } <span class="kw">else</span> {
         <span class="ident">psl::render_datamodel_to_string</span>(<span class="kw-2">&amp;</span><span class="ident">data_model</span>, <span class="prelude-val">Some</span>(<span class="ident">ctx</span>.<span class="ident">configuration</span>()))
     };
 
     <span class="prelude-val">Ok</span>(<span class="ident">IntrospectionResult</span> {
-        <span class="ident">data_model</span>,
+        <span class="ident">data_model</span>: <span class="ident">psl::reformat</span>(<span class="kw-2">&amp;</span><span class="ident">data_model</span>, <span class="number">2</span>).<span class="ident">unwrap</span>(),
         <span class="ident">is_empty</span>,
         <span class="ident">warnings</span>,
         <span class="ident">version</span>: <span class="ident">Version::NonPrisma</span>,

@@ -760,14 +760,6 @@
 <span id="760">760</span>
 <span id="761">761</span>
 <span id="762">762</span>
-<span id="763">763</span>
-<span id="764">764</span>
-<span id="765">765</span>
-<span id="766">766</span>
-<span id="767">767</span>
-<span id="768">768</span>
-<span id="769">769</span>
-<span id="770">770</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">datasource</span>;
 <span class="kw">mod</span> <span class="ident">validations</span>;
 
@@ -786,7 +778,7 @@
     <span class="ident">parser_database</span>::{<span class="ident">ast</span>, <span class="ident">walkers</span>, <span class="ident">IndexAlgorithm</span>, <span class="ident">OperatorClass</span>, <span class="ident">ParserDatabase</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ScalarType</span>},
     <span class="ident">Datasource</span>, <span class="ident">DatasourceConnectorData</span>, <span class="ident">PreviewFeature</span>,
 };
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">collections::HashMap</span>, <span class="ident">fmt</span>};
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">collections::HashMap</span>};
 
 <span class="kw">const</span> <span class="ident">SMALL_INT_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;SmallInt&quot;</span>;
 <span class="kw">const</span> <span class="ident">INTEGER_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Integer&quot;</span>;
@@ -902,14 +894,22 @@
 ];
 
 <span class="doccomment">/// Postgres-specific properties in the datasource block.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PostgresDatasourceProperties</span> {
-    <span class="ident">extensions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PostgresqlExtensions</span><span class="op">&gt;</span>,
+    <span class="ident">extensions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PostgresExtensions</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">PostgresDatasourceProperties</span> {
     <span class="doccomment">/// Database extensions.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extensions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PostgresqlExtensions</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extensions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PostgresExtensions</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">extensions</span>.<span class="ident">as_ref</span>()
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_extensions</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">extensions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PostgresExtension</span><span class="op">&gt;</span>) {
+        <span class="self">self</span>.<span class="ident">extensions</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">PostgresExtensions</span> {
+            <span class="ident">extensions</span>,
+            <span class="ident">span</span>: <span class="ident">ast::Span::empty</span>(),
+        });
     }
 }
 
@@ -921,6 +921,7 @@
 <span class="doccomment">///   //            ^^^^^^^</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PostgresExtension</span> {
     <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="ident">span</span>: <span class="ident">ast::Span</span>,
@@ -930,6 +931,32 @@
 }
 
 <span class="kw">impl</span> <span class="ident">PostgresExtension</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">name</span>,
+            <span class="ident">span</span>: <span class="ident">ast::Span::empty</span>(),
+            <span class="ident">schema</span>: <span class="prelude-val">None</span>,
+            <span class="ident">version</span>: <span class="prelude-val">None</span>,
+            <span class="ident">db_name</span>: <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_span</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">span</span>: <span class="ident">ast::Span</span>) {
+        <span class="self">self</span>.<span class="ident">span</span> <span class="op">=</span> <span class="ident">span</span>;
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_schema</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">schema</span>: <span class="ident">String</span>) {
+        <span class="self">self</span>.<span class="ident">schema</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">schema</span>);
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_version</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">version</span>: <span class="ident">String</span>) {
+        <span class="self">self</span>.<span class="ident">version</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">version</span>);
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_db_name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">db_name</span>: <span class="ident">String</span>) {
+        <span class="self">self</span>.<span class="ident">db_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">db_name</span>);
+    }
+
     <span class="doccomment">/// The name of the extension in the datasource.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```ignore</span>
@@ -985,12 +1012,22 @@
 <span class="doccomment">///   //           ^^^^^^^^^^^^^^^^^</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PostgresqlExtensions</span> {
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PostgresExtensions</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">extensions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PostgresExtension</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">span</span>: <span class="ident">ast::Span</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">PostgresqlExtensions</span> {
+<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">PostgresExtensions</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">extensions</span>: <span class="ident">Vec::new</span>(),
+            <span class="ident">span</span>: <span class="ident">ast::Span::empty</span>(),
+        }
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">PostgresExtensions</span> {
     <span class="doccomment">/// The span of the extensions in the datamodel.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ast::Span</span> {
         <span class="self">self</span>.<span class="ident">span</span>
@@ -999,6 +1036,15 @@
     <span class="doccomment">/// The extension definitions.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extensions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">PostgresExtension</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">extensions</span>
+    }
+
+    <span class="doccomment">/// Finds the extension with the given database name.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_by_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PostgresExtension</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">extensions</span>().<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">ext</span><span class="op">|</span> {
+            <span class="ident">ext</span>.<span class="ident">db_name</span>()
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">db_name</span><span class="op">|</span> <span class="ident">db_name</span> <span class="op">==</span> <span class="ident">name</span>)
+                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">ext</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">name</span>)
+        })
     }
 }
 
@@ -1146,6 +1192,7 @@
     ) {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">props</span>) <span class="op">=</span> <span class="ident">ds</span>.<span class="ident">downcast_connector_data</span>::<span class="op">&lt;</span><span class="ident">PostgresDatasourceProperties</span><span class="op">&gt;</span>() {
             <span class="ident">validations::extensions_preview_flag_must_be_set</span>(<span class="ident">preview_features</span>, <span class="ident">props</span>, <span class="ident">errors</span>);
+            <span class="ident">validations::extension_names_follow_prisma_syntax_rules</span>(<span class="ident">preview_features</span>, <span class="ident">props</span>, <span class="ident">errors</span>);
         }
     }
 
@@ -1351,69 +1398,6 @@
         <span class="kw">let</span> <span class="ident">properties</span> <span class="op">=</span> <span class="ident">PostgresDatasourceProperties</span> { <span class="ident">extensions</span> };
 
         <span class="ident">DatasourceConnectorData::new</span>(<span class="ident">Box::new</span>(<span class="ident">properties</span>))
-    }
-
-    <span class="kw">fn</span> <span class="ident">render_datasource_properties</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">properties</span>: <span class="kw-2">&amp;</span><span class="ident">DatasourceConnectorData</span>, <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="ident">properties</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">properties</span>.<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">PostgresDatasourceProperties</span><span class="op">&gt;</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">properties</span>) =&gt; <span class="ident">properties</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(()),
-        };
-
-        <span class="kw">let</span> <span class="ident">extensions</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">properties</span>.<span class="ident">extensions</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">extensions</span>) =&gt; <span class="ident">extensions</span>.<span class="ident">extensions</span>(),
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(()),
-        };
-
-        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;extensions = [&quot;</span>);
-
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">extension</span>) <span class="kw">in</span> <span class="ident">extensions</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="ident">extension</span>.<span class="ident">name</span>());
-
-            <span class="kw">if</span> <span class="ident">extension</span>.<span class="ident">db_name</span>().<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="ident">extension</span>.<span class="ident">version</span>().<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="ident">extension</span>.<span class="ident">schema</span>().<span class="ident">is_none</span>() {
-                <span class="kw">if</span> <span class="ident">extensions</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span> {
-                    <span class="ident">out</span>.<span class="ident">push</span>(<span class="string">&#39;,&#39;</span>);
-                }
-                <span class="kw">continue</span>;
-            }
-
-            <span class="ident">out</span>.<span class="ident">push</span>(<span class="string">&#39;(&#39;</span>);
-
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">db_name</span>) <span class="op">=</span> <span class="ident">extension</span>.<span class="ident">db_name</span>() {
-                <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;map: &quot;&quot;#</span>);
-                <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="ident">db_name</span>);
-                <span class="ident">out</span>.<span class="ident">push</span>(<span class="string">&#39;&quot;&#39;</span>);
-
-                <span class="kw">if</span> <span class="ident">extension</span>.<span class="ident">schema</span>().<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">extension</span>.<span class="ident">version</span>().<span class="ident">is_some</span>() {
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;, &quot;</span>);
-                }
-            }
-
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">schema</span>) <span class="op">=</span> <span class="ident">extension</span>.<span class="ident">schema</span>() {
-                <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;schema: &quot;&quot;#</span>);
-                <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="ident">schema</span>);
-                <span class="ident">out</span>.<span class="ident">push</span>(<span class="string">&#39;&quot;&#39;</span>);
-
-                <span class="kw">if</span> <span class="ident">extension</span>.<span class="ident">version</span>.<span class="ident">is_some</span>() {
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;, &quot;</span>);
-                }
-            }
-
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">version</span>) <span class="op">=</span> <span class="ident">extension</span>.<span class="ident">version</span>() {
-                <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;version: &quot;&quot;#</span>);
-                <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="ident">version</span>);
-                <span class="ident">out</span>.<span class="ident">push</span>(<span class="string">&#39;&quot;&#39;</span>);
-            }
-
-            <span class="ident">out</span>.<span class="ident">push</span>(<span class="string">&#39;)&#39;</span>);
-
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="ident">extensions</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span> {
-                <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;, &quot;</span>);
-            }
-        }
-
-        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;]\n&quot;</span>);
-
-        <span class="prelude-val">Ok</span>(())
     }
 }
 

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/raw-cpuid-10.5.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../raw_cpuid/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../raw_cpuid/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../raw_cpuid/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/raw-cpuid-10.6.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../raw_cpuid/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../raw_cpuid/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../raw_cpuid/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -5465,6 +5465,200 @@
 <span id="5465">5465</span>
 <span id="5466">5466</span>
 <span id="5467">5467</span>
+<span id="5468">5468</span>
+<span id="5469">5469</span>
+<span id="5470">5470</span>
+<span id="5471">5471</span>
+<span id="5472">5472</span>
+<span id="5473">5473</span>
+<span id="5474">5474</span>
+<span id="5475">5475</span>
+<span id="5476">5476</span>
+<span id="5477">5477</span>
+<span id="5478">5478</span>
+<span id="5479">5479</span>
+<span id="5480">5480</span>
+<span id="5481">5481</span>
+<span id="5482">5482</span>
+<span id="5483">5483</span>
+<span id="5484">5484</span>
+<span id="5485">5485</span>
+<span id="5486">5486</span>
+<span id="5487">5487</span>
+<span id="5488">5488</span>
+<span id="5489">5489</span>
+<span id="5490">5490</span>
+<span id="5491">5491</span>
+<span id="5492">5492</span>
+<span id="5493">5493</span>
+<span id="5494">5494</span>
+<span id="5495">5495</span>
+<span id="5496">5496</span>
+<span id="5497">5497</span>
+<span id="5498">5498</span>
+<span id="5499">5499</span>
+<span id="5500">5500</span>
+<span id="5501">5501</span>
+<span id="5502">5502</span>
+<span id="5503">5503</span>
+<span id="5504">5504</span>
+<span id="5505">5505</span>
+<span id="5506">5506</span>
+<span id="5507">5507</span>
+<span id="5508">5508</span>
+<span id="5509">5509</span>
+<span id="5510">5510</span>
+<span id="5511">5511</span>
+<span id="5512">5512</span>
+<span id="5513">5513</span>
+<span id="5514">5514</span>
+<span id="5515">5515</span>
+<span id="5516">5516</span>
+<span id="5517">5517</span>
+<span id="5518">5518</span>
+<span id="5519">5519</span>
+<span id="5520">5520</span>
+<span id="5521">5521</span>
+<span id="5522">5522</span>
+<span id="5523">5523</span>
+<span id="5524">5524</span>
+<span id="5525">5525</span>
+<span id="5526">5526</span>
+<span id="5527">5527</span>
+<span id="5528">5528</span>
+<span id="5529">5529</span>
+<span id="5530">5530</span>
+<span id="5531">5531</span>
+<span id="5532">5532</span>
+<span id="5533">5533</span>
+<span id="5534">5534</span>
+<span id="5535">5535</span>
+<span id="5536">5536</span>
+<span id="5537">5537</span>
+<span id="5538">5538</span>
+<span id="5539">5539</span>
+<span id="5540">5540</span>
+<span id="5541">5541</span>
+<span id="5542">5542</span>
+<span id="5543">5543</span>
+<span id="5544">5544</span>
+<span id="5545">5545</span>
+<span id="5546">5546</span>
+<span id="5547">5547</span>
+<span id="5548">5548</span>
+<span id="5549">5549</span>
+<span id="5550">5550</span>
+<span id="5551">5551</span>
+<span id="5552">5552</span>
+<span id="5553">5553</span>
+<span id="5554">5554</span>
+<span id="5555">5555</span>
+<span id="5556">5556</span>
+<span id="5557">5557</span>
+<span id="5558">5558</span>
+<span id="5559">5559</span>
+<span id="5560">5560</span>
+<span id="5561">5561</span>
+<span id="5562">5562</span>
+<span id="5563">5563</span>
+<span id="5564">5564</span>
+<span id="5565">5565</span>
+<span id="5566">5566</span>
+<span id="5567">5567</span>
+<span id="5568">5568</span>
+<span id="5569">5569</span>
+<span id="5570">5570</span>
+<span id="5571">5571</span>
+<span id="5572">5572</span>
+<span id="5573">5573</span>
+<span id="5574">5574</span>
+<span id="5575">5575</span>
+<span id="5576">5576</span>
+<span id="5577">5577</span>
+<span id="5578">5578</span>
+<span id="5579">5579</span>
+<span id="5580">5580</span>
+<span id="5581">5581</span>
+<span id="5582">5582</span>
+<span id="5583">5583</span>
+<span id="5584">5584</span>
+<span id="5585">5585</span>
+<span id="5586">5586</span>
+<span id="5587">5587</span>
+<span id="5588">5588</span>
+<span id="5589">5589</span>
+<span id="5590">5590</span>
+<span id="5591">5591</span>
+<span id="5592">5592</span>
+<span id="5593">5593</span>
+<span id="5594">5594</span>
+<span id="5595">5595</span>
+<span id="5596">5596</span>
+<span id="5597">5597</span>
+<span id="5598">5598</span>
+<span id="5599">5599</span>
+<span id="5600">5600</span>
+<span id="5601">5601</span>
+<span id="5602">5602</span>
+<span id="5603">5603</span>
+<span id="5604">5604</span>
+<span id="5605">5605</span>
+<span id="5606">5606</span>
+<span id="5607">5607</span>
+<span id="5608">5608</span>
+<span id="5609">5609</span>
+<span id="5610">5610</span>
+<span id="5611">5611</span>
+<span id="5612">5612</span>
+<span id="5613">5613</span>
+<span id="5614">5614</span>
+<span id="5615">5615</span>
+<span id="5616">5616</span>
+<span id="5617">5617</span>
+<span id="5618">5618</span>
+<span id="5619">5619</span>
+<span id="5620">5620</span>
+<span id="5621">5621</span>
+<span id="5622">5622</span>
+<span id="5623">5623</span>
+<span id="5624">5624</span>
+<span id="5625">5625</span>
+<span id="5626">5626</span>
+<span id="5627">5627</span>
+<span id="5628">5628</span>
+<span id="5629">5629</span>
+<span id="5630">5630</span>
+<span id="5631">5631</span>
+<span id="5632">5632</span>
+<span id="5633">5633</span>
+<span id="5634">5634</span>
+<span id="5635">5635</span>
+<span id="5636">5636</span>
+<span id="5637">5637</span>
+<span id="5638">5638</span>
+<span id="5639">5639</span>
+<span id="5640">5640</span>
+<span id="5641">5641</span>
+<span id="5642">5642</span>
+<span id="5643">5643</span>
+<span id="5644">5644</span>
+<span id="5645">5645</span>
+<span id="5646">5646</span>
+<span id="5647">5647</span>
+<span id="5648">5648</span>
+<span id="5649">5649</span>
+<span id="5650">5650</span>
+<span id="5651">5651</span>
+<span id="5652">5652</span>
+<span id="5653">5653</span>
+<span id="5654">5654</span>
+<span id="5655">5655</span>
+<span id="5656">5656</span>
+<span id="5657">5657</span>
+<span id="5658">5658</span>
+<span id="5659">5659</span>
+<span id="5660">5660</span>
+<span id="5661">5661</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A library to parse the x86 CPUID instruction, written in rust with no</span>
 <span class="doccomment">//! external dependencies. The implementation closely resembles the Intel CPUID</span>
 <span class="doccomment">//! manual description. The library works with no_std.</span>
@@ -5791,8 +5985,10 @@
 <span class="kw">const</span> <span class="ident">EAX_L2_L3_CACHE_INFO</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x8000_0006</span>;
 <span class="kw">const</span> <span class="ident">EAX_ADVANCED_POWER_MGMT_INFO</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x8000_0007</span>;
 <span class="kw">const</span> <span class="ident">EAX_PROCESSOR_CAPACITY_INFO</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x8000_0008</span>;
+<span class="kw">const</span> <span class="ident">EAX_TLB_1GB_PAGE_INFO</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x8000_0019</span>;
 <span class="kw">const</span> <span class="ident">EAX_PERFORMANCE_OPTIMIZATION_INFO</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x8000_001A</span>;
 <span class="kw">const</span> <span class="ident">EAX_CACHE_PARAMETERS_AMD</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x8000_001D</span>;
+<span class="kw">const</span> <span class="ident">EAX_PROCESSOR_TOPOLOGY_INFO</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x8000_001E</span>;
 <span class="kw">const</span> <span class="ident">EAX_MEMORY_ENCRYPTION_INFO</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x8000_001F</span>;
 <span class="kw">const</span> <span class="ident">EAX_SVM_FEATURES</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x8000_000A</span>;
 
@@ -6359,7 +6555,7 @@
     }
 
     <span class="doccomment">/// This function provides information about the SVM features that the processory</span>
-    <span class="doccomment">/// supports.</span>
+    <span class="doccomment">/// supports. (LEAF=0x8000_000A)</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If SVM is not supported if [ExtendedProcessorFeatureIdentifiers::has_svm] is</span>
     <span class="doccomment">/// false, this function is reserved then.</span>
@@ -6377,19 +6573,18 @@
         }
     }
 
-    <span class="doccomment">/// Informations about memory encryption support (LEAF=0x8000_001F)</span>
+    <span class="doccomment">/// TLB 1-GiB Pages Information (LEAF=0x8000_0019)</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
-    <span class="doccomment">/// ✅ AMD ❌ Intel (reserved)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_memory_encryption_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MemoryEncryptionInfo</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">leaf_is_supported</span>(<span class="ident">EAX_MEMORY_ENCRYPTION_INFO</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">MemoryEncryptionInfo::new</span>(
-                <span class="self">self</span>.<span class="ident">read</span>.<span class="ident">cpuid1</span>(<span class="ident">EAX_MEMORY_ENCRYPTION_INFO</span>),
-            ))
+    <span class="doccomment">/// ✅ AMD ❌ Intel</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_tlb_1gb_page_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Tlb1gbPageInfo</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">leaf_is_supported</span>(<span class="ident">EAX_TLB_1GB_PAGE_INFO</span>) {
+            <span class="prelude-val">Some</span>(<span class="ident">Tlb1gbPageInfo::new</span>(<span class="self">self</span>.<span class="ident">read</span>.<span class="ident">cpuid1</span>(<span class="ident">EAX_TLB_1GB_PAGE_INFO</span>)))
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
     }
+
     <span class="doccomment">/// Informations about performance optimization (LEAF=0x8000_001A)</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
@@ -6398,6 +6593,34 @@
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">leaf_is_supported</span>(<span class="ident">EAX_PERFORMANCE_OPTIMIZATION_INFO</span>) {
             <span class="prelude-val">Some</span>(<span class="ident">PerformanceOptimizationInfo::new</span>(
                 <span class="self">self</span>.<span class="ident">read</span>.<span class="ident">cpuid1</span>(<span class="ident">EAX_PERFORMANCE_OPTIMIZATION_INFO</span>),
+            ))
+        } <span class="kw">else</span> {
+            <span class="prelude-val">None</span>
+        }
+    }
+
+    <span class="doccomment">/// Informations about processor topology (LEAF=0x8000_001E)</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Platforms</span>
+    <span class="doccomment">/// ✅ AMD ❌ Intel (reserved)</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_processor_topology_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ProcessorTopologyInfo</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">leaf_is_supported</span>(<span class="ident">EAX_PROCESSOR_TOPOLOGY_INFO</span>) {
+            <span class="prelude-val">Some</span>(<span class="ident">ProcessorTopologyInfo::new</span>(
+                <span class="self">self</span>.<span class="ident">read</span>.<span class="ident">cpuid1</span>(<span class="ident">EAX_PROCESSOR_TOPOLOGY_INFO</span>),
+            ))
+        } <span class="kw">else</span> {
+            <span class="prelude-val">None</span>
+        }
+    }
+
+    <span class="doccomment">/// Informations about memory encryption support (LEAF=0x8000_001F)</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Platforms</span>
+    <span class="doccomment">/// ✅ AMD ❌ Intel (reserved)</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_memory_encryption_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MemoryEncryptionInfo</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">leaf_is_supported</span>(<span class="ident">EAX_MEMORY_ENCRYPTION_INFO</span>) {
+            <span class="prelude-val">Some</span>(<span class="ident">MemoryEncryptionInfo::new</span>(
+                <span class="self">self</span>.<span class="ident">read</span>.<span class="ident">cpuid1</span>(<span class="ident">EAX_MEMORY_ENCRYPTION_INFO</span>),
             ))
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
@@ -6449,6 +6672,29 @@
                 <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get_extended_processor_and_feature_identifiers</span>(),
             )
             .<span class="ident">field</span>(<span class="string">&quot;processor_brand_string&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get_processor_brand_string</span>())
+            .<span class="ident">field</span>(<span class="string">&quot;l1_cache_and_tlb_info&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get_l1_cache_and_tlb_info</span>())
+            .<span class="ident">field</span>(
+                <span class="string">&quot;l2_l3_cache_and_tlb_info&quot;</span>,
+                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get_l2_l3_cache_and_tlb_info</span>(),
+            )
+            .<span class="ident">field</span>(
+                <span class="string">&quot;advanced_power_mgmt_info&quot;</span>,
+                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get_advanced_power_mgmt_info</span>(),
+            )
+            .<span class="ident">field</span>(
+                <span class="string">&quot;processor_capacity_feature_info&quot;</span>,
+                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get_processor_capacity_feature_info</span>(),
+            )
+            .<span class="ident">field</span>(<span class="string">&quot;svm_info&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get_svm_info</span>())
+            .<span class="ident">field</span>(<span class="string">&quot;tlb_1gb_page_info&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get_tlb_1gb_page_info</span>())
+            .<span class="ident">field</span>(
+                <span class="string">&quot;performance_optimization_info&quot;</span>,
+                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get_performance_optimization_info</span>(),
+            )
+            .<span class="ident">field</span>(
+                <span class="string">&quot;processor_topology_info&quot;</span>,
+                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get_processor_topology_info</span>(),
+            )
             .<span class="ident">field</span>(<span class="string">&quot;memory_encryption_info&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get_memory_encryption_info</span>())
             .<span class="ident">finish</span>()
     }
@@ -8665,7 +8911,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ✅ AMD ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_fsgsbase</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_fsgsbase</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ebx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEbx::FSGSBASE</span>)
     }
 
@@ -8673,7 +8920,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ❌ AMD (reserved) ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_tsc_adjust_msr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_tsc_adjust_msr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ebx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEbx::ADJUST_MSR</span>)
     }
 
@@ -8681,7 +8929,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ✅ AMD ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_bmi1</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_bmi1</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ebx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEbx::BMI1</span>)
     }
 
@@ -8689,7 +8938,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ❌ AMD (reserved) ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_hle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_hle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ebx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEbx::HLE</span>)
     }
 
@@ -8697,7 +8947,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ✅ AMD ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_avx2</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_avx2</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ebx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEbx::AVX2</span>)
     }
 
@@ -8706,7 +8957,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ❌ AMD (reserved) ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_fdp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_fdp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ebx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEbx::FDP</span>)
     }
 
@@ -8714,7 +8966,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ✅ AMD ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_smep</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_smep</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ebx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEbx::SMEP</span>)
     }
 
@@ -8722,7 +8975,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ✅ AMD ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_bmi2</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_bmi2</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ebx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEbx::BMI2</span>)
     }
 
@@ -8730,7 +8984,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ❌ AMD (reserved) ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_rep_movsb_stosb</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_rep_movsb_stosb</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ebx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEbx::REP_MOVSB_STOSB</span>)
     }
 
@@ -8739,7 +8994,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ❌ AMD (reserved) ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_invpcid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_invpcid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ebx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEbx::INVPCID</span>)
     }
 
@@ -8747,7 +9003,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ❌ AMD (reserved) ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_rtm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_rtm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ebx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEbx::RTM</span>)
     }
 
@@ -8755,7 +9012,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ❌ AMD (reserved) ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_rdtm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_rdtm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ebx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEbx::RDTM</span>)
     }
 
@@ -8763,7 +9021,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ❌ AMD (reserved) ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_fpu_cs_ds_deprecated</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_fpu_cs_ds_deprecated</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ebx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEbx::DEPRECATE_FPU_CS_DS</span>)
     }
 
@@ -8771,7 +9030,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ❌ AMD (reserved) ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_mpx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_mpx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ebx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEbx::MPX</span>)
     }
 
@@ -8779,7 +9039,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ❌ AMD (reserved) ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_rdta</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_rdta</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ebx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEbx::RDTA</span>)
     }
 
@@ -8787,7 +9048,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ✅ AMD ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_rdseed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_rdseed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ebx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEbx::RDSEED</span>)
     }
 
@@ -8795,7 +9057,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ✅ AMD ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_adx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_adx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ebx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEbx::ADX</span>)
     }
 
@@ -8804,7 +9067,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ✅ AMD ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_smap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_smap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ebx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEbx::SMAP</span>)
     }
 
@@ -8812,7 +9076,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ✅ AMD ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_clflushopt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_clflushopt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ebx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEbx::CLFLUSHOPT</span>)
     }
 
@@ -8820,7 +9085,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ❌ AMD (reserved) ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_processor_trace</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_processor_trace</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ebx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEbx::PROCESSOR_TRACE</span>)
     }
 
@@ -8828,7 +9094,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ❌ AMD (reserved) ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_sha</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_sha</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ebx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEbx::SHA</span>)
     }
 
@@ -8836,7 +9103,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ❌ AMD (reserved) ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_sgx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_sgx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ebx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEbx::SGX</span>)
     }
 
@@ -8844,7 +9112,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ❌ AMD (reserved) ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_avx512f</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_avx512f</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ebx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEbx::AVX512F</span>)
     }
 
@@ -8852,7 +9121,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ❌ AMD (reserved) ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_avx512dq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_avx512dq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ebx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEbx::AVX512DQ</span>)
     }
 
@@ -8860,7 +9130,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ❌ AMD (reserved) ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_avx512_ifma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_avx512_ifma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ebx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEbx::AVX512_IFMA</span>)
     }
 
@@ -8868,7 +9139,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ❌ AMD (reserved) ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_avx512pf</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_avx512pf</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ebx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEbx::AVX512PF</span>)
     }
 
@@ -8876,7 +9148,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ❌ AMD (reserved) ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_avx512er</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_avx512er</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ebx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEbx::AVX512ER</span>)
     }
 
@@ -8884,7 +9157,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ❌ AMD (reserved) ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_avx512cd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_avx512cd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ebx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEbx::AVX512CD</span>)
     }
 
@@ -8892,7 +9166,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ❌ AMD (reserved) ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_avx512bw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_avx512bw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ebx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEbx::AVX512BW</span>)
     }
 
@@ -8900,7 +9175,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ❌ AMD (reserved) ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_avx512vl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_avx512vl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ebx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEbx::AVX512VL</span>)
     }
 
@@ -8908,7 +9184,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ✅ AMD ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_clwb</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_clwb</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ebx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEbx::CLWB</span>)
     }
 
@@ -8916,7 +9193,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ❌ AMD (reserved) ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_prefetchwt1</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_prefetchwt1</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ecx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEcx::PREFETCHWT1</span>)
     }
 
@@ -8924,7 +9202,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ❌ AMD (reserved) ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_umip</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_umip</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ecx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEcx::UMIP</span>)
     }
 
@@ -8932,7 +9211,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ❌ AMD (reserved) ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_pku</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_pku</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ecx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEcx::PKU</span>)
     }
 
@@ -8941,16 +9221,102 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ❌ AMD (reserved) ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_ospke</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_ospke</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ecx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEcx::OSPKE</span>)
+    }
+
+    <span class="doccomment">/// WAITPKG</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ❓ AMD ✅ Intel</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_waitpkg</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">ecx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEcx::WAITPKG</span>)
+    }
+
+    <span class="doccomment">/// AVX512VBMI2</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ❓ AMD ✅ Intel</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_av512vbmi2</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">ecx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEcx::AVX512VBMI2</span>)
+    }
+
+    <span class="doccomment">/// Supports CET shadow stack features. Processors that set this bit define bits 0..2 of the</span>
+    <span class="doccomment">/// IA32_U_CET and IA32_S_CET MSRs. Enumerates support for the following MSRs:</span>
+    <span class="doccomment">/// IA32_INTERRUPT_SPP_TABLE_ADDR, IA32_PL3_SSP, IA32_PL2_SSP, IA32_PL1_SSP, and IA32_PL0_SSP.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ❓ AMD ✅ Intel</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_cet_ss</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">ecx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEcx::GFNI</span>)
+    }
+
+    <span class="doccomment">/// GFNI</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ❓ AMD ✅ Intel</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_gfni</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">ecx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEcx::GFNI</span>)
+    }
+
+    <span class="doccomment">/// VAES</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ❓ AMD ✅ Intel</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_vaes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">ecx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEcx::VAES</span>)
+    }
+
+    <span class="doccomment">/// VPCLMULQDQ</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ❓ AMD ✅ Intel</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_vpclmulqdq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">ecx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEcx::VPCLMULQDQ</span>)
     }
 
     <span class="doccomment">/// AVX512VNNI</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ❌ AMD (reserved) ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_avx512vnni</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_avx512vnni</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ecx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEcx::AVX512VNNI</span>)
+    }
+
+    <span class="doccomment">/// AVX512BITALG</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ❓ AMD ✅ Intel</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_avx512bitalg</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">ecx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEcx::AVX512BITALG</span>)
+    }
+
+    <span class="doccomment">/// Indicates the following MSRs are supported: IA32_TME_CAPABILITY, IA32_TME_ACTIVATE,</span>
+    <span class="doccomment">/// IA32_TME_EXCLUDE_MASK, and IA32_TME_EXCLUDE_BASE.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ❓ AMD ✅ Intel</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_tme_en</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">ecx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEcx::TMEEN</span>)
+    }
+
+    <span class="doccomment">/// AVX512VPOPCNTDQ</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ❓ AMD ✅ Intel</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_avx512vpopcntdq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">ecx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEcx::AVX512VPOPCNTDQ</span>)
+    }
+
+    <span class="doccomment">/// Supports 57-bit linear addresses and five-level paging if 1.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Platforms</span>
+    <span class="doccomment">/// ❓ AMD ✅ Intel</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_la57</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">ecx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEcx::LA57</span>)
     }
 
     <span class="doccomment">/// RDPID and IA32_TSC_AUX are available.</span>
@@ -8962,7 +9328,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ✅ AMD ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_rdpid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_rdpid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ecx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEcx::RDPID</span>)
     }
 
@@ -8970,7 +9337,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ❌ AMD (reserved) ✅ Intel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_sgx_lc</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">has_sgx_lc</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ecx</span>.<span class="ident">contains</span>(<span class="ident">ExtendedFeaturesEcx::SGX_LC</span>)
     }
 
@@ -8978,6 +9346,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Platforms</span>
     <span class="doccomment">/// ❌ AMD (reserved) ✅ Intel</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mawau_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="ident">get_bits</span>(<span class="self">self</span>.<span class="ident">ecx</span>.<span class="ident">bits</span>(), <span class="number">17</span>, <span class="number">21</span>) <span class="kw">as</span> <span class="ident">u8</span>
     }
@@ -9067,25 +9436,44 @@
     <span class="kw">struct</span> <span class="ident">ExtendedFeaturesEcx</span>: <span class="ident">u32</span> {
         <span class="doccomment">/// Bit 0: Prefetch WT1. (Intel® Xeon Phi™ only).</span>
         <span class="kw">const</span> <span class="ident">PREFETCHWT1</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">0</span>;
-
         <span class="comment">// Bit 01: AVX512_VBMI</span>
         <span class="kw">const</span> <span class="ident">AVX512VBMI</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
-
         <span class="doccomment">/// Bit 02: UMIP. Supports user-mode instruction prevention if 1.</span>
         <span class="kw">const</span> <span class="ident">UMIP</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>;
-
         <span class="doccomment">/// Bit 03: PKU. Supports protection keys for user-mode pages if 1.</span>
         <span class="kw">const</span> <span class="ident">PKU</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>;
-
         <span class="doccomment">/// Bit 04: OSPKE. If 1, OS has set CR4.PKE to enable protection keys (and the RDPKRU/WRPKRU instruc-tions).</span>
         <span class="kw">const</span> <span class="ident">OSPKE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>;
-
+        <span class="doccomment">/// Bit 5: WAITPKG</span>
+        <span class="kw">const</span> <span class="ident">WAITPKG</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">5</span>;
+        <span class="doccomment">/// Bit 6: AV512_VBMI2</span>
+        <span class="kw">const</span> <span class="ident">AVX512VBMI2</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>;
+        <span class="doccomment">/// Bit 7: CET_SS. Supports CET shadow stack features if 1. Processors that set this bit define bits 0..2 of the</span>
+        <span class="doccomment">/// IA32_U_CET and IA32_S_CET MSRs. Enumerates support for the following MSRs:</span>
+        <span class="doccomment">/// IA32_INTERRUPT_SPP_TABLE_ADDR, IA32_PL3_SSP, IA32_PL2_SSP, IA32_PL1_SSP, and IA32_PL0_SSP.</span>
+        <span class="kw">const</span> <span class="ident">CETSS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">7</span>;
+        <span class="doccomment">/// Bit 8: GFNI</span>
+        <span class="kw">const</span> <span class="ident">GFNI</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>;
+        <span class="doccomment">/// Bit 9: VAES</span>
+        <span class="kw">const</span> <span class="ident">VAES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">9</span>;
+        <span class="doccomment">/// Bit 10: VPCLMULQDQ</span>
+        <span class="kw">const</span> <span class="ident">VPCLMULQDQ</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">10</span>;
         <span class="doccomment">/// Bit 11: AVX512_VNNI</span>
         <span class="kw">const</span> <span class="ident">AVX512VNNI</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">11</span>;
+        <span class="doccomment">/// Bit 12: AVX512_BITALG</span>
+        <span class="kw">const</span> <span class="ident">AVX512BITALG</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">12</span>;
+        <span class="doccomment">/// Bit 13: TME_EN. If 1, the following MSRs are supported: IA32_TME_CAPABILITY, IA32_TME_ACTIVATE,</span>
+        <span class="doccomment">/// IA32_TME_EXCLUDE_MASK, and IA32_TME_EXCLUDE_BASE.</span>
+        <span class="kw">const</span> <span class="ident">TMEEN</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">13</span>;
+        <span class="doccomment">/// Bit 14: AVX512_VPOPCNTDQ</span>
+        <span class="kw">const</span> <span class="ident">AVX512VPOPCNTDQ</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">14</span>;
 
-        <span class="comment">// Bits 16 - 5: Reserved.</span>
-        <span class="comment">// Bits 21 - 17: The value of MAWAU used by the BNDLDX and BNDSTX instructions in 64-bit mode.</span>
+        <span class="comment">// Bit 15: Reserved.</span>
 
+        <span class="doccomment">/// Bit 16: Supports 57-bit linear addresses and five-level paging if 1.</span>
+        <span class="kw">const</span> <span class="ident">LA57</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>;
+
+        <span class="comment">// Bits 21 - 17: The value of MAWAU used by the BNDLDX and BNDSTX instructions in 64-bit mode</span>
 
         <span class="doccomment">/// Bit 22: RDPID. RDPID and IA32_TSC_AUX are available if 1.</span>
         <span class="kw">const</span> <span class="ident">RDPID</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">22</span>;

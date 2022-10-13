@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/raw-cpuid-10.5.0/src/extended.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>extended.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../raw_cpuid/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../raw_cpuid/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../raw_cpuid/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/raw-cpuid-10.6.0/src/extended.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>extended.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../raw_cpuid/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../raw_cpuid/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../raw_cpuid/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1635,6 +1635,144 @@
 <span id="1635">1635</span>
 <span id="1636">1636</span>
 <span id="1637">1637</span>
+<span id="1638">1638</span>
+<span id="1639">1639</span>
+<span id="1640">1640</span>
+<span id="1641">1641</span>
+<span id="1642">1642</span>
+<span id="1643">1643</span>
+<span id="1644">1644</span>
+<span id="1645">1645</span>
+<span id="1646">1646</span>
+<span id="1647">1647</span>
+<span id="1648">1648</span>
+<span id="1649">1649</span>
+<span id="1650">1650</span>
+<span id="1651">1651</span>
+<span id="1652">1652</span>
+<span id="1653">1653</span>
+<span id="1654">1654</span>
+<span id="1655">1655</span>
+<span id="1656">1656</span>
+<span id="1657">1657</span>
+<span id="1658">1658</span>
+<span id="1659">1659</span>
+<span id="1660">1660</span>
+<span id="1661">1661</span>
+<span id="1662">1662</span>
+<span id="1663">1663</span>
+<span id="1664">1664</span>
+<span id="1665">1665</span>
+<span id="1666">1666</span>
+<span id="1667">1667</span>
+<span id="1668">1668</span>
+<span id="1669">1669</span>
+<span id="1670">1670</span>
+<span id="1671">1671</span>
+<span id="1672">1672</span>
+<span id="1673">1673</span>
+<span id="1674">1674</span>
+<span id="1675">1675</span>
+<span id="1676">1676</span>
+<span id="1677">1677</span>
+<span id="1678">1678</span>
+<span id="1679">1679</span>
+<span id="1680">1680</span>
+<span id="1681">1681</span>
+<span id="1682">1682</span>
+<span id="1683">1683</span>
+<span id="1684">1684</span>
+<span id="1685">1685</span>
+<span id="1686">1686</span>
+<span id="1687">1687</span>
+<span id="1688">1688</span>
+<span id="1689">1689</span>
+<span id="1690">1690</span>
+<span id="1691">1691</span>
+<span id="1692">1692</span>
+<span id="1693">1693</span>
+<span id="1694">1694</span>
+<span id="1695">1695</span>
+<span id="1696">1696</span>
+<span id="1697">1697</span>
+<span id="1698">1698</span>
+<span id="1699">1699</span>
+<span id="1700">1700</span>
+<span id="1701">1701</span>
+<span id="1702">1702</span>
+<span id="1703">1703</span>
+<span id="1704">1704</span>
+<span id="1705">1705</span>
+<span id="1706">1706</span>
+<span id="1707">1707</span>
+<span id="1708">1708</span>
+<span id="1709">1709</span>
+<span id="1710">1710</span>
+<span id="1711">1711</span>
+<span id="1712">1712</span>
+<span id="1713">1713</span>
+<span id="1714">1714</span>
+<span id="1715">1715</span>
+<span id="1716">1716</span>
+<span id="1717">1717</span>
+<span id="1718">1718</span>
+<span id="1719">1719</span>
+<span id="1720">1720</span>
+<span id="1721">1721</span>
+<span id="1722">1722</span>
+<span id="1723">1723</span>
+<span id="1724">1724</span>
+<span id="1725">1725</span>
+<span id="1726">1726</span>
+<span id="1727">1727</span>
+<span id="1728">1728</span>
+<span id="1729">1729</span>
+<span id="1730">1730</span>
+<span id="1731">1731</span>
+<span id="1732">1732</span>
+<span id="1733">1733</span>
+<span id="1734">1734</span>
+<span id="1735">1735</span>
+<span id="1736">1736</span>
+<span id="1737">1737</span>
+<span id="1738">1738</span>
+<span id="1739">1739</span>
+<span id="1740">1740</span>
+<span id="1741">1741</span>
+<span id="1742">1742</span>
+<span id="1743">1743</span>
+<span id="1744">1744</span>
+<span id="1745">1745</span>
+<span id="1746">1746</span>
+<span id="1747">1747</span>
+<span id="1748">1748</span>
+<span id="1749">1749</span>
+<span id="1750">1750</span>
+<span id="1751">1751</span>
+<span id="1752">1752</span>
+<span id="1753">1753</span>
+<span id="1754">1754</span>
+<span id="1755">1755</span>
+<span id="1756">1756</span>
+<span id="1757">1757</span>
+<span id="1758">1758</span>
+<span id="1759">1759</span>
+<span id="1760">1760</span>
+<span id="1761">1761</span>
+<span id="1762">1762</span>
+<span id="1763">1763</span>
+<span id="1764">1764</span>
+<span id="1765">1765</span>
+<span id="1766">1766</span>
+<span id="1767">1767</span>
+<span id="1768">1768</span>
+<span id="1769">1769</span>
+<span id="1770">1770</span>
+<span id="1771">1771</span>
+<span id="1772">1772</span>
+<span id="1773">1773</span>
+<span id="1774">1774</span>
+<span id="1775">1775</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Data-structures / interpretation for extended leafs (&gt;= 0x8000_0000)</span>
 <span class="kw">use</span> <span class="ident">core::fmt</span>::{<span class="self">self</span>, <span class="ident">Debug</span>, <span class="ident">Display</span>, <span class="ident">Formatter</span>};
 <span class="kw">use</span> <span class="ident">core::mem::size_of</span>;
@@ -2935,134 +3073,6 @@
     }
 }
 
-<span class="doccomment">/// Encrypted Memory Capabilities</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Platforms</span>
-<span class="doccomment">/// ✅ AMD ❌ Intel</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MemoryEncryptionInfo</span> {
-    <span class="ident">eax</span>: <span class="ident">MemoryEncryptionInfoEax</span>,
-    <span class="ident">ebx</span>: <span class="ident">u32</span>,
-    <span class="ident">ecx</span>: <span class="ident">u32</span>,
-    <span class="ident">edx</span>: <span class="ident">u32</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">MemoryEncryptionInfo</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">data</span>: <span class="ident">CpuIdResult</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">eax</span>: <span class="ident">MemoryEncryptionInfoEax::from_bits_truncate</span>(<span class="ident">data</span>.<span class="ident">eax</span>),
-            <span class="ident">ebx</span>: <span class="ident">data</span>.<span class="ident">ebx</span>,
-            <span class="ident">ecx</span>: <span class="ident">data</span>.<span class="ident">ecx</span>,
-            <span class="ident">edx</span>: <span class="ident">data</span>.<span class="ident">edx</span>,
-        }
-    }
-
-    <span class="doccomment">/// Secure Memory Encryption is supported if set.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_sme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">eax</span>.<span class="ident">contains</span>(<span class="ident">MemoryEncryptionInfoEax::SME</span>)
-    }
-
-    <span class="doccomment">/// Secure Encrypted Virtualization is supported if set.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_sev</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">eax</span>.<span class="ident">contains</span>(<span class="ident">MemoryEncryptionInfoEax::SEV</span>)
-    }
-
-    <span class="doccomment">/// The Page Flush MSR is available if set.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_page_flush_msr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">eax</span>.<span class="ident">contains</span>(<span class="ident">MemoryEncryptionInfoEax::PAGE_FLUSH_MSR</span>)
-    }
-
-    <span class="doccomment">/// SEV Encrypted State is supported if set.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_sev_es</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">eax</span>.<span class="ident">contains</span>(<span class="ident">MemoryEncryptionInfoEax::SEV_ES</span>)
-    }
-
-    <span class="doccomment">/// SEV Secure Nested Paging supported if set.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_sev_snp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">eax</span>.<span class="ident">contains</span>(<span class="ident">MemoryEncryptionInfoEax::SEV_SNP</span>)
-    }
-
-    <span class="doccomment">/// VM Permission Levels supported if set.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_vmpl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">eax</span>.<span class="ident">contains</span>(<span class="ident">MemoryEncryptionInfoEax::VMPL</span>)
-    }
-
-    <span class="doccomment">/// Hardware cache coherency across encryption domains enforced if set.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_hw_enforced_cache_coh</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">eax</span>.<span class="ident">contains</span>(<span class="ident">MemoryEncryptionInfoEax::HWENFCACHECOH</span>)
-    }
-
-    <span class="doccomment">/// SEV guest execution only allowed from a 64-bit host if set.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_64bit_mode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">eax</span>.<span class="ident">contains</span>(<span class="ident">MemoryEncryptionInfoEax::HOST64</span>)
-    }
-
-    <span class="doccomment">/// Restricted Injection supported if set.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_restricted_injection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">eax</span>.<span class="ident">contains</span>(<span class="ident">MemoryEncryptionInfoEax::RESTINJECT</span>)
-    }
-
-    <span class="doccomment">/// Alternate Injection supported if set.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_alternate_injection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">eax</span>.<span class="ident">contains</span>(<span class="ident">MemoryEncryptionInfoEax::ALTINJECT</span>)
-    }
-
-    <span class="doccomment">/// Full debug state swap supported for SEV-ES guests.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_debug_swap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">eax</span>.<span class="ident">contains</span>(<span class="ident">MemoryEncryptionInfoEax::DBGSWP</span>)
-    }
-
-    <span class="doccomment">/// Disallowing IBS use by the host supported if set.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_prevent_host_ibs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">eax</span>.<span class="ident">contains</span>(<span class="ident">MemoryEncryptionInfoEax::PREVHOSTIBS</span>)
-    }
-
-    <span class="doccomment">/// Virtual Transparent Encryption supported if set.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_vte</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">eax</span>.<span class="ident">contains</span>(<span class="ident">MemoryEncryptionInfoEax::VTE</span>)
-    }
-
-    <span class="doccomment">/// C-bit location in page table entry</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">c_bit_position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="ident">get_bits</span>(<span class="self">self</span>.<span class="ident">ebx</span>, <span class="number">0</span>, <span class="number">5</span>) <span class="kw">as</span> <span class="ident">u8</span>
-    }
-
-    <span class="doccomment">/// Physical Address bit reduction</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">physical_address_reduction</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="ident">get_bits</span>(<span class="self">self</span>.<span class="ident">ebx</span>, <span class="number">6</span>, <span class="number">11</span>) <span class="kw">as</span> <span class="ident">u8</span>
-    }
-
-    <span class="doccomment">/// Number of encrypted guests supported simultaneouslys</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_encrypted_guests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">ecx</span>
-    }
-
-    <span class="doccomment">/// Minimum ASID value for an SEV enabled, SEV-ES disabled guest</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">min_sev_no_es_asid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">edx</span>
-    }
-}
-
-<span class="macro">bitflags!</span> {
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-    <span class="kw">struct</span> <span class="ident">MemoryEncryptionInfoEax</span>: <span class="ident">u32</span> {
-        <span class="kw">const</span> <span class="ident">SME</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">0</span>;
-        <span class="kw">const</span> <span class="ident">SEV</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
-        <span class="kw">const</span> <span class="ident">PAGE_FLUSH_MSR</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>;
-        <span class="kw">const</span> <span class="ident">SEV_ES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>;
-        <span class="kw">const</span> <span class="ident">SEV_SNP</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>;
-        <span class="kw">const</span> <span class="ident">VMPL</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">5</span>;
-        <span class="kw">const</span> <span class="ident">HWENFCACHECOH</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">10</span>;
-        <span class="kw">const</span> <span class="ident">HOST64</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">11</span>;
-        <span class="kw">const</span> <span class="ident">RESTINJECT</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">12</span>;
-        <span class="kw">const</span> <span class="ident">ALTINJECT</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">13</span>;
-        <span class="kw">const</span> <span class="ident">DBGSWP</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">14</span>;
-        <span class="kw">const</span> <span class="ident">PREVHOSTIBS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">15</span>;
-        <span class="kw">const</span> <span class="ident">VTE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>;
-    }
-}
-
 <span class="doccomment">/// Information about the SVM features that the processory supports (LEAF=0x8000_000A).</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Note</span>
@@ -3221,6 +3231,76 @@
     }
 }
 
+<span class="doccomment">/// TLB 1-GiB Pages Information (LEAF=0x8000_0019).</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Platforms</span>
+<span class="doccomment">/// ✅ AMD ❌ Intel</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Tlb1gbPageInfo</span> {
+    <span class="ident">eax</span>: <span class="ident">u32</span>,
+    <span class="ident">ebx</span>: <span class="ident">u32</span>,
+    <span class="doccomment">/// Reserved</span>
+    <span class="ident">_ecx</span>: <span class="ident">u32</span>,
+    <span class="doccomment">/// Reserved</span>
+    <span class="ident">_edx</span>: <span class="ident">u32</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">Tlb1gbPageInfo</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">data</span>: <span class="ident">CpuIdResult</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">eax</span>: <span class="ident">data</span>.<span class="ident">eax</span>,
+            <span class="ident">ebx</span>: <span class="ident">data</span>.<span class="ident">ebx</span>,
+            <span class="ident">_ecx</span>: <span class="ident">data</span>.<span class="ident">ecx</span>,
+            <span class="ident">_edx</span>: <span class="ident">data</span>.<span class="ident">edx</span>,
+        }
+    }
+
+    <span class="doccomment">/// L1 Data TLB associativity for 1-GB pages.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dtlb_l1_1gb_associativity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Associativity</span> {
+        <span class="kw">let</span> <span class="ident">assoc_bits</span> <span class="op">=</span> <span class="ident">get_bits</span>(<span class="self">self</span>.<span class="ident">eax</span>, <span class="number">28</span>, <span class="number">31</span>) <span class="kw">as</span> <span class="ident">u8</span>;
+        <span class="ident">Associativity::for_l2</span>(<span class="ident">assoc_bits</span>)
+    }
+
+    <span class="doccomment">/// L1 Data TLB number of entries for 1-GB pages.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dtlb_l1_1gb_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
+        <span class="ident">get_bits</span>(<span class="self">self</span>.<span class="ident">eax</span>, <span class="number">16</span>, <span class="number">27</span>) <span class="kw">as</span> <span class="ident">u8</span>
+    }
+
+    <span class="doccomment">/// L1 Instruction TLB associativity for 1-GB pages.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">itlb_l1_1gb_associativity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Associativity</span> {
+        <span class="kw">let</span> <span class="ident">assoc_bits</span> <span class="op">=</span> <span class="ident">get_bits</span>(<span class="self">self</span>.<span class="ident">eax</span>, <span class="number">12</span>, <span class="number">15</span>) <span class="kw">as</span> <span class="ident">u8</span>;
+        <span class="ident">Associativity::for_l2</span>(<span class="ident">assoc_bits</span>)
+    }
+
+    <span class="doccomment">/// L1 Instruction TLB number of entries for 1-GB pages.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">itlb_l1_1gb_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
+        <span class="ident">get_bits</span>(<span class="self">self</span>.<span class="ident">eax</span>, <span class="number">0</span>, <span class="number">11</span>) <span class="kw">as</span> <span class="ident">u8</span>
+    }
+
+    <span class="doccomment">/// L2 Data TLB associativity for 1-GB pages.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dtlb_l2_1gb_associativity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Associativity</span> {
+        <span class="kw">let</span> <span class="ident">assoc_bits</span> <span class="op">=</span> <span class="ident">get_bits</span>(<span class="self">self</span>.<span class="ident">ebx</span>, <span class="number">28</span>, <span class="number">31</span>) <span class="kw">as</span> <span class="ident">u8</span>;
+        <span class="ident">Associativity::for_l2</span>(<span class="ident">assoc_bits</span>)
+    }
+
+    <span class="doccomment">/// L2 Data TLB number of entries for 1-GB pages.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dtlb_l2_1gb_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
+        <span class="ident">get_bits</span>(<span class="self">self</span>.<span class="ident">ebx</span>, <span class="number">16</span>, <span class="number">27</span>) <span class="kw">as</span> <span class="ident">u8</span>
+    }
+
+    <span class="doccomment">/// L2 Instruction TLB associativity for 1-GB pages.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">itlb_l2_1gb_associativity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Associativity</span> {
+        <span class="kw">let</span> <span class="ident">assoc_bits</span> <span class="op">=</span> <span class="ident">get_bits</span>(<span class="self">self</span>.<span class="ident">ebx</span>, <span class="number">12</span>, <span class="number">15</span>) <span class="kw">as</span> <span class="ident">u8</span>;
+        <span class="ident">Associativity::for_l2</span>(<span class="ident">assoc_bits</span>)
+    }
+
+    <span class="doccomment">/// L2 Instruction TLB number of entries for 1-GB pages.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">itlb_l2_1gb_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
+        <span class="ident">get_bits</span>(<span class="self">self</span>.<span class="ident">ebx</span>, <span class="number">0</span>, <span class="number">11</span>) <span class="kw">as</span> <span class="ident">u8</span>
+    }
+}
+
 <span class="doccomment">/// Performance Optimization Identifier (LEAF=0x8000_001A).</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Platforms</span>
@@ -3270,6 +3350,202 @@
         <span class="kw">const</span> <span class="ident">FP128</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">0</span>;
         <span class="kw">const</span> <span class="ident">MOVU</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
         <span class="kw">const</span> <span class="ident">FP256</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>;
+    }
+}
+
+<span class="doccomment">/// Processor Topology Information (LEAF=0x8000_001E).</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Platforms</span>
+<span class="doccomment">/// ✅ AMD ❌ Intel</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ProcessorTopologyInfo</span> {
+    <span class="ident">eax</span>: <span class="ident">u32</span>,
+    <span class="ident">ebx</span>: <span class="ident">u32</span>,
+    <span class="ident">ecx</span>: <span class="ident">u32</span>,
+    <span class="doccomment">/// Reserved</span>
+    <span class="ident">_edx</span>: <span class="ident">u32</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">ProcessorTopologyInfo</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">data</span>: <span class="ident">CpuIdResult</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">eax</span>: <span class="ident">data</span>.<span class="ident">eax</span>,
+            <span class="ident">ebx</span>: <span class="ident">data</span>.<span class="ident">ebx</span>,
+            <span class="ident">ecx</span>: <span class="ident">data</span>.<span class="ident">ecx</span>,
+            <span class="ident">_edx</span>: <span class="ident">data</span>.<span class="ident">edx</span>,
+        }
+    }
+
+    <span class="doccomment">/// x2APIC ID</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">x2apic_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
+        <span class="self">self</span>.<span class="ident">eax</span>
+    }
+
+    <span class="doccomment">/// Core ID</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Note</span>
+    <span class="doccomment">/// `Core ID` means `Compute Unit ID` if AMD Family 15h-16h Processors.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">core_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
+        <span class="ident">get_bits</span>(<span class="self">self</span>.<span class="ident">ebx</span>, <span class="number">0</span>, <span class="number">7</span>) <span class="kw">as</span> <span class="ident">u8</span>
+    }
+
+    <span class="doccomment">/// Threads per core</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Note</span>
+    <span class="doccomment">/// `Threads per Core` means `Cores per Compute Unit` if AMD Family 15h-16h Processors.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">threads_per_core</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
+        <span class="ident">get_bits</span>(<span class="self">self</span>.<span class="ident">ebx</span>, <span class="number">8</span>, <span class="number">15</span>) <span class="kw">as</span> <span class="ident">u8</span> <span class="op">+</span> <span class="number">1</span>
+    }
+
+    <span class="doccomment">/// Node ID</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">node_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
+        <span class="ident">get_bits</span>(<span class="self">self</span>.<span class="ident">ecx</span>, <span class="number">0</span>, <span class="number">7</span>) <span class="kw">as</span> <span class="ident">u8</span>
+    }
+
+    <span class="doccomment">/// Nodes per processor</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nodes_per_processor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
+        <span class="ident">get_bits</span>(<span class="self">self</span>.<span class="ident">ecx</span>, <span class="number">8</span>, <span class="number">10</span>) <span class="kw">as</span> <span class="ident">u8</span> <span class="op">+</span> <span class="number">1</span>
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">ProcessorTopologyInfo</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;ProcessorTopologyInfo&quot;</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;x2apic_id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">x2apic_id</span>())
+            .<span class="ident">field</span>(<span class="string">&quot;core_id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">core_id</span>())
+            .<span class="ident">field</span>(<span class="string">&quot;threads_per_core&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">threads_per_core</span>())
+            .<span class="ident">field</span>(<span class="string">&quot;node_id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">node_id</span>())
+            .<span class="ident">field</span>(<span class="string">&quot;nodes_per_processor&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">nodes_per_processor</span>())
+            .<span class="ident">finish</span>()
+    }
+}
+
+<span class="doccomment">/// Encrypted Memory Capabilities (LEAF=0x8000_001F).</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Platforms</span>
+<span class="doccomment">/// ✅ AMD ❌ Intel</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MemoryEncryptionInfo</span> {
+    <span class="ident">eax</span>: <span class="ident">MemoryEncryptionInfoEax</span>,
+    <span class="ident">ebx</span>: <span class="ident">u32</span>,
+    <span class="ident">ecx</span>: <span class="ident">u32</span>,
+    <span class="ident">edx</span>: <span class="ident">u32</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">MemoryEncryptionInfo</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">data</span>: <span class="ident">CpuIdResult</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">eax</span>: <span class="ident">MemoryEncryptionInfoEax::from_bits_truncate</span>(<span class="ident">data</span>.<span class="ident">eax</span>),
+            <span class="ident">ebx</span>: <span class="ident">data</span>.<span class="ident">ebx</span>,
+            <span class="ident">ecx</span>: <span class="ident">data</span>.<span class="ident">ecx</span>,
+            <span class="ident">edx</span>: <span class="ident">data</span>.<span class="ident">edx</span>,
+        }
+    }
+
+    <span class="doccomment">/// Secure Memory Encryption is supported if set.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_sme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">eax</span>.<span class="ident">contains</span>(<span class="ident">MemoryEncryptionInfoEax::SME</span>)
+    }
+
+    <span class="doccomment">/// Secure Encrypted Virtualization is supported if set.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_sev</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">eax</span>.<span class="ident">contains</span>(<span class="ident">MemoryEncryptionInfoEax::SEV</span>)
+    }
+
+    <span class="doccomment">/// The Page Flush MSR is available if set.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_page_flush_msr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">eax</span>.<span class="ident">contains</span>(<span class="ident">MemoryEncryptionInfoEax::PAGE_FLUSH_MSR</span>)
+    }
+
+    <span class="doccomment">/// SEV Encrypted State is supported if set.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_sev_es</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">eax</span>.<span class="ident">contains</span>(<span class="ident">MemoryEncryptionInfoEax::SEV_ES</span>)
+    }
+
+    <span class="doccomment">/// SEV Secure Nested Paging supported if set.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_sev_snp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">eax</span>.<span class="ident">contains</span>(<span class="ident">MemoryEncryptionInfoEax::SEV_SNP</span>)
+    }
+
+    <span class="doccomment">/// VM Permission Levels supported if set.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_vmpl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">eax</span>.<span class="ident">contains</span>(<span class="ident">MemoryEncryptionInfoEax::VMPL</span>)
+    }
+
+    <span class="doccomment">/// Hardware cache coherency across encryption domains enforced if set.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_hw_enforced_cache_coh</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">eax</span>.<span class="ident">contains</span>(<span class="ident">MemoryEncryptionInfoEax::HWENFCACHECOH</span>)
+    }
+
+    <span class="doccomment">/// SEV guest execution only allowed from a 64-bit host if set.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_64bit_mode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">eax</span>.<span class="ident">contains</span>(<span class="ident">MemoryEncryptionInfoEax::HOST64</span>)
+    }
+
+    <span class="doccomment">/// Restricted Injection supported if set.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_restricted_injection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">eax</span>.<span class="ident">contains</span>(<span class="ident">MemoryEncryptionInfoEax::RESTINJECT</span>)
+    }
+
+    <span class="doccomment">/// Alternate Injection supported if set.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_alternate_injection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">eax</span>.<span class="ident">contains</span>(<span class="ident">MemoryEncryptionInfoEax::ALTINJECT</span>)
+    }
+
+    <span class="doccomment">/// Full debug state swap supported for SEV-ES guests.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_debug_swap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">eax</span>.<span class="ident">contains</span>(<span class="ident">MemoryEncryptionInfoEax::DBGSWP</span>)
+    }
+
+    <span class="doccomment">/// Disallowing IBS use by the host supported if set.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_prevent_host_ibs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">eax</span>.<span class="ident">contains</span>(<span class="ident">MemoryEncryptionInfoEax::PREVHOSTIBS</span>)
+    }
+
+    <span class="doccomment">/// Virtual Transparent Encryption supported if set.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_vte</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">eax</span>.<span class="ident">contains</span>(<span class="ident">MemoryEncryptionInfoEax::VTE</span>)
+    }
+
+    <span class="doccomment">/// C-bit location in page table entry</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">c_bit_position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
+        <span class="ident">get_bits</span>(<span class="self">self</span>.<span class="ident">ebx</span>, <span class="number">0</span>, <span class="number">5</span>) <span class="kw">as</span> <span class="ident">u8</span>
+    }
+
+    <span class="doccomment">/// Physical Address bit reduction</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">physical_address_reduction</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
+        <span class="ident">get_bits</span>(<span class="self">self</span>.<span class="ident">ebx</span>, <span class="number">6</span>, <span class="number">11</span>) <span class="kw">as</span> <span class="ident">u8</span>
+    }
+
+    <span class="doccomment">/// Number of encrypted guests supported simultaneouslys</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_encrypted_guests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
+        <span class="self">self</span>.<span class="ident">ecx</span>
+    }
+
+    <span class="doccomment">/// Minimum ASID value for an SEV enabled, SEV-ES disabled guest</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">min_sev_no_es_asid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
+        <span class="self">self</span>.<span class="ident">edx</span>
+    }
+}
+
+<span class="macro">bitflags!</span> {
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
+    <span class="kw">struct</span> <span class="ident">MemoryEncryptionInfoEax</span>: <span class="ident">u32</span> {
+        <span class="kw">const</span> <span class="ident">SME</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">0</span>;
+        <span class="kw">const</span> <span class="ident">SEV</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
+        <span class="kw">const</span> <span class="ident">PAGE_FLUSH_MSR</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>;
+        <span class="kw">const</span> <span class="ident">SEV_ES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>;
+        <span class="kw">const</span> <span class="ident">SEV_SNP</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>;
+        <span class="kw">const</span> <span class="ident">VMPL</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">5</span>;
+        <span class="kw">const</span> <span class="ident">HWENFCACHECOH</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">10</span>;
+        <span class="kw">const</span> <span class="ident">HOST64</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">11</span>;
+        <span class="kw">const</span> <span class="ident">RESTINJECT</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">12</span>;
+        <span class="kw">const</span> <span class="ident">ALTINJECT</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">13</span>;
+        <span class="kw">const</span> <span class="ident">DBGSWP</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">14</span>;
+        <span class="kw">const</span> <span class="ident">PREVHOSTIBS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">15</span>;
+        <span class="kw">const</span> <span class="ident">VTE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>;
     }
 }
 </code></pre></div>

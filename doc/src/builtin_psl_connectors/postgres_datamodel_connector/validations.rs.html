@@ -474,6 +474,43 @@
 <span id="474">474</span>
 <span id="475">475</span>
 <span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">native_types::PostgresType</span>;
 <span class="kw">use</span> <span class="ident">psl_core</span>::{
@@ -949,6 +986,43 @@
         <span class="string">&quot;The `extensions` property is only available with the `postgresqlExtensions` preview feature.&quot;</span>,
         <span class="ident">span</span>,
     ));
+}
+
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">extension_names_follow_prisma_syntax_rules</span>(
+    <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
+    <span class="ident">props</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresDatasourceProperties</span>,
+    <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
+) {
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::PostgresqlExtensions</span>) {
+        <span class="kw">return</span>;
+    }
+
+    <span class="kw">let</span> <span class="ident">extensions</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">props</span>.<span class="ident">extensions</span>() {
+        <span class="prelude-val">Some</span>(<span class="ident">extensions</span>) =&gt; <span class="ident">extensions</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
+    };
+
+    <span class="comment">// Sadly these rules are already in identifier validation. It is</span>
+    <span class="comment">// not easy to share those rules here due to the code</span>
+    <span class="comment">// organization. TODO: organize the code better!</span>
+    <span class="kw">for</span> <span class="ident">extension</span> <span class="kw">in</span> <span class="ident">extensions</span>.<span class="ident">extensions</span>() {
+        <span class="kw">if</span> <span class="ident">extension</span>.<span class="ident">name</span>.<span class="ident">is_empty</span>() {
+            <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
+                <span class="string">&quot;The name of an extension must not be empty.&quot;</span>,
+                <span class="ident">extension</span>.<span class="ident">span</span>,
+            ));
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">extension</span>.<span class="ident">name</span>.<span class="ident">chars</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">is_numeric</span>() {
+            <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
+                <span class="string">&quot;The name of an extension must not start with a number.&quot;</span>,
+                <span class="ident">extension</span>.<span class="ident">span</span>,
+            ));
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">extension</span>.<span class="ident">name</span>.<span class="ident">contains</span>(<span class="string">&#39;-&#39;</span>) {
+            <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
+                <span class="string">&quot;The character `-` is not allowed in extension names.&quot;</span>,
+                <span class="ident">extension</span>.<span class="ident">span</span>,
+            ))
+        }
+    }
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="builtin_psl_connectors" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>

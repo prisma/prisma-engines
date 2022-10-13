@@ -47,6 +47,8 @@
 <span id="47">47</span>
 <span id="48">48</span>
 <span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../README.md&quot;</span>)]</span>
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>, <span class="ident">missing_docs</span>)]</span>
 
@@ -60,8 +62,10 @@
     <span class="ident">mcf</span>::{<span class="ident">generators_to_json</span>, <span class="ident">render_sources_to_json</span>}, <span class="comment">// for tests</span>
     <span class="ident">parser_database</span>::{<span class="self">self</span>, <span class="ident">SourceFile</span>},
     <span class="ident">reformat</span>,
+    <span class="ident">schema_ast</span>,
     <span class="ident">Configuration</span>,
     <span class="ident">Datasource</span>,
+    <span class="ident">DatasourceConnectorData</span>,
     <span class="ident">Generator</span>,
     <span class="ident">PreviewFeature</span>,
     <span class="ident">RelationNames</span>,
