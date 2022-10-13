@@ -166,6 +166,10 @@ impl PostgresSchemaExt {
     pub fn get_extension(&self, id: ExtensionId) -> &DatabaseExtension {
         &self.extensions[id.0 as usize]
     }
+
+    pub fn clear_extensions(&mut self) {
+        self.extensions.clear();
+    }
 }
 
 #[derive(Clone, Debug)]

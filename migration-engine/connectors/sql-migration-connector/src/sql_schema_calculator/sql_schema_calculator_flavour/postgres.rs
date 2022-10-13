@@ -50,8 +50,7 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
             .configuration
             .datasources
             .first()
-            .unwrap()
-            .downcast_connector_data();
+            .and_then(|ds| ds.downcast_connector_data());
 
         if let Some(extensions) = postgres_psl.and_then(|props| props.extensions()) {
             for extension in extensions.extensions() {
