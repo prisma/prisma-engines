@@ -14,6 +14,7 @@ pub struct Datasource<'a> {
     relation_mode: Option<RelationMode>,
     custom_properties: Vec<(&'a str, Value<'a>)>,
     documentation: Option<Commented<'a>>,
+    namespaces: Vec<&'a str>,
 }
 
 impl<'a> Datasource<'a> {
@@ -27,6 +28,7 @@ impl<'a> Datasource<'a> {
             relation_mode: None,
             custom_properties: Default::default(),
             documentation: None,
+            namespaces: vec![],
         }
     }
 
@@ -63,6 +65,7 @@ impl<'a> Datasource<'a> {
             relation_mode: psl_ds.relation_mode,
             documentation: psl_ds.documentation.as_deref().map(Commented::Documentation),
             custom_properties: Default::default(),
+            namespaces: psl_ds.namespaces.iter().map(|(ns, _)| ns.as_str()).collect(),
         }
     }
 }
@@ -87,6 +90,18 @@ impl<'a> fmt::Display for Datasource<'a> {
 
         for (key, value) in self.custom_properties.iter() {
             writeln!(f, "{key} = {value}")?;
+        }
+
+        if !self.namespaces.is_empty() {
+            let mut namespaces = self.namespaces.iter().peekable();
+            write!(f, "schemas = [")?;
+            while let Some(namespace) = namespaces.next() {
+                write!(f, "\"{}\"", namespace)?;
+                if namespaces.peek().is_some() {
+                    write!(f, ",")?;
+                }
+            }
+            write!(f, "]\n")?;
         }
 
         f.write_str("}\n")?;
