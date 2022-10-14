@@ -240,6 +240,7 @@
          <span class="op">|</span> <span class="ident">OrderByNulls</span>
          <span class="op">|</span> <span class="ident">FilteredRelationCount</span>
          <span class="op">|</span> <span class="ident">FieldReference</span>
+         <span class="op">|</span> <span class="ident">PostgresqlExtensions</span>
     }),
     <span class="ident">deprecated</span>: <span class="macro">enumflags2::make_bitflags!</span>(<span class="ident">PreviewFeature</span>::{
         <span class="ident">AtomicNumberOperations</span>
@@ -268,7 +269,6 @@
     }),
     <span class="ident">hidden</span>: <span class="macro">enumflags2::make_bitflags!</span>(<span class="ident">PreviewFeature</span>::{
         <span class="ident">MultiSchema</span>
-        <span class="op">|</span> <span class="ident">PostgresqlExtensions</span>
         <span class="op">|</span> <span class="ident">ClientExtensions</span>
     }),
 };

@@ -744,6 +744,12 @@
 <span id="744">744</span>
 <span id="745">745</span>
 <span id="746">746</span>
+<span id="747">747</span>
+<span id="748">748</span>
+<span id="749">749</span>
+<span id="750">750</span>
+<span id="751">751</span>
+<span id="752">752</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Database description. This crate is used heavily in the introspection and migration engines.</span>
 
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>)]</span>
@@ -832,6 +838,12 @@
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">downcast_connector_data</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
         <span class="self">self</span>.<span class="ident">connector_data</span>.<span class="ident">data</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">downcast_ref</span>().<span class="ident">unwrap</span>()
+    }
+
+    <span class="doccomment">/// Extract connector-specific constructs mutably. The type parameter must be the right one.</span>
+    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">downcast_connector_data_mut</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">T</span> {
+        <span class="self">self</span>.<span class="ident">connector_data</span>.<span class="ident">data</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">downcast_mut</span>().<span class="ident">unwrap</span>()
     }
 
     <span class="doccomment">/// Remove all namespaces from the schema.</span>

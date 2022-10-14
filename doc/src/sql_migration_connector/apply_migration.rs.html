@@ -174,6 +174,15 @@
 <span id="174">174</span>
 <span id="175">175</span>
 <span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">pair::Pair</span>,
     <span class="ident">sql_migration</span>::{<span class="ident">SqlMigration</span>, <span class="ident">SqlMigrationStep</span>},
@@ -347,6 +356,15 @@
         <span class="ident">SqlMigrationStep::RenameForeignKey</span> { <span class="ident">foreign_key_id</span> } =&gt; {
             <span class="kw">let</span> <span class="ident">fks</span> <span class="op">=</span> <span class="ident">schemas</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">foreign_key_id</span>);
             <span class="macro">vec!</span>[<span class="ident">renderer</span>.<span class="ident">render_rename_foreign_key</span>(<span class="ident">fks</span>)]
+        }
+        <span class="ident">SqlMigrationStep::CreateExtension</span>(<span class="ident">create_extension</span>) =&gt; {
+            <span class="ident">renderer</span>.<span class="ident">render_create_extension</span>(<span class="ident">create_extension</span>, <span class="ident">schemas</span>.<span class="ident">next</span>)
+        }
+        <span class="ident">SqlMigrationStep::AlterExtension</span>(<span class="ident">alter_extension</span>) =&gt; {
+            <span class="ident">renderer</span>.<span class="ident">render_alter_extension</span>(<span class="ident">alter_extension</span>, <span class="ident">Pair::new</span>(<span class="ident">schemas</span>.<span class="ident">previous</span>, <span class="ident">schemas</span>.<span class="ident">next</span>))
+        }
+        <span class="ident">SqlMigrationStep::DropExtension</span>(<span class="ident">drop_extension</span>) =&gt; {
+            <span class="ident">renderer</span>.<span class="ident">render_drop_extension</span>(<span class="ident">drop_extension</span>, <span class="ident">schemas</span>.<span class="ident">previous</span>)
         }
     }
 }

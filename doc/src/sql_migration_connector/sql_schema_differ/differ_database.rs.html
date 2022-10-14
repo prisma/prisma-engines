@@ -265,9 +265,68 @@
 <span id="265">265</span>
 <span id="266">266</span>
 <span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">column</span>, <span class="ident">enums::EnumDiffer</span>, <span class="ident">table::TableDiffer</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">flavour::SqlFlavour</span>, <span class="ident">pair::Pair</span>, <span class="ident">SqlDatabaseSchema</span>};
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
+    <span class="ident">postgres</span>::{<span class="ident">ExtensionId</span>, <span class="ident">ExtensionWalker</span>, <span class="ident">PostgresSchemaExt</span>},
     <span class="ident">walkers</span>::{<span class="ident">ColumnWalker</span>, <span class="ident">EnumWalker</span>, <span class="ident">TableWalker</span>},
     <span class="ident">ColumnId</span>, <span class="ident">NamespaceId</span>, <span class="ident">NamespaceWalker</span>, <span class="ident">TableId</span>,
 };
@@ -280,7 +339,7 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">DifferDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">flavour</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">SqlFlavour</span>,
     <span class="doccomment">/// The schemas being diffed</span>
-    <span class="ident">schemas</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">SqlDatabaseSchema</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">schemas</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">SqlDatabaseSchema</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Namespace name -&gt; namespace indexes.</span>
     <span class="ident">namespaces</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Pair</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NamespaceId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Table name -&gt; table indexes.</span>
@@ -290,6 +349,8 @@
     <span class="ident">columns</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span>(<span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">TableId</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>), <span class="ident">Pair</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// (table_idx, column_idx) -&gt; ColumnChanges</span>
     <span class="ident">column_changes</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnId</span><span class="op">&gt;</span>, <span class="ident">column::ColumnChanges</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Postgres extension name -&gt; extension indexes.</span>
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">extensions</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">Pair</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ExtensionId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Tables that will need to be completely redefined (dropped and recreated) for the migration</span>
     <span class="doccomment">/// to succeed. It needs to be crate public because it is set from the flavour.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">tables_to_redefine</span>: <span class="ident">BTreeSet</span><span class="op">&lt;</span><span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">TableId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -313,6 +374,7 @@
             <span class="ident">tables</span>: <span class="ident">HashMap::with_capacity</span>(<span class="ident">table_count_lb</span>),
             <span class="ident">columns</span>: <span class="ident">BTreeMap::new</span>(),
             <span class="ident">column_changes</span>: <span class="ident">Default::default</span>(),
+            <span class="ident">extensions</span>: <span class="ident">Default::default</span>(),
             <span class="ident">tables_to_redefine</span>: <span class="ident">Default::default</span>(),
         };
 
@@ -406,6 +468,7 @@
         }
 
         <span class="ident">flavour</span>.<span class="ident">set_tables_to_redefine</span>(<span class="kw-2">&amp;mut</span> <span class="ident">db</span>);
+        <span class="ident">flavour</span>.<span class="ident">define_extensions</span>(<span class="kw-2">&amp;mut</span> <span class="ident">db</span>);
 
         <span class="ident">db</span>
     }
@@ -516,6 +579,42 @@
             .<span class="ident">filter</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">previous</span><span class="op">|</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">next_enums</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">next</span><span class="op">|</span> <span class="ident">enums_match</span>(<span class="ident">previous</span>, <span class="kw-2">&amp;</span><span class="ident">next</span>)))
     }
 
+    <span class="doccomment">/// Extensions not present in the previous schema.</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">created_extensions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ExtensionId</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
+        <span class="self">self</span>.<span class="ident">extensions</span>
+            .<span class="ident">values</span>()
+            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> <span class="ident">pair</span>.<span class="ident">previous</span>.<span class="ident">is_none</span>())
+            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> <span class="ident">pair</span>.<span class="ident">next</span>)
+    }
+
+    <span class="doccomment">/// Non-relocatable extensions present in both schemas with changed values.</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">non_relocatable_extension_pairs</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="self">self</span>,
+    ) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ExtensionWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span> {
+        <span class="self">self</span>.<span class="ident">previous_extensions</span>().<span class="ident">filter_map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">previous</span><span class="op">|</span> {
+            <span class="self">self</span>.<span class="ident">next_extensions</span>()
+                .<span class="ident">find</span>(<span class="op">|</span><span class="ident">next</span><span class="op">|</span> {
+                    <span class="ident">previous</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">next</span>.<span class="ident">name</span>()
+                        <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">extensions_match</span>(<span class="ident">previous</span>, <span class="kw-2">*</span><span class="ident">next</span>)
+                        <span class="op">&amp;&amp;</span> (<span class="op">!</span><span class="ident">previous</span>.<span class="ident">relocatable</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">next</span>.<span class="ident">relocatable</span>())
+                })
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">next</span><span class="op">|</span> <span class="ident">Pair::new</span>(<span class="ident">previous</span>, <span class="ident">next</span>))
+        })
+    }
+
+    <span class="doccomment">/// Relocatable extensions present in both schemas with changed values.</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">relocatable_extension_pairs</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ExtensionWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span> {
+        <span class="self">self</span>.<span class="ident">previous_extensions</span>().<span class="ident">filter_map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">previous</span><span class="op">|</span> {
+            <span class="self">self</span>.<span class="ident">next_extensions</span>()
+                .<span class="ident">find</span>(<span class="op">|</span><span class="ident">next</span><span class="op">|</span> {
+                    <span class="ident">previous</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">next</span>.<span class="ident">name</span>()
+                        <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">extensions_match</span>(<span class="ident">previous</span>, <span class="kw-2">*</span><span class="ident">next</span>)
+                        <span class="op">&amp;&amp;</span> (<span class="ident">previous</span>.<span class="ident">relocatable</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">next</span>.<span class="ident">relocatable</span>())
+                })
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">next</span><span class="op">|</span> <span class="ident">Pair::new</span>(<span class="ident">previous</span>, <span class="ident">next</span>))
+        })
+    }
+
     <span class="kw">fn</span> <span class="ident">previous_enums</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">schemas</span>.<span class="ident">previous</span>.<span class="ident">describer_schema</span>.<span class="ident">enum_walkers</span>()
     }
@@ -524,9 +623,26 @@
         <span class="self">self</span>.<span class="ident">schemas</span>.<span class="ident">next</span>.<span class="ident">describer_schema</span>.<span class="ident">enum_walkers</span>()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">schemas</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">SqlDatabaseSchema</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">schemas</span>
+    <span class="kw">fn</span> <span class="ident">previous_extensions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ExtensionWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">conn_data</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schemas</span>.<span class="ident">previous</span>.<span class="ident">describer_schema</span>.<span class="ident">downcast_connector_data</span>();
+        <span class="ident">conn_data</span>.<span class="ident">extension_walkers</span>()
     }
+
+    <span class="kw">fn</span> <span class="ident">next_extensions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ExtensionWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">conn_data</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schemas</span>.<span class="ident">next</span>.<span class="ident">describer_schema</span>.<span class="ident">downcast_connector_data</span>();
+        <span class="ident">conn_data</span>.<span class="ident">extension_walkers</span>()
+    }
+}
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">extensions_match</span>(<span class="ident">previous</span>: <span class="ident">ExtensionWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">next</span>: <span class="ident">ExtensionWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">let</span> <span class="ident">names_match</span> <span class="op">=</span> <span class="ident">previous</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">next</span>.<span class="ident">name</span>();
+
+    <span class="kw">let</span> <span class="ident">versions_match</span> <span class="op">=</span>
+        <span class="ident">previous</span>.<span class="ident">version</span>() <span class="op">==</span> <span class="ident">next</span>.<span class="ident">version</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">previous</span>.<span class="ident">version</span>().<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">next</span>.<span class="ident">version</span>().<span class="ident">is_empty</span>();
+
+    <span class="kw">let</span> <span class="ident">schemas_match</span> <span class="op">=</span> <span class="ident">previous</span>.<span class="ident">schema</span>() <span class="op">==</span> <span class="ident">next</span>.<span class="ident">schema</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">previous</span>.<span class="ident">schema</span>().<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">next</span>.<span class="ident">schema</span>().<span class="ident">is_empty</span>();
+
+    <span class="ident">names_match</span> <span class="op">&amp;&amp;</span> <span class="ident">versions_match</span> <span class="op">&amp;&amp;</span> <span class="ident">schemas_match</span>
 }
 
 <span class="kw">fn</span> <span class="ident">enums_match</span>(<span class="ident">previous</span>: <span class="kw-2">&amp;</span><span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">next</span>: <span class="kw-2">&amp;</span><span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {

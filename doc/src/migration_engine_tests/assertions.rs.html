@@ -847,6 +847,48 @@
 <span id="847">847</span>
 <span id="848">848</span>
 <span id="849">849</span>
+<span id="850">850</span>
+<span id="851">851</span>
+<span id="852">852</span>
+<span id="853">853</span>
+<span id="854">854</span>
+<span id="855">855</span>
+<span id="856">856</span>
+<span id="857">857</span>
+<span id="858">858</span>
+<span id="859">859</span>
+<span id="860">860</span>
+<span id="861">861</span>
+<span id="862">862</span>
+<span id="863">863</span>
+<span id="864">864</span>
+<span id="865">865</span>
+<span id="866">866</span>
+<span id="867">867</span>
+<span id="868">868</span>
+<span id="869">869</span>
+<span id="870">870</span>
+<span id="871">871</span>
+<span id="872">872</span>
+<span id="873">873</span>
+<span id="874">874</span>
+<span id="875">875</span>
+<span id="876">876</span>
+<span id="877">877</span>
+<span id="878">878</span>
+<span id="879">879</span>
+<span id="880">880</span>
+<span id="881">881</span>
+<span id="882">882</span>
+<span id="883">883</span>
+<span id="884">884</span>
+<span id="885">885</span>
+<span id="886">886</span>
+<span id="887">887</span>
+<span id="888">888</span>
+<span id="889">889</span>
+<span id="890">890</span>
+<span id="891">891</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">migration_assertions</span>;
 <span class="kw">mod</span> <span class="ident">quaint_result_set_ext</span>;
 
@@ -857,7 +899,7 @@
 <span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
 <span class="kw">use</span> <span class="ident">psl::datamodel_connector::Connector</span>;
 <span class="kw">use</span> <span class="ident">sql</span>::{
-    <span class="ident">postgres::PostgresSchemaExt</span>,
+    <span class="ident">postgres</span>::{<span class="ident">ExtensionWalker</span>, <span class="ident">PostgresSchemaExt</span>},
     <span class="ident">walkers</span>::{<span class="ident">ColumnWalker</span>, <span class="ident">ForeignKeyWalker</span>, <span class="ident">IndexWalker</span>, <span class="ident">TableWalker</span>},
 };
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
@@ -903,6 +945,21 @@
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">table</span><span class="op">|</span> <span class="ident">table</span>.<span class="ident">name</span>())
                     .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
             ),
+        }
+    }
+
+    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_has_extension</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">PostgresExtensionAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">tags</span>.<span class="ident">contains</span>(<span class="ident">Tags::Postgres</span>) {
+            <span class="kw">let</span> <span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
+
+            <span class="kw">let</span> <span class="ident">extension</span> <span class="op">=</span> <span class="ident">ext</span>
+                .<span class="ident">extension_walker</span>(<span class="ident">name</span>)
+                .<span class="ident">expect</span>(<span class="string">&quot;Could not find extension with name {name}&quot;</span>);
+
+            <span class="ident">PostgresExtensionAssertion</span> { <span class="ident">extension</span> }
+        } <span class="kw">else</span> {
+            <span class="macro">panic!</span>(<span class="string">&quot;PostgreSQL extensions are only allowed on PostgreSQL.&quot;</span>)
         }
     }
 
@@ -1692,6 +1749,33 @@
             <span class="ident">length</span>: <span class="ident">col</span>.<span class="ident">length</span>(),
             <span class="ident">operator_class</span>,
         });
+
+        <span class="self">self</span>
+    }
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PostgresExtensionAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="ident">extension</span>: <span class="ident">ExtensionWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">PostgresExtensionAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_schema</span>(<span class="self">self</span>, <span class="ident">expected_schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
+        <span class="macro">assert_eq!</span>(
+            <span class="self">self</span>.<span class="ident">extension</span>.<span class="ident">schema</span>(), <span class="ident">expected_schema</span>,
+            <span class="string">&quot;Assertion failed. Expected the extension to be in the {expected_schema} schema, but was in {} schema instead.&quot;</span>,
+            <span class="self">self</span>.<span class="ident">extension</span>.<span class="ident">schema</span>()
+        );
+
+        <span class="self">self</span>
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_version</span>(<span class="self">self</span>, <span class="ident">expected_version</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
+        <span class="macro">assert_eq!</span>(
+            <span class="self">self</span>.<span class="ident">extension</span>.<span class="ident">version</span>(), <span class="ident">expected_version</span>,
+            <span class="string">&quot;Assertion failed. Expected the extension to be of version {expected_version}, but was of version {} instead.&quot;</span>,
+            <span class="self">self</span>.<span class="ident">extension</span>.<span class="ident">version</span>()
+        );
 
         <span class="self">self</span>
     }

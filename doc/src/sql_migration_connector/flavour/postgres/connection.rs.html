@@ -166,15 +166,25 @@
 <span id="166">166</span>
 <span id="167">167</span>
 <span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
 </pre><pre class="rust"><code><span class="doccomment">//! All the quaint-wrangling for the postgres connector should happen here.</span>
 
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ConnectorResult</span>};
+<span class="kw">use</span> <span class="ident">psl::PreviewFeature</span>;
 <span class="kw">use</span> <span class="ident">quaint</span>::{
     <span class="ident">connector</span>::{<span class="self">self</span>, <span class="ident">tokio_postgres::error::ErrorPosition</span>, <span class="ident">PostgresUrl</span>},
     <span class="ident">prelude</span>::{<span class="ident">ConnectionInfo</span>, <span class="ident">Queryable</span>},
 };
-<span class="kw">use</span> <span class="ident">sql_schema_describer::SqlSchema</span>;
+<span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="ident">postgres::PostgresSchemaExt</span>, <span class="ident">SqlSchema</span>};
 <span class="kw">use</span> <span class="ident">user_facing_errors</span>::{<span class="ident">introspection_engine::DatabaseSchemaInconsistent</span>, <span class="ident">migration_engine::ApplyMigrationError</span>};
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sql_renderer::IteratorJoin</span>;
@@ -221,6 +231,7 @@
             })<span class="question-mark">?</span>;
 
         <span class="ident"><span class="kw">crate</span>::flavour::normalize_sql_schema</span>(<span class="kw-2">&amp;mut</span> <span class="ident">schema</span>, <span class="ident">params</span>.<span class="ident">connector_params</span>.<span class="ident">preview_features</span>);
+        <span class="ident">normalize_sql_schema</span>(<span class="kw-2">&amp;mut</span> <span class="ident">schema</span>, <span class="ident">params</span>.<span class="ident">connector_params</span>.<span class="ident">preview_features</span>);
 
         <span class="prelude-val">Ok</span>(<span class="ident">schema</span>)
     }
@@ -328,6 +339,13 @@
                 }))
             }
         }
+    }
+}
+
+<span class="kw">fn</span> <span class="ident">normalize_sql_schema</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;mut</span> <span class="ident">SqlSchema</span>, <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>) {
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::PostgresqlExtensions</span>) {
+        <span class="kw">let</span> <span class="ident">pg_ext</span>: <span class="kw-2">&amp;mut</span> <span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="ident">schema</span>.<span class="ident">downcast_connector_data_mut</span>();
+        <span class="ident">pg_ext</span>.<span class="ident">clear_extensions</span>();
     }
 }
 

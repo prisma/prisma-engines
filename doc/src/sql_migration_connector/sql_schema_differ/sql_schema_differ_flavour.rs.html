@@ -162,6 +162,12 @@
 <span id="162">162</span>
 <span id="163">163</span>
 <span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">differ_database::DifferDatabase</span>, <span class="ident">ColumnTypeChange</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">pair::Pair</span>, <span class="ident">sql_migration::SqlMigrationStep</span>, <span class="ident">sql_schema_differ</span>};
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
@@ -219,6 +225,12 @@
 
     <span class="doccomment">/// Push AlterSequence steps.</span>
     <span class="kw">fn</span> <span class="ident">push_alter_sequence_steps</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_steps</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SqlMigrationStep</span><span class="op">&gt;</span>, <span class="ident">_db</span>: <span class="kw-2">&amp;</span><span class="ident">DifferDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {}
+
+    <span class="doccomment">/// Push AlterExtension steps.</span>
+    <span class="kw">fn</span> <span class="ident">push_extension_steps</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_steps</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SqlMigrationStep</span><span class="op">&gt;</span>, <span class="ident">_db</span>: <span class="kw-2">&amp;</span><span class="ident">DifferDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {}
+
+    <span class="doccomment">/// Define database-specific extension modules.</span>
+    <span class="kw">fn</span> <span class="ident">define_extensions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_db</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DifferDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {}
 
     <span class="doccomment">/// Connector-specific criterias deciding whether two indexes match.</span>
     <span class="kw">fn</span> <span class="ident">indexes_match</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_a</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">_b</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
