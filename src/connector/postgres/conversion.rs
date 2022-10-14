@@ -24,12 +24,12 @@ use tokio_postgres::{
 #[cfg(feature = "uuid")]
 use uuid::Uuid;
 
-pub fn conv_params<'a>(params: &'a [Value<'a>]) -> Vec<&'a (dyn types::ToSql + Sync)> {
+pub(crate) fn conv_params<'a>(params: &'a [Value<'a>]) -> Vec<&'a (dyn types::ToSql + Sync)> {
     params.iter().map(|x| x as &(dyn ToSql + Sync)).collect::<Vec<_>>()
 }
 
 /// Maps a list of query parameter values to a list of Postgres type.
-pub fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
+pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
     params
         .iter()
         .map(|p| -> PostgresType {
@@ -688,6 +688,7 @@ impl<'a> ToSql for Value<'a> {
                     for value in values.iter() {
                         let float = match value {
                             Value::Numeric(n) => n.as_ref().and_then(|n| n.to_string().parse::<f32>().ok()),
+                            Value::Int64(n) => n.map(|n| n as f32),
                             Value::Float(f) => *f,
                             Value::Double(d) => d.map(|d| d as f32),
                             v if v.is_null() => None,
@@ -713,6 +714,7 @@ impl<'a> ToSql for Value<'a> {
                     for value in values.iter() {
                         let float = match value {
                             Value::Numeric(n) => n.as_ref().and_then(|n| n.to_string().parse::<f64>().ok()),
+                            Value::Int64(n) => n.map(|n| n as f64),
                             Value::Float(f) => f.map(|f| f as f64),
                             Value::Double(d) => *d,
                             v if v.is_null() => None,
