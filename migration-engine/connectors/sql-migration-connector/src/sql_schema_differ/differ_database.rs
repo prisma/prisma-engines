@@ -1,6 +1,7 @@
 use super::{column, enums::EnumDiffer, table::TableDiffer};
 use crate::{flavour::SqlFlavour, pair::Pair, SqlDatabaseSchema};
 use sql_schema_describer::{
+    postgres::{ExtensionId, ExtensionWalker, PostgresSchemaExt},
     walkers::{ColumnWalker, EnumWalker, TableWalker},
     ColumnId, NamespaceId, NamespaceWalker, TableId,
 };
@@ -13,7 +14,7 @@ use std::{
 pub(crate) struct DifferDatabase<'a> {
     pub(super) flavour: &'a dyn SqlFlavour,
     /// The schemas being diffed
-    schemas: Pair<&'a SqlDatabaseSchema>,
+    pub(crate) schemas: Pair<&'a SqlDatabaseSchema>,
     /// Namespace name -> namespace indexes.
     namespaces: HashMap<Cow<'a, str>, Pair<Option<NamespaceId>>>,
     /// Table name -> table indexes.
@@ -23,6 +24,8 @@ pub(crate) struct DifferDatabase<'a> {
     columns: BTreeMap<(Pair<TableId>, &'a str), Pair<Option<ColumnId>>>,
     /// (table_idx, column_idx) -> ColumnChanges
     column_changes: HashMap<Pair<ColumnId>, column::ColumnChanges>,
+    /// Postgres extension name -> extension indexes.
+    pub(super) extensions: HashMap<&'a str, Pair<Option<ExtensionId>>>,
     /// Tables that will need to be completely redefined (dropped and recreated) for the migration
     /// to succeed. It needs to be crate public because it is set from the flavour.
     pub(crate) tables_to_redefine: BTreeSet<Pair<TableId>>,
@@ -46,6 +49,7 @@ impl<'a> DifferDatabase<'a> {
             tables: HashMap::with_capacity(table_count_lb),
             columns: BTreeMap::new(),
             column_changes: Default::default(),
+            extensions: Default::default(),
             tables_to_redefine: Default::default(),
         };
 
@@ -139,6 +143,7 @@ impl<'a> DifferDatabase<'a> {
         }
 
         flavour.set_tables_to_redefine(&mut db);
+        flavour.define_extensions(&mut db);
 
         db
     }
@@ -249,6 +254,42 @@ impl<'a> DifferDatabase<'a> {
             .filter(move |previous| !self.next_enums().any(|next| enums_match(previous, &next)))
     }
 
+    /// Extensions not present in the previous schema.
+    pub(crate) fn created_extensions(&self) -> impl Iterator<Item = ExtensionId> + '_ {
+        self.extensions
+            .values()
+            .filter(|pair| pair.previous.is_none())
+            .filter_map(|pair| pair.next)
+    }
+
+    /// Non-relocatable extensions present in both schemas with changed values.
+    pub(crate) fn non_relocatable_extension_pairs<'db>(
+        &'db self,
+    ) -> impl Iterator<Item = Pair<ExtensionWalker<'a>>> + 'db {
+        self.previous_extensions().filter_map(move |previous| {
+            self.next_extensions()
+                .find(|next| {
+                    previous.name() == next.name()
+                        && !extensions_match(previous, *next)
+                        && (!previous.relocatable() && !next.relocatable())
+                })
+                .map(|next| Pair::new(previous, next))
+        })
+    }
+
+    /// Relocatable extensions present in both schemas with changed values.
+    pub(crate) fn relocatable_extension_pairs<'db>(&'db self) -> impl Iterator<Item = Pair<ExtensionWalker<'a>>> + 'db {
+        self.previous_extensions().filter_map(move |previous| {
+            self.next_extensions()
+                .find(|next| {
+                    previous.name() == next.name()
+                        && !extensions_match(previous, *next)
+                        && (previous.relocatable() || next.relocatable())
+                })
+                .map(|next| Pair::new(previous, next))
+        })
+    }
+
     fn previous_enums(&self) -> impl Iterator<Item = EnumWalker<'a>> {
         self.schemas.previous.describer_schema.enum_walkers()
     }
@@ -257,9 +298,26 @@ impl<'a> DifferDatabase<'a> {
         self.schemas.next.describer_schema.enum_walkers()
     }
 
-    pub(crate) fn schemas(&self) -> Pair<&'a SqlDatabaseSchema> {
-        self.schemas
+    fn previous_extensions(&self) -> impl Iterator<Item = ExtensionWalker<'a>> {
+        let conn_data: &PostgresSchemaExt = self.schemas.previous.describer_schema.downcast_connector_data();
+        conn_data.extension_walkers()
     }
+
+    fn next_extensions(&self) -> impl Iterator<Item = ExtensionWalker<'a>> {
+        let conn_data: &PostgresSchemaExt = self.schemas.next.describer_schema.downcast_connector_data();
+        conn_data.extension_walkers()
+    }
+}
+
+pub(crate) fn extensions_match(previous: ExtensionWalker<'_>, next: ExtensionWalker<'_>) -> bool {
+    let names_match = previous.name() == next.name();
+
+    let versions_match =
+        previous.version() == next.version() || previous.version().is_empty() || next.version().is_empty();
+
+    let schemas_match = previous.schema() == next.schema() || previous.schema().is_empty() || next.schema().is_empty();
+
+    names_match && versions_match && schemas_match
 }
 
 fn enums_match(previous: &EnumWalker<'_>, next: &EnumWalker<'_>) -> bool {

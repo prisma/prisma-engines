@@ -88,6 +88,12 @@ impl SqlSchema {
         self.connector_data.data.as_ref().unwrap().downcast_ref().unwrap()
     }
 
+    /// Extract connector-specific constructs mutably. The type parameter must be the right one.
+    #[track_caller]
+    pub fn downcast_connector_data_mut<T: 'static>(&mut self) -> &mut T {
+        self.connector_data.data.as_mut().unwrap().downcast_mut().unwrap()
+    }
+
     /// Remove all namespaces from the schema.
     pub fn clear_namespaces(&mut self) {
         self.namespaces.clear();

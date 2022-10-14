@@ -2,11 +2,12 @@
 
 use enumflags2::BitFlags;
 use migration_connector::{ConnectorError, ConnectorResult};
+use psl::PreviewFeature;
 use quaint::{
     connector::{self, tokio_postgres::error::ErrorPosition, PostgresUrl},
     prelude::{ConnectionInfo, Queryable},
 };
-use sql_schema_describer::SqlSchema;
+use sql_schema_describer::{postgres::PostgresSchemaExt, SqlSchema};
 use user_facing_errors::{introspection_engine::DatabaseSchemaInconsistent, migration_engine::ApplyMigrationError};
 
 use crate::sql_renderer::IteratorJoin;
@@ -53,6 +54,7 @@ impl Connection {
             })?;
 
         crate::flavour::normalize_sql_schema(&mut schema, params.connector_params.preview_features);
+        normalize_sql_schema(&mut schema, params.connector_params.preview_features);
 
         Ok(schema)
     }
@@ -160,6 +162,13 @@ impl Connection {
                 }))
             }
         }
+    }
+}
+
+fn normalize_sql_schema(schema: &mut SqlSchema, preview_features: BitFlags<PreviewFeature>) {
+    if !preview_features.contains(PreviewFeature::PostgresqlExtensions) {
+        let pg_ext: &mut PostgresSchemaExt = schema.downcast_connector_data_mut();
+        pg_ext.clear_extensions();
     }
 }
 

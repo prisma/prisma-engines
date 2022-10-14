@@ -2,10 +2,10 @@ use super::PostgresSchemaExt;
 
 #[derive(Debug, Clone)]
 pub struct DatabaseExtension {
-    pub(crate) name: String,
-    pub(crate) schema: String,
-    pub(crate) version: String,
-    pub(crate) relocatable: bool,
+    pub name: String,
+    pub schema: String,
+    pub version: String,
+    pub relocatable: bool,
 }
 
 /// The identifier for an extension in a Postgres database.
@@ -15,7 +15,7 @@ pub struct ExtensionId(pub(crate) u32);
 /// Traverse an extension
 #[derive(Clone, Copy)]
 pub struct ExtensionWalker<'a> {
-    pub(super) id: ExtensionId,
+    pub id: ExtensionId,
     pub(super) schema_ext: &'a PostgresSchemaExt,
 }
 
