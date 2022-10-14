@@ -113,14 +113,14 @@ pub(crate) trait SqlRenderer {
     }
 
     fn render_create_extension(&self, _create: &CreateExtension, _schema: &SqlSchema) -> Vec<String> {
-        Default::default()
+        unreachable!("render_create_extension")
     }
 
     fn render_alter_extension(&self, _alter: &AlterExtension, _schemas: Pair<&SqlSchema>) -> Vec<String> {
-        Default::default()
+        unreachable!("render_alter_extension")
     }
 
     fn render_drop_extension(&self, _drop: &DropExtension, _schema: &SqlSchema) -> Vec<String> {
-        Default::default()
+        unreachable!("render_drop_extension")
     }
 }
