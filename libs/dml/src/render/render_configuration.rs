@@ -41,7 +41,7 @@ fn render_datasource(datasource: &Datasource, out: &mut String) -> fmt::Result {
         let mut namespaces = datasource.namespaces.iter().peekable();
         out.push_str("schemas = [");
         while let Some((namespace, _)) = namespaces.next() {
-            write!(out, "{}", string_literal(&namespace))?;
+            write!(out, "{}", string_literal(namespace))?;
             if namespaces.peek().is_some() {
                 out.push(',');
             }
