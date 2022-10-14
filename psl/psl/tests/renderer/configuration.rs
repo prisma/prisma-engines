@@ -23,3 +23,31 @@ fn shadow_database_url_round_trips() {
 
     assert_eq!(schema_str, rendered);
 }
+
+#[test]
+fn schemas_property_round_trips() {
+    let schema_str = indoc!(
+        r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["multiSchema"]
+        }
+        
+        datasource myds {
+          provider = "postgresql"
+          url      = "postgres://"
+          schemas  = ["bar", "foo"]
+        }
+
+        model Cat {
+          id   Int    @id
+          name String
+        }
+        "#
+    );
+
+    let schema = psl::parse_schema(schema_str).unwrap();
+    let rendered = render_datamodel_and_config_to_string(&psl::lift(&schema), &schema.configuration);
+
+    assert_eq!(schema_str, rendered);
+}
