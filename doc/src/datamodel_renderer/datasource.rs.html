@@ -136,11 +136,20 @@
 <span id="136">136</span>
 <span id="137">137</span>
 <span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::fmt</span>;
+<span class="kw">use</span> <span class="ident">std::default::Default</span>;
 
 <span class="kw">use</span> <span class="ident">psl::datamodel_connector::RelationMode</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Commented</span>, <span class="ident">Env</span>, <span class="ident">Text</span>, <span class="ident">Value</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Array</span>, <span class="ident">Commented</span>, <span class="ident">Env</span>, <span class="ident">Text</span>, <span class="ident">Value</span>};
 
 <span class="doccomment">/// The datasource block in a PSL file.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -152,6 +161,7 @@
     <span class="ident">relation_mode</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RelationMode</span><span class="op">&gt;</span>,
     <span class="ident">custom_properties</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
     <span class="ident">documentation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Commented</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">namespaces</span>: <span class="ident">Array</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Datasource</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
@@ -165,6 +175,7 @@
             <span class="ident">relation_mode</span>: <span class="prelude-val">None</span>,
             <span class="ident">custom_properties</span>: <span class="ident">Default::default</span>(),
             <span class="ident">documentation</span>: <span class="prelude-val">None</span>,
+            <span class="ident">namespaces</span>: <span class="ident">Array::default</span>(),
         }
     }
 
@@ -201,6 +212,7 @@
             <span class="ident">relation_mode</span>: <span class="ident">psl_ds</span>.<span class="ident">relation_mode</span>,
             <span class="ident">documentation</span>: <span class="ident">psl_ds</span>.<span class="ident">documentation</span>.<span class="ident">as_deref</span>().<span class="ident">map</span>(<span class="ident">Commented::Documentation</span>),
             <span class="ident">custom_properties</span>: <span class="ident">Default::default</span>(),
+            <span class="ident">namespaces</span>: <span class="ident">Array</span>(<span class="ident">psl_ds</span>.<span class="ident">namespaces</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">ns</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">Text</span>(<span class="ident">ns</span>).<span class="ident">into</span>()).<span class="ident">collect</span>()),
         }
     }
 }
@@ -225,6 +237,10 @@
 
         <span class="kw">for</span> (<span class="ident">key</span>, <span class="ident">value</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">custom_properties</span>.<span class="ident">iter</span>() {
             <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;{key} = {value}&quot;</span>)<span class="question-mark">?</span>;
+        }
+
+        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">namespaces</span>.<span class="ident">is_empty</span>() {
+            <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;schemas = {}&quot;</span>, <span class="self">self</span>.<span class="ident">namespaces</span>)<span class="question-mark">?</span>;
         }
 
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;}\n&quot;</span>)<span class="question-mark">?</span>;
