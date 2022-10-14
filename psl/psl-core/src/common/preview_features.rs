@@ -68,7 +68,8 @@ features!(
     FilteredRelationCount,
     FieldReference,
     PostgresqlExtensions,
-    ClientExtensions
+    ClientExtensions,
+    Deno
 );
 
 /// Generator preview features
@@ -84,6 +85,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
          | FilteredRelationCount
          | FieldReference
          | PostgresqlExtensions
+         | Deno
     }),
     deprecated: enumflags2::make_bitflags!(PreviewFeature::{
         AtomicNumberOperations
