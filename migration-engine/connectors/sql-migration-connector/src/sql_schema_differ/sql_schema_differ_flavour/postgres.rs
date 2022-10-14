@@ -100,7 +100,7 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
         }
 
         let schemas: Pair<(&SqlDatabaseSchema, &PostgresSchemaExt)> = db
-            .schemas()
+            .schemas
             .map(|schema| (schema, schema.describer_schema.downcast_connector_data()));
 
         let sequence_pairs = db
@@ -271,7 +271,7 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
 
     fn define_extensions(&self, db: &mut DifferDatabase<'_>) {
         let schemas: Pair<(&SqlDatabaseSchema, &PostgresSchemaExt)> = db
-            .schemas()
+            .schemas
             .map(|schema| (schema, schema.describer_schema.downcast_connector_data()));
 
         for extension in schemas.previous.1.extension_walkers() {
@@ -670,7 +670,7 @@ fn postgres_native_type_change_riskyness(previous: PostgresType, next: PostgresT
 fn push_alter_enum_previous_usages_as_default(db: &DifferDatabase<'_>, alter_enum: &mut AlterEnum) {
     let mut previous_usages_as_default: Vec<(_, Option<_>)> = Vec::new();
 
-    let enum_names = db.schemas().walk(alter_enum.id).map(|enm| enm.name());
+    let enum_names = db.schemas.walk(alter_enum.id).map(|enm| enm.name());
 
     for table in db.dropped_tables() {
         for column in table

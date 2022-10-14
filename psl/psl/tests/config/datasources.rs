@@ -195,7 +195,7 @@ fn postgresql_extension_parsing() {
 
     assert!(properties.extensions().is_some());
 
-    let mut extensions = properties.extensions().unwrap().extensions().into_iter();
+    let mut extensions = properties.extensions().unwrap().extensions().iter();
 
     let meow = extensions.next().unwrap();
     assert_eq!("meow", meow.name());

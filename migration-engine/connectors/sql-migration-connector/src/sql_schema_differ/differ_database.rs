@@ -14,7 +14,7 @@ use std::{
 pub(crate) struct DifferDatabase<'a> {
     pub(super) flavour: &'a dyn SqlFlavour,
     /// The schemas being diffed
-    schemas: Pair<&'a SqlDatabaseSchema>,
+    pub(crate) schemas: Pair<&'a SqlDatabaseSchema>,
     /// Namespace name -> namespace indexes.
     namespaces: HashMap<Cow<'a, str>, Pair<Option<NamespaceId>>>,
     /// Table name -> table indexes.
@@ -254,15 +254,12 @@ impl<'a> DifferDatabase<'a> {
             .filter(move |previous| !self.next_enums().any(|next| enums_match(previous, &next)))
     }
 
-    pub(crate) fn schemas(&self) -> Pair<&'a SqlDatabaseSchema> {
-        self.schemas
-    }
-
     /// Extensions not present in the previous schema.
     pub(crate) fn created_extensions(&self) -> impl Iterator<Item = ExtensionId> + '_ {
-        self.next_extensions()
-            .filter(move |next| !self.previous_extensions().any(|prev| next.name() == prev.name()))
-            .map(|w| w.id)
+        self.extensions
+            .values()
+            .filter(|pair| pair.previous.is_none())
+            .filter_map(|pair| pair.next)
     }
 
     /// Non-relocatable extensions present in both schemas with changed values.

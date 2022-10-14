@@ -522,11 +522,7 @@ fn push_foreign_key_pair_changes(
 }
 
 fn next_column_has_virtual_default(column_id: ColumnId, db: &DifferDatabase<'_>) -> bool {
-    db.schemas()
-        .next
-        .prisma_level_defaults
-        .binary_search(&column_id)
-        .is_ok()
+    db.schemas.next.prisma_level_defaults.binary_search(&column_id).is_ok()
 }
 
 fn is_prisma_implicit_m2m_fk(fk: ForeignKeyWalker<'_>) -> bool {
