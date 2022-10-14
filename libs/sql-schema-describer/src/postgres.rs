@@ -11,7 +11,6 @@ pub use extensions::{DatabaseExtension, ExtensionId, ExtensionWalker};
 use indexmap::IndexMap;
 use indoc::indoc;
 use native_types::{CockroachType, NativeType, PostgresType};
-use quaint::Value::Array;
 use quaint::{connector::ResultRow, prelude::Queryable};
 use regex::Regex;
 use std::{any::type_name, collections::BTreeMap, convert::TryInto};
@@ -427,7 +426,7 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
 
     async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata> {
         let mut sql_schema = SqlSchema::default();
-        sql_schema.push_namespace((*schema).into());
+        let id = sql_schema.push_namespace((*schema).into());
 
         let table_count = self.get_table_names(&mut sql_schema).await?.len();
         let size_in_bytes = self.get_size(schema).await?;
@@ -439,39 +438,10 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
     }
 
     async fn describe(&self, schemas: &[&str]) -> DescriberResult<SqlSchema> {
-        let mut sql_schema = SqlSchema::default();
-        let mut pg_ext = PostgresSchemaExt::default();
-
-        for schema in schemas {
-            sql_schema.push_namespace((*schema).into());
-        }
-
-        //TODO(matthias) can we get rid of the table names map and instead just use tablewalker_ns everywhere like in get_columns?
-        let table_names = self.get_table_names(&mut sql_schema).await?;
-
-        self.get_enums(&mut sql_schema).await?;
-        self.get_columns(&mut sql_schema).await?;
-        self.get_foreign_keys(&table_names, &mut sql_schema).await?;
-        self.get_indices(&table_names, &mut pg_ext, &mut sql_schema).await?;
-
-        self.get_views(&mut sql_schema).await?;
-        self.get_procedures(&mut sql_schema).await?;
-        self.get_extensions(&mut pg_ext).await?;
-
-        //Todo(matthias) understand this
-        self.get_sequences(&sql_schema, &mut pg_ext).await?;
-        // Make sure the vectors we use binary search on are sorted.
-        pg_ext.indexes.sort_by_key(|(id, _)| *id);
-        pg_ext.opclasses.sort_by_key(|(id, _)| *id);
-
-        sql_schema.connector_data = connector_data::ConnectorData {
-            data: Some(Box::new(pg_ext)),
-        };
-
-        Ok(sql_schema)
+        self.describe_impl(Some(schemas)).await
     }
 
-    async fn version(&self) -> crate::DescriberResult<Option<String>> {
+    async fn version(&self) -> DescriberResult<Option<String>> {
         Ok(self.conn.version().await?)
     }
 }
@@ -519,6 +489,54 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(())
     }
 
+    pub async fn describe_all_schemas(&self) -> DescriberResult<SqlSchema> {
+        self.describe_impl(None).await
+    }
+
+    async fn describe_impl(&self, schemas: Option<&[&str]>) -> DescriberResult<SqlSchema> {
+        let mut sql_schema = SqlSchema::default();
+        let mut pg_ext = PostgresSchemaExt::default();
+
+        sql_schema.namespaces = fetch_namespaces(self.conn).await?;
+        let namespace_params = namespace_params(&sql_schema, schemas)?;
+
+        if let Some(schemas) = schemas {
+            let mut inspected_namespaces = Vec::with_capacity(schemas.len());
+            for schema in schemas {
+                match sql_schema.get_namespace_id(schema) {
+                    Some(namespace_id) => {
+                        inspected_namespaces.push(namespace_id);
+                    }
+                    None => {
+                        return Err(DescriberError::new_schema_does_not_exist((*schema).to_owned()));
+                    }
+                }
+            }
+        }
+
+        let table_names = self.get_table_names(&mut sql_schema).await?;
+
+        self.get_enums(&mut sql_schema).await?;
+        self.get_columns(&mut sql_schema).await?;
+        self.get_foreign_keys(&table_names, &mut sql_schema).await?;
+        self.get_indices(&table_names, &mut pg_ext, &mut sql_schema).await?;
+
+        self.get_views(&mut sql_schema).await?;
+        self.get_procedures(&mut sql_schema).await?;
+        self.get_extensions(&mut pg_ext).await?;
+
+        self.get_sequences(&sql_schema, &mut pg_ext).await?;
+        // Make sure the vectors we use binary search on are sorted.
+        pg_ext.indexes.sort_by_key(|(id, _)| *id);
+        pg_ext.opclasses.sort_by_key(|(id, _)| *id);
+
+        sql_schema.connector_data = connector_data::ConnectorData {
+            data: Some(Box::new(pg_ext)),
+        };
+
+        Ok(sql_schema)
+    }
+
     async fn get_databases(&self) -> DescriberResult<Vec<String>> {
         let sql = "select schema_name from information_schema.schemata;";
         let rows = self.conn.query_raw(sql, &[]).await?;
@@ -533,8 +551,6 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 
     async fn get_procedures(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
-        let namespaces = &sql_schema.namespaces;
-
         if self.is_cockroach() {
             return Ok(());
         }
@@ -550,18 +566,14 @@ impl<'a> SqlSchemaDescriber<'a> {
             WHERE n.nspname = ANY ( $1 )
         "#;
 
-        let rows = self
-            .conn
-            .query_raw(
-                sql,
-                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
-            )
-            .await?;
+        let rows = self.conn.query_raw(sql, &[namespace_params(sql_schema)]).await?;
         let mut procedures = Vec::with_capacity(rows.len());
 
         for row in rows.into_iter() {
             procedures.push(Procedure {
-                namespace_id: sql_schema.get_namespace_id(&row.get_expect_string("namespace")),
+                namespace_id: sql_schema
+                    .get_namespace_id(&row.get_expect_string("namespace"))
+                    .unwrap(),
                 name: row.get_expect_string("name"),
                 definition: row.get_string("definition"),
             });
@@ -577,15 +589,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         sql_schema: &mut SqlSchema,
     ) -> DescriberResult<IndexMap<(String, String), TableId>> {
         let sql = include_str!("postgres/tables_query.sql");
-        let namespaces = &sql_schema.namespaces;
-
-        let rows = self
-            .conn
-            .query_raw(
-                sql,
-                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
-            )
-            .await?;
+        let rows = self.conn.query_raw(sql, &[namespace_params(sql_schema)]).await?;
         let names = rows
             .into_iter()
             .map(|row| (row.get_expect_string("table_name"), row.get_expect_string("namespace")));
@@ -593,7 +597,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for (table_name, namespace) in names {
             let cloned_name = table_name.clone();
-            let id = sql_schema.push_table(table_name, sql_schema.get_namespace_id(&namespace));
+            let id = sql_schema.push_table(table_name, sql_schema.get_namespace_id(&namespace).unwrap());
             map.insert((namespace, cloned_name), id);
         }
 
@@ -618,25 +622,20 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 
     async fn get_views(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
-        let namespaces = &sql_schema.namespaces;
         let sql = indoc! {r#"
             SELECT viewname AS view_name, definition AS view_sql, schemaname as namespace
             FROM pg_catalog.pg_views
             WHERE schemaname = ANY ( $1 )
         "#};
 
-        let result_set = self
-            .conn
-            .query_raw(
-                sql,
-                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
-            )
-            .await?;
+        let result_set = self.conn.query_raw(sql, &[namespace_params(sql_schema)]).await?;
         let mut views = Vec::with_capacity(result_set.len());
 
         for row in result_set.into_iter() {
             views.push(View {
-                namespace_id: sql_schema.get_namespace_id(&row.get_expect_string("namespace")),
+                namespace_id: sql_schema
+                    .get_namespace_id(&row.get_expect_string("namespace"))
+                    .unwrap(),
                 name: row.get_expect_string("view_name"),
                 definition: row.get_string("view_sql"),
             })
@@ -647,8 +646,6 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 
     async fn get_columns(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
-        let namespaces = &sql_schema.namespaces;
-
         let is_visible_clause = if self.is_cockroach() {
             " AND info.is_hidden = 'NO'"
         } else {
@@ -689,13 +686,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             is_visible_clause,
         );
 
-        let rows = self
-            .conn
-            .query_raw(
-                sql.as_str(),
-                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
-            )
-            .await?;
+        let rows = self.conn.query_raw(&sql, &[namespace_params(sql_schema)]).await?;
 
         for col in rows {
             let namespace = col.get_expect_string("namespace");
@@ -820,8 +811,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         table_ids: &IndexMap<(String, String), TableId>,
         sql_schema: &mut SqlSchema,
     ) -> DescriberResult<()> {
-        let namespaces = &sql_schema.namespaces;
-
         // The `generate_subscripts` in the inner select is needed because the optimizer is free to reorganize the unnested rows if not explicitly ordered.
         let sql = r#"
             SELECT
@@ -889,13 +878,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         // One foreign key with multiple columns will be represented here as several
         // rows with the same ID.
-        let result_set = self
-            .conn
-            .query_raw(
-                sql,
-                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
-            )
-            .await?;
+        let result_set = self.conn.query_raw(sql, &[namespace_params(sql_schema)]).await?;
 
         for row in result_set.into_iter() {
             trace!("Got description FK row {:?}", row);
@@ -982,15 +965,8 @@ impl<'a> SqlSchemaDescriber<'a> {
         pg_ext: &mut PostgresSchemaExt,
         sql_schema: &mut SqlSchema,
     ) -> DescriberResult<()> {
-        let namespaces = &sql_schema.namespaces;
         let sql = include_str!("postgres/indexes_query.sql");
-        let rows = self
-            .conn
-            .query_raw(
-                sql,
-                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
-            )
-            .await?;
+        let rows = self.conn.query_raw(sql, &[namespace_params(sql_schema)]).await?;
         let mut current_index: Option<IndexId> = None;
 
         for row in rows {
@@ -1085,7 +1061,6 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 
     async fn get_sequences(&self, sql_schema: &SqlSchema, postgres_ext: &mut PostgresSchemaExt) -> DescriberResult<()> {
-        let namespaces = &sql_schema.namespaces;
         // On postgres 9, pg_sequences does not exist, and the information schema view does not
         // contain the cache size.
         let sql = if self.is_cockroach() {
@@ -1120,15 +1095,11 @@ impl<'a> SqlSchemaDescriber<'a> {
             "#
         };
 
-        let rows = self
-            .conn
-            .query_raw(
-                sql,
-                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
-            )
-            .await?;
+        let rows = self.conn.query_raw(sql, &[namespace_params(sql_schema)]).await?;
         let sequences = rows.into_iter().map(|seq| Sequence {
-            namespace_id: sql_schema.get_namespace_id(&seq.get_expect_string("namespace")),
+            namespace_id: sql_schema
+                .get_namespace_id(&seq.get_expect_string("namespace"))
+                .unwrap(),
             name: seq.get_expect_string("sequence_name"),
             start_value: seq.get_expect_i64("start_value"),
             min_value: seq.get_expect_i64("min_value"),
@@ -1144,8 +1115,6 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 
     async fn get_enums(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
-        let namespaces = &sql_schema.namespaces;
-
         let sql = "
             SELECT t.typname as name, e.enumlabel as value, n.nspname as namespace
             FROM pg_type t
@@ -1154,13 +1123,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             WHERE n.nspname = ANY ( $1 )
             ORDER BY e.enumsortorder";
 
-        let rows = self
-            .conn
-            .query_raw(
-                sql,
-                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
-            )
-            .await?;
+        let rows = self.conn.query_raw(sql, &[namespace_params(sql_schema)]).await?;
         let mut enum_values: BTreeMap<(String, String), Vec<String>> = BTreeMap::new();
 
         for row in rows.into_iter() {
@@ -1176,7 +1139,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         let mut enums: Vec<Enum> = enum_values
             .into_iter()
             .map(|((name, namespace), values)| Enum {
-                namespace_id: sql_schema.get_namespace_id(&namespace),
+                namespace_id: sql_schema.get_namespace_id(&namespace).unwrap(),
                 name,
                 values,
             })
@@ -1187,6 +1150,19 @@ impl<'a> SqlSchemaDescriber<'a> {
         sql_schema.enums = enums;
         Ok(())
     }
+}
+
+async fn fetch_namespaces(conn: &dyn Queryable) -> Result<Vec<String>, DescriberError> {
+    let rows = conn
+        .query_raw(include_str!("postgres/namespaces_query.sql"), &[])
+        .await?;
+    let mut namespaces = Vec::with_capacity(rows.len());
+
+    for row in rows {
+        namespaces.push(row.at(0).unwrap().to_string().unwrap())
+    }
+
+    Ok(namespaces)
 }
 
 fn get_column_type_postgresql(row: &ResultRow, enums: &[Enum]) -> ColumnType {
@@ -1357,4 +1333,34 @@ fn get_column_type_cockroachdb(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         arity,
         native_type: native_type.map(|x| x.to_json()),
     }
+}
+
+fn namespace_params(sql_schema: &SqlSchema, schemas: Option<&[&str]>) -> DescriberResult<quaint::Value<'_>> {
+    let mut params = Vec::with_capacity(schemas.len());
+
+    if let Some(schemas) = schemas {
+        for schema in schemas {
+            if sql_schema.get_namespace_id(schema).is_some() {
+                params.push((*schema).into())
+            } else {
+                return Err(DescriberError::new_schema_does_not_exist((*schema).to_owned()));
+            }
+        }
+    } else {
+        for schema in &sql_schema.namespaces {
+            params.push(schema.as_str().into())
+        }
+    }
+
+    Ok(quaint::Value::Array(Some(params)))
+    // match &sql_schema.relevant_namespaces {
+    //     None => quaint::Value::Array(Some(sql_schema.namespaces.iter().map(|v| v.clone().into()).collect())),
+    //     Some(relevant_ones) => {
+    //         let names = relevant_ones
+    //             .iter()
+    //             .map(|relevant_schema| sql_schema.walk(*relevant_schema).name().into())
+    //             .collect();
+    //         quaint::Value::Array(Some(names))
+    //     }
+    // }
 }
