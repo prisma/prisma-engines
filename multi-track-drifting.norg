@@ -2,7 +2,8 @@
 
 * Context
 
-   - Original issue: https://github.com/prisma/prisma/issues/15133
+  - {https://github.com/prisma/prisma/issues/15133}[Original issue]
+  - Pull request with test repro: TODO
 
 * Diagnosis
 
@@ -48,16 +49,46 @@
 
 ** The Bug
 
-   Since Prisma 4.0, the following scenario can happen:
+   @code prisma
+   model TestModel {
+       id  Int @id @default(autoincrement())
+       col String? @test.Uuid
+   }
+   @end
 
-   - We
+   Since Prisma 4.0, given the schema above, the following scenario can happen with raw queries:
 
-   See this test: ...
+   - First insert a row in `TestModel` with `null` or `undefined` in the `col` column.
+   -- The SQL looks like this: `INSERT INTO "TestModel" (col) VALUES ($1)`
+   -- The prepared statement cached in quaint has the type of the `$1` parameter inferred, to the same as the column type: `UUID`.
+   - Now insert a second row with the same query, but with a string parameter (as that would naturally happen with the typescript Prisma Client).
+   -- The inferred parameter type is `UUID`, but the one we send is `TEXT`, leading to a database error: 
+    > ERROR: column "col" is of type uuid but expression is of type text. HINT: You will need to rewrite or cast the expression."
+
+   This is easily reproducible in QE tests.
 
 * Solution exploration
 
-*** Document the workaround
-*** Make the param types part of the cache key
+** Document the workaround
+
+   This is what the `HINT` section recommends in the postgres error. The user
+   can adapt their query to signal intent to send values of a certain type. In
+   the example above, `TEXT`.
+
+   The fixed query looks like this:
+
+   @code sql
+   INSERT INTO "TestModel" (col) VALUES ($1::TEXT::UUID)
+   @end
+
+   This is a relatively general solution. Julius also suggested it in
+   {https://github.com/prisma/prisma/issues/15133#issuecomment-1234242370}[this
+   issue comment].
+
+** Make the param types part of the cache key
 
     Hash the discriminants. Overhead of x bytes.
+
+** Coerce the parameters
+
 
