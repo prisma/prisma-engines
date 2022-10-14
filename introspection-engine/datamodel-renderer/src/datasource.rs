@@ -1,8 +1,9 @@
 use core::fmt;
+use std::default::Default;
 
 use psl::datamodel_connector::RelationMode;
 
-use crate::{Commented, Env, Text, Value};
+use crate::{Array, Commented, Env, Text, Value};
 
 /// The datasource block in a PSL file.
 #[derive(Debug)]
@@ -14,7 +15,7 @@ pub struct Datasource<'a> {
     relation_mode: Option<RelationMode>,
     custom_properties: Vec<(&'a str, Value<'a>)>,
     documentation: Option<Commented<'a>>,
-    namespaces: Vec<&'a str>,
+    namespaces: Array<'a>,
 }
 
 impl<'a> Datasource<'a> {
@@ -28,7 +29,7 @@ impl<'a> Datasource<'a> {
             relation_mode: None,
             custom_properties: Default::default(),
             documentation: None,
-            namespaces: vec![],
+            namespaces: Array::default(),
         }
     }
 
@@ -65,7 +66,7 @@ impl<'a> Datasource<'a> {
             relation_mode: psl_ds.relation_mode,
             documentation: psl_ds.documentation.as_deref().map(Commented::Documentation),
             custom_properties: Default::default(),
-            namespaces: psl_ds.namespaces.iter().map(|(ns, _)| ns.as_str()).collect(),
+            namespaces: Array(psl_ds.namespaces.iter().map(|(ns, _)| Text(ns).into()).collect()),
         }
     }
 }
@@ -93,15 +94,7 @@ impl<'a> fmt::Display for Datasource<'a> {
         }
 
         if !self.namespaces.is_empty() {
-            let mut namespaces = self.namespaces.iter().peekable();
-            write!(f, "schemas = [")?;
-            while let Some(namespace) = namespaces.next() {
-                write!(f, "\"{}\"", namespace)?;
-                if namespaces.peek().is_some() {
-                    write!(f, ",")?;
-                }
-            }
-            write!(f, "]\n")?;
+            writeln!(f, "schemas = {}", self.namespaces)?;
         }
 
         f.write_str("}\n")?;
