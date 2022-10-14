@@ -1,0 +1,63 @@
+= TOC Table of contents
+
+* Context
+
+   - Original issue: https://github.com/prisma/prisma/issues/15133
+
+* Diagnosis
+
+   Note that all of the following is specific to PostgreSQL. Other databases handle prepared statements differently.
+
+** The prepared statement cache
+
+   In order to resolve a Prisma Client request, the Query Engine issues database queries. The queries consist of SQL and bound parameters:
+
+   @code sql
+   INSERT INTO test (col1, col2) VALUES ($1, $2)
+   @end
+
+   With quaint, the database library used by the query engine, this is a single call:
+
+   @code rust
+   conn.query_raw("INSERT INTO test (col1, col2) VALUES ($1, $2)", &[param1, param2]).await?
+   @end
+
+   One might expect that this matches one network roundtrip between the client
+   and the database, but there are potentially two roundtrips involved.
+
+   - The first with the SQL string to /prepare/ the statement. The client /may/
+     choose to also indicate what type of parameter it will send for each of
+     the numbered placeholders. The database returns a /prepared statement
+   object/ that consists mainly of an identifier and of the types of the
+     parameters it expects for each of the placeholders (`$1` and `$2` in this
+     case).
+   - The second with the prepared statement identifier and the parameter values.
+
+   For an application using PostgreSQL directly, the expected workflow is that
+   a given query will be prepared once, then reused while the database
+   connection on which it was prepared lasts.
+
+   In Prisma, since we do not want to expose that to the users or even to the
+   query engine, we rely on /prepared statement caching/ in quaint. We have a
+   LRU cache mapping a SQL string to its corresponding prepared statement.
+
+   This was fine until we started sending type information when preparing
+   queries, with Prisma 4
+   ({https://github.com/prisma/prisma/releases/tag/4.0.0}[Prisma 4.0.0 — improvedQueryRaw is
+   now generally available]).
+
+** The Bug
+
+   Since Prisma 4.0, the following scenario can happen:
+
+   - We
+
+   See this test: ...
+
+* Solution exploration
+
+*** Document the workaround
+*** Make the param types part of the cache key
+
+    Hash the discriminants. Overhead of x bytes.
+
