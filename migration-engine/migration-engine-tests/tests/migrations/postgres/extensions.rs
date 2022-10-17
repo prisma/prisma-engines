@@ -306,3 +306,31 @@ fn removing_schema_definition_does_nothing(api: TestApi) {
         .assert_has_extension("citext")
         .assert_schema("prisma-tests");
 }
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("postgresqlExtensions"))]
+fn extension_functions_can_be_used_in_the_same_migration(api: TestApi) {
+    let dm = indoc! {r#"
+        datasource db {
+          provider   = "postgresql"
+          url        = env("TEST_DATABASE_URL")
+          extensions = [uuid_ossp(map: "uuid-ossp")]
+        }
+
+        generator js {
+          provider        = "prisma-client-js"
+          previewFeatures = ["postgresqlExtensions"]
+        }
+
+        model A {
+          id String @id @db.Uuid @default(dbgenerated("uuid_generate_v4()"))
+        }
+    "#};
+
+    api.schema_push(dm).send().assert_green().assert_has_executed_steps();
+
+    api.assert_schema().assert_has_extension("uuid-ossp");
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_column("id", |col| col.assert_dbgenerated("uuid_generate_v4()"))
+    });
+}

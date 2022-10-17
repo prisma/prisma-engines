@@ -43,6 +43,9 @@ impl SqlMigration {
         #[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Ord, Eq)]
         #[repr(u8)]
         enum DriftType {
+            AlteredExtension,
+            DroppedExtension,
+            CreatedExtension,
             AddedEnum,
             AddedTable,
             RemovedEnum,
@@ -52,9 +55,6 @@ impl SqlMigration {
             RedefinedTable,
             ChangedEnum,
             ChangedTable,
-            CreatedExtension,
-            AlteredExtension,
-            DroppedExtension,
         }
 
         // (sort key, item name, step index)
@@ -219,9 +219,7 @@ impl SqlMigration {
                         out.push_str("` extension\n");
                     }
                     DriftType::DroppedExtension => {
-                        out.push_str("\n[*] Dropped the `");
-                        out.push_str(item_name);
-                        out.push_str("` extension\n");
+                        out.push_str("\n[-] Removed extensions\n`");
                     }
                 }
             }
@@ -451,6 +449,9 @@ fn render_column_changes(columns: Pair<ColumnWalker<'_>>, changes: &ColumnChange
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) enum SqlMigrationStep {
     CreateSchema(sql_schema_describer::NamespaceId),
+    DropExtension(DropExtension),
+    CreateExtension(CreateExtension),
+    AlterExtension(AlterExtension),
     AlterSequence(Pair<u32>, SequenceChanges),
     DropView(DropView),
     DropUserDefinedType(DropUserDefinedType),
@@ -502,9 +503,6 @@ pub(crate) enum SqlMigrationStep {
     RedefineIndex {
         index: Pair<IndexId>,
     },
-    DropExtension(DropExtension),
-    CreateExtension(CreateExtension),
-    AlterExtension(AlterExtension),
 }
 
 impl SqlMigrationStep {
