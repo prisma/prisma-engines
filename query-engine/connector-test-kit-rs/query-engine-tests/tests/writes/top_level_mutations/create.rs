@@ -88,7 +88,8 @@ mod create {
     }
 
     // A Create Mutation should create and return item with explicit null attributes
-    #[connector_test]
+    // TODO: Flaky test on Cockroach, re-enable once figured out
+    #[connector_test(exclude(CockroachDb))]
     async fn return_item_explicit_null_attrs(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
@@ -215,7 +216,8 @@ mod create {
     }
 
     // "A Create Mutation" should "create and return an item with enums passed as strings"
-    #[connector_test]
+    // TODO: Flaky test on Cockroach, re-enable once figured out
+    #[connector_test(exclude(CockroachDb))]
     async fn return_enums_passed_as_strings(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {createOneScalarModel(data: {id: "1", optEnum: "A"}){ optEnum }}"#),
