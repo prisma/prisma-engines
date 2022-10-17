@@ -12,7 +12,7 @@ impl<'a> fmt::Display for Text<&'a str> {
     }
 }
 
-impl<'a> fmt::Display for Text<PreviewFeature> {
+impl fmt::Display for Text<PreviewFeature> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str("\"")?;
         self.0.fmt(f)?;

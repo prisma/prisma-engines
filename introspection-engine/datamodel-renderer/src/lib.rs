@@ -10,57 +10,58 @@
 //! use datamodel_renderer::{Datasource, Env};
 //! use indoc::{indoc, formatdoc};
 //!
-//! fn main() {
-//!     let datasource = Datasource::new(
-//!         "db",
-//!         "postgres",
-//!         Env::variable("DATABASE_URL")
-//!     );
+//! let datasource = Datasource::new(
+//!     "db",
+//!     "postgres",
+//!     Env::variable("DATABASE_URL")
+//! );
 //!
-//!     // We get a string rendering without proper formatting
-//!     // by calling the `to_string()` method:
-//!     let rendered = datasource.to_string();
+//! // We get a string rendering without proper formatting
+//! // by calling the `to_string()` method:
+//! let rendered = datasource.to_string();
 //!
-//!     // The output is not formatted, so we call the reformat
-//!     // function to the result to make it look more kosher.
-//!     let rendered = psl::reformat(&rendered, 2).unwrap();
+//! // The output is not formatted, so we call the reformat
+//! // function to the result to make it look more kosher.
+//! let rendered = psl::reformat(&rendered, 2).unwrap();
 //!
-//!     let expected = indoc! {r#"
-//!         datasource db {
-//!           provider = "postgres"
-//!           url      = env("DATABASE_URL")
-//!         }
-//!     "#};
+//! let expected = indoc! {r#"
+//!     datasource db {
+//!       provider = "postgres"
+//!       url      = env("DATABASE_URL")
+//!     }
 //!
-//!     assert_eq!(expected, &rendered);
+//! "#};
 //!
-//!     // Additionally we can just pass the datasource to any
-//!     // format block to include it in the resulting string:
-//!     let rendered = formatdoc!(r#"
-//!         {datasource}
+//! assert_eq!(expected, &rendered);
 //!
-//!         model A {{
-//!           id Int @id
-//!         }}
-//!     "#);
+//! // Additionally we can just pass the datasource to any
+//! // format block to include it in the resulting string:
+//! let rendered = formatdoc!(r#"
+//!     {datasource}
 //!
-//!     // Again, making the result indentation and spacing to
-//!     // look prettier.
-//!     let rendered = psl::reformat(&rendered, 2).unwrap();
+//!     model A {{
+//!       id Int @id
+//!     }}
+//! "#);
 //!
-//!     let expected = indoc! {r#"
-//!         datasource db {
-//!           provider = "postgres"
-//!           url      = env("DATABASE_URL")
-//!         }
+//! // Again, making the result indentation and spacing to
+//! // look prettier.
+//! let rendered = psl::reformat(&rendered, 2).unwrap();
 //!
-//!         model A {
-//!           id Int @id
-//!         }
-//!     "#};
+//! let expected = indoc! {r#"
+//!     datasource db {
+//!       provider = "postgres"
+//!       url      = env("DATABASE_URL")
+//!     }
 //!
-//!     assert_eq!(expected, &rendered);
-//! }
+//!     model A {
+//!       id Int @id
+//!     }
+//!
+//! "#};
+//!
+//! assert_eq!(expected, &rendered);
+//! ```
 
 #![warn(missing_docs)]
 
