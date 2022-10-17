@@ -110,7 +110,7 @@ mod where_unique {
         );
         run_query!(
             &runner,
-            r#"mutation { createOneTestModel(data: { id: 2, unique1: 1, unique2: 1, unique3: 1, unique4: 1, non_unique: 0 }) { id } }"#
+            r#"mutation { createOneTestModel(data: { id: 2, unique1: 2, unique2: 2, unique3: 2, unique4: 2, non_unique: 0 }) { id } }"#
         );
 
         insta::assert_snapshot!(
