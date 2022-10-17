@@ -1,5 +1,5 @@
 //! Write query AST
-use super::FilteredQuery;
+use super::{FilteredNestedMutation, FilteredQuery};
 use connector::{filter::Filter, DatasourceFieldName, RecordFilter, WriteArgs};
 use prisma_models::prelude::*;
 use std::{collections::HashMap, sync::Arc};
@@ -160,12 +160,6 @@ pub struct UpdateRecord {
     pub args: WriteArgs,
 }
 
-impl UpdateRecord {
-    pub fn set_selectors(&mut self, selectors: Vec<SelectionResult>) {
-        self.record_filter.selectors = Some(selectors);
-    }
-}
-
 #[derive(Debug, Clone)]
 pub struct UpdateManyRecords {
     pub model: ModelRef,
@@ -173,26 +167,10 @@ pub struct UpdateManyRecords {
     pub args: WriteArgs,
 }
 
-impl UpdateManyRecords {
-    pub fn set_selectors(&mut self, selectors: Vec<SelectionResult>) {
-        self.record_filter.selectors = Some(selectors);
-    }
-}
-
 #[derive(Debug, Clone)]
 pub struct DeleteRecord {
     pub model: ModelRef,
     pub record_filter: Option<RecordFilter>,
-}
-
-impl DeleteRecord {
-    pub fn set_selectors(&mut self, selectors: Vec<SelectionResult>) {
-        if let Some(ref mut rf) = self.record_filter {
-            rf.selectors = Some(selectors);
-        } else {
-            self.record_filter = Some(selectors.into())
-        }
-    }
 }
 
 #[derive(Debug, Clone)]
@@ -264,6 +242,28 @@ impl FilteredQuery for DeleteRecord {
         match self.record_filter {
             Some(ref mut rf) => rf.filter = filter,
             None => self.record_filter = Some(filter.into()),
+        }
+    }
+}
+
+impl FilteredNestedMutation for UpdateRecord {
+    fn set_selectors(&mut self, selectors: Vec<SelectionResult>) {
+        self.record_filter.selectors = Some(selectors);
+    }
+}
+
+impl FilteredNestedMutation for UpdateManyRecords {
+    fn set_selectors(&mut self, selectors: Vec<SelectionResult>) {
+        self.record_filter.selectors = Some(selectors);
+    }
+}
+
+impl FilteredNestedMutation for DeleteRecord {
+    fn set_selectors(&mut self, selectors: Vec<SelectionResult>) {
+        if let Some(ref mut rf) = self.record_filter {
+            rf.selectors = Some(selectors);
+        } else {
+            self.record_filter = Some(selectors.into())
         }
     }
 }

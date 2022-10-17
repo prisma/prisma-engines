@@ -60,7 +60,7 @@ pub fn nested_update(
         } else {
             match value {
                 // If the update input is of shape { where?: WhereInput, data: DataInput }
-                ParsedInputValue::Map(mut map) if map.is_nested_to_one_update_enveloppe() => {
+                ParsedInputValue::Map(mut map) if map.is_nested_to_one_update_envelope() => {
                     let filter = if let Some(where_arg) = map.remove(args::WHERE) {
                         let where_arg: ParsedInputMap = where_arg.try_into()?;
 

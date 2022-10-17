@@ -30,7 +30,7 @@ impl ParsedInputMap {
         matches!(&self.tag, Some(ObjectTag::FieldRefType(_)))
     }
 
-    pub fn is_nested_to_one_update_enveloppe(&self) -> bool {
+    pub fn is_nested_to_one_update_envelope(&self) -> bool {
         matches!(&self.tag, Some(ObjectTag::NestedToOneUpdateEnvelope))
     }
 }
