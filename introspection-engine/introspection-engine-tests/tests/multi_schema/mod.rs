@@ -1,5 +1,4 @@
 use introspection_engine_tests::{test_api::*, TestResult};
-use test_macros::test_connector;
 
 #[test_connector(tags(Postgres))]
 async fn multiple_schemas_without_schema_property_are_not_introspected(api: &TestApi) -> TestResult {
@@ -202,23 +201,38 @@ async fn multiple_schemas_w_cross_schema_are_introspected(api: &TestApi) -> Test
 //     Ok(())
 // }
 
-#[test_connector(tags(Postgres), preview_features("multiSchema"), db_schemas("first", "second"))]
+#[test_connector(
+    tags(Postgres),
+    exclude(CockroachDb),
+    preview_features("multiSchema"),
+    db_schemas("first", "second_schema")
+)]
 async fn multiple_schemas_w_enums_are_introspected(api: &TestApi) -> TestResult {
     let schema_name = "first";
-    let other_name = "second";
-    let create_schema = format!("CREATE Schema \"{schema_name}\"",);
-    let create_type = format!("CREATE TYPE \"{schema_name}\".\"HappyMood\" AS ENUM ('happy')",);
+    let other_name = "second_schema";
+    let sql = format! {
+        r#"
+            CREATE SCHEMA "{schema_name}";
+            CREATE TYPE "{schema_name}"."HappyMood" AS ENUM ('happy');
+            CREATE SCHEMA "{other_name}";
+            CREATE TYPE "{other_name}"."SadMood" AS ENUM ('sad');
+        "#,
+    };
 
-    api.database().raw_cmd(&create_schema).await?;
-    api.database().raw_cmd(&create_type).await?;
-
-    let create_schema = format!("CREATE Schema \"{other_name}\"",);
-    let create_type = format!("CREATE TYPE \"{other_name}\".\"SadMood\" AS ENUM ('sad')",);
-
-    api.database().raw_cmd(&create_schema).await?;
-    api.database().raw_cmd(&create_type).await?;
+    api.raw_cmd(&sql).await;
 
     let expected = expect![[r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["multiSchema"]
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+          schemas  = ["first", "second_schema"]
+        }
+
         enum HappyMood {
           happy
 
@@ -228,13 +242,11 @@ async fn multiple_schemas_w_enums_are_introspected(api: &TestApi) -> TestResult 
         enum SadMood {
           sad
 
-          @@schema("second")
+          @@schema("second_schema")
         }
     "#]];
 
-    let result = api.introspect_dml().await?;
-    expected.assert_eq(&result);
-
+    api.expect_datamodel(&expected).await;
     Ok(())
 }
 
@@ -333,6 +345,50 @@ async fn multiple_schemas_w_enums_without_schemas_are_not_introspected(api: &Tes
     Ok(())
 }
 
+#[test_connector(
+    tags(Postgres),
+    exclude(CockroachDb),
+    preview_features("multiSchema"),
+    db_schemas("first", "second_schema")
+)]
+async fn same_table_name_with_relation_in_two_schemas(api: &TestApi) -> TestResult {
+    let sql = r#"
+        CREATE SCHEMA "first";
+        CREATE SCHEMA "second_schema";
+        CREATE TABLE "first"."tbl" ( id SERIAL PRIMARY KEY );
+        CREATE TABLE "second_schema"."tbl" ( id SERIAL PRIMARY KEY, fst INT REFERENCES "first"."tbl"("id") );
+    "#;
+
+    api.raw_cmd(&sql).await;
+
+    let expected = expect![[r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["multiSchema"]
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+          schemas  = ["first", "second_schema"]
+        }
+
+        enum HappyMood {
+          happy
+
+          @@schema("first")
+        }
+
+        enum SadMood {
+          sad
+
+          @@schema("second_schema")
+        }
+    "#]];
+
+    api.expect_datamodel(&expected).await;
+    Ok(())
+}
 //cross schema
 // fks
 // enums
