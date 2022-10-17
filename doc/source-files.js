@@ -52,7 +52,7 @@ var sourcesIndex = JSON.parse('{\
 "difference":["",[],["display.rs","lcs.rs","lib.rs","merge.rs"]],\
 "digest":["",[["core_api",[],["ct_variable.rs","rt_variable.rs","wrapper.rs","xof_reader.rs"]]],["core_api.rs","digest.rs","lib.rs","mac.rs"]],\
 "dissimilar":["",[],["find.rs","lib.rs","range.rs"]],\
-"dml":["",[["render",[],["render_configuration.rs","render_datamodel.rs"]]],["composite_type.rs","datamodel.rs","default_value.rs","enum.rs","field.rs","lib.rs","lift.rs","model.rs","native_type_instance.rs","relation_info.rs","render.rs","scalars.rs","traits.rs"]],\
+"dml":["",[["render",[],["render_datamodel.rs"]]],["composite_type.rs","datamodel.rs","default_value.rs","enum.rs","field.rs","lib.rs","lift.rs","model.rs","native_type_instance.rs","relation_info.rs","render.rs","scalars.rs","traits.rs"]],\
 "dmmf":["",[["ast_builders",[["schema_ast_builder",[],["enum_renderer.rs","field_renderer.rs","mod.rs","object_renderer.rs","schema_renderer.rs","type_renderer.rs"]]],["datamodel_ast_builder.rs","mod.rs"]],["serialization_ast",[],["datamodel_ast.rs","mappings_ast.rs","mod.rs","schema_ast.rs"]]],["lib.rs"]],\
 "either":["",[],["lib.rs"]],\
 "encoding":["",[["codec",[],["ascii.rs","error.rs","japanese.rs","korean.rs","simpchinese.rs","singlebyte.rs","tradchinese.rs","utf_16.rs","utf_8.rs","whatwg.rs"]]],["all.rs","label.rs","lib.rs","types.rs","util.rs"]],\

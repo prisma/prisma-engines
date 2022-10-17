@@ -369,13 +369,6 @@
 <span id="369">369</span>
 <span id="370">370</span>
 <span id="371">371</span>
-<span id="372">372</span>
-<span id="373">373</span>
-<span id="374">374</span>
-<span id="375">375</span>
-<span id="376">376</span>
-<span id="377">377</span>
-<span id="378">378</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::TestResult</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">expect_test::expect</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">indoc</span>::{<span class="ident">formatdoc</span>, <span class="ident">indoc</span>};
@@ -694,16 +687,9 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_eq_datamodels</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">expected_without_header</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">result_with_header</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
         <span class="kw">let</span> <span class="ident">expected_with_source</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">dm_with_sources</span>(<span class="ident">expected_without_header</span>);
         <span class="kw">let</span> <span class="ident">expected_with_generator</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">dm_with_generator_and_preview_flags</span>(<span class="kw-2">&amp;</span><span class="ident">expected_with_source</span>);
+        <span class="kw">let</span> <span class="ident">reformatted_expected</span> <span class="op">=</span> <span class="ident">psl::reformat</span>(<span class="kw-2">&amp;</span><span class="ident">expected_with_generator</span>, <span class="number">2</span>).<span class="ident">unwrap</span>();
 
-        <span class="kw">let</span> <span class="ident">parsed_expected</span> <span class="op">=</span> <span class="ident">psl::lift</span>(<span class="kw-2">&amp;</span><span class="ident">parse_datamodel</span>(<span class="kw-2">&amp;</span><span class="ident">expected_with_generator</span>));
-        <span class="kw">let</span> <span class="ident">parsed_result</span> <span class="op">=</span> <span class="ident">psl::lift</span>(<span class="kw-2">&amp;</span><span class="ident">parse_datamodel</span>(<span class="ident">result_with_header</span>));
-
-        <span class="kw">let</span> <span class="ident">reformatted_expected</span> <span class="op">=</span> <span class="ident">psl::render_datamodel_and_config_to_string</span>(<span class="kw-2">&amp;</span><span class="ident">parsed_expected</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">configuration</span>());
-        <span class="kw">let</span> <span class="ident">reformatted_result</span> <span class="op">=</span> <span class="ident">psl::render_datamodel_and_config_to_string</span>(<span class="kw-2">&amp;</span><span class="ident">parsed_result</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">configuration</span>());
-
-        <span class="macro">println!</span>(<span class="string">&quot;{reformatted_expected}\n{reformatted_result}&quot;</span>);
-
-        <span class="macro">pretty_assertions::assert_eq!</span>(<span class="ident">reformatted_expected</span>, <span class="ident">reformatted_result</span>);
+        <span class="macro">pretty_assertions::assert_eq!</span>(<span class="ident">reformatted_expected</span>, <span class="ident">result_with_header</span>);
     }
 
     <span class="kw">fn</span> <span class="ident">dm_with_sources</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
