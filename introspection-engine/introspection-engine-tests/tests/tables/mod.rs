@@ -310,7 +310,7 @@ async fn a_table_with_a_non_unique_index(api: &TestApi) -> TestResult {
         model User {
             a       Int
             id      Int @id @default(autoincrement())
-            @@index([a], name: "test")
+            @@index([a], map: "test")
         }
     "##};
 
@@ -339,7 +339,7 @@ async fn a_table_with_a_multi_column_non_unique_index(api: &TestApi) -> TestResu
             a  Int
             b  Int
             id Int @id @default(autoincrement())
-            @@index([a,b], name: "test")
+            @@index([a,b], map: "test")
         }
     "##};
 
