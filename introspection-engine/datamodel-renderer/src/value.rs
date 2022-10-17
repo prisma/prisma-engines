@@ -4,11 +4,21 @@ use psl::{PreviewFeature, StringFromEnvVar};
 
 /// Represents a string value in the PSL.
 #[derive(Debug, Clone, Copy)]
-pub struct Text<'a>(pub &'a str);
+pub struct Text<T: fmt::Display>(pub T);
 
-impl<'a> fmt::Display for Text<'a> {
+impl<'a> fmt::Display for Text<&'a str> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         fmt::Display::fmt(&psl::schema_ast::string_literal(self.0), f)
+    }
+}
+
+impl<'a> fmt::Display for Text<PreviewFeature> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str("\"")?;
+        self.0.fmt(f)?;
+        f.write_str("\"")?;
+
+        Ok(())
     }
 }
 
@@ -60,9 +70,9 @@ impl<'a> fmt::Display for Commented<'a> {
 pub enum Env<'a> {
     /// Represents `env("VAR")`, where `var` is the tuple value. The
     /// value is fetched from an env var of the same name.
-    FromVar(Text<'a>),
+    FromVar(Text<&'a str>),
     /// Value directly written to the file, not using an env var.
-    Value(Text<'a>),
+    Value(Text<&'a str>),
 }
 
 impl<'a> Env<'a> {
@@ -183,9 +193,9 @@ impl<'a> fmt::Display for Function<'a> {
 
 /// An array of values.
 #[derive(Debug, Default)]
-pub struct Array<'a>(pub(crate) Vec<Value<'a>>);
+pub struct Array<T: fmt::Display>(pub(crate) Vec<T>);
 
-impl<'a> Array<'a> {
+impl<T: fmt::Display> Array<T> {
     /// Returns `true` if the array contains no elements.
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
@@ -197,12 +207,17 @@ impl<'a> Array<'a> {
     }
 
     /// Add a new value to the end of the array.
-    pub fn push(&mut self, val: impl Into<Value<'a>>) {
+    pub fn push(&mut self, val: impl Into<T>) {
         self.0.push(val.into());
+    }
+
+    /// Create a new array.
+    pub const fn new() -> Self {
+        Self(Vec::new())
     }
 }
 
-impl<'a> fmt::Display for Array<'a> {
+impl<T: fmt::Display> fmt::Display for Array<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str("[")?;
 
@@ -224,21 +239,19 @@ impl<'a> fmt::Display for Array<'a> {
 #[derive(Debug)]
 pub enum Value<'a> {
     /// A string value, quoted and escaped accordingly.
-    Text(Text<'a>),
+    Text(Text<&'a str>),
     /// A constant value without quoting.
     Constant(&'a str),
     /// An array of values.
-    Array(Array<'a>),
+    Array(Array<Value<'a>>),
     /// A function has a name, and optionally named parameters.
     Function(Function<'a>),
     /// A value can be read from the environment.
     Env(Env<'a>),
-    /// Prisma preview feature
-    Feature(PreviewFeature),
 }
 
-impl<'a> From<Text<'a>> for Value<'a> {
-    fn from(t: Text<'a>) -> Self {
+impl<'a> From<Text<&'a str>> for Value<'a> {
+    fn from(t: Text<&'a str>) -> Self {
         Self::Text(t)
     }
 }
@@ -249,8 +262,8 @@ impl<'a> From<&'a str> for Value<'a> {
     }
 }
 
-impl<'a> From<Array<'a>> for Value<'a> {
-    fn from(t: Array<'a>) -> Self {
+impl<'a> From<Array<Value<'a>>> for Value<'a> {
+    fn from(t: Array<Value<'a>>) -> Self {
         Self::Array(t)
     }
 }
@@ -264,12 +277,6 @@ impl<'a> From<Function<'a>> for Value<'a> {
 impl<'a> From<Env<'a>> for Value<'a> {
     fn from(t: Env<'a>) -> Self {
         Self::Env(t)
-    }
-}
-
-impl From<PreviewFeature> for Value<'_> {
-    fn from(feat: PreviewFeature) -> Self {
-        Self::Feature(feat)
     }
 }
 
@@ -290,11 +297,6 @@ impl<'a> fmt::Display for Value<'a> {
             }
             Value::Env(env) => {
                 env.fmt(f)?;
-            }
-            Value::Feature(feat) => {
-                f.write_str("\"")?;
-                feat.fmt(f)?;
-                f.write_str("\"")?;
             }
         }
 
