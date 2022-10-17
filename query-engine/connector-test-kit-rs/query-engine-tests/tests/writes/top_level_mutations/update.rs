@@ -242,7 +242,8 @@ mod update {
     }
 
     // "An updateOne mutation" should "update enums"
-    #[connector_test(schema(schema_3), capabilities(Enums))]
+    // TODO: Flaky test on Cockroach, re-enable once figured out
+    #[connector_test(schema(schema_3), capabilities(Enums), exclude(CockroachDb))]
     async fn update_enums(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1 }"#).await?;
 
