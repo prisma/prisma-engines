@@ -85,7 +85,8 @@ mod default_value {
     }
 
     // "The default value" should "work for enums"
-    #[connector_test(schema(schema_enum), exclude(Sqlite, SqlServer))]
+    // TODO: Flaky test on Cockroach, re-enable once figured out
+    #[connector_test(schema(schema_enum), exclude(Sqlite, SqlServer, CockroachDb))]
     async fn enum_field(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
@@ -170,7 +171,8 @@ mod default_value {
     }
 
     // "Remapped enum default values" should "work"
-    #[connector_test(schema(schema_remapped_enum), exclude(Sqlite, SqlServer))]
+    // TODO: Flaky test on Cockroach, re-enable once figured out
+    #[connector_test(schema(schema_remapped_enum), exclude(Sqlite, SqlServer, CockroachDb))]
     async fn remapped_enum_field(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {

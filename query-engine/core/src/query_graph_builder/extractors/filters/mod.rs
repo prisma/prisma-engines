@@ -14,6 +14,7 @@ use connector::{
 };
 use filter_fold::*;
 use filter_grouping::*;
+use indexmap::IndexMap;
 use prisma_models::{
     prelude::ParentContainer, CompositeFieldRef, Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef,
 };
@@ -22,6 +23,30 @@ use std::{collections::HashMap, convert::TryInto, str::FromStr};
 
 /// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.
 pub fn extract_unique_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraphBuilderResult<Filter> {
+    let tag = value_map.tag.clone();
+    // Partition the input into a map containing only the unique fields and one containing all the other filters
+    // so that we can parse them separately and ensure we AND both filters
+    let (unique_map, rest_map): (IndexMap<_, _>, IndexMap<_, _>) =
+        value_map
+            .into_iter()
+            .partition(|(field_name, _)| match model.fields().find_from_scalar(&field_name) {
+                Ok(field) => field.unique(),
+                Err(_) => utils::resolve_compound_field(&field_name, &model).is_some(),
+            });
+    let mut unique_map = ParsedInputMap::from(unique_map);
+    let mut rest_map = ParsedInputMap::from(rest_map);
+    unique_map.set_tag(tag.clone());
+    rest_map.set_tag(tag);
+
+    let unique_filters = internal_extract_unique_filter(unique_map, model)?;
+    let rest_filters = extract_filter(rest_map, model)?;
+
+    Ok(Filter::and(vec![unique_filters, rest_filters]))
+}
+
+/// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.
+/// The input map must only contain unique & compound unique fields.
+fn internal_extract_unique_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraphBuilderResult<Filter> {
     let filters = value_map
         .into_iter()
         .map(|(field_name, value): (String, ParsedInputValue)| {

@@ -69,7 +69,8 @@ features!(
     FieldReference,
     PostgresqlExtensions,
     ClientExtensions,
-    Deno
+    Deno,
+    ExtendedWhereUnique
 );
 
 /// Generator preview features
@@ -86,6 +87,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
          | FieldReference
          | PostgresqlExtensions
          | Deno
+         | ExtendedWhereUnique
     }),
     deprecated: enumflags2::make_bitflags!(PreviewFeature::{
         AtomicNumberOperations

@@ -1,5 +1,5 @@
 //! Write query AST
-use super::FilteredQuery;
+use super::{FilteredNestedMutation, FilteredQuery};
 use connector::{filter::Filter, DatasourceFieldName, RecordFilter, WriteArgs};
 use prisma_models::prelude::*;
 use std::{collections::HashMap, sync::Arc};
@@ -37,6 +37,15 @@ impl WriteQuery {
         }
 
         args.update_datetimes(&model);
+    }
+
+    pub fn set_selectors(&mut self, selectors: Vec<SelectionResult>) {
+        match self {
+            Self::UpdateManyRecords(x) => x.set_selectors(selectors),
+            Self::UpdateRecord(x) => x.set_selectors(selectors),
+            Self::DeleteRecord(x) => x.set_selectors(selectors),
+            _ => return,
+        }
     }
 
     pub fn returns(&self, field_selection: &FieldSelection) -> bool {
@@ -234,7 +243,27 @@ impl FilteredQuery for DeleteRecord {
             Some(ref mut rf) => rf.filter = filter,
             None => self.record_filter = Some(filter.into()),
         }
+    }
+}
 
-        //.filter = Some(filter)
+impl FilteredNestedMutation for UpdateRecord {
+    fn set_selectors(&mut self, selectors: Vec<SelectionResult>) {
+        self.record_filter.selectors = Some(selectors);
+    }
+}
+
+impl FilteredNestedMutation for UpdateManyRecords {
+    fn set_selectors(&mut self, selectors: Vec<SelectionResult>) {
+        self.record_filter.selectors = Some(selectors);
+    }
+}
+
+impl FilteredNestedMutation for DeleteRecord {
+    fn set_selectors(&mut self, selectors: Vec<SelectionResult>) {
+        if let Some(ref mut rf) = self.record_filter {
+            rf.selectors = Some(selectors);
+        } else {
+            self.record_filter = Some(selectors.into())
+        }
     }
 }
