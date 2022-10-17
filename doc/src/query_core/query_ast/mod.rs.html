@@ -92,6 +92,13 @@
 <span id="92">92</span>
 <span id="93">93</span>
 <span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">read</span>;
 <span class="kw">mod</span> <span class="ident">write</span>;
 
@@ -99,7 +106,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">write</span>::<span class="kw-2">*</span>;
 
 <span class="kw">use</span> <span class="ident">connector::filter::Filter</span>;
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">FieldSelection</span>, <span class="ident">ModelRef</span>};
+<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">FieldSelection</span>, <span class="ident">ModelRef</span>, <span class="ident">SelectionResult</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>)]</span>
@@ -176,6 +183,13 @@
     <span class="kw">fn</span> <span class="ident">default_filter_behaviour</span>(<span class="ident">inner_filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>) -&gt; <span class="ident">Filter</span> {
         <span class="ident">Filter::Or</span>(<span class="ident">inner_filters</span>)
     }
+}
+
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">FilteredNestedMutation</span> {
+    <span class="doccomment">/// Sets the parent id of a nested mutation.</span>
+    <span class="doccomment">/// This indicates the connector that it doesn&#39;t need to refetch the child and that the mutation</span>
+    <span class="doccomment">/// can directly be performed using that id.</span>
+    <span class="kw">fn</span> <span class="ident">set_selectors</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">selectors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>);
 }
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">Query</span> {

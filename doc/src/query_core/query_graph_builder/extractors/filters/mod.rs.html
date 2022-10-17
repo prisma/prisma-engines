@@ -328,6 +328,31 @@
 <span id="328">328</span>
 <span id="329">329</span>
 <span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">composite</span>;
 <span class="kw">mod</span> <span class="ident">filter_fold</span>;
 <span class="kw">mod</span> <span class="ident">filter_grouping</span>;
@@ -344,6 +369,7 @@
 };
 <span class="kw">use</span> <span class="ident">filter_fold</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">filter_grouping</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">indexmap::IndexMap</span>;
 <span class="kw">use</span> <span class="ident">prisma_models</span>::{
     <span class="ident">prelude::ParentContainer</span>, <span class="ident">CompositeFieldRef</span>, <span class="ident">Field</span>, <span class="ident">ModelRef</span>, <span class="ident">PrismaValue</span>, <span class="ident">RelationFieldRef</span>, <span class="ident">ScalarFieldRef</span>,
 };
@@ -352,6 +378,30 @@
 
 <span class="doccomment">/// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract_unique_filter</span>(<span class="ident">value_map</span>: <span class="ident">ParsedInputMap</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">tag</span> <span class="op">=</span> <span class="ident">value_map</span>.<span class="ident">tag</span>.<span class="ident">clone</span>();
+    <span class="comment">// Partition the input into a map containing only the unique fields and one containing all the other filters</span>
+    <span class="comment">// so that we can parse them separately and ensure we AND both filters</span>
+    <span class="kw">let</span> (<span class="ident">unique_map</span>, <span class="ident">rest_map</span>): (<span class="ident">IndexMap</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>, <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>) <span class="op">=</span>
+        <span class="ident">value_map</span>
+            .<span class="ident">into_iter</span>()
+            .<span class="ident">partition</span>(<span class="op">|</span>(<span class="ident">field_name</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="kw">match</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">find_from_scalar</span>(<span class="kw-2">&amp;</span><span class="ident">field_name</span>) {
+                <span class="prelude-val">Ok</span>(<span class="ident">field</span>) =&gt; <span class="ident">field</span>.<span class="ident">unique</span>(),
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="ident">utils::resolve_compound_field</span>(<span class="kw-2">&amp;</span><span class="ident">field_name</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>).<span class="ident">is_some</span>(),
+            });
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">unique_map</span> <span class="op">=</span> <span class="ident">ParsedInputMap::from</span>(<span class="ident">unique_map</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rest_map</span> <span class="op">=</span> <span class="ident">ParsedInputMap::from</span>(<span class="ident">rest_map</span>);
+    <span class="ident">unique_map</span>.<span class="ident">set_tag</span>(<span class="ident">tag</span>.<span class="ident">clone</span>());
+    <span class="ident">rest_map</span>.<span class="ident">set_tag</span>(<span class="ident">tag</span>);
+
+    <span class="kw">let</span> <span class="ident">unique_filters</span> <span class="op">=</span> <span class="ident">internal_extract_unique_filter</span>(<span class="ident">unique_map</span>, <span class="ident">model</span>)<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">rest_filters</span> <span class="op">=</span> <span class="ident">extract_filter</span>(<span class="ident">rest_map</span>, <span class="ident">model</span>)<span class="question-mark">?</span>;
+
+    <span class="prelude-val">Ok</span>(<span class="ident">Filter::and</span>(<span class="macro">vec!</span>[<span class="ident">unique_filters</span>, <span class="ident">rest_filters</span>]))
+}
+
+<span class="doccomment">/// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.</span>
+<span class="doccomment">/// The input map must only contain unique &amp; compound unique fields.</span>
+<span class="kw">fn</span> <span class="ident">internal_extract_unique_filter</span>(<span class="ident">value_map</span>: <span class="ident">ParsedInputMap</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">filters</span> <span class="op">=</span> <span class="ident">value_map</span>
         .<span class="ident">into_iter</span>()
         .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">field_name</span>, <span class="ident">value</span>): (<span class="ident">String</span>, <span class="ident">ParsedInputValue</span>)<span class="op">|</span> {

@@ -284,6 +284,20 @@
 <span id="284">284</span>
 <span id="285">285</span>
 <span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">fmt::Debug</span>;
 <span class="kw">use</span> <span class="ident">once_cell::sync::OnceCell</span>;
@@ -307,6 +321,7 @@
     <span class="comment">// Holds the type against which a field can be compared</span>
     <span class="ident">FieldRefType</span>(<span class="ident">InputType</span>),
     <span class="ident">WhereInputType</span>(<span class="ident">ParentContainer</span>),
+    <span class="ident">NestedToOneUpdateEnvelope</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">PartialEq</span>)]</span>
@@ -316,6 +331,10 @@
 
     <span class="doccomment">/// The minimum number of fields that must be provided.</span>
     <span class="kw">pub</span> <span class="ident">max_num_fields</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// The fields against which the constraints should be applied.</span>
+    <span class="doccomment">/// If `None`, constraints should be applied on _all_ fields on the input object type.</span>
+    <span class="kw">pub</span> <span class="ident">fields</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">InputObjectType</span> {
@@ -352,19 +371,24 @@
         <span class="self">self</span>.<span class="ident">get_fields</span>().<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">name</span>).<span class="ident">cloned</span>()
     }
 
-    <span class="doccomment">/// Allow exactly one field of the possible ones to be in the input.</span>
+    <span class="doccomment">/// Require exactly one field of the possible ones to be in the input.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">require_exactly_one_field</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">set_max_fields</span>(<span class="number">1</span>);
         <span class="self">self</span>.<span class="ident">set_min_fields</span>(<span class="number">1</span>);
     }
 
-    <span class="doccomment">/// Allow at most one field of the possible ones to be in the input.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allow_at_most_one_field</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+    <span class="doccomment">/// Require at least one field of the possible ones to be in the input.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">require_at_least_one_field</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+        <span class="self">self</span>.<span class="ident">set_min_fields</span>(<span class="number">1</span>);
+    }
+
+    <span class="doccomment">/// Require at most one field of the possible ones to be in the input.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">require_at_most_one_field</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">set_max_fields</span>(<span class="number">1</span>);
         <span class="self">self</span>.<span class="ident">set_min_fields</span>(<span class="number">0</span>);
     }
 
-    <span class="doccomment">/// Allow a maximum of `max` fields to be present in the input.</span>
+    <span class="doccomment">/// Require a maximum of `max` fields to be present in the input.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_max_fields</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">max</span>: <span class="ident">usize</span>) {
         <span class="self">self</span>.<span class="ident">constraints</span>.<span class="ident">max_num_fields</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">max</span>);
     }
@@ -372,6 +396,10 @@
     <span class="doccomment">/// Require a minimum of `min` fields to be present in the input.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_min_fields</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">min</span>: <span class="ident">usize</span>) {
         <span class="self">self</span>.<span class="ident">constraints</span>.<span class="ident">min_num_fields</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">min</span>);
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">apply_constraints_on_fields</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) {
+        <span class="self">self</span>.<span class="ident">constraints</span>.<span class="ident">fields</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">fields</span>);
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_tag</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">tag</span>: <span class="ident">ObjectTag</span>) {

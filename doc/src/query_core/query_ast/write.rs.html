@@ -238,8 +238,37 @@
 <span id="238">238</span>
 <span id="239">239</span>
 <span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Write query AST</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::FilteredQuery</span>;
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">FilteredNestedMutation</span>, <span class="ident">FilteredQuery</span>};
 <span class="kw">use</span> <span class="ident">connector</span>::{<span class="ident">filter::Filter</span>, <span class="ident">DatasourceFieldName</span>, <span class="ident">RecordFilter</span>, <span class="ident">WriteArgs</span>};
 <span class="kw">use</span> <span class="ident">prisma_models::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">sync::Arc</span>};
@@ -277,6 +306,15 @@
         }
 
         <span class="ident">args</span>.<span class="ident">update_datetimes</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>);
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_selectors</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">selectors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>) {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident"><span class="self">Self</span>::UpdateManyRecords</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">set_selectors</span>(<span class="ident">selectors</span>),
+            <span class="ident"><span class="self">Self</span>::UpdateRecord</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">set_selectors</span>(<span class="ident">selectors</span>),
+            <span class="ident"><span class="self">Self</span>::DeleteRecord</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">set_selectors</span>(<span class="ident">selectors</span>),
+            <span class="kw">_</span> =&gt; <span class="kw">return</span>,
+        }
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">returns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">field_selection</span>: <span class="kw-2">&amp;</span><span class="ident">FieldSelection</span>) -&gt; <span class="ident">bool</span> {
@@ -474,8 +512,28 @@
             <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">rf</span>) =&gt; <span class="ident">rf</span>.<span class="ident">filter</span> <span class="op">=</span> <span class="ident">filter</span>,
             <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">record_filter</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">filter</span>.<span class="ident">into</span>()),
         }
+    }
+}
 
-        <span class="comment">//.filter = Some(filter)</span>
+<span class="kw">impl</span> <span class="ident">FilteredNestedMutation</span> <span class="kw">for</span> <span class="ident">UpdateRecord</span> {
+    <span class="kw">fn</span> <span class="ident">set_selectors</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">selectors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>) {
+        <span class="self">self</span>.<span class="ident">record_filter</span>.<span class="ident">selectors</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">selectors</span>);
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">FilteredNestedMutation</span> <span class="kw">for</span> <span class="ident">UpdateManyRecords</span> {
+    <span class="kw">fn</span> <span class="ident">set_selectors</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">selectors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>) {
+        <span class="self">self</span>.<span class="ident">record_filter</span>.<span class="ident">selectors</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">selectors</span>);
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">FilteredNestedMutation</span> <span class="kw">for</span> <span class="ident">DeleteRecord</span> {
+    <span class="kw">fn</span> <span class="ident">set_selectors</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">selectors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>) {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">rf</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">record_filter</span> {
+            <span class="ident">rf</span>.<span class="ident">selectors</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">selectors</span>);
+        } <span class="kw">else</span> {
+            <span class="self">self</span>.<span class="ident">record_filter</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">selectors</span>.<span class="ident">into</span>())
+        }
     }
 }
 </code></pre></div>

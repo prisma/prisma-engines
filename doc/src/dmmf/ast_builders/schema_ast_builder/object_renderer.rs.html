@@ -112,6 +112,7 @@
 <span id="112">112</span>
 <span id="113">113</span>
 <span id="114">114</span>
+<span id="115">115</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -164,6 +165,7 @@
             <span class="ident">constraints</span>: <span class="ident">DmmfInputTypeConstraints</span> {
                 <span class="ident">max_num_fields</span>: <span class="ident">input_object</span>.<span class="ident">constraints</span>.<span class="ident">max_num_fields</span>,
                 <span class="ident">min_num_fields</span>: <span class="ident">input_object</span>.<span class="ident">constraints</span>.<span class="ident">min_num_fields</span>,
+                <span class="ident">fields</span>: <span class="ident">input_object</span>.<span class="ident">constraints</span>.<span class="ident">fields</span>.<span class="ident">as_ref</span>().<span class="ident">cloned</span>(),
             },
             <span class="ident">fields</span>: <span class="ident">rendered_fields</span>,
             <span class="ident">meta</span>,

@@ -114,6 +114,8 @@
 <span id="114">114</span>
 <span id="115">115</span>
 <span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
 </pre><pre class="rust"><code><span class="doccomment">/// Functions in this module are meant to parse the JSON result of mutation sent to the Query Engine</span>
 <span class="doccomment">/// in order to extract the generated id(s).</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::TestError</span>;
@@ -145,13 +147,13 @@
 <span class="doccomment">/// Parses the JSON result of mutation sent to the Query Engine in order to extract the generated id.</span>
 <span class="doccomment">/// Returns a string that&#39;s already formatted to be included in another query. eg:</span>
 <span class="doccomment">/// { &quot;id&quot;: &quot;my_fancy_id&quot; }</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_id</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">json</span>: <span class="kw-2">&amp;</span><span class="ident">serde_json::Value</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">TestError</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_id</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">json</span>: <span class="kw-2">&amp;</span><span class="ident">serde_json::Value</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>], <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">TestError</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">path_with_field</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">to_vec</span>();
     <span class="ident">path_with_field</span>.<span class="ident">push</span>(<span class="ident">field</span>);
 
     <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">walk_json</span>(<span class="ident">json</span>, <span class="kw-2">&amp;</span><span class="ident">path_with_field</span>)<span class="question-mark">?</span>.<span class="ident">to_string</span>();
 
-    <span class="prelude-val">Ok</span>(<span class="macro">format!</span>(<span class="string">&quot;{{ {}: {} }}&quot;</span>, <span class="ident">field</span>, <span class="ident">value</span>))
+    <span class="prelude-val">Ok</span>(<span class="macro">format!</span>(<span class="string">&quot;{{ {field}: {value}, {meta} }}&quot;</span>))
 }
 
 <span class="doccomment">/// Parses the JSON result of mutation sent to the Query Engine in order to extract the generated compound ids.</span>
@@ -162,6 +164,7 @@
     <span class="ident">arg_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">json</span>: <span class="kw-2">&amp;</span><span class="ident">serde_json::Value</span>,
     <span class="ident">path</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>],
+    <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">TestError</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">field_values</span> <span class="op">=</span> <span class="ident">fields</span>
         .<span class="ident">iter</span>()
@@ -183,7 +186,8 @@
         <span class="string">&quot;{{
             {arg_name}: {{
               {arguments}
-            }}
+            }},
+            {meta}
         }}&quot;</span>,
         <span class="ident">arg_name</span> <span class="op">=</span> <span class="ident">arg_name</span>,
         <span class="ident">arguments</span> <span class="op">=</span> <span class="ident">arguments</span>
@@ -201,7 +205,7 @@
         <span class="ident">serde_json::Value::Array</span>(<span class="ident">arr</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">compound_ids</span> <span class="op">=</span> <span class="ident">arr</span>
                 .<span class="ident">iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">json_val</span><span class="op">|</span> <span class="ident">parse_compound_id</span>(<span class="ident">fields</span>, <span class="ident">arg_name</span>, <span class="ident">json_val</span>, <span class="kw-2">&amp;</span>[]))
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">json_val</span><span class="op">|</span> <span class="ident">parse_compound_id</span>(<span class="ident">fields</span>, <span class="ident">arg_name</span>, <span class="ident">json_val</span>, <span class="kw-2">&amp;</span>[], <span class="string">&quot;&quot;</span>))
                 .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
 
             <span class="prelude-val">Ok</span>(<span class="ident">compound_ids</span>)
@@ -219,7 +223,7 @@
         <span class="ident">serde_json::Value::Array</span>(<span class="ident">arr</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">ids</span> <span class="op">=</span> <span class="ident">arr</span>
                 .<span class="ident">iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">json_val</span><span class="op">|</span> <span class="ident">parse_id</span>(<span class="ident">field</span>, <span class="ident">json_val</span>, <span class="kw-2">&amp;</span>[]))
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">json_val</span><span class="op">|</span> <span class="ident">parse_id</span>(<span class="ident">field</span>, <span class="ident">json_val</span>, <span class="kw-2">&amp;</span>[], <span class="string">&quot;&quot;</span>))
                 .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
 
             <span class="prelude-val">Ok</span>(<span class="ident">ids</span>)
