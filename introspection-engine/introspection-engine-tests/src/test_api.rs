@@ -316,16 +316,9 @@ impl TestApi {
     pub fn assert_eq_datamodels(&self, expected_without_header: &str, result_with_header: &str) {
         let expected_with_source = self.dm_with_sources(expected_without_header);
         let expected_with_generator = self.dm_with_generator_and_preview_flags(&expected_with_source);
+        let reformatted_expected = psl::reformat(&expected_with_generator, 2).unwrap();
 
-        let parsed_expected = psl::lift(&parse_datamodel(&expected_with_generator));
-        let parsed_result = psl::lift(&parse_datamodel(result_with_header));
-
-        let reformatted_expected = psl::render_datamodel_and_config_to_string(&parsed_expected, &self.configuration());
-        let reformatted_result = psl::render_datamodel_and_config_to_string(&parsed_result, &self.configuration());
-
-        println!("{reformatted_expected}\n{reformatted_result}");
-
-        pretty_assertions::assert_eq!(reformatted_expected, reformatted_result);
+        pretty_assertions::assert_eq!(reformatted_expected, result_with_header);
     }
 
     fn dm_with_sources(&self, schema: &str) -> String {

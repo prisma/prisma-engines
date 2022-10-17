@@ -29,7 +29,7 @@ async fn mapped_model_name(api: &TestApi) -> TestResult {
         model Custom_User {
             id               Int         @id @default(autoincrement())
 
-            @@map(name: "_User")
+            @@map("_User")
         }
     "#};
 
@@ -37,7 +37,7 @@ async fn mapped_model_name(api: &TestApi) -> TestResult {
         model Custom_User {
             id               Int         @id @default(autoincrement())
 
-            @@map(name: "_User")
+            @@map("_User")
         }
 
         model Unrelated {
@@ -279,7 +279,7 @@ async fn mapped_field_name(api: &TestApi) -> TestResult {
             unique_2    Int
 
             @@id([c_id_1, id_2])
-            @@index([c_index], name: "test2")
+            @@index([c_index], map: "test2")
             @@unique([c_unique_1, unique_2], map: "sqlite_autoindex_User_1")
         }
     "#};
@@ -293,7 +293,7 @@ async fn mapped_field_name(api: &TestApi) -> TestResult {
             unique_2    Int
 
             @@id([c_id_1, id_2])
-            @@index([c_index], name: "test2")
+            @@index([c_index], map: "test2")
             @@unique([c_unique_1, unique_2], map: "sqlite_autoindex_User_1")
         }
 
@@ -1188,8 +1188,7 @@ async fn virtual_cuid_default_cockroach(api: &TestApi) {
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn comments_should_be_kept(api: &TestApi) -> TestResult {
-    let sql = "CREATE Type a as ENUM (\'A\')".to_string();
-    api.database().execute_raw(&sql, &[]).await?;
+    api.raw_cmd("CREATE TYPE a AS ENUM (\'A\')").await;
 
     api.barrel()
         .execute(|migration| {
@@ -1243,10 +1242,8 @@ async fn comments_should_be_kept(api: &TestApi) -> TestResult {
 
         /// A really helpful comment about the enum
         enum a {
-            A // A really helpful comment about enum variant
+            A
         }
-
-        /// just floating around here
     "#};
 
     api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
