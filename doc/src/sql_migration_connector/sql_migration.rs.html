@@ -681,8 +681,6 @@
 <span id="681">681</span>
 <span id="682">682</span>
 <span id="683">683</span>
-<span id="684">684</span>
-<span id="685">685</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">pair::Pair</span>,
     <span class="ident">sql_renderer::IteratorJoin</span>,
@@ -728,6 +726,9 @@
         <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Eq</span>)]</span>
         <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
         <span class="kw">enum</span> <span class="ident">DriftType</span> {
+            <span class="ident">AlteredExtension</span>,
+            <span class="ident">DroppedExtension</span>,
+            <span class="ident">CreatedExtension</span>,
             <span class="ident">AddedEnum</span>,
             <span class="ident">AddedTable</span>,
             <span class="ident">RemovedEnum</span>,
@@ -737,9 +738,6 @@
             <span class="ident">RedefinedTable</span>,
             <span class="ident">ChangedEnum</span>,
             <span class="ident">ChangedTable</span>,
-            <span class="ident">CreatedExtension</span>,
-            <span class="ident">AlteredExtension</span>,
-            <span class="ident">DroppedExtension</span>,
         }
 
         <span class="comment">// (sort key, item name, step index)</span>
@@ -904,9 +902,7 @@
                         <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;` extension\n&quot;</span>);
                     }
                     <span class="ident">DriftType::DroppedExtension</span> =&gt; {
-                        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;\n[*] Dropped the `&quot;</span>);
-                        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="ident">item_name</span>);
-                        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;` extension\n&quot;</span>);
+                        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;\n[-] Removed extensions\n`&quot;</span>);
                     }
                 }
             }
@@ -1136,6 +1132,9 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">SqlMigrationStep</span> {
     <span class="ident">CreateSchema</span>(<span class="ident">sql_schema_describer::NamespaceId</span>),
+    <span class="ident">DropExtension</span>(<span class="ident">DropExtension</span>),
+    <span class="ident">CreateExtension</span>(<span class="ident">CreateExtension</span>),
+    <span class="ident">AlterExtension</span>(<span class="ident">AlterExtension</span>),
     <span class="ident">AlterSequence</span>(<span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>, <span class="ident">SequenceChanges</span>),
     <span class="ident">DropView</span>(<span class="ident">DropView</span>),
     <span class="ident">DropUserDefinedType</span>(<span class="ident">DropUserDefinedType</span>),
@@ -1187,9 +1186,6 @@
     <span class="ident">RedefineIndex</span> {
         <span class="ident">index</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">IndexId</span><span class="op">&gt;</span>,
     },
-    <span class="ident">DropExtension</span>(<span class="ident">DropExtension</span>),
-    <span class="ident">CreateExtension</span>(<span class="ident">CreateExtension</span>),
-    <span class="ident">AlterExtension</span>(<span class="ident">AlterExtension</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">SqlMigrationStep</span> {
