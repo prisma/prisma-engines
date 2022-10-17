@@ -37,7 +37,7 @@ impl<'a> Generator<'a> {
 
     /// Add a new preview feature to the generator block.
     pub fn push_preview_feature(&mut self, feature: PreviewFeature) {
-        let features = self.preview_features.get_or_insert_with(|| Array::default());
+        let features = self.preview_features.get_or_insert_with(Array::default);
         features.push(Value::Feature(feature));
     }
 
