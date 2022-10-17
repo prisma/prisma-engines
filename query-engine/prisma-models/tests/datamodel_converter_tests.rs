@@ -1,6 +1,120 @@
 #![allow(non_snake_case)]
 use prisma_models::*;
+use prisma_models::{dml::ReferentialAction, *};
+use std::collections::BTreeSet;
 use std::sync::Arc;
+
+#[test]
+fn set_null_is_not_valid_on_mandatory_fields() {
+    let datamodel = convert(
+        r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialIntegrity"]
+        }
+
+        datasource db {
+            provider = "sqlite"
+            url = "./dev.db"
+            relationMode = "foreignKeys"
+        }
+
+        model SomeUser {
+            id      Int      @id
+            ref     Int
+            profile Profile?
+          
+            @@unique([id, ref])
+          }
+          
+        model Profile {
+            id     Int       @id
+            user   SomeUser? @relation(fields: [user_id, user_ref], references: [id, ref], onUpdate: SetNull, onDelete: SetNull)
+            user_id Int?
+            user_ref Int
+            
+            @@unique([user_id, user_ref])
+        }
+    "#,
+    );
+
+    let relations = datamodel.relations();
+    assert_eq!(relations.len(), 1);
+
+    let relation = &relations[0];
+    assert_eq!(relation.on_update(), ReferentialAction::SetNull);
+    assert_eq!(relation.on_delete(), ReferentialAction::SetNull);
+
+    assert_eq!(relation.is_one_to_one(), true);
+    assert_eq!(relation.field_a().name, "user");
+    assert_eq!(relation.field_b().name, "profile");
+
+    /// Find the first `RelationField` in the first `Model` in the `Relation` that matches the given predicate.
+    /// This would be private once moved into a module.
+    fn find_referenced_field_a<'a>(
+        relation_field_a: &'a RelationFieldRef,
+        model_a: &'a ModelRef,
+        field_predicate: impl Fn(&&Field) -> bool,
+    ) -> Option<&'a Field> {
+        let fields_a = &relation_field_a.relation_info.fields;
+        let fields_a_as_set: BTreeSet<String> = fields_a.iter().map(|s| s.to_owned()).collect();
+        let referenced_fields = model_a.fields().find_many_from_all(&fields_a_as_set);
+
+        match referenced_fields.into_iter().find(field_predicate) {
+            Some(field) => Some(&field),
+            _ => None,
+        }
+    }
+
+    /// Find the first `RelationField` in the first `Model` in the `Relation` that matches the given predicate.
+    /// This would be public once moved into a module.
+    fn find_referenced_field_a_from_relation(
+        relation: &std::sync::Arc<Relation>,
+        field_predicate: impl Fn(&&Field) -> bool,
+    ) -> Option<Field> {
+        let relation_field_a = &relation.field_a();
+        let model_a = &relation.model_a();
+
+        match find_referenced_field_a(&relation_field_a, &model_a, field_predicate) {
+            // we could technically just return the field name here, avoiding a clone.
+            // I think it could make sense to keep the clone if we wanted this as a general utility function
+            Some(field) => Some(field.clone()),
+            _ => None,
+        }
+    }
+
+    fn validate(relation: &std::sync::Arc<Relation>) {
+        let has_referential_action_set_null =
+            [relation.on_update(), relation.on_delete()].contains(&ReferentialAction::SetNull);
+        if !has_referential_action_set_null {
+            return;
+        }
+
+        match find_referenced_field_name_a(&relation, |field| field.is_required()) {
+            Some(required_field_name) => {
+                let action = if relation.on_update() == ReferentialAction::SetNull {
+                    "onUpdate"
+                } else {
+                    "onDelete"
+                };
+                dbg!(format!(
+                    "Field {} is required, but that is incompatible with the referential action {}: {}.",
+                    action,
+                    required_field_name.name(),
+                    ReferentialAction::SetNull,
+                ));
+            }
+            _ => (),
+        }
+    }
+
+    // you should see the dbg! output:
+    //
+    // format!("Field {} is required, but that is incompatible with the referential action {}: {}.",
+    // action, required_field_name.name(), ReferentialAction :: SetNull,) = "Field onUpdate is required, but that is incompatible with the referential action user_ref: SetNull."
+    // test set_null_is_not_valid_on_mandatory_fields ... ok
+    validate(&relation);
+}
 
 #[test]
 fn an_empty_datamodel_must_work() {
