@@ -51,7 +51,11 @@ mod one2one_req {
     }
 }
 
-#[test_suite(suite = "noaction_onD_1to1_opt", schema(optional), exclude(MongoDb))]
+#[test_suite(
+    suite = "noaction_onD_1to1_opt",
+    schema(optional),
+    exclude(Postgres, Sqlite, MongoDb)
+)]
 mod one2one_opt {
     fn optional() -> String {
         let schema = indoc! {
@@ -145,7 +149,12 @@ mod one2one_opt {
     }
 }
 
-#[test_suite(suite = "noaction_onD_1toM_req", schema(required), relation_mode = "prisma")]
+#[test_suite(
+    suite = "noaction_onD_1toM_req",
+    schema(required),
+    relation_mode = "prisma",
+    exclude(Postgres, Sqlite)
+)]
 mod one2many_req {
     fn required() -> String {
         let schema = indoc! {
@@ -239,7 +248,11 @@ mod one2many_req {
     }
 }
 
-#[test_suite(suite = "noaction_onD_1toM_opt", schema(optional), exclude(MongoDb))]
+#[test_suite(
+    suite = "noaction_onD_1toM_opt",
+    schema(optional),
+    exclude(Postgres, Sqlite, MongoDb)
+)]
 mod one2many_opt {
     fn optional() -> String {
         let schema = indoc! {
