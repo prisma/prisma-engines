@@ -383,17 +383,13 @@ pub(crate) fn calculate_scalar_field_type_with_native_types(column: sql::ColumnW
     match scalar_type {
         FieldType::Scalar(scal_type, _) => match &column.column_type().native_type {
             None => scalar_type,
-            Some(native_type) => {
-                let native_type_instance = ctx.active_connector().introspect_native_type(native_type.clone());
-                FieldType::Scalar(
-                    scal_type,
-                    Some(psl::dml::NativeTypeInstance {
-                        args: native_type_instance.args,
-                        serialized_native_type: native_type_instance.serialized_native_type,
-                        name: native_type_instance.name,
-                    }),
-                )
-            }
+            Some(native_type) => FieldType::Scalar(
+                scal_type,
+                Some(psl::dml::NativeTypeInstance::new(
+                    native_type.clone(),
+                    ctx.active_connector(),
+                )),
+            ),
         },
         field_type => field_type,
     }

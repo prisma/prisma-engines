@@ -4,8 +4,10 @@ use crate::{
     SqlFamilyTrait,
 };
 use introspection_connector::{Version, Warning};
-use native_types::{MySqlType, PostgresType};
-use psl::dml::{self, Datamodel, ValueGenerator};
+use psl::{
+    builtin_connectors::{MySqlType, PostgresType},
+    dml::{self, Datamodel, ValueGenerator},
+};
 use sql_schema_describer::SqlSchema;
 
 pub(crate) fn add_prisma_1_id_defaults(
@@ -28,21 +30,21 @@ pub(crate) fn add_prisma_1_id_defaults(
 
             if ctx.sql_family().is_postgres() {
                 if let Some(native_type) = &column.column_type().native_type {
-                    let native_type: PostgresType = serde_json::from_value(native_type.clone()).unwrap();
+                    let native_type: &PostgresType = native_type.downcast_ref();
 
-                    if native_type == PostgresType::VarChar(Some(25)) {
+                    if native_type == &PostgresType::VarChar(Some(25)) {
                         needs_to_be_changed.push((model_and_field, true))
-                    } else if native_type == PostgresType::VarChar(Some(36)) {
+                    } else if native_type == &PostgresType::VarChar(Some(36)) {
                         needs_to_be_changed.push((model_and_field, false))
                     }
                 }
             } else if ctx.sql_family().is_mysql() {
                 if let Some(native_type) = &column.column_type().native_type {
-                    let native_type: MySqlType = serde_json::from_value(native_type.clone()).unwrap();
+                    let native_type: &MySqlType = native_type.downcast_ref();
 
-                    if native_type == MySqlType::Char(25) {
+                    if native_type == &MySqlType::Char(25) {
                         needs_to_be_changed.push((model_and_field, true))
-                    } else if native_type == MySqlType::Char(36) {
+                    } else if native_type == &MySqlType::Char(36) {
                         needs_to_be_changed.push((model_and_field, false))
                     }
                 }

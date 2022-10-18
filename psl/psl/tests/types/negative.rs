@@ -128,7 +128,7 @@ fn should_fail_on_native_type_with_invalid_arguments() {
     "#};
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mExpected a numeric value, but failed while parsing "a": invalid digit found in string.[0m
+        [1;91merror[0m: [1mExpected a nonnegative integer, but found (a).[0m
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id     Int    @id

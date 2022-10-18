@@ -446,7 +446,6 @@ fn push_column_for_builtin_scalar_type(
 
     let native_type = field
         .native_type_instance(connector)
-        .map(|instance| instance.serialized_native_type)
         .unwrap_or_else(|| connector.default_native_type_for_scalar_type(&scalar_type));
 
     enum ColumnDefault {

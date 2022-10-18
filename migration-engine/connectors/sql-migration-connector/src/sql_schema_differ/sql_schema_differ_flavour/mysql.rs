@@ -1,6 +1,6 @@
 use super::SqlSchemaDifferFlavour;
 use crate::{flavour::MysqlFlavour, pair::Pair, sql_schema_differ::ColumnTypeChange};
-use native_types::MySqlType;
+use psl::builtin_connectors::MySqlType;
 use sql_schema_describer::{
     walkers::{ColumnWalker, IndexWalker},
     ColumnTypeFamily,
@@ -113,7 +113,7 @@ fn safe() -> ColumnTypeChange {
     ColumnTypeChange::SafeCast
 }
 
-fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
+fn native_type_change(types: Pair<&MySqlType>) -> Option<ColumnTypeChange> {
     let next = &types.next;
 
     Some(match &types.previous {

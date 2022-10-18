@@ -22,7 +22,7 @@ pub use self::{
 };
 
 use once_cell::sync::Lazy;
-use prisma_value::PrismaValue;
+use psl::dml::PrismaValue;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -411,7 +411,7 @@ pub struct UserDefinedType {
     pub definition: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Column {
     /// Column name.
     pub name: String,
@@ -424,7 +424,7 @@ pub struct Column {
 }
 
 /// The type of a column.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ColumnType {
     /// The full SQL data type, the sql string necessary to recreate the column, drawn directly from the db, used when there is no native type.
     pub full_data_type: String,
@@ -433,7 +433,8 @@ pub struct ColumnType {
     /// The arity of the column.
     pub arity: ColumnArity,
     /// The Native type of the column.
-    pub native_type: Option<serde_json::Value>,
+    #[serde(skip)]
+    pub native_type: Option<psl::datamodel_connector::NativeTypeInstance>,
 }
 
 impl ColumnType {

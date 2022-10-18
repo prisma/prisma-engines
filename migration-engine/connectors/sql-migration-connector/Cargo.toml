@@ -6,7 +6,6 @@ version = "0.1.0"
 [dependencies]
 psl.workspace = true
 migration-connector = { path = "../migration-connector" }
-native-types = { path = "../../../libs/native-types" }
 sql-schema-describer = { path = "../../../libs/sql-schema-describer" }
 sql-ddl = { path = "../../../libs/sql-ddl" }
 sql-introspection-connector = { path = "../../../introspection-engine/connectors/sql-introspection-connector" }

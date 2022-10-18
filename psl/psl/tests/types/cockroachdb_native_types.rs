@@ -60,29 +60,6 @@ fn should_fail_on_invalid_precision_for_time_types() {
 
         model User {
           id  Int      @id
-          val DateTime @db.Time(-1)
-        }
-    "#};
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mArgument M is out of range for native type `Time(-1)` of CockroachDB: M can range from 0 to 6.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
-        [1;94m   | [0m
-        [1;94m 7 | [0m  id  Int      @id
-        [1;94m 8 | [0m  val DateTime [1;91m@db.Time(-1)[0m
-        [1;94m   | [0m
-    "#]];
-
-    expect_error(schema, &expectation);
-
-    let schema = indoc! {r#"
-        datasource db {
-          provider = "cockroachdb"
-          url      = env("DATABASE_URL")
-        }
-
-        model User {
-          id  Int      @id
           val DateTime @db.Timestamp(7)
         }
     "#};
@@ -93,29 +70,6 @@ fn should_fail_on_invalid_precision_for_time_types() {
         [1;94m   | [0m
         [1;94m 7 | [0m  id  Int      @id
         [1;94m 8 | [0m  val DateTime [1;91m@db.Timestamp(7)[0m
-        [1;94m   | [0m
-    "#]];
-
-    expect_error(schema, &expectation);
-
-    let schema = indoc! {r#"
-        datasource db {
-          provider = "cockroachdb"
-          url      = env("DATABASE_URL")
-        }
-
-        model User {
-          id  Int      @id
-          val DateTime @db.Timestamp(-1)
-        }
-    "#};
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mArgument M is out of range for native type `Timestamp(-1)` of CockroachDB: M can range from 0 to 6.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
-        [1;94m   | [0m
-        [1;94m 7 | [0m  id  Int      @id
-        [1;94m 8 | [0m  val DateTime [1;91m@db.Timestamp(-1)[0m
         [1;94m   | [0m
     "#]];
 
