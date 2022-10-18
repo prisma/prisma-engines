@@ -9,17 +9,27 @@ use crate::{Array, Commented, Env, Text, Value};
 #[derive(Debug)]
 pub struct Datasource<'a> {
     name: &'a str,
-    provider: Text<'a>,
+    provider: Text<&'a str>,
     url: Env<'a>,
     shadow_database_url: Option<Env<'a>>,
     relation_mode: Option<RelationMode>,
     custom_properties: Vec<(&'a str, Value<'a>)>,
     documentation: Option<Commented<'a>>,
-    namespaces: Array<'a>,
+    namespaces: Array<Text<&'a str>>,
 }
 
 impl<'a> Datasource<'a> {
     /// Create a new datasource with all required properties.
+    ///
+    /// ```ignore
+    /// datasource db {
+    /// //         ^^ name
+    ///   provider = "postgresql"
+    /// //            ^^^^^^^^^^ provider
+    ///   url      = env("DATABASE_URL")
+    /// //                ^^^^^^^^^^^^ url
+    /// }
+    /// ```
     pub fn new(name: &'a str, provider: &'a str, url: impl Into<Env<'a>>) -> Self {
         Self {
             name,
@@ -29,27 +39,68 @@ impl<'a> Datasource<'a> {
             relation_mode: None,
             custom_properties: Default::default(),
             documentation: None,
-            namespaces: Array::default(),
+            namespaces: Array::new(),
         }
     }
 
     /// Used for migration engine to reflect the contents of
     /// migrations directory to diff against the actual database.
+    ///
+    /// ```ignore
+    /// datasource db {
+    ///   provider          = "postgresql"
+    ///   url               = env("DATABASE_URL")
+    ///   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+    /// //                         ^^^^^^^^^^^^^^^^^^^ this
+    /// }
+    /// ```
     pub fn shadow_database_url(&mut self, url: impl Into<Env<'a>>) {
         self.shadow_database_url = Some(url.into());
     }
 
     /// Who handles referential integrity.
+    ///
+    /// ```ignore
+    /// datasource db {
+    ///   provider     = "postgresql"
+    ///   url          = env("DATABASE_URL")
+    ///   relationMode = "foreignKeys"
+    /// //                ^^^^^^^^^^^ this
+    /// }
+    /// ```
     pub fn relation_mode(&mut self, relation_mode: RelationMode) {
         self.relation_mode = Some(relation_mode);
     }
 
     /// Add a custom connector-specific property to the datasource.
+    /// Use this for settings that are only for a single database. For
+    /// shared things, add an explicit property to the `Datasource`
+    /// struct.
+    ///
+    /// An example for PostgreSQL extensions, using an array of functions:
+    ///
+    /// ```ignore
+    /// datasource db {
+    ///   provider   = "postgresql"
+    ///   url          = env("DATABASE_URL")
+    ///   extensions = [citext(version: "2.1")]
+    /// //             ^^^^^^^^^^^^^^^^^^^^^^^^ value
+    /// //^^^^^^^^^^ key
+    /// }
+    /// ```
     pub fn push_custom_property(&mut self, key: &'a str, value: impl Into<Value<'a>>) {
         self.custom_properties.push((key, value.into()));
     }
 
     /// The documentation on top of the datasource.
+    ///
+    /// ```ignore
+    /// /// This here is the documentation.
+    /// datasource db {
+    ///   provider = "postgresql"
+    ///   url      = env("DATABASE_URL")
+    /// }
+    /// ```
     pub fn documentation(&mut self, documentation: &'a str) {
         self.documentation = Some(Commented::Documentation(documentation));
     }
@@ -66,7 +117,7 @@ impl<'a> Datasource<'a> {
             relation_mode: psl_ds.relation_mode,
             documentation: psl_ds.documentation.as_deref().map(Commented::Documentation),
             custom_properties: Default::default(),
-            namespaces: Array(psl_ds.namespaces.iter().map(|(ns, _)| Text(ns).into()).collect()),
+            namespaces: Array(psl_ds.namespaces.iter().map(|(ns, _)| Text(ns.as_str())).collect()),
         }
     }
 }
@@ -117,12 +168,12 @@ mod tests {
         datasource.shadow_database_url(Env::variable("SHADOW_DATABASE_URL"));
         datasource.relation_mode(RelationMode::ForeignKeys);
 
-        let mut fun = Function::new("uuid_ossp");
-        fun.push_param(("map", Text("uuid-ossp")));
+        let mut w = Function::new("uuid_ossp");
+        w.push_param(("map", Text("uuid-ossp")));
 
-        let mut extensions = Array::default();
-        extensions.push("postgis");
-        extensions.push(fun);
+        let mut extensions = Array::new();
+        extensions.push(Function::new("postgis"));
+        extensions.push(w);
 
         datasource.push_custom_property("extensions", extensions);
 

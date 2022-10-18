@@ -2,7 +2,7 @@ use std::fmt;
 
 use psl::PreviewFeature;
 
-use crate::{value::Array, Commented, Env, Text, Value};
+use crate::{value::Array, Commented, Env, Text};
 
 /// The generator block of the datasource.
 #[derive(Debug)]
@@ -10,48 +10,94 @@ pub struct Generator<'a> {
     name: &'a str,
     provider: Env<'a>,
     output: Option<Env<'a>>,
-    preview_features: Option<Array<'a>>,
-    binary_targets: Array<'a>,
+    preview_features: Option<Array<Text<PreviewFeature>>>,
+    binary_targets: Array<Env<'a>>,
     documentation: Option<Commented<'a>>,
-    config: Vec<(&'a str, Text<'a>)>,
+    config: Vec<(&'a str, Text<&'a str>)>,
 }
 
 impl<'a> Generator<'a> {
     /// A new generator with the required values set.
+    ///
+    /// ```ignore
+    /// generator js {
+    /// //        ^^ name
+    ///   provider = "prisma-client-js"
+    /// //            ^^^^^^^^^^^^^^^^ provider
+    /// }
+    /// ```
     pub fn new(name: &'a str, provider: impl Into<Env<'a>>) -> Self {
         Self {
             name,
             provider: provider.into(),
             output: None,
             preview_features: None,
-            binary_targets: Array::default(),
+            binary_targets: Array::new(),
             documentation: None,
             config: Vec::new(),
         }
     }
 
     /// Sets an output target.
+    ///
+    /// ```ignore
+    /// generator js {
+    ///   output = env("OUTPUT_DIR")
+    /// //              ^^^^^^^^^^ this
+    /// }
+    /// ```
     pub fn output(&mut self, output: impl Into<Env<'a>>) {
         self.output = Some(output.into());
     }
 
     /// Add a new preview feature to the generator block.
+    ///
+    /// ```ignore
+    /// generator js {
+    ///   previewFeatures = ["postgresqlExtensions"]
+    /// //                    ^^^^^^^^^^^^^^^^^^^^ pushed here
+    /// }
+    /// ```
     pub fn push_preview_feature(&mut self, feature: PreviewFeature) {
-        let features = self.preview_features.get_or_insert_with(Array::default);
-        features.push(Value::Feature(feature));
+        let features = self.preview_features.get_or_insert_with(Array::new);
+        features.push(Text(feature));
     }
 
     /// Add a new binary target to the generator block.
+    ///
+    /// ```ignore
+    /// generator js {
+    ///   binaryTargets = [env("FOO_TARGET")]
+    /// //                 ^^^^^^^^^^^^^^^^^ pushed here
+    /// }
+    /// ```
     pub fn push_binary_target(&mut self, target: impl Into<Env<'a>>) {
         self.binary_targets.push(target.into())
     }
 
     /// Set the generator block documentation.
+    ///
+    /// ```ignore
+    /// /// This here is the documentation.
+    /// generator js {
+    ///   provider = "prisma-client-js"
+    /// }
+    /// ```
     pub fn documentation(&mut self, docs: &'a str) {
         self.documentation = Some(Commented::Documentation(docs));
     }
 
-    /// Add a custom config value to the block.
+    /// Add a custom config value to the block. For now we support any
+    /// key/value pairs, and the value must be text.
+    ///
+    /// ```ignore
+    /// generator js {
+    ///   provider = "prisma-client-js"
+    ///   custom   = "foo"
+    /// //           ^^^^^ value
+    /// //^^^^^^ key
+    /// }
+    /// ```
     pub fn push_config_value(&mut self, key: &'a str, val: &'a str) {
         self.config.push((key, Text(val)));
     }
@@ -60,10 +106,10 @@ impl<'a> Generator<'a> {
     pub fn from_psl(psl_gen: &'a psl::Generator) -> Self {
         let preview_features = psl_gen
             .preview_features
-            .map(|f| f.iter().map(Value::Feature).collect())
+            .map(|f| f.iter().map(Text).collect())
             .map(Array);
 
-        let binary_targets = psl_gen.binary_targets.iter().map(Env::from).map(Value::from).collect();
+        let binary_targets = psl_gen.binary_targets.iter().map(Env::from).collect();
 
         let config = psl_gen
             .config

@@ -23,7 +23,7 @@ pub(super) fn add_extensions<'a>(
         .downcast_ref::<PostgresDatasourceProperties>();
 
     let previous_extensions = connector_data.and_then(|p| p.extensions());
-    let mut next_extensions = render::Array::default();
+    let mut next_extensions = render::Array::new();
 
     for ext in pg_schema_ext.extension_walkers() {
         let sanitized_name = sanitize_string(ext.name());
