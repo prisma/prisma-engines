@@ -96,7 +96,7 @@
         .<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">PostgresDatasourceProperties</span><span class="op">&gt;</span>();
 
     <span class="kw">let</span> <span class="ident">previous_extensions</span> <span class="op">=</span> <span class="ident">connector_data</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">extensions</span>());
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">next_extensions</span> <span class="op">=</span> <span class="ident">render::Array::default</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">next_extensions</span> <span class="op">=</span> <span class="ident">render::Array::new</span>();
 
     <span class="kw">for</span> <span class="ident">ext</span> <span class="kw">in</span> <span class="ident">pg_schema_ext</span>.<span class="ident">extension_walkers</span>() {
         <span class="kw">let</span> <span class="ident">sanitized_name</span> <span class="op">=</span> <span class="ident">sanitize_string</span>(<span class="ident">ext</span>.<span class="ident">name</span>());

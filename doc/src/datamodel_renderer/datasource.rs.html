@@ -144,6 +144,57 @@
 <span id="144">144</span>
 <span id="145">145</span>
 <span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::fmt</span>;
 <span class="kw">use</span> <span class="ident">std::default::Default</span>;
 
@@ -155,17 +206,27 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Datasource</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    <span class="ident">provider</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="ident">provider</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>,
     <span class="ident">url</span>: <span class="ident">Env</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
     <span class="ident">shadow_database_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Env</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">relation_mode</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RelationMode</span><span class="op">&gt;</span>,
     <span class="ident">custom_properties</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
     <span class="ident">documentation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Commented</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">namespaces</span>: <span class="ident">Array</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="ident">namespaces</span>: <span class="ident">Array</span><span class="op">&lt;</span><span class="ident">Text</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Datasource</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Create a new datasource with all required properties.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```ignore</span>
+    <span class="doccomment">/// datasource db {</span>
+    <span class="doccomment">/// //         ^^ name</span>
+    <span class="doccomment">///   provider = &quot;postgresql&quot;</span>
+    <span class="doccomment">/// //            ^^^^^^^^^^ provider</span>
+    <span class="doccomment">///   url      = env(&quot;DATABASE_URL&quot;)</span>
+    <span class="doccomment">/// //                ^^^^^^^^^^^^ url</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">provider</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">url</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Env</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">name</span>,
@@ -175,27 +236,68 @@
             <span class="ident">relation_mode</span>: <span class="prelude-val">None</span>,
             <span class="ident">custom_properties</span>: <span class="ident">Default::default</span>(),
             <span class="ident">documentation</span>: <span class="prelude-val">None</span>,
-            <span class="ident">namespaces</span>: <span class="ident">Array::default</span>(),
+            <span class="ident">namespaces</span>: <span class="ident">Array::new</span>(),
         }
     }
 
     <span class="doccomment">/// Used for migration engine to reflect the contents of</span>
     <span class="doccomment">/// migrations directory to diff against the actual database.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```ignore</span>
+    <span class="doccomment">/// datasource db {</span>
+    <span class="doccomment">///   provider          = &quot;postgresql&quot;</span>
+    <span class="doccomment">///   url               = env(&quot;DATABASE_URL&quot;)</span>
+    <span class="doccomment">///   shadowDatabaseUrl = env(&quot;SHADOW_DATABASE_URL&quot;)</span>
+    <span class="doccomment">/// //                         ^^^^^^^^^^^^^^^^^^^ this</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shadow_database_url</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">url</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Env</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">shadow_database_url</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">url</span>.<span class="ident">into</span>());
     }
 
     <span class="doccomment">/// Who handles referential integrity.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```ignore</span>
+    <span class="doccomment">/// datasource db {</span>
+    <span class="doccomment">///   provider     = &quot;postgresql&quot;</span>
+    <span class="doccomment">///   url          = env(&quot;DATABASE_URL&quot;)</span>
+    <span class="doccomment">///   relationMode = &quot;foreignKeys&quot;</span>
+    <span class="doccomment">/// //                ^^^^^^^^^^^ this</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_mode</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">relation_mode</span>: <span class="ident">RelationMode</span>) {
         <span class="self">self</span>.<span class="ident">relation_mode</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">relation_mode</span>);
     }
 
     <span class="doccomment">/// Add a custom connector-specific property to the datasource.</span>
+    <span class="doccomment">/// Use this for settings that are only for a single database. For</span>
+    <span class="doccomment">/// shared things, add an explicit property to the `Datasource`</span>
+    <span class="doccomment">/// struct.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// An example for PostgreSQL extensions, using an array of functions:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```ignore</span>
+    <span class="doccomment">/// datasource db {</span>
+    <span class="doccomment">///   provider   = &quot;postgresql&quot;</span>
+    <span class="doccomment">///   url          = env(&quot;DATABASE_URL&quot;)</span>
+    <span class="doccomment">///   extensions = [citext(version: &quot;2.1&quot;)]</span>
+    <span class="doccomment">/// //             ^^^^^^^^^^^^^^^^^^^^^^^^ value</span>
+    <span class="doccomment">/// //^^^^^^^^^^ key</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_custom_property</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">custom_properties</span>.<span class="ident">push</span>((<span class="ident">key</span>, <span class="ident">value</span>.<span class="ident">into</span>()));
     }
 
     <span class="doccomment">/// The documentation on top of the datasource.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```ignore</span>
+    <span class="doccomment">/// /// This here is the documentation.</span>
+    <span class="doccomment">/// datasource db {</span>
+    <span class="doccomment">///   provider = &quot;postgresql&quot;</span>
+    <span class="doccomment">///   url      = env(&quot;DATABASE_URL&quot;)</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">documentation</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">documentation</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) {
         <span class="self">self</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Commented::Documentation</span>(<span class="ident">documentation</span>));
     }
@@ -212,7 +314,7 @@
             <span class="ident">relation_mode</span>: <span class="ident">psl_ds</span>.<span class="ident">relation_mode</span>,
             <span class="ident">documentation</span>: <span class="ident">psl_ds</span>.<span class="ident">documentation</span>.<span class="ident">as_deref</span>().<span class="ident">map</span>(<span class="ident">Commented::Documentation</span>),
             <span class="ident">custom_properties</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">namespaces</span>: <span class="ident">Array</span>(<span class="ident">psl_ds</span>.<span class="ident">namespaces</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">ns</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">Text</span>(<span class="ident">ns</span>).<span class="ident">into</span>()).<span class="ident">collect</span>()),
+            <span class="ident">namespaces</span>: <span class="ident">Array</span>(<span class="ident">psl_ds</span>.<span class="ident">namespaces</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">ns</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">Text</span>(<span class="ident">ns</span>.<span class="ident">as_str</span>())).<span class="ident">collect</span>()),
         }
     }
 }
@@ -263,12 +365,12 @@
         <span class="ident">datasource</span>.<span class="ident">shadow_database_url</span>(<span class="ident">Env::variable</span>(<span class="string">&quot;SHADOW_DATABASE_URL&quot;</span>));
         <span class="ident">datasource</span>.<span class="ident">relation_mode</span>(<span class="ident">RelationMode::ForeignKeys</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fun</span> <span class="op">=</span> <span class="ident">Function::new</span>(<span class="string">&quot;uuid_ossp&quot;</span>);
-        <span class="ident">fun</span>.<span class="ident">push_param</span>((<span class="string">&quot;map&quot;</span>, <span class="ident">Text</span>(<span class="string">&quot;uuid-ossp&quot;</span>)));
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">w</span> <span class="op">=</span> <span class="ident">Function::new</span>(<span class="string">&quot;uuid_ossp&quot;</span>);
+        <span class="ident">w</span>.<span class="ident">push_param</span>((<span class="string">&quot;map&quot;</span>, <span class="ident">Text</span>(<span class="string">&quot;uuid-ossp&quot;</span>)));
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">extensions</span> <span class="op">=</span> <span class="ident">Array::default</span>();
-        <span class="ident">extensions</span>.<span class="ident">push</span>(<span class="string">&quot;postgis&quot;</span>);
-        <span class="ident">extensions</span>.<span class="ident">push</span>(<span class="ident">fun</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">extensions</span> <span class="op">=</span> <span class="ident">Array::new</span>();
+        <span class="ident">extensions</span>.<span class="ident">push</span>(<span class="ident">Function::new</span>(<span class="string">&quot;postgis&quot;</span>));
+        <span class="ident">extensions</span>.<span class="ident">push</span>(<span class="ident">w</span>);
 
         <span class="ident">datasource</span>.<span class="ident">push_custom_property</span>(<span class="string">&quot;extensions&quot;</span>, <span class="ident">extensions</span>);
 
