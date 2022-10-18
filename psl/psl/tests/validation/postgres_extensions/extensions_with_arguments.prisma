@@ -1,0 +1,10 @@
+generator js {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource mypg {
+  provider   = "postgresql"
+  url        = env("TEST_DATABASE_URL")
+  extensions = [uuid_ossp(map: "uuid-ossp", schema: "meow", version: "2.1")]
+}

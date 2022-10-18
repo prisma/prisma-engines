@@ -2,7 +2,10 @@ use super::{common::*, SqlRenderer};
 use crate::{
     flavour::PostgresFlavour,
     pair::Pair,
-    sql_migration::{AlterColumn, AlterEnum, AlterTable, RedefineTable, SequenceChange, SequenceChanges, TableChange},
+    sql_migration::{
+        AlterColumn, AlterEnum, AlterExtension, AlterTable, CreateExtension, DropExtension, ExtensionChange,
+        RedefineTable, SequenceChange, SequenceChanges, TableChange,
+    },
     sql_schema_differ::{ColumnChange, ColumnChanges},
 };
 use native_types::{CockroachType, PostgresType};
@@ -76,6 +79,70 @@ impl SqlRenderer for PostgresFlavour {
                 }
             })
         })
+    }
+
+    fn render_create_extension(&self, create: &CreateExtension, schema: &SqlSchema) -> Vec<String> {
+        let ext: &PostgresSchemaExt = schema.downcast_connector_data();
+        let extension = ext.get_extension(create.id);
+
+        render_step(&mut |step| {
+            step.render_statement(&mut |stmt| {
+                stmt.push_str("CREATE EXTENSION IF NOT EXISTS ");
+                stmt.push_display(&Quoted::postgres_ident(&extension.name));
+
+                if !extension.version.is_empty() || !extension.schema.is_empty() {
+                    stmt.push_str(" WITH");
+                }
+
+                if !extension.schema.is_empty() {
+                    stmt.push_str(" SCHEMA ");
+                    stmt.push_display(&Quoted::postgres_ident(&extension.schema));
+                }
+
+                if !extension.version.is_empty() {
+                    stmt.push_str(" VERSION ");
+                    stmt.push_display(&Quoted::postgres_ident(&extension.version));
+                }
+            })
+        })
+    }
+
+    fn render_drop_extension(&self, drop: &DropExtension, schema: &SqlSchema) -> Vec<String> {
+        let ext: &PostgresSchemaExt = schema.downcast_connector_data();
+        let extension = ext.get_extension(drop.id);
+
+        render_step(&mut |step| {
+            step.render_statement(&mut |stmt| {
+                stmt.push_str("DROP EXTENSION ");
+                stmt.push_display(&Quoted::postgres_ident(&extension.name));
+            })
+        })
+    }
+
+    fn render_alter_extension(&self, alter: &AlterExtension, schemas: Pair<&SqlSchema>) -> Vec<String> {
+        let exts: Pair<&PostgresSchemaExt> = schemas.map(|schema| schema.downcast_connector_data());
+        let extensions = exts.zip(alter.ids).map(|(ext, id)| ext.get_extension(id));
+
+        alter
+            .changes
+            .iter()
+            .flat_map(|change| {
+                render_step(&mut |step| match change {
+                    ExtensionChange::AlterVersion => step.render_statement(&mut |stmt| {
+                        stmt.push_str("ALTER EXTENSION ");
+                        stmt.push_display(&Quoted::postgres_ident(&extensions.previous.name));
+                        stmt.push_str(" UPDATE TO ");
+                        stmt.push_display(&Quoted::postgres_ident(&extensions.next.version));
+                    }),
+                    ExtensionChange::AlterSchema => step.render_statement(&mut |stmt| {
+                        stmt.push_str("ALTER EXTENSION ");
+                        stmt.push_display(&Quoted::postgres_ident(&extensions.previous.name));
+                        stmt.push_str(" SET SCHEMA ");
+                        stmt.push_display(&Quoted::postgres_ident(&extensions.next.schema));
+                    }),
+                })
+            })
+            .collect()
     }
 
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {

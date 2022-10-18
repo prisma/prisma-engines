@@ -1,0 +1,16 @@
+generator js {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource mypg {
+  provider   = "postgresql"
+  url        = env("TEST_DATABASE_URL")
+  extensions = [postgis("2.1")]
+}
+// [1;91merror[0m: [1mError validating: The argument must have a name[0m
+//   [1;94m-->[0m  [4mschema.prisma:9[0m
+// [1;94m   | [0m
+// [1;94m 8 | [0m  url        = env("TEST_DATABASE_URL")
+// [1;94m 9 | [0m  extensions = [postgis([1;91m"2.1"[0m)]
+// [1;94m   | [0m

@@ -1,3 +1,5 @@
+mod postgres;
+
 use crate::{
     calculate_datamodel::CalculateDatamodelContext as Context,
     commenting_out_guardrails::commenting_out_guardrails,
@@ -7,9 +9,13 @@ use crate::{
     sanitize_datamodel_names::{sanitization_leads_to_duplicate_names, sanitize_datamodel_names},
     version_checker, SqlError, SqlFamilyTrait,
 };
+use datamodel_renderer as render;
 use introspection_connector::{Version, Warning};
-use psl::dml::{self, Datamodel, Field, Model, PrimaryKeyDefinition, PrimaryKeyField, RelationField, SortOrder};
-use sql_schema_describer::{walkers::TableWalker, ForeignKeyId, SQLSortOrder};
+use psl::{
+    dml::{self, Datamodel, Field, Model, PrimaryKeyDefinition, PrimaryKeyField, RelationField, SortOrder},
+    Configuration,
+};
+use sql_schema_describer::{walkers::TableWalker, ForeignKeyId, SQLSortOrder, SqlSchema};
 use std::collections::HashSet;
 use tracing::debug;
 
@@ -104,12 +110,22 @@ pub(crate) fn introspect(ctx: &Context, warnings: &mut Vec<Warning>) -> Result<(
             });
         }
 
+        if matches!(ctx.config.datasources.first(), Some(ds) if !ds.namespaces.is_empty()) {
+            model.schema = table.namespace().map(|n| n.to_string());
+        }
+
         datamodel.add_model(model);
     }
 
-    for e in schema.enums.iter() {
-        let values = e.values.iter().map(|v| dml::EnumValue::new(v)).collect();
-        datamodel.add_enum(dml::Enum::new(&e.name, values));
+    for e in schema.enum_walkers() {
+        let values = e.values().iter().map(|v| dml::EnumValue::new(v)).collect();
+
+        let schema = if matches!(ctx.config.datasources.first(), Some(ds) if !ds.namespaces.is_empty()) {
+            e.namespace().map(|n| n.to_string())
+        } else {
+            None
+        };
+        datamodel.add_enum(dml::Enum::new(e.name(), values, schema));
     }
 
     let mut fields_to_be_added = Vec::new();
@@ -122,7 +138,7 @@ pub(crate) fn introspect(ctx: &Context, warnings: &mut Vec<Warning>) -> Result<(
                 .find_related_field_for_info(relation_info, &relation_field.name)
                 .is_none()
             {
-                let other_model = datamodel.find_model(&relation_info.to).unwrap();
+                let other_model = datamodel.find_model(&relation_info.referenced_model).unwrap();
                 let field = calculate_backrelation_field(schema, model, other_model, relation_field, relation_info)?;
 
                 fields_to_be_added.push((other_model.name.clone(), field));
@@ -142,11 +158,16 @@ pub(crate) fn introspect(ctx: &Context, warnings: &mut Vec<Warning>) -> Result<(
         datamodel.find_model_mut(&model).add_field(Field::RelationField(field));
     }
 
+    //TODO(matthias) the sanitation and deduplication of names that come from the schema should move to an initial phase based upon the sqlschema
+    //it could yield a map from tableId / enumId to the changed name,
+    // during the construction of the dml we'd then draw from that map
+    // this way, all usages are already populated with the correct final name and won't need to be tracked down separately
     if !sanitization_leads_to_duplicate_names(&datamodel) {
         // our opinionation about valid names
         sanitize_datamodel_names(ctx, &mut datamodel);
     }
 
+    // TODO(matthias) relation field names might be different since they do not come from the schema but we generate them during dml construction
     // deduplicating relation field names
     deduplicate_relation_field_names(&mut datamodel);
 
@@ -164,15 +185,35 @@ pub(crate) fn introspect(ctx: &Context, warnings: &mut Vec<Warning>) -> Result<(
     // if based on a previous Prisma version add id default opinionations
     add_prisma_1_id_defaults(&version, &mut datamodel, schema, warnings, ctx);
 
-    let is_empty = datamodel.is_empty();
-
     let data_model = if ctx.render_config {
-        psl::render_datamodel_and_config_to_string(&datamodel, ctx.config)
+        format!(
+            "{}\n{}",
+            render_configuration(ctx.config, schema),
+            psl::render_datamodel_to_string(&datamodel, Some(ctx.config))
+        )
     } else {
         psl::render_datamodel_to_string(&datamodel, Some(ctx.config))
     };
 
-    Ok((version, data_model, is_empty))
+    Ok((version, psl::reformat(&data_model, 2).unwrap(), datamodel.is_empty()))
+}
+
+fn render_configuration<'a>(config: &'a Configuration, schema: &'a SqlSchema) -> render::Configuration<'a> {
+    let mut output = render::Configuration::default();
+    let prev_ds = config.datasources.first().unwrap();
+    let mut datasource = render::Datasource::from_psl(prev_ds);
+
+    if prev_ds.active_connector.is_provider("postgres") {
+        postgres::add_extensions(&mut datasource, schema, config);
+    }
+
+    output.push_datasource(datasource);
+
+    for prev in config.generators.iter() {
+        output.push_generator(render::Generator::from_psl(prev));
+    }
+
+    output
 }
 
 fn calculate_fields_for_prisma_join_table(

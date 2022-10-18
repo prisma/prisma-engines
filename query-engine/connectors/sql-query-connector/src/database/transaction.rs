@@ -8,7 +8,7 @@ use connector_interface::{
 };
 use prisma_models::{prelude::*, SelectionResult};
 use prisma_value::PrismaValue;
-use psl::common::preview_features::PreviewFeature;
+use psl::PreviewFeature;
 use quaint::prelude::ConnectionInfo;
 use std::collections::HashMap;
 

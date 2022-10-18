@@ -1,3 +1,4 @@
+mod datasource;
 mod validations;
 
 use enumflags2::BitFlags;
@@ -13,8 +14,9 @@ use psl_core::{
     },
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{ast, walkers, IndexAlgorithm, OperatorClass, ParserDatabase, ReferentialAction, ScalarType},
+    Datasource, DatasourceConnectorData, PreviewFeature,
 };
-use std::borrow::Cow;
+use std::{borrow::Cow, collections::HashMap};
 
 const SMALL_INT_TYPE_NAME: &str = "SmallInt";
 const INTEGER_TYPE_NAME: &str = "Integer";
@@ -128,6 +130,161 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, PostgresType)] = &[
     (ScalarType::Bytes, PostgresType::ByteA),
     (ScalarType::Json, PostgresType::JsonB),
 ];
+
+/// Postgres-specific properties in the datasource block.
+#[derive(Default, Debug)]
+pub struct PostgresDatasourceProperties {
+    extensions: Option<PostgresExtensions>,
+}
+
+impl PostgresDatasourceProperties {
+    /// Database extensions.
+    pub fn extensions(&self) -> Option<&PostgresExtensions> {
+        self.extensions.as_ref()
+    }
+
+    pub fn set_extensions(&mut self, extensions: Vec<PostgresExtension>) {
+        self.extensions = Some(PostgresExtensions {
+            extensions,
+            span: ast::Span::empty(),
+        });
+    }
+}
+
+/// An extension defined in the extensions array of the datasource.
+///
+/// ```ignore
+/// datasource db {
+///   extensions = [postgis, foobar]
+///   //            ^^^^^^^
+/// }
+/// ```
+#[derive(Debug, Clone)]
+pub struct PostgresExtension {
+    name: String,
+    span: ast::Span,
+    schema: Option<String>,
+    version: Option<String>,
+    db_name: Option<String>,
+}
+
+impl PostgresExtension {
+    pub fn new(name: String) -> Self {
+        Self {
+            name,
+            span: ast::Span::empty(),
+            schema: None,
+            version: None,
+            db_name: None,
+        }
+    }
+
+    pub fn set_span(&mut self, span: ast::Span) {
+        self.span = span;
+    }
+
+    pub fn set_schema(&mut self, schema: String) {
+        self.schema = Some(schema);
+    }
+
+    pub fn set_version(&mut self, version: String) {
+        self.version = Some(version);
+    }
+
+    pub fn set_db_name(&mut self, db_name: String) {
+        self.db_name = Some(db_name);
+    }
+
+    /// The name of the extension in the datasource.
+    ///
+    /// ```ignore
+    /// extensions = [bar]
+    /// //            ^^^ this
+    /// ```
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    /// The name of the extension in the database, defined in the
+    /// `map` argument.
+    ///
+    /// ```ignore
+    /// extensions = [bar(map: "foo")]
+    /// //                     ^^^^^ this
+    /// ```
+    pub fn db_name(&self) -> Option<&str> {
+        self.db_name.as_deref()
+    }
+
+    /// The span of the extension definition in the datamodel.
+    pub fn span(&self) -> ast::Span {
+        self.span
+    }
+
+    /// The schema where the extension tables are stored.
+    ///
+    /// ```ignore
+    /// extensions = [postgis(schema: "public")]
+    /// //                            ^^^^^^^^ this
+    /// ```
+    pub fn schema(&self) -> Option<&str> {
+        self.schema.as_deref()
+    }
+
+    /// The version of the extension to be used in the database.
+    ///
+    /// ```ignore
+    /// extensions = [postgis(version: "2.1")]
+    /// //                             ^^^^^ this
+    /// ```
+    pub fn version(&self) -> Option<&str> {
+        self.version.as_deref()
+    }
+}
+
+/// The extensions defined in the extensions array of the datrasource.
+///
+/// ```ignore
+/// datasource db {
+///   extensions = [postgis, foobar]
+///   //           ^^^^^^^^^^^^^^^^^
+/// }
+/// ```
+#[derive(Debug, Clone)]
+pub struct PostgresExtensions {
+    pub(crate) extensions: Vec<PostgresExtension>,
+    pub(crate) span: ast::Span,
+}
+
+impl Default for PostgresExtensions {
+    fn default() -> Self {
+        Self {
+            extensions: Vec::new(),
+            span: ast::Span::empty(),
+        }
+    }
+}
+
+impl PostgresExtensions {
+    /// The span of the extensions in the datamodel.
+    pub fn span(&self) -> ast::Span {
+        self.span
+    }
+
+    /// The extension definitions.
+    pub fn extensions(&self) -> &[PostgresExtension] {
+        &self.extensions
+    }
+
+    /// Finds the extension with the given database name.
+    pub fn find_by_name(&self, name: &str) -> Option<&PostgresExtension> {
+        self.extensions().iter().find(|ext| {
+            ext.db_name()
+                .map(|db_name| db_name == name)
+                .unwrap_or_else(|| ext.name() == name)
+        })
+    }
+}
 
 impl Connector for PostgresDatamodelConnector {
     fn is_provider(&self, name: &str) -> bool {
@@ -262,6 +419,18 @@ impl Connector for PostgresDatamodelConnector {
             validations::compatible_native_types(index, self, errors);
             validations::generalized_index_validations(index, self, errors);
             validations::spgist_indexed_column_count(index, errors);
+        }
+    }
+
+    fn validate_datasource(
+        &self,
+        preview_features: BitFlags<PreviewFeature>,
+        ds: &Datasource,
+        errors: &mut Diagnostics,
+    ) {
+        if let Some(props) = ds.downcast_connector_data::<PostgresDatasourceProperties>() {
+            validations::extensions_preview_flag_must_be_set(preview_features, props, errors);
+            validations::extension_names_follow_prisma_syntax_rules(preview_features, props, errors);
         }
     }
 
@@ -456,6 +625,17 @@ impl Connector for PostgresDatamodelConnector {
             }
             _ => (),
         }
+    }
+
+    fn parse_datasource_properties(
+        &self,
+        args: &mut HashMap<&str, (ast::Span, &ast::Expression)>,
+        diagnostics: &mut Diagnostics,
+    ) -> DatasourceConnectorData {
+        let extensions = datasource::parse_extensions(args, diagnostics);
+        let properties = PostgresDatasourceProperties { extensions };
+
+        DatasourceConnectorData::new(Box::new(properties))
     }
 }
 

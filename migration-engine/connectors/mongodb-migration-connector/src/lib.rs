@@ -16,7 +16,7 @@ use enumflags2::BitFlags;
 use migration::MongoDbMigration;
 use migration_connector::{migrations_directory::MigrationDirectory, *};
 use mongodb_schema_describer::MongoSchema;
-use psl::common::preview_features::PreviewFeature;
+use psl::PreviewFeature;
 use std::{future, sync::Arc};
 use tokio::sync::OnceCell;
 
@@ -163,7 +163,7 @@ impl MigrationConnector for MongoDbMigrationConnector {
         ctx: &'a IntrospectionContext,
     ) -> BoxFuture<'a, ConnectorResult<IntrospectionResult>> {
         Box::pin(async move {
-            let url: String = ctx.source.load_url(|v| std::env::var(v).ok()).map_err(|err| {
+            let url: String = ctx.datasource().load_url(|v| std::env::var(v).ok()).map_err(|err| {
                 migration_connector::ConnectorError::new_schema_parser_error(
                     err.to_pretty_string("schema.prisma", ctx.schema_string()),
                 )

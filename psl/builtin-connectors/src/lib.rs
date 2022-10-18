@@ -1,11 +1,11 @@
 #![deny(rust_2018_idioms, unsafe_code)]
 
 pub mod cockroach_datamodel_connector;
+pub mod postgres_datamodel_connector;
 
 mod mongodb;
 mod mssql_datamodel_connector;
 mod mysql_datamodel_connector;
-mod postgres_datamodel_connector;
 mod sqlite_datamodel_connector;
 
 use psl_core::{datamodel_connector::Connector, ConnectorRegistry};

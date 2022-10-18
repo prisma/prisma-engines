@@ -3,10 +3,9 @@ use crate::{
     datamodel_connector::{Connector, ConnectorCapabilities, RelationMode},
     diagnostics::{DatamodelError, Diagnostics, Span},
 };
-use std::{borrow::Cow, path::Path};
+use std::{any::Any, borrow::Cow, path::Path};
 
 /// a `datasource` from the prisma schema.
-#[derive(Clone)]
 pub struct Datasource {
     pub name: String,
     /// The provider string
@@ -26,8 +25,25 @@ pub struct Datasource {
     /// In which layer referential actions are handled.
     pub relation_mode: Option<RelationMode>,
     /// _Sorted_ vec of schemas defined in the schemas property.
-    pub schemas: Vec<(String, Span)>,
-    pub(crate) schemas_span: Option<Span>,
+    pub namespaces: Vec<(String, Span)>,
+    pub schemas_span: Option<Span>,
+    pub connector_data: DatasourceConnectorData,
+}
+
+#[derive(Default)]
+pub struct DatasourceConnectorData {
+    data: Option<Box<dyn Any + Send + Sync + 'static>>,
+}
+
+impl DatasourceConnectorData {
+    pub fn new(data: Box<dyn Any + Send + Sync + 'static>) -> Self {
+        Self { data: Some(data) }
+    }
+
+    #[track_caller]
+    pub fn downcast_ref<T: 'static>(&self) -> Option<&T> {
+        self.data.as_ref().map(|data| data.downcast_ref().unwrap())
+    }
 }
 
 impl std::fmt::Debug for Datasource {
@@ -42,14 +58,20 @@ impl std::fmt::Debug for Datasource {
             .field("shadow_database_url", &"<shadow_database_url>")
             .field("referential_integrity [deprecated]", &self.referential_integrity)
             .field("relation_mode", &self.relation_mode)
-            .field("schemas", &self.schemas)
+            .field("namespaces", &self.namespaces)
             .finish()
     }
 }
 
 impl Datasource {
+    /// Extract connector-specific constructs. The type parameter must be the right one.
+    #[track_caller]
+    pub fn downcast_connector_data<T: 'static>(&self) -> Option<&T> {
+        self.connector_data.downcast_ref()
+    }
+
     pub(crate) fn has_schema(&self, name: &str) -> bool {
-        self.schemas.binary_search_by_key(&name, |(s, _)| s).is_ok()
+        self.namespaces.binary_search_by_key(&name, |(s, _)| s).is_ok()
     }
 
     pub fn capabilities(&self) -> ConnectorCapabilities {

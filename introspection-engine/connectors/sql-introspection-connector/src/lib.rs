@@ -22,7 +22,7 @@ use introspection_connector::{
     ConnectorError, ConnectorResult, DatabaseMetadata, ErrorKind, IntrospectionConnector, IntrospectionContext,
     IntrospectionResult,
 };
-use psl::common::preview_features::PreviewFeature;
+use psl::PreviewFeature;
 use quaint::prelude::SqlFamily;
 use quaint::{prelude::ConnectionInfo, single::Quaint};
 use schema_describer_loading::load_describer;
@@ -104,19 +104,15 @@ impl SqlIntrospectionConnector {
     }
 
     /// Exported for tests
-    pub async fn describe(&self, provider: Option<&str>) -> SqlIntrospectionResult<SqlSchema> {
-        Ok(self
-            .describer(provider)
-            .await?
-            .describe(self.connection.connection_info().schema_name())
-            .await?)
+    pub async fn describe(&self, provider: Option<&str>, namespaces: &[&str]) -> SqlIntrospectionResult<SqlSchema> {
+        Ok(self.describer(provider).await?.describe(namespaces).await?)
     }
 
     async fn version(&self) -> SqlIntrospectionResult<String> {
         Ok(self
             .describer(None)
             .await?
-            .version(self.connection.connection_info().schema_name())
+            .version()
             .await?
             .unwrap_or_else(|| "Database version information not available.".into()))
     }
@@ -133,7 +129,9 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
     }
 
     async fn get_database_description(&self) -> ConnectorResult<String> {
-        let sql_schema = self.catch(self.describe(None)).await?;
+        let sql_schema = self
+            .catch(self.describe(None, &[self.connection.connection_info().schema_name()]))
+            .await?;
         tracing::debug!("SQL Schema Describer is done: {:?}", sql_schema);
         let description = serde_json::to_string_pretty(&sql_schema).unwrap();
         Ok(description)
@@ -147,7 +145,20 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
     }
 
     async fn introspect(&self, ctx: &IntrospectionContext) -> ConnectorResult<IntrospectionResult> {
-        let sql_schema = self.catch(self.describe(Some(ctx.source.active_provider))).await?;
+        //TODO(matthias) do we even need extra preview flagging here?
+        let namespaces = &mut ctx
+            .datasource()
+            .namespaces
+            .iter()
+            .map(|(ns, _)| ns.as_ref())
+            .collect::<Vec<&str>>();
+        if namespaces.is_empty() {
+            namespaces.push(self.connection.connection_info().schema_name())
+        }
+
+        let sql_schema = self
+            .catch(self.describe(Some(ctx.datasource().active_provider), namespaces))
+            .await?;
 
         let introspection_result =
             calculate_datamodel::calculate_datamodel(&sql_schema, ctx).map_err(|sql_introspection_error| {
@@ -164,7 +175,7 @@ trait SqlFamilyTrait {
 
 impl SqlFamilyTrait for IntrospectionContext {
     fn sql_family(&self) -> SqlFamily {
-        match self.source.active_provider {
+        match self.datasource().active_provider {
             "postgresql" => SqlFamily::Postgres,
             "cockroachdb" => SqlFamily::Postgres,
             "sqlite" => SqlFamily::Sqlite,

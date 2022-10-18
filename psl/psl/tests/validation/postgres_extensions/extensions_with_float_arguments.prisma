@@ -1,0 +1,22 @@
+generator js {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource mypg {
+  provider   = "postgresql"
+  url        = env("TEST_DATABASE_URL")
+  extensions = [postgis(version: 2.1)]
+}
+// [1;91merror[0m: [1mExpected a string value, but received numeric value `2.1`.[0m
+//   [1;94m-->[0m  [4mschema.prisma:9[0m
+// [1;94m   | [0m
+// [1;94m 8 | [0m  url        = env("TEST_DATABASE_URL")
+// [1;94m 9 | [0m  extensions = [postgis(version: [1;91m2.1[0m)]
+// [1;94m   | [0m
+// [1;91merror[0m: [1mError validating: The `version` argument must be a string literal[0m
+//   [1;94m-->[0m  [4mschema.prisma:9[0m
+// [1;94m   | [0m
+// [1;94m 8 | [0m  url        = env("TEST_DATABASE_URL")
+// [1;94m 9 | [0m  extensions = [postgis([1;91mversion: 2.1[0m)]
+// [1;94m   | [0m

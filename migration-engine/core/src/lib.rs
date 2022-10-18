@@ -22,10 +22,7 @@ pub use migration_connector;
 use enumflags2::BitFlags;
 use migration_connector::ConnectorParams;
 use mongodb_migration_connector::MongoDbMigrationConnector;
-use psl::{
-    builtin_connectors::*, common::preview_features::PreviewFeature, parser_database::SourceFile, Datasource,
-    ValidatedSchema,
-};
+use psl::{builtin_connectors::*, parser_database::SourceFile, Datasource, PreviewFeature, ValidatedSchema};
 use sql_migration_connector::SqlMigrationConnector;
 use std::{env, path::Path};
 use user_facing_errors::common::InvalidConnectionString;

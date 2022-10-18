@@ -18,20 +18,12 @@ pub struct CompleteInlineRelationWalker<'db> {
 impl<'db> CompleteInlineRelationWalker<'db> {
     /// The model that defines the relation fields and actions.
     pub fn referencing_model(self) -> ModelWalker<'db> {
-        ModelWalker {
-            model_id: self.side_a.0,
-            db: self.db,
-            model_attributes: &self.db.types.model_attributes[&self.side_a.0],
-        }
+        self.db.walk(self.side_a.0)
     }
 
     /// The implicit relation side.
     pub fn referenced_model(self) -> ModelWalker<'db> {
-        ModelWalker {
-            model_id: self.side_b.0,
-            db: self.db,
-            model_attributes: &self.db.types.model_attributes[&self.side_b.0],
-        }
+        self.db.walk(self.side_b.0)
     }
 
     pub fn referencing_field(self) -> RelationFieldWalker<'db> {
@@ -55,7 +47,7 @@ impl<'db> CompleteInlineRelationWalker<'db> {
     /// The scalar fields defining the relation on the referenced model.
     pub fn referenced_fields(self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'db>> + 'db {
         let f = move |field_id: &ast::FieldId| {
-            let model_id = self.referenced_model().model_id;
+            let model_id = self.referenced_model().id;
 
             ScalarFieldWalker {
                 model_id,
@@ -74,7 +66,7 @@ impl<'db> CompleteInlineRelationWalker<'db> {
     /// The scalar fields on the defining the relation on the referencing model.
     pub fn referencing_fields(self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'db>> + 'db {
         let f = move |field_id: &ast::FieldId| {
-            let model_id = self.referencing_model().model_id;
+            let model_id = self.referencing_model().id;
 
             ScalarFieldWalker {
                 model_id,

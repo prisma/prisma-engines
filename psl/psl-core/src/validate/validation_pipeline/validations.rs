@@ -2,6 +2,7 @@ mod autoincrement;
 mod composite_types;
 mod constraint_namespace;
 mod database_name;
+mod datasource;
 mod default_value;
 mod enums;
 mod fields;
@@ -12,18 +13,14 @@ mod relation_fields;
 mod relations;
 
 use super::context::Context;
-use diagnostics::DatamodelError;
 use names::Names;
 use parser_database::walkers::RefinedRelationWalker;
 
 pub(super) fn validate(ctx: &mut Context<'_>) {
-    let db = ctx.db;
-    let connector = ctx.connector;
-
-    let names = Names::new(db, connector);
+    let names = Names::new(ctx);
 
     composite_types::detect_composite_cycles(ctx);
-    for composite_type in db.walk_composite_types() {
+    for composite_type in ctx.db.walk_composite_types() {
         composite_types::composite_types_support(composite_type, ctx);
 
         if !ctx.diagnostics.has_errors() {
@@ -39,10 +36,17 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
     ctx.connector
         .validate_scalar_field_unknown_default_functions(ctx.db, ctx.diagnostics);
 
+    if let Some(ds) = ctx.datasource {
+        datasource::schemas_property_without_preview_feature(ds, ctx);
+        datasource::schemas_property_with_no_connector_support(ds, ctx);
+        ctx.connector
+            .validate_datasource(ctx.preview_features, ds, ctx.diagnostics);
+    }
+
     // Model validations
     models::database_name_clashes(ctx);
 
-    for model in db.walk_models() {
+    for model in ctx.db.walk_models() {
         models::has_a_strict_unique_criteria(model, ctx);
         models::has_a_unique_primary_key_name(model, &names, ctx);
         models::has_a_unique_custom_primary_key_name_per_model(model, &names, ctx);
@@ -52,7 +56,12 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
         models::primary_key_length_prefix_supported(model, ctx);
         models::primary_key_sort_order_supported(model, ctx);
         models::only_one_fulltext_attribute_allowed(model, ctx);
+        models::multischema_feature_flag_needed(model, ctx);
+        models::schema_is_defined_in_the_datasource(model, ctx);
+        models::schema_attribute_supported_in_connector(model, ctx);
+        models::schema_attribute_missing(model, ctx);
         models::connector_specific(model, ctx);
+
         autoincrement::validate_auto_increment(model, ctx);
 
         if let Some(pk) = model.primary_key() {
@@ -117,74 +126,21 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
         }
     }
 
-    if !connector.supports_enums() {
-        for r#enum in db.ast().iter_tops().filter_map(|(_, top)| top.as_enum()) {
-            ctx.push_error(DatamodelError::new_validation_error(
-                &format!(
-                    "You defined the enum `{}`. But the current connector does not support enums.",
-                    &r#enum.name.name
-                ),
-                r#enum.span,
-            ));
-        }
-    } else {
-        for r#enum in db.walk_enums() {
-            ctx.connector.validate_enum(r#enum, ctx.diagnostics);
-        }
+    if ctx.connector.supports_enums() {
+        enums::database_name_clashes(ctx);
     }
 
-    if !ctx.preview_features.contains(crate::PreviewFeature::MultiSchema) {
-        for model in ctx.db.walk_models() {
-            if let Some((_, span)) = model.schema() {
-                ctx.push_error(DatamodelError::new_static(
-                    "@@schema is only available with the `multiSchema` preview feature.",
-                    span,
-                ))
-            }
-        }
+    for r#enum in ctx.db.walk_enums() {
+        enums::connector_supports_enums(r#enum, ctx);
+        enums::multischema_feature_flag_needed(r#enum, ctx);
+        enums::schema_is_defined_in_the_datasource(r#enum, ctx);
+        enums::schema_attribute_supported_in_connector(r#enum, ctx);
+        enums::schema_attribute_missing(r#enum, ctx);
 
-        for enm in ctx.db.walk_enums() {
-            if let Some((_, span)) = enm.schema() {
-                ctx.push_error(DatamodelError::new_static(
-                    "@@schema is only available with the `multiSchema` preview feature.",
-                    span,
-                ))
-            }
-        }
-
-        if let Some(ds) = ctx.datasource {
-            if let Some(span) = ds.schemas_span {
-                ctx.push_error(DatamodelError::new_static(
-                    "The `schemas` property is only availably with the `multiSchema` preview feature.",
-                    span,
-                ))
-            }
-        }
-    } else {
-        for model in ctx.db.walk_models() {
-            models::schema_attribute(model, ctx);
-        }
-
-        for r#enum in ctx.db.walk_enums() {
-            enums::schema_attribute(r#enum, ctx);
-        }
-
-        if !ctx
-            .connector
-            .has_capability(crate::datamodel_connector::ConnectorCapability::MultiSchema)
-        {
-            if let Some(ds) = ctx.datasource {
-                if let Some(span) = ds.schemas_span {
-                    ctx.push_error(DatamodelError::new_static(
-                        "The `schemas` property is not supported on the current connector.",
-                        span,
-                    ))
-                }
-            }
-        }
+        ctx.connector.validate_enum(r#enum, ctx.diagnostics);
     }
 
-    for relation in db.walk_relations() {
+    for relation in ctx.db.walk_relations() {
         match relation.refine() {
             // 1:1, 1:n
             RefinedRelationWalker::Inline(relation) => {

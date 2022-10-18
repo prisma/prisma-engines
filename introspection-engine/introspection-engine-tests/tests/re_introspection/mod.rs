@@ -29,7 +29,7 @@ async fn mapped_model_name(api: &TestApi) -> TestResult {
         model Custom_User {
             id               Int         @id @default(autoincrement())
 
-            @@map(name: "_User")
+            @@map("_User")
         }
     "#};
 
@@ -37,7 +37,7 @@ async fn mapped_model_name(api: &TestApi) -> TestResult {
         model Custom_User {
             id               Int         @id @default(autoincrement())
 
-            @@map(name: "_User")
+            @@map("_User")
         }
 
         model Unrelated {
@@ -279,7 +279,7 @@ async fn mapped_field_name(api: &TestApi) -> TestResult {
             unique_2    Int
 
             @@id([c_id_1, id_2])
-            @@index([c_index], name: "test2")
+            @@index([c_index], map: "test2")
             @@unique([c_unique_1, unique_2], map: "sqlite_autoindex_User_1")
         }
     "#};
@@ -293,7 +293,7 @@ async fn mapped_field_name(api: &TestApi) -> TestResult {
             unique_2    Int
 
             @@id([c_id_1, id_2])
-            @@index([c_index], name: "test2")
+            @@index([c_index], map: "test2")
             @@unique([c_unique_1, unique_2], map: "sqlite_autoindex_User_1")
         }
 
@@ -1188,8 +1188,7 @@ async fn virtual_cuid_default_cockroach(api: &TestApi) {
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn comments_should_be_kept(api: &TestApi) -> TestResult {
-    let sql = "CREATE Type a as ENUM (\'A\')".to_string();
-    api.database().execute_raw(&sql, &[]).await?;
+    api.raw_cmd("CREATE TYPE a AS ENUM (\'A\')").await;
 
     api.barrel()
         .execute(|migration| {
@@ -1243,10 +1242,8 @@ async fn comments_should_be_kept(api: &TestApi) -> TestResult {
 
         /// A really helpful comment about the enum
         enum a {
-            A // A really helpful comment about enum variant
+            A
         }
-
-        /// just floating around here
     "#};
 
     api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
@@ -1898,6 +1895,65 @@ async fn re_introspecting_custom_index_order(api: &TestApi) -> TestResult {
           @@index([a], map: "bbbbbb", type: Gin)
           @@index([b], map: "aaaaaa", type: Gin)
           @@index([c], map: "cccccc", type: Gin)
+        }
+    "#]];
+
+    expected.assert_eq(&re_introspected);
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres))]
+async fn re_introspecting_with_schemas_property(api: &TestApi) -> TestResult {
+    let create_schema = "CREATE SCHEMA \"first\"";
+    let create_table = format!("CREATE TABLE \"first\".\"A\" (id TEXT PRIMARY KEY)",);
+
+    api.database().raw_cmd(&create_schema).await?;
+    api.database().raw_cmd(&create_table).await?;
+
+    let create_schema = "CREATE SCHEMA \"second\"";
+    let create_table = format!("CREATE TABLE \"second\".\"B\" (id TEXT PRIMARY KEY)",);
+
+    api.database().raw_cmd(&create_schema).await?;
+    api.database().raw_cmd(&create_table).await?;
+
+    let input_dm = indoc! {r#"
+          generator client {
+           provider        = "prisma-client-js"
+           previewFeatures = ["multiSchema"]
+         }
+         
+         datasource myds {
+           provider = "postgresql"
+           url      = env("DATABASE_URL")
+           schemas  = ["first", "second"]
+         }
+    "#};
+
+    let re_introspected = api.re_introspect_config(input_dm).await?;
+
+    let expected = expect![[r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["multiSchema"]
+        }
+
+        datasource myds {
+          provider = "postgresql"
+          url      = env("DATABASE_URL")
+          schemas  = ["first", "second"]
+        }
+
+        model A {
+          id String @id
+
+          @@schema("first")
+        }
+
+        model B {
+          id String @id
+
+          @@schema("second")
         }
     "#]];
 

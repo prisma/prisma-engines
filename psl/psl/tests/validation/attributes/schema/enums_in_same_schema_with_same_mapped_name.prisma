@@ -1,0 +1,44 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("TEST_DATABASE_URL")
+  schemas  = ["base", "transactional"]
+}
+
+enum Color {
+    RED
+    GREEN
+    BLUE
+
+    @@map("attribute")
+    @@schema("transactional")
+}
+
+enum Size {
+    SMALL
+    MEDIUM
+    LARGE
+    VENTI
+
+    @@map("attribute")
+    @@schema("transactional")
+}
+
+// [1;91merror[0m: [1mAn enum with the same database name is already defined.[0m
+//   [1;94m-->[0m  [4mschema.prisma:21[0m
+// [1;94m   | [0m
+// [1;94m20 | [0m
+// [1;94m21 | [0m[1;91menum Size {[0m
+// [1;94m22 | [0m    SMALL
+// [1;94m23 | [0m    MEDIUM
+// [1;94m24 | [0m    LARGE
+// [1;94m25 | [0m    VENTI
+// [1;94m26 | [0m
+// [1;94m27 | [0m    @@map("attribute")
+// [1;94m28 | [0m    @@schema("transactional")
+// [1;94m29 | [0m}
+// [1;94m   | [0m

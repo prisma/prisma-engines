@@ -63,7 +63,8 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
     }
 
     #[tracing::instrument(skip(self))]
-    async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema> {
+    async fn describe(&self, schemas: &[&str]) -> DescriberResult<SqlSchema> {
+        let schema = schemas[0];
         let mut sql_schema = SqlSchema::default();
         let version = self.conn.version().await.ok().flatten();
         let flavour = version
@@ -86,7 +87,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
     }
 
     #[tracing::instrument(skip(self))]
-    async fn version(&self, _schema: &str) -> crate::DescriberResult<Option<String>> {
+    async fn version(&self) -> crate::DescriberResult<Option<String>> {
         Ok(self.conn.version().await?)
     }
 }
@@ -223,6 +224,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for row in result_set.into_iter() {
             views.push(View {
+                namespace_id: NamespaceId(0),
                 name: row.get_expect_string("view_name"),
                 definition: row.get_string("view_sql"),
             })
@@ -246,6 +248,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for row in rows.into_iter() {
             procedures.push(Procedure {
+                namespace_id: NamespaceId(0),
                 name: row.get_expect_string("name"),
                 definition: row.get_string("definition"),
             });

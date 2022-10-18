@@ -114,7 +114,7 @@ pub fn referential_actions(schema: String) -> String {
 /// type GetConfigResponse = GetConfigErrorResponse | GetConfigSuccessResponse
 ///
 /// ```
-pub fn get_config(get_config_params: String) -> String {
+pub fn get_config(get_config_params: String) -> Result<String, String> {
     get_config::get_config(&get_config_params)
 }
 

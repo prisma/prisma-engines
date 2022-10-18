@@ -7,7 +7,7 @@ mod disconnect_inside_upsert {
 
     // "a P1 to C1 relation " should "be disconnectable through a nested mutation by id"
     #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt")]
-    async fn p1_c1_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+    async fn p1_c1_by_id_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let res = run_query_json!(
             runner,
             format!(
@@ -52,6 +52,112 @@ mod disconnect_inside_upsert {
             }}
           }}"#, parent = parent)),
           @r###"{"data":{"upsertOneParent":{"childOpt":null}}}"###
+        );
+
+        Ok(())
+    }
+
+    // "a P1 to C1 relation " should "be disconnectable through a nested mutation by id"
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt")]
+    async fn p1_c1_by_filters_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+        let res = run_query_json!(
+            runner,
+            format!(
+                r#"mutation {{
+                  createOneParent(data: {{
+                    p: "p1"
+                    p_1: "p"
+                    p_2: "1"
+                    childOpt: {{
+                      create: {{
+                        c: "c1"
+                        c_1: "c_1"
+                        c_2: "c_2",
+                        non_unique: "0"
+                      }}
+                    }}
+                  }}){{
+                    {parent_selection}
+                    childOpt{{
+                      {child_selection}
+                    }}
+                  }}
+                }}"#,
+                parent_selection = t.parent().selection(),
+                child_selection = t.child().selection()
+            )
+        );
+        let parent = t.parent().parse(res, &["data", "createOneParent"])?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, format!(r#"mutation {{
+            upsertOneParent(
+              where: {parent}
+              update:{{
+                p: {{ set: "p2" }}
+                childOpt: {{disconnect: {{ non_unique: "0" }} }}
+              }}
+              create:{{p: "Should not Matter", p_1: "lol", p_2: "woot"}}
+            ){{
+              childOpt {{
+                c
+              }}
+            }}
+          }}"#, parent = parent)),
+          @r###"{"data":{"upsertOneParent":{"childOpt":null}}}"###
+        );
+
+        Ok(())
+    }
+
+    // "a P1 to C1 relation " should "be disconnectable through a nested mutation by id"
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt")]
+    async fn p1_c1_by_fails_if_filter_no_match(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+        let res = run_query_json!(
+            runner,
+            format!(
+                r#"mutation {{
+                  createOneParent(data: {{
+                    p: "p1"
+                    p_1: "p"
+                    p_2: "1"
+                    childOpt: {{
+                      create: {{
+                        c: "c1"
+                        c_1: "c_1"
+                        c_2: "c_2",
+                        non_unique: "0"
+                      }}
+                    }}
+                  }}){{
+                    {parent_selection}
+                    childOpt{{
+                      {child_selection}
+                    }}
+                  }}
+                }}"#,
+                parent_selection = t.parent().selection(),
+                child_selection = t.child().selection()
+            )
+        );
+        let parent = t.parent().parse(res, &["data", "createOneParent"])?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, format!(r#"mutation {{
+            upsertOneParent(
+              where: {parent}
+              update:{{
+                p: {{ set: "p2" }}
+                childOpt: {{disconnect: {{ non_unique: "1" }} }}
+              }}
+              create:{{p: "Should not Matter", p_1: "lol", p_2: "woot"}}
+            ){{
+              childOpt {{
+                c
+              }}
+            }}
+          }}"#, parent = parent)),
+          @r###"{"data":{"upsertOneParent":{"childOpt":{"c":"c1"}}}}"###
         );
 
         Ok(())

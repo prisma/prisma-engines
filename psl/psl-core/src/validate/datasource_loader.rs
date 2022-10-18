@@ -1,10 +1,9 @@
 use crate::{
     ast::{self, SourceConfig, Span},
-    common::preview_features::PreviewFeature,
     configuration::StringFromEnvVar,
     datamodel_connector::RelationMode,
     diagnostics::{DatamodelError, Diagnostics},
-    Datasource,
+    Datasource, PreviewFeature,
 };
 use enumflags2::BitFlags;
 use parser_database::{ast::WithDocumentation, coerce, coerce_array, coerce_opt};
@@ -198,6 +197,12 @@ fn lift_datasource(
         .remove(SCHEMAS_KEY)
         .and_then(|(_, expr)| coerce_array(expr, &coerce::string_with_span, diagnostics).map(|b| (b, expr.span())))
         .map(|(mut schemas, span)| {
+            if schemas.is_empty() {
+                let error = DatamodelError::new_schemas_array_empty_error(span);
+
+                diagnostics.push_error(error);
+            }
+
             schemas.sort_by(|(a, _), (b, _)| a.cmp(b));
 
             for pair in schemas.windows(2) {
@@ -213,16 +218,19 @@ fn lift_datasource(
         })
         .unwrap_or_default();
 
+    let connector_data = active_connector.parse_datasource_properties(&mut args, diagnostics);
+
     // we handle these elsewhere
     args.remove("previewFeatures");
     args.remove("referentialIntegrity");
     args.remove("relationMode");
+
     for (name, (span, _)) in args.into_iter() {
         diagnostics.push_error(DatamodelError::new_property_not_known_error(name, span));
     }
 
     Some(Datasource {
-        schemas: schemas.into_iter().map(|(s, span)| (s.to_owned(), span)).collect(),
+        namespaces: schemas.into_iter().map(|(s, span)| (s.to_owned(), span)).collect(),
         schemas_span,
         name: source_name.to_string(),
         provider: provider.to_owned(),
@@ -234,6 +242,7 @@ fn lift_datasource(
         shadow_database_url,
         referential_integrity,
         relation_mode,
+        connector_data,
     })
 }
 

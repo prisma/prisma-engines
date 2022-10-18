@@ -14,7 +14,7 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
     pub(crate) fn column_pairs(&self) -> impl Iterator<Item = Pair<ColumnWalker<'schema>>> + '_ {
         self.db
             .column_pairs(self.tables.map(|t| t.id))
-            .map(move |colids| self.db.schemas().walk(colids))
+            .map(move |colids| self.db.schemas.walk(colids))
     }
 
     pub(crate) fn any_column_changed(&self) -> bool {

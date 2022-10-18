@@ -1,12 +1,8 @@
 //! Render a datamodel to a string (for introspection).
 
-mod render_configuration;
 mod render_datamodel;
 
-pub(crate) use self::{
-    render_configuration::render_configuration,
-    render_datamodel::{render_datamodel, RenderParams},
-};
+pub(crate) use self::render_datamodel::{render_datamodel, RenderParams};
 
 fn render_documentation(doc: &str, is_commented_out: bool, out: &mut String) {
     // We comment out objects in introspection. Those are put into `//` comments. We use the

@@ -3,7 +3,7 @@ use crate::CoreError;
 use connection_string::JdbcString;
 use connector::Connector;
 use mongodb_client::MongoConnectionString;
-use psl::{builtin_connectors::*, common::preview_features::PreviewFeature, Datasource};
+use psl::{builtin_connectors::*, Datasource, PreviewFeature};
 use sql_connector::*;
 use std::collections::HashMap;
 use std::str::FromStr;

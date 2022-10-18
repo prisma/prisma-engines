@@ -674,6 +674,27 @@ mod upsert {
         Ok(())
     }
 
+    #[connector_test(schema(generic))]
+    async fn upsert_fails_if_filter_dont_match(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation { createOneTestModel(data: { id: 1, field: "hello" }) { id } }"#
+        );
+
+        assert_error!(
+            &runner,
+            r#"mutation {
+                  upsertOneTestModel(where: { id: 1, field: "bonjour" }, create: { id: 1, field: "hello" }, update: { field: "updated" }) {
+                    id
+                  }
+                }"#,
+            2002,
+            "Unique constraint failed"
+        );
+
+        Ok(())
+    }
+
     async fn count_todo(runner: &Runner) -> TestResult<usize> {
         let res = run_query_json!(runner, r#"{ findManyTodo { id } }"#);
         let data = &res["data"]["findManyTodo"];

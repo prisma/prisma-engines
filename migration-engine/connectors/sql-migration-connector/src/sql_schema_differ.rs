@@ -24,6 +24,8 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlDatabaseSchema>, flavour: &dyn S
     let db = DifferDatabase::new(schemas, flavour);
     let mut steps: Vec<SqlMigrationStep> = Vec::new();
 
+    flavour.push_extension_steps(&mut steps, &db);
+
     push_created_schema_steps(&mut steps, &db);
     push_created_table_steps(&mut steps, &db);
     push_dropped_table_steps(&mut steps, &db);
@@ -41,7 +43,7 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlDatabaseSchema>, flavour: &dyn S
 }
 
 fn push_created_schema_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDatabase<'_>) {
-    for schema in db.schemas().next.describer_schema.walk_namespaces() {
+    for schema in db.created_namespaces() {
         steps.push(SqlMigrationStep::CreateSchema(schema.id))
     }
 }
@@ -520,11 +522,7 @@ fn push_foreign_key_pair_changes(
 }
 
 fn next_column_has_virtual_default(column_id: ColumnId, db: &DifferDatabase<'_>) -> bool {
-    db.schemas()
-        .next
-        .prisma_level_defaults
-        .binary_search(&column_id)
-        .is_ok()
+    db.schemas.next.prisma_level_defaults.binary_search(&column_id).is_ok()
 }
 
 fn is_prisma_implicit_m2m_fk(fk: ForeignKeyWalker<'_>) -> bool {

@@ -13,10 +13,10 @@ use migration_core::{
     json_rpc::types::*,
     migration_connector::{BoxFuture, ConnectorResult},
 };
-use psl::{builtin_connectors::*, common::preview_features::*, Datasource};
+use psl::{builtin_connectors::*, Datasource};
 use std::{env, sync::Arc};
 
-fn parse_configuration(datamodel: &str) -> ConnectorResult<(Datasource, String, BitFlags<PreviewFeature>)> {
+fn parse_configuration(datamodel: &str) -> ConnectorResult<(Datasource, String, BitFlags<psl::PreviewFeature>)> {
     let config = psl::parse_configuration(datamodel)
         .map_err(|err| ConnectorError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
 

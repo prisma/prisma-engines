@@ -232,7 +232,9 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
     api.raw_cmd(&schema);
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [],
+            namespaces: [
+                "prisma-tests",
+            ],
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -451,6 +453,9 @@ fn cockroachdb_sequences_must_work(api: TestApi) {
             indexes: [],
             sequences: [
                 Sequence {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "test",
                     start_value: 1,
                     min_value: 1,
@@ -461,6 +466,9 @@ fn cockroachdb_sequences_must_work(api: TestApi) {
                     virtual: false,
                 },
                 Sequence {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "testmore",
                     start_value: 20,
                     min_value: 10,
@@ -471,6 +479,9 @@ fn cockroachdb_sequences_must_work(api: TestApi) {
                     virtual: false,
                 },
                 Sequence {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "testnotcycling",
                     start_value: 1,
                     min_value: 1,
@@ -481,6 +492,7 @@ fn cockroachdb_sequences_must_work(api: TestApi) {
                     virtual: false,
                 },
             ],
+            extensions: [],
         }
     "#]];
     expected_ext.assert_debug_eq(&ext);

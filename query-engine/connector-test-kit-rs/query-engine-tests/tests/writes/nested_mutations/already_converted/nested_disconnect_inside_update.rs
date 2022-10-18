@@ -7,7 +7,7 @@ mod disconnect_inside_update {
 
     // "a P1 to C1 relation " should "be disconnectable through a nested mutation by id"
     #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt")]
-    async fn p1_c1_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+    async fn p1_c1_by_id_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
             run_query_json!(
                 runner,
@@ -46,6 +46,100 @@ mod disconnect_inside_update {
           }}
         }}"#, parent = parent)),
           @r###"{"data":{"updateOneParent":{"childOpt":null}}}"###
+        );
+
+        Ok(())
+    }
+
+    // "a P1 to C1 relation " should "be disconnectable through a nested mutation by id"
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt")]
+    async fn p1_c1_by_filters_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+        let parent = t.parent().parse(
+            run_query_json!(
+                runner,
+                format!(
+                    r#"mutation {{
+                      createOneParent(data: {{
+                        p: "p1", p_1: "p", p_2: "1"
+                        childOpt: {{
+                          create: {{
+                            c: "c1"
+                            c_1: "c_1"
+                            c_2: "c_2",
+                            non_unique: "0"
+                          }}
+                        }}
+                      }}){{
+                        {selection}
+                      }}
+                    }}"#,
+                    selection = t.parent().selection()
+                )
+            ),
+            &["data", "createOneParent"],
+        )?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, format!(r#"mutation {{
+          updateOneParent(
+            where: {parent}
+            data:{{
+              p: {{ set: "p2" }}
+              childOpt: {{disconnect: {{ non_unique: "0" }} }}
+          }}){{
+            childOpt {{
+              c
+            }}
+          }}
+        }}"#, parent = parent)),
+          @r###"{"data":{"updateOneParent":{"childOpt":null}}}"###
+        );
+
+        Ok(())
+    }
+
+    // "a P1 to C1 relation " should "be disconnectable through a nested mutation by id"
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt")]
+    async fn p1_c1_by_fails_if_filters_no_match(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+        let parent = t.parent().parse(
+            run_query_json!(
+                runner,
+                format!(
+                    r#"mutation {{
+                      createOneParent(data: {{
+                        p: "p1", p_1: "p", p_2: "1"
+                        childOpt: {{
+                          create: {{
+                            c: "c1"
+                            c_1: "c_1"
+                            c_2: "c_2",
+                            non_unique: "0"
+                          }}
+                        }}
+                      }}){{
+                        {selection}
+                      }}
+                    }}"#,
+                    selection = t.parent().selection()
+                )
+            ),
+            &["data", "createOneParent"],
+        )?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, format!(r#"mutation {{
+          updateOneParent(
+            where: {parent}
+            data:{{
+              p: {{ set: "p2" }}
+              childOpt: {{disconnect: {{ non_unique: "1" }} }}
+          }}){{
+            childOpt {{
+              c
+            }}
+          }}
+        }}"#, parent = parent)),
+          @r###"{"data":{"updateOneParent":{"childOpt":{"c":"c1"}}}}"###
         );
 
         Ok(())
@@ -244,6 +338,69 @@ mod disconnect_inside_update {
           }}"#, parent = parent, child = second_child)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c1"}]}}}"###
         );
+        Ok(())
+    }
+
+    // "a PM to C1 relation with the child already in a relation" should "be disconnectable through a nested mutation by unique"
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt")]
+    async fn pm_c1_child_inrel_with_filters(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+        let res = run_query_json!(
+            runner,
+            format!(
+                r#"mutation {{
+                      createOneParent(data: {{
+                        p: "p1", p_1: "p", p_2: "1"
+                        childrenOpt: {{
+                          create: [
+                            {{ c: "c1", c_1: "c", c_2: "1", non_unique: "0" }},
+                            {{ c: "c2", c_1: "c", c_2: "2", non_unique: "1" }}
+                          ]
+                        }}
+                      }}){{
+                        {parent_selection}
+                        childrenOpt{{
+                           {child_selection}
+                        }}
+                      }}
+                    }}"#,
+                parent_selection = t.parent().selection(),
+                child_selection = t.child().selection()
+            )
+        );
+        let parent = t.parent().parse(res.clone(), &["data", "createOneParent"])?;
+
+        // Works when filters match
+        insta::assert_snapshot!(
+          run_query!(runner, format!(r#"mutation {{
+                updateOneParent(
+                where: {parent}
+                data:{{
+                  childrenOpt: {{ disconnect: [{{ c: "c2", non_unique: "1" }} ]}}
+                }}){{
+                  childrenOpt {{
+                    c
+                  }}
+                }}
+              }}"#, parent = parent)),
+          @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c1"}]}}}"###
+        );
+
+        // Silently fails when filters don't match
+        insta::assert_snapshot!(
+          run_query!(runner, format!(r#"mutation {{
+                updateOneParent(
+                where: {parent}
+                data:{{
+                  childrenOpt: {{ disconnect: [{{ c: "c1", non_unique: "1" }} ]}}
+                }}){{
+                  childrenOpt {{
+                    c
+                  }}
+                }}
+              }}"#, parent = parent)),
+          @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c1"}]}}}"###
+        );
+
         Ok(())
     }
 

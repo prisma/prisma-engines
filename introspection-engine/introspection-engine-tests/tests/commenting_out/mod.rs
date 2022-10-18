@@ -108,7 +108,7 @@ async fn a_table_without_fully_required_compound_unique(api: &TestApi) -> TestRe
     Ok(())
 }
 
-#[test_connector(exclude(CockroachDb))]
+#[test_connector(exclude(CockroachDb, Mysql, Mssql))]
 async fn remapping_field_names_to_empty(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -125,6 +125,32 @@ async fn remapping_field_names_to_empty(api: &TestApi) -> TestResult {
         model User {
           // This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
           // 1 String @map("1")
+          last Int    @id @default(autoincrement())
+        }
+    "#};
+
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Mysql, Mssql))]
+async fn remapping_field_names_to_empty_mysql(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("1", types::text());
+                t.add_column("last", types::integer().increments(true));
+
+                t.add_constraint("User_pkey", types::primary_constraint(vec!["last"]));
+            });
+        })
+        .await?;
+
+    let dm = indoc! {r#"
+        model User {
+          // This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 1 String @map("1") @db.Text
           last Int    @id @default(autoincrement())
         }
     "#};

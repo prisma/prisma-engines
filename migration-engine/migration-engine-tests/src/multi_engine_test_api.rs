@@ -12,7 +12,7 @@ use crate::{
     commands::{ApplyMigrations, CreateMigration, DiagnoseMigrationHistory, Reset, SchemaPush},
 };
 use migration_core::migration_connector::{ConnectorParams, MigrationConnector};
-use psl::common::preview_features::PreviewFeature;
+use psl::PreviewFeature;
 use quaint::{
     prelude::{ConnectionInfo, Queryable, ResultSet},
     single::Quaint,

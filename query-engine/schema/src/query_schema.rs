@@ -1,6 +1,6 @@
 use super::*;
 use fmt::Debug;
-use prisma_models::{psl::common::preview_features::PreviewFeature, InternalDataModelRef, ModelRef};
+use prisma_models::{psl::PreviewFeature, InternalDataModelRef, ModelRef};
 use psl::datamodel_connector::{ConnectorCapability, RelationMode};
 use std::{borrow::Borrow, fmt};
 

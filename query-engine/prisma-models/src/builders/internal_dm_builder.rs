@@ -224,7 +224,10 @@ pub(crate) fn relation_placeholders(datamodel: &dml::Datamodel) -> Vec<RelationP
     for model in datamodel.models().filter(|model| !model.is_ignored) {
         for field in model.relation_fields().filter(|field| !field.is_ignored) {
             let dml::RelationInfo {
-                to, references, name, ..
+                referenced_model: to,
+                references,
+                name,
+                ..
             } = &field.relation_info;
 
             let related_model = datamodel

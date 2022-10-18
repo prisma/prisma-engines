@@ -65,7 +65,7 @@ fn sanitize_models(ctx: &Context, datamodel: &mut Datamodel) -> HashMap<String, 
                     let info = &mut rf.relation_info;
 
                     info.name = sanitize_string(&info.name);
-                    info.to = sanitize_string(&reformat_reserved_string(&info.to));
+                    info.referenced_model = sanitize_string(&reformat_reserved_string(&info.referenced_model));
 
                     info.references = sanitize_strings(&info.references);
                     info.fields = sanitize_strings(&info.fields);
@@ -202,7 +202,7 @@ where
     };
 }
 
-fn sanitize_string(s: &str) -> String {
+pub(super) fn sanitize_string(s: &str) -> String {
     let needs_sanitation = RE_START.is_match(s) || RE.is_match(s);
 
     if needs_sanitation {

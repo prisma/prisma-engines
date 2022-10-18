@@ -75,7 +75,9 @@ fn all_postgres_column_types_must_work(api: TestApi) {
     api.raw_cmd(sql);
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [],
+            namespaces: [
+                "prisma-tests",
+            ],
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -961,6 +963,9 @@ fn all_postgres_column_types_must_work(api: TestApi) {
             ],
             sequences: [
                 Sequence {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "User_bigserial_col_seq",
                     start_value: 1,
                     min_value: 1,
@@ -971,6 +976,9 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                     virtual: false,
                 },
                 Sequence {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "User_primary_col_seq",
                     start_value: 1,
                     min_value: 1,
@@ -981,6 +989,9 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                     virtual: false,
                 },
                 Sequence {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "User_serial_col_seq",
                     start_value: 1,
                     min_value: 1,
@@ -991,6 +1002,9 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                     virtual: false,
                 },
                 Sequence {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "User_smallserial_col_seq",
                     start_value: 1,
                     min_value: 1,
@@ -999,6 +1013,14 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                     cycle: false,
                     cache_size: 0,
                     virtual: false,
+                },
+            ],
+            extensions: [
+                DatabaseExtension {
+                    name: "plpgsql",
+                    schema: "pg_catalog",
+                    version: "1.0",
+                    relocatable: false,
                 },
             ],
         }
@@ -1110,6 +1132,9 @@ fn postgres_sequences_must_work(api: TestApi) {
             indexes: [],
             sequences: [
                 Sequence {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
                     name: "test",
                     start_value: 1,
                     min_value: 1,
@@ -1118,6 +1143,14 @@ fn postgres_sequences_must_work(api: TestApi) {
                     cycle: false,
                     cache_size: 0,
                     virtual: false,
+                },
+            ],
+            extensions: [
+                DatabaseExtension {
+                    name: "plpgsql",
+                    schema: "pg_catalog",
+                    version: "1.0",
+                    relocatable: false,
                 },
             ],
         }
@@ -1192,7 +1225,9 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
     api.raw_cmd(create_table);
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [],
+            namespaces: [
+                "prisma-tests",
+            ],
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -1355,7 +1390,9 @@ fn seemingly_escaped_backslashes_in_string_literals_must_not_be_unescaped(api: T
     api.raw_cmd(create_table);
     let expectation = expect![[r#"
         SqlSchema {
-            namespaces: [],
+            namespaces: [
+                "prisma-tests",
+            ],
             tables: [
                 Table {
                     namespace_id: NamespaceId(
@@ -1645,6 +1682,1119 @@ fn int_expressions_in_defaults(api: TestApi) {
     let col = table.column("mysum").unwrap();
     let value = col.default().unwrap();
     assert!(value.is_db_generated());
+}
+
+#[test_connector(tags(Postgres14), exclude(CockroachDb))]
+fn extensions_are_described_correctly(api: TestApi) {
+    let schema = r#"CREATE EXTENSION IF NOT EXISTS citext;"#;
+
+    api.raw_cmd(schema);
+
+    let result = api.describe();
+    let ext = extract_ext(&result);
+    let expected_ext = expect![[r#"
+        PostgresSchemaExt {
+            opclasses: [],
+            indexes: [],
+            sequences: [],
+            extensions: [
+                DatabaseExtension {
+                    name: "citext",
+                    schema: "prisma-tests",
+                    version: "1.6",
+                    relocatable: true,
+                },
+                DatabaseExtension {
+                    name: "plpgsql",
+                    schema: "pg_catalog",
+                    version: "1.0",
+                    relocatable: false,
+                },
+            ],
+        }
+    "#]];
+
+    expected_ext.assert_debug_eq(&ext);
+}
+
+// multi schema
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
+    let schema = r#"
+           CREATE Schema "schema_0";
+           CREATE TABLE "schema_0"."Table_0" ("id_0" SERIAL PRIMARY KEY, int Integer Default 0);
+
+           CREATE Schema "schema_1";
+           CREATE TABLE "schema_1"."Table_0" ("id_1" SERIAL PRIMARY KEY, int Integer Default 1);
+    "#;
+
+    api.raw_cmd(schema);
+    let schema = api.describe_with_schemas(&["schema_0", "schema_1"]);
+
+    let expected_schema = expect![[r#"
+        SqlSchema {
+            namespaces: [
+                "schema_0",
+                "schema_1",
+            ],
+            tables: [
+                Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
+                    name: "Table_0",
+                },
+                Table {
+                    namespace_id: NamespaceId(
+                        1,
+                    ),
+                    name: "Table_0",
+                },
+            ],
+            enums: [],
+            columns: [
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "id_0",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Sequence(
+                                    "Table_0_id_0_seq",
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: true,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "int",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Nullable,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Value(
+                                    Int(
+                                        0,
+                                    ),
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        1,
+                    ),
+                    Column {
+                        name: "id_1",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Sequence(
+                                    "Table_0_id_1_seq",
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: true,
+                    },
+                ),
+                (
+                    TableId(
+                        1,
+                    ),
+                    Column {
+                        name: "int",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Nullable,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Value(
+                                    Int(
+                                        1,
+                                    ),
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: false,
+                    },
+                ),
+            ],
+            foreign_keys: [],
+            foreign_key_columns: [],
+            indexes: [
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "Table_0_pkey",
+                    tpe: PrimaryKey,
+                },
+                Index {
+                    table_id: TableId(
+                        1,
+                    ),
+                    index_name: "Table_0_pkey",
+                    tpe: PrimaryKey,
+                },
+            ],
+            index_columns: [
+                IndexColumn {
+                    index_id: IndexId(
+                        0,
+                    ),
+                    column_id: ColumnId(
+                        0,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        1,
+                    ),
+                    column_id: ColumnId(
+                        2,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+            ],
+            views: [],
+            procedures: [],
+            user_defined_types: [],
+            connector_data: <ConnectorData>,
+        }
+    "#]];
+
+    expected_schema.assert_debug_eq(&schema);
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
+    let schema = r#"
+           CREATE Schema "schema_0";
+           CREATE TABLE "schema_0"."Table_0" ("other" Integer, "id_0" SERIAL PRIMARY KEY);
+           CREATE TABLE "schema_0"."Table_1" ("id_1" SERIAL PRIMARY KEY, o_id_0 Integer);
+           ALTER TABLE "schema_0"."Table_1" ADD CONSTRAINT "fk_0" FOREIGN KEY ("o_id_0") REFERENCES "schema_0"."Table_0" ("id_0");
+
+           CREATE Schema "schema_1";
+           CREATE TABLE "schema_1"."Table_0" ("id_2" SERIAL PRIMARY KEY);
+           CREATE TABLE "schema_1"."Table_1" ("id_3" SERIAL PRIMARY KEY, o_id_0 Integer);
+           ALTER TABLE "schema_1"."Table_1" ADD CONSTRAINT "fk_0" FOREIGN KEY ("o_id_0") REFERENCES "schema_1"."Table_0" ("id_2");
+           
+           CREATE TABLE "schema_1"."Table_2" ("id_4" SERIAL PRIMARY KEY, o_id_0 Integer);
+           ALTER TABLE "schema_1"."Table_2" ADD CONSTRAINT "fk_1" FOREIGN KEY ("o_id_0") REFERENCES "schema_0"."Table_0" ("id_0");
+    "#;
+
+    api.raw_cmd(schema);
+    let schema = api.describe_with_schemas(&["schema_0", "schema_1"]);
+
+    let expected_schema = expect![[r#"
+        SqlSchema {
+            namespaces: [
+                "schema_0",
+                "schema_1",
+            ],
+            tables: [
+                Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
+                    name: "Table_0",
+                },
+                Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
+                    name: "Table_1",
+                },
+                Table {
+                    namespace_id: NamespaceId(
+                        1,
+                    ),
+                    name: "Table_0",
+                },
+                Table {
+                    namespace_id: NamespaceId(
+                        1,
+                    ),
+                    name: "Table_1",
+                },
+                Table {
+                    namespace_id: NamespaceId(
+                        1,
+                    ),
+                    name: "Table_2",
+                },
+            ],
+            enums: [],
+            columns: [
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "other",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Nullable,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "id_0",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Sequence(
+                                    "Table_0_id_0_seq",
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: true,
+                    },
+                ),
+                (
+                    TableId(
+                        1,
+                    ),
+                    Column {
+                        name: "id_1",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Sequence(
+                                    "Table_1_id_1_seq",
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: true,
+                    },
+                ),
+                (
+                    TableId(
+                        1,
+                    ),
+                    Column {
+                        name: "o_id_0",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Nullable,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        2,
+                    ),
+                    Column {
+                        name: "id_2",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Sequence(
+                                    "Table_0_id_2_seq",
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: true,
+                    },
+                ),
+                (
+                    TableId(
+                        3,
+                    ),
+                    Column {
+                        name: "id_3",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Sequence(
+                                    "Table_1_id_3_seq",
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: true,
+                    },
+                ),
+                (
+                    TableId(
+                        3,
+                    ),
+                    Column {
+                        name: "o_id_0",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Nullable,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        4,
+                    ),
+                    Column {
+                        name: "id_4",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Sequence(
+                                    "Table_2_id_4_seq",
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: true,
+                    },
+                ),
+                (
+                    TableId(
+                        4,
+                    ),
+                    Column {
+                        name: "o_id_0",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Nullable,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+            ],
+            foreign_keys: [
+                ForeignKey {
+                    constrained_table: TableId(
+                        1,
+                    ),
+                    referenced_table: TableId(
+                        0,
+                    ),
+                    constraint_name: Some(
+                        "fk_0",
+                    ),
+                    on_delete_action: NoAction,
+                    on_update_action: NoAction,
+                },
+                ForeignKey {
+                    constrained_table: TableId(
+                        3,
+                    ),
+                    referenced_table: TableId(
+                        2,
+                    ),
+                    constraint_name: Some(
+                        "fk_0",
+                    ),
+                    on_delete_action: NoAction,
+                    on_update_action: NoAction,
+                },
+                ForeignKey {
+                    constrained_table: TableId(
+                        4,
+                    ),
+                    referenced_table: TableId(
+                        0,
+                    ),
+                    constraint_name: Some(
+                        "fk_1",
+                    ),
+                    on_delete_action: NoAction,
+                    on_update_action: NoAction,
+                },
+            ],
+            foreign_key_columns: [
+                ForeignKeyColumn {
+                    foreign_key_id: ForeignKeyId(
+                        0,
+                    ),
+                    constrained_column: ColumnId(
+                        3,
+                    ),
+                    referenced_column: ColumnId(
+                        1,
+                    ),
+                },
+                ForeignKeyColumn {
+                    foreign_key_id: ForeignKeyId(
+                        1,
+                    ),
+                    constrained_column: ColumnId(
+                        6,
+                    ),
+                    referenced_column: ColumnId(
+                        4,
+                    ),
+                },
+                ForeignKeyColumn {
+                    foreign_key_id: ForeignKeyId(
+                        2,
+                    ),
+                    constrained_column: ColumnId(
+                        8,
+                    ),
+                    referenced_column: ColumnId(
+                        1,
+                    ),
+                },
+            ],
+            indexes: [
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "Table_0_pkey",
+                    tpe: PrimaryKey,
+                },
+                Index {
+                    table_id: TableId(
+                        1,
+                    ),
+                    index_name: "Table_1_pkey",
+                    tpe: PrimaryKey,
+                },
+                Index {
+                    table_id: TableId(
+                        2,
+                    ),
+                    index_name: "Table_0_pkey",
+                    tpe: PrimaryKey,
+                },
+                Index {
+                    table_id: TableId(
+                        3,
+                    ),
+                    index_name: "Table_1_pkey",
+                    tpe: PrimaryKey,
+                },
+                Index {
+                    table_id: TableId(
+                        4,
+                    ),
+                    index_name: "Table_2_pkey",
+                    tpe: PrimaryKey,
+                },
+            ],
+            index_columns: [
+                IndexColumn {
+                    index_id: IndexId(
+                        0,
+                    ),
+                    column_id: ColumnId(
+                        1,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        1,
+                    ),
+                    column_id: ColumnId(
+                        2,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        2,
+                    ),
+                    column_id: ColumnId(
+                        4,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        3,
+                    ),
+                    column_id: ColumnId(
+                        5,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        4,
+                    ),
+                    column_id: ColumnId(
+                        7,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+            ],
+            views: [],
+            procedures: [],
+            user_defined_types: [],
+            connector_data: <ConnectorData>,
+        }
+    "#]];
+
+    expected_schema.assert_debug_eq(&schema);
+}
+
+#[test_connector(tags(Postgres11))]
+fn multiple_schemas_are_described(api: TestApi) {
+    let schema = r#"
+           CREATE Schema "schema_0";
+           CREATE TABLE "schema_0"."Table_0" ("id_0" SERIAL PRIMARY KEY);
+           CREATE TABLE "schema_0"."Table_1" ("id_1" SERIAL PRIMARY KEY, o_id_0 Integer References "schema_0"."Table_0"("id_0"));
+           CREATE SEQUENCE "schema_0"."Sequence_0" START 1;
+           CREATE TYPE "schema_0"."Type_0" AS ENUM ('happy');
+           CREATE INDEX "Index_0" ON "schema_0"."Table_1"("o_id_0");
+           CREATE VIEW "schema_0"."View_0" AS SELECT 0;
+           CREATE PROCEDURE "schema_0"."Procedure_0" ()
+            LANGUAGE SQL
+            AS $$
+            Select 0;
+            $$;
+           
+           CREATE Schema "schema_1";
+           CREATE TABLE "schema_1"."Table_2" ("id_2" SERIAL PRIMARY KEY);
+           CREATE TABLE "schema_1"."Table_3" ("id_3" SERIAL PRIMARY KEY, o_id_2 Integer References "schema_1"."Table_2"("id_2"));
+           CREATE SEQUENCE "schema_1"."Sequence_1" START 100;
+           CREATE TYPE "schema_1"."Type_1" AS ENUM ('happy');
+           CREATE INDEX "Index_1" ON "schema_1"."Table_3"("o_id_2");
+           CREATE VIEW "schema_1"."View_1" AS SELECT 1;
+           CREATE PROCEDURE "schema_1"."Procedure_1" ()
+            LANGUAGE SQL
+            AS $$
+            Select 1;
+            $$;
+    "#;
+
+    api.raw_cmd(schema);
+    let schema = api.describe_with_schemas(&["schema_0", "schema_1"]);
+
+    let expected_schema = expect![[r#"
+        SqlSchema {
+            namespaces: [
+                "schema_0",
+                "schema_1",
+            ],
+            tables: [
+                Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
+                    name: "Table_0",
+                },
+                Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
+                    name: "Table_1",
+                },
+                Table {
+                    namespace_id: NamespaceId(
+                        1,
+                    ),
+                    name: "Table_2",
+                },
+                Table {
+                    namespace_id: NamespaceId(
+                        1,
+                    ),
+                    name: "Table_3",
+                },
+            ],
+            enums: [
+                Enum {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
+                    name: "Type_0",
+                    values: [
+                        "happy",
+                    ],
+                },
+                Enum {
+                    namespace_id: NamespaceId(
+                        1,
+                    ),
+                    name: "Type_1",
+                    values: [
+                        "happy",
+                    ],
+                },
+            ],
+            columns: [
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "id_0",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Sequence(
+                                    "Table_0_id_0_seq",
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: true,
+                    },
+                ),
+                (
+                    TableId(
+                        1,
+                    ),
+                    Column {
+                        name: "id_1",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Sequence(
+                                    "Table_1_id_1_seq",
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: true,
+                    },
+                ),
+                (
+                    TableId(
+                        1,
+                    ),
+                    Column {
+                        name: "o_id_0",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Nullable,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        2,
+                    ),
+                    Column {
+                        name: "id_2",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Sequence(
+                                    "Table_2_id_2_seq",
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: true,
+                    },
+                ),
+                (
+                    TableId(
+                        3,
+                    ),
+                    Column {
+                        name: "id_3",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: Some(
+                            DefaultValue {
+                                kind: Sequence(
+                                    "Table_3_id_3_seq",
+                                ),
+                                constraint_name: None,
+                            },
+                        ),
+                        auto_increment: true,
+                    },
+                ),
+                (
+                    TableId(
+                        3,
+                    ),
+                    Column {
+                        name: "o_id_2",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Nullable,
+                            native_type: Some(
+                                String("Integer"),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+            ],
+            foreign_keys: [
+                ForeignKey {
+                    constrained_table: TableId(
+                        1,
+                    ),
+                    referenced_table: TableId(
+                        0,
+                    ),
+                    constraint_name: Some(
+                        "Table_1_o_id_0_fkey",
+                    ),
+                    on_delete_action: NoAction,
+                    on_update_action: NoAction,
+                },
+                ForeignKey {
+                    constrained_table: TableId(
+                        3,
+                    ),
+                    referenced_table: TableId(
+                        2,
+                    ),
+                    constraint_name: Some(
+                        "Table_3_o_id_2_fkey",
+                    ),
+                    on_delete_action: NoAction,
+                    on_update_action: NoAction,
+                },
+            ],
+            foreign_key_columns: [
+                ForeignKeyColumn {
+                    foreign_key_id: ForeignKeyId(
+                        0,
+                    ),
+                    constrained_column: ColumnId(
+                        2,
+                    ),
+                    referenced_column: ColumnId(
+                        0,
+                    ),
+                },
+                ForeignKeyColumn {
+                    foreign_key_id: ForeignKeyId(
+                        1,
+                    ),
+                    constrained_column: ColumnId(
+                        5,
+                    ),
+                    referenced_column: ColumnId(
+                        3,
+                    ),
+                },
+            ],
+            indexes: [
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "Table_0_pkey",
+                    tpe: PrimaryKey,
+                },
+                Index {
+                    table_id: TableId(
+                        1,
+                    ),
+                    index_name: "Index_0",
+                    tpe: Normal,
+                },
+                Index {
+                    table_id: TableId(
+                        1,
+                    ),
+                    index_name: "Table_1_pkey",
+                    tpe: PrimaryKey,
+                },
+                Index {
+                    table_id: TableId(
+                        2,
+                    ),
+                    index_name: "Table_2_pkey",
+                    tpe: PrimaryKey,
+                },
+                Index {
+                    table_id: TableId(
+                        3,
+                    ),
+                    index_name: "Index_1",
+                    tpe: Normal,
+                },
+                Index {
+                    table_id: TableId(
+                        3,
+                    ),
+                    index_name: "Table_3_pkey",
+                    tpe: PrimaryKey,
+                },
+            ],
+            index_columns: [
+                IndexColumn {
+                    index_id: IndexId(
+                        0,
+                    ),
+                    column_id: ColumnId(
+                        0,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        1,
+                    ),
+                    column_id: ColumnId(
+                        2,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        2,
+                    ),
+                    column_id: ColumnId(
+                        1,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        3,
+                    ),
+                    column_id: ColumnId(
+                        3,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        4,
+                    ),
+                    column_id: ColumnId(
+                        5,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        5,
+                    ),
+                    column_id: ColumnId(
+                        4,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+            ],
+            views: [
+                View {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
+                    name: "View_0",
+                    definition: Some(
+                        " SELECT 0;",
+                    ),
+                },
+                View {
+                    namespace_id: NamespaceId(
+                        1,
+                    ),
+                    name: "View_1",
+                    definition: Some(
+                        " SELECT 1;",
+                    ),
+                },
+            ],
+            procedures: [
+                Procedure {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
+                    name: "Procedure_0",
+                    definition: Some(
+                        "CREATE OR REPLACE PROCEDURE schema_0.\"Procedure_0\"()\n LANGUAGE sql\nAS $procedure$\n            Select 0;\n            $procedure$\n",
+                    ),
+                },
+                Procedure {
+                    namespace_id: NamespaceId(
+                        1,
+                    ),
+                    name: "Procedure_1",
+                    definition: Some(
+                        "CREATE OR REPLACE PROCEDURE schema_1.\"Procedure_1\"()\n LANGUAGE sql\nAS $procedure$\n            Select 1;\n            $procedure$\n",
+                    ),
+                },
+            ],
+            user_defined_types: [],
+            connector_data: <ConnectorData>,
+        }
+    "#]];
+
+    expected_schema.assert_debug_eq(&schema);
 }
 
 fn extract_ext(schema: &SqlSchema) -> &PostgresSchemaExt {
