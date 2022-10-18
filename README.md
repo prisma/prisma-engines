@@ -9,17 +9,40 @@ This repository contains a collection of engines that power the core stack for
 Client](https://www.prisma.io/client) and [Prisma
 Migrate](https://www.prisma.io/migrate).
 
-The engines and their respective binary crates are:
+If you're looking for how to install Prisma or any of the engines, the [Getting
+Started](https://www.prisma.io/docs/getting-started) guide might be useful.
 
-- Query engine: `query-engine`
-- Migration engine: `migration-engine-cli`
-- Introspection engine: `introspection-engine`
-- Prisma Format: `prisma-fmt`
+This document describes some of the internals of the engines, and how to build
+and test them.
+
+## What's in this repository
+
+This repository contains four engines:
+
+- *Query engine*, used by the client to run database queries from Prisma Client
+- *Migration engine*, used to create and run migrations
+- *Introspection engine*, used to get the state of the database, compare it
+    to the schema file, and figure out what the differences are
+- *Prisma Format*, used to format prisma files
+
+Additionally, the *psl* (Prisma Schema Language) is the library that defines how
+the language looks like, how it's parsed, etc.
+
+You'll also find:
+- *libs*, for various (small) libraries such as macros, user facing errors,
+    various connector/database-specific libraries, etc.
+- a `docker-compose.yml` file that's helpful for running tests and bringing up
+    containers for various databases
+- a `flake.nix` file for bringing up all dependencies and making it easy to
+    build the code in this repository (the use of this file and `nix` is
+    entirely optional, but can be a good and easy way to get started)
+- an `.envrc` file to make it easier to set everything up, including the `nix
+    shell`
 
 ## Documentation
 
 The [API docs (cargo doc)](https://prisma.github.io/prisma-engines/) are
-published on the repo GitHub pages.
+published on our fabulous repo page.
 
 ## Building Prisma Engines
 
@@ -35,6 +58,10 @@ published on the repo GitHub pages.
   - Alternatively: Load the defined environment in `./.envrc` manually in your
     shell.
 - **For m1 users**: Install [Protocol Buffers](https://grpc.io/docs/protoc-installation/)
+
+Note for nix users: it should be enough to `direnv allow`. Note that
+`rust-analyzer` is missing, so you'll have to already have that in scope if you
+want to use it.
 
 **How to build:**
 
@@ -53,18 +80,48 @@ compiled binaries inside the repository root in the `target/debug` (without
 | Introspection Engine | `./target/[debug\|release]/introspection-engine` |
 | Prisma Format        | `./target/[debug\|release]/prisma-fmt`           |
 
+## Prisma Schema Language
+
+The *Prisma Schema Language* is a library which defines the data structures and
+parsing rules for prisma files, including the available database connectors. For
+more technical details, please check the [library README](./psl/README.md).
+
+The PSL is used throughout the migration and introspection engines, as well as
+prisma format. The DataModeL (DML), which is an annotated version of the PSL is
+also used as input for the query engine.
+
 ## Query Engine
+
+The *Query Engine* is how Prisma Client queries are executed. Here's a brief
+description of what it does:
+- takes as inputs an annotated version of the Prisma Schema file called the
+    DataModeL (DML),
+- using the DML (specifically, the datasources and providers), it builds up a
+    [GraphQL](https://graphql.org) model for queries and responses,
+- runs as a server listening for GraphQL queries,
+- it translates the queries to the respective native datasource(s) and
+    returns GraphQL responses, and
+- handles all connections and communication with the native databases.
+
+When used through the Prisma Client, there are two ways for the Query Engine to
+be executed:
+- as a binary, downloaded during installation, launched at runtime;
+    communication happens via HTTP (`./query-engine/query-engine`)
+- as a native, platform-specific Node.js addon; also downloaded during
+    installation (`./query-engine/query-engine-node-api`)
 
 ### Usage
 
-The Query Engine can be run as a graphql server without using the Prisma Client.
-If using it on production please be aware the api and the query language can
-change any time. There is no guaranteed API stability.
+You can also run the Query Engine as a stand-alone GraphQL server.
+
+**Warning**: There is no guaranteed API stability. If using it on production
+please be aware the api and the query language can change any time.
 
 Notable environment flags:
 
 - `RUST_LOG_FORMAT=(devel|json)` sets the log format. By default outputs `json`.
-- `QE_LOG_LEVEL=(info|debug|trace)` sets the log level for the Query Engine. If you need Query Graph debugging logs, set it to "trace"
+- `QE_LOG_LEVEL=(info|debug|trace)` sets the log level for the Query Engine. If
+    you need Query Graph debugging logs, set it to "trace"
 - `FMT_SQL=1` enables logging _formatted_ SQL queries
 - `PRISMA_DML_PATH=[path_to_datamodel_file]` should point to the datamodel file
   location. This or `PRISMA_DML` is required for the Query Engine to run.
@@ -85,54 +142,49 @@ The engine can be started either with using the `cargo` build tool, or
 pre-building a binary and running it directly. If using `cargo`, replace
 whatever command that starts with `./query-engine` with `cargo run --bin query-engine --`.
 
-**Help**
+You can also pass `--help` to find out more options to run the engine.
 
-```bash
-> ./target/release/query-engine --help
-query-engine d6f9915c25a2ae6eb793a3a18f87e576fb82e9da
-
-USAGE:
-    query-engine [FLAGS] [OPTIONS] [SUBCOMMAND]
-
-FLAGS:
-        --enable-raw-queries           Enables raw SQL queries with executeRaw/queryRaw mutation
-    -h, --help                         Prints help information
-    -V, --version                      Prints version information
-
-OPTIONS:
-        --host <host>    The hostname or IP the query engine should bind to [default: 127.0.0.1]
-    -p, --port <port>    The port the query engine should bind to [env: PORT=]  [default: 4466]
-
-SUBCOMMANDS:
-    cli     Doesn't start a server, but allows running specific commands against Prisma
-    help    Prints this message or the help of the given subcommand(s)
-
-> ./target/release/query-engine cli --help
-Doesn't start a server, but allows running specific commands against Prisma
-
-USAGE:
-    query-engine cli <SUBCOMMAND>
-
-FLAGS:
-    -h, --help       Prints help information
-    -V, --version    Prints version information
-
-SUBCOMMANDS:
-    dmmf               Output the DMMF from the loaded data model
-    dmmf-to-dml        Convert the given DMMF JSON file to a data model
-    execute-request    Executes one request and then terminates
-    get-config         Get the configuration from the given data model
-    help               Prints this message or the help of the given subcommand(s)
-```
-
-The prisma version hash is the latest git commit at the time the binary was built.
-
-## Metrics
+### Metrics
 
 Running `make show-metrics` will start Prometheus and Grafana with a default metrics dashboard.
 Prometheus will scrape the `/metrics` endpoint to collect the engine's metrics
 
 Navigate to `http://localhost:3000` to view the Grafana dashboard.
+
+## Migration Engine
+
+The *Migration Engine* does a couple of things:
+- creates new migrations by comparing the prisma file with the current state of
+    the database, in order to bring the database in sync with the prisma file
+- run these migrations and keeps track of which migrations have been executed
+
+The engine uses:
+- the prisma files, as the source of truth
+- the database it connects to, for diffing and running migrations, as well as
+    keeping track of migrations in the `_prisma_migrations` table
+- the `prisma/migrations` directory which acts as a database of existing
+    migrations
+
+For more information about the migrations engine, check the [crate
+README](./migration-engine/README.md).
+
+## Introspection Engine
+
+The *Introspection Engine* is able to (re-)generate a prisma file starting from
+a live database.
+
+In a way, it's the opposite of the migration engine: whereas the migration
+engine uses the prisma file as the source of truth to update the database, the
+introspection engine reverses that dependency. It inspects the database, and
+generates a prisma schema file as a result.
+
+For more information about the introspection engine, check the [crate README
+](./introspection-engine/README.md).
+
+## Prisma format
+
+Prisma format can format prisma schema files. It also comes as a WASM module via
+a node package. You can read more [here](./prisma-fmt-wasm/README.md).
 
 ## Testing
 
