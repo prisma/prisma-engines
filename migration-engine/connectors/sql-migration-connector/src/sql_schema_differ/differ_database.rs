@@ -1,8 +1,9 @@
 use super::{column, enums::EnumDiffer, table::TableDiffer};
 use crate::{flavour::SqlFlavour, pair::Pair, SqlDatabaseSchema};
 use sql_schema_describer::{
+    postgres::{ExtensionId, ExtensionWalker, PostgresSchemaExt},
     walkers::{ColumnWalker, EnumWalker, TableWalker},
-    ColumnId, TableId,
+    ColumnId, NamespaceId, NamespaceWalker, TableId,
 };
 use std::{
     borrow::Cow,
@@ -13,7 +14,9 @@ use std::{
 pub(crate) struct DifferDatabase<'a> {
     pub(super) flavour: &'a dyn SqlFlavour,
     /// The schemas being diffed
-    schemas: Pair<&'a SqlDatabaseSchema>,
+    pub(crate) schemas: Pair<&'a SqlDatabaseSchema>,
+    /// Namespace name -> namespace indexes.
+    namespaces: HashMap<Cow<'a, str>, Pair<Option<NamespaceId>>>,
     /// Table name -> table indexes.
     tables: HashMap<Cow<'a, str>, Pair<Option<TableId>>>,
     /// (table_idxs, column_name) -> column_idxs. BTreeMap because we want range
@@ -21,6 +24,8 @@ pub(crate) struct DifferDatabase<'a> {
     columns: BTreeMap<(Pair<TableId>, &'a str), Pair<Option<ColumnId>>>,
     /// (table_idx, column_idx) -> ColumnChanges
     column_changes: HashMap<Pair<ColumnId>, column::ColumnChanges>,
+    /// Postgres extension name -> extension indexes.
+    pub(super) extensions: HashMap<&'a str, Pair<Option<ExtensionId>>>,
     /// Tables that will need to be completely redefined (dropped and recreated) for the migration
     /// to succeed. It needs to be crate public because it is set from the flavour.
     pub(crate) tables_to_redefine: BTreeSet<Pair<TableId>>,
@@ -28,16 +33,23 @@ pub(crate) struct DifferDatabase<'a> {
 
 impl<'a> DifferDatabase<'a> {
     pub(crate) fn new(schemas: Pair<&'a SqlDatabaseSchema>, flavour: &'a dyn SqlFlavour) -> Self {
+        let namespace_count_lb = std::cmp::max(
+            schemas.previous.describer_schema.namespaces_count(),
+            schemas.next.describer_schema.namespaces_count(),
+        );
         let table_count_lb = std::cmp::max(
             schemas.previous.describer_schema.tables_count(),
             schemas.next.describer_schema.tables_count(),
         );
+
         let mut db = DifferDatabase {
             flavour,
             schemas,
+            namespaces: HashMap::with_capacity(namespace_count_lb),
             tables: HashMap::with_capacity(table_count_lb),
             columns: BTreeMap::new(),
             column_changes: Default::default(),
+            extensions: Default::default(),
             tables_to_redefine: Default::default(),
         };
 
@@ -45,6 +57,28 @@ impl<'a> DifferDatabase<'a> {
         let table_is_ignored = |table_name: &str| {
             table_name == crate::MIGRATIONS_TABLE_NAME || flavour.table_should_be_ignored(table_name)
         };
+
+        // First insert all namespaces from the previous schema.
+        for namespace in schemas.previous.describer_schema.namespace_walkers() {
+            let namespace_name = if flavour.lower_cases_table_names() {
+                namespace.name().to_ascii_lowercase().into()
+            } else {
+                Cow::Borrowed(namespace.name())
+            };
+            db.namespaces
+                .insert(namespace_name, Pair::new(Some(namespace.id), None));
+        }
+
+        // Then insert all namespaces from the next schema.
+        for namespace in schemas.next.describer_schema.namespace_walkers() {
+            let namespace_name = if flavour.lower_cases_table_names() {
+                namespace.name().to_ascii_lowercase().into()
+            } else {
+                Cow::Borrowed(namespace.name())
+            };
+            let entry = db.namespaces.entry(namespace_name).or_default();
+            entry.next = Some(namespace.id);
+        }
 
         // First insert all tables from the previous schema.
         for table in schemas
@@ -109,6 +143,7 @@ impl<'a> DifferDatabase<'a> {
         }
 
         flavour.set_tables_to_redefine(&mut db);
+        flavour.define_extensions(&mut db);
 
         db
     }
@@ -141,6 +176,14 @@ impl<'a> DifferDatabase<'a> {
             .filter(|p| p.previous.is_none())
             .filter_map(|p| p.next)
             .map(move |table_id| self.schemas.next.walk(table_id))
+    }
+
+    pub(crate) fn created_namespaces(&self) -> impl Iterator<Item = NamespaceWalker<'_>> + '_ {
+        self.namespaces
+            .values()
+            .filter(|p| p.previous.is_none())
+            .filter_map(|p| p.next)
+            .map(move |namespace_id| self.schemas.next.walk(namespace_id))
     }
 
     pub(crate) fn dropped_columns(&self, table: Pair<TableId>) -> impl Iterator<Item = ColumnId> + '_ {
@@ -211,6 +254,42 @@ impl<'a> DifferDatabase<'a> {
             .filter(move |previous| !self.next_enums().any(|next| enums_match(previous, &next)))
     }
 
+    /// Extensions not present in the previous schema.
+    pub(crate) fn created_extensions(&self) -> impl Iterator<Item = ExtensionId> + '_ {
+        self.extensions
+            .values()
+            .filter(|pair| pair.previous.is_none())
+            .filter_map(|pair| pair.next)
+    }
+
+    /// Non-relocatable extensions present in both schemas with changed values.
+    pub(crate) fn non_relocatable_extension_pairs<'db>(
+        &'db self,
+    ) -> impl Iterator<Item = Pair<ExtensionWalker<'a>>> + 'db {
+        self.previous_extensions().filter_map(move |previous| {
+            self.next_extensions()
+                .find(|next| {
+                    previous.name() == next.name()
+                        && !extensions_match(previous, *next)
+                        && (!previous.relocatable() && !next.relocatable())
+                })
+                .map(|next| Pair::new(previous, next))
+        })
+    }
+
+    /// Relocatable extensions present in both schemas with changed values.
+    pub(crate) fn relocatable_extension_pairs<'db>(&'db self) -> impl Iterator<Item = Pair<ExtensionWalker<'a>>> + 'db {
+        self.previous_extensions().filter_map(move |previous| {
+            self.next_extensions()
+                .find(|next| {
+                    previous.name() == next.name()
+                        && !extensions_match(previous, *next)
+                        && (previous.relocatable() || next.relocatable())
+                })
+                .map(|next| Pair::new(previous, next))
+        })
+    }
+
     fn previous_enums(&self) -> impl Iterator<Item = EnumWalker<'a>> {
         self.schemas.previous.describer_schema.enum_walkers()
     }
@@ -219,9 +298,26 @@ impl<'a> DifferDatabase<'a> {
         self.schemas.next.describer_schema.enum_walkers()
     }
 
-    pub(crate) fn schemas(&self) -> Pair<&'a SqlDatabaseSchema> {
-        self.schemas
+    fn previous_extensions(&self) -> impl Iterator<Item = ExtensionWalker<'a>> {
+        let conn_data: &PostgresSchemaExt = self.schemas.previous.describer_schema.downcast_connector_data();
+        conn_data.extension_walkers()
     }
+
+    fn next_extensions(&self) -> impl Iterator<Item = ExtensionWalker<'a>> {
+        let conn_data: &PostgresSchemaExt = self.schemas.next.describer_schema.downcast_connector_data();
+        conn_data.extension_walkers()
+    }
+}
+
+pub(crate) fn extensions_match(previous: ExtensionWalker<'_>, next: ExtensionWalker<'_>) -> bool {
+    let names_match = previous.name() == next.name();
+
+    let versions_match =
+        previous.version() == next.version() || previous.version().is_empty() || next.version().is_empty();
+
+    let schemas_match = previous.schema() == next.schema() || previous.schema().is_empty() || next.schema().is_empty();
+
+    names_match && versions_match && schemas_match
 }
 
 fn enums_match(previous: &EnumWalker<'_>, next: &EnumWalker<'_>) -> bool {

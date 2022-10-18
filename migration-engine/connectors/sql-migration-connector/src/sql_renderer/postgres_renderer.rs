@@ -2,10 +2,13 @@ use super::{common::*, SqlRenderer};
 use crate::{
     flavour::PostgresFlavour,
     pair::Pair,
-    sql_migration::{AlterColumn, AlterEnum, AlterTable, RedefineTable, SequenceChange, SequenceChanges, TableChange},
+    sql_migration::{
+        AlterColumn, AlterEnum, AlterExtension, AlterTable, CreateExtension, DropExtension, ExtensionChange,
+        RedefineTable, SequenceChange, SequenceChanges, TableChange,
+    },
     sql_schema_differ::{ColumnChange, ColumnChanges},
 };
-use native_types::{CockroachType, PostgresType};
+use psl::builtin_connectors::{CockroachType, PostgresType};
 use psl::dml::PrismaValue;
 use sql_ddl::{postgres as ddl, IndexColumn, SortOrder};
 use sql_schema_describer::{
@@ -76,6 +79,70 @@ impl SqlRenderer for PostgresFlavour {
                 }
             })
         })
+    }
+
+    fn render_create_extension(&self, create: &CreateExtension, schema: &SqlSchema) -> Vec<String> {
+        let ext: &PostgresSchemaExt = schema.downcast_connector_data();
+        let extension = ext.get_extension(create.id);
+
+        render_step(&mut |step| {
+            step.render_statement(&mut |stmt| {
+                stmt.push_str("CREATE EXTENSION IF NOT EXISTS ");
+                stmt.push_display(&Quoted::postgres_ident(&extension.name));
+
+                if !extension.version.is_empty() || !extension.schema.is_empty() {
+                    stmt.push_str(" WITH");
+                }
+
+                if !extension.schema.is_empty() {
+                    stmt.push_str(" SCHEMA ");
+                    stmt.push_display(&Quoted::postgres_ident(&extension.schema));
+                }
+
+                if !extension.version.is_empty() {
+                    stmt.push_str(" VERSION ");
+                    stmt.push_display(&Quoted::postgres_ident(&extension.version));
+                }
+            })
+        })
+    }
+
+    fn render_drop_extension(&self, drop: &DropExtension, schema: &SqlSchema) -> Vec<String> {
+        let ext: &PostgresSchemaExt = schema.downcast_connector_data();
+        let extension = ext.get_extension(drop.id);
+
+        render_step(&mut |step| {
+            step.render_statement(&mut |stmt| {
+                stmt.push_str("DROP EXTENSION ");
+                stmt.push_display(&Quoted::postgres_ident(&extension.name));
+            })
+        })
+    }
+
+    fn render_alter_extension(&self, alter: &AlterExtension, schemas: Pair<&SqlSchema>) -> Vec<String> {
+        let exts: Pair<&PostgresSchemaExt> = schemas.map(|schema| schema.downcast_connector_data());
+        let extensions = exts.zip(alter.ids).map(|(ext, id)| ext.get_extension(id));
+
+        alter
+            .changes
+            .iter()
+            .flat_map(|change| {
+                render_step(&mut |step| match change {
+                    ExtensionChange::AlterVersion => step.render_statement(&mut |stmt| {
+                        stmt.push_str("ALTER EXTENSION ");
+                        stmt.push_display(&Quoted::postgres_ident(&extensions.previous.name));
+                        stmt.push_str(" UPDATE TO ");
+                        stmt.push_display(&Quoted::postgres_ident(&extensions.next.version));
+                    }),
+                    ExtensionChange::AlterSchema => step.render_statement(&mut |stmt| {
+                        stmt.push_str("ALTER EXTENSION ");
+                        stmt.push_display(&Quoted::postgres_ident(&extensions.previous.name));
+                        stmt.push_str(" SET SCHEMA ");
+                        stmt.push_display(&Quoted::postgres_ident(&extensions.next.schema));
+                    }),
+                })
+            })
+            .collect()
     }
 
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
@@ -494,7 +561,7 @@ fn render_column_type_postgres(col: ColumnWalker<'_>) -> Cow<'static, str> {
     let t = col.column_type();
     let is_autoincrement = col.is_autoincrement();
 
-    let native_type = col
+    let native_type: &PostgresType = col
         .column_native_type()
         .expect("Missing native type in postgres_renderer::render_column_type()");
 
@@ -509,21 +576,21 @@ fn render_column_type_postgres(col: ColumnWalker<'_>) -> Cow<'static, str> {
         PostgresType::Integer => "INTEGER".into(),
         PostgresType::BigInt if is_autoincrement => "BIGSERIAL".into(),
         PostgresType::BigInt => "BIGINT".into(),
-        PostgresType::Decimal(precision) => format!("DECIMAL{}", render_decimal_args(precision)).into(),
+        PostgresType::Decimal(precision) => format!("DECIMAL{}", render_decimal_args(*precision)).into(),
         PostgresType::Real => "REAL".into(),
         PostgresType::DoublePrecision => "DOUBLE PRECISION".into(),
-        PostgresType::VarChar(length) => format!("VARCHAR{}", render_optional_args(length)).into(),
-        PostgresType::Char(length) => format!("CHAR{}", render_optional_args(length)).into(),
+        PostgresType::VarChar(length) => format!("VARCHAR{}", render_optional_args(*length)).into(),
+        PostgresType::Char(length) => format!("CHAR{}", render_optional_args(*length)).into(),
         PostgresType::Text => "TEXT".into(),
         PostgresType::ByteA => "BYTEA".into(),
         PostgresType::Date => "DATE".into(),
-        PostgresType::Timestamp(precision) => format!("TIMESTAMP{}", render_optional_args(precision)).into(),
-        PostgresType::Timestamptz(precision) => format!("TIMESTAMPTZ{}", render_optional_args(precision)).into(),
-        PostgresType::Time(precision) => format!("TIME{}", render_optional_args(precision)).into(),
-        PostgresType::Timetz(precision) => format!("TIMETZ{}", render_optional_args(precision)).into(),
+        PostgresType::Timestamp(precision) => format!("TIMESTAMP{}", render_optional_args(*precision)).into(),
+        PostgresType::Timestamptz(precision) => format!("TIMESTAMPTZ{}", render_optional_args(*precision)).into(),
+        PostgresType::Time(precision) => format!("TIME{}", render_optional_args(*precision)).into(),
+        PostgresType::Timetz(precision) => format!("TIMETZ{}", render_optional_args(*precision)).into(),
         PostgresType::Boolean => "BOOLEAN".into(),
-        PostgresType::Bit(length) => format!("BIT{}", render_optional_args(length)).into(),
-        PostgresType::VarBit(length) => format!("VARBIT{}", render_optional_args(length)).into(),
+        PostgresType::Bit(length) => format!("BIT{}", render_optional_args(*length)).into(),
+        PostgresType::VarBit(length) => format!("VARBIT{}", render_optional_args(*length)).into(),
         PostgresType::Uuid => "UUID".into(),
         PostgresType::Xml => "XML".into(),
         PostgresType::Json => "JSON".into(),
@@ -549,24 +616,24 @@ fn render_column_type_cockroachdb(col: ColumnWalker<'_>) -> Cow<'static, str> {
         CockroachType::Int4 => "INT4".into(),
         CockroachType::Int8 => "INT8".into(),
         CockroachType::Oid => "OID".into(),
-        CockroachType::Decimal(precision) => format!("DECIMAL{}", render_decimal_args(precision)).into(),
+        CockroachType::Decimal(precision) => format!("DECIMAL{}", render_decimal_args(*precision)).into(),
         CockroachType::Float4 => "FLOAT4".into(),
         CockroachType::Float8 => "FLOAT8".into(),
-        CockroachType::String(length) => format!("STRING{}", render_optional_args(length)).into(),
+        CockroachType::String(length) => format!("STRING{}", render_optional_args(*length)).into(),
 
         // https://www.cockroachlabs.com/docs/stable/string.html
-        CockroachType::Char(length) => format!("CHAR{}", render_optional_args(length)).into(),
+        CockroachType::Char(length) => format!("CHAR{}", render_optional_args(*length)).into(),
         CockroachType::CatalogSingleChar => r#""char""#.into(),
 
         CockroachType::Bytes => "BYTES".into(),
         CockroachType::Date => "DATE".into(),
-        CockroachType::Timestamp(precision) => format!("TIMESTAMP{}", render_optional_args(precision)).into(),
-        CockroachType::Timestamptz(precision) => format!("TIMESTAMPTZ{}", render_optional_args(precision)).into(),
-        CockroachType::Time(precision) => format!("TIME{}", render_optional_args(precision)).into(),
-        CockroachType::Timetz(precision) => format!("TIMETZ{}", render_optional_args(precision)).into(),
+        CockroachType::Timestamp(precision) => format!("TIMESTAMP{}", render_optional_args(*precision)).into(),
+        CockroachType::Timestamptz(precision) => format!("TIMESTAMPTZ{}", render_optional_args(*precision)).into(),
+        CockroachType::Time(precision) => format!("TIME{}", render_optional_args(*precision)).into(),
+        CockroachType::Timetz(precision) => format!("TIMETZ{}", render_optional_args(*precision)).into(),
         CockroachType::Bool => "BOOL".into(),
-        CockroachType::Bit(length) => format!("BIT{}", render_optional_args(length)).into(),
-        CockroachType::VarBit(length) => format!("VARBIT{}", render_optional_args(length)).into(),
+        CockroachType::Bit(length) => format!("BIT{}", render_optional_args(*length)).into(),
+        CockroachType::VarBit(length) => format!("VARBIT{}", render_optional_args(*length)).into(),
         CockroachType::Uuid => "UUID".into(),
         CockroachType::JsonB => "JSONB".into(),
     };

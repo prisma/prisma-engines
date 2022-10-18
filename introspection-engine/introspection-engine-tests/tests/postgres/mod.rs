@@ -1,4 +1,5 @@
 mod brin;
+mod extensions;
 mod gin;
 mod gist;
 mod spgist;

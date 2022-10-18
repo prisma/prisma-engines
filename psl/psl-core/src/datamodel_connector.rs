@@ -4,31 +4,36 @@
 pub mod capabilities;
 /// Constraint name defaults.
 pub mod constraint_names;
-/// Helpers for implementors of `Connector`.
-pub mod helper;
 /// Extensions for parser database walkers with context from the connector.
 pub mod walker_ext_traits;
 
 mod empty_connector;
 mod filters;
-mod native_type_constructor;
-mod native_type_instance;
+mod native_types;
 mod relation_mode;
 
 pub use self::{
     capabilities::{ConnectorCapabilities, ConnectorCapability},
     empty_connector::EmptyDatamodelConnector,
     filters::*,
-    native_type_constructor::NativeTypeConstructor,
-    native_type_instance::NativeTypeInstance,
+    native_types::{NativeTypeArguments, NativeTypeConstructor, NativeTypeInstance},
     relation_mode::RelationMode,
 };
 
+use crate::{configuration::DatasourceConnectorData, Datasource, PreviewFeature};
 use diagnostics::{DatamodelError, Diagnostics, NativeTypeErrorFactory, Span};
 use enumflags2::BitFlags;
 use lsp_types::CompletionList;
-use parser_database::{ast::SchemaPosition, walkers, IndexAlgorithm, ParserDatabase, ReferentialAction, ScalarType};
-use std::{borrow::Cow, collections::BTreeMap};
+use parser_database::{
+    ast::{self, SchemaPosition},
+    walkers, IndexAlgorithm, ParserDatabase, ReferentialAction, ScalarType,
+};
+use std::{
+    borrow::Cow,
+    collections::{BTreeMap, HashMap},
+};
+
+pub const EXTENSIONS_KEY: &str = "extensions";
 
 /// The datamodel connector API.
 pub trait Connector: Send + Sync {
@@ -71,7 +76,17 @@ pub trait Connector: Send + Sync {
     }
 
     /// The referential actions supported by the connector.
-    fn referential_actions(&self, relation_mode: &RelationMode) -> BitFlags<ReferentialAction>;
+    fn referential_actions(&self) -> BitFlags<ReferentialAction>;
+
+    /// The referential actions supported when using relationMode = "prisma" by the connector.
+    /// There are in fact scenarios in which the set of emulated referential actions supported may change
+    /// depending on the connector. For example, Postgres' NoAction mode behaves similarly to Restrict
+    /// (raising an error if any referencing rows still exist when the constraint is checked), but with
+    /// a subtle twist we decided not to emulate: NO ACTION allows the check to be deferred until later
+    /// in the transaction, whereas RESTRICT does not.
+    fn emulated_referential_actions(&self) -> BitFlags<ReferentialAction> {
+        RelationMode::allowed_emulated_referential_actions_default()
+    }
 
     fn supports_composite_types(&self) -> bool {
         self.has_capability(ConnectorCapability::CompositeTypes)
@@ -90,7 +105,10 @@ pub trait Connector: Send + Sync {
     }
 
     fn supports_referential_action(&self, relation_mode: &RelationMode, action: ReferentialAction) -> bool {
-        self.referential_actions(relation_mode).contains(action)
+        match relation_mode {
+            RelationMode::ForeignKeys => self.referential_actions().contains(action),
+            RelationMode::Prisma => self.emulated_referential_actions().contains(action),
+        }
     }
 
     /// This is used by the query engine schema builder.
@@ -131,6 +149,7 @@ pub trait Connector: Send + Sync {
 
     fn validate_enum(&self, _enum: walkers::EnumWalker<'_>, _: &mut Diagnostics) {}
     fn validate_model(&self, _model: walkers::ModelWalker<'_>, _: &mut Diagnostics) {}
+    fn validate_datasource(&self, _: BitFlags<PreviewFeature>, _: &Datasource, _: &mut Diagnostics) {}
 
     fn validate_scalar_field_unknown_default_functions(
         &self,
@@ -153,15 +172,22 @@ pub trait Connector: Send + Sync {
     /// Powers the auto completion of the VSCode plugin.
     fn available_native_type_constructors(&self) -> &'static [NativeTypeConstructor];
 
-    /// Returns the Scalar Type for the given native type
-    fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType;
+    /// Returns the default scalar type for the given native type
+    fn scalar_type_for_native_type(&self, native_type: &NativeTypeInstance) -> ScalarType;
 
     /// On each connector, each built-in Prisma scalar type (`Boolean`,
     /// `String`, `Float`, etc.) has a corresponding native type.
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value;
+    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> NativeTypeInstance;
 
     /// Same mapping as `default_native_type_for_scalar_type()`, but in the opposite direction.
-    fn native_type_is_default_for_scalar_type(&self, native_type: serde_json::Value, scalar_type: &ScalarType) -> bool;
+    fn native_type_is_default_for_scalar_type(
+        &self,
+        native_type: &NativeTypeInstance,
+        scalar_type: &ScalarType,
+    ) -> bool;
+
+    /// Debug/error representation of a native type.
+    fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>);
 
     fn find_native_type_constructor(&self, name: &str) -> Option<&NativeTypeConstructor> {
         self.available_native_type_constructors()
@@ -173,13 +199,10 @@ pub trait Connector: Send + Sync {
     fn parse_native_type(
         &self,
         name: &str,
-        args: Vec<String>,
+        args: &[String],
         span: Span,
-    ) -> Result<NativeTypeInstance, DatamodelError>;
-
-    /// This function is used during introspection to turn an introspected native type into an
-    /// instance that can be inserted into dml.
-    fn introspect_native_type(&self, native_type: serde_json::Value) -> NativeTypeInstance;
+        diagnostics: &mut Diagnostics,
+    ) -> Option<NativeTypeInstance>;
 
     fn set_config_dir<'a>(&self, config_dir: &std::path::Path, url: &'a str) -> Cow<'a, str> {
         let set_root = |path: &str| {
@@ -276,13 +299,31 @@ pub trait Connector: Send + Sync {
         self.has_capability(ConnectorCapability::RelationFieldsInArbitraryOrder)
     }
 
+    fn native_type_to_string(&self, instance: &NativeTypeInstance) -> String {
+        let (name, args) = self.native_type_to_parts(instance);
+        let args = if args.is_empty() {
+            String::new()
+        } else {
+            format!("({})", args.join(","))
+        };
+        format!("{name}{args}")
+    }
+
     fn native_instance_error(&self, instance: &NativeTypeInstance) -> NativeTypeErrorFactory {
-        NativeTypeErrorFactory::new(instance.to_string(), self.name().to_owned())
+        NativeTypeErrorFactory::new(self.native_type_to_string(instance), self.name().to_owned())
     }
 
     fn validate_url(&self, url: &str) -> Result<(), String>;
 
     fn push_completions(&self, _db: &ParserDatabase, _position: SchemaPosition<'_>, _completions: &mut CompletionList) {
+    }
+
+    fn parse_datasource_properties(
+        &self,
+        _args: &mut HashMap<&str, (Span, &ast::Expression)>,
+        _diagnostics: &mut Diagnostics,
+    ) -> DatasourceConnectorData {
+        Default::default()
     }
 }
 

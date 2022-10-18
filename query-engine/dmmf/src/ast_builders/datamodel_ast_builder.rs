@@ -239,7 +239,7 @@ fn function_to_serde(name: &str, args: &[PrismaValue]) -> serde_json::Value {
 fn get_field_type(field: &dml::Field) -> String {
     match &field.field_type() {
         dml::FieldType::CompositeType(t) => t.clone(),
-        dml::FieldType::Relation(relation_info) => relation_info.to.clone(),
+        dml::FieldType::Relation(relation_info) => relation_info.referenced_model.clone(),
         dml::FieldType::Enum(t) => t.clone(),
         dml::FieldType::Unsupported(t) => t.clone(),
         dml::FieldType::Scalar(t, _) => type_to_string(t),

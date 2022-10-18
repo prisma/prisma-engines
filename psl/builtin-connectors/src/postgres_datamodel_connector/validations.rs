@@ -1,18 +1,22 @@
-use native_types::PostgresType;
+use crate::PostgresType;
+use enumflags2::BitFlags;
 use psl_core::{
     datamodel_connector::{walker_ext_traits::*, Connector},
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{ast::WithSpan, walkers::IndexWalker, IndexAlgorithm, OperatorClass},
+    PreviewFeature,
 };
+
+use super::PostgresDatasourceProperties;
 
 pub(super) fn compatible_native_types(index: IndexWalker<'_>, connector: &dyn Connector, errors: &mut Diagnostics) {
     for field in index.fields() {
         if let Some(native_type) = field.native_type_instance(connector) {
             let span = field.ast_field().span();
-            let r#type: PostgresType = serde_json::from_value(native_type.serialized_native_type.clone()).unwrap();
+            let r#type: &PostgresType = native_type.downcast_ref();
             let error = connector.native_instance_error(&native_type);
 
-            if r#type == PostgresType::Xml {
+            if r#type == &PostgresType::Xml {
                 if index.is_unique() {
                     errors.push_error(error.new_incompatible_native_type_with_unique("", span))
                 } else {
@@ -59,9 +63,10 @@ pub(super) fn generalized_index_validations(
         }
 
         let native_type_instance = field.as_index_field().native_type_instance(connector);
-        let native_type = native_type_instance
+        let native_type: Option<&PostgresType> = native_type_instance.as_ref().map(|t| t.downcast_ref());
+        let native_type_name = native_type_instance
             .as_ref()
-            .map(|t| serde_json::from_value(t.serialized_native_type.clone()).unwrap());
+            .map(|nt| connector.native_type_to_parts(nt).0);
 
         let r#type = field.as_index_field().scalar_field_type();
 
@@ -136,7 +141,7 @@ pub(super) fn generalized_index_validations(
             match (&native_type, opclass) {
                 // Inet / InetOps
                 (Some(PostgresType::Inet), Some(InetOps)) => (),
-                _ => err_f(native_type_instance.as_ref().map(|i| i.name.as_str()), opclass),
+                _ => err_f(native_type_name, opclass),
             }
         } else if algo.is_gin() {
             match (&native_type, opclass) {
@@ -184,7 +189,7 @@ pub(super) fn generalized_index_validations(
                         index.ast_attribute().span,
                     ));
                 }
-                _ => err_f(native_type_instance.as_ref().map(|i| i.name.as_str()), opclass),
+                _ => err_f(native_type_name, opclass),
             }
         } else if algo.is_spgist() {
             match (&native_type, opclass) {
@@ -213,7 +218,7 @@ pub(super) fn generalized_index_validations(
                 (Some(PostgresType::VarChar(_)), Some(TextOps) | None) => (),
                 (Some(PostgresType::Char(_)), Some(TextOps) | None) => (),
 
-                _ => err_f(native_type_instance.as_ref().map(|i| i.name.as_str()), opclass),
+                _ => err_f(native_type_name, opclass),
             }
         } else if algo.is_brin() {
             match (&native_type, opclass) {
@@ -445,8 +450,65 @@ pub(super) fn generalized_index_validations(
                 (Some(PostgresType::Uuid), Some(UuidMinMaxOps)) => (),
                 (Some(PostgresType::Uuid), Some(UuidMinMaxMultiOps)) => (),
 
-                _ => err_f(native_type_instance.as_ref().map(|i| i.name.as_str()), opclass),
+                _ => err_f(native_type_name, opclass),
             }
+        }
+    }
+}
+
+pub(super) fn extensions_preview_flag_must_be_set(
+    preview_features: BitFlags<PreviewFeature>,
+    props: &PostgresDatasourceProperties,
+    errors: &mut Diagnostics,
+) {
+    if preview_features.contains(PreviewFeature::PostgresqlExtensions) {
+        return;
+    }
+
+    let span = match props.extensions() {
+        Some(extensions) => extensions.span,
+        None => return,
+    };
+
+    errors.push_error(DatamodelError::new_static(
+        "The `extensions` property is only available with the `postgresqlExtensions` preview feature.",
+        span,
+    ));
+}
+
+pub(super) fn extension_names_follow_prisma_syntax_rules(
+    preview_features: BitFlags<PreviewFeature>,
+    props: &PostgresDatasourceProperties,
+    errors: &mut Diagnostics,
+) {
+    if !preview_features.contains(PreviewFeature::PostgresqlExtensions) {
+        return;
+    }
+
+    let extensions = match props.extensions() {
+        Some(extensions) => extensions,
+        None => return,
+    };
+
+    // Sadly these rules are already in identifier validation. It is
+    // not easy to share those rules here due to the code
+    // organization. TODO: organize the code better!
+    for extension in extensions.extensions() {
+        if extension.name.is_empty() {
+            errors.push_error(DatamodelError::new_validation_error(
+                "The name of an extension must not be empty.",
+                extension.span,
+            ));
+        } else if extension.name.chars().next().unwrap().is_numeric() {
+            errors.push_error(DatamodelError::new_validation_error(
+                "The name of an extension must not start with a number.",
+                extension.span,
+            ));
+        } else if extension.name.contains('-') {
+            errors.push_error(DatamodelError::new_validation_error(
+                "The character `-` is not allowed in extension names.",
+                extension.span,
+            ))
         }
     }
 }

@@ -5,7 +5,7 @@ use std::fmt;
 #[derive(Debug, PartialEq, Clone)]
 pub struct RelationInfo {
     /// The target model of the relation.
-    pub to: String,
+    pub referenced_model: String,
     /// The fields forming the relation.
     pub fields: Vec<String>,
     /// The target field of the relation a.k.a. `references`
@@ -25,9 +25,9 @@ pub struct RelationInfo {
 impl RelationInfo {
     /// Creates a new relation info for the
     /// given target model.
-    pub fn new(to: &str) -> RelationInfo {
+    pub fn new(model: &str) -> RelationInfo {
         RelationInfo {
-            to: String::from(to),
+            referenced_model: String::from(model),
             fields: Vec::new(),
             references: Vec::new(),
             name: String::new(),

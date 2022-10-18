@@ -19,7 +19,9 @@ pub(crate) use common::IteratorJoin;
 use self::common::{Quoted, TableName};
 use crate::{
     pair::Pair,
-    sql_migration::{AlterEnum, AlterTable, RedefineTable, SequenceChanges},
+    sql_migration::{
+        AlterEnum, AlterExtension, AlterTable, CreateExtension, DropExtension, RedefineTable, SequenceChanges,
+    },
 };
 use sql_schema_describer::{
     self as sql,
@@ -108,5 +110,17 @@ pub(crate) trait SqlRenderer {
 
     fn render_create_namespace(&self, _namespace: sql::NamespaceWalker<'_>) -> String {
         unreachable!()
+    }
+
+    fn render_create_extension(&self, _create: &CreateExtension, _schema: &SqlSchema) -> Vec<String> {
+        unreachable!("render_create_extension")
+    }
+
+    fn render_alter_extension(&self, _alter: &AlterExtension, _schemas: Pair<&SqlSchema>) -> Vec<String> {
+        unreachable!("render_alter_extension")
+    }
+
+    fn render_drop_extension(&self, _drop: &DropExtension, _schema: &SqlSchema) -> Vec<String> {
+        unreachable!("render_drop_extension")
     }
 }

@@ -111,21 +111,22 @@ mod delete {
         Ok(())
     }
 
-    // "A Delete Mutation" should "gracefully fail when referring to a non-unique field"
-    #[connector_test]
-    async fn should_fail_referring_non_uniq_field(runner: Runner) -> TestResult<()> {
-        create_row(&runner, r#"{id: 1, string: "a"}"#).await?;
+    #[connector_test(schema(generic))]
+    async fn delete_fails_if_filter_dont_match(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation { createOneTestModel(data: { id: 1, field: "hello" }) { id } }"#
+        );
 
         assert_error!(
             &runner,
-            r#"mutation {deleteOneScalarModel(where: {string: "a"}) { string }}"#,
-            2009,
-            "`Field does not exist on enclosing type.` at `Mutation.deleteOneScalarModel.where.ScalarModelWhereUniqueInput.string`"
-        );
-
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyScalarModel { string }}"#),
-          @r###"{"data":{"findManyScalarModel":[{"string":"a"}]}}"###
+            r#"mutation {
+                  deleteOneTestModel(where: { id: 1, field: "bonjour" }) {
+                    id
+                  }
+                }"#,
+            2025,
+            "An operation failed because it depends on one or more records that were required but not found. Record to delete does not exist."
         );
 
         Ok(())

@@ -1,13 +1,13 @@
+mod native_types;
 mod validations;
+
+pub use native_types::CockroachType;
 
 use enumflags2::BitFlags;
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList};
-use native_types::{CockroachType, NativeType};
 use psl_core::{
     datamodel_connector::{
-        helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
-        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, RelationMode,
-        StringFilter,
+        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, StringFilter,
     },
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{
@@ -19,54 +19,6 @@ use psl_core::{
     },
 };
 use std::borrow::Cow;
-
-const BIT_TYPE_NAME: &str = "Bit";
-const BOOL_TYPE_NAME: &str = "Bool";
-const BYTES_TYPE_NAME: &str = "Bytes";
-const CHAR_TYPE_NAME: &str = "Char";
-const DATE_TYPE_NAME: &str = "Date";
-const DECIMAL_TYPE_NAME: &str = "Decimal";
-const FLOAT4_TYPE_NAME: &str = "Float4";
-const FLOAT8_TYPE_NAME: &str = "Float8";
-const INET_TYPE_NAME: &str = "Inet";
-const INT2_TYPE_NAME: &str = "Int2";
-const INT4_TYPE_NAME: &str = "Int4";
-const INT8_TYPE_NAME: &str = "Int8";
-const JSON_B_TYPE_NAME: &str = "JsonB";
-const OID_TYPE_NAME: &str = "Oid";
-const CATALOG_SINGLE_CHAR_TYPE_NAME: &str = "CatalogSingleChar";
-const STRING_TYPE_NAME: &str = "String";
-const TIMESTAMP_TYPE_NAME: &str = "Timestamp";
-const TIMESTAMP_TZ_TYPE_NAME: &str = "Timestamptz";
-const TIME_TYPE_NAME: &str = "Time";
-const TIME_TZ_TYPE_NAME: &str = "Timetz";
-const UUID_TYPE_NAME: &str = "Uuid";
-const VAR_BIT_TYPE_NAME: &str = "VarBit";
-
-const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[
-    NativeTypeConstructor::with_optional_args(BIT_TYPE_NAME, 1, &[ScalarType::String]),
-    NativeTypeConstructor::with_optional_args(CHAR_TYPE_NAME, 1, &[ScalarType::String]),
-    NativeTypeConstructor::with_optional_args(DECIMAL_TYPE_NAME, 2, &[ScalarType::Decimal]),
-    NativeTypeConstructor::with_optional_args(STRING_TYPE_NAME, 1, &[ScalarType::String]),
-    NativeTypeConstructor::with_optional_args(TIMESTAMP_TYPE_NAME, 1, &[ScalarType::DateTime]),
-    NativeTypeConstructor::with_optional_args(TIMESTAMP_TZ_TYPE_NAME, 1, &[ScalarType::DateTime]),
-    NativeTypeConstructor::with_optional_args(TIME_TYPE_NAME, 1, &[ScalarType::DateTime]),
-    NativeTypeConstructor::with_optional_args(TIME_TZ_TYPE_NAME, 1, &[ScalarType::DateTime]),
-    NativeTypeConstructor::with_optional_args(VAR_BIT_TYPE_NAME, 1, &[ScalarType::String]),
-    NativeTypeConstructor::without_args(BOOL_TYPE_NAME, &[ScalarType::Boolean]),
-    NativeTypeConstructor::without_args(BYTES_TYPE_NAME, &[ScalarType::Bytes]),
-    NativeTypeConstructor::without_args(DATE_TYPE_NAME, &[ScalarType::DateTime]),
-    NativeTypeConstructor::without_args(FLOAT4_TYPE_NAME, &[ScalarType::Float]),
-    NativeTypeConstructor::without_args(FLOAT8_TYPE_NAME, &[ScalarType::Float]),
-    NativeTypeConstructor::without_args(INET_TYPE_NAME, &[ScalarType::String]),
-    NativeTypeConstructor::without_args(INT2_TYPE_NAME, &[ScalarType::Int]),
-    NativeTypeConstructor::without_args(INT4_TYPE_NAME, &[ScalarType::Int]),
-    NativeTypeConstructor::without_args(INT8_TYPE_NAME, &[ScalarType::BigInt]),
-    NativeTypeConstructor::without_args(JSON_B_TYPE_NAME, &[ScalarType::Json]),
-    NativeTypeConstructor::without_args(OID_TYPE_NAME, &[ScalarType::Int]),
-    NativeTypeConstructor::without_args(CATALOG_SINGLE_CHAR_TYPE_NAME, &[ScalarType::String]),
-    NativeTypeConstructor::without_args(UUID_TYPE_NAME, &[ScalarType::String]),
-];
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey];
 
@@ -133,14 +85,14 @@ impl Connector for CockroachDatamodelConnector {
         63
     }
 
-    fn referential_actions(&self, relation_mode: &RelationMode) -> BitFlags<ReferentialAction> {
+    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
-        relation_mode.allowed_referential_actions(NoAction | Restrict | Cascade | SetNull | SetDefault)
+        NoAction | Restrict | Cascade | SetNull | SetDefault
     }
 
-    fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {
-        let native_type: CockroachType = serde_json::from_value(native_type).unwrap();
+    fn scalar_type_for_native_type(&self, native_type: &NativeTypeInstance) -> ScalarType {
+        let native_type: &CockroachType = native_type.downcast_ref();
 
         match native_type {
             // String
@@ -177,7 +129,7 @@ impl Connector for CockroachDatamodelConnector {
         }
     }
 
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
+    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> NativeTypeInstance {
         let native_type = SCALAR_TYPE_DEFAULTS
             .iter()
             .find(|(st, _)| st == scalar_type)
@@ -185,15 +137,23 @@ impl Connector for CockroachDatamodelConnector {
             .ok_or_else(|| format!("Could not find scalar type {:?} in SCALAR_TYPE_DEFAULTS", scalar_type))
             .unwrap();
 
-        serde_json::to_value(native_type).expect("CockroachType to JSON failed")
+        NativeTypeInstance::new::<CockroachType>(*native_type)
     }
 
-    fn native_type_is_default_for_scalar_type(&self, native_type: serde_json::Value, scalar_type: &ScalarType) -> bool {
-        let native_type: CockroachType = serde_json::from_value(native_type).expect("CockroachType from JSON failed");
+    fn native_type_is_default_for_scalar_type(
+        &self,
+        native_type: &NativeTypeInstance,
+        scalar_type: &ScalarType,
+    ) -> bool {
+        let native_type: &CockroachType = native_type.downcast_ref();
 
         SCALAR_TYPE_DEFAULTS
             .iter()
-            .any(|(st, nt)| scalar_type == st && &native_type == nt)
+            .any(|(st, nt)| scalar_type == st && native_type == nt)
+    }
+
+    fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
+        native_type.downcast_ref::<CockroachType>().to_parts()
     }
 
     fn validate_native_type_arguments(
@@ -203,15 +163,14 @@ impl Connector for CockroachDatamodelConnector {
         span: ast::Span,
         errors: &mut Diagnostics,
     ) {
-        let native_type: CockroachType =
-            serde_json::from_value(native_type_instance.serialized_native_type.clone()).unwrap();
+        let native_type: &CockroachType = native_type_instance.downcast_ref();
         let error = self.native_instance_error(native_type_instance);
 
         match native_type {
             CockroachType::Decimal(Some((precision, scale))) if scale > precision => {
                 errors.push_error(error.new_scale_larger_than_precision_error(span))
             }
-            CockroachType::Decimal(Some((prec, _))) if prec > 1000 || prec == 0 => {
+            CockroachType::Decimal(Some((prec, _))) if *prec > 1000 || *prec == 0 => {
                 errors.push_error(error.new_argument_m_out_of_range_error(
                     "Precision must be positive with a maximum value of 1000.",
                     span,
@@ -224,7 +183,7 @@ impl Connector for CockroachDatamodelConnector {
             | CockroachType::Timestamptz(Some(p))
             | CockroachType::Time(Some(p))
             | CockroachType::Timetz(Some(p))
-                if p > 6 =>
+                if *p > 6 =>
             {
                 errors.push_error(error.new_argument_m_out_of_range_error("M can range from 0 to 6.", span))
             }
@@ -261,7 +220,7 @@ impl Connector for CockroachDatamodelConnector {
     }
 
     fn available_native_type_constructors(&self) -> &'static [NativeTypeConstructor] {
-        NATIVE_TYPE_CONSTRUCTORS
+        native_types::CONSTRUCTORS
     }
 
     fn supported_index_types(&self) -> BitFlags<IndexAlgorithm> {
@@ -271,74 +230,12 @@ impl Connector for CockroachDatamodelConnector {
     fn parse_native_type(
         &self,
         name: &str,
-        args: Vec<String>,
+        args: &[String],
         span: ast::Span,
-    ) -> Result<NativeTypeInstance, DatamodelError> {
-        let cloned_args = args.clone();
-
-        let native_type = match name {
-            BYTES_TYPE_NAME => CockroachType::Bytes,
-            CHAR_TYPE_NAME => CockroachType::Char(parse_one_opt_u32(args, CHAR_TYPE_NAME, span)?),
-            DECIMAL_TYPE_NAME => CockroachType::Decimal(parse_two_opt_u32(args, DECIMAL_TYPE_NAME, span)?),
-            FLOAT4_TYPE_NAME => CockroachType::Float4,
-            FLOAT8_TYPE_NAME => CockroachType::Float8,
-            INET_TYPE_NAME => CockroachType::Inet,
-            INT2_TYPE_NAME => CockroachType::Int2,
-            INT4_TYPE_NAME => CockroachType::Int4,
-            INT8_TYPE_NAME => CockroachType::Int8,
-            CATALOG_SINGLE_CHAR_TYPE_NAME => CockroachType::CatalogSingleChar,
-            STRING_TYPE_NAME => CockroachType::String(parse_one_opt_u32(args, STRING_TYPE_NAME, span)?),
-            TIMESTAMP_TYPE_NAME => CockroachType::Timestamp(parse_one_opt_u32(args, TIMESTAMP_TYPE_NAME, span)?),
-            TIMESTAMP_TZ_TYPE_NAME => {
-                CockroachType::Timestamptz(parse_one_opt_u32(args, TIMESTAMP_TZ_TYPE_NAME, span)?)
-            }
-            BIT_TYPE_NAME => CockroachType::Bit(parse_one_opt_u32(args, BIT_TYPE_NAME, span)?),
-            BOOL_TYPE_NAME => CockroachType::Bool,
-            DATE_TYPE_NAME => CockroachType::Date,
-            JSON_B_TYPE_NAME => CockroachType::JsonB,
-            OID_TYPE_NAME => CockroachType::Oid,
-            TIME_TYPE_NAME => CockroachType::Time(parse_one_opt_u32(args, TIME_TYPE_NAME, span)?),
-            TIME_TZ_TYPE_NAME => CockroachType::Timetz(parse_one_opt_u32(args, TIME_TZ_TYPE_NAME, span)?),
-            UUID_TYPE_NAME => CockroachType::Uuid,
-            VAR_BIT_TYPE_NAME => CockroachType::VarBit(parse_one_opt_u32(args, VAR_BIT_TYPE_NAME, span)?),
-            _ => return Err(DatamodelError::new_native_type_parser_error(name, span)),
-        };
-
-        Ok(NativeTypeInstance::new(name, cloned_args, native_type.to_json()))
-    }
-
-    fn introspect_native_type(&self, native_type: serde_json::Value) -> NativeTypeInstance {
-        let native_type: CockroachType = serde_json::from_value(native_type).unwrap();
-        let (constructor_name, args) = match native_type {
-            CockroachType::Int2 => (INT2_TYPE_NAME, vec![]),
-            CockroachType::Int4 => (INT4_TYPE_NAME, vec![]),
-            CockroachType::Int8 => (INT8_TYPE_NAME, vec![]),
-            CockroachType::Oid => (OID_TYPE_NAME, vec![]),
-            CockroachType::Decimal(x) => (DECIMAL_TYPE_NAME, args_vec_from_opt(x)),
-            CockroachType::Float4 => (FLOAT4_TYPE_NAME, vec![]),
-            CockroachType::Float8 => (FLOAT8_TYPE_NAME, vec![]),
-            CockroachType::String(x) => (STRING_TYPE_NAME, arg_vec_from_opt(x)),
-            CockroachType::Char(x) => (CHAR_TYPE_NAME, arg_vec_from_opt(x)),
-            CockroachType::CatalogSingleChar => (CATALOG_SINGLE_CHAR_TYPE_NAME, Vec::new()),
-            CockroachType::Bytes => (BYTES_TYPE_NAME, vec![]),
-            CockroachType::Timestamp(x) => (TIMESTAMP_TYPE_NAME, arg_vec_from_opt(x)),
-            CockroachType::Timestamptz(x) => (TIMESTAMP_TZ_TYPE_NAME, arg_vec_from_opt(x)),
-            CockroachType::Date => (DATE_TYPE_NAME, vec![]),
-            CockroachType::Time(x) => (TIME_TYPE_NAME, arg_vec_from_opt(x)),
-            CockroachType::Timetz(x) => (TIME_TZ_TYPE_NAME, arg_vec_from_opt(x)),
-            CockroachType::Bool => (BOOL_TYPE_NAME, vec![]),
-            CockroachType::Bit(x) => (BIT_TYPE_NAME, arg_vec_from_opt(x)),
-            CockroachType::VarBit(x) => (VAR_BIT_TYPE_NAME, arg_vec_from_opt(x)),
-            CockroachType::Uuid => (UUID_TYPE_NAME, vec![]),
-            CockroachType::JsonB => (JSON_B_TYPE_NAME, vec![]),
-            CockroachType::Inet => (INET_TYPE_NAME, vec![]),
-        };
-
-        if let Some(constructor) = self.find_native_type_constructor(constructor_name) {
-            NativeTypeInstance::new(constructor.name, args, native_type.to_json())
-        } else {
-            unreachable!()
-        }
+        diagnostics: &mut Diagnostics,
+    ) -> Option<NativeTypeInstance> {
+        let native_type = CockroachType::from_parts(name, args, span, diagnostics)?;
+        Some(NativeTypeInstance::new::<CockroachType>(native_type))
     }
 
     fn scalar_filter_name(&self, scalar_type_name: String, native_type_name: Option<&str>) -> Cow<'_, str> {

@@ -1,9 +1,7 @@
 use enumflags2::BitFlags;
 use psl_core::{
-    datamodel_connector::{
-        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, RelationMode,
-    },
-    diagnostics::{DatamodelError, Span},
+    datamodel_connector::{Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance},
+    diagnostics::{DatamodelError, Diagnostics, Span},
     parser_database::{ReferentialAction, ScalarType},
 };
 use std::borrow::Cow;
@@ -43,26 +41,36 @@ impl Connector for SqliteDatamodelConnector {
         10000
     }
 
-    fn referential_actions(&self, relation_mode: &RelationMode) -> BitFlags<ReferentialAction> {
+    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
-        relation_mode.allowed_referential_actions(SetNull | SetDefault | Cascade | Restrict | NoAction)
+        SetNull | SetDefault | Cascade | Restrict | NoAction
     }
 
-    fn scalar_type_for_native_type(&self, _native_type: serde_json::Value) -> ScalarType {
+    fn emulated_referential_actions(&self) -> BitFlags<ReferentialAction> {
+        use ReferentialAction::*;
+
+        Restrict | SetNull | Cascade
+    }
+
+    fn scalar_type_for_native_type(&self, _native_type: &NativeTypeInstance) -> ScalarType {
         unreachable!("No native types on Sqlite");
     }
 
-    fn default_native_type_for_scalar_type(&self, _scalar_type: &ScalarType) -> serde_json::Value {
-        serde_json::Value::Null
+    fn default_native_type_for_scalar_type(&self, _scalar_type: &ScalarType) -> NativeTypeInstance {
+        NativeTypeInstance::new(())
     }
 
     fn native_type_is_default_for_scalar_type(
         &self,
-        _native_type: serde_json::Value,
+        _native_type: &NativeTypeInstance,
         _scalar_type: &ScalarType,
     ) -> bool {
         false
+    }
+
+    fn native_type_to_parts(&self, _native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
+        unreachable!()
     }
 
     fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {
@@ -76,17 +84,15 @@ impl Connector for SqliteDatamodelConnector {
     fn parse_native_type(
         &self,
         _name: &str,
-        _args: Vec<String>,
+        _args: &[String],
         span: Span,
-    ) -> Result<NativeTypeInstance, DatamodelError> {
-        Err(DatamodelError::new_native_types_not_supported(
+        diagnostics: &mut Diagnostics,
+    ) -> Option<NativeTypeInstance> {
+        diagnostics.push_error(DatamodelError::new_native_types_not_supported(
             self.name().to_owned(),
             span,
-        ))
-    }
-
-    fn introspect_native_type(&self, _native_type: serde_json::Value) -> NativeTypeInstance {
-        unreachable!("unreachable introspect_native_type() on sqlite")
+        ));
+        None
     }
 
     fn set_config_dir<'a>(&self, config_dir: &std::path::Path, url: &'a str) -> Cow<'a, str> {

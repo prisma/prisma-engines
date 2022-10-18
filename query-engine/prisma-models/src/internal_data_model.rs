@@ -95,7 +95,7 @@ impl InternalDataModel {
 
                 self.relation_fields()
                     .iter()
-                    .filter(|rf| &rf.relation_info.to == model_name)
+                    .filter(|rf| &rf.relation_info.referenced_model == model_name)
                     .filter(|rf| rf.relation_info.references.contains(&field.name))
                     .map(Arc::clone)
                     .collect()

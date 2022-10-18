@@ -1,14 +1,15 @@
 mod mongodb_types;
 mod validations;
 
+pub use mongodb_types::MongoDbType;
+
 use enumflags2::BitFlags;
 use mongodb_types::*;
-use native_types::{MongoDbType, NativeType};
 use psl_core::{
     datamodel_connector::{
         Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, RelationMode,
     },
-    diagnostics::{DatamodelError, Diagnostics, Span},
+    diagnostics::{Diagnostics, Span},
     parser_database::{walkers::*, ReferentialAction, ScalarType},
 };
 use std::result::Result as StdResult;
@@ -54,8 +55,8 @@ impl Connector for MongoDbDatamodelConnector {
         &[ConstraintScope::ModelKeyIndex]
     }
 
-    fn referential_actions(&self, relation_mode: &RelationMode) -> BitFlags<ReferentialAction> {
-        relation_mode.allowed_referential_actions(BitFlags::empty())
+    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+        BitFlags::empty()
     }
 
     fn validate_model(&self, model: ModelWalker<'_>, errors: &mut Diagnostics) {
@@ -79,40 +80,40 @@ impl Connector for MongoDbDatamodelConnector {
     }
 
     fn available_native_type_constructors(&self) -> &'static [NativeTypeConstructor] {
-        NATIVE_TYPE_CONSTRUCTORS
+        mongodb_types::CONSTRUCTORS
     }
 
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
+    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> NativeTypeInstance {
         let native_type = default_for(scalar_type);
-        serde_json::to_value(native_type).expect("MongoDB native type to JSON failed")
+        NativeTypeInstance::new::<MongoDbType>(*native_type)
     }
 
-    fn native_type_is_default_for_scalar_type(&self, native_type: serde_json::Value, scalar_type: &ScalarType) -> bool {
+    fn native_type_is_default_for_scalar_type(
+        &self,
+        native_type: &NativeTypeInstance,
+        scalar_type: &ScalarType,
+    ) -> bool {
         let default_native_type = default_for(scalar_type);
-        let native_type: MongoDbType =
-            serde_json::from_value(native_type).expect("MongoDB native type from JSON failed");
-
-        &native_type == default_native_type
+        let native_type: &MongoDbType = native_type.downcast_ref();
+        native_type == default_native_type
     }
 
     fn parse_native_type(
         &self,
         name: &str,
-        args: Vec<String>,
+        args: &[String],
         span: Span,
-    ) -> Result<NativeTypeInstance, DatamodelError> {
-        let mongo_type = mongo_type_from_input(name, span)?;
-
-        Ok(NativeTypeInstance::new(name, args, mongo_type.to_json()))
+        diagnostics: &mut Diagnostics,
+    ) -> Option<NativeTypeInstance> {
+        let native_type = MongoDbType::from_parts(name, args, span, diagnostics)?;
+        Some(NativeTypeInstance::new::<MongoDbType>(native_type))
     }
 
-    fn introspect_native_type(&self, _native_type: serde_json::Value) -> NativeTypeInstance {
-        // Out of scope for MVP
-        todo!()
+    fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
+        native_type.downcast_ref::<MongoDbType>().to_parts()
     }
 
-    fn scalar_type_for_native_type(&self, _native_type: serde_json::Value) -> ScalarType {
-        // Out of scope for MVP
+    fn scalar_type_for_native_type(&self, _native_type: &NativeTypeInstance) -> ScalarType {
         todo!()
     }
 

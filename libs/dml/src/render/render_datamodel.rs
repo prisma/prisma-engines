@@ -1,6 +1,6 @@
 use crate::*;
 use psl_core::datamodel_connector::{constraint_names::ConstraintNames, Connector, EmptyDatamodelConnector};
-use psl_core::{common::RelationNames, parser_database as db, Datasource};
+use psl_core::{parser_database as db, Datasource, RelationNames};
 use schema_ast::string_literal;
 use std::fmt::Write;
 
@@ -63,11 +63,21 @@ fn render_enum(enm: &Enum, out: &mut String) {
         out.push('\n');
     }
 
+    // @@schema
+    if let Some(schema_name) = &enm.schema {
+        render_schema_attribute(schema_name, "@@", out);
+        out.push('\n');
+    }
+
     out.push_str("}\n");
 }
 
 fn render_map_attribute(mapped_name: &str, owl: &str, out: &mut String) {
     write!(out, " {owl}map({})", string_literal(mapped_name)).unwrap()
+}
+
+fn render_schema_attribute(schema_name: &str, owl: &str, out: &mut String) {
+    write!(out, " {owl}schema({})", string_literal(schema_name)).unwrap()
 }
 
 fn render_model(model: &Model, params: RenderParams<'_>, out: &mut String) {
@@ -241,10 +251,11 @@ fn render_field_attributes(field: &Field, model: &Model, params: RenderParams<'_
         let mut args = Vec::new();
         let relation_info = &rf.relation_info;
         let parent_model = params.datamodel.find_model_by_relation_field_ref(rf).unwrap();
-        let is_self_relation = relation_info.to.as_str() == model.name();
+        let is_self_relation = relation_info.referenced_model.as_str() == model.name();
 
         if is_self_relation
-            || relation_info.name != RelationNames::name_for_unambiguous_relation(&relation_info.to, &parent_model.name)
+            || relation_info.name
+                != RelationNames::name_for_unambiguous_relation(&relation_info.referenced_model, &parent_model.name)
         {
             args.push((None, string_literal(&relation_info.name).to_string()));
         }
@@ -302,7 +313,7 @@ fn render_native_type_attribute(
     out: &mut String,
 ) {
     if datasource.active_connector.native_type_is_default_for_scalar_type(
-        native_type.serialized_native_type.clone(),
+        native_type.inner(),
         &dml_scalar_type_to_parser_database_scalar_type(*scalar_type),
     ) {
         return;
@@ -311,9 +322,10 @@ fn render_native_type_attribute(
     out.push_str(" @");
     out.push_str(&datasource.name);
     out.push('.');
-    out.push_str(&native_type.name);
+    let (name, args) = datasource.active_connector.native_type_to_parts(native_type.inner());
+    out.push_str(name);
 
-    let mut args = native_type.args.iter().map(|arg| (None, arg.clone())).collect();
+    let mut args = args.into_iter().map(|arg| (None, arg)).collect();
     render_arguments(&mut args, out);
 }
 
@@ -411,7 +423,7 @@ fn render_composite_field_type(field_type: &CompositeTypeFieldType, out: &mut St
     }
 }
 
-fn render_field_type(field_type: &crate::FieldType, out: &mut String) {
+fn render_field_type(field_type: &FieldType, out: &mut String) {
     match field_type {
         FieldType::CompositeType(name) | FieldType::Enum(name) => out.push_str(name),
         FieldType::Unsupported(name) => {
@@ -420,11 +432,11 @@ fn render_field_type(field_type: &crate::FieldType, out: &mut String) {
         FieldType::Scalar(tpe, _) => {
             out.push_str(&tpe.to_string());
         }
-        FieldType::Relation(rel) => out.push_str(&rel.to),
+        FieldType::Relation(rel) => out.push_str(&rel.referenced_model),
     }
 }
 
-fn render_model_attributes(model: &crate::Model, params: RenderParams<'_>, out: &mut String) {
+fn render_model_attributes(model: &Model, params: RenderParams<'_>, out: &mut String) {
     // @@id
     if let Some(pk) = &model.primary_key {
         if !pk.defined_on_field {
@@ -477,9 +489,15 @@ fn render_model_attributes(model: &crate::Model, params: RenderParams<'_>, out: 
     if model.is_ignored() {
         out.push_str("@@ignore\n");
     }
+
+    // @@schema
+    if let Some(schema_name) = &model.schema {
+        render_schema_attribute(schema_name, "@@", out);
+        out.push('\n');
+    }
 }
 
-fn render_field_arity(arity: &crate::FieldArity, out: &mut String) {
+fn render_field_arity(arity: &FieldArity, out: &mut String) {
     match arity {
         FieldArity::Required => (),
         FieldArity::Optional => out.push('?'),
@@ -487,24 +505,24 @@ fn render_field_arity(arity: &crate::FieldArity, out: &mut String) {
     }
 }
 
-fn dml_scalar_type_to_parser_database_scalar_type(st: crate::ScalarType) -> db::ScalarType {
+fn dml_scalar_type_to_parser_database_scalar_type(st: ScalarType) -> db::ScalarType {
     match st {
-        crate::ScalarType::Int => db::ScalarType::Int,
-        crate::ScalarType::BigInt => db::ScalarType::BigInt,
-        crate::ScalarType::Float => db::ScalarType::Float,
-        crate::ScalarType::Boolean => db::ScalarType::Boolean,
-        crate::ScalarType::String => db::ScalarType::String,
-        crate::ScalarType::DateTime => db::ScalarType::DateTime,
-        crate::ScalarType::Json => db::ScalarType::Json,
-        crate::ScalarType::Bytes => db::ScalarType::Bytes,
-        crate::ScalarType::Decimal => db::ScalarType::Decimal,
+        ScalarType::Int => db::ScalarType::Int,
+        ScalarType::BigInt => db::ScalarType::BigInt,
+        ScalarType::Float => db::ScalarType::Float,
+        ScalarType::Boolean => db::ScalarType::Boolean,
+        ScalarType::String => db::ScalarType::String,
+        ScalarType::DateTime => db::ScalarType::DateTime,
+        ScalarType::Json => db::ScalarType::Json,
+        ScalarType::Bytes => db::ScalarType::Bytes,
+        ScalarType::Decimal => db::ScalarType::Decimal,
     }
 }
 
-fn render_default_value(dv: &crate::DefaultValue, out: &mut String) {
+fn render_default_value(dv: &DefaultValue, out: &mut String) {
     match dv.kind() {
-        crate::DefaultKind::Single(v) => render_prisma_value(v, out),
-        crate::DefaultKind::Expression(e) => {
+        DefaultKind::Single(v) => render_prisma_value(v, out),
+        DefaultKind::Expression(e) => {
             out.push_str(e.name());
             out.push('(');
             let mut args = e.args().iter().peekable();

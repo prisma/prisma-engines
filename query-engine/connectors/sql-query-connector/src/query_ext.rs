@@ -8,7 +8,7 @@ use futures::future::FutureExt;
 use itertools::Itertools;
 use opentelemetry::trace::TraceFlags;
 use prisma_models::*;
-use psl::common::preview_features::PreviewFeature;
+use psl::PreviewFeature;
 use quaint::{
     ast::*,
     connector::{self, Queryable},

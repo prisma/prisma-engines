@@ -8,9 +8,12 @@ use crate::{
 use enumflags2::BitFlags;
 use indexmap::IndexMap;
 use indoc::indoc;
-use native_types::{MsSqlType, MsSqlTypeParameter, NativeType};
 use once_cell::sync::Lazy;
-use prisma_value::PrismaValue;
+use psl::{
+    builtin_connectors::{MsSqlType, MsSqlTypeParameter},
+    datamodel_connector::NativeTypeInstance,
+    dml::prisma_value::PrismaValue,
+};
 use quaint::prelude::Queryable;
 use regex::Regex;
 use std::{any::type_name, borrow::Cow, collections::HashMap, convert::TryInto};
@@ -115,7 +118,8 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
         })
     }
 
-    async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema> {
+    async fn describe(&self, schemas: &[&str]) -> DescriberResult<SqlSchema> {
+        let schema = schemas[0];
         let mut sql_schema = SqlSchema::default();
         let mut mssql_ext = MssqlSchemaExt::default();
 
@@ -136,7 +140,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
         Ok(sql_schema)
     }
 
-    async fn version(&self, _schema: &str) -> DescriberResult<Option<String>> {
+    async fn version(&self) -> DescriberResult<Option<String>> {
         Ok(self.conn.version().await?)
     }
 }
@@ -169,6 +173,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for row in rows.into_iter() {
             procedures.push(Procedure {
+                namespace_id: NamespaceId(0),
                 name: row.get_expect_string("name"),
                 definition: row.get_string("definition"),
             });
@@ -489,6 +494,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for row in result_set.into_iter() {
             views.push(View {
+                namespace_id: NamespaceId(0),
                 name: row.get_expect_string("view_name"),
                 definition: row.get_string("view_sql"),
             })
@@ -762,7 +768,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             full_data_type,
             family,
             arity,
-            native_type: native_type.map(|x| x.to_json()),
+            native_type: native_type.map(NativeTypeInstance::new::<MsSqlType>),
         }
     }
 }

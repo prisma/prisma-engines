@@ -202,8 +202,6 @@ impl SqlMigrationConnector {
                                 );
                             }
 
-                            // can this just use the flavour??
-                            // todo pull up type rendering and native type check here
                             match type_change {
                                 Some(ColumnTypeChange::SafeCast) | None => (),
                                 Some(ColumnTypeChange::RiskyCast) => {
@@ -217,7 +215,6 @@ impl SqlMigrationConnector {
                                         step_index,
                                     );
                                 }
-                                //todo why no precise type warnings here if native types are on?
                                 Some(ColumnTypeChange::NotCastable) => plan.push_warning(
                                     SqlMigrationWarningCheck::NotCastable {
                                         table: columns.previous.table().name().to_owned(),

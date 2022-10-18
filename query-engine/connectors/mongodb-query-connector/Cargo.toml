@@ -26,9 +26,6 @@ query-engine-metrics = {path = "../../metrics"}
 [dependencies.prisma-models]
 path = "../../prisma-models"
 
-[dependencies.native-types]
-path = "../../../libs/native-types"
-
 [dependencies.mongodb-client]
 path = "../../../libs/mongodb-client"
 
@@ -44,15 +41,14 @@ features = ["serde"]
 version = "0.4"
 
 [dependencies.psl]
-path = "../../../psl/psl"
+workspace = true
 
 [dependencies.serde]
-features = ["derive"]
-version = "1.0"
+workspace = true
 
 [dependencies.cuid]
 version = "1.2"
 
 [dependencies.user-facing-errors]
 features = ["sql"]
-path = "../../../libs/user-facing-errors"
+workspace = true

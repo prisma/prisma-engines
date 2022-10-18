@@ -22,7 +22,7 @@ pub use self::{
 };
 
 use once_cell::sync::Lazy;
-use prisma_value::PrismaValue;
+use psl::dml::PrismaValue;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -40,10 +40,10 @@ pub trait SqlSchemaDescriberBackend: Send + Sync {
     async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata>;
 
     /// Describe a database schema.
-    async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema>;
+    async fn describe(&self, schemas: &[&str]) -> DescriberResult<SqlSchema>;
 
     /// Get the database version.
-    async fn version(&self, schema: &str) -> DescriberResult<Option<String>>;
+    async fn version(&self) -> DescriberResult<Option<String>>;
 }
 
 /// The return type of get_metadata().
@@ -88,6 +88,17 @@ impl SqlSchema {
         self.connector_data.data.as_ref().unwrap().downcast_ref().unwrap()
     }
 
+    /// Extract connector-specific constructs mutably. The type parameter must be the right one.
+    #[track_caller]
+    pub fn downcast_connector_data_mut<T: 'static>(&mut self) -> &mut T {
+        self.connector_data.data.as_mut().unwrap().downcast_mut().unwrap()
+    }
+
+    /// Remove all namespaces from the schema.
+    pub fn clear_namespaces(&mut self) {
+        self.namespaces.clear();
+    }
+
     /// Insert connector-specific data into the schema. This will replace existing connector data.
     pub fn set_connector_data(&mut self, data: Box<dyn Any + Send + Sync>) {
         self.connector_data.data = Some(data);
@@ -111,6 +122,12 @@ impl SqlSchema {
     /// Get a user defined type by name.
     pub fn get_user_defined_type(&self, name: &str) -> Option<&UserDefinedType> {
         self.user_defined_types.iter().find(|x| x.name == name)
+    }
+
+    /// Get a namespaceId by name
+    pub fn get_namespace_id(&self, name: &str) -> NamespaceId {
+        let id = self.namespaces.iter().position(|ns| ns == name).unwrap();
+        NamespaceId(id as u32)
     }
 
     /// The total number of indexes in the schema.
@@ -225,12 +242,38 @@ impl SqlSchema {
         id
     }
 
+    pub fn namespaces_count(&self) -> usize {
+        self.namespaces.len()
+    }
+
+    pub fn namespace_walker<'a>(&'a self, name: &str) -> Option<NamespaceWalker<'a>> {
+        let namespace_idx = self.namespaces.iter().position(|ns| ns == name)?;
+        Some(self.walk(NamespaceId(namespace_idx as u32)))
+    }
+
+    pub fn namespace_walkers(&self) -> impl Iterator<Item = NamespaceWalker<'_>> {
+        (0..self.namespaces.len()).map(move |namespace_index| NamespaceWalker {
+            schema: self,
+            id: NamespaceId(namespace_index as u32),
+        })
+    }
+
     pub fn tables_count(&self) -> usize {
         self.tables.len()
     }
 
     pub fn table_walker<'a>(&'a self, name: &str) -> Option<TableWalker<'a>> {
         let table_idx = self.tables.iter().position(|table| table.name == name)?;
+        Some(self.walk(TableId(table_idx as u32)))
+    }
+
+    pub fn table_walker_ns<'a>(&'a self, namespace: &str, name: &str) -> Option<TableWalker<'a>> {
+        let namespace_idx = self.namespace_walker(namespace)?.id;
+
+        let table_idx = self
+            .tables
+            .iter()
+            .position(|table| table.name == name && table.namespace_id == namespace_idx)?;
         Some(self.walk(TableId(table_idx as u32)))
     }
 
@@ -351,6 +394,8 @@ struct Index {
 /// A stored procedure (like, the function inside your database).
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct Procedure {
+    ///Namespace of the procedure
+    namespace_id: NamespaceId,
     /// Procedure name.
     pub name: String,
     /// The definition of the procedure.
@@ -366,7 +411,7 @@ pub struct UserDefinedType {
     pub definition: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Column {
     /// Column name.
     pub name: String,
@@ -379,7 +424,7 @@ pub struct Column {
 }
 
 /// The type of a column.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ColumnType {
     /// The full SQL data type, the sql string necessary to recreate the column, drawn directly from the db, used when there is no native type.
     pub full_data_type: String,
@@ -388,7 +433,8 @@ pub struct ColumnType {
     /// The arity of the column.
     pub arity: ColumnArity,
     /// The Native type of the column.
-    pub native_type: Option<serde_json::Value>,
+    #[serde(skip)]
+    pub native_type: Option<psl::datamodel_connector::NativeTypeInstance>,
 }
 
 impl ColumnType {
@@ -565,6 +611,8 @@ pub struct Enum {
 /// An SQL view.
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct View {
+    /// Namespace of the view
+    namespace_id: NamespaceId,
     /// Name of the view.
     pub name: String,
     /// The SQL definition of the view.

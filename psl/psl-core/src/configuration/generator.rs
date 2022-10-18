@@ -1,4 +1,4 @@
-use crate::{common::preview_features::PreviewFeature, configuration::StringFromEnvVar};
+use crate::{configuration::StringFromEnvVar, PreviewFeature};
 use enumflags2::BitFlags;
 use serde::{ser::SerializeSeq, Serialize, Serializer};
 use std::collections::HashMap;

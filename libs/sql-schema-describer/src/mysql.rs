@@ -4,12 +4,11 @@ use crate::{getters::Getter, parsers::Parser, *};
 use bigdecimal::ToPrimitive;
 use indexmap::IndexMap;
 use indoc::indoc;
-use native_types::{MySqlType, NativeType};
+use psl::{builtin_connectors::MySqlType, datamodel_connector::NativeTypeInstance};
 use quaint::{
     prelude::{Queryable, ResultRow},
     Value,
 };
-use serde_json::from_str;
 use std::borrow::Cow;
 use tracing::trace;
 
@@ -63,7 +62,8 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
     }
 
     #[tracing::instrument(skip(self))]
-    async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema> {
+    async fn describe(&self, schemas: &[&str]) -> DescriberResult<SqlSchema> {
+        let schema = schemas[0];
         let mut sql_schema = SqlSchema::default();
         let version = self.conn.version().await.ok().flatten();
         let flavour = version
@@ -86,7 +86,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
     }
 
     #[tracing::instrument(skip(self))]
-    async fn version(&self, _schema: &str) -> crate::DescriberResult<Option<String>> {
+    async fn version(&self) -> crate::DescriberResult<Option<String>> {
         Ok(self.conn.version().await?)
     }
 }
@@ -223,6 +223,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for row in result_set.into_iter() {
             views.push(View {
+                namespace_id: NamespaceId(0),
                 name: row.get_expect_string("view_name"),
                 definition: row.get_string("view_sql"),
             })
@@ -246,6 +247,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for row in rows.into_iter() {
             procedures.push(Procedure {
+                namespace_id: NamespaceId(0),
                 name: row.get_expect_string("name"),
                 definition: row.get_string("definition"),
             });
@@ -645,7 +647,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             full_data_type: full_data_type.to_owned(),
             family,
             arity,
-            native_type: native_type.map(|x| x.to_json()),
+            native_type: native_type.map(NativeTypeInstance::new::<MySqlType>),
         };
 
         (tpe, enm)
@@ -654,7 +656,7 @@ impl<'a> SqlSchemaDescriber<'a> {
     fn extract_precision(input: &str) -> Option<u32> {
         static RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#".*\(([1-9])\)"#).unwrap());
         RE.captures(input)
-            .and_then(|cap| cap.get(1).map(|precision| from_str::<u32>(precision.as_str()).unwrap()))
+            .and_then(|cap| cap.get(1).map(|precision| precision.as_str().parse::<u32>().unwrap()))
     }
 
     fn extract_enum_values(full_data_type: &&str) -> Vec<String> {

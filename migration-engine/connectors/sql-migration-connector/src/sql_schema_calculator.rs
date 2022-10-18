@@ -9,7 +9,7 @@ use psl::{
     parser_database::{
         ast,
         walkers::{ModelWalker, ScalarFieldWalker},
-        ReferentialAction, ScalarFieldType, ScalarType, SortOrder,
+        ReferentialAction, ScalarFieldType, ScalarType, SchemaFlags, SortOrder,
     },
     ValidatedSchema,
 };
@@ -27,13 +27,9 @@ pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn Sq
         schemas: Default::default(),
     };
 
-    if datamodel
-        .configuration
-        .preview_features()
-        .contains(psl::common::preview_features::PreviewFeature::MultiSchema)
-    {
+    if datamodel.db.schema_flags().contains(SchemaFlags::UsesSchemaAttribute) {
         if let Some(ds) = context.datamodel.configuration.datasources.get(0) {
-            for (schema, _) in &ds.schemas {
+            for (schema, _) in &ds.namespaces {
                 context
                     .schemas
                     .insert(schema, context.schema.describer_schema.push_namespace(schema.clone()));
@@ -450,7 +446,6 @@ fn push_column_for_builtin_scalar_type(
 
     let native_type = field
         .native_type_instance(connector)
-        .map(|instance| instance.serialized_native_type)
         .unwrap_or_else(|| connector.default_native_type_for_scalar_type(&scalar_type));
 
     enum ColumnDefault {

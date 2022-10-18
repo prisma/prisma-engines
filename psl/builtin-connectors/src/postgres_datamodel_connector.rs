@@ -1,77 +1,21 @@
+mod datasource;
+mod native_types;
 mod validations;
+
+pub use native_types::PostgresType;
 
 use enumflags2::BitFlags;
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList, InsertTextFormat};
-use native_types::{
-    NativeType,
-    PostgresType::{self, *},
-};
 use psl_core::{
     datamodel_connector::{
-        helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
-        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, RelationMode,
-        StringFilter,
+        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, StringFilter,
     },
-    diagnostics::{DatamodelError, Diagnostics},
+    diagnostics::Diagnostics,
     parser_database::{ast, walkers, IndexAlgorithm, OperatorClass, ParserDatabase, ReferentialAction, ScalarType},
+    Datasource, DatasourceConnectorData, PreviewFeature,
 };
-use std::borrow::Cow;
-
-const SMALL_INT_TYPE_NAME: &str = "SmallInt";
-const INTEGER_TYPE_NAME: &str = "Integer";
-const BIG_INT_TYPE_NAME: &str = "BigInt";
-const DECIMAL_TYPE_NAME: &str = "Decimal";
-const MONEY_TYPE_NAME: &str = "Money";
-const INET_TYPE_NAME: &str = "Inet";
-const CITEXT_TYPE_NAME: &str = "Citext";
-const OID_TYPE_NAME: &str = "Oid";
-const REAL_TYPE_NAME: &str = "Real";
-const DOUBLE_PRECISION_TYPE_NAME: &str = "DoublePrecision";
-const VARCHAR_TYPE_NAME: &str = "VarChar";
-const CHAR_TYPE_NAME: &str = "Char";
-const TEXT_TYPE_NAME: &str = "Text";
-const BYTE_A_TYPE_NAME: &str = "ByteA";
-const TIMESTAMP_TYPE_NAME: &str = "Timestamp";
-const TIMESTAMP_TZ_TYPE_NAME: &str = "Timestamptz";
-const DATE_TYPE_NAME: &str = "Date";
-const TIME_TYPE_NAME: &str = "Time";
-const TIME_TZ_TYPE_NAME: &str = "Timetz";
-const BOOLEAN_TYPE_NAME: &str = "Boolean";
-const BIT_TYPE_NAME: &str = "Bit";
-const VAR_BIT_TYPE_NAME: &str = "VarBit";
-const UUID_TYPE_NAME: &str = "Uuid";
-const XML_TYPE_NAME: &str = "Xml";
-const JSON_TYPE_NAME: &str = "Json";
-const JSON_B_TYPE_NAME: &str = "JsonB";
-
-const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[
-    NativeTypeConstructor::without_args(SMALL_INT_TYPE_NAME, &[ScalarType::Int]),
-    NativeTypeConstructor::without_args(INTEGER_TYPE_NAME, &[ScalarType::Int]),
-    NativeTypeConstructor::without_args(BIG_INT_TYPE_NAME, &[ScalarType::BigInt]),
-    NativeTypeConstructor::with_optional_args(DECIMAL_TYPE_NAME, 2, &[ScalarType::Decimal]),
-    NativeTypeConstructor::without_args(MONEY_TYPE_NAME, &[ScalarType::Decimal]),
-    NativeTypeConstructor::without_args(INET_TYPE_NAME, &[ScalarType::String]),
-    NativeTypeConstructor::without_args(CITEXT_TYPE_NAME, &[ScalarType::String]),
-    NativeTypeConstructor::without_args(OID_TYPE_NAME, &[ScalarType::Int]),
-    NativeTypeConstructor::without_args(REAL_TYPE_NAME, &[ScalarType::Float]),
-    NativeTypeConstructor::without_args(DOUBLE_PRECISION_TYPE_NAME, &[ScalarType::Float]),
-    NativeTypeConstructor::with_optional_args(VARCHAR_TYPE_NAME, 1, &[ScalarType::String]),
-    NativeTypeConstructor::with_optional_args(CHAR_TYPE_NAME, 1, &[ScalarType::String]),
-    NativeTypeConstructor::without_args(TEXT_TYPE_NAME, &[ScalarType::String]),
-    NativeTypeConstructor::without_args(BYTE_A_TYPE_NAME, &[ScalarType::Bytes]),
-    NativeTypeConstructor::with_optional_args(TIMESTAMP_TYPE_NAME, 1, &[ScalarType::DateTime]),
-    NativeTypeConstructor::with_optional_args(TIMESTAMP_TZ_TYPE_NAME, 1, &[ScalarType::DateTime]),
-    NativeTypeConstructor::without_args(DATE_TYPE_NAME, &[ScalarType::DateTime]),
-    NativeTypeConstructor::with_optional_args(TIME_TYPE_NAME, 1, &[ScalarType::DateTime]),
-    NativeTypeConstructor::with_optional_args(TIME_TZ_TYPE_NAME, 1, &[ScalarType::DateTime]),
-    NativeTypeConstructor::without_args(BOOLEAN_TYPE_NAME, &[ScalarType::Boolean]),
-    NativeTypeConstructor::with_optional_args(BIT_TYPE_NAME, 1, &[ScalarType::String]),
-    NativeTypeConstructor::with_optional_args(VAR_BIT_TYPE_NAME, 1, &[ScalarType::String]),
-    NativeTypeConstructor::without_args(UUID_TYPE_NAME, &[ScalarType::String]),
-    NativeTypeConstructor::without_args(XML_TYPE_NAME, &[ScalarType::String]),
-    NativeTypeConstructor::without_args(JSON_TYPE_NAME, &[ScalarType::Json]),
-    NativeTypeConstructor::without_args(JSON_B_TYPE_NAME, &[ScalarType::Json]),
-];
+use std::{borrow::Cow, collections::HashMap};
+use PostgresType::*;
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[
     ConstraintScope::GlobalPrimaryKeyKeyIndex,
@@ -130,6 +74,161 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, PostgresType)] = &[
     (ScalarType::Json, PostgresType::JsonB),
 ];
 
+/// Postgres-specific properties in the datasource block.
+#[derive(Default, Debug)]
+pub struct PostgresDatasourceProperties {
+    extensions: Option<PostgresExtensions>,
+}
+
+impl PostgresDatasourceProperties {
+    /// Database extensions.
+    pub fn extensions(&self) -> Option<&PostgresExtensions> {
+        self.extensions.as_ref()
+    }
+
+    pub fn set_extensions(&mut self, extensions: Vec<PostgresExtension>) {
+        self.extensions = Some(PostgresExtensions {
+            extensions,
+            span: ast::Span::empty(),
+        });
+    }
+}
+
+/// An extension defined in the extensions array of the datasource.
+///
+/// ```ignore
+/// datasource db {
+///   extensions = [postgis, foobar]
+///   //            ^^^^^^^
+/// }
+/// ```
+#[derive(Debug, Clone)]
+pub struct PostgresExtension {
+    name: String,
+    span: ast::Span,
+    schema: Option<String>,
+    version: Option<String>,
+    db_name: Option<String>,
+}
+
+impl PostgresExtension {
+    pub fn new(name: String) -> Self {
+        Self {
+            name,
+            span: ast::Span::empty(),
+            schema: None,
+            version: None,
+            db_name: None,
+        }
+    }
+
+    pub fn set_span(&mut self, span: ast::Span) {
+        self.span = span;
+    }
+
+    pub fn set_schema(&mut self, schema: String) {
+        self.schema = Some(schema);
+    }
+
+    pub fn set_version(&mut self, version: String) {
+        self.version = Some(version);
+    }
+
+    pub fn set_db_name(&mut self, db_name: String) {
+        self.db_name = Some(db_name);
+    }
+
+    /// The name of the extension in the datasource.
+    ///
+    /// ```ignore
+    /// extensions = [bar]
+    /// //            ^^^ this
+    /// ```
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    /// The name of the extension in the database, defined in the
+    /// `map` argument.
+    ///
+    /// ```ignore
+    /// extensions = [bar(map: "foo")]
+    /// //                     ^^^^^ this
+    /// ```
+    pub fn db_name(&self) -> Option<&str> {
+        self.db_name.as_deref()
+    }
+
+    /// The span of the extension definition in the datamodel.
+    pub fn span(&self) -> ast::Span {
+        self.span
+    }
+
+    /// The schema where the extension tables are stored.
+    ///
+    /// ```ignore
+    /// extensions = [postgis(schema: "public")]
+    /// //                            ^^^^^^^^ this
+    /// ```
+    pub fn schema(&self) -> Option<&str> {
+        self.schema.as_deref()
+    }
+
+    /// The version of the extension to be used in the database.
+    ///
+    /// ```ignore
+    /// extensions = [postgis(version: "2.1")]
+    /// //                             ^^^^^ this
+    /// ```
+    pub fn version(&self) -> Option<&str> {
+        self.version.as_deref()
+    }
+}
+
+/// The extensions defined in the extensions array of the datrasource.
+///
+/// ```ignore
+/// datasource db {
+///   extensions = [postgis, foobar]
+///   //           ^^^^^^^^^^^^^^^^^
+/// }
+/// ```
+#[derive(Debug, Clone)]
+pub struct PostgresExtensions {
+    pub(crate) extensions: Vec<PostgresExtension>,
+    pub(crate) span: ast::Span,
+}
+
+impl Default for PostgresExtensions {
+    fn default() -> Self {
+        Self {
+            extensions: Vec::new(),
+            span: ast::Span::empty(),
+        }
+    }
+}
+
+impl PostgresExtensions {
+    /// The span of the extensions in the datamodel.
+    pub fn span(&self) -> ast::Span {
+        self.span
+    }
+
+    /// The extension definitions.
+    pub fn extensions(&self) -> &[PostgresExtension] {
+        &self.extensions
+    }
+
+    /// Finds the extension with the given database name.
+    pub fn find_by_name(&self, name: &str) -> Option<&PostgresExtension> {
+        self.extensions().iter().find(|ext| {
+            ext.db_name()
+                .map(|db_name| db_name == name)
+                .unwrap_or_else(|| ext.name() == name)
+        })
+    }
+}
+
 impl Connector for PostgresDatamodelConnector {
     fn is_provider(&self, name: &str) -> bool {
         ["postgresql", "postgres"].contains(&name)
@@ -154,17 +253,23 @@ impl Connector for PostgresDatamodelConnector {
         63
     }
 
-    fn referential_actions(&self, relation_mode: &RelationMode) -> BitFlags<ReferentialAction> {
+    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
-        relation_mode.allowed_referential_actions(NoAction | Restrict | Cascade | SetNull | SetDefault)
+        NoAction | Restrict | Cascade | SetNull | SetDefault
     }
 
-    fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {
-        let native_type: PostgresType = serde_json::from_value(native_type).unwrap();
+    fn emulated_referential_actions(&self) -> BitFlags<ReferentialAction> {
+        use ReferentialAction::*;
+
+        Restrict | SetNull | Cascade
+    }
+
+    fn scalar_type_for_native_type(&self, native_type: &NativeTypeInstance) -> ScalarType {
+        let native_type: &PostgresType = native_type.downcast_ref();
 
         match native_type {
-            //String
+            // String
             Text => ScalarType::String,
             Char(_) => ScalarType::String,
             VarChar(_) => ScalarType::String,
@@ -174,35 +279,35 @@ impl Connector for PostgresDatamodelConnector {
             Xml => ScalarType::String,
             Inet => ScalarType::String,
             Citext => ScalarType::String,
-            //Boolean
+            // Boolean
             Boolean => ScalarType::Boolean,
-            //Int
+            // Int
             SmallInt => ScalarType::Int,
             Integer => ScalarType::Int,
             Oid => ScalarType::Int,
-            //BigInt
+            // BigInt
             BigInt => ScalarType::BigInt,
-            //Float
+            // Float
             Real => ScalarType::Float,
             DoublePrecision => ScalarType::Float,
-            //Decimal
+            // Decimal
             Decimal(_) => ScalarType::Decimal,
             Money => ScalarType::Float,
-            //DateTime
+            // DateTime
             Timestamp(_) => ScalarType::DateTime,
             Timestamptz(_) => ScalarType::DateTime,
             Date => ScalarType::DateTime,
             Time(_) => ScalarType::DateTime,
             Timetz(_) => ScalarType::DateTime,
-            //Json
+            // Json
             Json => ScalarType::Json,
             JsonB => ScalarType::Json,
-            //Bytes
+            // Bytes
             ByteA => ScalarType::Bytes,
         }
     }
 
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
+    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> NativeTypeInstance {
         let native_type = SCALAR_TYPE_DEFAULTS
             .iter()
             .find(|(st, _)| st == scalar_type)
@@ -210,15 +315,19 @@ impl Connector for PostgresDatamodelConnector {
             .ok_or_else(|| format!("Could not find scalar type {:?} in SCALAR_TYPE_DEFAULTS", scalar_type))
             .unwrap();
 
-        serde_json::to_value(native_type).expect("PostgresType to JSON failed")
+        NativeTypeInstance::new::<PostgresType>(*native_type)
     }
 
-    fn native_type_is_default_for_scalar_type(&self, native_type: serde_json::Value, scalar_type: &ScalarType) -> bool {
-        let native_type: PostgresType = serde_json::from_value(native_type).expect("PostgresType from JSON failed");
+    fn native_type_is_default_for_scalar_type(
+        &self,
+        native_type: &NativeTypeInstance,
+        scalar_type: &ScalarType,
+    ) -> bool {
+        let native_type: &PostgresType = native_type.downcast_ref();
 
         SCALAR_TYPE_DEFAULTS
             .iter()
-            .any(|(st, nt)| scalar_type == st && &native_type == nt)
+            .any(|(st, nt)| scalar_type == st && native_type == nt)
     }
 
     fn validate_native_type_arguments(
@@ -228,15 +337,14 @@ impl Connector for PostgresDatamodelConnector {
         span: ast::Span,
         errors: &mut Diagnostics,
     ) {
-        let native_type: PostgresType =
-            serde_json::from_value(native_type_instance.serialized_native_type.clone()).unwrap();
+        let native_type: &PostgresType = native_type_instance.downcast_ref();
         let error = self.native_instance_error(native_type_instance);
 
         match native_type {
             Decimal(Some((precision, scale))) if scale > precision => {
                 errors.push_error(error.new_scale_larger_than_precision_error(span))
             }
-            Decimal(Some((prec, _))) if prec > 1000 || prec == 0 => {
+            Decimal(Some((prec, _))) if *prec > 1000 || *prec == 0 => {
                 errors.push_error(error.new_argument_m_out_of_range_error(
                     "Precision must be positive with a maximum value of 1000.",
                     span,
@@ -245,7 +353,7 @@ impl Connector for PostgresDatamodelConnector {
             Bit(Some(0)) | VarBit(Some(0)) => {
                 errors.push_error(error.new_argument_m_out_of_range_error("M must be a positive integer.", span))
             }
-            Timestamp(Some(p)) | Timestamptz(Some(p)) | Time(Some(p)) | Timetz(Some(p)) if p > 6 => {
+            Timestamp(Some(p)) | Timestamptz(Some(p)) | Time(Some(p)) | Timetz(Some(p)) if *p > 6 => {
                 errors.push_error(error.new_argument_m_out_of_range_error("M can range from 0 to 6.", span))
             }
             _ => (),
@@ -260,12 +368,24 @@ impl Connector for PostgresDatamodelConnector {
         }
     }
 
+    fn validate_datasource(
+        &self,
+        preview_features: BitFlags<PreviewFeature>,
+        ds: &Datasource,
+        errors: &mut Diagnostics,
+    ) {
+        if let Some(props) = ds.downcast_connector_data::<PostgresDatasourceProperties>() {
+            validations::extensions_preview_flag_must_be_set(preview_features, props, errors);
+            validations::extension_names_follow_prisma_syntax_rules(preview_features, props, errors);
+        }
+    }
+
     fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {
         CONSTRAINT_SCOPES
     }
 
     fn available_native_type_constructors(&self) -> &'static [NativeTypeConstructor] {
-        NATIVE_TYPE_CONSTRUCTORS
+        native_types::CONSTRUCTORS
     }
 
     fn supported_index_types(&self) -> BitFlags<IndexAlgorithm> {
@@ -281,80 +401,16 @@ impl Connector for PostgresDatamodelConnector {
     fn parse_native_type(
         &self,
         name: &str,
-        args: Vec<String>,
+        args: &[String],
         span: ast::Span,
-    ) -> Result<NativeTypeInstance, DatamodelError> {
-        let cloned_args = args.clone();
-
-        let native_type = match name {
-            SMALL_INT_TYPE_NAME => SmallInt,
-            INTEGER_TYPE_NAME => Integer,
-            BIG_INT_TYPE_NAME => BigInt,
-            DECIMAL_TYPE_NAME => Decimal(parse_two_opt_u32(args, DECIMAL_TYPE_NAME, span)?),
-            INET_TYPE_NAME => Inet,
-            MONEY_TYPE_NAME => Money,
-            CITEXT_TYPE_NAME => Citext,
-            OID_TYPE_NAME => Oid,
-            REAL_TYPE_NAME => Real,
-            DOUBLE_PRECISION_TYPE_NAME => DoublePrecision,
-            VARCHAR_TYPE_NAME => VarChar(parse_one_opt_u32(args, VARCHAR_TYPE_NAME, span)?),
-            CHAR_TYPE_NAME => Char(parse_one_opt_u32(args, CHAR_TYPE_NAME, span)?),
-            TEXT_TYPE_NAME => Text,
-            BYTE_A_TYPE_NAME => ByteA,
-            TIMESTAMP_TYPE_NAME => Timestamp(parse_one_opt_u32(args, TIMESTAMP_TYPE_NAME, span)?),
-            TIMESTAMP_TZ_TYPE_NAME => Timestamptz(parse_one_opt_u32(args, TIMESTAMP_TZ_TYPE_NAME, span)?),
-            DATE_TYPE_NAME => Date,
-            TIME_TYPE_NAME => Time(parse_one_opt_u32(args, TIME_TYPE_NAME, span)?),
-            TIME_TZ_TYPE_NAME => Timetz(parse_one_opt_u32(args, TIME_TZ_TYPE_NAME, span)?),
-            BOOLEAN_TYPE_NAME => Boolean,
-            BIT_TYPE_NAME => Bit(parse_one_opt_u32(args, BIT_TYPE_NAME, span)?),
-            VAR_BIT_TYPE_NAME => VarBit(parse_one_opt_u32(args, VAR_BIT_TYPE_NAME, span)?),
-            UUID_TYPE_NAME => Uuid,
-            XML_TYPE_NAME => Xml,
-            JSON_TYPE_NAME => Json,
-            JSON_B_TYPE_NAME => JsonB,
-            _ => return Err(DatamodelError::new_native_type_parser_error(name, span)),
-        };
-
-        Ok(NativeTypeInstance::new(name, cloned_args, native_type.to_json()))
+        diagnostics: &mut Diagnostics,
+    ) -> Option<NativeTypeInstance> {
+        let native_type = PostgresType::from_parts(name, args, span, diagnostics)?;
+        Some(NativeTypeInstance::new::<PostgresType>(native_type))
     }
 
-    fn introspect_native_type(&self, native_type: serde_json::Value) -> NativeTypeInstance {
-        let native_type: PostgresType = serde_json::from_value(native_type).unwrap();
-        let (constructor_name, args) = match native_type {
-            SmallInt => (SMALL_INT_TYPE_NAME, vec![]),
-            Integer => (INTEGER_TYPE_NAME, vec![]),
-            BigInt => (BIG_INT_TYPE_NAME, vec![]),
-            Decimal(x) => (DECIMAL_TYPE_NAME, args_vec_from_opt(x)),
-            Real => (REAL_TYPE_NAME, vec![]),
-            DoublePrecision => (DOUBLE_PRECISION_TYPE_NAME, vec![]),
-            VarChar(x) => (VARCHAR_TYPE_NAME, arg_vec_from_opt(x)),
-            Char(x) => (CHAR_TYPE_NAME, arg_vec_from_opt(x)),
-            Text => (TEXT_TYPE_NAME, vec![]),
-            ByteA => (BYTE_A_TYPE_NAME, vec![]),
-            Timestamp(x) => (TIMESTAMP_TYPE_NAME, arg_vec_from_opt(x)),
-            Timestamptz(x) => (TIMESTAMP_TZ_TYPE_NAME, arg_vec_from_opt(x)),
-            Date => (DATE_TYPE_NAME, vec![]),
-            Time(x) => (TIME_TYPE_NAME, arg_vec_from_opt(x)),
-            Timetz(x) => (TIME_TZ_TYPE_NAME, arg_vec_from_opt(x)),
-            Boolean => (BOOLEAN_TYPE_NAME, vec![]),
-            Bit(x) => (BIT_TYPE_NAME, arg_vec_from_opt(x)),
-            VarBit(x) => (VAR_BIT_TYPE_NAME, arg_vec_from_opt(x)),
-            Uuid => (UUID_TYPE_NAME, vec![]),
-            Xml => (XML_TYPE_NAME, vec![]),
-            Json => (JSON_TYPE_NAME, vec![]),
-            JsonB => (JSON_B_TYPE_NAME, vec![]),
-            Money => (MONEY_TYPE_NAME, vec![]),
-            Inet => (INET_TYPE_NAME, vec![]),
-            Citext => (CITEXT_TYPE_NAME, vec![]),
-            Oid => (OID_TYPE_NAME, vec![]),
-        };
-
-        if let Some(constructor) = self.find_native_type_constructor(constructor_name) {
-            NativeTypeInstance::new(constructor.name, args, native_type.to_json())
-        } else {
-            unreachable!()
-        }
+    fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
+        native_type.downcast_ref::<PostgresType>().to_parts()
     }
 
     fn scalar_filter_name(&self, scalar_type_name: String, native_type_name: Option<&str>) -> Cow<'_, str> {
@@ -451,6 +507,17 @@ impl Connector for PostgresDatamodelConnector {
             }
             _ => (),
         }
+    }
+
+    fn parse_datasource_properties(
+        &self,
+        args: &mut HashMap<&str, (ast::Span, &ast::Expression)>,
+        diagnostics: &mut Diagnostics,
+    ) -> DatasourceConnectorData {
+        let extensions = datasource::parse_extensions(args, diagnostics);
+        let properties = PostgresDatasourceProperties { extensions };
+
+        DatasourceConnectorData::new(Box::new(properties))
     }
 }
 

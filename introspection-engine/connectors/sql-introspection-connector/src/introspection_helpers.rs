@@ -1,10 +1,10 @@
 use crate::{calculate_datamodel::CalculateDatamodelContext as Context, SqlError, SqlFamilyTrait};
 use psl::{
-    common::{preview_features::PreviewFeature, RelationNames},
     dml::{
         Datamodel, FieldArity, FieldType, IndexAlgorithm, IndexDefinition, IndexField, Model, OperatorClass,
         PrimaryKeyField, ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, SortOrder,
     },
+    PreviewFeature, RelationNames,
 };
 use sql::walkers::{ColumnWalker, ForeignKeyWalker, TableWalker};
 use sql_schema_describer::{
@@ -132,7 +132,7 @@ pub fn calculate_many_to_many_field(
         name: relation_name,
         fk_name: None,
         fields: Vec::new(),
-        to: opposite_foreign_key.referenced_table_name().to_owned(),
+        referenced_model: opposite_foreign_key.referenced_table_name().to_owned(),
         references: Vec::new(),
         on_delete: None,
         on_update: None,
@@ -156,7 +156,7 @@ pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &Contex
     let tpe = match index.index_type() {
         IndexType::Unique => psl::dml::IndexType::Unique,
         IndexType::Normal => psl::dml::IndexType::Normal,
-        IndexType::Fulltext if ctx.preview_features.contains(PreviewFeature::FullTextIndex) => {
+        IndexType::Fulltext if ctx.config.preview_features().contains(PreviewFeature::FullTextIndex) => {
             psl::dml::IndexType::Fulltext
         }
         IndexType::Fulltext => psl::dml::IndexType::Normal,
@@ -244,7 +244,7 @@ pub(crate) fn calculate_relation_field(
         name: calculate_relation_name(foreign_key, m2m_table_names, duplicated_foreign_keys),
         fk_name: foreign_key.constraint_name().map(String::from),
         fields: foreign_key.constrained_columns().map(|c| c.name().to_owned()).collect(),
-        to: foreign_key.referenced_table().name().to_owned(),
+        referenced_model: foreign_key.referenced_table().name().to_owned(),
         references: foreign_key.referenced_columns().map(|c| c.name().to_owned()).collect(),
         on_delete: Some(map_action(foreign_key.on_delete_action())),
         on_update: Some(map_action(foreign_key.on_update_action())),
@@ -283,7 +283,7 @@ pub(crate) fn calculate_backrelation_field(
             let new_relation_info = RelationInfo {
                 name: relation_info.name.clone(),
                 fk_name: None,
-                to: model.name.clone(),
+                referenced_model: model.name.clone(),
                 fields: vec![],
                 references: vec![],
                 on_delete: None,
@@ -383,17 +383,13 @@ pub(crate) fn calculate_scalar_field_type_with_native_types(column: sql::ColumnW
     match scalar_type {
         FieldType::Scalar(scal_type, _) => match &column.column_type().native_type {
             None => scalar_type,
-            Some(native_type) => {
-                let native_type_instance = ctx.source.active_connector.introspect_native_type(native_type.clone());
-                FieldType::Scalar(
-                    scal_type,
-                    Some(psl::dml::NativeTypeInstance {
-                        args: native_type_instance.args,
-                        serialized_native_type: native_type_instance.serialized_native_type,
-                        name: native_type_instance.name,
-                    }),
-                )
-            }
+            Some(native_type) => FieldType::Scalar(
+                scal_type,
+                Some(psl::dml::NativeTypeInstance::new(
+                    native_type.clone(),
+                    ctx.active_connector(),
+                )),
+            ),
         },
         field_type => field_type,
     }

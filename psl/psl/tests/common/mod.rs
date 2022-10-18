@@ -231,7 +231,7 @@ impl RelationFieldAsserts for dml::RelationField {
     }
 
     fn assert_relation_to(&self, t: &str) -> &Self {
-        assert_eq!(self.relation_info.to, t);
+        assert_eq!(self.relation_info.referenced_model, t);
         self
     }
 
@@ -416,6 +416,7 @@ pub(crate) fn parse_unwrap_err(schema: &str) -> String {
     psl::parse_schema(schema).map(drop).unwrap_err()
 }
 
+#[track_caller]
 pub(crate) fn parse(datamodel_string: &str) -> Datamodel {
     let schema = psl::parse_schema(datamodel_string).unwrap();
     psl::lift(&schema)

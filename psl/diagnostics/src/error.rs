@@ -122,6 +122,11 @@ impl DatamodelError {
         Self::new(msg, span)
     }
 
+    pub fn new_duplicate_enum_database_name_error(span: Span) -> DatamodelError {
+        let msg = "An enum with the same database name is already defined.";
+        Self::new(msg, span)
+    }
+
     pub fn new_duplicate_model_database_name_error(
         model_database_name: &str,
         existing_model_name: &str,
@@ -279,6 +284,10 @@ impl DatamodelError {
         Self::new(format!("Property not known: \"{property_name}\"."), span)
     }
 
+    pub fn new_argument_not_known_error(property_name: &str, span: Span) -> DatamodelError {
+        Self::new(format!("Argument not known: \"{property_name}\"."), span)
+    }
+
     pub fn new_default_unknown_function(function_name: &str, span: Span) -> DatamodelError {
         DatamodelError::new(format!(
                 "Unknown function in @default(): `{function_name}` is not known. You can read about the available functions here: https://pris.ly/d/attribute-functions"
@@ -312,8 +321,8 @@ impl DatamodelError {
         Self::new(msg, span)
     }
 
-    pub fn new_value_parser_error(expected_type: &str, parser_error: &str, raw: &str, span: Span) -> DatamodelError {
-        let msg = format!("Expected a {expected_type} value, but failed while parsing \"{raw}\": {parser_error}.");
+    pub fn new_value_parser_error(expected_type: &str, raw: &str, span: Span) -> DatamodelError {
+        let msg = format!("Expected {expected_type}, but found {raw}.");
         Self::new(msg, span)
     }
 
@@ -342,6 +351,11 @@ impl DatamodelError {
 
     pub fn new_type_mismatch_error(expected_type: &str, received_type: &str, raw: &str, span: Span) -> DatamodelError {
         let msg = format!("Expected a {expected_type} value, but received {received_type} value `{raw}`.");
+        Self::new(msg, span)
+    }
+
+    pub fn new_schemas_array_empty_error(span: Span) -> DatamodelError {
+        let msg = "If provided, the schemas array can not be empty.".to_string();
         Self::new(msg, span)
     }
 

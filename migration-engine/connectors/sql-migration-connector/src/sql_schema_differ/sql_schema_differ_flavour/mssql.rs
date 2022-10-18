@@ -5,7 +5,7 @@ use crate::{
     sql_migration::SqlMigrationStep,
     sql_schema_differ::{column::ColumnTypeChange, differ_database::DifferDatabase, table::TableDiffer, ColumnChanges},
 };
-use native_types::{MsSqlType, MsSqlTypeParameter};
+use psl::builtin_connectors::{MsSqlType, MsSqlTypeParameter};
 use sql_schema_describer::{self as sql, mssql::MssqlSchemaExt, ColumnId, ColumnTypeFamily};
 
 impl SqlSchemaDifferFlavour for MssqlFlavour {
@@ -56,8 +56,8 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
     fn column_type_change(&self, differ: Pair<sql::ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
         let previous_family = differ.previous.column_type_family();
         let next_family = differ.next.column_type_family();
-        let previous_type: Option<MsSqlType> = differ.previous.column_native_type();
-        let next_type: Option<MsSqlType> = differ.next.column_native_type();
+        let previous_type: Option<&MsSqlType> = differ.previous.column_native_type();
+        let next_type: Option<&MsSqlType> = differ.next.column_native_type();
 
         match (previous_type, next_type) {
             (None, _) | (_, None) => family_change_riskyness(previous_family, next_family),
@@ -118,7 +118,7 @@ fn family_change_riskyness(previous: &ColumnTypeFamily, next: &ColumnTypeFamily)
     }
 }
 
-fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<ColumnTypeChange> {
+fn native_type_change_riskyness(previous: &MsSqlType, next: &MsSqlType) -> Option<ColumnTypeChange> {
     use ColumnTypeChange::*;
     use MsSqlTypeParameter::*;
 
@@ -168,13 +168,13 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::Bit => RiskyCast,
             MsSqlType::Char(param) | MsSqlType::NChar(param) => match param {
                 // TinyInt can be at most three digits, so this might fail.
-                Some(len) if len < 3 => RiskyCast,
+                Some(len) if *len < 3 => RiskyCast,
                 None => RiskyCast,
                 _ => SafeCast,
             },
             MsSqlType::VarChar(param) | MsSqlType::NVarChar(param) => match param {
                 // TinyInt can be at most three digits, so this might fail.
-                Some(Number(len)) if len < 3 => RiskyCast,
+                Some(Number(len)) if *len < 3 => RiskyCast,
                 None => RiskyCast,
                 _ => SafeCast,
             },
@@ -200,26 +200,26 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::SmallDateTime => SafeCast,
             MsSqlType::Binary(param) => match param {
                 // SmallInt is two bytes, so this might fail.
-                Some(n) if n < 2 => RiskyCast,
+                Some(n) if *n < 2 => RiskyCast,
                 None => RiskyCast, // n == 1 by default
                 _ => SafeCast,
             },
             MsSqlType::VarBinary(param) => match param {
                 // SmallInt is two bytes, so this might fail.
-                Some(Number(n)) if n < 2 => RiskyCast,
+                Some(Number(n)) if *n < 2 => RiskyCast,
                 None => RiskyCast, // n == 1 by default
                 _ => SafeCast,
             },
             MsSqlType::Bit => RiskyCast,
             MsSqlType::Char(param) | MsSqlType::NChar(param) => match param {
                 // We can have five digits and an optional sign.
-                Some(len) if len < 6 => RiskyCast,
+                Some(len) if *len < 6 => RiskyCast,
                 None => RiskyCast,
                 _ => SafeCast,
             },
             MsSqlType::VarChar(param) | MsSqlType::NVarChar(param) => match param {
                 // We can have five digits and an optional sign.
-                Some(Number(len)) if len < 6 => RiskyCast,
+                Some(Number(len)) if *len < 6 => RiskyCast,
                 None => RiskyCast,
                 _ => SafeCast,
             },
@@ -245,26 +245,26 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::SmallDateTime => RiskyCast,
             MsSqlType::Binary(param) => match param {
                 // Int is four bytes.
-                Some(n) if n < 4 => RiskyCast,
+                Some(n) if *n < 4 => RiskyCast,
                 None => RiskyCast, // n == 1 by default
                 _ => SafeCast,
             },
             MsSqlType::VarBinary(param) => match param {
                 // Int is four bytes.
-                Some(Number(n)) if n < 4 => RiskyCast,
+                Some(Number(n)) if *n < 4 => RiskyCast,
                 None => RiskyCast, // n == 1 by default
                 _ => SafeCast,
             },
             MsSqlType::Bit => RiskyCast,
             MsSqlType::Char(param) | MsSqlType::NChar(param) => match param {
                 // Int can be at most eleven characters, so this might fail.
-                Some(len) if len < 11 => RiskyCast,
+                Some(len) if *len < 11 => RiskyCast,
                 None => RiskyCast,
                 _ => SafeCast,
             },
             MsSqlType::VarChar(param) | MsSqlType::NVarChar(param) => match param {
                 // Int can be at most eleven characters, so this might fail.
-                Some(Number(len)) if len < 11 => RiskyCast,
+                Some(Number(len)) if *len < 11 => RiskyCast,
                 None => RiskyCast,
                 _ => SafeCast,
             },
@@ -291,26 +291,26 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::SmallDateTime => RiskyCast,
             MsSqlType::Binary(param) => match param {
                 // BigInt is eight bytes.
-                Some(n) if n < 8 => RiskyCast,
+                Some(n) if *n < 8 => RiskyCast,
                 None => RiskyCast, // n == 1 by default
                 _ => SafeCast,
             },
             MsSqlType::VarBinary(param) => match param {
                 // BigInt is eight bytes.
-                Some(Number(n)) if n < 8 => RiskyCast,
+                Some(Number(n)) if *n < 8 => RiskyCast,
                 None => RiskyCast, // n == 1 by default
                 _ => SafeCast,
             },
             MsSqlType::Bit => RiskyCast,
             MsSqlType::Char(param) | MsSqlType::NChar(param) => match param {
                 // BigInt can have at most 20 characters.
-                Some(len) if len < 20 => RiskyCast,
+                Some(len) if *len < 20 => RiskyCast,
                 None => RiskyCast,
                 _ => SafeCast,
             },
             MsSqlType::VarChar(param) | MsSqlType::NVarChar(param) => match param {
                 // BigInt can have at most 20 characters.
-                Some(Number(len)) if len < 20 => RiskyCast,
+                Some(Number(len)) if *len < 20 => RiskyCast,
                 None => RiskyCast,
                 _ => SafeCast,
             },
@@ -337,8 +337,8 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
                 MsSqlType::Binary(_) => RiskyCast,
                 MsSqlType::VarBinary(_) => RiskyCast,
                 MsSqlType::Decimal(new_params) => match (old_params, new_params) {
-                    (Some((p_old, s_old)), None) if p_old > 18 || s_old > 0 => RiskyCast,
-                    (None, Some((p_new, s_new))) if p_new < 18 || s_new > 0 => RiskyCast,
+                    (Some((p_old, s_old)), None) if *p_old > 18 || *s_old > 0 => RiskyCast,
+                    (None, Some((p_new, s_new))) if *p_new < 18 || *s_new > 0 => RiskyCast,
                     // Sigh... So, numeric(4,0) to numeric(4,2) would be risky,
                     // so would numeric(4,2) to numeric(4,0).
                     (Some((p_old, s_old)), Some((p_new, s_new))) if p_old - s_old > p_new - s_new || s_old > s_new => {
@@ -349,26 +349,26 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
                 MsSqlType::Char(length) | MsSqlType::NChar(length) => match (length, old_params) {
                     // We must fit p digits and a possible sign to our
                     // string, otherwise might truncate.
-                    (Some(len), Some((p, 0))) if p + 1 > len => RiskyCast,
+                    (Some(len), Some((p, 0))) if p + 1 > *len => RiskyCast,
                     // We must fit p digits, a possible sign and a comma to
                     // our string, otherwise might truncate.
-                    (Some(len), Some((p, n))) if n > 0 && p + 2 > len => RiskyCast,
+                    (Some(len), Some((p, n))) if *n > 0 && p + 2 > *len => RiskyCast,
                     // Defaults to `number(18, 0)`, so we must fit 18 digits
                     // and a possible sign without truncating.
-                    (Some(len), None) if len < 19 => RiskyCast,
+                    (Some(len), None) if *len < 19 => RiskyCast,
                     (None, _) => RiskyCast,
                     _ => SafeCast,
                 },
                 MsSqlType::VarChar(length) | MsSqlType::NVarChar(length) => match (length, old_params) {
                     // We must fit p digits and a possible sign to our
                     // string, otherwise might truncate.
-                    (Some(Number(len)), Some((p, 0))) if p + 1 > len.into() => RiskyCast,
+                    (Some(Number(len)), Some((p, 0))) if p + 1 > (*len).into() => RiskyCast,
                     // We must fit p digits, a possible sign and a comma to
                     // our string, otherwise might truncate.
-                    (Some(Number(len)), Some((p, n))) if n > 0 && p + 2 > len.into() => RiskyCast,
+                    (Some(Number(len)), Some((p, n))) if *n > 0 && p + 2 > (*len).into() => RiskyCast,
                     // Defaults to `number(18, 0)`, so we must fit 18 digits
                     // and a possible sign without truncating.
-                    (Some(Number(len)), None) if len < 19 => RiskyCast,
+                    (Some(Number(len)), None) if *len < 19 => RiskyCast,
                     (None, _) => RiskyCast,
                     _ => SafeCast,
                 },
@@ -384,7 +384,7 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::BigInt => RiskyCast,
             MsSqlType::Decimal(params) => match params {
                 // We can have 19 digits and four decimals.
-                Some((p, s)) if p < 19 || s < 4 => RiskyCast,
+                Some((p, s)) if *p < 19 || *s < 4 => RiskyCast,
                 None => RiskyCast,
                 _ => SafeCast,
             },
@@ -397,25 +397,25 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::SmallDateTime => RiskyCast,
             MsSqlType::Char(param) | MsSqlType::NChar(param) => match param {
                 // We can have 19 digits, comma and sign
-                Some(len) if len < 21 => RiskyCast,
+                Some(len) if *len < 21 => RiskyCast,
                 None => RiskyCast,
                 _ => SafeCast,
             },
             MsSqlType::VarChar(param) | MsSqlType::NVarChar(param) => match param {
                 // We can have 19 digits, comma and sign
-                Some(Number(len)) if len < 21 => RiskyCast,
+                Some(Number(len)) if *len < 21 => RiskyCast,
                 None => RiskyCast,
                 _ => SafeCast,
             },
             MsSqlType::Binary(param) => match param {
                 // Eight bytes.
-                Some(len) if len < 8 => RiskyCast,
+                Some(len) if *len < 8 => RiskyCast,
                 None => RiskyCast,
                 _ => SafeCast,
             },
             MsSqlType::VarBinary(param) => match param {
                 // Eight bytes.
-                Some(Number(len)) if len < 8 => RiskyCast,
+                Some(Number(len)) if *len < 8 => RiskyCast,
                 None => RiskyCast,
                 _ => SafeCast,
             },
@@ -431,7 +431,7 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::BigInt => RiskyCast,
             MsSqlType::Decimal(params) => match params {
                 // Ten digits, four decimals
-                Some((p, s)) if p < 10 || s < 4 => RiskyCast,
+                Some((p, s)) if *p < 10 || *s < 4 => RiskyCast,
                 None => RiskyCast,
                 _ => SafeCast,
             },
@@ -444,25 +444,25 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::SmallDateTime => RiskyCast,
             MsSqlType::Char(param) | MsSqlType::NChar(param) => match param {
                 // Ten digits, comma and a sign.
-                Some(len) if len < 12 => RiskyCast,
+                Some(len) if *len < 12 => RiskyCast,
                 None => RiskyCast,
                 _ => SafeCast,
             },
             MsSqlType::VarChar(param) | MsSqlType::NVarChar(param) => match param {
                 // Ten digits, comma and a sign.
-                Some(Number(len)) if len < 12 => RiskyCast,
+                Some(Number(len)) if *len < 12 => RiskyCast,
                 None => RiskyCast,
                 _ => SafeCast,
             },
             MsSqlType::Binary(param) => match param {
                 // Four bytes.
-                Some(len) if len < 4 => RiskyCast,
+                Some(len) if *len < 4 => RiskyCast,
                 None => RiskyCast,
                 _ => SafeCast,
             },
             MsSqlType::VarBinary(param) => match param {
                 // Four bytes.
-                Some(Number(len)) if len < 4 => RiskyCast,
+                Some(Number(len)) if *len < 4 => RiskyCast,
                 None => RiskyCast,
                 _ => SafeCast,
             },
@@ -483,55 +483,55 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::Bit => RiskyCast,
             MsSqlType::Float(new_param) => match (old_param, new_param) {
                 // If length is 24 or lower, we have a four byte float.
-                (Some(left_len), Some(right_len)) if left_len <= 24 && right_len <= 24 => SafeCast,
-                (Some(left_len), Some(right_len)) if left_len > 24 && right_len > 24 => SafeCast,
+                (Some(left_len), Some(right_len)) if *left_len <= 24 && *right_len <= 24 => SafeCast,
+                (Some(left_len), Some(right_len)) if *left_len > 24 && *right_len > 24 => SafeCast,
                 // If length is not set, it's an eight byte float (double).
-                (None, Some(right_len)) if right_len > 24 => SafeCast,
-                (Some(left_len), None) if left_len > 24 => SafeCast,
+                (None, Some(right_len)) if *right_len > 24 => SafeCast,
+                (Some(left_len), None) if *left_len > 24 => SafeCast,
                 (None, None) => SafeCast,
                 _ => RiskyCast,
             },
             MsSqlType::Real => match old_param {
                 // Real is always a four byte float.
-                Some(len) if len <= 24 => SafeCast,
+                Some(len) if *len <= 24 => SafeCast,
                 _ => RiskyCast,
             },
             MsSqlType::SmallDateTime => RiskyCast,
             MsSqlType::DateTime => RiskyCast,
             MsSqlType::Char(new_param) | MsSqlType::NChar(new_param) => match (old_param, new_param) {
                 // If float, we can have 47 characters including the sign and comma.
-                (Some(f_len), Some(char_len)) if f_len <= 24 && char_len >= 47 => SafeCast,
+                (Some(f_len), Some(char_len)) if *f_len <= 24 && *char_len >= 47 => SafeCast,
                 // If double, we can have 317 characters including the sign and comma.
-                (Some(f_len), Some(char_len)) if f_len > 24 && char_len >= 317 => SafeCast,
+                (Some(f_len), Some(char_len)) if *f_len > 24 && *char_len >= 317 => SafeCast,
                 // If length not set, it's a double.
-                (None, Some(char_len)) if char_len >= 317 => SafeCast,
+                (None, Some(char_len)) if *char_len >= 317 => SafeCast,
                 _ => RiskyCast,
             },
             MsSqlType::VarChar(new_param) | MsSqlType::NVarChar(new_param) => match (old_param, new_param) {
                 // If float, we can have 47 characters including the sign and comma.
-                (Some(f_len), Some(Number(char_len))) if f_len <= 24 && char_len >= 47 => SafeCast,
+                (Some(f_len), Some(Number(char_len))) if *f_len <= 24 && *char_len >= 47 => SafeCast,
                 // If double, we can have 317 characters including the sign and comma.
-                (Some(f_len), Some(Number(char_len))) if f_len > 24 && char_len >= 317 => SafeCast,
+                (Some(f_len), Some(Number(char_len))) if *f_len > 24 && *char_len >= 317 => SafeCast,
                 // If length not set, it's a double.
-                (None, Some(Number(char_len))) if char_len >= 317 => SafeCast,
+                (None, Some(Number(char_len))) if *char_len >= 317 => SafeCast,
                 _ => RiskyCast,
             },
             MsSqlType::Binary(new_param) => match (old_param, new_param) {
                 // Float is four bytes.
-                (Some(f_len), Some(bin_len)) if f_len <= 24 && bin_len >= 4 => SafeCast,
+                (Some(f_len), Some(bin_len)) if *f_len <= 24 && *bin_len >= 4 => SafeCast,
                 // Double is eight bytes.
-                (Some(f_len), Some(bin_len)) if f_len > 24 && bin_len >= 8 => SafeCast,
+                (Some(f_len), Some(bin_len)) if *f_len > 24 && *bin_len >= 8 => SafeCast,
                 // By default, we have a double.
-                (None, Some(bin_len)) if bin_len >= 8 => SafeCast,
+                (None, Some(bin_len)) if *bin_len >= 8 => SafeCast,
                 _ => RiskyCast,
             },
             MsSqlType::VarBinary(new_param) => match (old_param, new_param) {
                 // Float is four bytes.
-                (Some(f_len), Some(Number(bin_len))) if f_len <= 24 && bin_len >= 4 => SafeCast,
+                (Some(f_len), Some(Number(bin_len))) if *f_len <= 24 && *bin_len >= 4 => SafeCast,
                 // Double is eight bytes.
-                (Some(f_len), Some(Number(bin_len))) if f_len > 24 && bin_len >= 8 => SafeCast,
+                (Some(f_len), Some(Number(bin_len))) if *f_len > 24 && *bin_len >= 8 => SafeCast,
                 // By default, we have a double.
-                (None, Some(Number(bin_len))) if bin_len >= 8 => SafeCast,
+                (None, Some(Number(bin_len))) if *bin_len >= 8 => SafeCast,
                 _ => RiskyCast,
             },
             _ => NotCastable,
@@ -552,27 +552,27 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::SmallDateTime => RiskyCast,
             MsSqlType::Float(param) => match param {
                 // Real is the same as float(24) or lower.
-                Some(len) if len <= 24 => SafeCast,
+                Some(len) if *len <= 24 => SafeCast,
                 _ => RiskyCast,
             },
             MsSqlType::Char(param) | MsSqlType::NChar(param) => match param {
                 // We have 47 characters maximum.
-                Some(len) if len >= 47 => SafeCast,
+                Some(len) if *len >= 47 => SafeCast,
                 _ => RiskyCast,
             },
             MsSqlType::VarChar(param) | MsSqlType::NVarChar(param) => match param {
                 // We have 47 characters maximum.
-                Some(Number(len)) if len >= 47 => SafeCast,
+                Some(Number(len)) if *len >= 47 => SafeCast,
                 _ => RiskyCast,
             },
             MsSqlType::Binary(param) => match param {
                 // Real is four bytes.
-                Some(len) if len >= 4 => SafeCast,
+                Some(len) if *len >= 4 => SafeCast,
                 _ => RiskyCast,
             },
             MsSqlType::VarBinary(param) => match param {
                 // Real is four bytes.
-                Some(Number(len)) if len >= 4 => SafeCast,
+                Some(Number(len)) if *len >= 4 => SafeCast,
                 _ => RiskyCast,
             },
             _ => NotCastable,
@@ -586,12 +586,12 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::DateTimeOffset => SafeCast,
             MsSqlType::Char(param) | MsSqlType::NChar(param) => match param {
                 // We can have 10 characters.
-                Some(len) if len >= 10 => SafeCast,
+                Some(len) if *len >= 10 => SafeCast,
                 _ => RiskyCast,
             },
             MsSqlType::VarChar(param) | MsSqlType::NVarChar(param) => match param {
                 // We can have 10 characters.
-                Some(Number(len)) if len >= 10 => SafeCast,
+                Some(Number(len)) if *len >= 10 => SafeCast,
                 _ => RiskyCast,
             },
             MsSqlType::SmallDateTime => RiskyCast,
@@ -606,12 +606,12 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::DateTimeOffset => SafeCast,
             MsSqlType::Char(param) | MsSqlType::NChar(param) => match param {
                 // We can have 8 characters.
-                Some(len) if len >= 8 => SafeCast,
+                Some(len) if *len >= 8 => SafeCast,
                 _ => RiskyCast,
             },
             MsSqlType::VarChar(param) | MsSqlType::NVarChar(param) => match param {
                 // We can have 8 characters.
-                Some(Number(len)) if len >= 8 => SafeCast,
+                Some(Number(len)) if *len >= 8 => SafeCast,
                 _ => RiskyCast,
             },
             MsSqlType::SmallDateTime => RiskyCast,
@@ -629,12 +629,12 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::SmallDateTime => RiskyCast,
             MsSqlType::Char(param) | MsSqlType::NChar(param) => match param {
                 // We can have 23 characters.
-                Some(len) if len >= 23 => SafeCast,
+                Some(len) if *len >= 23 => SafeCast,
                 _ => RiskyCast,
             },
             MsSqlType::VarChar(param) | MsSqlType::NVarChar(param) => match param {
                 // We can have 23 characters.
-                Some(Number(len)) if len >= 23 => SafeCast,
+                Some(Number(len)) if *len >= 23 => SafeCast,
                 _ => RiskyCast,
             },
             _ => NotCastable,
@@ -651,12 +651,12 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::SmallDateTime => RiskyCast,
             MsSqlType::Char(param) | MsSqlType::NChar(param) => match param {
                 // We can have 27 characters.
-                Some(len) if len >= 27 => SafeCast,
+                Some(len) if *len >= 27 => SafeCast,
                 _ => RiskyCast,
             },
             MsSqlType::VarChar(param) | MsSqlType::NVarChar(param) => match param {
                 // We can have 27 characters.
-                Some(Number(len)) if len >= 27 => SafeCast,
+                Some(Number(len)) if *len >= 27 => SafeCast,
                 _ => RiskyCast,
             },
             _ => NotCastable,
@@ -672,12 +672,12 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::SmallDateTime => RiskyCast,
             MsSqlType::Char(param) | MsSqlType::NChar(param) => match param {
                 // We can have 33 characters.
-                Some(len) if len >= 33 => SafeCast,
+                Some(len) if *len >= 33 => SafeCast,
                 _ => RiskyCast,
             },
             MsSqlType::VarChar(param) | MsSqlType::NVarChar(param) => match param {
                 // We can have 33 characters.
-                Some(Number(len)) if len >= 33 => SafeCast,
+                Some(Number(len)) if *len >= 33 => SafeCast,
                 _ => RiskyCast,
             },
             _ => NotCastable,
@@ -695,12 +695,12 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::SmallDateTime => SafeCast,
             MsSqlType::Char(param) | MsSqlType::NChar(param) => match param {
                 // We can have 19 characters.
-                Some(len) if len >= 19 => SafeCast,
+                Some(len) if *len >= 19 => SafeCast,
                 _ => RiskyCast,
             },
             MsSqlType::VarChar(param) | MsSqlType::NVarChar(param) => match param {
                 // We can have 19 characters.
-                Some(Number(len)) if len >= 19 => SafeCast,
+                Some(Number(len)) if *len >= 19 => SafeCast,
                 _ => RiskyCast,
             },
             _ => NotCastable,
@@ -730,13 +730,13 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::Char(new_param) | MsSqlType::NChar(new_param) => match (old_param, new_param) {
                 (Some(old_len), Some(new_len)) if old_len > new_len => RiskyCast,
                 // Default length is 1.
-                (Some(old_len), None) if old_len > 1 => RiskyCast,
+                (Some(old_len), None) if *old_len > 1 => RiskyCast,
                 _ => SafeCast,
             },
             MsSqlType::VarChar(new_param) | MsSqlType::NVarChar(new_param) => match (old_param, new_param) {
-                (Some(old_len), Some(Number(new_len))) if old_len > new_len.into() => RiskyCast,
+                (Some(old_len), Some(Number(new_len))) if *old_len > (*new_len).into() => RiskyCast,
                 // Default length is 1.
-                (Some(old_len), None) if old_len > 1 => RiskyCast,
+                (Some(old_len), None) if *old_len > 1 => RiskyCast,
                 _ => SafeCast,
             },
             MsSqlType::Text => SafeCast,
@@ -769,15 +769,15 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::NChar(new_param) => match (old_param, new_param) {
                 (Some(old_len), Some(new_len)) if old_len > new_len => RiskyCast,
                 // Default length is 1.
-                (Some(old_len), None) if old_len > 1 => RiskyCast,
+                (Some(old_len), None) if *old_len > 1 => RiskyCast,
                 _ => SafeCast,
             },
             MsSqlType::Char(_) => RiskyCast,
             MsSqlType::VarChar(_) => RiskyCast,
             MsSqlType::NVarChar(new_param) => match (old_param, new_param) {
-                (Some(old_len), Some(Number(new_len))) if old_len > new_len.into() => RiskyCast,
+                (Some(old_len), Some(Number(new_len))) if *old_len > (*new_len).into() => RiskyCast,
                 // Default length is 1.
-                (Some(old_len), None) if old_len > 1 => RiskyCast,
+                (Some(old_len), None) if *old_len > 1 => RiskyCast,
                 _ => SafeCast,
             },
             MsSqlType::Text => RiskyCast,
@@ -809,9 +809,9 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::DateTimeOffset => RiskyCast,
             MsSqlType::SmallDateTime => RiskyCast,
             MsSqlType::NChar(new_param) | MsSqlType::Char(new_param) => match (old_param, new_param) {
-                (Some(Number(old_len)), Some(new_len)) if u32::from(old_len) > new_len => RiskyCast,
+                (Some(Number(old_len)), Some(new_len)) if u32::from(*old_len) > *new_len => RiskyCast,
                 // Default length is 1.
-                (Some(Number(old_len)), None) if old_len > 1 => RiskyCast,
+                (Some(Number(old_len)), None) if *old_len > 1 => RiskyCast,
                 (Some(Max), _) => RiskyCast,
                 _ => SafeCast,
             },
@@ -822,7 +822,7 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::VarChar(new_param) | MsSqlType::NVarChar(new_param) => match (old_param, new_param) {
                 (Some(Number(old_len)), Some(Number(new_len))) if old_len > new_len => RiskyCast,
                 // Default length is 1.
-                (Some(Number(old_len)), None) if old_len > 1 => RiskyCast,
+                (Some(Number(old_len)), None) if *old_len > 1 => RiskyCast,
                 (Some(Max), Some(Number(_))) => RiskyCast,
                 (Some(Max), None) => RiskyCast,
                 _ => SafeCast,
@@ -861,16 +861,16 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::Char(_) => RiskyCast,
             MsSqlType::VarChar(_) => RiskyCast,
             MsSqlType::NChar(new_param) => match (old_param, new_param) {
-                (Some(Number(old_len)), Some(new_len)) if u32::from(old_len) > new_len => RiskyCast,
+                (Some(Number(old_len)), Some(new_len)) if u32::from(*old_len) > *new_len => RiskyCast,
                 // Default length is 1.
-                (Some(Number(old_len)), None) if old_len > 1 => RiskyCast,
+                (Some(Number(old_len)), None) if *old_len > 1 => RiskyCast,
                 (Some(Max), _) => RiskyCast,
                 _ => SafeCast,
             },
             MsSqlType::NVarChar(new_param) => match (old_param, new_param) {
                 (Some(Number(old_len)), Some(Number(new_len))) if old_len > new_len => RiskyCast,
                 // Default length is 1.
-                (Some(Number(old_len)), None) if old_len > 1 => RiskyCast,
+                (Some(Number(old_len)), None) if *old_len > 1 => RiskyCast,
                 (Some(Max), Some(Number(_))) => RiskyCast,
                 (Some(Max), None) => RiskyCast,
                 _ => SafeCast,
@@ -917,37 +917,37 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
         MsSqlType::Binary(old_param) => match next {
             MsSqlType::TinyInt => match old_param {
                 // One byte for tinyint.
-                Some(len) if len <= 1 => SafeCast,
+                Some(len) if *len <= 1 => SafeCast,
                 None => SafeCast,
                 _ => RiskyCast,
             },
             MsSqlType::SmallInt => match old_param {
                 // Two bytes for smallint.
-                Some(len) if len <= 2 => SafeCast,
+                Some(len) if *len <= 2 => SafeCast,
                 None => SafeCast,
                 _ => RiskyCast,
             },
             MsSqlType::Int => match old_param {
                 // Four bytes for int.
-                Some(len) if len <= 4 => SafeCast,
+                Some(len) if *len <= 4 => SafeCast,
                 None => SafeCast,
                 _ => RiskyCast,
             },
             MsSqlType::BigInt => match old_param {
                 // Eight bytes for bigint.
-                Some(len) if len <= 8 => SafeCast,
+                Some(len) if *len <= 8 => SafeCast,
                 None => SafeCast,
                 _ => RiskyCast,
             },
             MsSqlType::Decimal(_) => RiskyCast,
             MsSqlType::Money => match old_param {
                 // We can fit at most eight bytes here.
-                Some(len) if len > 8 => RiskyCast,
+                Some(len) if *len > 8 => RiskyCast,
                 _ => SafeCast,
             },
             MsSqlType::SmallMoney => match old_param {
                 // We can fit at most four bytes here.
-                Some(len) if len > 4 => RiskyCast,
+                Some(len) if *len > 4 => RiskyCast,
                 _ => SafeCast,
             },
             MsSqlType::Bit => RiskyCast,
@@ -956,39 +956,41 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::Char(new_param) => match (old_param, new_param) {
                 (Some(binary_len), Some(char_len)) if binary_len > char_len => RiskyCast,
                 // Default Char length is one.
-                (Some(binary_len), None) if binary_len > 1 => RiskyCast,
+                (Some(binary_len), None) if *binary_len > 1 => RiskyCast,
                 _ => SafeCast,
             },
             MsSqlType::NChar(new_param) => match (old_param, new_param) {
                 // NChar uses twice the space per length unit.
-                (Some(binary_len), Some(nchar_len)) if binary_len > (nchar_len * 2) => RiskyCast,
+                (Some(binary_len), Some(nchar_len)) if *binary_len > (nchar_len * 2) => RiskyCast,
                 // By default we use two bytes.
-                (Some(binary_len), None) if binary_len > 2 => RiskyCast,
+                (Some(binary_len), None) if *binary_len > 2 => RiskyCast,
                 _ => SafeCast,
             },
             MsSqlType::VarChar(new_param) => match (old_param, new_param) {
-                (Some(binary_len), Some(Number(varchar_len))) if binary_len > varchar_len.into() => RiskyCast,
+                (Some(binary_len), Some(Number(varchar_len))) if *binary_len > (*varchar_len).into() => RiskyCast,
                 // By default we can fit one byte.
-                (Some(binary_len), None) if binary_len > 1 => RiskyCast,
+                (Some(binary_len), None) if *binary_len > 1 => RiskyCast,
                 _ => SafeCast,
             },
             MsSqlType::NVarChar(new_param) => match (old_param, new_param) {
                 // NVarChar takes double the space per length unit.
-                (Some(binary_len), Some(Number(nvarchar_len))) if binary_len > (nvarchar_len * 2).into() => RiskyCast,
+                (Some(binary_len), Some(Number(nvarchar_len))) if (*binary_len) > (*nvarchar_len * 2).into() => {
+                    RiskyCast
+                }
                 // By default we can fit two bytes.
-                (Some(binary_len), None) if binary_len > 2 => RiskyCast,
+                (Some(binary_len), None) if *binary_len > 2 => RiskyCast,
                 _ => SafeCast,
             },
             MsSqlType::Binary(new_param) => match (old_param, new_param) {
                 (Some(old_len), Some(new_len)) if old_len > new_len => RiskyCast,
                 // By default we can fit one byte.
-                (Some(old_len), None) if old_len > 1 => RiskyCast,
+                (Some(old_len), None) if *old_len > 1 => RiskyCast,
                 _ => SafeCast,
             },
             MsSqlType::VarBinary(new_param) => match (old_param, new_param) {
-                (Some(old_len), Some(Number(new_len))) if old_len > new_len.into() => RiskyCast,
+                (Some(old_len), Some(Number(new_len))) if *old_len > (*new_len).into() => RiskyCast,
                 // By default we can fit one byte.
-                (Some(old_len), None) if old_len > 1 => RiskyCast,
+                (Some(old_len), None) if *old_len > 1 => RiskyCast,
                 _ => SafeCast,
             },
             MsSqlType::Image => SafeCast,
@@ -1002,35 +1004,35 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
         MsSqlType::VarBinary(old_param) => match next {
             MsSqlType::TinyInt => match old_param {
                 // One byte.
-                Some(Number(binary_len)) if binary_len <= 1 => SafeCast,
+                Some(Number(binary_len)) if *binary_len <= 1 => SafeCast,
                 None => SafeCast,
                 _ => RiskyCast,
             },
             MsSqlType::SmallInt => match old_param {
                 // Two bytes.
-                Some(Number(binary_len)) if binary_len <= 2 => SafeCast,
+                Some(Number(binary_len)) if *binary_len <= 2 => SafeCast,
                 _ => RiskyCast,
             },
             MsSqlType::Int => match old_param {
                 // Four bytes.
-                Some(Number(binary_len)) if binary_len <= 4 => SafeCast,
+                Some(Number(binary_len)) if *binary_len <= 4 => SafeCast,
                 _ => RiskyCast,
             },
             MsSqlType::BigInt => match old_param {
                 // Eight bytes.
-                Some(Number(binary_len)) if binary_len <= 8 => SafeCast,
+                Some(Number(binary_len)) if *binary_len <= 8 => SafeCast,
                 _ => RiskyCast,
             },
             MsSqlType::Decimal(_) => RiskyCast,
             MsSqlType::Money => match old_param {
                 // Spending eight bytes for money.
-                Some(Number(binary_len)) if binary_len > 8 => RiskyCast,
+                Some(Number(binary_len)) if *binary_len > 8 => RiskyCast,
                 Some(Max) => RiskyCast,
                 _ => SafeCast,
             },
             MsSqlType::SmallMoney => match old_param {
                 // Four bytes for money.
-                Some(Number(binary_len)) if binary_len > 4 => RiskyCast,
+                Some(Number(binary_len)) if *binary_len > 4 => RiskyCast,
                 Some(Max) => RiskyCast,
                 _ => SafeCast,
             },
@@ -1038,44 +1040,44 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::DateTime => RiskyCast,
             MsSqlType::SmallDateTime => RiskyCast,
             MsSqlType::Char(new_param) => match (old_param, new_param) {
-                (Some(Number(binary_len)), Some(char_len)) if u32::from(binary_len) > char_len => RiskyCast,
-                (Some(Number(binary_len)), None) if binary_len > 1 => RiskyCast,
+                (Some(Number(binary_len)), Some(char_len)) if u32::from(*binary_len) > *char_len => RiskyCast,
+                (Some(Number(binary_len)), None) if *binary_len > 1 => RiskyCast,
                 (Some(Max), _) => RiskyCast,
                 _ => SafeCast,
             },
             MsSqlType::NChar(new_param) => match (old_param, new_param) {
                 // NChar length unit is two bytes.
-                (Some(Number(binary_len)), Some(nchar_len)) if u32::from(binary_len) > (nchar_len * 2) => RiskyCast,
+                (Some(Number(binary_len)), Some(nchar_len)) if u32::from(*binary_len) > (nchar_len * 2) => RiskyCast,
                 // One nchar takes two bytes.
-                (Some(Number(binary_len)), None) if binary_len > 2 => RiskyCast,
+                (Some(Number(binary_len)), None) if *binary_len > 2 => RiskyCast,
                 (Some(Max), _) => RiskyCast,
                 _ => SafeCast,
             },
             MsSqlType::VarChar(new_param) => match (old_param, new_param) {
                 (Some(Number(binary_len)), Some(Number(varchar_len))) if binary_len > varchar_len => RiskyCast,
-                (Some(Number(binary_len)), None) if binary_len > 1 => RiskyCast,
+                (Some(Number(binary_len)), None) if *binary_len > 1 => RiskyCast,
                 (Some(Max), Some(Max)) => SafeCast,
                 (Some(Max), _) => RiskyCast,
                 _ => SafeCast,
             },
             MsSqlType::NVarChar(new_param) => match (old_param, new_param) {
                 // NVarChar length unit is two bytes.
-                (Some(Number(binary_len)), Some(Number(nvarchar_len))) if binary_len > (nvarchar_len * 2) => RiskyCast,
+                (Some(Number(binary_len)), Some(Number(nvarchar_len))) if *binary_len > (nvarchar_len * 2) => RiskyCast,
                 // One nvarchar takes two bytes.
-                (Some(Number(binary_len)), None) if binary_len > 2 => RiskyCast,
+                (Some(Number(binary_len)), None) if *binary_len > 2 => RiskyCast,
                 (Some(Max), Some(Max)) => SafeCast,
                 (Some(Max), _) => RiskyCast,
                 _ => SafeCast,
             },
             MsSqlType::Binary(new_param) => match (old_param, new_param) {
-                (Some(Number(old_len)), Some(new_len)) if u32::from(old_len) > new_len => RiskyCast,
-                (Some(Number(old_len)), None) if old_len > 1 => RiskyCast,
+                (Some(Number(old_len)), Some(new_len)) if u32::from(*old_len) > *new_len => RiskyCast,
+                (Some(Number(old_len)), None) if *old_len > 1 => RiskyCast,
                 (Some(Max), _) => RiskyCast,
                 _ => SafeCast,
             },
             MsSqlType::VarBinary(new_param) => match (old_param, new_param) {
                 (Some(Number(old_len)), Some(Number(new_len))) if old_len > new_len => RiskyCast,
-                (Some(Number(old_len)), None) if old_len > 1 => RiskyCast,
+                (Some(Number(old_len)), None) if *old_len > 1 => RiskyCast,
                 (Some(Max), Some(Max)) => SafeCast,
                 (Some(Max), _) => RiskyCast,
                 _ => SafeCast,
@@ -1117,20 +1119,20 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
         // GUID. The rest of the world calls this UUID.
         MsSqlType::UniqueIdentifier => match next {
             MsSqlType::Char(param) | MsSqlType::NChar(param) => match param {
-                Some(length) if length >= 36 => SafeCast,
+                Some(length) if *length >= 36 => SafeCast,
                 _ => RiskyCast,
             },
             MsSqlType::VarChar(param) | MsSqlType::NVarChar(param) => match param {
-                Some(Number(length)) if length >= 36 => SafeCast,
+                Some(Number(length)) if *length >= 36 => SafeCast,
                 Some(Max) => SafeCast,
                 _ => RiskyCast,
             },
             MsSqlType::Binary(param) => match param {
-                Some(length) if length >= 16 => SafeCast,
+                Some(length) if *length >= 16 => SafeCast,
                 _ => RiskyCast,
             },
             MsSqlType::VarBinary(param) => match param {
-                Some(Number(length)) if length >= 16 => SafeCast,
+                Some(Number(length)) if *length >= 16 => SafeCast,
                 Some(Max) => SafeCast,
                 _ => RiskyCast,
             },

@@ -66,11 +66,15 @@ features!(
     OrderByNulls,
     MultiSchema,
     FilteredRelationCount,
-    FieldReference
+    FieldReference,
+    PostgresqlExtensions,
+    ClientExtensions,
+    Deno,
+    ExtendedWhereUnique
 );
 
 /// Generator preview features
-pub const GENERATOR: FeatureMap = FeatureMap {
+pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
     active: enumflags2::make_bitflags!(PreviewFeature::{
         ReferentialIntegrity
          | InteractiveTransactions
@@ -81,6 +85,9 @@ pub const GENERATOR: FeatureMap = FeatureMap {
          | OrderByNulls
          | FilteredRelationCount
          | FieldReference
+         | PostgresqlExtensions
+         | Deno
+         | ExtendedWhereUnique
     }),
     deprecated: enumflags2::make_bitflags!(PreviewFeature::{
         AtomicNumberOperations
@@ -107,7 +114,10 @@ pub const GENERATOR: FeatureMap = FeatureMap {
         | ImprovedQueryRaw
         | DataProxy
     }),
-    hidden: enumflags2::make_bitflags!(PreviewFeature::{MultiSchema}),
+    hidden: enumflags2::make_bitflags!(PreviewFeature::{
+        MultiSchema
+        | ClientExtensions
+    }),
 };
 
 #[derive(Debug)]

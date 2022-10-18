@@ -67,18 +67,18 @@ impl TestApi {
     }
 
     pub(crate) fn describe(&self) -> SqlSchema {
-        self.describe_with_schema(self.schema_name())
+        self.describe_with_schemas(&[self.schema_name()])
     }
 
-    pub(crate) fn describe_with_schema(&self, schema: &str) -> SqlSchema {
-        tok(self.describe_impl(schema)).unwrap()
+    pub(crate) fn describe_with_schemas(&self, schemas: &[&str]) -> SqlSchema {
+        tok(self.describe_impl(schemas)).unwrap()
     }
 
     pub(crate) fn describe_error(&self) -> DescriberError {
-        tok(self.describe_impl(self.schema_name())).unwrap_err()
+        tok(self.describe_impl(&[self.schema_name()])).unwrap_err()
     }
 
-    async fn describe_impl(&self, schema: &str) -> Result<SqlSchema, DescriberError> {
+    async fn describe_impl(&self, schemas: &[&str]) -> Result<SqlSchema, DescriberError> {
         match self.sql_family() {
             SqlFamily::Postgres => {
                 sql_schema_describer::postgres::SqlSchemaDescriber::new(
@@ -89,7 +89,7 @@ impl TestApi {
                         Default::default()
                     },
                 )
-                .describe(schema)
+                .describe(schemas)
                 .await
             }
             SqlFamily::Sqlite => {
@@ -99,12 +99,12 @@ impl TestApi {
             }
             SqlFamily::Mysql => {
                 sql_schema_describer::mysql::SqlSchemaDescriber::new(&self.database)
-                    .describe(schema)
+                    .describe(schemas)
                     .await
             }
             SqlFamily::Mssql => {
                 sql_schema_describer::mssql::SqlSchemaDescriber::new(&self.database)
-                    .describe(schema)
+                    .describe(schemas)
                     .await
             }
         }

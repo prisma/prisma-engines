@@ -63,10 +63,11 @@ pub(super) fn has_a_unique_default_constraint_name(
         None => return,
     };
 
-    for violation in names
-        .constraint_namespace
-        .constraint_name_scope_violations(field.model().model_id(), ConstraintName::Default(name.as_ref()))
-    {
+    for violation in names.constraint_namespace.constraint_name_scope_violations(
+        field.model().model_id(),
+        ConstraintName::Default(name.as_ref()),
+        ctx,
+    ) {
         let message = format!(
             "The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.",
             name,
@@ -194,15 +195,10 @@ pub(super) fn validate_native_type_arguments<'db>(field: impl Into<TypedFieldWal
         return;
     }
 
-    match ctx.connector.parse_native_type(type_name, args.to_owned(), span) {
-        Ok(native_type) => {
-            ctx.connector
-                .validate_native_type_arguments(&native_type, &scalar_type, span, ctx.diagnostics);
-        }
-        Err(err) => {
-            ctx.push_error(err);
-        }
-    };
+    if let Some(native_type) = ctx.connector.parse_native_type(type_name, args, span, ctx.diagnostics) {
+        ctx.connector
+            .validate_native_type_arguments(&native_type, &scalar_type, span, ctx.diagnostics);
+    }
 }
 
 /// Validates the @default attribute of a model scalar field
@@ -322,12 +318,14 @@ pub(super) fn validate_unsupported_field_type(field: ScalarFieldWalker<'_>, ctx:
             Some(params) => params.as_str().split(',').map(|s| s.trim().to_string()).collect(),
         };
 
-        if let Ok(native_type) = connector.parse_native_type(prefix, args, field.ast_field().span()) {
-            let prisma_type = connector.scalar_type_for_native_type(native_type.serialized_native_type.clone());
+        if let Some(native_type) =
+            connector.parse_native_type(prefix, &args, field.ast_field().span(), &mut Default::default())
+        {
+            let prisma_type = connector.scalar_type_for_native_type(&native_type);
 
             let msg = format!(
                         "The type `Unsupported(\"{}\")` you specified in the type definition for the field `{}` is supported as a native type by Prisma. Please use the native type notation `{} @{}.{}` for full support.",
-                        unsupported_lit, field.name(), prisma_type.as_str(), &source.name, native_type
+                        unsupported_lit, field.name(), prisma_type.as_str(), &source.name, connector.native_type_to_string(&native_type)
                     );
 
             ctx.push_error(DatamodelError::new_validation_error(&msg, field.ast_field().span()));

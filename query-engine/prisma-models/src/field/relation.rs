@@ -111,7 +111,10 @@ impl RelationField {
             .get_or_init(|| {
                 self.model()
                     .internal_data_model()
-                    .find_relation((&self.model().name, &self.relation_info.to), &self.relation_name)
+                    .find_relation(
+                        (&self.model().name, &self.relation_info.referenced_model),
+                        &self.relation_name,
+                    )
                     .unwrap()
             })
             .upgrade()

@@ -3,7 +3,7 @@ use migration_connector::{ConnectorError, ConnectorResult};
 use mongodb::{error::Error as MongoError, options::WriteConcern};
 use mongodb_client::MongoConnectionString;
 use mongodb_schema_describer::MongoSchema;
-use psl::common::preview_features::PreviewFeature;
+use psl::PreviewFeature;
 
 /// Abstraction over a mongodb connection (exposed for tests).
 pub struct Client {

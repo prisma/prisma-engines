@@ -53,7 +53,7 @@ pub(crate) fn completion(schema: String, params: CompletionParams) -> Completion
 fn push_ast_completions(
     completion_list: &mut CompletionList,
     connector: &'static dyn Connector,
-    relation_mode: RelationMode,
+    _relation_mode: RelationMode,
     db: &ParserDatabase,
     position: usize,
 ) {
@@ -62,7 +62,7 @@ fn push_ast_completions(
             _model_id,
             ast::ModelPosition::Field(_, ast::FieldPosition::Attribute("relation", _, Some(attr_name))),
         ) if attr_name == "onDelete" || attr_name == "onUpdate" => {
-            for referential_action in connector.referential_actions(&relation_mode).iter() {
+            for referential_action in connector.referential_actions().iter() {
                 completion_list.items.push(CompletionItem {
                     label: referential_action.as_str().to_owned(),
                     kind: Some(CompletionItemKind::ENUM),

@@ -7,8 +7,8 @@ pub fn format(schema: String, params: String) -> String {
 
 /// Docs: https://prisma.github.io/prisma-engines/doc/prisma_fmt/fn.get_config.html
 #[wasm_bindgen]
-pub fn get_config(params: String) -> String {
-    prisma_fmt::get_config(params)
+pub fn get_config(params: String) -> Result<String, JsError> {
+    prisma_fmt::get_config(params).map_err(|e| JsError::new(&e))
 }
 
 #[wasm_bindgen]

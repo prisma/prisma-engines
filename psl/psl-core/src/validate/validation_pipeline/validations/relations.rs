@@ -33,10 +33,11 @@ pub(super) fn has_a_unique_constraint_name(
     let name = relation.constraint_name(ctx.connector);
     let model = relation.referencing_model();
 
-    for violation in names
-        .constraint_namespace
-        .constraint_name_scope_violations(model.model_id(), ConstraintName::Relation(name.as_ref()))
-    {
+    for violation in names.constraint_namespace.constraint_name_scope_violations(
+        model.model_id(),
+        ConstraintName::Relation(name.as_ref()),
+        ctx,
+    ) {
         let span = relation
             .forward_relation_field()
             .map(|rf| {
@@ -247,7 +248,7 @@ pub(super) fn cycles(relation: CompleteInlineRelationWalker<'_>, ctx: &mut Conte
         if on_update.triggers_modification() || on_delete.triggers_modification() {
             let model = next_relation.referencing_model();
 
-            if model == related_model {
+            if model.id == related_model.id {
                 let msg = "A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes.";
                 ctx.push_error(cascade_error_with_default_values(
                     relation,
@@ -259,7 +260,7 @@ pub(super) fn cycles(relation: CompleteInlineRelationWalker<'_>, ctx: &mut Conte
                 return;
             }
 
-            if related_model == parent_model {
+            if related_model.id == parent_model.id {
                 let msg = format!(
                     "Reference causes a cycle. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: {}.",
                     visited_relations
@@ -347,12 +348,12 @@ pub(super) fn multiple_cascading_paths(relation: CompleteInlineRelationWalker<'_
         current_path.insert(next_relation.referencing_field());
 
         // Self-relations are detected elsewhere.
-        if model == related_model {
+        if model.id == related_model.id {
             continue;
         }
 
         // Cycles are detected elsewhere.
-        if related_model == parent_model {
+        if related_model.id == parent_model.id {
             continue;
         }
 

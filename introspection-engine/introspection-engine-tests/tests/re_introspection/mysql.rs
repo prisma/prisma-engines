@@ -2,6 +2,37 @@ use barrel::types;
 use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 
+#[test_connector(tags(Mysql))]
+async fn empty_preview_features_are_kept(api: &TestApi) -> TestResult {
+    let schema = indoc! {r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = []
+        }
+
+        datasource db {
+          provider   = "mysql"
+          url        = "env(TEST_DATABASE_URL)"
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = []
+        }
+
+        datasource db {
+          provider = "mysql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+    "#]];
+
+    expectation.assert_eq(&api.re_introspect_config(schema).await?);
+
+    Ok(())
+}
+
 #[test_connector(tags(Mysql), exclude(Vitess), preview_features("referentialIntegrity"))]
 async fn relation_mode_parameter_is_not_added(api: &TestApi) -> TestResult {
     let result = api.re_introspect("").await?;

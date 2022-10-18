@@ -1,5 +1,5 @@
 use crate::common::*;
-use native_types::PostgresType;
+use psl::builtin_connectors::PostgresType;
 
 #[test]
 fn xml_data_type_should_fail_on_index() {
@@ -120,29 +120,6 @@ fn should_fail_on_invalid_precision_for_time_types() {
 
         model User {
           id  Int      @id
-          val DateTime @db.Time(-1)
-        }
-    "#};
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mArgument M is out of range for native type `Time(-1)` of Postgres: M can range from 0 to 6.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
-        [1;94m   | [0m
-        [1;94m 7 | [0m  id  Int      @id
-        [1;94m 8 | [0m  val DateTime [1;91m@db.Time(-1)[0m
-        [1;94m   | [0m
-    "#]];
-
-    expect_error(schema, &expectation);
-
-    let schema = indoc! {r#"
-        datasource db {
-          provider = "postgresql"
-          url      = env("DATABASE_URL")
-        }
-
-        model User {
-          id  Int      @id
           val DateTime @db.Timestamp(7)
         }
     "#};
@@ -153,29 +130,6 @@ fn should_fail_on_invalid_precision_for_time_types() {
         [1;94m   | [0m
         [1;94m 7 | [0m  id  Int      @id
         [1;94m 8 | [0m  val DateTime [1;91m@db.Timestamp(7)[0m
-        [1;94m   | [0m
-    "#]];
-
-    expect_error(schema, &expectation);
-
-    let schema = indoc! {r#"
-        datasource db {
-          provider = "postgresql"
-          url      = env("DATABASE_URL")
-        }
-
-        model User {
-          id  Int      @id
-          val DateTime @db.Timestamp(-1)
-        }
-    "#};
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mArgument M is out of range for native type `Timestamp(-1)` of Postgres: M can range from 0 to 6.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
-        [1;94m   | [0m
-        [1;94m 7 | [0m  id  Int      @id
-        [1;94m 8 | [0m  val DateTime [1;91m@db.Timestamp(-1)[0m
         [1;94m   | [0m
     "#]];
 
@@ -275,6 +229,6 @@ fn xml_should_work_with_string_scalar_type() {
     let user_model = datamodel.assert_has_model("Blog");
     let sft = user_model.assert_has_scalar_field("dec").assert_native_type();
 
-    let postgres_tpe: PostgresType = sft.deserialize_native_type();
-    assert_eq!(postgres_tpe, PostgresType::Xml);
+    let postgres_tpe: &PostgresType = sft.deserialize_native_type();
+    assert_eq!(postgres_tpe, &PostgresType::Xml);
 }

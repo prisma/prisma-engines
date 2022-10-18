@@ -84,6 +84,86 @@ mod connect_inside_create {
         Ok(())
     }
 
+    // "a P1 to C1  relation with the child without a relation" should "be connectable through a nested mutation by id and filters"
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt")]
+    async fn p1_c1_connect_by_id_and_filters(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+        let child_1 = t.child().parse_extend(
+            run_query_json!(
+                runner,
+                format!(
+                    r#"mutation {{
+                  createOneChild(data: {{c: "c1", c_1:"c", c_2: "1", non_unique: "0"}})
+                    {{
+                      {selection}
+                    }}
+                }}"#,
+                    selection = t.child().selection()
+                )
+            ),
+            &["data", "createOneChild"],
+            r#"non_unique: "0""#,
+        )?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, format!(r#"mutation {{
+            createOneParent(data:{{
+              p: "p1", p_1:"p", p_2: "1",
+              childOpt: {{ connect: {connect} }}
+            }}){{
+              childOpt {{
+                c
+              }}
+            }}
+          }}"#, connect = child_1)),
+          @r###"{"data":{"createOneParent":{"childOpt":{"c":"c1"}}}}"###
+        );
+
+        Ok(())
+    }
+
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt")]
+    async fn p1_c1_error_if_filter_dont_match(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+        let child = t.child().parse_extend(
+            run_query_json!(
+                runner,
+                format!(
+                    r#"mutation {{
+                        createOneChild(data: {{c: "c1", c_1: "foo", c_2: "bar", non_unique: "0"}})
+                        {{
+                          {selection}
+                        }}
+                    }}"#,
+                    selection = t.child().selection()
+                )
+            ),
+            &["data", "createOneChild"],
+            r#"non_unique: "1""#,
+        )?;
+
+        assert_error!(
+          runner,
+          format!(
+              r#"mutation {{
+                createOneParent(data:{{
+                  p: "p2"
+                  p_1: "p2_1"
+                  p_2: "p2_2"
+                  childOpt: {{ connect: {child} }}
+                }}){{
+                  childOpt {{
+                    c
+                  }}
+                }}
+              }}"#,
+              child = child
+          ),
+          2025,
+          "An operation failed because it depends on one or more records that were required but not found. No 'Child' record to connect was found was found for a nested connect on one-to-one relation 'ChildToParent'."
+      );
+
+        Ok(())
+    }
+
     // "a PM to C1!  relation with the child already in a relation" should "be connectable through a nested mutation by unique"
     #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq")]
     async fn pm_to_c1_req_connect_by_uniq(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
@@ -168,6 +248,49 @@ mod connect_inside_create {
         Ok(())
     }
 
+    // "a P1 to C1!  relation with the child already in a relation" should "be connectable through a nested mutation by unique and filters"
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneReq")]
+    async fn p1_to_c1_req_by_uniq_and_filters(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+        let child = t.child().parse_extend(
+            run_query_json!(
+                runner,
+                format!(
+                    r#"mutation {{
+                      createOneParent(data: {{
+                        p: "p1", p_1:"p", p_2: "1",
+                        childOpt: {{
+                          create: {{c: "c1", c_1:"c", c_2: "1", non_unique: "0"}}
+                        }}
+                      }}){{
+                        childOpt{{
+                            {selection}
+                        }}
+                      }}
+                    }}"#,
+                    selection = t.child().selection()
+                )
+            ),
+            &["data", "createOneParent", "childOpt"],
+            r#"non_unique: "0""#,
+        )?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, format!(r#"mutation {{
+            createOneParent(data:{{
+              p: "p2", p_1:"p", p_2: "2",
+              childOpt: {{ connect: {child} }}
+            }}){{
+              childOpt {{
+                c
+              }}
+            }}
+          }}"#, child = child)),
+          @r###"{"data":{"createOneParent":{"childOpt":{"c":"c1"}}}}"###
+        );
+
+        Ok(())
+    }
+
     // "a PM to C1  relation with the child already in a relation" should "be connectable through a nested mutation by unique"
     #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt")]
     async fn pm_to_c1_connect_by_uniq(runner: &Runner, _t: &DatamodelWithParams) -> TestResult<()> {
@@ -197,6 +320,47 @@ mod connect_inside_create {
               p_1: "p2_1"
               p_2: "p2_2"
               childrenOpt: {connect: [{c: "c1"}, {c: "c2"}, {c: "c2"}]}
+            }){
+              childrenOpt {
+                c
+              }
+            }
+          }"#),
+          @r###"{"data":{"createOneParent":{"childrenOpt":[{"c":"c1"},{"c":"c2"}]}}}"###
+        );
+
+        Ok(())
+    }
+
+    // "a PM to C1  relation with the child already in a relation" should "be connectable through a nested mutation by unique"
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt")]
+    async fn pm_to_c1_by_uniq_and_filters(runner: &Runner, _t: &DatamodelWithParams) -> TestResult<()> {
+        run_query!(
+            runner,
+            r#"mutation {
+                createOneParent(data: {
+                  p: "p1"
+                  p_1: "p1_1"
+                  p_2: "p1_2"
+                  childrenOpt: {
+                    create: [{c: "c1", c_1: "foo", c_2: "bar", non_unique: "0"}, {c: "c2", c_1: "lol", c_2: "no", non_unique: "1"}]
+                  }
+                }){
+                  childrenOpt{
+                    c
+                  }
+                }
+          }"#
+        );
+
+        // we are even resilient against multiple identical connects here -> twice connecting to c2
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+            createOneParent(data:{
+              p: "p2"
+              p_1: "p2_1"
+              p_2: "p2_2"
+              childrenOpt: {connect: [{c: "c1", non_unique: "0"}, {c: "c2", non_unique: "1"}, {c: "c2", non_unique: "1"}]}
             }){
               childrenOpt {
                 c
@@ -271,6 +435,8 @@ mod connect_inside_create {
                 r#"mutation {{
                   createOneParent(data:{{
                     p: "p2"
+                    p_1: "p2_1"
+                    p_2: "p2_2"
                     childrenOpt: {{connect: [{child}, {{c: "DOES NOT EXIST", c_1: "no", c_2: "no"}}]}}
                   }}){{
                     childrenOpt {{
@@ -280,9 +446,52 @@ mod connect_inside_create {
                 }}"#,
                 child = child
             ),
-            0,
-            "RecordNotFound"
+            2018,
+            "The required connected records were not found. Expected 2 records to be connected after connect operation on one-to-many relation 'ChildToParent', found 1."
         );
+
+        Ok(())
+    }
+
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt")]
+    async fn pm_to_c1_rel_fail_filter_dont_match(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+        let child = t.child().parse_extend(
+            run_query_json!(
+                runner,
+                format!(
+                    r#"mutation {{
+                        createOneChild(data: {{c: "c1", c_1: "foo", c_2: "bar", non_unique: "0"}})
+                        {{
+                          {selection}
+                        }}
+                    }}"#,
+                    selection = t.child().selection()
+                )
+            ),
+            &["data", "createOneChild"],
+            r#"non_unique: "1""#,
+        )?;
+
+        assert_error!(
+          runner,
+          format!(
+              r#"mutation {{
+                createOneParent(data:{{
+                  p: "p2"
+                  p_1: "p2_1"
+                  p_2: "p2_2"
+                  childrenOpt: {{connect: [{child}]}}
+                }}){{
+                  childrenOpt {{
+                    c
+                  }}
+                }}
+              }}"#,
+              child = child
+          ),
+          2018,
+          "The required connected records were not found. Expected 1 records to be connected after connect operation on one-to-many relation 'ChildToParent', found 0."
+      );
 
         Ok(())
     }
@@ -545,6 +754,49 @@ mod connect_inside_create {
           run_query!(runner, r#"query{findManyChild{parentsOpt{p}}}"#),
           @r###"{"data":{"findManyChild":[{"parentsOpt":[{"p":"p2"}]}]}}"###
         );
+
+        Ok(())
+    }
+
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToMany")]
+    async fn pm_to_cm_rel_fail_filter_dont_match(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+        let child = t.child().parse_extend(
+            run_query_json!(
+                runner,
+                format!(
+                    r#"mutation {{
+                        createOneChild(data: {{c: "c1", c_1: "foo", c_2: "bar", non_unique: "0"}})
+                        {{
+                          {selection}
+                        }}
+                    }}"#,
+                    selection = t.child().selection()
+                )
+            ),
+            &["data", "createOneChild"],
+            r#"non_unique: "1""#,
+        )?;
+
+        assert_error!(
+          runner,
+          format!(
+              r#"mutation {{
+                createOneParent(data:{{
+                  p: "p2"
+                  p_1: "p2_1"
+                  p_2: "p2_2"
+                  childrenOpt: {{connect: [{child}]}}
+                }}){{
+                  childrenOpt {{
+                    c
+                  }}
+                }}
+              }}"#,
+              child = child
+          ),
+          2025,
+          "An operation failed because it depends on one or more records that were required but not found. Expected 1 records to be connected, found only 0."
+      );
 
         Ok(())
     }

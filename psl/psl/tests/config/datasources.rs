@@ -1,3 +1,5 @@
+use builtin_psl_connectors::PostgresDatasourceProperties;
+
 use crate::common::*;
 
 #[test]
@@ -170,6 +172,101 @@ fn escaped_windows_paths_should_work() {
     "#};
 
     assert_valid(schema)
+}
+
+#[test]
+fn postgresql_extension_parsing() {
+    let schema = indoc! {r#"
+        datasource ds {
+          provider = "postgres"
+          url = env("DATABASE_URL")
+          extensions = [postgis(version: "2.1", schema: "public"), uuidOssp(map: "uuid-ossp"), meow]
+        }
+
+        generator js {
+          provider = "prisma-client-js"
+          previewFeatures = ["postgresqlExtensions"]
+        }
+    "#};
+
+    let config = psl::parse_configuration(schema).unwrap();
+    let properties: &PostgresDatasourceProperties =
+        config.datasources.first().unwrap().downcast_connector_data().unwrap();
+
+    assert!(properties.extensions().is_some());
+
+    let mut extensions = properties.extensions().unwrap().extensions().iter();
+
+    let meow = extensions.next().unwrap();
+    assert_eq!("meow", meow.name());
+    assert_eq!(None, meow.db_name());
+    assert_eq!(None, meow.version());
+    assert_eq!(None, meow.schema());
+
+    let postgis = extensions.next().unwrap();
+    assert_eq!("postgis", postgis.name());
+    assert_eq!(None, postgis.db_name());
+    assert_eq!(Some("2.1"), postgis.version());
+    assert_eq!(Some("public"), postgis.schema());
+
+    let uuid_ossp = extensions.next().unwrap();
+    assert_eq!("uuidOssp", uuid_ossp.name());
+    assert_eq!(Some("uuid-ossp"), uuid_ossp.db_name());
+    assert_eq!(None, uuid_ossp.version());
+    assert_eq!(None, uuid_ossp.schema());
+}
+
+#[test]
+fn empty_schema_property_should_error() {
+    let schema = indoc! {r#"
+        generator js {
+          provider        = "prisma-client-js"
+          previewFeatures = ["multiSchema"]
+        }
+
+        datasource ds {
+          provider   = "postgres"
+          url        = env("DATABASE_URL")
+          schemas = []
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mIf provided, the schemas array can not be empty.[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
+        [1;94m   | [0m
+        [1;94m 8 | [0m  url        = env("DATABASE_URL")
+        [1;94m 9 | [0m  schemas = [1;91m[][0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expect);
+}
+
+#[test]
+fn schemas_array_without_preview_feature_should_error() {
+    let schema = indoc! {r#"
+        generator js {
+          provider        = "prisma-client-js"
+        }
+
+        datasource ds {
+          provider   = "postgres"
+          url        = env("DATABASE_URL")
+          schemas = ["test"]
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mThe `schemas` property is only availably with the `multiSchema` preview feature.[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
+        [1;94m   | [0m
+        [1;94m 7 | [0m  url        = env("DATABASE_URL")
+        [1;94m 8 | [0m  schemas = [1;91m["test"][0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expect);
 }
 
 fn render_schema_json(schema: &str) -> String {

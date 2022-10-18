@@ -56,6 +56,12 @@ pub(crate) trait SqlSchemaDifferFlavour {
     /// Push AlterSequence steps.
     fn push_alter_sequence_steps(&self, _steps: &mut Vec<SqlMigrationStep>, _db: &DifferDatabase<'_>) {}
 
+    /// Push AlterExtension steps.
+    fn push_extension_steps(&self, _steps: &mut Vec<SqlMigrationStep>, _db: &DifferDatabase<'_>) {}
+
+    /// Define database-specific extension modules.
+    fn define_extensions(&self, _db: &mut DifferDatabase<'_>) {}
+
     /// Connector-specific criterias deciding whether two indexes match.
     fn indexes_match(&self, _a: IndexWalker<'_>, _b: IndexWalker<'_>) -> bool {
         true

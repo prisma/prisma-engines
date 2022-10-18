@@ -11,8 +11,8 @@ use introspection_connector::{
     IntrospectionResult, Version,
 };
 use migration_connector::{ConnectorParams, MigrationConnector};
-use psl::common::preview_features::PreviewFeature;
 use psl::Configuration;
+use psl::PreviewFeature;
 use quaint::{prelude::SqlFamily, single::Quaint};
 use sql_introspection_connector::SqlIntrospectionConnector;
 use sql_migration_connector::SqlMigrationConnector;
@@ -26,6 +26,7 @@ pub struct TestApi {
     args: TestApiArgs,
     connection_string: String,
     preview_features: BitFlags<PreviewFeature>,
+    namespaces: Vec<String>,
 }
 
 impl TestApi {
@@ -38,6 +39,8 @@ impl TestApi {
             .iter()
             .flat_map(|f| PreviewFeature::parse_opt(f))
             .collect();
+
+        let namespaces = args.namespaces().iter().map(|ns| ns.to_string()).collect();
 
         let (database, connection_string): (Quaint, String) = if tags.intersects(Tags::Vitess) {
             let params = ConnectorParams {
@@ -88,6 +91,7 @@ impl TestApi {
             args,
             connection_string,
             preview_features,
+            namespaces,
         }
     }
 
@@ -134,6 +138,10 @@ impl TestApi {
         self.preview_features
     }
 
+    pub fn namespaces(&self) -> &[String] {
+        &self.namespaces
+    }
+
     #[track_caller]
     async fn test_introspect_internal(
         &self,
@@ -164,6 +172,15 @@ impl TestApi {
     pub async fn re_introspect_dml(&self, data_model_string: &str) -> Result<String> {
         let data_model = parse_datamodel(&format!("{}{}", self.pure_config(), data_model_string));
         let introspection_result = self.test_introspect_internal(data_model, false).await?;
+
+        Ok(introspection_result.data_model)
+    }
+
+    #[tracing::instrument(skip(self, data_model_string))]
+    #[track_caller]
+    pub async fn re_introspect_config(&self, data_model_string: &str) -> Result<String> {
+        let data_model = parse_datamodel(data_model_string);
+        let introspection_result = self.test_introspect_internal(data_model, true).await?;
 
         Ok(introspection_result.data_model)
     }
@@ -235,20 +252,46 @@ impl TestApi {
         self.args.tags()
     }
 
-    pub fn datasource_block(&self) -> DatasourceBlock<'_> {
-        let no_foreign_keys =
-            self.is_vitess() && self.preview_features().contains(PreviewFeature::ReferentialIntegrity);
+    pub fn datasource_block_string(&self) -> String {
+        let relation_mode =
+            if self.is_vitess() && self.preview_features().contains(PreviewFeature::ReferentialIntegrity) {
+                "\nrelationMode = \"prisma\""
+            } else {
+                ""
+            };
 
-        if no_foreign_keys {
-            self.args
-                .datasource_block(&self.connection_string, &[("relationMode", r#""prisma""#)])
+        let namespaces: Vec<String> = self.namespaces().iter().map(|ns| format!(r#""{}""#, ns)).collect();
+
+        let namespaces = if namespaces.is_empty() {
+            "".to_string()
         } else {
-            self.args.datasource_block(r#"env(TEST_DATABASE_URL)"#, &[])
-        }
+            format!("\nschemas = [{}]", namespaces.join(", "))
+        };
+
+        let provider = &self.args.provider();
+        let datasource_block = format!(
+            r#"datasource db {{
+                 provider = "{}"
+                 url = "{}"{}{}
+               }}"#,
+            provider, "env(TEST_DATABASE_URL)", namespaces, relation_mode
+        );
+        datasource_block
+    }
+
+    pub fn datasource_block(&self) -> DatasourceBlock<'_> {
+        self.args.datasource_block(
+            "env(TEST_DATABASE_URL)",
+            if self.is_vitess() && self.preview_features().contains(PreviewFeature::ReferentialIntegrity) {
+                &[("relationMode", r#""prisma""#)]
+            } else {
+                &[]
+            },
+        )
     }
 
     fn pure_config(&self) -> String {
-        format!("{}\n{}", &self.datasource_block(), &self.generator_block())
+        format!("{}\n{}", &self.datasource_block_string(), &self.generator_block())
     }
 
     pub fn configuration(&self) -> Configuration {
@@ -273,22 +316,15 @@ impl TestApi {
     pub fn assert_eq_datamodels(&self, expected_without_header: &str, result_with_header: &str) {
         let expected_with_source = self.dm_with_sources(expected_without_header);
         let expected_with_generator = self.dm_with_generator_and_preview_flags(&expected_with_source);
+        let reformatted_expected = psl::reformat(&expected_with_generator, 2).unwrap();
 
-        let parsed_expected = psl::lift(&parse_datamodel(&expected_with_generator));
-        let parsed_result = psl::lift(&parse_datamodel(result_with_header));
-
-        let reformatted_expected = psl::render_datamodel_and_config_to_string(&parsed_expected, &self.configuration());
-        let reformatted_result = psl::render_datamodel_and_config_to_string(&parsed_result, &self.configuration());
-
-        println!("{reformatted_expected}\n{reformatted_result}");
-
-        pretty_assertions::assert_eq!(reformatted_expected, reformatted_result);
+        pretty_assertions::assert_eq!(reformatted_expected, result_with_header);
     }
 
     fn dm_with_sources(&self, schema: &str) -> String {
         let mut out = String::with_capacity(320 + schema.len());
 
-        write!(out, "{}\n{}", self.datasource_block(), schema).unwrap();
+        write!(out, "{}\n{}", self.datasource_block_string(), schema).unwrap();
 
         out
     }
