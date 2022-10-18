@@ -71,12 +71,8 @@
 <span id="71">71</span>
 <span id="72">72</span>
 <span id="73">73</span>
-<span id="74">74</span>
-<span id="75">75</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel_renderer</span> <span class="kw">as</span> <span class="ident">render</span>;
-<span class="kw">use</span> <span class="ident">psl</span>::{
-    <span class="ident">builtin_connectors::postgres_datamodel_connector::PostgresDatasourceProperties</span>, <span class="ident">Configuration</span>, <span class="ident">PreviewFeature</span>,
-};
+<span class="kw">use</span> <span class="ident">psl</span>::{<span class="ident">builtin_connectors::PostgresDatasourceProperties</span>, <span class="ident">Configuration</span>, <span class="ident">PreviewFeature</span>};
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="ident">postgres::PostgresSchemaExt</span>, <span class="ident">SqlSchema</span>};
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sanitize_datamodel_names::sanitize_string</span>;

@@ -18,14 +18,30 @@
 <span id="18">18</span>
 <span id="19">19</span>
 <span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>)]</span>
+<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::derive_partial_eq_without_eq</span>)]</span>
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">cockroach_datamodel_connector</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">postgres_datamodel_connector</span>;
+
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">cockroach_datamodel_connector::CockroachType</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">mongodb::MongoDbType</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">mssql_datamodel_connector</span>::{<span class="ident">MsSqlType</span>, <span class="ident">MsSqlTypeParameter</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">mysql_datamodel_connector::MySqlType</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">postgres_datamodel_connector</span>::{<span class="ident">PostgresDatasourceProperties</span>, <span class="ident">PostgresType</span>};
 
 <span class="kw">mod</span> <span class="ident">mongodb</span>;
 <span class="kw">mod</span> <span class="ident">mssql_datamodel_connector</span>;
 <span class="kw">mod</span> <span class="ident">mysql_datamodel_connector</span>;
+<span class="kw">mod</span> <span class="ident">native_type_definition</span>;
+<span class="kw">mod</span> <span class="ident">postgres_datamodel_connector</span>;
 <span class="kw">mod</span> <span class="ident">sqlite_datamodel_connector</span>;
 
 <span class="kw">use</span> <span class="ident">psl_core</span>::{<span class="ident">datamodel_connector::Connector</span>, <span class="ident">ConnectorRegistry</span>};

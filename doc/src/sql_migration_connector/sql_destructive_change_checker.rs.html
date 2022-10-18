@@ -282,9 +282,6 @@
 <span id="282">282</span>
 <span id="283">283</span>
 <span id="284">284</span>
-<span id="285">285</span>
-<span id="286">286</span>
-<span id="287">287</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The SQL implementation of DestructiveChangeChecker is responsible for</span>
 <span class="doccomment">//! informing users about potentially destructive or impossible changes that</span>
 <span class="doccomment">//! their attempted migrations contain.</span>
@@ -489,8 +486,6 @@
                                 );
                             }
 
-                            <span class="comment">// can this just use the flavour??</span>
-                            <span class="comment">// todo pull up type rendering and native type check here</span>
                             <span class="kw">match</span> <span class="ident">type_change</span> {
                                 <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::SafeCast</span>) <span class="op">|</span> <span class="prelude-val">None</span> =&gt; (),
                                 <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::RiskyCast</span>) =&gt; {
@@ -504,7 +499,6 @@
                                         <span class="ident">step_index</span>,
                                     );
                                 }
-                                <span class="comment">//todo why no precise type warnings here if native types are on?</span>
                                 <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::NotCastable</span>) =&gt; <span class="ident">plan</span>.<span class="ident">push_warning</span>(
                                     <span class="ident">SqlMigrationWarningCheck::NotCastable</span> {
                                         <span class="ident">table</span>: <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">table</span>().<span class="ident">name</span>().<span class="ident">to_owned</span>(),

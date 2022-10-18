@@ -799,19 +799,17 @@
 <span id="799">799</span>
 <span id="800">800</span>
 <span id="801">801</span>
-<span id="802">802</span>
 </pre><pre class="rust"><code><span class="doccomment">//! MySQL schema description.</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">getters::Getter</span>, <span class="ident">parsers::Parser</span>, <span class="kw-2">*</span>};
 <span class="kw">use</span> <span class="ident">bigdecimal::ToPrimitive</span>;
 <span class="kw">use</span> <span class="ident">indexmap::IndexMap</span>;
 <span class="kw">use</span> <span class="ident">indoc::indoc</span>;
-<span class="kw">use</span> <span class="ident">native_types</span>::{<span class="ident">MySqlType</span>, <span class="ident">NativeType</span>};
+<span class="kw">use</span> <span class="ident">psl</span>::{<span class="ident">builtin_connectors::MySqlType</span>, <span class="ident">datamodel_connector::NativeTypeInstance</span>};
 <span class="kw">use</span> <span class="ident">quaint</span>::{
     <span class="ident">prelude</span>::{<span class="ident">Queryable</span>, <span class="ident">ResultRow</span>},
     <span class="ident">Value</span>,
 };
-<span class="kw">use</span> <span class="ident">serde_json::from_str</span>;
 <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 <span class="kw">use</span> <span class="ident">tracing::trace</span>;
 
@@ -1450,7 +1448,7 @@
             <span class="ident">full_data_type</span>: <span class="ident">full_data_type</span>.<span class="ident">to_owned</span>(),
             <span class="ident">family</span>,
             <span class="ident">arity</span>,
-            <span class="ident">native_type</span>: <span class="ident">native_type</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">to_json</span>()),
+            <span class="ident">native_type</span>: <span class="ident">native_type</span>.<span class="ident">map</span>(<span class="ident">NativeTypeInstance::new</span>::<span class="op">&lt;</span><span class="ident">MySqlType</span><span class="op">&gt;</span>),
         };
 
         (<span class="ident">tpe</span>, <span class="ident">enm</span>)
@@ -1459,7 +1457,7 @@
     <span class="kw">fn</span> <span class="ident">extract_precision</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
         <span class="kw">static</span> <span class="ident">RE</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">Regex</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Regex::new</span>(<span class="string">r#&quot;.*\(([1-9])\)&quot;#</span>).<span class="ident">unwrap</span>());
         <span class="ident">RE</span>.<span class="ident">captures</span>(<span class="ident">input</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">cap</span><span class="op">|</span> <span class="ident">cap</span>.<span class="ident">get</span>(<span class="number">1</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">precision</span><span class="op">|</span> <span class="ident">from_str</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>(<span class="ident">precision</span>.<span class="ident">as_str</span>()).<span class="ident">unwrap</span>()))
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">cap</span><span class="op">|</span> <span class="ident">cap</span>.<span class="ident">get</span>(<span class="number">1</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">precision</span><span class="op">|</span> <span class="ident">precision</span>.<span class="ident">as_str</span>().<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>()))
     }
 
     <span class="kw">fn</span> <span class="ident">extract_enum_values</span>(<span class="ident">full_data_type</span>: <span class="op">&amp;&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {

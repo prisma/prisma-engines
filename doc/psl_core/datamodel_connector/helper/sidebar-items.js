@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":[["arg_vec_from_opt",""],["args_vec_from_opt",""],["parse_one_opt_u32",""],["parse_one_u32",""],["parse_two_opt_u32",""],["wrap_error_from_result",""]]};

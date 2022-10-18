@@ -94,7 +94,7 @@
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">tokenize</span>, <span class="ident">Parser</span>, <span class="ident">Token</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ColumnType</span>, <span class="ident">ColumnTypeFamily</span>};
-<span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
+<span class="kw">use</span> <span class="ident">psl::dml::prisma_value::PrismaValue</span>;
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">parse_array_literal</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">tpe</span>: <span class="kw-2">&amp;</span><span class="ident">ColumnType</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">values</span> <span class="op">=</span> <span class="ident">Vec::new</span>();

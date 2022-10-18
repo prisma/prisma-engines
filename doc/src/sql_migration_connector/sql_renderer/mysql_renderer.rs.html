@@ -521,7 +521,6 @@
 <span id="521">521</span>
 <span id="522">522</span>
 <span id="523">523</span>
-<span id="524">524</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">common</span>::<span class="kw-2">*</span>, <span class="ident">IteratorJoin</span>, <span class="ident">SqlRenderer</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">flavour::MysqlFlavour</span>,
@@ -529,8 +528,8 @@
     <span class="ident">sql_migration</span>::{<span class="ident">AlterColumn</span>, <span class="ident">AlterEnum</span>, <span class="ident">AlterTable</span>, <span class="ident">RedefineTable</span>, <span class="ident">TableChange</span>},
     <span class="ident">sql_schema_differ::ColumnChanges</span>,
 };
-<span class="kw">use</span> <span class="ident">native_types::MySqlType</span>;
 <span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
+<span class="kw">use</span> <span class="ident">psl::builtin_connectors::MySqlType</span>;
 <span class="kw">use</span> <span class="ident">psl::dml::PrismaValue</span>;
 <span class="kw">use</span> <span class="ident">regex::Regex</span>;
 <span class="kw">use</span> <span class="ident">sql_ddl</span>::{<span class="ident">mysql</span> <span class="kw">as</span> <span class="ident">ddl</span>, <span class="ident">IndexColumn</span>, <span class="ident">SortOrder</span>};
@@ -949,7 +948,7 @@
         <span class="ident">MySqlType::TinyInt</span> =&gt; <span class="string">&quot;TINYINT&quot;</span>.<span class="ident">into</span>(),
         <span class="ident">MySqlType::MediumInt</span> =&gt; <span class="string">&quot;MEDIUMINT&quot;</span>.<span class="ident">into</span>(),
         <span class="ident">MySqlType::BigInt</span> =&gt; <span class="string">&quot;BIGINT&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">MySqlType::Decimal</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;DECIMAL{}&quot;</span>, <span class="ident">render_decimal</span>(<span class="ident">precision</span>)).<span class="ident">into</span>(),
+        <span class="ident">MySqlType::Decimal</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;DECIMAL{}&quot;</span>, <span class="ident">render_decimal</span>(<span class="kw-2">*</span><span class="ident">precision</span>)).<span class="ident">into</span>(),
         <span class="ident">MySqlType::Float</span> =&gt; <span class="string">&quot;FLOAT&quot;</span>.<span class="ident">into</span>(),
         <span class="ident">MySqlType::Double</span> =&gt; <span class="string">&quot;DOUBLE&quot;</span>.<span class="ident">into</span>(),
         <span class="ident">MySqlType::Bit</span>(<span class="ident">size</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;BIT({size})&quot;</span>, <span class="ident">size</span> <span class="op">=</span> <span class="ident">size</span>).<span class="ident">into</span>(),
@@ -966,9 +965,9 @@
         <span class="ident">MySqlType::MediumText</span> =&gt; <span class="string">&quot;MEDIUMTEXT&quot;</span>.<span class="ident">into</span>(),
         <span class="ident">MySqlType::LongText</span> =&gt; <span class="string">&quot;LONGTEXT&quot;</span>.<span class="ident">into</span>(),
         <span class="ident">MySqlType::Date</span> =&gt; <span class="string">&quot;DATE&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">MySqlType::Time</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;TIME{}&quot;</span>, <span class="ident">render</span>(<span class="ident">precision</span>)).<span class="ident">into</span>(),
-        <span class="ident">MySqlType::DateTime</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;DATETIME{}&quot;</span>, <span class="ident">render</span>(<span class="ident">precision</span>)).<span class="ident">into</span>(),
-        <span class="ident">MySqlType::Timestamp</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;TIMESTAMP{}&quot;</span>, <span class="ident">render</span>(<span class="ident">precision</span>)).<span class="ident">into</span>(),
+        <span class="ident">MySqlType::Time</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;TIME{}&quot;</span>, <span class="ident">render</span>(<span class="kw-2">*</span><span class="ident">precision</span>)).<span class="ident">into</span>(),
+        <span class="ident">MySqlType::DateTime</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;DATETIME{}&quot;</span>, <span class="ident">render</span>(<span class="kw-2">*</span><span class="ident">precision</span>)).<span class="ident">into</span>(),
+        <span class="ident">MySqlType::Timestamp</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;TIMESTAMP{}&quot;</span>, <span class="ident">render</span>(<span class="kw-2">*</span><span class="ident">precision</span>)).<span class="ident">into</span>(),
         <span class="ident">MySqlType::Year</span> =&gt; <span class="string">&quot;YEAR&quot;</span>.<span class="ident">into</span>(),
         <span class="ident">MySqlType::Json</span> =&gt; <span class="string">&quot;JSON&quot;</span>.<span class="ident">into</span>(),
         <span class="ident">MySqlType::UnsignedInt</span> =&gt; <span class="string">&quot;INTEGER UNSIGNED&quot;</span>.<span class="ident">into</span>(),
@@ -1033,7 +1032,6 @@
         <span class="ident">DefaultKind::Now</span> =&gt; {
             <span class="kw">let</span> <span class="ident">precision</span> <span class="op">=</span> <span class="ident">column</span>
                 .<span class="ident">column_native_type</span>()
-                .<span class="ident">as_ref</span>()
                 .<span class="ident">and_then</span>(<span class="ident">MySqlType::timestamp_precision</span>)
                 .<span class="ident">unwrap_or</span>(<span class="number">3</span>);
 

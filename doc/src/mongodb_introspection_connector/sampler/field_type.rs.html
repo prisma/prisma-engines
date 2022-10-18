@@ -132,10 +132,28 @@
 <span id="132">132</span>
 <span id="133">133</span>
 <span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::statistics::Name</span>;
 <span class="kw">use</span> <span class="ident">mongodb::bson::Bson</span>;
-<span class="kw">use</span> <span class="ident">native_types::MongoDbType</span>;
-<span class="kw">use</span> <span class="ident">psl::dml</span>::{<span class="self">self</span>, <span class="ident">NativeTypeInstance</span>, <span class="ident">ScalarType</span>};
+<span class="kw">use</span> <span class="ident">psl</span>::{
+    <span class="ident">builtin_connectors::MongoDbType</span>,
+    <span class="ident">datamodel_connector</span>,
+    <span class="ident">dml</span>::{<span class="self">self</span>, <span class="ident">NativeTypeInstance</span>, <span class="ident">ScalarType</span>},
+};
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
@@ -223,12 +241,18 @@
             <span class="ident">FieldType::BinData</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Bytes</span>, <span class="prelude-val">None</span>),
             <span class="ident">FieldType::ObjectId</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(
                 <span class="ident">ScalarType::String</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">NativeTypeInstance::new</span>(<span class="string">&quot;ObjectId&quot;</span>, <span class="ident">Vec::new</span>(), <span class="kw-2">&amp;</span><span class="ident">MongoDbType::ObjectId</span>)),
+                <span class="prelude-val">Some</span>(<span class="ident">NativeTypeInstance::new</span>(
+                    <span class="ident">datamodel_connector::NativeTypeInstance::new</span>::<span class="op">&lt;</span><span class="ident">MongoDbType</span><span class="op">&gt;</span>(<span class="ident">MongoDbType::ObjectId</span>),
+                    <span class="ident">psl::builtin_connectors::MONGODB</span>,
+                )),
             ),
             <span class="ident">FieldType::Bool</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Boolean</span>, <span class="prelude-val">None</span>),
             <span class="ident">FieldType::Date</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(
                 <span class="ident">ScalarType::DateTime</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">NativeTypeInstance::new</span>(<span class="string">&quot;Date&quot;</span>, <span class="ident">Vec::new</span>(), <span class="kw-2">&amp;</span><span class="ident">MongoDbType::Date</span>)),
+                <span class="prelude-val">Some</span>(<span class="ident">NativeTypeInstance::new</span>(
+                    <span class="ident">datamodel_connector::NativeTypeInstance::new</span>::<span class="op">&lt;</span><span class="ident">MongoDbType</span><span class="op">&gt;</span>(<span class="ident">MongoDbType::Date</span>),
+                    <span class="ident">psl::builtin_connectors::MONGODB</span>,
+                )),
             ),
             <span class="ident">FieldType::Int32</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Int</span>, <span class="prelude-val">None</span>),
             <span class="ident">FieldType::Timestamp</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::DateTime</span>, <span class="prelude-val">None</span>),
@@ -249,12 +273,18 @@
             <span class="ident">FieldType::BinData</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">ScalarType::Bytes</span>, <span class="prelude-val">None</span>),
             <span class="ident">FieldType::ObjectId</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(
                 <span class="ident">ScalarType::String</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">NativeTypeInstance::new</span>(<span class="string">&quot;ObjectId&quot;</span>, <span class="ident">Vec::new</span>(), <span class="kw-2">&amp;</span><span class="ident">MongoDbType::ObjectId</span>)),
+                <span class="prelude-val">Some</span>(<span class="ident">NativeTypeInstance::new</span>(
+                    <span class="ident">datamodel_connector::NativeTypeInstance::new</span>::<span class="op">&lt;</span><span class="ident">MongoDbType</span><span class="op">&gt;</span>(<span class="ident">MongoDbType::ObjectId</span>),
+                    <span class="ident">psl::builtin_connectors::MONGODB</span>,
+                )),
             ),
             <span class="ident">FieldType::Bool</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">ScalarType::Boolean</span>, <span class="prelude-val">None</span>),
             <span class="ident">FieldType::Date</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(
                 <span class="ident">ScalarType::DateTime</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">NativeTypeInstance::new</span>(<span class="string">&quot;Date&quot;</span>, <span class="ident">Vec::new</span>(), <span class="kw-2">&amp;</span><span class="ident">MongoDbType::Date</span>)),
+                <span class="prelude-val">Some</span>(<span class="ident">NativeTypeInstance::new</span>(
+                    <span class="ident">datamodel_connector::NativeTypeInstance::new</span>::<span class="op">&lt;</span><span class="ident">MongoDbType</span><span class="op">&gt;</span>(<span class="ident">MongoDbType::Date</span>),
+                    <span class="ident">psl::builtin_connectors::MONGODB</span>,
+                )),
             ),
             <span class="ident">FieldType::Int32</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">ScalarType::Int</span>, <span class="prelude-val">None</span>),
             <span class="ident">FieldType::Timestamp</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">ScalarType::DateTime</span>, <span class="prelude-val">None</span>),

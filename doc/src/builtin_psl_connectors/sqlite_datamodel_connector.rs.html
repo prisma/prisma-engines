@@ -119,10 +119,12 @@
 <span id="119">119</span>
 <span id="120">120</span>
 <span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">psl_core</span>::{
     <span class="ident">datamodel_connector</span>::{<span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ConstraintScope</span>, <span class="ident">NativeTypeConstructor</span>, <span class="ident">NativeTypeInstance</span>},
-    <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Span</span>},
+    <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>, <span class="ident">Span</span>},
     <span class="ident">parser_database</span>::{<span class="ident">ReferentialAction</span>, <span class="ident">ScalarType</span>},
 };
 <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
@@ -174,20 +176,24 @@
         <span class="ident">Restrict</span> <span class="op">|</span> <span class="ident">SetNull</span> <span class="op">|</span> <span class="ident">Cascade</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">scalar_type_for_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_native_type</span>: <span class="ident">serde_json::Value</span>) -&gt; <span class="ident">ScalarType</span> {
+    <span class="kw">fn</span> <span class="ident">scalar_type_for_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_native_type</span>: <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>) -&gt; <span class="ident">ScalarType</span> {
         <span class="macro">unreachable!</span>(<span class="string">&quot;No native types on Sqlite&quot;</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">default_native_type_for_scalar_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>) -&gt; <span class="ident">serde_json::Value</span> {
-        <span class="ident">serde_json::Value::Null</span>
+    <span class="kw">fn</span> <span class="ident">default_native_type_for_scalar_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>) -&gt; <span class="ident">NativeTypeInstance</span> {
+        <span class="ident">NativeTypeInstance::new</span>(())
     }
 
     <span class="kw">fn</span> <span class="ident">native_type_is_default_for_scalar_type</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">_native_type</span>: <span class="ident">serde_json::Value</span>,
+        <span class="ident">_native_type</span>: <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>,
         <span class="ident">_scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>,
     ) -&gt; <span class="ident">bool</span> {
         <span class="bool-val">false</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">native_type_to_parts</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_native_type</span>: <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>) -&gt; (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) {
+        <span class="macro">unreachable!</span>()
     }
 
     <span class="kw">fn</span> <span class="ident">constraint_violation_scopes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">ConstraintScope</span>] {
@@ -201,17 +207,15 @@
     <span class="kw">fn</span> <span class="ident">parse_native_type</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">_args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+        <span class="ident">_args</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>],
         <span class="ident">span</span>: <span class="ident">Span</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span>, <span class="ident">DatamodelError</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">DatamodelError::new_native_types_not_supported</span>(
+        <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
+    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span> {
+        <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_native_types_not_supported</span>(
             <span class="self">self</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
             <span class="ident">span</span>,
-        ))
-    }
-
-    <span class="kw">fn</span> <span class="ident">introspect_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_native_type</span>: <span class="ident">serde_json::Value</span>) -&gt; <span class="ident">NativeTypeInstance</span> {
-        <span class="macro">unreachable!</span>(<span class="string">&quot;unreachable introspect_native_type() on sqlite&quot;</span>)
+        ));
+        <span class="prelude-val">None</span>
     }
 
     <span class="kw">fn</span> <span class="ident">set_config_dir</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">config_dir</span>: <span class="kw-2">&amp;</span><span class="ident">std::path::Path</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span> {

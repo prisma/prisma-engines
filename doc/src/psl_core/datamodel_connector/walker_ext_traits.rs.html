@@ -159,12 +159,6 @@
 <span id="159">159</span>
 <span id="160">160</span>
 <span id="161">161</span>
-<span id="162">162</span>
-<span id="163">163</span>
-<span id="164">164</span>
-<span id="165">165</span>
-<span id="166">166</span>
-<span id="167">167</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::datamodel_connector</span>::{
     <span class="ident">constraint_names::ConstraintNames</span>, <span class="ident">Connector</span>, <span class="ident">NativeTypeInstance</span>, <span class="ident">ReferentialAction</span>, <span class="ident">RelationMode</span>,
 };
@@ -288,9 +282,7 @@
 <span class="kw">impl</span> <span class="ident">ScalarFieldWalkerExt</span> <span class="kw">for</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">native_type_instance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">raw_native_type</span>().<span class="ident">and_then</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">name</span>, <span class="ident">args</span>, <span class="kw">_</span>)<span class="op">|</span> {
-            <span class="ident">connector</span>
-                .<span class="ident">parse_native_type</span>(<span class="ident">name</span>, <span class="ident">args</span>.<span class="ident">to_owned</span>(), <span class="self">self</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>())
-                .<span class="ident">ok</span>()
+            <span class="ident">connector</span>.<span class="ident">parse_native_type</span>(<span class="ident">name</span>, <span class="ident">args</span>, <span class="self">self</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">Default::default</span>())
         })
     }
 }
@@ -298,9 +290,7 @@
 <span class="kw">impl</span> <span class="ident">ScalarFieldWalkerExt</span> <span class="kw">for</span> <span class="ident">CompositeTypeFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">native_type_instance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">raw_native_type</span>().<span class="ident">and_then</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">name</span>, <span class="ident">args</span>, <span class="kw">_</span>)<span class="op">|</span> {
-            <span class="ident">connector</span>
-                .<span class="ident">parse_native_type</span>(<span class="ident">name</span>, <span class="ident">args</span>.<span class="ident">to_owned</span>(), <span class="self">self</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>())
-                .<span class="ident">ok</span>()
+            <span class="ident">connector</span>.<span class="ident">parse_native_type</span>(<span class="ident">name</span>, <span class="ident">args</span>, <span class="self">self</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">Default::default</span>())
         })
     }
 }
@@ -308,9 +298,7 @@
 <span class="kw">impl</span> <span class="ident">ScalarFieldWalkerExt</span> <span class="kw">for</span> <span class="ident">IndexFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">native_type_instance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">raw_native_type</span>().<span class="ident">and_then</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">name</span>, <span class="ident">args</span>, <span class="kw">_</span>)<span class="op">|</span> {
-            <span class="ident">connector</span>
-                .<span class="ident">parse_native_type</span>(<span class="ident">name</span>, <span class="ident">args</span>.<span class="ident">to_owned</span>(), <span class="self">self</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>())
-                .<span class="ident">ok</span>()
+            <span class="ident">connector</span>.<span class="ident">parse_native_type</span>(<span class="ident">name</span>, <span class="ident">args</span>, <span class="self">self</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">Default::default</span>())
         })
     }
 }

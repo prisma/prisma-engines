@@ -511,8 +511,9 @@
 <span id="511">511</span>
 <span id="512">512</span>
 <span id="513">513</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
-<span class="kw">use</span> <span class="ident">native_types::PostgresType</span>;
+<span id="514">514</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::PostgresType</span>;
+<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">psl_core</span>::{
     <span class="ident">datamodel_connector</span>::{<span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>, <span class="ident">Connector</span>},
     <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>},
@@ -526,10 +527,10 @@
     <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">index</span>.<span class="ident">fields</span>() {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">native_type</span>) <span class="op">=</span> <span class="ident">field</span>.<span class="ident">native_type_instance</span>(<span class="ident">connector</span>) {
             <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>();
-            <span class="kw">let</span> <span class="ident">r#type</span>: <span class="ident">PostgresType</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">native_type</span>.<span class="ident">serialized_native_type</span>.<span class="ident">clone</span>()).<span class="ident">unwrap</span>();
+            <span class="kw">let</span> <span class="ident">r#type</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresType</span> <span class="op">=</span> <span class="ident">native_type</span>.<span class="ident">downcast_ref</span>();
             <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">native_instance_error</span>(<span class="kw-2">&amp;</span><span class="ident">native_type</span>);
 
-            <span class="kw">if</span> <span class="ident">r#type</span> <span class="op">==</span> <span class="ident">PostgresType::Xml</span> {
+            <span class="kw">if</span> <span class="ident">r#type</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">PostgresType::Xml</span> {
                 <span class="kw">if</span> <span class="ident">index</span>.<span class="ident">is_unique</span>() {
                     <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_incompatible_native_type_with_unique</span>(<span class="string">&quot;&quot;</span>, <span class="ident">span</span>))
                 } <span class="kw">else</span> {
@@ -576,9 +577,10 @@
         }
 
         <span class="kw">let</span> <span class="ident">native_type_instance</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">as_index_field</span>().<span class="ident">native_type_instance</span>(<span class="ident">connector</span>);
-        <span class="kw">let</span> <span class="ident">native_type</span> <span class="op">=</span> <span class="ident">native_type_instance</span>
+        <span class="kw">let</span> <span class="ident">native_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PostgresType</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">native_type_instance</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">downcast_ref</span>());
+        <span class="kw">let</span> <span class="ident">native_type_name</span> <span class="op">=</span> <span class="ident">native_type_instance</span>
             .<span class="ident">as_ref</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">serde_json::from_value</span>(<span class="ident">t</span>.<span class="ident">serialized_native_type</span>.<span class="ident">clone</span>()).<span class="ident">unwrap</span>());
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">nt</span><span class="op">|</span> <span class="ident">connector</span>.<span class="ident">native_type_to_parts</span>(<span class="ident">nt</span>).<span class="number">0</span>);
 
         <span class="kw">let</span> <span class="ident">r#type</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">as_index_field</span>().<span class="ident">scalar_field_type</span>();
 
@@ -653,7 +655,7 @@
             <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="ident">native_type</span>, <span class="ident">opclass</span>) {
                 <span class="comment">// Inet / InetOps</span>
                 (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Inet</span>), <span class="prelude-val">Some</span>(<span class="ident">InetOps</span>)) =&gt; (),
-                <span class="kw">_</span> =&gt; <span class="ident">err_f</span>(<span class="ident">native_type_instance</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()), <span class="ident">opclass</span>),
+                <span class="kw">_</span> =&gt; <span class="ident">err_f</span>(<span class="ident">native_type_name</span>, <span class="ident">opclass</span>),
             }
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">algo</span>.<span class="ident">is_gin</span>() {
             <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="ident">native_type</span>, <span class="ident">opclass</span>) {
@@ -701,7 +703,7 @@
                         <span class="ident">index</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>,
                     ));
                 }
-                <span class="kw">_</span> =&gt; <span class="ident">err_f</span>(<span class="ident">native_type_instance</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()), <span class="ident">opclass</span>),
+                <span class="kw">_</span> =&gt; <span class="ident">err_f</span>(<span class="ident">native_type_name</span>, <span class="ident">opclass</span>),
             }
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">algo</span>.<span class="ident">is_spgist</span>() {
             <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="ident">native_type</span>, <span class="ident">opclass</span>) {
@@ -730,7 +732,7 @@
                 (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::VarChar</span>(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="ident">TextOps</span>) <span class="op">|</span> <span class="prelude-val">None</span>) =&gt; (),
                 (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Char</span>(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="ident">TextOps</span>) <span class="op">|</span> <span class="prelude-val">None</span>) =&gt; (),
 
-                <span class="kw">_</span> =&gt; <span class="ident">err_f</span>(<span class="ident">native_type_instance</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()), <span class="ident">opclass</span>),
+                <span class="kw">_</span> =&gt; <span class="ident">err_f</span>(<span class="ident">native_type_name</span>, <span class="ident">opclass</span>),
             }
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">algo</span>.<span class="ident">is_brin</span>() {
             <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="ident">native_type</span>, <span class="ident">opclass</span>) {
@@ -962,7 +964,7 @@
                 (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Uuid</span>), <span class="prelude-val">Some</span>(<span class="ident">UuidMinMaxOps</span>)) =&gt; (),
                 (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Uuid</span>), <span class="prelude-val">Some</span>(<span class="ident">UuidMinMaxMultiOps</span>)) =&gt; (),
 
-                <span class="kw">_</span> =&gt; <span class="ident">err_f</span>(<span class="ident">native_type_instance</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()), <span class="ident">opclass</span>),
+                <span class="kw">_</span> =&gt; <span class="ident">err_f</span>(<span class="ident">native_type_name</span>, <span class="ident">opclass</span>),
             }
         }
     }

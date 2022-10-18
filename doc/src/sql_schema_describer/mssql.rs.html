@@ -777,6 +777,9 @@
 <span id="777">777</span>
 <span id="778">778</span>
 <span id="779">779</span>
+<span id="780">780</span>
+<span id="781">781</span>
+<span id="782">782</span>
 </pre><pre class="rust"><code><span class="doccomment">//! SQL server schema description.</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -787,9 +790,12 @@
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">indexmap::IndexMap</span>;
 <span class="kw">use</span> <span class="ident">indoc::indoc</span>;
-<span class="kw">use</span> <span class="ident">native_types</span>::{<span class="ident">MsSqlType</span>, <span class="ident">MsSqlTypeParameter</span>, <span class="ident">NativeType</span>};
 <span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
-<span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
+<span class="kw">use</span> <span class="ident">psl</span>::{
+    <span class="ident">builtin_connectors</span>::{<span class="ident">MsSqlType</span>, <span class="ident">MsSqlTypeParameter</span>},
+    <span class="ident">datamodel_connector::NativeTypeInstance</span>,
+    <span class="ident">dml::prisma_value::PrismaValue</span>,
+};
 <span class="kw">use</span> <span class="ident">quaint::prelude::Queryable</span>;
 <span class="kw">use</span> <span class="ident">regex::Regex</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">any::type_name</span>, <span class="ident">borrow::Cow</span>, <span class="ident">collections::HashMap</span>, <span class="ident">convert::TryInto</span>};
@@ -1544,7 +1550,7 @@
             <span class="ident">full_data_type</span>,
             <span class="ident">family</span>,
             <span class="ident">arity</span>,
-            <span class="ident">native_type</span>: <span class="ident">native_type</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">to_json</span>()),
+            <span class="ident">native_type</span>: <span class="ident">native_type</span>.<span class="ident">map</span>(<span class="ident">NativeTypeInstance::new</span>::<span class="op">&lt;</span><span class="ident">MsSqlType</span><span class="op">&gt;</span>),
         }
     }
 }

@@ -750,6 +750,7 @@
 <span id="750">750</span>
 <span id="751">751</span>
 <span id="752">752</span>
+<span id="753">753</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Database description. This crate is used heavily in the introspection and migration engines.</span>
 
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>)]</span>
@@ -774,7 +775,7 @@
 };
 
 <span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
-<span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
+<span class="kw">use</span> <span class="ident">psl::dml::PrismaValue</span>;
 <span class="kw">use</span> <span class="ident">regex::Regex</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{
@@ -1163,7 +1164,7 @@
     <span class="kw">pub</span> <span class="ident">definition</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Column</span> {
     <span class="doccomment">/// Column name.</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
@@ -1176,7 +1177,7 @@
 }
 
 <span class="doccomment">/// The type of a column.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ColumnType</span> {
     <span class="doccomment">/// The full SQL data type, the sql string necessary to recreate the column, drawn directly from the db, used when there is no native type.</span>
     <span class="kw">pub</span> <span class="ident">full_data_type</span>: <span class="ident">String</span>,
@@ -1185,7 +1186,8 @@
     <span class="doccomment">/// The arity of the column.</span>
     <span class="kw">pub</span> <span class="ident">arity</span>: <span class="ident">ColumnArity</span>,
     <span class="doccomment">/// The Native type of the column.</span>
-    <span class="kw">pub</span> <span class="ident">native_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">native_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">psl::datamodel_connector::NativeTypeInstance</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">ColumnType</span> {

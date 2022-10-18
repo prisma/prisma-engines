@@ -394,15 +394,11 @@
 <span id="394">394</span>
 <span id="395">395</span>
 <span id="396">396</span>
-<span id="397">397</span>
-<span id="398">398</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident"><span class="kw">super</span>::Context</span>, <span class="ident">SqlSchemaCalculatorFlavour</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::flavour</span>::{<span class="ident">PostgresFlavour</span>, <span class="ident">SqlFlavour</span>};
 <span class="kw">use</span> <span class="ident">either::Either</span>;
 <span class="kw">use</span> <span class="ident">psl</span>::{
-    <span class="ident">builtin_connectors</span>::{
-        <span class="ident">cockroach_datamodel_connector::SequenceFunction</span>, <span class="ident">postgres_datamodel_connector::PostgresDatasourceProperties</span>,
-    },
+    <span class="ident">builtin_connectors</span>::{<span class="ident">cockroach_datamodel_connector::SequenceFunction</span>, <span class="ident">PostgresDatasourceProperties</span>},
     <span class="ident">datamodel_connector::walker_ext_traits::IndexWalkerExt</span>,
     <span class="ident">parser_database</span>::{<span class="ident">walkers</span>::<span class="kw-2">*</span>, <span class="ident">IndexAlgorithm</span>, <span class="ident">OperatorClass</span>},
 };

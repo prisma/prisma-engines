@@ -1370,21 +1370,27 @@
 <span id="1370">1370</span>
 <span id="1371">1371</span>
 <span id="1372">1372</span>
+<span id="1373">1373</span>
+<span id="1374">1374</span>
+<span id="1375">1375</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Postgres schema description.</span>
 
 <span class="kw">mod</span> <span class="ident">default</span>;
 <span class="kw">mod</span> <span class="ident">extensions</span>;
 
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">extensions</span>::{<span class="ident">DatabaseExtension</span>, <span class="ident">ExtensionId</span>, <span class="ident">ExtensionWalker</span>};
+
 <span class="kw">use</span> <span class="ident"><span class="self">self</span>::default::get_default_value</span>;
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::getters::Getter</span>;
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">extensions</span>::{<span class="ident">DatabaseExtension</span>, <span class="ident">ExtensionId</span>, <span class="ident">ExtensionWalker</span>};
 <span class="kw">use</span> <span class="ident">indexmap::IndexMap</span>;
 <span class="kw">use</span> <span class="ident">indoc::indoc</span>;
-<span class="kw">use</span> <span class="ident">native_types</span>::{<span class="ident">CockroachType</span>, <span class="ident">NativeType</span>, <span class="ident">PostgresType</span>};
-<span class="kw">use</span> <span class="ident">quaint::Value::Array</span>;
-<span class="kw">use</span> <span class="ident">quaint</span>::{<span class="ident">connector::ResultRow</span>, <span class="ident">prelude::Queryable</span>};
+<span class="kw">use</span> <span class="ident">psl</span>::{
+    <span class="ident">builtin_connectors</span>::{<span class="ident">CockroachType</span>, <span class="ident">PostgresType</span>},
+    <span class="ident">datamodel_connector::NativeTypeInstance</span>,
+};
+<span class="kw">use</span> <span class="ident">quaint</span>::{<span class="ident">connector::ResultRow</span>, <span class="ident">prelude::Queryable</span>, <span class="ident">Value::Array</span>};
 <span class="kw">use</span> <span class="ident">regex::Regex</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">any::type_name</span>, <span class="ident">collections::BTreeMap</span>, <span class="ident">convert::TryInto</span>};
 <span class="kw">use</span> <span class="ident">tracing::trace</span>;
@@ -2655,7 +2661,7 @@
         <span class="ident">full_data_type</span>,
         <span class="ident">family</span>,
         <span class="ident">arity</span>,
-        <span class="ident">native_type</span>: <span class="ident">native_type</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">to_json</span>()),
+        <span class="ident">native_type</span>: <span class="ident">native_type</span>.<span class="ident">map</span>(<span class="ident">NativeTypeInstance::new</span>::<span class="op">&lt;</span><span class="ident">PostgresType</span><span class="op">&gt;</span>),
     }
 }
 
@@ -2739,7 +2745,7 @@
         <span class="ident">full_data_type</span>,
         <span class="ident">family</span>,
         <span class="ident">arity</span>,
-        <span class="ident">native_type</span>: <span class="ident">native_type</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">to_json</span>()),
+        <span class="ident">native_type</span>: <span class="ident">native_type</span>.<span class="ident">map</span>(<span class="ident">NativeTypeInstance::new</span>::<span class="op">&lt;</span><span class="ident">CockroachType</span><span class="op">&gt;</span>),
     }
 }
 </code></pre></div>

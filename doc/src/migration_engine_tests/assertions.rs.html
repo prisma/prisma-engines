@@ -887,8 +887,6 @@
 <span id="887">887</span>
 <span id="888">888</span>
 <span id="889">889</span>
-<span id="890">890</span>
-<span id="891">891</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">migration_assertions</span>;
 <span class="kw">mod</span> <span class="ident">quaint_result_set_ext</span>;
 
@@ -1354,9 +1352,7 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_native_type</span>(<span class="self">self</span>, <span class="ident">expected</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">found</span> <span class="op">=</span> <span class="ident">connector</span>
-            .<span class="ident">introspect_native_type</span>(<span class="self">self</span>.<span class="ident">column</span>.<span class="ident">column_type</span>().<span class="ident">native_type</span>.<span class="ident">clone</span>().<span class="ident">unwrap</span>())
-            .<span class="ident">to_string</span>();
+        <span class="kw">let</span> <span class="ident">found</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">native_type_to_string</span>(<span class="self">self</span>.<span class="ident">column</span>.<span class="ident">column_type</span>().<span class="ident">native_type</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>());
         <span class="macro">assert!</span>(
             <span class="ident">found</span> <span class="op">==</span> <span class="ident">expected</span>,
             <span class="string">&quot;Assertion failed. Expected the column native type for `{}` to be `{:?}`, found `{:?}`&quot;</span>,

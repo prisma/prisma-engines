@@ -1369,7 +1369,7 @@
 <span id="1369">1369</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SqlSchemaDifferFlavour</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">flavour::MysqlFlavour</span>, <span class="ident">pair::Pair</span>, <span class="ident">sql_schema_differ::ColumnTypeChange</span>};
-<span class="kw">use</span> <span class="ident">native_types::MySqlType</span>;
+<span class="kw">use</span> <span class="ident">psl::builtin_connectors::MySqlType</span>;
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
     <span class="ident">walkers</span>::{<span class="ident">ColumnWalker</span>, <span class="ident">IndexWalker</span>},
     <span class="ident">ColumnTypeFamily</span>,
@@ -1482,7 +1482,7 @@
     <span class="ident">ColumnTypeChange::SafeCast</span>
 }
 
-<span class="kw">fn</span> <span class="ident">native_type_change</span>(<span class="ident">types</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">MySqlType</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnTypeChange</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">native_type_change</span>(<span class="ident">types</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">MySqlType</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnTypeChange</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">types</span>.<span class="ident">next</span>;
 
     <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">types</span>.<span class="ident">previous</span> {

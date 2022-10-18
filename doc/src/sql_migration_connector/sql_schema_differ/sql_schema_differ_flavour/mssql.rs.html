@@ -1148,6 +1148,8 @@
 <span id="1148">1148</span>
 <span id="1149">1149</span>
 <span id="1150">1150</span>
+<span id="1151">1151</span>
+<span id="1152">1152</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SqlSchemaDifferFlavour</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">flavour::MssqlFlavour</span>,
@@ -1155,7 +1157,7 @@
     <span class="ident">sql_migration::SqlMigrationStep</span>,
     <span class="ident">sql_schema_differ</span>::{<span class="ident">column::ColumnTypeChange</span>, <span class="ident">differ_database::DifferDatabase</span>, <span class="ident">table::TableDiffer</span>, <span class="ident">ColumnChanges</span>},
 };
-<span class="kw">use</span> <span class="ident">native_types</span>::{<span class="ident">MsSqlType</span>, <span class="ident">MsSqlTypeParameter</span>};
+<span class="kw">use</span> <span class="ident">psl::builtin_connectors</span>::{<span class="ident">MsSqlType</span>, <span class="ident">MsSqlTypeParameter</span>};
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">sql</span>, <span class="ident">mssql::MssqlSchemaExt</span>, <span class="ident">ColumnId</span>, <span class="ident">ColumnTypeFamily</span>};
 
 <span class="kw">impl</span> <span class="ident">SqlSchemaDifferFlavour</span> <span class="kw">for</span> <span class="ident">MssqlFlavour</span> {
@@ -1206,8 +1208,8 @@
     <span class="kw">fn</span> <span class="ident">column_type_change</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">differ</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">sql::ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnTypeChange</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">previous_family</span> <span class="op">=</span> <span class="ident">differ</span>.<span class="ident">previous</span>.<span class="ident">column_type_family</span>();
         <span class="kw">let</span> <span class="ident">next_family</span> <span class="op">=</span> <span class="ident">differ</span>.<span class="ident">next</span>.<span class="ident">column_type_family</span>();
-        <span class="kw">let</span> <span class="ident">previous_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MsSqlType</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">differ</span>.<span class="ident">previous</span>.<span class="ident">column_native_type</span>();
-        <span class="kw">let</span> <span class="ident">next_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MsSqlType</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">differ</span>.<span class="ident">next</span>.<span class="ident">column_native_type</span>();
+        <span class="kw">let</span> <span class="ident">previous_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">MsSqlType</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">differ</span>.<span class="ident">previous</span>.<span class="ident">column_native_type</span>();
+        <span class="kw">let</span> <span class="ident">next_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">MsSqlType</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">differ</span>.<span class="ident">next</span>.<span class="ident">column_native_type</span>();
 
         <span class="kw">match</span> (<span class="ident">previous_type</span>, <span class="ident">next_type</span>) {
             (<span class="prelude-val">None</span>, <span class="kw">_</span>) <span class="op">|</span> (<span class="kw">_</span>, <span class="prelude-val">None</span>) =&gt; <span class="ident">family_change_riskyness</span>(<span class="ident">previous_family</span>, <span class="ident">next_family</span>),
@@ -1268,7 +1270,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">native_type_change_riskyness</span>(<span class="ident">previous</span>: <span class="ident">MsSqlType</span>, <span class="ident">next</span>: <span class="ident">MsSqlType</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnTypeChange</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">native_type_change_riskyness</span>(<span class="ident">previous</span>: <span class="kw-2">&amp;</span><span class="ident">MsSqlType</span>, <span class="ident">next</span>: <span class="kw-2">&amp;</span><span class="ident">MsSqlType</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnTypeChange</span><span class="op">&gt;</span> {
     <span class="kw">use</span> <span class="ident">ColumnTypeChange</span>::<span class="kw-2">*</span>;
     <span class="kw">use</span> <span class="ident">MsSqlTypeParameter</span>::<span class="kw-2">*</span>;
 
@@ -1318,13 +1320,13 @@
             <span class="ident">MsSqlType::Bit</span> =&gt; <span class="ident">RiskyCast</span>,
             <span class="ident">MsSqlType::Char</span>(<span class="ident">param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NChar</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// TinyInt can be at most three digits, so this might fail.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="number">3</span> =&gt; <span class="ident">RiskyCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span> <span class="number">3</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="prelude-val">None</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::VarChar</span>(<span class="ident">param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NVarChar</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// TinyInt can be at most three digits, so this might fail.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="number">3</span> =&gt; <span class="ident">RiskyCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span> <span class="number">3</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="prelude-val">None</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
@@ -1350,26 +1352,26 @@
             <span class="ident">MsSqlType::SmallDateTime</span> =&gt; <span class="ident">SafeCast</span>,
             <span class="ident">MsSqlType::Binary</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// SmallInt is two bytes, so this might fail.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span> <span class="op">&lt;</span> <span class="number">2</span> =&gt; <span class="ident">RiskyCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">n</span> <span class="op">&lt;</span> <span class="number">2</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="prelude-val">None</span> =&gt; <span class="ident">RiskyCast</span>, <span class="comment">// n == 1 by default</span>
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::VarBinary</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// SmallInt is two bytes, so this might fail.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">n</span>)) <span class="kw">if</span> <span class="ident">n</span> <span class="op">&lt;</span> <span class="number">2</span> =&gt; <span class="ident">RiskyCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">n</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">n</span> <span class="op">&lt;</span> <span class="number">2</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="prelude-val">None</span> =&gt; <span class="ident">RiskyCast</span>, <span class="comment">// n == 1 by default</span>
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::Bit</span> =&gt; <span class="ident">RiskyCast</span>,
             <span class="ident">MsSqlType::Char</span>(<span class="ident">param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NChar</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// We can have five digits and an optional sign.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="number">6</span> =&gt; <span class="ident">RiskyCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span> <span class="number">6</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="prelude-val">None</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::VarChar</span>(<span class="ident">param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NVarChar</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// We can have five digits and an optional sign.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="number">6</span> =&gt; <span class="ident">RiskyCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span> <span class="number">6</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="prelude-val">None</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
@@ -1395,26 +1397,26 @@
             <span class="ident">MsSqlType::SmallDateTime</span> =&gt; <span class="ident">RiskyCast</span>,
             <span class="ident">MsSqlType::Binary</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// Int is four bytes.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span> <span class="op">&lt;</span> <span class="number">4</span> =&gt; <span class="ident">RiskyCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">n</span> <span class="op">&lt;</span> <span class="number">4</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="prelude-val">None</span> =&gt; <span class="ident">RiskyCast</span>, <span class="comment">// n == 1 by default</span>
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::VarBinary</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// Int is four bytes.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">n</span>)) <span class="kw">if</span> <span class="ident">n</span> <span class="op">&lt;</span> <span class="number">4</span> =&gt; <span class="ident">RiskyCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">n</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">n</span> <span class="op">&lt;</span> <span class="number">4</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="prelude-val">None</span> =&gt; <span class="ident">RiskyCast</span>, <span class="comment">// n == 1 by default</span>
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::Bit</span> =&gt; <span class="ident">RiskyCast</span>,
             <span class="ident">MsSqlType::Char</span>(<span class="ident">param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NChar</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// Int can be at most eleven characters, so this might fail.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="number">11</span> =&gt; <span class="ident">RiskyCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span> <span class="number">11</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="prelude-val">None</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::VarChar</span>(<span class="ident">param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NVarChar</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// Int can be at most eleven characters, so this might fail.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="number">11</span> =&gt; <span class="ident">RiskyCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span> <span class="number">11</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="prelude-val">None</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
@@ -1441,26 +1443,26 @@
             <span class="ident">MsSqlType::SmallDateTime</span> =&gt; <span class="ident">RiskyCast</span>,
             <span class="ident">MsSqlType::Binary</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// BigInt is eight bytes.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span> <span class="op">&lt;</span> <span class="number">8</span> =&gt; <span class="ident">RiskyCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">n</span> <span class="op">&lt;</span> <span class="number">8</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="prelude-val">None</span> =&gt; <span class="ident">RiskyCast</span>, <span class="comment">// n == 1 by default</span>
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::VarBinary</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// BigInt is eight bytes.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">n</span>)) <span class="kw">if</span> <span class="ident">n</span> <span class="op">&lt;</span> <span class="number">8</span> =&gt; <span class="ident">RiskyCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">n</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">n</span> <span class="op">&lt;</span> <span class="number">8</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="prelude-val">None</span> =&gt; <span class="ident">RiskyCast</span>, <span class="comment">// n == 1 by default</span>
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::Bit</span> =&gt; <span class="ident">RiskyCast</span>,
             <span class="ident">MsSqlType::Char</span>(<span class="ident">param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NChar</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// BigInt can have at most 20 characters.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="number">20</span> =&gt; <span class="ident">RiskyCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span> <span class="number">20</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="prelude-val">None</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::VarChar</span>(<span class="ident">param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NVarChar</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// BigInt can have at most 20 characters.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="number">20</span> =&gt; <span class="ident">RiskyCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span> <span class="number">20</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="prelude-val">None</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
@@ -1487,8 +1489,8 @@
                 <span class="ident">MsSqlType::Binary</span>(<span class="kw">_</span>) =&gt; <span class="ident">RiskyCast</span>,
                 <span class="ident">MsSqlType::VarBinary</span>(<span class="kw">_</span>) =&gt; <span class="ident">RiskyCast</span>,
                 <span class="ident">MsSqlType::Decimal</span>(<span class="ident">new_params</span>) =&gt; <span class="kw">match</span> (<span class="ident">old_params</span>, <span class="ident">new_params</span>) {
-                    (<span class="prelude-val">Some</span>((<span class="ident">p_old</span>, <span class="ident">s_old</span>)), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">p_old</span> <span class="op">&gt;</span> <span class="number">18</span> <span class="op">|</span><span class="op">|</span> <span class="ident">s_old</span> <span class="op">&gt;</span> <span class="number">0</span> =&gt; <span class="ident">RiskyCast</span>,
-                    (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>((<span class="ident">p_new</span>, <span class="ident">s_new</span>))) <span class="kw">if</span> <span class="ident">p_new</span> <span class="op">&lt;</span> <span class="number">18</span> <span class="op">|</span><span class="op">|</span> <span class="ident">s_new</span> <span class="op">&gt;</span> <span class="number">0</span> =&gt; <span class="ident">RiskyCast</span>,
+                    (<span class="prelude-val">Some</span>((<span class="ident">p_old</span>, <span class="ident">s_old</span>)), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">p_old</span> <span class="op">&gt;</span> <span class="number">18</span> <span class="op">|</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">s_old</span> <span class="op">&gt;</span> <span class="number">0</span> =&gt; <span class="ident">RiskyCast</span>,
+                    (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>((<span class="ident">p_new</span>, <span class="ident">s_new</span>))) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">p_new</span> <span class="op">&lt;</span> <span class="number">18</span> <span class="op">|</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">s_new</span> <span class="op">&gt;</span> <span class="number">0</span> =&gt; <span class="ident">RiskyCast</span>,
                     <span class="comment">// Sigh... So, numeric(4,0) to numeric(4,2) would be risky,</span>
                     <span class="comment">// so would numeric(4,2) to numeric(4,0).</span>
                     (<span class="prelude-val">Some</span>((<span class="ident">p_old</span>, <span class="ident">s_old</span>)), <span class="prelude-val">Some</span>((<span class="ident">p_new</span>, <span class="ident">s_new</span>))) <span class="kw">if</span> <span class="ident">p_old</span> <span class="op">-</span> <span class="ident">s_old</span> <span class="op">&gt;</span> <span class="ident">p_new</span> <span class="op">-</span> <span class="ident">s_new</span> <span class="op">|</span><span class="op">|</span> <span class="ident">s_old</span> <span class="op">&gt;</span> <span class="ident">s_new</span> =&gt; {
@@ -1499,26 +1501,26 @@
                 <span class="ident">MsSqlType::Char</span>(<span class="ident">length</span>) <span class="op">|</span> <span class="ident">MsSqlType::NChar</span>(<span class="ident">length</span>) =&gt; <span class="kw">match</span> (<span class="ident">length</span>, <span class="ident">old_params</span>) {
                     <span class="comment">// We must fit p digits and a possible sign to our</span>
                     <span class="comment">// string, otherwise might truncate.</span>
-                    (<span class="prelude-val">Some</span>(<span class="ident">len</span>), <span class="prelude-val">Some</span>((<span class="ident">p</span>, <span class="number">0</span>))) <span class="kw">if</span> <span class="ident">p</span> <span class="op">+</span> <span class="number">1</span> <span class="op">&gt;</span> <span class="ident">len</span> =&gt; <span class="ident">RiskyCast</span>,
+                    (<span class="prelude-val">Some</span>(<span class="ident">len</span>), <span class="prelude-val">Some</span>((<span class="ident">p</span>, <span class="number">0</span>))) <span class="kw">if</span> <span class="ident">p</span> <span class="op">+</span> <span class="number">1</span> <span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">len</span> =&gt; <span class="ident">RiskyCast</span>,
                     <span class="comment">// We must fit p digits, a possible sign and a comma to</span>
                     <span class="comment">// our string, otherwise might truncate.</span>
-                    (<span class="prelude-val">Some</span>(<span class="ident">len</span>), <span class="prelude-val">Some</span>((<span class="ident">p</span>, <span class="ident">n</span>))) <span class="kw">if</span> <span class="ident">n</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">p</span> <span class="op">+</span> <span class="number">2</span> <span class="op">&gt;</span> <span class="ident">len</span> =&gt; <span class="ident">RiskyCast</span>,
+                    (<span class="prelude-val">Some</span>(<span class="ident">len</span>), <span class="prelude-val">Some</span>((<span class="ident">p</span>, <span class="ident">n</span>))) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">n</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">p</span> <span class="op">+</span> <span class="number">2</span> <span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">len</span> =&gt; <span class="ident">RiskyCast</span>,
                     <span class="comment">// Defaults to `number(18, 0)`, so we must fit 18 digits</span>
                     <span class="comment">// and a possible sign without truncating.</span>
-                    (<span class="prelude-val">Some</span>(<span class="ident">len</span>), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="number">19</span> =&gt; <span class="ident">RiskyCast</span>,
+                    (<span class="prelude-val">Some</span>(<span class="ident">len</span>), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span> <span class="number">19</span> =&gt; <span class="ident">RiskyCast</span>,
                     (<span class="prelude-val">None</span>, <span class="kw">_</span>) =&gt; <span class="ident">RiskyCast</span>,
                     <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
                 },
                 <span class="ident">MsSqlType::VarChar</span>(<span class="ident">length</span>) <span class="op">|</span> <span class="ident">MsSqlType::NVarChar</span>(<span class="ident">length</span>) =&gt; <span class="kw">match</span> (<span class="ident">length</span>, <span class="ident">old_params</span>) {
                     <span class="comment">// We must fit p digits and a possible sign to our</span>
                     <span class="comment">// string, otherwise might truncate.</span>
-                    (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)), <span class="prelude-val">Some</span>((<span class="ident">p</span>, <span class="number">0</span>))) <span class="kw">if</span> <span class="ident">p</span> <span class="op">+</span> <span class="number">1</span> <span class="op">&gt;</span> <span class="ident">len</span>.<span class="ident">into</span>() =&gt; <span class="ident">RiskyCast</span>,
+                    (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)), <span class="prelude-val">Some</span>((<span class="ident">p</span>, <span class="number">0</span>))) <span class="kw">if</span> <span class="ident">p</span> <span class="op">+</span> <span class="number">1</span> <span class="op">&gt;</span> (<span class="kw-2">*</span><span class="ident">len</span>).<span class="ident">into</span>() =&gt; <span class="ident">RiskyCast</span>,
                     <span class="comment">// We must fit p digits, a possible sign and a comma to</span>
                     <span class="comment">// our string, otherwise might truncate.</span>
-                    (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)), <span class="prelude-val">Some</span>((<span class="ident">p</span>, <span class="ident">n</span>))) <span class="kw">if</span> <span class="ident">n</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">p</span> <span class="op">+</span> <span class="number">2</span> <span class="op">&gt;</span> <span class="ident">len</span>.<span class="ident">into</span>() =&gt; <span class="ident">RiskyCast</span>,
+                    (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)), <span class="prelude-val">Some</span>((<span class="ident">p</span>, <span class="ident">n</span>))) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">n</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">p</span> <span class="op">+</span> <span class="number">2</span> <span class="op">&gt;</span> (<span class="kw-2">*</span><span class="ident">len</span>).<span class="ident">into</span>() =&gt; <span class="ident">RiskyCast</span>,
                     <span class="comment">// Defaults to `number(18, 0)`, so we must fit 18 digits</span>
                     <span class="comment">// and a possible sign without truncating.</span>
-                    (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="number">19</span> =&gt; <span class="ident">RiskyCast</span>,
+                    (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span> <span class="number">19</span> =&gt; <span class="ident">RiskyCast</span>,
                     (<span class="prelude-val">None</span>, <span class="kw">_</span>) =&gt; <span class="ident">RiskyCast</span>,
                     <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
                 },
@@ -1534,7 +1536,7 @@
             <span class="ident">MsSqlType::BigInt</span> =&gt; <span class="ident">RiskyCast</span>,
             <span class="ident">MsSqlType::Decimal</span>(<span class="ident">params</span>) =&gt; <span class="kw">match</span> <span class="ident">params</span> {
                 <span class="comment">// We can have 19 digits and four decimals.</span>
-                <span class="prelude-val">Some</span>((<span class="ident">p</span>, <span class="ident">s</span>)) <span class="kw">if</span> <span class="ident">p</span> <span class="op">&lt;</span> <span class="number">19</span> <span class="op">|</span><span class="op">|</span> <span class="ident">s</span> <span class="op">&lt;</span> <span class="number">4</span> =&gt; <span class="ident">RiskyCast</span>,
+                <span class="prelude-val">Some</span>((<span class="ident">p</span>, <span class="ident">s</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">p</span> <span class="op">&lt;</span> <span class="number">19</span> <span class="op">|</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">s</span> <span class="op">&lt;</span> <span class="number">4</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="prelude-val">None</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
@@ -1547,25 +1549,25 @@
             <span class="ident">MsSqlType::SmallDateTime</span> =&gt; <span class="ident">RiskyCast</span>,
             <span class="ident">MsSqlType::Char</span>(<span class="ident">param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NChar</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// We can have 19 digits, comma and sign</span>
-                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="number">21</span> =&gt; <span class="ident">RiskyCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span> <span class="number">21</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="prelude-val">None</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::VarChar</span>(<span class="ident">param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NVarChar</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// We can have 19 digits, comma and sign</span>
-                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="number">21</span> =&gt; <span class="ident">RiskyCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span> <span class="number">21</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="prelude-val">None</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::Binary</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// Eight bytes.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="number">8</span> =&gt; <span class="ident">RiskyCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span> <span class="number">8</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="prelude-val">None</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::VarBinary</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// Eight bytes.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="number">8</span> =&gt; <span class="ident">RiskyCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span> <span class="number">8</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="prelude-val">None</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
@@ -1581,7 +1583,7 @@
             <span class="ident">MsSqlType::BigInt</span> =&gt; <span class="ident">RiskyCast</span>,
             <span class="ident">MsSqlType::Decimal</span>(<span class="ident">params</span>) =&gt; <span class="kw">match</span> <span class="ident">params</span> {
                 <span class="comment">// Ten digits, four decimals</span>
-                <span class="prelude-val">Some</span>((<span class="ident">p</span>, <span class="ident">s</span>)) <span class="kw">if</span> <span class="ident">p</span> <span class="op">&lt;</span> <span class="number">10</span> <span class="op">|</span><span class="op">|</span> <span class="ident">s</span> <span class="op">&lt;</span> <span class="number">4</span> =&gt; <span class="ident">RiskyCast</span>,
+                <span class="prelude-val">Some</span>((<span class="ident">p</span>, <span class="ident">s</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">p</span> <span class="op">&lt;</span> <span class="number">10</span> <span class="op">|</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">s</span> <span class="op">&lt;</span> <span class="number">4</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="prelude-val">None</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
@@ -1594,25 +1596,25 @@
             <span class="ident">MsSqlType::SmallDateTime</span> =&gt; <span class="ident">RiskyCast</span>,
             <span class="ident">MsSqlType::Char</span>(<span class="ident">param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NChar</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// Ten digits, comma and a sign.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="number">12</span> =&gt; <span class="ident">RiskyCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span> <span class="number">12</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="prelude-val">None</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::VarChar</span>(<span class="ident">param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NVarChar</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// Ten digits, comma and a sign.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="number">12</span> =&gt; <span class="ident">RiskyCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span> <span class="number">12</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="prelude-val">None</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::Binary</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// Four bytes.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="number">4</span> =&gt; <span class="ident">RiskyCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span> <span class="number">4</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="prelude-val">None</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::VarBinary</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// Four bytes.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="number">4</span> =&gt; <span class="ident">RiskyCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span> <span class="number">4</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="prelude-val">None</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
@@ -1633,55 +1635,55 @@
             <span class="ident">MsSqlType::Bit</span> =&gt; <span class="ident">RiskyCast</span>,
             <span class="ident">MsSqlType::Float</span>(<span class="ident">new_param</span>) =&gt; <span class="kw">match</span> (<span class="ident">old_param</span>, <span class="ident">new_param</span>) {
                 <span class="comment">// If length is 24 or lower, we have a four byte float.</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">left_len</span>), <span class="prelude-val">Some</span>(<span class="ident">right_len</span>)) <span class="kw">if</span> <span class="ident">left_len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">24</span> <span class="op">&amp;&amp;</span> <span class="ident">right_len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">24</span> =&gt; <span class="ident">SafeCast</span>,
-                (<span class="prelude-val">Some</span>(<span class="ident">left_len</span>), <span class="prelude-val">Some</span>(<span class="ident">right_len</span>)) <span class="kw">if</span> <span class="ident">left_len</span> <span class="op">&gt;</span> <span class="number">24</span> <span class="op">&amp;&amp;</span> <span class="ident">right_len</span> <span class="op">&gt;</span> <span class="number">24</span> =&gt; <span class="ident">SafeCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">left_len</span>), <span class="prelude-val">Some</span>(<span class="ident">right_len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">left_len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">24</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">right_len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">24</span> =&gt; <span class="ident">SafeCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">left_len</span>), <span class="prelude-val">Some</span>(<span class="ident">right_len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">left_len</span> <span class="op">&gt;</span> <span class="number">24</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">right_len</span> <span class="op">&gt;</span> <span class="number">24</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="comment">// If length is not set, it&#39;s an eight byte float (double).</span>
-                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">right_len</span>)) <span class="kw">if</span> <span class="ident">right_len</span> <span class="op">&gt;</span> <span class="number">24</span> =&gt; <span class="ident">SafeCast</span>,
-                (<span class="prelude-val">Some</span>(<span class="ident">left_len</span>), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">left_len</span> <span class="op">&gt;</span> <span class="number">24</span> =&gt; <span class="ident">SafeCast</span>,
+                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">right_len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">right_len</span> <span class="op">&gt;</span> <span class="number">24</span> =&gt; <span class="ident">SafeCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">left_len</span>), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">left_len</span> <span class="op">&gt;</span> <span class="number">24</span> =&gt; <span class="ident">SafeCast</span>,
                 (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="ident">MsSqlType::Real</span> =&gt; <span class="kw">match</span> <span class="ident">old_param</span> {
                 <span class="comment">// Real is always a four byte float.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">24</span> =&gt; <span class="ident">SafeCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">24</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="ident">MsSqlType::SmallDateTime</span> =&gt; <span class="ident">RiskyCast</span>,
             <span class="ident">MsSqlType::DateTime</span> =&gt; <span class="ident">RiskyCast</span>,
             <span class="ident">MsSqlType::Char</span>(<span class="ident">new_param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NChar</span>(<span class="ident">new_param</span>) =&gt; <span class="kw">match</span> (<span class="ident">old_param</span>, <span class="ident">new_param</span>) {
                 <span class="comment">// If float, we can have 47 characters including the sign and comma.</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">f_len</span>), <span class="prelude-val">Some</span>(<span class="ident">char_len</span>)) <span class="kw">if</span> <span class="ident">f_len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">24</span> <span class="op">&amp;&amp;</span> <span class="ident">char_len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">47</span> =&gt; <span class="ident">SafeCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">f_len</span>), <span class="prelude-val">Some</span>(<span class="ident">char_len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">f_len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">24</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">char_len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">47</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="comment">// If double, we can have 317 characters including the sign and comma.</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">f_len</span>), <span class="prelude-val">Some</span>(<span class="ident">char_len</span>)) <span class="kw">if</span> <span class="ident">f_len</span> <span class="op">&gt;</span> <span class="number">24</span> <span class="op">&amp;&amp;</span> <span class="ident">char_len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">317</span> =&gt; <span class="ident">SafeCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">f_len</span>), <span class="prelude-val">Some</span>(<span class="ident">char_len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">f_len</span> <span class="op">&gt;</span> <span class="number">24</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">char_len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">317</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="comment">// If length not set, it&#39;s a double.</span>
-                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">char_len</span>)) <span class="kw">if</span> <span class="ident">char_len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">317</span> =&gt; <span class="ident">SafeCast</span>,
+                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">char_len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">char_len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">317</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="ident">MsSqlType::VarChar</span>(<span class="ident">new_param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NVarChar</span>(<span class="ident">new_param</span>) =&gt; <span class="kw">match</span> (<span class="ident">old_param</span>, <span class="ident">new_param</span>) {
                 <span class="comment">// If float, we can have 47 characters including the sign and comma.</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">f_len</span>), <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">char_len</span>))) <span class="kw">if</span> <span class="ident">f_len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">24</span> <span class="op">&amp;&amp;</span> <span class="ident">char_len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">47</span> =&gt; <span class="ident">SafeCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">f_len</span>), <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">char_len</span>))) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">f_len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">24</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">char_len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">47</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="comment">// If double, we can have 317 characters including the sign and comma.</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">f_len</span>), <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">char_len</span>))) <span class="kw">if</span> <span class="ident">f_len</span> <span class="op">&gt;</span> <span class="number">24</span> <span class="op">&amp;&amp;</span> <span class="ident">char_len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">317</span> =&gt; <span class="ident">SafeCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">f_len</span>), <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">char_len</span>))) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">f_len</span> <span class="op">&gt;</span> <span class="number">24</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">char_len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">317</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="comment">// If length not set, it&#39;s a double.</span>
-                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">char_len</span>))) <span class="kw">if</span> <span class="ident">char_len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">317</span> =&gt; <span class="ident">SafeCast</span>,
+                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">char_len</span>))) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">char_len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">317</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="ident">MsSqlType::Binary</span>(<span class="ident">new_param</span>) =&gt; <span class="kw">match</span> (<span class="ident">old_param</span>, <span class="ident">new_param</span>) {
                 <span class="comment">// Float is four bytes.</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">f_len</span>), <span class="prelude-val">Some</span>(<span class="ident">bin_len</span>)) <span class="kw">if</span> <span class="ident">f_len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">24</span> <span class="op">&amp;&amp;</span> <span class="ident">bin_len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">4</span> =&gt; <span class="ident">SafeCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">f_len</span>), <span class="prelude-val">Some</span>(<span class="ident">bin_len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">f_len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">24</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">bin_len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">4</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="comment">// Double is eight bytes.</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">f_len</span>), <span class="prelude-val">Some</span>(<span class="ident">bin_len</span>)) <span class="kw">if</span> <span class="ident">f_len</span> <span class="op">&gt;</span> <span class="number">24</span> <span class="op">&amp;&amp;</span> <span class="ident">bin_len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">8</span> =&gt; <span class="ident">SafeCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">f_len</span>), <span class="prelude-val">Some</span>(<span class="ident">bin_len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">f_len</span> <span class="op">&gt;</span> <span class="number">24</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">bin_len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">8</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="comment">// By default, we have a double.</span>
-                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">bin_len</span>)) <span class="kw">if</span> <span class="ident">bin_len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">8</span> =&gt; <span class="ident">SafeCast</span>,
+                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">bin_len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">bin_len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">8</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="ident">MsSqlType::VarBinary</span>(<span class="ident">new_param</span>) =&gt; <span class="kw">match</span> (<span class="ident">old_param</span>, <span class="ident">new_param</span>) {
                 <span class="comment">// Float is four bytes.</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">f_len</span>), <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">bin_len</span>))) <span class="kw">if</span> <span class="ident">f_len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">24</span> <span class="op">&amp;&amp;</span> <span class="ident">bin_len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">4</span> =&gt; <span class="ident">SafeCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">f_len</span>), <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">bin_len</span>))) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">f_len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">24</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">bin_len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">4</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="comment">// Double is eight bytes.</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">f_len</span>), <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">bin_len</span>))) <span class="kw">if</span> <span class="ident">f_len</span> <span class="op">&gt;</span> <span class="number">24</span> <span class="op">&amp;&amp;</span> <span class="ident">bin_len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">8</span> =&gt; <span class="ident">SafeCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">f_len</span>), <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">bin_len</span>))) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">f_len</span> <span class="op">&gt;</span> <span class="number">24</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">bin_len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">8</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="comment">// By default, we have a double.</span>
-                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">bin_len</span>))) <span class="kw">if</span> <span class="ident">bin_len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">8</span> =&gt; <span class="ident">SafeCast</span>,
+                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">bin_len</span>))) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">bin_len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">8</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
@@ -1702,27 +1704,27 @@
             <span class="ident">MsSqlType::SmallDateTime</span> =&gt; <span class="ident">RiskyCast</span>,
             <span class="ident">MsSqlType::Float</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// Real is the same as float(24) or lower.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">24</span> =&gt; <span class="ident">SafeCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">24</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="ident">MsSqlType::Char</span>(<span class="ident">param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NChar</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// We have 47 characters maximum.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">47</span> =&gt; <span class="ident">SafeCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">47</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="ident">MsSqlType::VarChar</span>(<span class="ident">param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NVarChar</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// We have 47 characters maximum.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">47</span> =&gt; <span class="ident">SafeCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">47</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="ident">MsSqlType::Binary</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// Real is four bytes.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">4</span> =&gt; <span class="ident">SafeCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">4</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="ident">MsSqlType::VarBinary</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// Real is four bytes.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">4</span> =&gt; <span class="ident">SafeCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">4</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
@@ -1736,12 +1738,12 @@
             <span class="ident">MsSqlType::DateTimeOffset</span> =&gt; <span class="ident">SafeCast</span>,
             <span class="ident">MsSqlType::Char</span>(<span class="ident">param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NChar</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// We can have 10 characters.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">10</span> =&gt; <span class="ident">SafeCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">10</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="ident">MsSqlType::VarChar</span>(<span class="ident">param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NVarChar</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// We can have 10 characters.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">10</span> =&gt; <span class="ident">SafeCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">10</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="ident">MsSqlType::SmallDateTime</span> =&gt; <span class="ident">RiskyCast</span>,
@@ -1756,12 +1758,12 @@
             <span class="ident">MsSqlType::DateTimeOffset</span> =&gt; <span class="ident">SafeCast</span>,
             <span class="ident">MsSqlType::Char</span>(<span class="ident">param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NChar</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// We can have 8 characters.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">8</span> =&gt; <span class="ident">SafeCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">8</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="ident">MsSqlType::VarChar</span>(<span class="ident">param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NVarChar</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// We can have 8 characters.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">8</span> =&gt; <span class="ident">SafeCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">8</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="ident">MsSqlType::SmallDateTime</span> =&gt; <span class="ident">RiskyCast</span>,
@@ -1779,12 +1781,12 @@
             <span class="ident">MsSqlType::SmallDateTime</span> =&gt; <span class="ident">RiskyCast</span>,
             <span class="ident">MsSqlType::Char</span>(<span class="ident">param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NChar</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// We can have 23 characters.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">23</span> =&gt; <span class="ident">SafeCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">23</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="ident">MsSqlType::VarChar</span>(<span class="ident">param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NVarChar</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// We can have 23 characters.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">23</span> =&gt; <span class="ident">SafeCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">23</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
@@ -1801,12 +1803,12 @@
             <span class="ident">MsSqlType::SmallDateTime</span> =&gt; <span class="ident">RiskyCast</span>,
             <span class="ident">MsSqlType::Char</span>(<span class="ident">param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NChar</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// We can have 27 characters.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">27</span> =&gt; <span class="ident">SafeCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">27</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="ident">MsSqlType::VarChar</span>(<span class="ident">param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NVarChar</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// We can have 27 characters.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">27</span> =&gt; <span class="ident">SafeCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">27</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
@@ -1822,12 +1824,12 @@
             <span class="ident">MsSqlType::SmallDateTime</span> =&gt; <span class="ident">RiskyCast</span>,
             <span class="ident">MsSqlType::Char</span>(<span class="ident">param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NChar</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// We can have 33 characters.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">33</span> =&gt; <span class="ident">SafeCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">33</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="ident">MsSqlType::VarChar</span>(<span class="ident">param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NVarChar</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// We can have 33 characters.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">33</span> =&gt; <span class="ident">SafeCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">33</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
@@ -1845,12 +1847,12 @@
             <span class="ident">MsSqlType::SmallDateTime</span> =&gt; <span class="ident">SafeCast</span>,
             <span class="ident">MsSqlType::Char</span>(<span class="ident">param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NChar</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// We can have 19 characters.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">19</span> =&gt; <span class="ident">SafeCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">19</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="ident">MsSqlType::VarChar</span>(<span class="ident">param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NVarChar</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
                 <span class="comment">// We can have 19 characters.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">19</span> =&gt; <span class="ident">SafeCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">19</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
@@ -1880,13 +1882,13 @@
             <span class="ident">MsSqlType::Char</span>(<span class="ident">new_param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NChar</span>(<span class="ident">new_param</span>) =&gt; <span class="kw">match</span> (<span class="ident">old_param</span>, <span class="ident">new_param</span>) {
                 (<span class="prelude-val">Some</span>(<span class="ident">old_len</span>), <span class="prelude-val">Some</span>(<span class="ident">new_len</span>)) <span class="kw">if</span> <span class="ident">old_len</span> <span class="op">&gt;</span> <span class="ident">new_len</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="comment">// Default length is 1.</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">old_len</span>), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">old_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">old_len</span>), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">old_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::VarChar</span>(<span class="ident">new_param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NVarChar</span>(<span class="ident">new_param</span>) =&gt; <span class="kw">match</span> (<span class="ident">old_param</span>, <span class="ident">new_param</span>) {
-                (<span class="prelude-val">Some</span>(<span class="ident">old_len</span>), <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">new_len</span>))) <span class="kw">if</span> <span class="ident">old_len</span> <span class="op">&gt;</span> <span class="ident">new_len</span>.<span class="ident">into</span>() =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">old_len</span>), <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">new_len</span>))) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">old_len</span> <span class="op">&gt;</span> (<span class="kw-2">*</span><span class="ident">new_len</span>).<span class="ident">into</span>() =&gt; <span class="ident">RiskyCast</span>,
                 <span class="comment">// Default length is 1.</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">old_len</span>), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">old_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">old_len</span>), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">old_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::Text</span> =&gt; <span class="ident">SafeCast</span>,
@@ -1919,15 +1921,15 @@
             <span class="ident">MsSqlType::NChar</span>(<span class="ident">new_param</span>) =&gt; <span class="kw">match</span> (<span class="ident">old_param</span>, <span class="ident">new_param</span>) {
                 (<span class="prelude-val">Some</span>(<span class="ident">old_len</span>), <span class="prelude-val">Some</span>(<span class="ident">new_len</span>)) <span class="kw">if</span> <span class="ident">old_len</span> <span class="op">&gt;</span> <span class="ident">new_len</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="comment">// Default length is 1.</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">old_len</span>), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">old_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">old_len</span>), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">old_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::Char</span>(<span class="kw">_</span>) =&gt; <span class="ident">RiskyCast</span>,
             <span class="ident">MsSqlType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">RiskyCast</span>,
             <span class="ident">MsSqlType::NVarChar</span>(<span class="ident">new_param</span>) =&gt; <span class="kw">match</span> (<span class="ident">old_param</span>, <span class="ident">new_param</span>) {
-                (<span class="prelude-val">Some</span>(<span class="ident">old_len</span>), <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">new_len</span>))) <span class="kw">if</span> <span class="ident">old_len</span> <span class="op">&gt;</span> <span class="ident">new_len</span>.<span class="ident">into</span>() =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">old_len</span>), <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">new_len</span>))) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">old_len</span> <span class="op">&gt;</span> (<span class="kw-2">*</span><span class="ident">new_len</span>).<span class="ident">into</span>() =&gt; <span class="ident">RiskyCast</span>,
                 <span class="comment">// Default length is 1.</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">old_len</span>), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">old_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">old_len</span>), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">old_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::Text</span> =&gt; <span class="ident">RiskyCast</span>,
@@ -1959,9 +1961,9 @@
             <span class="ident">MsSqlType::DateTimeOffset</span> =&gt; <span class="ident">RiskyCast</span>,
             <span class="ident">MsSqlType::SmallDateTime</span> =&gt; <span class="ident">RiskyCast</span>,
             <span class="ident">MsSqlType::NChar</span>(<span class="ident">new_param</span>) <span class="op">|</span> <span class="ident">MsSqlType::Char</span>(<span class="ident">new_param</span>) =&gt; <span class="kw">match</span> (<span class="ident">old_param</span>, <span class="ident">new_param</span>) {
-                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">old_len</span>)), <span class="prelude-val">Some</span>(<span class="ident">new_len</span>)) <span class="kw">if</span> <span class="ident">u32::from</span>(<span class="ident">old_len</span>) <span class="op">&gt;</span> <span class="ident">new_len</span> =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">old_len</span>)), <span class="prelude-val">Some</span>(<span class="ident">new_len</span>)) <span class="kw">if</span> <span class="ident">u32::from</span>(<span class="kw-2">*</span><span class="ident">old_len</span>) <span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">new_len</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="comment">// Default length is 1.</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">old_len</span>)), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">old_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">old_len</span>)), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">old_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
                 (<span class="prelude-val">Some</span>(<span class="ident">Max</span>), <span class="kw">_</span>) =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
@@ -1972,7 +1974,7 @@
             <span class="ident">MsSqlType::VarChar</span>(<span class="ident">new_param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NVarChar</span>(<span class="ident">new_param</span>) =&gt; <span class="kw">match</span> (<span class="ident">old_param</span>, <span class="ident">new_param</span>) {
                 (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">old_len</span>)), <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">new_len</span>))) <span class="kw">if</span> <span class="ident">old_len</span> <span class="op">&gt;</span> <span class="ident">new_len</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="comment">// Default length is 1.</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">old_len</span>)), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">old_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">old_len</span>)), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">old_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
                 (<span class="prelude-val">Some</span>(<span class="ident">Max</span>), <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="kw">_</span>))) =&gt; <span class="ident">RiskyCast</span>,
                 (<span class="prelude-val">Some</span>(<span class="ident">Max</span>), <span class="prelude-val">None</span>) =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
@@ -2011,16 +2013,16 @@
             <span class="ident">MsSqlType::Char</span>(<span class="kw">_</span>) =&gt; <span class="ident">RiskyCast</span>,
             <span class="ident">MsSqlType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">RiskyCast</span>,
             <span class="ident">MsSqlType::NChar</span>(<span class="ident">new_param</span>) =&gt; <span class="kw">match</span> (<span class="ident">old_param</span>, <span class="ident">new_param</span>) {
-                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">old_len</span>)), <span class="prelude-val">Some</span>(<span class="ident">new_len</span>)) <span class="kw">if</span> <span class="ident">u32::from</span>(<span class="ident">old_len</span>) <span class="op">&gt;</span> <span class="ident">new_len</span> =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">old_len</span>)), <span class="prelude-val">Some</span>(<span class="ident">new_len</span>)) <span class="kw">if</span> <span class="ident">u32::from</span>(<span class="kw-2">*</span><span class="ident">old_len</span>) <span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">new_len</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="comment">// Default length is 1.</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">old_len</span>)), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">old_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">old_len</span>)), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">old_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
                 (<span class="prelude-val">Some</span>(<span class="ident">Max</span>), <span class="kw">_</span>) =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::NVarChar</span>(<span class="ident">new_param</span>) =&gt; <span class="kw">match</span> (<span class="ident">old_param</span>, <span class="ident">new_param</span>) {
                 (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">old_len</span>)), <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">new_len</span>))) <span class="kw">if</span> <span class="ident">old_len</span> <span class="op">&gt;</span> <span class="ident">new_len</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="comment">// Default length is 1.</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">old_len</span>)), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">old_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">old_len</span>)), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">old_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
                 (<span class="prelude-val">Some</span>(<span class="ident">Max</span>), <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="kw">_</span>))) =&gt; <span class="ident">RiskyCast</span>,
                 (<span class="prelude-val">Some</span>(<span class="ident">Max</span>), <span class="prelude-val">None</span>) =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
@@ -2067,37 +2069,37 @@
         <span class="ident">MsSqlType::Binary</span>(<span class="ident">old_param</span>) =&gt; <span class="kw">match</span> <span class="ident">next</span> {
             <span class="ident">MsSqlType::TinyInt</span> =&gt; <span class="kw">match</span> <span class="ident">old_param</span> {
                 <span class="comment">// One byte for tinyint.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">1</span> =&gt; <span class="ident">SafeCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">1</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="prelude-val">None</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="ident">MsSqlType::SmallInt</span> =&gt; <span class="kw">match</span> <span class="ident">old_param</span> {
                 <span class="comment">// Two bytes for smallint.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">2</span> =&gt; <span class="ident">SafeCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">2</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="prelude-val">None</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="ident">MsSqlType::Int</span> =&gt; <span class="kw">match</span> <span class="ident">old_param</span> {
                 <span class="comment">// Four bytes for int.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">4</span> =&gt; <span class="ident">SafeCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">4</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="prelude-val">None</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="ident">MsSqlType::BigInt</span> =&gt; <span class="kw">match</span> <span class="ident">old_param</span> {
                 <span class="comment">// Eight bytes for bigint.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">8</span> =&gt; <span class="ident">SafeCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">8</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="prelude-val">None</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="ident">MsSqlType::Decimal</span>(<span class="kw">_</span>) =&gt; <span class="ident">RiskyCast</span>,
             <span class="ident">MsSqlType::Money</span> =&gt; <span class="kw">match</span> <span class="ident">old_param</span> {
                 <span class="comment">// We can fit at most eight bytes here.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span> <span class="number">8</span> =&gt; <span class="ident">RiskyCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&gt;</span> <span class="number">8</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::SmallMoney</span> =&gt; <span class="kw">match</span> <span class="ident">old_param</span> {
                 <span class="comment">// We can fit at most four bytes here.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span> <span class="number">4</span> =&gt; <span class="ident">RiskyCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&gt;</span> <span class="number">4</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::Bit</span> =&gt; <span class="ident">RiskyCast</span>,
@@ -2106,39 +2108,41 @@
             <span class="ident">MsSqlType::Char</span>(<span class="ident">new_param</span>) =&gt; <span class="kw">match</span> (<span class="ident">old_param</span>, <span class="ident">new_param</span>) {
                 (<span class="prelude-val">Some</span>(<span class="ident">binary_len</span>), <span class="prelude-val">Some</span>(<span class="ident">char_len</span>)) <span class="kw">if</span> <span class="ident">binary_len</span> <span class="op">&gt;</span> <span class="ident">char_len</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="comment">// Default Char length is one.</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">binary_len</span>), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">binary_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">binary_len</span>), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">binary_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::NChar</span>(<span class="ident">new_param</span>) =&gt; <span class="kw">match</span> (<span class="ident">old_param</span>, <span class="ident">new_param</span>) {
                 <span class="comment">// NChar uses twice the space per length unit.</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">binary_len</span>), <span class="prelude-val">Some</span>(<span class="ident">nchar_len</span>)) <span class="kw">if</span> <span class="ident">binary_len</span> <span class="op">&gt;</span> (<span class="ident">nchar_len</span> <span class="op">*</span> <span class="number">2</span>) =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">binary_len</span>), <span class="prelude-val">Some</span>(<span class="ident">nchar_len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">binary_len</span> <span class="op">&gt;</span> (<span class="ident">nchar_len</span> <span class="op">*</span> <span class="number">2</span>) =&gt; <span class="ident">RiskyCast</span>,
                 <span class="comment">// By default we use two bytes.</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">binary_len</span>), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">binary_len</span> <span class="op">&gt;</span> <span class="number">2</span> =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">binary_len</span>), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">binary_len</span> <span class="op">&gt;</span> <span class="number">2</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::VarChar</span>(<span class="ident">new_param</span>) =&gt; <span class="kw">match</span> (<span class="ident">old_param</span>, <span class="ident">new_param</span>) {
-                (<span class="prelude-val">Some</span>(<span class="ident">binary_len</span>), <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">varchar_len</span>))) <span class="kw">if</span> <span class="ident">binary_len</span> <span class="op">&gt;</span> <span class="ident">varchar_len</span>.<span class="ident">into</span>() =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">binary_len</span>), <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">varchar_len</span>))) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">binary_len</span> <span class="op">&gt;</span> (<span class="kw-2">*</span><span class="ident">varchar_len</span>).<span class="ident">into</span>() =&gt; <span class="ident">RiskyCast</span>,
                 <span class="comment">// By default we can fit one byte.</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">binary_len</span>), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">binary_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">binary_len</span>), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">binary_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::NVarChar</span>(<span class="ident">new_param</span>) =&gt; <span class="kw">match</span> (<span class="ident">old_param</span>, <span class="ident">new_param</span>) {
                 <span class="comment">// NVarChar takes double the space per length unit.</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">binary_len</span>), <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">nvarchar_len</span>))) <span class="kw">if</span> <span class="ident">binary_len</span> <span class="op">&gt;</span> (<span class="ident">nvarchar_len</span> <span class="op">*</span> <span class="number">2</span>).<span class="ident">into</span>() =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">binary_len</span>), <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">nvarchar_len</span>))) <span class="kw">if</span> (<span class="kw-2">*</span><span class="ident">binary_len</span>) <span class="op">&gt;</span> (<span class="kw-2">*</span><span class="ident">nvarchar_len</span> <span class="op">*</span> <span class="number">2</span>).<span class="ident">into</span>() =&gt; {
+                    <span class="ident">RiskyCast</span>
+                }
                 <span class="comment">// By default we can fit two bytes.</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">binary_len</span>), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">binary_len</span> <span class="op">&gt;</span> <span class="number">2</span> =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">binary_len</span>), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">binary_len</span> <span class="op">&gt;</span> <span class="number">2</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::Binary</span>(<span class="ident">new_param</span>) =&gt; <span class="kw">match</span> (<span class="ident">old_param</span>, <span class="ident">new_param</span>) {
                 (<span class="prelude-val">Some</span>(<span class="ident">old_len</span>), <span class="prelude-val">Some</span>(<span class="ident">new_len</span>)) <span class="kw">if</span> <span class="ident">old_len</span> <span class="op">&gt;</span> <span class="ident">new_len</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="comment">// By default we can fit one byte.</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">old_len</span>), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">old_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">old_len</span>), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">old_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::VarBinary</span>(<span class="ident">new_param</span>) =&gt; <span class="kw">match</span> (<span class="ident">old_param</span>, <span class="ident">new_param</span>) {
-                (<span class="prelude-val">Some</span>(<span class="ident">old_len</span>), <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">new_len</span>))) <span class="kw">if</span> <span class="ident">old_len</span> <span class="op">&gt;</span> <span class="ident">new_len</span>.<span class="ident">into</span>() =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">old_len</span>), <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">new_len</span>))) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">old_len</span> <span class="op">&gt;</span> (<span class="kw-2">*</span><span class="ident">new_len</span>).<span class="ident">into</span>() =&gt; <span class="ident">RiskyCast</span>,
                 <span class="comment">// By default we can fit one byte.</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">old_len</span>), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">old_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">old_len</span>), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">old_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::Image</span> =&gt; <span class="ident">SafeCast</span>,
@@ -2152,35 +2156,35 @@
         <span class="ident">MsSqlType::VarBinary</span>(<span class="ident">old_param</span>) =&gt; <span class="kw">match</span> <span class="ident">next</span> {
             <span class="ident">MsSqlType::TinyInt</span> =&gt; <span class="kw">match</span> <span class="ident">old_param</span> {
                 <span class="comment">// One byte.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">binary_len</span>)) <span class="kw">if</span> <span class="ident">binary_len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">1</span> =&gt; <span class="ident">SafeCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">binary_len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">binary_len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">1</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="prelude-val">None</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="ident">MsSqlType::SmallInt</span> =&gt; <span class="kw">match</span> <span class="ident">old_param</span> {
                 <span class="comment">// Two bytes.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">binary_len</span>)) <span class="kw">if</span> <span class="ident">binary_len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">2</span> =&gt; <span class="ident">SafeCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">binary_len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">binary_len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">2</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="ident">MsSqlType::Int</span> =&gt; <span class="kw">match</span> <span class="ident">old_param</span> {
                 <span class="comment">// Four bytes.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">binary_len</span>)) <span class="kw">if</span> <span class="ident">binary_len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">4</span> =&gt; <span class="ident">SafeCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">binary_len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">binary_len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">4</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="ident">MsSqlType::BigInt</span> =&gt; <span class="kw">match</span> <span class="ident">old_param</span> {
                 <span class="comment">// Eight bytes.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">binary_len</span>)) <span class="kw">if</span> <span class="ident">binary_len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">8</span> =&gt; <span class="ident">SafeCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">binary_len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">binary_len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">8</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="ident">MsSqlType::Decimal</span>(<span class="kw">_</span>) =&gt; <span class="ident">RiskyCast</span>,
             <span class="ident">MsSqlType::Money</span> =&gt; <span class="kw">match</span> <span class="ident">old_param</span> {
                 <span class="comment">// Spending eight bytes for money.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">binary_len</span>)) <span class="kw">if</span> <span class="ident">binary_len</span> <span class="op">&gt;</span> <span class="number">8</span> =&gt; <span class="ident">RiskyCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">binary_len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">binary_len</span> <span class="op">&gt;</span> <span class="number">8</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="prelude-val">Some</span>(<span class="ident">Max</span>) =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::SmallMoney</span> =&gt; <span class="kw">match</span> <span class="ident">old_param</span> {
                 <span class="comment">// Four bytes for money.</span>
-                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">binary_len</span>)) <span class="kw">if</span> <span class="ident">binary_len</span> <span class="op">&gt;</span> <span class="number">4</span> =&gt; <span class="ident">RiskyCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">binary_len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">binary_len</span> <span class="op">&gt;</span> <span class="number">4</span> =&gt; <span class="ident">RiskyCast</span>,
                 <span class="prelude-val">Some</span>(<span class="ident">Max</span>) =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
@@ -2188,44 +2192,44 @@
             <span class="ident">MsSqlType::DateTime</span> =&gt; <span class="ident">RiskyCast</span>,
             <span class="ident">MsSqlType::SmallDateTime</span> =&gt; <span class="ident">RiskyCast</span>,
             <span class="ident">MsSqlType::Char</span>(<span class="ident">new_param</span>) =&gt; <span class="kw">match</span> (<span class="ident">old_param</span>, <span class="ident">new_param</span>) {
-                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">binary_len</span>)), <span class="prelude-val">Some</span>(<span class="ident">char_len</span>)) <span class="kw">if</span> <span class="ident">u32::from</span>(<span class="ident">binary_len</span>) <span class="op">&gt;</span> <span class="ident">char_len</span> =&gt; <span class="ident">RiskyCast</span>,
-                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">binary_len</span>)), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">binary_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">binary_len</span>)), <span class="prelude-val">Some</span>(<span class="ident">char_len</span>)) <span class="kw">if</span> <span class="ident">u32::from</span>(<span class="kw-2">*</span><span class="ident">binary_len</span>) <span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">char_len</span> =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">binary_len</span>)), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">binary_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
                 (<span class="prelude-val">Some</span>(<span class="ident">Max</span>), <span class="kw">_</span>) =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::NChar</span>(<span class="ident">new_param</span>) =&gt; <span class="kw">match</span> (<span class="ident">old_param</span>, <span class="ident">new_param</span>) {
                 <span class="comment">// NChar length unit is two bytes.</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">binary_len</span>)), <span class="prelude-val">Some</span>(<span class="ident">nchar_len</span>)) <span class="kw">if</span> <span class="ident">u32::from</span>(<span class="ident">binary_len</span>) <span class="op">&gt;</span> (<span class="ident">nchar_len</span> <span class="op">*</span> <span class="number">2</span>) =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">binary_len</span>)), <span class="prelude-val">Some</span>(<span class="ident">nchar_len</span>)) <span class="kw">if</span> <span class="ident">u32::from</span>(<span class="kw-2">*</span><span class="ident">binary_len</span>) <span class="op">&gt;</span> (<span class="ident">nchar_len</span> <span class="op">*</span> <span class="number">2</span>) =&gt; <span class="ident">RiskyCast</span>,
                 <span class="comment">// One nchar takes two bytes.</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">binary_len</span>)), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">binary_len</span> <span class="op">&gt;</span> <span class="number">2</span> =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">binary_len</span>)), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">binary_len</span> <span class="op">&gt;</span> <span class="number">2</span> =&gt; <span class="ident">RiskyCast</span>,
                 (<span class="prelude-val">Some</span>(<span class="ident">Max</span>), <span class="kw">_</span>) =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::VarChar</span>(<span class="ident">new_param</span>) =&gt; <span class="kw">match</span> (<span class="ident">old_param</span>, <span class="ident">new_param</span>) {
                 (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">binary_len</span>)), <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">varchar_len</span>))) <span class="kw">if</span> <span class="ident">binary_len</span> <span class="op">&gt;</span> <span class="ident">varchar_len</span> =&gt; <span class="ident">RiskyCast</span>,
-                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">binary_len</span>)), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">binary_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">binary_len</span>)), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">binary_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
                 (<span class="prelude-val">Some</span>(<span class="ident">Max</span>), <span class="prelude-val">Some</span>(<span class="ident">Max</span>)) =&gt; <span class="ident">SafeCast</span>,
                 (<span class="prelude-val">Some</span>(<span class="ident">Max</span>), <span class="kw">_</span>) =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::NVarChar</span>(<span class="ident">new_param</span>) =&gt; <span class="kw">match</span> (<span class="ident">old_param</span>, <span class="ident">new_param</span>) {
                 <span class="comment">// NVarChar length unit is two bytes.</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">binary_len</span>)), <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">nvarchar_len</span>))) <span class="kw">if</span> <span class="ident">binary_len</span> <span class="op">&gt;</span> (<span class="ident">nvarchar_len</span> <span class="op">*</span> <span class="number">2</span>) =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">binary_len</span>)), <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">nvarchar_len</span>))) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">binary_len</span> <span class="op">&gt;</span> (<span class="ident">nvarchar_len</span> <span class="op">*</span> <span class="number">2</span>) =&gt; <span class="ident">RiskyCast</span>,
                 <span class="comment">// One nvarchar takes two bytes.</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">binary_len</span>)), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">binary_len</span> <span class="op">&gt;</span> <span class="number">2</span> =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">binary_len</span>)), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">binary_len</span> <span class="op">&gt;</span> <span class="number">2</span> =&gt; <span class="ident">RiskyCast</span>,
                 (<span class="prelude-val">Some</span>(<span class="ident">Max</span>), <span class="prelude-val">Some</span>(<span class="ident">Max</span>)) =&gt; <span class="ident">SafeCast</span>,
                 (<span class="prelude-val">Some</span>(<span class="ident">Max</span>), <span class="kw">_</span>) =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::Binary</span>(<span class="ident">new_param</span>) =&gt; <span class="kw">match</span> (<span class="ident">old_param</span>, <span class="ident">new_param</span>) {
-                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">old_len</span>)), <span class="prelude-val">Some</span>(<span class="ident">new_len</span>)) <span class="kw">if</span> <span class="ident">u32::from</span>(<span class="ident">old_len</span>) <span class="op">&gt;</span> <span class="ident">new_len</span> =&gt; <span class="ident">RiskyCast</span>,
-                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">old_len</span>)), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">old_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">old_len</span>)), <span class="prelude-val">Some</span>(<span class="ident">new_len</span>)) <span class="kw">if</span> <span class="ident">u32::from</span>(<span class="kw-2">*</span><span class="ident">old_len</span>) <span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">new_len</span> =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">old_len</span>)), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">old_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
                 (<span class="prelude-val">Some</span>(<span class="ident">Max</span>), <span class="kw">_</span>) =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
             },
             <span class="ident">MsSqlType::VarBinary</span>(<span class="ident">new_param</span>) =&gt; <span class="kw">match</span> (<span class="ident">old_param</span>, <span class="ident">new_param</span>) {
                 (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">old_len</span>)), <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">new_len</span>))) <span class="kw">if</span> <span class="ident">old_len</span> <span class="op">&gt;</span> <span class="ident">new_len</span> =&gt; <span class="ident">RiskyCast</span>,
-                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">old_len</span>)), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">old_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">old_len</span>)), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">old_len</span> <span class="op">&gt;</span> <span class="number">1</span> =&gt; <span class="ident">RiskyCast</span>,
                 (<span class="prelude-val">Some</span>(<span class="ident">Max</span>), <span class="prelude-val">Some</span>(<span class="ident">Max</span>)) =&gt; <span class="ident">SafeCast</span>,
                 (<span class="prelude-val">Some</span>(<span class="ident">Max</span>), <span class="kw">_</span>) =&gt; <span class="ident">RiskyCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
@@ -2267,20 +2271,20 @@
         <span class="comment">// GUID. The rest of the world calls this UUID.</span>
         <span class="ident">MsSqlType::UniqueIdentifier</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
             <span class="ident">MsSqlType::Char</span>(<span class="ident">param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NChar</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">length</span>) <span class="kw">if</span> <span class="ident">length</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">36</span> =&gt; <span class="ident">SafeCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">length</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">length</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">36</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="ident">MsSqlType::VarChar</span>(<span class="ident">param</span>) <span class="op">|</span> <span class="ident">MsSqlType::NVarChar</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">length</span>)) <span class="kw">if</span> <span class="ident">length</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">36</span> =&gt; <span class="ident">SafeCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">length</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">length</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">36</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="prelude-val">Some</span>(<span class="ident">Max</span>) =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="ident">MsSqlType::Binary</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">length</span>) <span class="kw">if</span> <span class="ident">length</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">16</span> =&gt; <span class="ident">SafeCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">length</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">length</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">16</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },
             <span class="ident">MsSqlType::VarBinary</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">length</span>)) <span class="kw">if</span> <span class="ident">length</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">16</span> =&gt; <span class="ident">SafeCast</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">Number</span>(<span class="ident">length</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">length</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">16</span> =&gt; <span class="ident">SafeCast</span>,
                 <span class="prelude-val">Some</span>(<span class="ident">Max</span>) =&gt; <span class="ident">SafeCast</span>,
                 <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
             },

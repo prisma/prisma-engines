@@ -688,6 +688,7 @@
 <span id="688">688</span>
 <span id="689">689</span>
 <span id="690">690</span>
+<span id="691">691</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">dml</span>, <span class="kw-2">*</span>};
 <span class="kw">use</span> <span class="ident">either::Either</span>;
 <span class="kw">use</span> <span class="ident">psl_core</span>::{
@@ -1164,12 +1165,15 @@
             <span class="ident">db::ScalarFieldType::BuiltInScalar</span>(<span class="ident">scalar_type</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">native_type</span> <span class="op">=</span> <span class="ident">scalar_field</span>.<span class="ident">raw_native_type</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">name</span>, <span class="ident">args</span>, <span class="kw">_</span>)<span class="op">|</span> {
                     <span class="self">self</span>.<span class="ident">connector</span>
-                        .<span class="ident">parse_native_type</span>(<span class="ident">name</span>, <span class="ident">args</span>.<span class="ident">to_owned</span>(), <span class="ident">scalar_field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>())
+                        .<span class="ident">parse_native_type</span>(<span class="ident">name</span>, <span class="ident">args</span>, <span class="ident">scalar_field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">Default::default</span>())
                         .<span class="ident">unwrap</span>()
                 });
                 <span class="ident">FieldType::Scalar</span>(
                     <span class="ident">parser_database_scalar_type_to_dml_scalar_type</span>(<span class="kw-2">*</span><span class="ident">scalar_type</span>),
-                    <span class="ident">native_type</span>.<span class="ident">map</span>(<span class="ident">datamodel_connector_native_type_to_dml_native_type</span>),
+                    <span class="ident">native_type</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">nt</span><span class="op">|</span> <span class="ident">dml::NativeTypeInstance</span> {
+                        <span class="ident">native_type</span>: <span class="ident">nt</span>,
+                        <span class="ident">connector</span>: <span class="self">self</span>.<span class="ident">connector</span>,
+                    }),
                 )
             }
         }
@@ -1187,13 +1191,21 @@
             <span class="ident">db::ScalarFieldType::BuiltInScalar</span>(<span class="ident">scalar_type</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">native_type</span> <span class="op">=</span> <span class="ident">composite_type_field</span>.<span class="ident">raw_native_type</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">name</span>, <span class="ident">args</span>, <span class="kw">_</span>)<span class="op">|</span> {
                     <span class="self">self</span>.<span class="ident">connector</span>
-                        .<span class="ident">parse_native_type</span>(<span class="ident">name</span>, <span class="ident">args</span>.<span class="ident">to_owned</span>(), <span class="ident">composite_type_field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>())
+                        .<span class="ident">parse_native_type</span>(
+                            <span class="ident">name</span>,
+                            <span class="ident">args</span>,
+                            <span class="ident">composite_type_field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+                            <span class="kw-2">&amp;mut</span> <span class="ident">Default::default</span>(),
+                        )
                         .<span class="ident">unwrap</span>()
                 });
 
                 <span class="ident">CompositeTypeFieldType::Scalar</span>(
                     <span class="ident">parser_database_scalar_type_to_dml_scalar_type</span>(<span class="kw-2">*</span><span class="ident">scalar_type</span>),
-                    <span class="ident">native_type</span>.<span class="ident">map</span>(<span class="ident">datamodel_connector_native_type_to_dml_native_type</span>),
+                    <span class="ident">native_type</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">nt</span><span class="op">|</span> <span class="ident">dml::NativeTypeInstance</span> {
+                        <span class="ident">native_type</span>: <span class="ident">nt</span>,
+                        <span class="ident">connector</span>: <span class="self">self</span>.<span class="ident">connector</span>,
+                    }),
                 )
             }
             <span class="ident">db::ScalarFieldType::Enum</span>(<span class="ident">enum_id</span>) =&gt; {
@@ -1233,18 +1245,8 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parser_database_scalar_type_to_dml_scalar_type</span>(<span class="ident">st</span>: <span class="ident">ScalarType</span>) -&gt; <span class="ident">dml::ScalarType</span> {
+<span class="kw">fn</span> <span class="ident">parser_database_scalar_type_to_dml_scalar_type</span>(<span class="ident">st</span>: <span class="ident">db::ScalarType</span>) -&gt; <span class="ident">dml::ScalarType</span> {
     <span class="ident">st</span>.<span class="ident">as_str</span>().<span class="ident">parse</span>().<span class="ident">unwrap</span>()
-}
-
-<span class="kw">fn</span> <span class="ident">datamodel_connector_native_type_to_dml_native_type</span>(
-    <span class="ident">instance</span>: <span class="ident">psl_core::datamodel_connector::NativeTypeInstance</span>,
-) -&gt; <span class="ident">NativeTypeInstance</span> {
-    <span class="ident">NativeTypeInstance</span> {
-        <span class="ident">name</span>: <span class="ident">instance</span>.<span class="ident">name</span>,
-        <span class="ident">args</span>: <span class="ident">instance</span>.<span class="ident">args</span>,
-        <span class="ident">serialized_native_type</span>: <span class="ident">instance</span>.<span class="ident">serialized_native_type</span>,
-    }
 }
 
 <span class="kw">fn</span> <span class="ident">dml_default_kind</span>(<span class="ident">default_value</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Expression</span>, <span class="ident">scalar_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ScalarType</span><span class="op">&gt;</span>) -&gt; <span class="ident">DefaultKind</span> {
