@@ -10,8 +10,8 @@ use crate::{
     sql_schema_differ::{column::ColumnTypeChange, differ_database::DifferDatabase},
 };
 use enumflags2::BitFlags;
-use native_types::{CockroachType, PostgresType};
 use once_cell::sync::Lazy;
+use psl::builtin_connectors::{CockroachType, PostgresType};
 use regex::RegexSet;
 use sql_schema_describer::{
     postgres::PostgresSchemaExt,
@@ -289,8 +289,8 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
 fn cockroach_column_type_change(columns: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
     use ColumnTypeChange::*;
 
-    let previous_type: Option<CockroachType> = columns.previous.column_native_type();
-    let next_type: Option<CockroachType> = columns.next.column_native_type();
+    let previous_type: Option<&CockroachType> = columns.previous.column_native_type();
+    let next_type: Option<&CockroachType> = columns.next.column_native_type();
     let from_list_to_scalar = columns.previous.arity().is_list() && !columns.next.arity().is_list();
     let from_scalar_to_list = !columns.previous.arity().is_list() && columns.next.arity().is_list();
 
@@ -299,7 +299,7 @@ fn cockroach_column_type_change(columns: Pair<ColumnWalker<'_>>) -> Option<Colum
         (_, Some(CockroachType::String(_))) if from_list_to_scalar => Some(RiskyCast),
         (_, Some(CockroachType::Char(_))) if from_list_to_scalar => Some(RiskyCast),
         (_, _) if from_scalar_to_list || from_list_to_scalar => Some(NotCastable),
-        (Some(previous), Some(next)) => cockroach_native_type_change_riskyness(previous, next, columns),
+        (Some(previous), Some(next)) => cockroach_native_type_change_riskyness(*previous, *next, columns),
         // Unsupported types will have None as Native type
         (None, Some(_)) => Some(RiskyCast),
         (Some(_), None) => Some(RiskyCast),
@@ -342,8 +342,8 @@ fn cockroach_native_type_change_riskyness(
 
 fn postgres_column_type_change(columns: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
     use ColumnTypeChange::*;
-    let previous_type: Option<PostgresType> = columns.previous.column_native_type();
-    let next_type: Option<PostgresType> = columns.next.column_native_type();
+    let previous_type: Option<&PostgresType> = columns.previous.column_native_type();
+    let next_type: Option<&PostgresType> = columns.next.column_native_type();
     let from_list_to_scalar = columns.previous.arity().is_list() && !columns.next.arity().is_list();
     let from_scalar_to_list = !columns.previous.arity().is_list() && columns.next.arity().is_list();
 
@@ -366,8 +366,8 @@ fn postgres_column_type_change(columns: Pair<ColumnWalker<'_>>) -> Option<Column
     }
 }
 
-fn postgres_native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> Option<ColumnTypeChange> {
-    use native_types::PostgresType::*;
+fn postgres_native_type_change_riskyness(previous: &PostgresType, next: &PostgresType) -> Option<ColumnTypeChange> {
+    use psl::builtin_connectors::PostgresType::*;
     use ColumnTypeChange::*;
 
     // varchar / varbit without param=> unlimited length
@@ -408,7 +408,7 @@ fn postgres_native_type_change_riskyness(previous: PostgresType, next: PostgresT
                 DoublePrecision => SafeCast,
                 VarChar(param) | Char(param) => match param {
                     // Smallint can have three digits and an optional sign.
-                    Some(len) if len < 4 => RiskyCast,
+                    Some(len) if *len < 4 => RiskyCast,
                     None if next_is_char() => RiskyCast,
                     _ => SafeCast,
                 },
@@ -427,7 +427,7 @@ fn postgres_native_type_change_riskyness(previous: PostgresType, next: PostgresT
                 DoublePrecision => SafeCast,
                 VarChar(param) | Char(param) => match param {
                     // Integer can have five digits and an optional sign.
-                    Some(len) if len < 11 => RiskyCast,
+                    Some(len) if *len < 11 => RiskyCast,
                     None if next_is_char() => RiskyCast,
                     _ => SafeCast,
                 },
@@ -446,7 +446,7 @@ fn postgres_native_type_change_riskyness(previous: PostgresType, next: PostgresT
                 DoublePrecision => SafeCast,
                 VarChar(param) | Char(param) => match param {
                     // Bigint can have twenty digits and an optional sign.
-                    Some(len) if len < 20 => RiskyCast,
+                    Some(len) if *len < 20 => RiskyCast,
                     None if next_is_char() => RiskyCast,
                     _ => SafeCast,
                 },
@@ -456,25 +456,25 @@ fn postgres_native_type_change_riskyness(previous: PostgresType, next: PostgresT
             Decimal(old_params) => match next {
                 SmallInt => match old_params {
                     None => RiskyCast,
-                    Some((_, s)) if s > 0 => RiskyCast,
-                    Some((p, 0)) if p > 2 => RiskyCast,
+                    Some((_, s)) if *s > 0 => RiskyCast,
+                    Some((p, 0)) if *p > 2 => RiskyCast,
                     _ => SafeCast,
                 },
                 Integer => match old_params {
                     None => RiskyCast,
-                    Some((_, s)) if s > 0 => RiskyCast,
-                    Some((p, 0)) if p > 9 => RiskyCast,
+                    Some((_, s)) if *s > 0 => RiskyCast,
+                    Some((p, 0)) if *p > 9 => RiskyCast,
                     _ => SafeCast,
                 },
                 BigInt => match old_params {
                     None => RiskyCast,
-                    Some((_, s)) if s > 0 => RiskyCast,
-                    Some((p, 0)) if p > 18 => RiskyCast,
+                    Some((_, s)) if *s > 0 => RiskyCast,
+                    Some((p, 0)) if *p > 18 => RiskyCast,
                     _ => SafeCast,
                 },
                 Decimal(new_params) => match (old_params, new_params) {
                     (Some(_), None) => SafeCast,
-                    (None, Some((p_new, s_new))) if p_new < 131072 || s_new < 16383 => RiskyCast,
+                    (None, Some((p_new, s_new))) if *p_new < 131072 || *s_new < 16383 => RiskyCast,
                     // Sigh... So, numeric(4,0) to numeric(4,2) would be risky,
                     // so would numeric(4,2) to numeric(4,0).
                     (Some((p_old, s_old)), Some((p_new, s_new))) if p_old - s_old > p_new - s_new || s_old > s_new => {
@@ -488,12 +488,12 @@ fn postgres_native_type_change_riskyness(previous: PostgresType, next: PostgresT
                 VarChar(length) | Char(length) => match (length, old_params) {
                     // We must fit p digits and a possible sign to our
                     // string, otherwise might truncate.
-                    (Some(len), Some((p, 0))) if p + 1 > len => RiskyCast,
+                    (Some(len), Some((p, 0))) if p + 1 > *len => RiskyCast,
                     // We must fit p digits, a possible sign and a comma to
                     // our string, otherwise might truncate.
-                    (Some(len), Some((p, n))) if n > 0 && p + 2 > len => RiskyCast,
+                    (Some(len), Some((p, n))) if *n > 0 && p + 2 > *len => RiskyCast,
                     //up to 131072 digits before the decimal point; up to 16383 digits after the decimal point
-                    (Some(len), None) if len < 131073 => RiskyCast,
+                    (Some(len), None) if *len < 131073 => RiskyCast,
                     (None, _) if next_is_char() => RiskyCast,
                     (None, _) => SafeCast,
                     _ => SafeCast,
@@ -510,7 +510,7 @@ fn postgres_native_type_change_riskyness(previous: PostgresType, next: PostgresT
                 DoublePrecision => SafeCast,
                 VarChar(len) | Char(len) => match len {
                     // If float, we can have 47 characters including the sign and comma.
-                    Some(len) if len < 47 => RiskyCast,
+                    Some(len) if *len < 47 => RiskyCast,
                     None if next_is_char() => RiskyCast,
                     _ => SafeCast,
                 },
@@ -526,7 +526,7 @@ fn postgres_native_type_change_riskyness(previous: PostgresType, next: PostgresT
                 DoublePrecision => SafeCast,
                 VarChar(len) | Char(len) => match len {
                     // If double, we can have 317 characters including the sign and comma.
-                    Some(len) if len < 317 => RiskyCast,
+                    Some(len) if *len < 317 => RiskyCast,
                     None if next_is_char() => RiskyCast,
                     _ => SafeCast,
                 },
@@ -565,51 +565,51 @@ fn postgres_native_type_change_riskyness(previous: PostgresType, next: PostgresT
             },
             ByteA => match next {
                 Text | VarChar(None) => SafeCast,
-                VarChar(Some(length)) | Char(Some(length)) if length > 2 => RiskyCast,
+                VarChar(Some(length)) | Char(Some(length)) if *length > 2 => RiskyCast,
                 _ => NotCastable,
             },
             Timestamp(a) => match next {
                 Text | VarChar(None) => SafeCast,
-                Char(Some(len)) | VarChar(Some(len)) if len > 22 => SafeCast,
+                Char(Some(len)) | VarChar(Some(len)) if *len > 22 => SafeCast,
                 PostgresType::Timestamp(None) => return None,
-                PostgresType::Timestamp(Some(b)) if a.is_none() || a == Some(b) => return None,
+                PostgresType::Timestamp(Some(b)) if a.is_none() || *a == Some(*b) => return None,
                 Timestamp(_) | Timestamptz(_) | Date | Time(_) | Timetz(_) => SafeCast,
                 _ => NotCastable,
             },
             Timestamptz(a) => match next {
                 Text | VarChar(None) => SafeCast,
-                Char(Some(len)) | VarChar(Some(len)) if len > 27 => SafeCast,
+                Char(Some(len)) | VarChar(Some(len)) if *len > 27 => SafeCast,
                 PostgresType::Timestamptz(None) => return None,
-                PostgresType::Timestamptz(Some(b)) if a.is_none() || a == Some(b) => return None,
+                PostgresType::Timestamptz(Some(b)) if a.is_none() || *a == Some(*b) => return None,
                 Timestamp(_) | Timestamptz(_) | Date | Time(_) | Timetz(_) => SafeCast,
                 _ => NotCastable,
             },
             Date => match next {
                 Text | VarChar(None) => SafeCast,
-                Char(Some(len)) | VarChar(Some(len)) if len > 27 => SafeCast,
+                Char(Some(len)) | VarChar(Some(len)) if *len > 27 => SafeCast,
                 Timestamp(_) | Timestamptz(_) => SafeCast,
                 _ => NotCastable,
             },
             Time(a) => match next {
                 Text | VarChar(None) => SafeCast,
-                Char(Some(len)) | VarChar(Some(len)) if len > 13 => SafeCast,
+                Char(Some(len)) | VarChar(Some(len)) if *len > 13 => SafeCast,
                 PostgresType::Time(None) => return None,
-                PostgresType::Time(Some(b)) if a.is_none() || a == Some(b) => return None,
+                PostgresType::Time(Some(b)) if a.is_none() || *a == Some(*b) => return None,
                 Timetz(_) => SafeCast,
                 _ => NotCastable,
             },
             Timetz(a) => match next {
                 Text | VarChar(None) => SafeCast,
-                Char(Some(len)) | VarChar(Some(len)) if len > 18 => SafeCast,
+                Char(Some(len)) | VarChar(Some(len)) if *len > 18 => SafeCast,
                 PostgresType::Timetz(None) => return None,
-                PostgresType::Timetz(Some(b)) if a.is_none() || a == Some(b) => return None,
+                PostgresType::Timetz(Some(b)) if a.is_none() || *a == Some(*b) => return None,
                 Timetz(_) | Time(_) => SafeCast,
                 _ => NotCastable,
             },
             Boolean => match next {
                 Text | VarChar(_) => SafeCast,
-                Char(Some(length)) if length > 4 => SafeCast,
-                Char(Some(length)) if length > 3 => RiskyCast,
+                Char(Some(length)) if *length > 4 => SafeCast,
+                Char(Some(length)) if *length > 3 => RiskyCast,
                 _ => NotCastable,
             },
             Bit(None) => match next {
@@ -630,7 +630,7 @@ fn postgres_native_type_change_riskyness(previous: PostgresType, next: PostgresT
             },
             VarBit(Some(length)) => match next {
                 Text | VarChar(None) | VarBit(None) => SafeCast,
-                VarBit(Some(new_length)) if new_length > length => SafeCast,
+                VarBit(Some(new_length)) if *new_length > *length => SafeCast,
                 VarChar(Some(new_length)) | Char(Some(new_length)) if new_length >= length => SafeCast,
                 Bit(Some(new_length)) if new_length <= length => RiskyCast,
                 Bit(None) => RiskyCast,
@@ -639,7 +639,7 @@ fn postgres_native_type_change_riskyness(previous: PostgresType, next: PostgresT
             },
             Uuid => match next {
                 Text | VarChar(None) => SafeCast,
-                VarChar(Some(length)) | Char(Some(length)) if length > 31 => SafeCast,
+                VarChar(Some(length)) | Char(Some(length)) if *length > 31 => SafeCast,
                 _ => NotCastable,
             },
             Xml => match next {

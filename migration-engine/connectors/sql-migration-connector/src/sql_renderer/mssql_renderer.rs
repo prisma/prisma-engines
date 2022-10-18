@@ -7,7 +7,7 @@ use crate::{
     sql_migration::{AlterEnum, AlterTable, RedefineTable},
 };
 use indoc::{formatdoc, indoc};
-use native_types::{MsSqlType, MsSqlTypeParameter};
+use psl::builtin_connectors::{MsSqlType, MsSqlTypeParameter};
 use psl::dml::PrismaValue;
 use sql_schema_describer::{self as sql, mssql::MssqlSchemaExt};
 use std::{borrow::Cow, fmt::Write};
@@ -485,7 +485,7 @@ fn render_column_type(column: sql::ColumnWalker<'_>) -> Cow<'static, str> {
         MsSqlType::Money => "MONEY".into(),
         MsSqlType::SmallMoney => "SMALLMONEY".into(),
         MsSqlType::Bit => "BIT".into(),
-        MsSqlType::Float(bits) => format!("FLOAT{bits}", bits = format_u32_arg(bits)).into(),
+        MsSqlType::Float(bits) => format!("FLOAT{bits}", bits = format_u32_arg(*bits)).into(),
 
         MsSqlType::Real => "REAL".into(),
         MsSqlType::Date => "DATE".into(),
@@ -494,14 +494,14 @@ fn render_column_type(column: sql::ColumnWalker<'_>) -> Cow<'static, str> {
         MsSqlType::DateTime2 => "DATETIME2".into(),
         MsSqlType::DateTimeOffset => "DATETIMEOFFSET".into(),
         MsSqlType::SmallDateTime => "SMALLDATETIME".into(),
-        MsSqlType::NChar(len) => format!("NCHAR{len}", len = format_u32_arg(len)).into(),
-        MsSqlType::Char(len) => format!("CHAR{len}", len = format_u32_arg(len)).into(),
-        MsSqlType::VarChar(len) => format!("VARCHAR{len}", len = format_type_param(len)).into(),
+        MsSqlType::NChar(len) => format!("NCHAR{len}", len = format_u32_arg(*len)).into(),
+        MsSqlType::Char(len) => format!("CHAR{len}", len = format_u32_arg(*len)).into(),
+        MsSqlType::VarChar(len) => format!("VARCHAR{len}", len = format_type_param(*len)).into(),
         MsSqlType::Text => "TEXT".into(),
-        MsSqlType::NVarChar(len) => format!("NVARCHAR{len}", len = format_type_param(len)).into(),
+        MsSqlType::NVarChar(len) => format!("NVARCHAR{len}", len = format_type_param(*len)).into(),
         MsSqlType::NText => "NTEXT".into(),
-        MsSqlType::Binary(len) => format!("BINARY{len}", len = format_u32_arg(len)).into(),
-        MsSqlType::VarBinary(len) => format!("VARBINARY{len}", len = format_type_param(len)).into(),
+        MsSqlType::Binary(len) => format!("BINARY{len}", len = format_u32_arg(*len)).into(),
+        MsSqlType::VarBinary(len) => format!("VARBINARY{len}", len = format_type_param(*len)).into(),
         MsSqlType::Image => "IMAGE".into(),
         MsSqlType::Xml => "XML".into(),
         MsSqlType::UniqueIdentifier => "UNIQUEIDENTIFIER".into(),

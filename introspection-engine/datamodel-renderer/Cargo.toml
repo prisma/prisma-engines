@@ -10,3 +10,4 @@ psl.workspace = true
 
 [dev-dependencies]
 expect-test = "1.4.0"
+indoc = "1.0.7"

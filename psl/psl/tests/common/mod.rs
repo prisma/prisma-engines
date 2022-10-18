@@ -416,6 +416,7 @@ pub(crate) fn parse_unwrap_err(schema: &str) -> String {
     psl::parse_schema(schema).map(drop).unwrap_err()
 }
 
+#[track_caller]
 pub(crate) fn parse(datamodel_string: &str) -> Datamodel {
     let schema = psl::parse_schema(datamodel_string).unwrap();
     psl::lift(&schema)

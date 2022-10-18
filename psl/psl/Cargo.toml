@@ -12,7 +12,6 @@ psl-core = { path = "../psl-core" }
 dissimilar = "1.0.4"
 expect-test = "1.1.0"
 indoc = "1"
-native-types = { path = "../../libs/native-types" }
 
 [features]
 default_generators = ["dml/default_generators"]

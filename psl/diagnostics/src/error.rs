@@ -321,8 +321,8 @@ impl DatamodelError {
         Self::new(msg, span)
     }
 
-    pub fn new_value_parser_error(expected_type: &str, parser_error: &str, raw: &str, span: Span) -> DatamodelError {
-        let msg = format!("Expected a {expected_type} value, but failed while parsing \"{raw}\": {parser_error}.");
+    pub fn new_value_parser_error(expected_type: &str, raw: &str, span: Span) -> DatamodelError {
+        let msg = format!("Expected {expected_type}, but found {raw}.");
         Self::new(msg, span)
     }
 

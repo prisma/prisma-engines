@@ -4,8 +4,7 @@ name = "sql-schema-describer"
 version = "0.1.0"
 
 [dependencies]
-native-types = { path = "../native-types" }
-prisma-value = { path = "../prisma-value" }
+psl.workspace = true
 
 async-trait = "0.1.17"
 bigdecimal = "0.3"
@@ -15,7 +14,6 @@ indoc = "1"
 once_cell = "1.3"
 regex = "1.2"
 serde.workspace = true
-serde_json.workspace = true
 tracing = "0.1"
 tracing-error = "0.2"
 tracing-futures = "0.2"

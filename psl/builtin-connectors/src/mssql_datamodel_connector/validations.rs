@@ -1,4 +1,4 @@
-use native_types::MsSqlType;
+use super::MsSqlType;
 use psl_core::{
     datamodel_connector::{walker_ext_traits::ScalarFieldWalkerExt, Connector},
     diagnostics::{DatamodelError, Diagnostics},
@@ -19,9 +19,9 @@ pub(crate) fn index_uses_correct_field_types(
             None => continue,
         };
 
-        let r#type: MsSqlType = serde_json::from_value(native_type.serialized_native_type.clone()).unwrap();
+        let r#type: &MsSqlType = native_type.downcast_ref();
 
-        if !super::heap_allocated_types().contains(&r#type) {
+        if !super::heap_allocated_types().contains(r#type) {
             continue;
         }
 
@@ -46,9 +46,9 @@ pub(crate) fn primary_key_uses_correct_field_types(
         let span = pk.ast_attribute().span;
 
         if let Some(native_type) = field.native_type_instance(connector) {
-            let r#type: MsSqlType = serde_json::from_value(native_type.serialized_native_type.clone()).unwrap();
+            let r#type: &MsSqlType = native_type.downcast_ref();
 
-            if super::heap_allocated_types().contains(&r#type) {
+            if super::heap_allocated_types().contains(r#type) {
                 let error = connector
                     .native_instance_error(&native_type)
                     .new_incompatible_native_type_with_id("", span);
