@@ -47,11 +47,10 @@ fn get_config_impl(params: GetConfigParams) -> Result<serde_json::Value, GetConf
         let mut full_error = errors.to_pretty_string("schema.prisma", &params.prisma_schema);
         write!(full_error, "\nValidation Error Count: {}", errors.errors().len()).unwrap();
 
-        let parser_error = user_facing_errors::common::SchemaParserError { full_error };
-
         GetConfigError {
-            error_code: None,
-            message: parser_error.full_error,
+            // this mirrors user_facing_errors::common::SchemaParserError
+            error_code: Some(String::from("P1012")),
+            message: full_error,
         }
     };
 

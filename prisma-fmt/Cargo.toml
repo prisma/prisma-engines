@@ -11,7 +11,6 @@ serde.workspace = true
 lsp-types = "0.91.1"
 log = "0.4.14"
 indoc = "1"
-user-facing-errors = { path = "../libs/user-facing-errors" }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 structopt = "0.3"
