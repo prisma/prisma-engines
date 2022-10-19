@@ -403,9 +403,9 @@ async fn referential_actions_are_kept_intact(api: &TestApi) -> TestResult {
         }
 
         model B {
-          id  Int @id @default(autoincrement())
-          aId Int
-          a   A   @relation(fields: [aId], references: [id], onDelete: SetNull)
+          id  Int  @id @default(autoincrement())
+          aId Int?
+          a   A?   @relation(fields: [aId], references: [id], onDelete: SetNull)
         }
     "#};
 
@@ -416,9 +416,9 @@ async fn referential_actions_are_kept_intact(api: &TestApi) -> TestResult {
         }
 
         model B {
-          id  Int @id @default(autoincrement())
-          aId Int
-          a   A   @relation(fields: [aId], references: [id], onDelete: SetNull)
+          id  Int  @id @default(autoincrement())
+          aId Int?
+          a   A?   @relation(fields: [aId], references: [id], onDelete: SetNull)
         }
     "#]];
 
