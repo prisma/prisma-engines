@@ -390,7 +390,7 @@ async fn referential_actions_are_kept_intact(api: &TestApi) -> TestResult {
 
         CREATE TABLE `B` (
             id  INT AUTO_INCREMENT PRIMARY KEY,
-            aId INT NOT NULL
+            aId INT NULL
         );
     "#};
 
