@@ -2,4 +2,5 @@
 
 mod new;
 mod queries;
+mod raw;
 mod writes;

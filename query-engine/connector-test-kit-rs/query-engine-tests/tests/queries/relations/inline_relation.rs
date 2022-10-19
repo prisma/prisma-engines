@@ -10,7 +10,7 @@ mod inline_rel {
             r#"model ModelA {
               #id(id, String, @id)
               bool Boolean @default(true)
-              b_id String?
+              b_id String? @unique
               b    ModelB? @relation(fields: [b_id], references: [id])
             }
 

@@ -1,15 +1,14 @@
 pub(crate) fn run(schema: &str) -> String {
-    let datamodel_result = datamodel::parse_configuration(schema);
+    let datamodel_result = psl::parse_configuration(schema);
 
     match datamodel_result {
         Ok(validated_configuration) => {
-            if validated_configuration.subject.datasources.len() != 1 {
+            if validated_configuration.datasources.len() != 1 {
                 "[]".to_string()
-            } else if let Some(datasource) = validated_configuration.subject.datasources.first() {
-                let referential_integrity = datasource.referential_integrity();
+            } else if let Some(datasource) = validated_configuration.datasources.first() {
                 let available_referential_actions = datasource
                     .active_connector
-                    .referential_actions(&referential_integrity)
+                    .referential_actions()
                     .iter()
                     .map(|act| format!("{:?}", act))
                     .collect::<Vec<_>>();

@@ -3,12 +3,12 @@ use chrono::Utc;
 use migration_engine_tests::test_api::*;
 use once_cell::sync::Lazy;
 use quaint::{prelude::Insert, Value};
-use std::{collections::HashMap, str::FromStr};
+use std::{collections::HashMap, fmt::Write as _, str::FromStr};
 
 static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
     vec![
         ("Oid", Value::integer(u8::MAX), &["VarChar(100)", "Integer", "BigInt"]),
-        ("Money", Value::integer(u8::MAX), &["VarChar(100)"]),
+        ("Money", Value::int64(u8::MAX), &["VarChar(100)"]),
         ("Inet", Value::text("10.1.2.3"), &["VarChar(100)"]),
         (
             "SmallInt",
@@ -39,7 +39,7 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ),
         (
             "BigInt",
-            Value::integer(i64::MAX),
+            Value::int64(i64::MAX),
             &["BigInt", "Real", "DoublePrecision", "VarChar(53)", "Char(53)", "Text"],
         ),
         (
@@ -154,7 +154,7 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
 
 static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
     vec![
-        ("Money", Value::integer(u8::MAX), &["Decimal"]),
+        ("Money", Value::int64(u8::MAX), &["Decimal"]),
         (
             "SmallInt",
             Value::integer(2),
@@ -265,7 +265,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ),
         (
             "BigInt",
-            Value::integer(i64::MAX),
+            Value::int64(i64::MAX),
             &[
                 "ByteA",
                 "Timestamp(3)",
@@ -771,7 +771,7 @@ fn prisma_type(native_type: &str) -> &str {
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn safe_casts_with_existing_data_should_work(api: TestApi) {
-    let connector = sql_datamodel_connector::POSTGRES;
+    let connector = psl::builtin_connectors::POSTGRES;
 
     for (from, seed, casts) in SAFE_CASTS.iter() {
         let span = tracing::info_span!("SafeCasts", from = %from, to = ?casts, seed = ?seed);
@@ -788,19 +788,23 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
 
             let column_name = format!("column_{}", idx);
 
-            previous_columns.push_str(&format!(
-                "{column_name}  {prisma_type}? @db.{native_type} \n",
+            writeln!(
+                previous_columns,
+                "{column_name}  {prisma_type}? @db.{native_type}",
                 prisma_type = prisma_type(from),
                 native_type = from,
                 column_name = column_name
-            ));
+            )
+            .unwrap();
 
-            next_columns.push_str(&format!(
-                "{column_name}  {prisma_type}? @db.{native_type}\n",
+            writeln!(
+                next_columns,
+                "{column_name}  {prisma_type}? @db.{native_type}",
                 prisma_type = prisma_type(to),
                 native_type = to,
                 column_name = column_name
-            ));
+            )
+            .unwrap();
 
             insert = insert.value(column_name.clone(), seed.clone());
 
@@ -828,7 +832,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
         // first assertions
         api.assert_schema().assert_table("A", |table| {
             previous_assertions.iter().fold(
-                table.assert_column_count(previous_assertions.len() + 1),
+                table.assert_columns_count(previous_assertions.len() + 1),
                 |table, (column_name, expected)| {
                     table.assert_column(column_name, |c| c.assert_native_type(expected, connector))
                 },
@@ -850,7 +854,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
         // second assertions
         api.assert_schema().assert_table("A", |table| {
             next_assertions.iter().fold(
-                table.assert_column_count(next_assertions.len() + 1),
+                table.assert_columns_count(next_assertions.len() + 1),
                 |table, (name, expected)| table.assert_column(name, |c| c.assert_native_type(expected, connector)),
             )
         });
@@ -861,7 +865,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn risky_casts_with_existing_data_should_warn(api: TestApi) {
-    let connector = sql_datamodel_connector::POSTGRES;
+    let connector = psl::builtin_connectors::POSTGRES;
 
     for (from, seed, casts) in RISKY_CASTS.iter() {
         let mut previous_columns = "".to_string();
@@ -876,19 +880,23 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
 
             let column_name = format!("column_{}", idx);
 
-            previous_columns.push_str(&format!(
-                "{column_name}  {prisma_type}? @db.{native_type} \n",
+            writeln!(
+                previous_columns,
+                "{column_name}  {prisma_type}? @db.{native_type}",
                 prisma_type = prisma_type(from),
                 native_type = from,
                 column_name = column_name
-            ));
+            )
+            .unwrap();
 
-            next_columns.push_str(&format!(
-                "{column_name}  {prisma_type}? @db.{native_type}\n",
+            writeln!(
+                next_columns,
+                "{column_name}  {prisma_type}? @db.{native_type}",
                 prisma_type = prisma_type(to),
                 native_type = to,
                 column_name = column_name
-            ));
+            )
+            .unwrap();
 
             insert = insert.value(column_name.clone(), seed.clone());
 
@@ -922,7 +930,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
 
         api.assert_schema().assert_table("A", |table| {
             previous_assertions.iter().fold(
-                table.assert_column_count(previous_assertions.len() + 1),
+                table.assert_columns_count(previous_assertions.len() + 1),
                 |table, (column_name, expected)| {
                     table.assert_column(column_name, |c| c.assert_native_type(expected, connector))
                 },
@@ -947,7 +955,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
         //second assertions same as first
         api.assert_schema().assert_table("A", |table| {
             next_assertions.iter().fold(
-                table.assert_column_count(next_assertions.len() + 1),
+                table.assert_columns_count(next_assertions.len() + 1),
                 |table, (column_name, expected)| {
                     table.assert_column(column_name, |c| c.assert_native_type(expected, connector))
                 },
@@ -960,7 +968,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn not_castable_with_existing_data_should_warn(api: TestApi) {
-    let connector = sql_datamodel_connector::POSTGRES;
+    let connector = psl::builtin_connectors::POSTGRES;
     let mut warnings = Vec::new();
 
     for (from, seed, casts) in NOT_CASTABLE.iter() {
@@ -975,19 +983,23 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
 
             let column_name = format!("column_{}", idx);
 
-            previous_columns.push_str(&format!(
-                "{column_name}  {prisma_type}? @db.{native_type} \n",
+            writeln!(
+                previous_columns,
+                "{column_name}  {prisma_type}? @db.{native_type}",
                 prisma_type = prisma_type(from),
                 native_type = from,
                 column_name = column_name
-            ));
+            )
+            .unwrap();
 
-            next_columns.push_str(&format!(
-                "{column_name}  {prisma_type}? @db.{native_type}\n",
+            writeln!(
+                next_columns,
+                "{column_name}  {prisma_type}? @db.{native_type}",
                 prisma_type = prisma_type(to),
                 native_type = to,
                 column_name = column_name
-            ));
+            )
+            .unwrap();
 
             insert = insert.value(column_name.clone(), seed.clone());
 
@@ -1023,7 +1035,7 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
         // first assertions
         api.assert_schema().assert_table("A", |table| {
             previous_assertions.iter().fold(
-                table.assert_column_count(previous_assertions.len() + 1),
+                table.assert_columns_count(previous_assertions.len() + 1),
                 |table, (column_name, expected)| {
                     table.assert_column(column_name, |c| c.assert_native_type(expected, connector))
                 },
@@ -1047,7 +1059,7 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
         //second assertions same as first
         api.assert_schema().assert_table("A", |table| {
             previous_assertions.iter().fold(
-                table.assert_column_count(previous_assertions.len() + 1),
+                table.assert_columns_count(previous_assertions.len() + 1),
                 |table, (column_name, expected)| {
                     table.assert_column(column_name, |c| c.assert_native_type(expected, connector))
                 },
@@ -1067,8 +1079,8 @@ static SAFE_CASTS_NON_LIST_TO_STRING: CastList = Lazy::new(|| {
             "Text",
             vec![
                 ("SmallInt", Value::array(vec![1])),
-                ("Integer", Value::array(vec![Value::integer(i32::MAX)])),
-                ("BigInt", Value::array(vec![Value::integer(i64::MAX)])),
+                ("Integer", Value::array(vec![Value::int32(i32::MAX)])),
+                ("BigInt", Value::array(vec![Value::int64(i64::MAX)])),
                 (
                     "Decimal(10,2)",
                     Value::array(vec![Value::numeric(BigDecimal::from_str("128.90").unwrap())]),
@@ -1106,8 +1118,8 @@ static SAFE_CASTS_NON_LIST_TO_STRING: CastList = Lazy::new(|| {
             "VarChar",
             vec![
                 ("SmallInt", Value::array(vec![1])),
-                ("Integer", Value::array(vec![Value::integer(i32::MAX)])),
-                ("BigInt", Value::array(vec![Value::integer(i64::MAX)])),
+                ("Integer", Value::array(vec![Value::int32(i32::MAX)])),
+                ("BigInt", Value::array(vec![Value::int64(i64::MAX)])),
                 (
                     "Decimal(10,2)",
                     Value::array(vec![Value::numeric(BigDecimal::from_str("128.90").unwrap())]),
@@ -1146,7 +1158,7 @@ static SAFE_CASTS_NON_LIST_TO_STRING: CastList = Lazy::new(|| {
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
-    let connector = sql_datamodel_connector::POSTGRES;
+    let connector = psl::builtin_connectors::POSTGRES;
 
     for (to, from) in SAFE_CASTS_NON_LIST_TO_STRING.iter() {
         let mut previous_columns = "".to_string();
@@ -1160,19 +1172,23 @@ fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
 
             let column_name = format!("column_{}", idx);
 
-            previous_columns.push_str(&format!(
-                "{column_name}  {prisma_type}[] @db.{native_type} \n",
+            writeln!(
+                previous_columns,
+                "{column_name}  {prisma_type}[] @db.{native_type}",
                 prisma_type = prisma_type(from),
                 native_type = from,
                 column_name = column_name
-            ));
+            )
+            .unwrap();
 
-            next_columns.push_str(&format!(
-                "{column_name}  {prisma_type} @db.{native_type}\n",
+            writeln!(
+                next_columns,
+                "{column_name}  {prisma_type} @db.{native_type}",
                 prisma_type = prisma_type(to),
                 native_type = to,
                 column_name = column_name
-            ));
+            )
+            .unwrap();
 
             insert = insert.value(column_name.clone(), seed.clone());
 
@@ -1198,7 +1214,7 @@ fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
         // first assertions
         api.assert_schema().assert_table("A", |table| {
             previous_assertions.iter().fold(
-                table.assert_column_count(previous_assertions.len() + 1),
+                table.assert_columns_count(previous_assertions.len() + 1),
                 |table, (column_name, expected)| {
                     table.assert_column(column_name, |c| c.assert_native_type(expected, connector))
                 },
@@ -1220,7 +1236,7 @@ fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
         //second assertions
         api.assert_schema().assert_table("A", |table| {
             next_assertions.iter().fold(
-                table.assert_column_count(next_assertions.len() + 1),
+                table.assert_columns_count(next_assertions.len() + 1),
                 |table, (name, expected)| table.assert_column(name, |c| c.assert_native_type(expected, connector)),
             )
         });
@@ -1229,7 +1245,7 @@ fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
     }
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
     let dm = r#"
         model Post {
@@ -1284,7 +1300,7 @@ fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
         .assert_no_steps();
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn typescript_starter_schema_with_different_native_types_is_idempotent(api: TestApi) {
     let dm = r#"
         model Post {

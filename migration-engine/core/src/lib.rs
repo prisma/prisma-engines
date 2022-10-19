@@ -1,5 +1,6 @@
 #![deny(rust_2018_idioms, unsafe_code, missing_docs)]
 #![allow(clippy::needless_collect)] // the implementation of that rule is way too eager, it rejects necessary collects
+#![allow(clippy::derive_partial_eq_without_eq)]
 
 //! The top-level library crate for the migration engine.
 
@@ -13,31 +14,21 @@ mod api;
 mod core_error;
 mod rpc;
 mod state;
+mod timings;
 
-pub use self::{api::GenericApi, core_error::*, rpc::rpc_api};
+pub use self::{api::GenericApi, core_error::*, rpc::rpc_api, timings::TimingsLayer};
 pub use migration_connector;
 
-use datamodel::ValidatedSchema;
-use datamodel::{
-    common::{
-        preview_features::PreviewFeature,
-        provider_names::{
-            COCKROACHDB_SOURCE_NAME, MONGODB_SOURCE_NAME, MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME,
-            SQLITE_SOURCE_NAME,
-        },
-    },
-    Datasource,
-};
 use enumflags2::BitFlags;
 use migration_connector::ConnectorParams;
 use mongodb_migration_connector::MongoDbMigrationConnector;
+use psl::{builtin_connectors::*, parser_database::SourceFile, Datasource, PreviewFeature, ValidatedSchema};
 use sql_migration_connector::SqlMigrationConnector;
-use std::env;
-use std::path::Path;
+use std::{env, path::Path};
 use user_facing_errors::common::InvalidConnectionString;
 
-fn parse_schema(schema: &str) -> CoreResult<ValidatedSchema> {
-    datamodel::parse_schema_parserdb(schema).map_err(CoreError::new_schema_parser_error)
+fn parse_schema(schema: SourceFile) -> CoreResult<ValidatedSchema> {
+    psl::parse_schema(schema).map_err(CoreError::new_schema_parser_error)
 }
 
 fn connector_for_connection_string(
@@ -56,11 +47,7 @@ fn connector_for_connection_string(
             connector.set_params(params)?;
             Ok(Box::new(connector))
         }
-        // TODO: `sqlite:` connection strings may not work if we try to connect to them, but they
-        // seem to be used by some tests in prisma/prisma. They are not tested at all engine-side.
-        //
-        // Tracking issue: https://github.com/prisma/prisma/issues/11468
-        Some("file") | Some("sqlite") => {
+        Some("file") => {
             let params = ConnectorParams {
                 connection_string,
                 preview_features,
@@ -110,8 +97,7 @@ fn connector_for_connection_string(
 
 /// Same as schema_to_connector, but it will only read the provider, not the connector params.
 fn schema_to_connector_unchecked(schema: &str) -> CoreResult<Box<dyn migration_connector::MigrationConnector>> {
-    let config = datamodel::parse_configuration(schema)
-        .map(|validated_config| validated_config.subject)
+    let config = psl::parse_configuration(schema)
         .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", schema)))?;
 
     let preview_features = config.preview_features();
@@ -121,7 +107,7 @@ fn schema_to_connector_unchecked(schema: &str) -> CoreResult<Box<dyn migration_c
         .next()
         .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
 
-    let mut connector = connector_for_provider(source.active_provider.as_str())?;
+    let mut connector = connector_for_provider(source.active_provider)?;
 
     if let Ok(connection_string) = source.load_url(|key| env::var(key).ok()) {
         connector.set_params(ConnectorParams {
@@ -151,20 +137,20 @@ fn schema_to_connector(
         shadow_database_connection_string: shadow_database_url,
     };
 
-    let mut connector = connector_for_provider(source.active_provider.as_str())?;
+    let mut connector = connector_for_provider(source.active_provider)?;
     connector.set_params(params)?;
     Ok(connector)
 }
 
 fn connector_for_provider(provider: &str) -> CoreResult<Box<dyn migration_connector::MigrationConnector>> {
     match provider {
-        POSTGRES_SOURCE_NAME => Ok(Box::new(SqlMigrationConnector::new_postgres())),
-        COCKROACHDB_SOURCE_NAME => Ok(Box::new(SqlMigrationConnector::new_cockroach())),
-        MYSQL_SOURCE_NAME => Ok(Box::new(SqlMigrationConnector::new_mysql())),
-        SQLITE_SOURCE_NAME => Ok(Box::new(SqlMigrationConnector::new_sqlite())),
-        MSSQL_SOURCE_NAME => Ok(Box::new(SqlMigrationConnector::new_mssql())),
+        p if POSTGRES.is_provider(p) => Ok(Box::new(SqlMigrationConnector::new_postgres())),
+        p if COCKROACH.is_provider(p) => Ok(Box::new(SqlMigrationConnector::new_cockroach())),
+        p if MYSQL.is_provider(p) => Ok(Box::new(SqlMigrationConnector::new_mysql())),
+        p if SQLITE.is_provider(p) => Ok(Box::new(SqlMigrationConnector::new_sqlite())),
+        p if MSSQL.is_provider(p) => Ok(Box::new(SqlMigrationConnector::new_mssql())),
         // TODO: adopt a state machine pattern in the mongo connector too
-        MONGODB_SOURCE_NAME => Ok(Box::new(MongoDbMigrationConnector::new(ConnectorParams {
+        p if MONGODB.is_provider(p) => Ok(Box::new(MongoDbMigrationConnector::new(ConnectorParams {
             connection_string: String::new(),
             preview_features: Default::default(),
             shadow_database_connection_string: None,
@@ -191,8 +177,7 @@ pub fn migration_api(
 }
 
 fn parse_configuration(datamodel: &str) -> CoreResult<(Datasource, String, BitFlags<PreviewFeature>, Option<String>)> {
-    let config = datamodel::parse_configuration(datamodel)
-        .map(|validated_config| validated_config.subject)
+    let config = psl::parse_configuration(datamodel)
         .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
 
     let preview_features = config.preview_features();

@@ -18,6 +18,10 @@ impl SqlSchemaDifferFlavour for SqliteFlavour {
         false
     }
 
+    fn column_autoincrement_changed(&self, _columns: Pair<ColumnWalker<'_>>) -> bool {
+        false
+    }
+
     fn column_type_change(&self, differ: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
         match (differ.previous.column_type_family(), differ.next.column_type_family()) {
             (a, b) if a == b => None,

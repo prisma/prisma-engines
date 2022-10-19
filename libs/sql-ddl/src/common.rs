@@ -73,6 +73,7 @@ pub struct IndexColumn<'a> {
     pub name: Cow<'a, str>,
     pub length: Option<u32>,
     pub sort_order: Option<SortOrder>,
+    pub operator_class: Option<String>,
 }
 
 impl<'a> IndexColumn<'a> {

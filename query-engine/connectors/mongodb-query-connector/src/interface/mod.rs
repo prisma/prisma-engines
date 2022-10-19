@@ -9,10 +9,10 @@ use connector_interface::{
     error::{ConnectorError, ErrorKind},
     Connector,
 };
-use datamodel::Datasource;
 use futures::Future;
 use mongodb::Client;
 use prisma_models::prelude::*;
+use psl::Datasource;
 
 use crate::error::MongoError;
 
@@ -29,8 +29,8 @@ impl MongoDb {
     pub async fn new(_source: &Datasource, url: &str) -> connector_interface::Result<Self> {
         let client = mongodb_client::create(&url).await.map_err(|err| {
             let kind = match err.kind {
-                mongodb_client::ErrorKind::InvalidArgument { .. } => ErrorKind::InvalidDatabaseUrl {
-                    details: "Unable to parse URL.".to_owned(),
+                mongodb_client::ErrorKind::InvalidArgument { message } => ErrorKind::InvalidDatabaseUrl {
+                    details: format!("MongoDB connection string error: {message}"),
                     url: url.to_owned(),
                 },
                 mongodb_client::ErrorKind::Other(err) => ErrorKind::ConnectionError(err.into()),
@@ -80,5 +80,51 @@ async fn catch<O>(
     match fut.await {
         Ok(o) => Ok(o),
         Err(err) => Err(err.into_connector_error()),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn test_schema(url: &str) -> String {
+        format!(
+            r#"
+            datasource db {{
+              provider = "mongodb"
+              url      = "{url}"
+            }}
+
+            model User {{
+              id    String @id @map("_id") @default(auto()) @db.ObjectId
+            }}
+            "#
+        )
+    }
+
+    async fn mongodb_connector(url: &str) -> connector_interface::Result<MongoDb> {
+        let schema = psl::validate(test_schema(url).into());
+        let datasource = &schema.configuration.datasources[0];
+        MongoDb::new(datasource, url).await
+    }
+
+    /// Regression test for https://github.com/prisma/prisma/issues/13388
+    #[tokio::test]
+    async fn test_error_details_forwarding_srv_port() {
+        let url = "mongodb+srv://root:example@localhost:27017/myDatabase";
+        let error = mongodb_connector(url).await.err().unwrap();
+
+        assert!(error
+            .to_string()
+            .contains("a port cannot be specified with 'mongodb+srv'"));
+    }
+
+    /// Regression test for https://github.com/prisma/prisma/issues/11883
+    #[tokio::test]
+    async fn test_error_details_forwarding_illegal_characters() {
+        let url = "mongodb://localhost:C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==@localhost:10255/e2e-tests?ssl=true";
+        let error = mongodb_connector(url).await.err().unwrap();
+
+        assert!(error.to_string().contains("illegal character in database name"));
     }
 }

@@ -1,16 +1,21 @@
-use crate::warnings::{warning_default_cuid_warning, warning_default_uuid_warning, ModelAndField};
-use crate::SqlFamilyTrait;
-use datamodel::dml::{self, Datamodel, ValueGenerator};
-use introspection_connector::{IntrospectionContext, Version, Warning};
-use native_types::{MySqlType, PostgresType};
+use crate::{
+    calculate_datamodel::CalculateDatamodelContext,
+    warnings::{warning_default_cuid_warning, warning_default_uuid_warning, ModelAndField},
+    SqlFamilyTrait,
+};
+use introspection_connector::{Version, Warning};
+use psl::{
+    builtin_connectors::{MySqlType, PostgresType},
+    dml::{self, Datamodel, ValueGenerator},
+};
 use sql_schema_describer::SqlSchema;
 
-pub fn add_prisma_1_id_defaults(
+pub(crate) fn add_prisma_1_id_defaults(
     version: &Version,
     data_model: &mut Datamodel,
     schema: &SqlSchema,
     warnings: &mut Vec<Warning>,
-    ctx: &IntrospectionContext,
+    ctx: &CalculateDatamodelContext,
 ) {
     let mut needs_to_be_changed = vec![];
 
@@ -18,28 +23,28 @@ pub fn add_prisma_1_id_defaults(
         for model in data_model.models().filter(|m| m.has_single_id_field()) {
             let id_field = model.scalar_fields().find(|f| model.field_is_primary(&f.name)).unwrap();
             let table_name = model.database_name.as_ref().unwrap_or(&model.name);
-            let table = schema.table(table_name).unwrap();
+            let table = schema.table_walker(table_name).unwrap();
             let column_name = id_field.database_name.as_ref().unwrap_or(&id_field.name);
             let column = table.column(column_name).unwrap();
             let model_and_field = ModelAndField::new(&model.name, &id_field.name);
 
             if ctx.sql_family().is_postgres() {
-                if let Some(native_type) = &column.tpe.native_type {
-                    let native_type: PostgresType = serde_json::from_value(native_type.clone()).unwrap();
+                if let Some(native_type) = &column.column_type().native_type {
+                    let native_type: &PostgresType = native_type.downcast_ref();
 
-                    if native_type == PostgresType::VarChar(Some(25)) {
+                    if native_type == &PostgresType::VarChar(Some(25)) {
                         needs_to_be_changed.push((model_and_field, true))
-                    } else if native_type == PostgresType::VarChar(Some(36)) {
+                    } else if native_type == &PostgresType::VarChar(Some(36)) {
                         needs_to_be_changed.push((model_and_field, false))
                     }
                 }
             } else if ctx.sql_family().is_mysql() {
-                if let Some(native_type) = &column.tpe.native_type {
-                    let native_type: MySqlType = serde_json::from_value(native_type.clone()).unwrap();
+                if let Some(native_type) = &column.column_type().native_type {
+                    let native_type: &MySqlType = native_type.downcast_ref();
 
-                    if native_type == MySqlType::Char(25) {
+                    if native_type == &MySqlType::Char(25) {
                         needs_to_be_changed.push((model_and_field, true))
-                    } else if native_type == MySqlType::Char(36) {
+                    } else if native_type == &MySqlType::Char(36) {
                         needs_to_be_changed.push((model_and_field, false))
                     }
                 }

@@ -65,7 +65,7 @@ fn test_connecting_with_a_non_working_mysql_connection_string(api: TestApi) {
 
     non_existing_url.set_path("this_does_not_exist");
 
-    let output = api.run(&["--datasource", &non_existing_url.to_string(), "can-connect-to-database"]);
+    let output = api.run(&["--datasource", non_existing_url.as_ref(), "can-connect-to-database"]);
     assert_eq!(output.status.code(), Some(1));
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(stderr.contains(r#""error_code":"P1003""#), "{}", stderr);
@@ -107,7 +107,7 @@ fn test_connecting_with_a_non_working_psql_connection_string(api: TestApi) {
     let mut url: url::Url = api.args.database_url().parse().unwrap();
     url.set_path("this_does_not_exist");
 
-    let output = api.run(&["--datasource", &url.to_string(), "can-connect-to-database"]);
+    let output = api.run(&["--datasource", url.as_ref(), "can-connect-to-database"]);
     assert_eq!(output.status.code(), Some(1));
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(stderr.contains(r#""error_code":"P1003""#), "{}", stderr);
@@ -143,7 +143,6 @@ fn test_create_database(api: TestApi) {
 fn test_create_database_mssql(api: TestApi) {
     let connection_string = api
         .connection_string()
-        .replace("master", "masterNEW")
         .replace("test_create_database_mssql", "test_create_database_NEW");
 
     let output = api.run(&["--datasource", &connection_string, "drop-database"]);
@@ -153,7 +152,7 @@ fn test_create_database_mssql(api: TestApi) {
     assert!(output.status.success());
 
     let stderr = String::from_utf8_lossy(&output.stderr);
-    assert!(stderr.contains("Database 'masterNEW\' was successfully created."));
+    assert!(stderr.contains("Database 'test_create_database_NEW\' was successfully created."));
 
     let output = api.run(&["--datasource", &connection_string, "can-connect-to-database"]);
     assert!(output.status.success());
@@ -198,7 +197,6 @@ fn test_drop_sqlite_database(api: TestApi) {
 #[test_connector(tags(Postgres, Mysql))]
 fn test_drop_database(api: TestApi) {
     let connection_string = api.connection_string();
-    drop(api);
     let output = run(&["--datasource", &connection_string, "drop-database"]);
     assert!(output.status.success(), "{:#?}", output);
 
@@ -293,7 +291,7 @@ fn basic_jsonrpc_roundtrip_works(_api: TestApi) {
         .env("RUST_LOG", "INFO")
         .stdin(std::process::Stdio::piped())
         .stdout(std::process::Stdio::piped())
-        .stderr(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::null())
         .spawn()
         .unwrap();
     let stdin = process.stdin.as_mut().unwrap();
@@ -311,6 +309,51 @@ fn basic_jsonrpc_roundtrip_works(_api: TestApi) {
 
         assert!(response.contains("PostgreSQL") || response.contains("CockroachDB"));
     }
+}
 
-    process.kill().unwrap();
+#[test]
+fn introspect_e2e() {
+    use std::io::{BufRead, BufReader, Write as _};
+    let tmpdir = tempfile::tempdir().unwrap();
+    let schema = r#"
+        datasource db {
+            provider = "sqlite"
+            url = env("TEST_DB_URL")
+        }
+
+    "#;
+    let mut process = Command::new(migration_engine_bin_path())
+        .env("RUST_LOG", "INFO")
+        .env(
+            "TEST_DB_URL",
+            format!("file:{}/dev.db", tmpdir.path().to_string_lossy()),
+        )
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::null())
+        .spawn()
+        .unwrap();
+    let stdin = process.stdin.as_mut().unwrap();
+    let mut stdout = BufReader::new(process.stdout.as_mut().unwrap());
+
+    for iteration in 0..2 {
+        let msg = serde_json::to_string(&serde_json::json!({
+            "jsonrpc": "2.0",
+            "method": "introspect",
+            "id": iteration,
+            "params": {
+                "schema": schema,
+                "force": true,
+                "compositeTypeDepth": 5,
+            }
+        }))
+        .unwrap();
+        stdin.write_all(msg.as_bytes()).unwrap();
+        stdin.write_all(b"\n").unwrap();
+
+        let mut response = String::new();
+        stdout.read_line(&mut response).unwrap();
+
+        assert!(response.starts_with(r##"{"jsonrpc":"2.0","result":{"datamodel":"datasource db {\n  provider = \"sqlite\"\n  url      = env(\"TEST_DB_URL\")\n}\n","version":"NonPrisma","warnings":[]},"##));
+    }
 }

@@ -3,7 +3,7 @@ use crate::filter::Filter;
 use prisma_models::RelationField;
 use std::sync::Arc;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct RelationFilter {
     /// Starting field of the relation traversal.
     pub field: Arc<RelationField>,
@@ -15,6 +15,16 @@ pub struct RelationFilter {
     /// E.g. if all related records or only some need
     /// to fulfill `nested_filter`.
     pub condition: RelationCondition,
+}
+
+impl std::fmt::Debug for RelationFilter {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("RelationFilter")
+            .field("field", &format!("{}", self.field))
+            .field("nested_filter", &self.nested_filter)
+            .field("condition", &self.condition)
+            .finish()
+    }
 }
 
 impl RelationFilter {

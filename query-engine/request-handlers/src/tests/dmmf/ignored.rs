@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use super::helpers::*;
-use query_core::PRISMA_NAMESPACE;
+use query_core::schema::PRISMA_NAMESPACE;
 use serial_test::serial;
 
 // Tests in this file run serially because the function `get_query_schema` depends on setting an env var.

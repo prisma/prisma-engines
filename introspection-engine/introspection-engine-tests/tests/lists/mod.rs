@@ -1,6 +1,6 @@
 use barrel::types;
 use indoc::indoc;
-use introspection_engine_tests::{test_api::*, TestResult};
+use introspection_engine_tests::test_api::*;
 use test_macros::test_connector;
 
 #[test_connector(capabilities(ScalarLists))]
@@ -8,18 +8,19 @@ async fn scalar_list_types(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Post", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::text());
                 t.add_column("ints", types::custom("integer[12]"));
                 t.add_column("bools", types::custom("boolean[12]"));
                 t.add_column("strings", types::custom("text[12]"));
                 t.add_column("floats", types::custom("float[12]"));
+                t.set_primary_key(&["id"]);
             });
         })
         .await?;
 
     let dm = indoc! {r#"
          model Post {
-            id       Int @id @default(autoincrement())
+            id       String @id
             ints     Int []
             bools    Boolean []
             strings  String []

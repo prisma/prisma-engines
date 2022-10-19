@@ -1,4 +1,5 @@
 use migration_connector::ConnectorError;
+use migration_core::TimingsLayer;
 use tracing_error::ErrorLayer;
 
 pub(crate) fn init_logger() {
@@ -10,7 +11,8 @@ pub(crate) fn init_logger() {
         .with_timer(tracing_subscriber::fmt::time::UtcTime::rfc_3339())
         .with_writer(std::io::stderr)
         .finish()
-        .with(ErrorLayer::default());
+        .with(ErrorLayer::default())
+        .with(TimingsLayer::default());
 
     tracing::subscriber::set_global_default(subscriber)
         .map_err(|err| eprintln!("Error initializing the global logger: {}", err))

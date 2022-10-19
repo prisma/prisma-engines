@@ -3,7 +3,8 @@ mod vitess;
 use migration_engine_tests::test_api::*;
 use sql_schema_describer::{ColumnTypeFamily, DefaultKind};
 
-#[test_connector]
+// This is more complicated on CockroachDB
+#[test_connector(exclude(CockroachDb))]
 fn adding_an_id_field_of_type_int_with_autoincrement_works(api: TestApi) {
     let dm2 = r#"
         model Test {
@@ -58,16 +59,16 @@ fn a_model_can_be_removed(api: TestApi) {
     let dm1 = api.datamodel_with_provider(
         r#"
         model User {
-            id   Int     @id @default(autoincrement())
+            id   BigInt     @id @default(autoincrement())
             name String?
             Post Post[]
         }
 
         model Post {
-            id     Int    @id @default(autoincrement())
+            id     String @id
             title  String
             User   User   @relation(fields: [userId], references: [id])
-            userId Int
+            userId BigInt
         }
     "#,
     );
@@ -77,7 +78,7 @@ fn a_model_can_be_removed(api: TestApi) {
     let dm2 = api.datamodel_with_provider(
         r#"
         model User {
-            id   Int     @id @default(autoincrement())
+            id   BigInt     @id @default(autoincrement())
             name String?
         }
     "#,
@@ -241,7 +242,7 @@ fn removing_a_scalar_field_must_work(api: TestApi) {
     api.schema_push_w_datasource(dm2).send().assert_green();
 
     api.assert_schema()
-        .assert_table("Test", |table| table.assert_column_count(1));
+        .assert_table("Test", |table| table.assert_columns_count(1));
 }
 
 #[test_connector]
@@ -418,21 +419,7 @@ fn renaming_a_datasource_works(api: TestApi) {
         .assert_no_steps();
 }
 
-#[test_connector]
-fn simple_type_aliases_in_migrations_must_work(api: TestApi) {
-    let dm1 = r#"
-        type CUID = String @id @default(cuid())
-
-        model User {
-            id CUID
-            age Float
-        }
-    "#;
-
-    api.schema_push_w_datasource(dm1).send().assert_green();
-}
-
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 fn created_at_does_not_get_arbitrarily_migrated(api: TestApi) {
     use quaint::ast::Insert;
 
@@ -452,15 +439,7 @@ fn created_at_does_not_get_arbitrarily_migrated(api: TestApi) {
     let insert = Insert::single_into(api.render_table_name("Fruit")).value("name", "banana");
     api.query(insert.into());
 
-    let dm2 = r#"
-        model Fruit {
-            id Int @id @default(autoincrement())
-            name String
-            createdAt DateTime @default(now())
-        }
-    "#;
-
-    api.schema_push_w_datasource(dm2)
+    api.schema_push_w_datasource(dm1)
         .send()
         .assert_green()
         .assert_no_steps();
@@ -521,7 +500,6 @@ fn adding_a_primary_key_must_work(api: TestApi) {
 
     api.schema_push_w_datasource(dm2).send().assert_green();
 
-    api.assert_schema().assert_table("Test", |t| {
-        t.assert_pk(|pk| pk.assert_constraint_name(Some("Test_pkey".into())))
-    });
+    api.assert_schema()
+        .assert_table("Test", |t| t.assert_pk(|pk| pk.assert_constraint_name("Test_pkey")));
 }

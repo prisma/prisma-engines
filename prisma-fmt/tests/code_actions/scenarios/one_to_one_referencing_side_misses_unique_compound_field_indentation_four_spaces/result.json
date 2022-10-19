@@ -1,0 +1,41 @@
+[
+  {
+    "title": "Make referencing fields unique",
+    "kind": "quickfix",
+    "diagnostics": [
+      {
+        "range": {
+          "start": {
+            "line": 9,
+            "character": 2
+          },
+          "end": {
+            "line": 9,
+            "character": 71
+          }
+        },
+        "severity": 1,
+        "message": "The model needs a unique constraint (fields: bId1, bId2) due to a relation"
+      }
+    ],
+    "edit": {
+      "changes": {
+        "file:///path/to/schema.prisma": [
+          {
+            "range": {
+              "start": {
+                "line": 10,
+                "character": 0
+              },
+              "end": {
+                "line": 10,
+                "character": 1
+              }
+            },
+            "newText": "\n    @@unique([bId1, bId2])\n}"
+          }
+        ]
+      }
+    }
+  }
+]

@@ -113,8 +113,6 @@ fn making_an_optional_field_required_with_data_with_a_default_is_unexecutable(ap
 
     api.schema_push_w_datasource(dm1).send().assert_green();
 
-    let initial_schema = api.assert_schema().into_schema();
-
     api.insert("Test")
         .value("id", "abc")
         .value("name", "george")
@@ -143,9 +141,8 @@ fn making_an_optional_field_required_with_data_with_a_default_is_unexecutable(ap
         .force(false)
         .send()
         .assert_unexecutable(&[error])
-        .assert_no_warning();
-
-    api.assert_schema().assert_equals(&initial_schema);
+        .assert_no_warning()
+        .assert_no_steps();
 
     let rows = api.dump_table("Test");
 
@@ -154,8 +151,8 @@ fn making_an_optional_field_required_with_data_with_a_default_is_unexecutable(ap
             .map(|row| row.into_iter().collect::<Vec<Value>>())
             .collect::<Vec<_>>(),
         &[
-            &[Value::text("abc"), Value::text("george"), Value::Integer(None)],
-            &[Value::text("def"), Value::text("X Æ A-12"), Value::integer(7)],
+            &[Value::text("abc"), Value::text("george"), Value::Int32(None)],
+            &[Value::text("def"), Value::text("X Æ A-12"), Value::int32(7)],
         ]
     );
 }

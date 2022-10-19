@@ -1,98 +1,47 @@
-mod to_dmmf;
-pub use to_dmmf::render_to_dmmf;
-pub use to_dmmf::render_to_dmmf_value;
+mod ast_builders;
+mod serialization_ast;
 
-// This is a simple JSON serialization using Serde.
-// The JSON format follows the DMMF spec.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Field {
-    pub name: String,
-    pub kind: String,
-    pub is_list: bool,
-    pub is_required: bool,
-    pub is_unique: bool,
-    pub is_id: bool,
-    pub is_read_only: bool,
-    #[serde(rename = "type")]
-    pub field_type: String,
-    pub has_default_value: bool,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub default: Option<serde_json::Value>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub relation_name: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub relation_from_fields: Option<Vec<String>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub relation_to_fields: Option<Vec<String>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub relation_on_delete: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub is_generated: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub is_updated_at: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub documentation: Option<String>,
+pub use serialization_ast::DataModelMetaFormat;
+
+use ast_builders::{schema_to_dmmf, DmmfQuerySchemaRenderer};
+use schema::{QuerySchemaRef, QuerySchemaRenderer};
+use std::sync::Arc;
+
+pub fn dmmf_json_from_schema(schema: &str) -> String {
+    let dmmf = dmmf_from_schema(schema);
+    serde_json::to_string(&dmmf).unwrap()
 }
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Function {
-    pub name: String,
-    pub args: Vec<serde_json::Value>,
+// enable raw param?
+pub fn dmmf_from_schema(schema: &str) -> DataModelMetaFormat {
+    let schema = psl::parse_schema(schema).unwrap();
+    let config = &schema.configuration;
+    let dml = psl::lift(&schema);
+
+    // We only support one data source at the moment, so take the first one (default not exposed yet).
+    let data_source = config.datasources.first().unwrap();
+    let preview_features: Vec<_> = config.preview_features().iter().collect();
+    let internal_data_model = prisma_models::convert(&schema, "dummy".to_owned());
+
+    // Construct query schema
+    let query_schema = Arc::new(schema_builder::build(
+        internal_data_model,
+        true, // todo
+        data_source.active_connector,
+        preview_features,
+        data_source.relation_mode(),
+    ));
+
+    from_precomputed_parts(&dml, query_schema)
 }
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Model {
-    pub name: String,
-    pub db_name: Option<String>,
-    pub fields: Vec<Field>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub is_generated: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub documentation: Option<String>,
-    pub primary_key: Option<PrimaryKey>,
-    pub unique_fields: Vec<Vec<String>>,
-    pub unique_indexes: Vec<UniqueIndex>,
-}
+pub fn from_precomputed_parts(dml: &psl::dml::Datamodel, query_schema: QuerySchemaRef) -> DataModelMetaFormat {
+    let (schema, mappings) = DmmfQuerySchemaRenderer::render(query_schema);
+    let data_model = schema_to_dmmf(dml);
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct UniqueIndex {
-    pub name: Option<String>,
-    pub fields: Vec<String>,
-}
-
-//TODO(extended indices) add field options here
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct PrimaryKey {
-    pub name: Option<String>,
-    pub fields: Vec<String>,
-}
-
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Enum {
-    pub name: String,
-    pub values: Vec<EnumValue>,
-    pub db_name: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub documentation: Option<String>,
-}
-
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct EnumValue {
-    pub name: String,
-    pub db_name: Option<String>,
-}
-
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Datamodel {
-    pub enums: Vec<Enum>,
-    pub models: Vec<Model>,
-    pub types: Vec<Model>, // composite types
+    DataModelMetaFormat {
+        data_model,
+        schema,
+        mappings,
+    }
 }

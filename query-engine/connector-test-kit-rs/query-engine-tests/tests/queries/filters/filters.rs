@@ -13,7 +13,7 @@ mod filter_spec {
                 unique     Int      @unique
                 name       String?
                 optional   String?
-                vehicle_id String?
+                vehicle_id String? @unique
 
                 ride Vehicle? @relation(fields: [vehicle_id], references: [id])
             }

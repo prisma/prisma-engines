@@ -51,7 +51,6 @@ pub fn create_migration_directory(
 }
 
 /// Write the migration_lock file to the directory.
-#[tracing::instrument]
 pub fn write_migration_lock_file(migrations_directory_path: &str, provider: &str) -> std::io::Result<()> {
     let directory_path = Path::new(migrations_directory_path);
     let mut file_path = directory_path.join(MIGRATION_LOCK_FILENAME);
@@ -74,7 +73,6 @@ provider = "{}""##,
 }
 
 /// Error if the provider in the schema does not match the one in the schema_lock.toml
-#[tracing::instrument]
 pub fn error_on_changed_provider(migrations_directory_path: &str, provider: &str) -> ConnectorResult<()> {
     match match_provider_in_lock_file(migrations_directory_path, provider) {
         None => Ok(()),
@@ -87,7 +85,6 @@ pub fn error_on_changed_provider(migrations_directory_path: &str, provider: &str
 }
 
 /// Check whether provider matches. `None` means there was no migration_lock.toml file.
-#[tracing::instrument]
 fn match_provider_in_lock_file(migrations_directory_path: &str, provider: &str) -> Option<Result<(), String>> {
     read_provider_from_lock_file(migrations_directory_path).map(|found_provider| {
         if found_provider == provider {
@@ -208,14 +205,12 @@ impl MigrationDirectory {
     }
 
     /// Check whether the checksum of the migration script matches the provided one.
-    #[tracing::instrument]
     pub fn matches_checksum(&self, checksum_str: &str) -> Result<bool, ReadMigrationScriptError> {
         let filesystem_script = self.read_migration_script()?;
         Ok(checksum::script_matches_checksum(&filesystem_script, checksum_str))
     }
 
     /// Write the migration script to the directory.
-    #[tracing::instrument]
     pub fn write_migration_script(&self, script: &str, extension: &str) -> std::io::Result<()> {
         let mut path = self.path.join(MIGRATION_SCRIPT_FILENAME);
 
@@ -230,7 +225,6 @@ impl MigrationDirectory {
     }
 
     /// Read the migration script to a string.
-    #[tracing::instrument]
     pub fn read_migration_script(&self) -> Result<String, ReadMigrationScriptError> {
         let path = self.path.join("migration.sql"); // todo why is it hardcoded here?
         std::fs::read_to_string(&path).map_err(|ioerr| ReadMigrationScriptError::new(ioerr, &path))

@@ -11,6 +11,7 @@ use crossbeam_queue::SegQueue;
 use futures::future::BoxFuture;
 use im::HashMap;
 use prisma_models::prelude::*;
+use tracing::Instrument;
 
 #[derive(Debug, Clone)]
 pub enum ExpressionResult {
@@ -44,7 +45,6 @@ pub struct DiffResult {
 impl ExpressionResult {
     /// Attempts to transform this `ExpressionResult` into a vector of `SelectionResult`s corresponding to the passed desired selection shape.
     /// A vector is returned as some expression results return more than one result row at once.
-    #[tracing::instrument(skip(self, field_selection))]
     pub fn as_selection_results(&self, field_selection: &FieldSelection) -> InterpretationResult<Vec<SelectionResult>> {
         let converted = match self {
             Self::Query(ref result) => match result {
@@ -91,7 +91,6 @@ impl ExpressionResult {
         })
     }
 
-    #[tracing::instrument(skip(self))]
     pub fn as_query_result(&self) -> InterpretationResult<&QueryResult> {
         let converted = match self {
             Self::Query(ref q) => Some(q),
@@ -103,7 +102,6 @@ impl ExpressionResult {
         })
     }
 
-    #[tracing::instrument(skip(self))]
     pub fn as_diff_result(&self) -> InterpretationResult<&DiffResult> {
         let converted = match self {
             Self::Computation(ComputationResult::Diff(ref d)) => Some(d),
@@ -164,7 +162,6 @@ impl<'conn> QueryInterpreter<'conn> {
         Self { conn, log }
     }
 
-    #[tracing::instrument(skip(self, exp, env, level))]
     pub fn interpret(
         &mut self,
         exp: Expression,
@@ -228,14 +225,18 @@ impl<'conn> QueryInterpreter<'conn> {
                 match *query {
                     Query::Read(read) => {
                         self.log_line(level, || format!("READ {}", read));
+                        let span = info_span!("prisma:engine:read-execute");
                         Ok(read::execute(self.conn, read, None, trace_id)
+                            .instrument(span)
                             .await
                             .map(ExpressionResult::Query)?)
                     }
 
                     Query::Write(write) => {
                         self.log_line(level, || format!("WRITE {}", write));
+                        let span = info_span!("prisma:engine:write-execute");
                         Ok(write::execute(self.conn, write, trace_id)
+                            .instrument(span)
                             .await
                             .map(ExpressionResult::Query)?)
                     }
@@ -282,11 +283,10 @@ impl<'conn> QueryInterpreter<'conn> {
         }
     }
 
-    #[tracing::instrument(skip(self))]
     pub fn log_output(&self) -> String {
         let mut output = String::with_capacity(self.log.len() * 30);
 
-        while let Ok(s) = self.log.pop() {
+        while let Some(s) = self.log.pop() {
             output.push_str(&s);
         }
 

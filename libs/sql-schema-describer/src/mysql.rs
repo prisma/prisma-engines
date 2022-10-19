@@ -1,15 +1,15 @@
-use super::*;
-use crate::{getters::Getter, parsers::Parser};
+//! MySQL schema description.
+
+use crate::{getters::Getter, parsers::Parser, *};
 use bigdecimal::ToPrimitive;
-use common::purge_dangling_foreign_keys;
+use indexmap::IndexMap;
 use indoc::indoc;
-use native_types::{MySqlType, NativeType};
-use quaint::{prelude::Queryable, Value};
-use serde_json::from_str;
-use std::{
-    borrow::Cow,
-    collections::{BTreeMap, HashSet},
+use psl::{builtin_connectors::MySqlType, datamodel_connector::NativeTypeInstance};
+use quaint::{
+    prelude::{Queryable, ResultRow},
+    Value,
 };
+use std::borrow::Cow;
 use tracing::trace;
 
 /// Matches a default value in the schema, wrapped single quotes.
@@ -51,7 +51,8 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
     }
 
     async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata> {
-        let table_count = self.get_table_names(schema).await?.len();
+        let mut sql_schema = SqlSchema::default();
+        let table_count = self.get_table_names(schema, &mut sql_schema).await?.len();
         let size_in_bytes = self.get_size(schema).await?;
 
         Ok(SqlMetadata {
@@ -61,51 +62,130 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
     }
 
     #[tracing::instrument(skip(self))]
-    async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema> {
+    async fn describe(&self, schemas: &[&str]) -> DescriberResult<SqlSchema> {
+        let schema = schemas[0];
+        let mut sql_schema = SqlSchema::default();
         let version = self.conn.version().await.ok().flatten();
         let flavour = version
             .as_ref()
             .map(|s| Flavour::from_version(s))
             .unwrap_or(Flavour::Mysql);
 
-        let table_names = self.get_table_names(schema).await?;
-        let mut tables = Vec::with_capacity(table_names.len());
-        let mut columns = Self::get_all_columns(self.conn, schema, &flavour).await?;
-        let mut indexes = self.get_all_indexes(schema).await?;
-        let mut fks = Self::get_foreign_keys(self.conn, schema).await?;
+        let table_names = self.get_table_names(schema, &mut sql_schema).await?;
+        sql_schema.tables.reserve(table_names.len());
+        sql_schema.columns.reserve(table_names.len());
 
-        let mut enums = vec![];
-        for table_name in &table_names {
-            let (table, enms) = self.get_table(table_name, &mut columns, &mut indexes, &mut fks);
+        Self::get_all_columns(&table_names, self.conn, schema, &mut sql_schema, &flavour).await?;
+        push_foreign_keys(schema, &table_names, &mut sql_schema, self.conn).await?;
+        push_indexes(&table_names, schema, &mut sql_schema, self.conn).await?;
 
-            // If we cannot query any of the columns, do not add the table to
-            // the data model...
-            if table.columns.is_empty() {
-                continue;
-            }
+        sql_schema.views = self.get_views(schema).await?;
+        sql_schema.procedures = self.get_procedures(schema).await?;
 
-            tables.push(table);
-            enums.extend(enms.into_iter());
-        }
-
-        purge_dangling_foreign_keys(&mut tables);
-
-        let views = self.get_views(schema).await?;
-        let procedures = self.get_procedures(schema).await?;
-
-        Ok(SqlSchema {
-            tables,
-            enums,
-            views,
-            procedures,
-            ..Default::default()
-        })
+        Ok(sql_schema)
     }
 
     #[tracing::instrument(skip(self))]
-    async fn version(&self, _schema: &str) -> crate::DescriberResult<Option<String>> {
+    async fn version(&self) -> crate::DescriberResult<Option<String>> {
         Ok(self.conn.version().await?)
     }
+}
+
+async fn push_indexes(
+    table_ids: &IndexMap<String, TableId>,
+    schema_name: &str,
+    sql_schema: &mut SqlSchema,
+    conn: &dyn Queryable,
+) -> DescriberResult<()> {
+    // We alias all the columns because MySQL column names are case-insensitive in queries, but
+    // the information schema column names became upper-case in MySQL 8, causing the code
+    // fetching the result values by column name below to fail.
+    let sql = include_str!("mysql/indexes_query.sql");
+
+    let rows = conn.query_raw(sql, &[schema_name.into()]).await?;
+    let mut current_index_id: Option<IndexId> = None;
+    let mut index_should_be_filtered_out = false;
+
+    let remove_last_index = |schema: &mut SqlSchema, index_id: IndexId| {
+        schema.indexes.pop().unwrap();
+        loop {
+            match schema.index_columns.last() {
+                Some(col) if col.index_id == index_id => {
+                    schema.index_columns.pop().unwrap();
+                }
+                None | Some(_) => break,
+            }
+        }
+    };
+
+    for row in rows {
+        let table_name = row.get_expect_string("table_name");
+        let table_id = if let Some(id) = table_ids.get(table_name.as_str()) {
+            *id
+        } else {
+            continue;
+        };
+        let index_name = row.get_expect_string("index_name");
+        let length = row.get_u32("partial");
+
+        let sort_order = row.get_string("column_order").map(|v| match v.as_ref() {
+            "A" => SQLSortOrder::Asc,
+            "D" => SQLSortOrder::Desc,
+            misc => panic!("Unexpected sort order `{}`, collation should be A, D or Null", misc),
+        });
+        let column_name = if let Some(name) = row.get_string("column_name") {
+            name
+        } else {
+            index_should_be_filtered_out = true; // filter out indexes on expressions
+            continue;
+        };
+        let column_id = if let Some(col) = sql_schema.walk(table_id).column(&column_name) {
+            col.id
+        } else {
+            continue;
+        };
+
+        let seq_in_index = row.get_expect_i64("seq_in_index"); // starts at 1
+        let is_unique = !row.get_expect_bool("non_unique");
+        let is_pk = index_name.eq_ignore_ascii_case("primary");
+        let is_fulltext = row.get_string("index_type").as_deref() == Some("FULLTEXT");
+
+        if seq_in_index == 1 {
+            // new index!
+
+            // first delete the old one if necessary
+            if index_should_be_filtered_out {
+                remove_last_index(sql_schema, current_index_id.unwrap());
+                index_should_be_filtered_out = false;
+            }
+
+            // then install the new one
+            let index_id = if is_pk {
+                sql_schema.push_primary_key(table_id, String::new())
+            } else if is_unique {
+                sql_schema.push_unique_constraint(table_id, index_name)
+            } else if is_fulltext {
+                sql_schema.push_fulltext_index(table_id, index_name)
+            } else {
+                sql_schema.push_index(table_id, index_name)
+            };
+
+            current_index_id = Some(index_id);
+        }
+
+        sql_schema.push_index_column(IndexColumn {
+            index_id: current_index_id.unwrap(),
+            column_id,
+            sort_order,
+            length,
+        });
+    }
+
+    if index_should_be_filtered_out {
+        remove_last_index(sql_schema, current_index_id.unwrap())
+    }
+
+    Ok(())
 }
 
 impl Parser for SqlSchemaDescriber<'_> {}
@@ -143,6 +223,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for row in result_set.into_iter() {
             views.push(View {
+                namespace_id: NamespaceId(0),
                 name: row.get_expect_string("view_name"),
                 definition: row.get_string("view_sql"),
             })
@@ -166,6 +247,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for row in rows.into_iter() {
             procedures.push(Procedure {
+                namespace_id: NamespaceId(0),
                 name: row.get_expect_string("name"),
                 definition: row.get_string("definition"),
             });
@@ -175,21 +257,37 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 
     #[tracing::instrument(skip(self))]
-    async fn get_table_names(&self, schema: &str) -> DescriberResult<Vec<String>> {
-        let sql = "SELECT table_name as table_name FROM information_schema.tables
-            WHERE table_schema = ?
-            -- Views are not supported yet
-            AND table_type = 'BASE TABLE'
-            ORDER BY Binary table_name";
-        let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
-        let names = rows
-            .into_iter()
-            .map(|row| row.get_expect_string("table_name"))
-            .collect();
+    async fn get_table_names(
+        &self,
+        schema: &str,
+        sql_schema: &mut SqlSchema,
+    ) -> DescriberResult<IndexMap<String, TableId>> {
+        // Only consider tables for which we can read at least one column.
+        let sql = r#"
+            SELECT DISTINCT BINARY table_info.table_name AS table_name
+            FROM information_schema.tables AS table_info
+            JOIN information_schema.columns AS column_info
+                ON BINARY column_info.table_name = BINARY table_info.table_name
+            WHERE
+                table_info.table_schema = ?
+                AND column_info.table_schema = ?
+                -- Exclude views.
+                AND table_info.table_type = 'BASE TABLE'
+            ORDER BY BINARY table_info.table_name"#;
+        let rows = self.conn.query_raw(sql, &[schema.into(), schema.into()]).await?;
+        let names = rows.into_iter().map(|row| row.get_expect_string("table_name"));
 
-        trace!("Found table names: {:?}", names);
+        let mut map = IndexMap::default();
 
-        Ok(names)
+        for name in names {
+            let cloned_name = name.clone();
+            let id = sql_schema.push_table(name, Default::default());
+            map.insert(cloned_name, id);
+        }
+
+        trace!("Found table names: {:?}", map);
+
+        Ok(map)
     }
 
     #[tracing::instrument(skip(self))]
@@ -216,46 +314,13 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(size as usize)
     }
 
-    #[tracing::instrument(skip(self, columns, indexes, foreign_keys))]
-    fn get_table(
-        &self,
-        name: &str,
-        columns: &mut BTreeMap<String, (Vec<Column>, Vec<Enum>)>,
-        indexes: &mut BTreeMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>,
-        foreign_keys: &mut BTreeMap<String, Vec<ForeignKey>>,
-    ) -> (Table, Vec<Enum>) {
-        let (columns, enums) = columns.remove(name).unwrap_or((vec![], vec![]));
-        let (mut indices, primary_key) = indexes.remove(name).unwrap_or_else(|| (BTreeMap::new(), None));
-
-        let foreign_keys = foreign_keys.remove(name).unwrap_or_default();
-
-        // In certain cases we cannot query any columns, but we can still list
-        // indices. This leads to a very broken result, so we instead just take
-        // these indices out from the data model.
-        indices.retain(|_, index| {
-            index
-                .columns
-                .iter()
-                .all(|left| columns.iter().any(|right| right.name == left.name))
-        });
-
-        (
-            Table {
-                name: name.to_string(),
-                columns,
-                foreign_keys,
-                indices: indices.into_iter().map(|(_k, v)| v).collect(),
-                primary_key,
-            },
-            enums,
-        )
-    }
-
     async fn get_all_columns(
+        table_ids: &IndexMap<String, TableId>,
         conn: &dyn Queryable,
         schema_name: &str,
+        sql_schema: &mut SqlSchema,
         flavour: &Flavour,
-    ) -> DescriberResult<BTreeMap<String, (Vec<Column>, Vec<Enum>)>> {
+    ) -> DescriberResult<()> {
         // We alias all the columns because MySQL column names are case-insensitive in queries, but the
         // information schema column names became upper-case in MySQL 8, causing the code fetching
         // the result values by column name below to fail.
@@ -277,13 +342,16 @@ impl<'a> SqlSchemaDescriber<'a> {
             ORDER BY ordinal_position
         ";
 
-        let mut map = BTreeMap::new();
-
         let rows = conn.query_raw(sql, &[schema_name.into()]).await?;
 
         for col in rows {
             trace!("Got column: {:?}", col);
             let table_name = col.get_expect_string("table_name");
+            let table_id = if let Some(id) = table_ids.get(table_name.as_str()) {
+                *id
+            } else {
+                continue;
+            };
             let name = col.get_expect_string("column_name");
             let data_type = col.get_expect_string("data_type");
             let full_data_type = col.get_expect_string("full_data_type");
@@ -327,10 +395,8 @@ impl<'a> SqlSchemaDescriber<'a> {
             let extra = col.get_expect_string("extra").to_lowercase();
             let auto_increment = matches!(extra.as_str(), "auto_increment");
 
-            let entry = map.entry(table_name).or_insert((Vec::new(), Vec::new()));
-
             if let Some(enm) = enum_option {
-                entry.1.push(enm);
+                sql_schema.enums.push(enm);
             }
 
             let default = match default_value {
@@ -432,10 +498,12 @@ impl<'a> SqlSchemaDescriber<'a> {
                 auto_increment,
             };
 
-            entry.0.push(col);
+            sql_schema.columns.push((table_id, col));
         }
 
-        Ok(map)
+        sql_schema.columns.sort_by_key(|(table_id, _)| *table_id);
+
+        Ok(())
     }
 
     fn dbgenerated_expression(default_string: &str) -> DefaultValue {
@@ -450,241 +518,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         }
     }
 
-    async fn get_all_indexes(
-        &self,
-        schema_name: &str,
-    ) -> DescriberResult<BTreeMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>> {
-        let mut map = BTreeMap::new();
-        let mut indexes_with_expressions: HashSet<(String, String)> = HashSet::new();
-
-        // We alias all the columns because MySQL column names are case-insensitive in queries, but the
-        // information schema column names became upper-case in MySQL 8, causing the code fetching
-        // the result values by column name below to fail.
-        let sql = "
-            SELECT DISTINCT
-                index_name AS index_name,
-                non_unique AS non_unique,
-                Binary column_name AS column_name,
-                seq_in_index AS seq_in_index,
-                Binary table_name AS table_name,
-                sub_part AS partial,
-                Binary collation AS column_order,
-                Binary index_type AS index_type
-            FROM INFORMATION_SCHEMA.STATISTICS
-            WHERE table_schema = ?
-            ORDER BY index_name, seq_in_index
-            ";
-
-        let rows = self.conn.query_raw(sql, &[schema_name.into()]).await?;
-
-        for row in rows {
-            trace!("Got index row: {:#?}", row);
-            let table_name = row.get_expect_string("table_name");
-            let index_name = row.get_expect_string("index_name");
-            let length = row.get_u32("partial");
-
-            let sort_order = row.get_string("column_order").map(|v| match v.as_ref() {
-                "A" => SQLSortOrder::Asc,
-                "D" => SQLSortOrder::Desc,
-                misc => panic!("Unexpected sort order `{}`, collation should be A, D or Null", misc),
-            });
-
-            match row.get_string("column_name") {
-                Some(column_name) => {
-                    let seq_in_index = row.get_expect_i64("seq_in_index");
-                    let pos = seq_in_index - 1;
-                    let is_unique = !row.get_expect_bool("non_unique");
-
-                    // Multi-column indices will return more than one row (with different column_name values).
-                    // We cannot assume that one row corresponds to one index.
-                    let (ref mut indexes_map, ref mut primary_key): &mut (_, Option<PrimaryKey>) = map
-                        .entry(table_name)
-                        .or_insert((BTreeMap::<String, Index>::new(), None));
-
-                    let is_pk = index_name.to_lowercase() == "primary";
-                    if is_pk {
-                        trace!("Column '{}' is part of the primary key", column_name);
-                        match primary_key {
-                            Some(pk) => {
-                                if pk.columns.len() < (pos + 1) as usize {
-                                    pk.columns.resize((pos + 1) as usize, PrimaryKeyColumn::default());
-                                }
-
-                                let mut column = PrimaryKeyColumn::new(column_name);
-                                column.length = length;
-
-                                pk.columns[pos as usize] = column;
-
-                                trace!(
-                                    "The primary key has already been created, added column to it: {:?}",
-                                    pk.columns
-                                );
-                            }
-                            None => {
-                                trace!("Instantiating primary key");
-
-                                let mut column = PrimaryKeyColumn::new(column_name);
-                                column.length = length;
-
-                                primary_key.replace(PrimaryKey {
-                                    columns: vec![column],
-                                    sequence: None,
-                                    constraint_name: None,
-                                });
-                            }
-                        };
-                    } else if indexes_map.contains_key(&index_name) {
-                        if let Some(index) = indexes_map.get_mut(&index_name) {
-                            let mut column = IndexColumn::new(column_name);
-                            column.length = length;
-                            column.sort_order = sort_order;
-
-                            index.columns.push(column);
-                        }
-                    } else {
-                        let mut column = IndexColumn::new(column_name);
-                        column.length = length;
-                        column.sort_order = sort_order;
-
-                        let tpe = match (is_unique, row.get_string("index_type").as_deref()) {
-                            (true, _) => IndexType::Unique,
-                            (_, Some("FULLTEXT")) => IndexType::Fulltext,
-                            _ => IndexType::Normal,
-                        };
-
-                        indexes_map.insert(
-                            index_name.clone(),
-                            Index {
-                                name: index_name,
-                                columns: vec![column],
-                                tpe,
-                                algorithm: None,
-                            },
-                        );
-                    }
-                }
-                None => {
-                    indexes_with_expressions.insert((table_name, index_name));
-                }
-            }
-        }
-
-        for (table, (index_map, _)) in &mut map {
-            for (tble, index_name) in &indexes_with_expressions {
-                if tble == table {
-                    index_map.remove(index_name);
-                }
-            }
-        }
-
-        Ok(map)
-    }
-
-    async fn get_foreign_keys(
-        conn: &dyn Queryable,
-        schema_name: &str,
-    ) -> DescriberResult<BTreeMap<String, Vec<ForeignKey>>> {
-        // Foreign keys covering multiple columns will return multiple rows, which we need to
-        // merge.
-        let mut map: BTreeMap<String, BTreeMap<String, ForeignKey>> = BTreeMap::new();
-
-        // XXX: Is constraint_name unique? Need a way to uniquely associate rows with foreign keys
-        // One should think it's unique since it's used to join information_schema.key_column_usage
-        // and information_schema.referential_constraints tables in this query lifted from
-        // Stack Overflow
-        //
-        // We alias all the columns because MySQL column names are case-insensitive in queries, but the
-        // information schema column names became upper-case in MySQL 8, causing the code fetching
-        // the result values by column name below to fail.
-        let sql = "
-            SELECT
-                kcu.constraint_name constraint_name,
-                kcu.column_name column_name,
-                kcu.referenced_table_name referenced_table_name,
-                kcu.referenced_column_name referenced_column_name,
-                kcu.ordinal_position ordinal_position,
-                kcu.table_name table_name,
-                rc.delete_rule delete_rule,
-                rc.update_rule update_rule
-            FROM information_schema.key_column_usage AS kcu
-            INNER JOIN information_schema.referential_constraints AS rc ON
-            kcu.constraint_name = rc.constraint_name
-            WHERE
-                kcu.table_schema = ?
-                AND rc.constraint_schema = ?
-                AND kcu.referenced_column_name IS NOT NULL
-            ORDER BY ordinal_position
-        ";
-
-        let result_set = conn.query_raw(sql, &[schema_name.into(), schema_name.into()]).await?;
-
-        for row in result_set.into_iter() {
-            trace!("Got description FK row {:#?}", row);
-            let table_name = row.get_expect_string("table_name");
-            let constraint_name = row.get_expect_string("constraint_name");
-            let column = row.get_expect_string("column_name");
-            let referenced_table = row.get_expect_string("referenced_table_name");
-            let referenced_column = row.get_expect_string("referenced_column_name");
-            let ord_pos = row.get_expect_i64("ordinal_position");
-            let on_delete_action = match row.get_expect_string("delete_rule").to_lowercase().as_str() {
-                "cascade" => ForeignKeyAction::Cascade,
-                "set null" => ForeignKeyAction::SetNull,
-                "set default" => ForeignKeyAction::SetDefault,
-                "restrict" => ForeignKeyAction::Restrict,
-                "no action" => ForeignKeyAction::NoAction,
-                s => panic!("Unrecognized on delete action '{}'", s),
-            };
-            let on_update_action = match row.get_expect_string("update_rule").to_lowercase().as_str() {
-                "cascade" => ForeignKeyAction::Cascade,
-                "set null" => ForeignKeyAction::SetNull,
-                "set default" => ForeignKeyAction::SetDefault,
-                "restrict" => ForeignKeyAction::Restrict,
-                "no action" => ForeignKeyAction::NoAction,
-                s => panic!("Unrecognized on update action '{}'", s),
-            };
-
-            let intermediate_fks = map.entry(table_name).or_default();
-
-            match intermediate_fks.get_mut(&constraint_name) {
-                Some(fk) => {
-                    let pos = ord_pos as usize - 1;
-                    if fk.columns.len() <= pos {
-                        fk.columns.resize(pos + 1, "".to_string());
-                    }
-                    fk.columns[pos] = column;
-                    if fk.referenced_columns.len() <= pos {
-                        fk.referenced_columns.resize(pos + 1, "".to_string());
-                    }
-                    fk.referenced_columns[pos] = referenced_column;
-                }
-                None => {
-                    let fk = ForeignKey {
-                        constraint_name: Some(constraint_name.clone()),
-                        columns: vec![column],
-                        referenced_table,
-                        referenced_columns: vec![referenced_column],
-                        on_delete_action,
-                        on_update_action,
-                    };
-                    intermediate_fks.insert(constraint_name, fk);
-                }
-            };
-        }
-
-        let fks = map
-            .into_iter()
-            .map(|(k, v)| {
-                let mut fks: Vec<ForeignKey> = v.into_iter().map(|(_k, v)| v).collect();
-
-                fks.sort_unstable_by(|this, other| this.columns.cmp(&other.columns));
-
-                (k, fks)
-            })
-            .collect();
-
-        Ok(fks)
-    }
-
     fn get_column_type_and_enum(
         table: &str,
         column_name: &str,
@@ -692,15 +525,9 @@ impl<'a> SqlSchemaDescriber<'a> {
         full_data_type: &str,
         precision: Precision,
         arity: ColumnArity,
-        default: Option<&Value>,
+        default: Option<&Value<'_>>,
     ) -> (ColumnType, Option<Enum>) {
         static UNSIGNEDNESS_RE: Lazy<Regex> = Lazy::new(|| Regex::new("(?i)unsigned$").unwrap());
-        // println!("Name: {}", column_name);
-        // println!("DT: {}", data_type);
-        // println!("FDT: {}", full_data_type);
-        // println!("Precision: {:?}", precision);
-        // println!("Default: {:?}", default);
-
         let is_tinyint1 = || Self::extract_precision(full_data_type) == Some(1);
         let invalid_bool_default = || {
             default
@@ -809,6 +636,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         let enm = match &family {
             ColumnTypeFamily::Enum(name) => Some(Enum {
+                namespace_id: Default::default(),
                 name: name.clone(),
                 values: Self::extract_enum_values(&full_data_type),
             }),
@@ -819,7 +647,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             full_data_type: full_data_type.to_owned(),
             family,
             arity,
-            native_type: native_type.map(|x| x.to_json()),
+            native_type: native_type.map(NativeTypeInstance::new::<MySqlType>),
         };
 
         (tpe, enm)
@@ -828,7 +656,7 @@ impl<'a> SqlSchemaDescriber<'a> {
     fn extract_precision(input: &str) -> Option<u32> {
         static RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#".*\(([1-9])\)"#).unwrap());
         RE.captures(input)
-            .and_then(|cap| cap.get(1).map(|precision| from_str::<u32>(precision.as_str()).unwrap()))
+            .and_then(|cap| cap.get(1).map(|precision| precision.as_str().parse::<u32>().unwrap()))
     }
 
     fn extract_enum_values(full_data_type: &&str) -> Vec<String> {
@@ -846,7 +674,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         static MARIADB_NEWLINE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\n"#).unwrap());
         static MARIADB_DEFAULT_QUOTE_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'(.*)'"#).unwrap());
 
-        let maybe_unquoted: Cow<str> = if matches!(flavour, Flavour::MariaDb) {
+        let maybe_unquoted: Cow<'_, str> = if matches!(flavour, Flavour::MariaDb) {
             let unquoted = MARIADB_DEFAULT_QUOTE_UNESCAPE_RE
                 .captures(&default)
                 .and_then(|cap| cap.get(1).map(|x| x.as_str()))
@@ -867,4 +695,107 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         MYSQL_CURRENT_TIMESTAMP_RE.is_match(default_str)
     }
+}
+
+async fn push_foreign_keys(
+    schema_name: &str,
+    table_ids: &IndexMap<String, TableId>,
+    sql_schema: &mut SqlSchema,
+    conn: &dyn Queryable,
+) -> DescriberResult<()> {
+    // We alias all the columns because MySQL column names are case-insensitive in queries, but
+    // the information schema column names became upper-case in MySQL 8, causing the code
+    // fetching the result values by column name below to fail.
+    let sql = "
+            SELECT
+                kcu.constraint_name constraint_name,
+                kcu.column_name column_name,
+                kcu.referenced_table_name referenced_table_name,
+                kcu.referenced_column_name referenced_column_name,
+                kcu.ordinal_position ordinal_position,
+                kcu.table_name table_name,
+                rc.delete_rule delete_rule,
+                rc.update_rule update_rule
+            FROM information_schema.key_column_usage AS kcu
+            INNER JOIN information_schema.referential_constraints AS rc ON
+                BINARY kcu.constraint_name = BINARY rc.constraint_name
+            WHERE
+                BINARY kcu.table_schema = ?
+                AND BINARY rc.constraint_schema = ?
+                AND kcu.referenced_column_name IS NOT NULL
+
+            ORDER BY
+                BINARY kcu.table_schema,
+                BINARY kcu.table_name,
+                BINARY kcu.constraint_name,
+                kcu.ordinal_position
+        ";
+
+    fn get_ids(
+        row: &ResultRow,
+        table_ids: &IndexMap<String, TableId>,
+        sql_schema: &SqlSchema,
+    ) -> Option<(TableId, ColumnId, TableId, ColumnId)> {
+        let table_name = row.get_expect_string("table_name");
+        let column_name = row.get_expect_string("column_name");
+        let referenced_table_name = row.get_expect_string("referenced_table_name");
+        let referenced_column_name = row.get_expect_string("referenced_column_name");
+
+        let table_id = *table_ids.get(&table_name)?;
+        let referenced_table_id = *table_ids.get(&referenced_table_name)?;
+        let column_id = sql_schema.walk(table_id).column(&column_name)?.id;
+        let referenced_column_id = sql_schema.walk(referenced_table_id).column(&referenced_column_name)?.id;
+
+        Some((table_id, column_id, referenced_table_id, referenced_column_id))
+    }
+
+    let result_set = conn.query_raw(sql, &[schema_name.into(), schema_name.into()]).await?;
+    let mut current_fk: Option<(TableId, String, ForeignKeyId)> = None;
+
+    for row in result_set.into_iter() {
+        trace!("Got description FK row {:#?}", row);
+        let (table_id, column_id, referenced_table_id, referenced_column_id) =
+            if let Some(ids) = get_ids(&row, table_ids, sql_schema) {
+                ids
+            } else {
+                continue;
+            };
+        let constraint_name = row.get_expect_string("constraint_name");
+        let on_delete_action = match row.get_expect_string("delete_rule").to_lowercase().as_str() {
+            "cascade" => ForeignKeyAction::Cascade,
+            "set null" => ForeignKeyAction::SetNull,
+            "set default" => ForeignKeyAction::SetDefault,
+            "restrict" => ForeignKeyAction::Restrict,
+            "no action" => ForeignKeyAction::NoAction,
+            s => panic!("Unrecognized on delete action '{}'", s),
+        };
+        let on_update_action = match row.get_expect_string("update_rule").to_lowercase().as_str() {
+            "cascade" => ForeignKeyAction::Cascade,
+            "set null" => ForeignKeyAction::SetNull,
+            "set default" => ForeignKeyAction::SetDefault,
+            "restrict" => ForeignKeyAction::Restrict,
+            "no action" => ForeignKeyAction::NoAction,
+            s => panic!("Unrecognized on update action '{}'", s),
+        };
+
+        match &current_fk {
+            Some((cur_table_id, cur_constraint_name, _))
+                if *cur_table_id == table_id && *cur_constraint_name == constraint_name => {}
+            None | Some(_) => {
+                let fkid = sql_schema.push_foreign_key(
+                    Some(constraint_name.clone()),
+                    [table_id, referenced_table_id],
+                    [on_delete_action, on_update_action],
+                );
+
+                current_fk = Some((table_id, constraint_name, fkid));
+            }
+        }
+
+        if let Some((_, _, fkid)) = current_fk {
+            sql_schema.push_foreign_key_column(fkid, [column_id, referenced_column_id]);
+        }
+    }
+
+    Ok(())
 }

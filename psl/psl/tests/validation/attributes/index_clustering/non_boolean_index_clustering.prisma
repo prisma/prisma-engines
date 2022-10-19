@@ -1,0 +1,16 @@
+datasource test {
+    provider = "sqlserver"
+    url = env("TEST_DATABASE_URL")
+}
+
+model A {
+  id Int @id(clustered: meow)
+}
+
+
+// [1;91merror[0m: [1mExpected a boolean value, but received literal value `meow`.[0m
+//   [1;94m-->[0m  [4mschema.prisma:7[0m
+// [1;94m   | [0m
+// [1;94m 6 | [0mmodel A {
+// [1;94m 7 | [0m  id Int @id(clustered: [1;91mmeow[0m)
+// [1;94m   | [0m

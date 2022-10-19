@@ -1,5 +1,5 @@
-use datamodel::common::preview_features::PreviewFeature;
 use enumflags2::BitFlags;
+use psl::PreviewFeature;
 
 /// Parameters passed from the core to connectors on initialization.
 pub struct ConnectorParams {

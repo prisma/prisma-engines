@@ -1,9 +1,8 @@
-use std::iter;
-
 use crate::join::JoinStage;
 use itertools::Itertools;
 use mongodb::bson::{doc, Document};
 use prisma_models::{OrderBy, OrderByHop, OrderByToManyAggregation, SortOrder};
+use std::iter;
 
 #[derive(Debug)]
 pub(crate) struct OrderByData {
@@ -54,7 +53,7 @@ impl OrderByData {
             let mut folded_stages = stages
                 .into_iter()
                 .rev()
-                .fold1(|right, mut left| {
+                .reduce(|right, mut left| {
                     left.push_nested(right);
                     left
                 })
@@ -105,8 +104,8 @@ impl OrderByData {
 
     /// The Mongo binding name of this orderBy, required for cursor conditions.
     /// For a relation field, this is only the first item of the path (e.g. orderby_TestModel_1)
-    /// Returns 2 forms, one for the left one and one for the right one. The left one is
-    /// escaped for usage in user-defined variables.
+    /// Returns 2 forms, one for the left one and one for the right one. The left one is a unique,
+    /// valid name for a variable binding.
     pub(crate) fn binding_names(&self) -> (String, String) {
         if let Some(ref prefix) = self.prefix {
             let first = prefix.first().unwrap().to_string();
@@ -114,18 +113,14 @@ impl OrderByData {
             (first.clone(), first)
         } else {
             // TODO: Order by relevance won't work here
-            let right = self
-                .order_by
-                .field()
-                .expect("a field on which to order by is expected")
-                .db_name()
-                .to_owned();
+            let field = self.order_by.field().expect("a field on which to order by is expected");
+            let right = field.db_name().to_owned();
+            let mut left = field.name.clone();
 
-            let left = if right.starts_with('_') {
-                right.strip_prefix('_').unwrap().to_owned()
-            } else {
-                right.to_owned()
-            };
+            // Issue: https://github.com/prisma/prisma/issues/14001
+            // Here we can assume the field name is ASCII, because it is the _client_ field name,
+            // not the mapped name.
+            left[..1].make_ascii_lowercase();
 
             (left, right)
         }

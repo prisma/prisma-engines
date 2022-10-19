@@ -9,7 +9,7 @@ mod interactive_tx {
 
     #[connector_test]
     async fn basic_commit_workflow(mut runner: Runner) -> TestResult<()> {
-        let tx_id = runner.start_tx(5000, 5000).await?;
+        let tx_id = runner.start_tx(5000, 5000, None).await?;
         runner.set_active_tx(tx_id.clone());
 
         insta::assert_snapshot!(
@@ -36,7 +36,7 @@ mod interactive_tx {
 
     #[connector_test]
     async fn basic_rollback_workflow(mut runner: Runner) -> TestResult<()> {
-        let tx_id = runner.start_tx(5000, 5000).await?;
+        let tx_id = runner.start_tx(5000, 5000, None).await?;
         runner.set_active_tx(tx_id.clone());
 
         insta::assert_snapshot!(
@@ -64,7 +64,7 @@ mod interactive_tx {
     #[connector_test]
     async fn tx_expiration_cycle(mut runner: Runner) -> TestResult<()> {
         // Tx expires after one second.
-        let tx_id = runner.start_tx(5000, 1000).await?;
+        let tx_id = runner.start_tx(5000, 1000, None).await?;
         runner.set_active_tx(tx_id.clone());
 
         insta::assert_snapshot!(
@@ -86,18 +86,22 @@ mod interactive_tx {
 
         let error = res.err().unwrap();
         let known_err = error.as_known().unwrap();
+        println!("KNOWN ERROR {:?}", known_err);
 
         assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
-        assert!(known_err.message.contains("Transaction is no longer valid. Last state"));
+        assert!(known_err
+            .message
+            .contains("A commit cannot be executed on a closed transaction."));
 
-        // Wait for cache eviction, no tx should be found.
-        time::sleep(time::Duration::from_secs(2)).await;
+        // Try again
         let res = runner.commit_tx(tx_id).await?;
         let error = res.err().unwrap();
         let known_err = error.as_known().unwrap();
 
         assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
-        assert!(known_err.message.contains("Transaction not found."));
+        assert!(known_err
+            .message
+            .contains("A commit cannot be executed on a closed transaction."));
 
         Ok(())
     }
@@ -105,7 +109,7 @@ mod interactive_tx {
     #[connector_test]
     async fn no_auto_rollback(mut runner: Runner) -> TestResult<()> {
         // Tx expires after five second.
-        let tx_id = runner.start_tx(5000, 5000).await?;
+        let tx_id = runner.start_tx(5000, 5000, None).await?;
         runner.set_active_tx(tx_id.clone());
 
         // Row is created
@@ -132,17 +136,17 @@ mod interactive_tx {
     #[connector_test(only(Postgres))]
     async fn raw_queries(mut runner: Runner) -> TestResult<()> {
         // Tx expires after five second.
-        let tx_id = runner.start_tx(5000, 5000).await?;
+        let tx_id = runner.start_tx(5000, 5000, None).await?;
         runner.set_active_tx(tx_id.clone());
 
         insta::assert_snapshot!(
-          run_query!(&runner, fmt_execute_raw("INSERT INTO \"TestModel\"(id, field) VALUES ($1, $2)", vec![PrismaValue::Int(1), PrismaValue::String("Test".to_owned())])),
+          run_query!(&runner, fmt_execute_raw("INSERT INTO \"TestModel\"(id, field) VALUES ($1, $2)", vec![RawParam::from(1), RawParam::from("Test")])),
           @r###"{"data":{"executeRaw":1}}"###
         );
 
         insta::assert_snapshot!(
           run_query!(&runner, fmt_query_raw("SELECT * FROM \"TestModel\"", vec![])),
-          @r###"{"data":{"queryRaw":[{"id":1,"field":"Test"}]}}"###
+          @r###"{"data":{"queryRaw":[{"id":{"prisma__type":"int","prisma__value":1},"field":{"prisma__type":"string","prisma__value":"Test"}}]}}"###
         );
 
         let res = runner.commit_tx(tx_id.clone()).await?;
@@ -152,7 +156,7 @@ mod interactive_tx {
         // Data still there after commit.
         insta::assert_snapshot!(
           run_query!(&runner, fmt_query_raw("SELECT * FROM \"TestModel\"", vec![])),
-          @r###"{"data":{"queryRaw":[{"id":1,"field":"Test"}]}}"###
+          @r###"{"data":{"queryRaw":[{"id":{"prisma__type":"int","prisma__value":1},"field":{"prisma__type":"string","prisma__value":"Test"}}]}}"###
         );
 
         Ok(())
@@ -161,7 +165,7 @@ mod interactive_tx {
     #[connector_test]
     async fn batch_queries_success(mut runner: Runner) -> TestResult<()> {
         // Tx expires after five second.
-        let tx_id = runner.start_tx(5000, 5000).await?;
+        let tx_id = runner.start_tx(5000, 5000, None).await?;
         runner.set_active_tx(tx_id.clone());
 
         let queries = vec![
@@ -171,7 +175,7 @@ mod interactive_tx {
         ];
 
         // Tx flag is not set, but it executes on an ITX.
-        runner.batch(queries, false).await?;
+        runner.batch(queries, false, None).await?;
         let res = runner.commit_tx(tx_id.clone()).await?;
         assert!(res.is_ok());
         runner.clear_active_tx();
@@ -187,7 +191,7 @@ mod interactive_tx {
     #[connector_test]
     async fn batch_queries_rollback(mut runner: Runner) -> TestResult<()> {
         // Tx expires after five second.
-        let tx_id = runner.start_tx(5000, 5000).await?;
+        let tx_id = runner.start_tx(5000, 5000, None).await?;
         runner.set_active_tx(tx_id.clone());
 
         let queries = vec![
@@ -197,7 +201,7 @@ mod interactive_tx {
         ];
 
         // Tx flag is not set, but it executes on an ITX.
-        runner.batch(queries, false).await?;
+        runner.batch(queries, false, None).await?;
         let res = runner.rollback_tx(tx_id.clone()).await?;
         assert!(res.is_ok());
         runner.clear_active_tx();
@@ -213,7 +217,7 @@ mod interactive_tx {
     #[connector_test]
     async fn batch_queries_failure(mut runner: Runner) -> TestResult<()> {
         // Tx expires after five second.
-        let tx_id = runner.start_tx(5000, 5000).await?;
+        let tx_id = runner.start_tx(5000, 5000, None).await?;
         runner.set_active_tx(tx_id.clone());
 
         // One dup key, will cause failure of the batch.
@@ -225,7 +229,7 @@ mod interactive_tx {
         ];
 
         // Tx flag is not set, but it executes on an ITX.
-        let batch_results = runner.batch(queries, false).await?;
+        let batch_results = runner.batch(queries, false, None).await?;
         batch_results.assert_failure(2002, None);
 
         let res = runner.commit_tx(tx_id.clone()).await?;
@@ -256,7 +260,7 @@ mod interactive_tx {
     #[connector_test]
     async fn tx_expiration_failure_cycle(mut runner: Runner) -> TestResult<()> {
         // Tx expires after one seconds.
-        let tx_id = runner.start_tx(5000, 1000).await?;
+        let tx_id = runner.start_tx(5000, 1000, None).await?;
         runner.set_active_tx(tx_id.clone());
 
         // Row is created
@@ -275,14 +279,48 @@ mod interactive_tx {
         // Wait for tx to expire
         time::sleep(time::Duration::from_millis(1500)).await;
 
-        // Expect the state of the tx to be expired.
-        // Status of the tx must be `Expired`
+        // Expect the state of the tx to be expired so the commit should fail.
         let res = runner.commit_tx(tx_id.clone()).await?;
         let error = res.err().unwrap();
         let known_err = error.as_known().unwrap();
 
         assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
-        assert!(known_err.message.contains("Transaction is no longer valid"));
+        assert!(known_err
+            .message
+            .contains("A commit cannot be executed on a closed transaction."));
+
+        // Expect the state of the tx to be expired so the rollback should fail.
+        let res = runner.rollback_tx(tx_id.clone()).await?;
+        let error = res.err().unwrap();
+        let known_err = error.as_known().unwrap();
+
+        assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
+        assert!(known_err
+            .message
+            .contains("A rollback cannot be executed on a closed transaction."));
+
+        // Expect the state of the tx to be expired so the query should fail.
+        assert_error!(
+            runner,
+            r#"{ findManyTestModel { id } }"#,
+            2028,
+            "A query cannot be executed on a closed transaction."
+        );
+
+        runner
+            .batch(
+                vec![
+                    "{ findManyTestModel { id } }".to_string(),
+                    "{ findManyTestModel { id } }".to_string(),
+                ],
+                false,
+                None,
+            )
+            .await?
+            .assert_failure(
+                2028,
+                Some("A batch query cannot be executed on a closed transaction.".to_string()),
+            );
 
         Ok(())
     }
@@ -291,10 +329,10 @@ mod interactive_tx {
     #[connector_test(exclude(Sqlite))]
     async fn multiple_tx(mut runner: Runner) -> TestResult<()> {
         // First transaction.
-        let tx_id_a = runner.start_tx(2000, 2000).await?;
+        let tx_id_a = runner.start_tx(2000, 2000, None).await?;
 
         // Second transaction.
-        let tx_id_b = runner.start_tx(2000, 2000).await?;
+        let tx_id_b = runner.start_tx(2000, 2000, None).await?;
 
         // Execute on first transaction.
         runner.set_active_tx(tx_id_a.clone());
@@ -329,6 +367,138 @@ mod interactive_tx {
         let res = runner.commit_tx(tx_id_a.clone()).await?;
 
         assert!(res.is_ok());
+
+        Ok(())
+    }
+
+    #[connector_test(only(Postgres))]
+    async fn write_conflict(mut runner: Runner) -> TestResult<()> {
+        // create row
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1, field: "initial" }) { id }}"#),
+          @r###"{"data":{"createOneTestModel":{"id":1}}}"###
+        );
+
+        // First transaction.
+        let tx_id_a = runner.start_tx(5000, 5000, Some("Serializable".into())).await?;
+
+        // Second transaction.
+        let tx_id_b = runner.start_tx(5000, 5000, Some("Serializable".into())).await?;
+
+        // Read on first transaction.
+        runner.set_active_tx(tx_id_a.clone());
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel { id field }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1,"field":"initial"}]}}"###
+        );
+
+        // Read on the second transaction.
+        runner.set_active_tx(tx_id_b.clone());
+        insta::assert_snapshot!(
+            run_query!(&runner, r#"query { findManyTestModel { id field }}"#),
+            @r###"{"data":{"findManyTestModel":[{"id":1,"field":"initial"}]}}"###
+        );
+
+        // write and commit on the first transaction
+        runner.set_active_tx(tx_id_a.clone());
+        insta::assert_snapshot!(
+            run_query!(&runner, r#"mutation { updateManyTestModel(data: { field: "a" }) { count }}"#),
+            @r###"{"data":{"updateManyTestModel":{"count":1}}}"###
+        );
+
+        let commit_res = runner.commit_tx(tx_id_a.clone()).await?;
+        assert!(commit_res.is_ok());
+
+        // attempt to write on the second transaction
+        runner.set_active_tx(tx_id_b.clone());
+        let res = runner
+            .query(r#"mutation { updateManyTestModel(data: { field: "b" }) { count }}"#)
+            .await?;
+
+        res.assert_failure(2034, None);
+
+        Ok(())
+    }
+}
+
+#[test_suite(schema(generic))]
+mod itx_isolation {
+    use query_engine_tests::*;
+
+    // All (SQL) connectors support serializable.
+    #[connector_test(exclude(MongoDb))]
+    async fn basic_serializable(mut runner: Runner) -> TestResult<()> {
+        let tx_id = runner.start_tx(5000, 5000, Some("Serializable".to_owned())).await?;
+        runner.set_active_tx(tx_id.clone());
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1 }) { id }}"#),
+          @r###"{"data":{"createOneTestModel":{"id":1}}}"###
+        );
+
+        let res = runner.commit_tx(tx_id).await?;
+        assert!(res.is_ok());
+        runner.clear_active_tx();
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel { id field }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1,"field":null}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(exclude(MongoDb))]
+    async fn casing_doesnt_matter(mut runner: Runner) -> TestResult<()> {
+        let tx_id = runner.start_tx(5000, 5000, Some("sErIaLiZaBlE".to_owned())).await?;
+        runner.set_active_tx(tx_id.clone());
+
+        let res = runner.commit_tx(tx_id).await?;
+        assert!(res.is_ok());
+
+        Ok(())
+    }
+
+    #[connector_test(only(Postgres))]
+    async fn spacing_doesnt_matter(mut runner: Runner) -> TestResult<()> {
+        let tx_id = runner.start_tx(5000, 5000, Some("Repeatable Read".to_owned())).await?;
+        runner.set_active_tx(tx_id.clone());
+
+        let res = runner.commit_tx(tx_id).await?;
+        assert!(res.is_ok());
+
+        let tx_id = runner.start_tx(5000, 5000, Some("RepeatableRead".to_owned())).await?;
+        runner.set_active_tx(tx_id.clone());
+
+        let res = runner.commit_tx(tx_id).await?;
+        assert!(res.is_ok());
+
+        Ok(())
+    }
+
+    #[connector_test(exclude(MongoDb))]
+    async fn invalid_isolation(runner: Runner) -> TestResult<()> {
+        let tx_id = runner.start_tx(5000, 5000, Some("test".to_owned())).await;
+
+        match tx_id {
+            Ok(_) => panic!("Expected invalid isolation level string to throw an error, but it succeeded instead."),
+            Err(err) => assert!(err.to_string().contains("Invalid isolation level `test`")),
+        };
+
+        Ok(())
+    }
+
+    // Mongo doesn't support isolation levels.
+    #[connector_test(only(MongoDb))]
+    async fn mongo_failure(runner: Runner) -> TestResult<()> {
+        let tx_id = runner.start_tx(5000, 5000, Some("Serializable".to_owned())).await;
+
+        match tx_id {
+            Ok(_) => panic!("Expected mongo to throw an unsupported error, but it succeeded instead."),
+            Err(err) => assert!(err.to_string().contains(
+                "Unsupported connector feature: Mongo does not support setting transaction isolation levels"
+            )),
+        };
 
         Ok(())
     }

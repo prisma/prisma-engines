@@ -563,3 +563,46 @@ fn enum_array_modification_should_work(api: TestApi) {
         .send_sync()
         .assert_applied_migrations(&[]);
 }
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn mapped_enum_defaults_must_work(api: TestApi) {
+    let schema = r#"
+        datasource db {
+            provider = "postgres"
+            url = "postgres://meowmeowmeow"
+        }
+
+        enum Color {
+            Red @map("0")
+            Green @map("Grün")
+            Blue @map("Blu")
+            Annoyed @map("pfuh 🙄...")
+        }
+
+        model Test {
+            id Int @id
+            mainColor Color @default(Green)
+            secondaryColor Color @default(Red)
+            colorOrdering Color[] @default([Blue, Red, Green, Red, Blue, Red])
+        }
+    "#;
+
+    let expect = expect![[r#"
+        -- CreateEnum
+        CREATE TYPE "Color" AS ENUM ('0', 'Grün', 'Blu', 'pfuh 🙄...');
+
+        -- CreateTable
+        CREATE TABLE "Test" (
+            "id" INTEGER NOT NULL,
+            "mainColor" "Color" NOT NULL DEFAULT 'Grün',
+            "secondaryColor" "Color" NOT NULL DEFAULT '0',
+            "colorOrdering" "Color"[] DEFAULT ARRAY['Blu', '0', 'Grün', '0', 'Blu', '0']::"Color"[],
+
+            CONSTRAINT "Test_pkey" PRIMARY KEY ("id")
+        );
+    "#]];
+    api.expect_sql_for_schema(schema, &expect);
+
+    api.schema_push(schema).send().assert_green();
+    api.schema_push(schema).send().assert_green().assert_no_steps();
+}

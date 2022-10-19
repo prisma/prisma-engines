@@ -133,7 +133,7 @@ pub fn mixed_composites() -> String {
             to_one_com   CompositeA?  @map("to_one_composite")
             to_many_com  CompositeB[] @map("to_many_composite")
 
-            to_one_rel_id Int?
+            to_one_rel_id Int? @unique
             to_one_rel    RelatedModel? @relation(name: "ToOne", fields: [to_one_rel_id], references: [id])
 
             #m2m(to_many_rel, RelatedModel[], id, Int, ToMany)

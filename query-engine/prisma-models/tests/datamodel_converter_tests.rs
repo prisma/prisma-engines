@@ -1,6 +1,78 @@
 #![allow(non_snake_case)]
-use prisma_models::*;
+use prisma_models::{dml::ReferentialAction, *};
 use std::sync::Arc;
+
+#[test]
+fn no_action_is_alias_for_restrict_when_prisma_relation_mode() {
+    let datamodel = convert(
+        r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialIntegrity"]
+        }
+
+        datasource db {
+            provider = "mysql"
+            url      = "mysql://"
+            relationMode = "prisma"
+        }
+
+        model A {
+            id Int @id
+            bs B[]
+        }
+
+        model B {
+            id Int @id
+            aId Int
+            a A @relation(fields: [aId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+        }
+        "#,
+    );
+
+    let relations = datamodel.relations();
+    assert_eq!(relations.len(), 1);
+
+    let relation = &relations[0];
+    assert_eq!(relation.on_update(), ReferentialAction::Restrict);
+    assert_eq!(relation.on_delete(), ReferentialAction::Restrict);
+}
+
+#[test]
+fn no_action_is_not_alias_for_restrict_when_foreign_keys_relation_mode() {
+    let datamodel = convert(
+        r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialIntegrity"]
+        }
+
+        datasource db {
+            provider = "mysql"
+            url      = "mysql://"
+            relationMode = "foreignKeys"
+        }
+
+        model A {
+            id Int @id
+            bs B[]
+        }
+
+        model B {
+            id Int @id
+            aId Int
+            a A @relation(fields: [aId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+        }
+        "#,
+    );
+
+    let relations = datamodel.relations();
+    assert_eq!(relations.len(), 1);
+
+    let relation = &relations[0];
+    assert_eq!(relation.on_update(), ReferentialAction::NoAction);
+    assert_eq!(relation.on_delete(), ReferentialAction::NoAction);
+}
 
 #[test]
 fn an_empty_datamodel_must_work() {
@@ -298,7 +370,7 @@ fn explicit_relation_fields() {
     let relation_name = "BlogToPost";
     let blog = datamodel.assert_model("Blog");
     let post = datamodel.assert_model("Post");
-    let relation = datamodel.assert_relation(relation_name);
+    let relation = datamodel.assert_relation(("Blog", "Post"), relation_name);
 
     blog.assert_relation_field("posts")
         .assert_list()
@@ -339,7 +411,7 @@ fn many_to_many_relations() {
     let relation_name = "BlogToPost";
     let blog = datamodel.assert_model("Blog");
     let post = datamodel.assert_model("Post");
-    let relation = datamodel.assert_relation(relation_name);
+    let relation = datamodel.assert_relation(("Blog", "Post"), relation_name);
 
     blog.assert_relation_field("posts")
         .assert_list()
@@ -426,10 +498,10 @@ fn ambiguous_relations() {
 
             model Post {
                 id      Int  @id
-                blog1Id Int
-                blog2Id Int
-                blog1   Blog @relation(name: "Relation1", fields: blog1Id, references: id)
-                blog2   Blog @relation(name: "Relation2", fields: blog2Id, references: id)
+                blog1Id Int  @unique
+                blog2Id Int  @unique
+                blog1   Blog @relation(name: "Relation1", fields: [blog1Id], references: [id])
+                blog2   Blog @relation(name: "Relation2", fields: [blog2Id], references: [id])
             }
         "#,
     );
@@ -441,6 +513,35 @@ fn ambiguous_relations() {
     let post = datamodel.assert_model("Post");
     post.assert_relation_field("blog1").assert_relation_name("Relation1");
     post.assert_relation_field("blog2").assert_relation_name("Relation2");
+}
+
+// Regression test
+// https://github.com/prisma/prisma/issues/12986
+#[test]
+fn duplicate_relation_name() {
+    let schema = r#"
+        model Post {
+            id     String @unique
+            userId String
+            user   User   @relation("a", fields: [userId], references: [id])
+          }
+          
+          model User {
+            id       String    @unique
+            posts    Post[]    @relation("a")
+            comments Comment[] @relation("a")
+          }
+          
+          model Comment {
+            id     String @unique
+            userId String
+            user   User   @relation("a", fields: [userId], references: [id])
+          }
+          
+        "#;
+
+    let dml = psl::parse_schema(schema).unwrap();
+    prisma_models::convert(&dml, String::new());
 }
 
 #[test]
@@ -462,13 +563,13 @@ fn implicit_many_to_many_relation() {
 }
 
 fn convert(datamodel: &str) -> Arc<InternalDataModel> {
-    let builder = InternalDataModelBuilder::new(datamodel);
-    builder.build("not_important".to_string())
+    let schema = psl::parse_schema(datamodel).unwrap();
+    prisma_models::convert(&schema, "not_important".to_string())
 }
 
 trait DatamodelAssertions {
     fn assert_model(&self, name: &str) -> Arc<Model>;
-    fn assert_relation(&self, name: &str) -> Arc<Relation>;
+    fn assert_relation(&self, models: (&str, &str), name: &str) -> Arc<Relation>;
 }
 
 impl DatamodelAssertions for InternalDataModel {
@@ -476,8 +577,8 @@ impl DatamodelAssertions for InternalDataModel {
         self.find_model(name).unwrap()
     }
 
-    fn assert_relation(&self, name: &str) -> Arc<Relation> {
-        self.find_relation(name).unwrap().upgrade().unwrap()
+    fn assert_relation(&self, models: (&str, &str), name: &str) -> Arc<Relation> {
+        self.find_relation(models, name).unwrap().upgrade().unwrap()
     }
 }
 

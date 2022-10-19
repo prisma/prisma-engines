@@ -11,8 +11,8 @@ use crate::{
     assertions::SchemaAssertion,
     commands::{ApplyMigrations, CreateMigration, DiagnoseMigrationHistory, Reset, SchemaPush},
 };
-use datamodel::common::preview_features::PreviewFeature;
 use migration_core::migration_connector::{ConnectorParams, MigrationConnector};
+use psl::PreviewFeature;
 use quaint::{
     prelude::{ConnectionInfo, Queryable, ResultSet},
     single::Quaint,
@@ -138,6 +138,11 @@ impl TestApi {
         self.tags().contains(Tags::Postgres)
     }
 
+    /// Returns true only when testing on postgres version 15.
+    pub fn is_postgres_15(&self) -> bool {
+        self.tags().contains(Tags::Postgres15)
+    }
+
     /// Returns true only when testing on cockroach.
     pub fn is_cockroach(&self) -> bool {
         self.tags().contains(Tags::CockroachDb)
@@ -171,13 +176,21 @@ impl TestApi {
         shadow_database_connection_string: Option<String>,
     ) -> EngineTestApi {
         let connection_info = ConnectionInfo::from_url(&connection_string).unwrap();
+
         let params = ConnectorParams {
             connection_string,
             preview_features: self.preview_features,
             shadow_database_connection_string,
         };
+
         let mut connector = match &connection_info {
-            ConnectionInfo::Postgres(_) => SqlMigrationConnector::new_postgres(),
+            ConnectionInfo::Postgres(_) => {
+                if self.args.provider() == "cockroachdb" {
+                    SqlMigrationConnector::new_cockroach()
+                } else {
+                    SqlMigrationConnector::new_postgres()
+                }
+            }
             ConnectionInfo::Mysql(_) => SqlMigrationConnector::new_mysql(),
             ConnectionInfo::Mssql(_) => SqlMigrationConnector::new_mssql(),
             ConnectionInfo::Sqlite { .. } => SqlMigrationConnector::new_sqlite(),

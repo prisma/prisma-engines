@@ -6,6 +6,10 @@ mod update_inside_update {
     use query_engine_tests::{assert_error, run_query, run_query_json, DatamodelWithParams};
     use query_test_macros::relation_link_test;
 
+    // ----------------------------------
+    // ------------ P1 to CM ------------
+    // ----------------------------------
+
     // "A P1 to CM relation relation" should "work"
     #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToMany")]
     async fn p1_cm_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
@@ -53,6 +57,138 @@ mod update_inside_update {
 
         Ok(())
     }
+
+    // "A P1 to CM relation relation" should "work"
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToMany")]
+    async fn p1_cm_by_id_and_filters_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+        let parent = t.parent().parse(
+            run_query_json!(
+                runner,
+                format!(
+                    r#"mutation {{
+                      createOneParent(data: {{
+                        p: "p1", p_1: "p", p_2: "1",
+                        childOpt: {{
+                          create: {{c: "c1", c_1: "c", c_2: "1", non_unique: "0"}}
+                        }}
+                      }}){{
+
+                        {parent_selection}
+                        childOpt{{
+                          {child_selection}
+                        }}
+                      }}
+                    }}"#,
+                    parent_selection = t.parent().selection(),
+                    child_selection = t.child().selection()
+                )
+            ),
+            &["data", "createOneParent"],
+        )?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, format!(r#"mutation {{
+            updateOneParent(
+              where: {parent}
+              data:{{
+                childOpt: {{
+                  update: {{ where: {{ non_unique: "0" }} data: {{ non_unique: {{ set: "updated" }} }} }}
+                }}
+            }}){{
+              childOpt {{
+                non_unique
+              }}
+            }}
+          }}"#, parent = parent)),
+          @r###"{"data":{"updateOneParent":{"childOpt":{"non_unique":"updated"}}}}"###
+        );
+
+        Ok(())
+    }
+
+    // "a P1 to CM relation" should "error if the nodes are not connected"
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToMany")]
+    async fn p1_cm_error_if_not_connected(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+        let parent = t.parent().parse(
+            run_query_json!(
+                runner,
+                format!(
+                    r#"mutation {{
+                      createOneParent(data: {{p: "p1", p_1: "p", p_2: "1"}}) {{
+                        {selection}
+                      }}
+                    }}"#,
+                    selection = t.parent().selection()
+                )
+            ),
+            &["data", "createOneParent"],
+        )?;
+
+        assert_error!(
+            runner,
+            format!(r#"mutation {{
+              updateOneParent(
+              where: {parent}
+              data:{{
+                childOpt: {{update: {{ non_unique: "updated" }}}}
+              }}){{
+                childOpt {{
+                  c
+                }}
+              }}
+            }}"#, parent = parent),
+            2025,
+            "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested update on relation 'ChildToParent'."
+        );
+
+        Ok(())
+    }
+
+    // "a P1 to CM relation" should "error if the node is connected but the additional filters don't match it"
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToMany")]
+    async fn p1_cm_error_if_filter_not_match(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+        let parent = t.parent().parse(
+            run_query_json!(
+                runner,
+                format!(
+                    r#"mutation {{
+                      createOneParent(data: {{
+                        p: "p1", p_1: "p", p_2: "1",
+                        childOpt: {{
+                          create: {{c: "existingChild", c_1: "c", c_2: "1", non_unique: "0"}}
+                        }}
+                      }}) {{
+                        {selection}
+                      }}
+                    }}"#,
+                    selection = t.parent().selection()
+                )
+            ),
+            &["data", "createOneParent"],
+        )?;
+
+        assert_error!(
+            runner,
+            format!(r#"mutation {{
+              updateOneParent(
+                where: {parent}
+                data:{{ childOpt: {{ update: {{ where: {{ non_unique: "1" }}, data: {{ non_unique: "updated" }} }} }} }}
+              ) {{
+                childOpt {{
+                  c
+                }}
+              }}
+            }}"#, parent = parent),
+            2025,
+            "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested update on relation 'ChildToParent'."
+        );
+
+        Ok(())
+    }
+
+    // ----------------------------------
+    // ------------ PM to C1 ------------
+    // ----------------------------------
 
     // "A PM to C1 relation relation" should "work"
     #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt")]
@@ -105,6 +241,148 @@ mod update_inside_update {
         Ok(())
     }
 
+    // "A PM to C1 relation relation" should "work"
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt")]
+    async fn pm_c1_by_id_and_filters_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+        let res = run_query_json!(
+            runner,
+            format!(
+                r#"mutation {{
+                  createOneParent(data: {{
+                    p: "p1", p_1: "p", p_2: "1",
+                    childrenOpt: {{
+                      create: [{{c: "c1", c_1: "c", c_2: "1", non_unique: "0"}},{{c: "c2", c_1: "c", c_2: "2", non_unique: "1"}}]
+                    }}
+                  }}) {{
+                    {parent_selection}
+                    childrenOpt{{
+                      {child_selection}
+                    }}
+                  }}
+                }}"#,
+                parent_selection = t.parent().selection(),
+                child_selection = t.child().selection()
+            )
+        );
+
+        let parent = t.parent().parse(res.clone(), &["data", "createOneParent"])?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, format!(r#"mutation {{
+            updateOneParent(
+              where: {parent}
+              data:{{
+                childrenOpt: {{
+                    update:  [
+                      {{ where: {{ c: "c1", non_unique: "0" }}, data: {{ non_unique: {{ set: "updated" }} }}}}
+                    ]
+                  }}
+            }}){{
+              childrenOpt (orderBy: {{ c: asc }} ){{
+                non_unique
+              }}
+            }}
+          }}"#, parent = parent)),
+          @r###"{"data":{"updateOneParent":{"childrenOpt":[{"non_unique":"updated"},{"non_unique":"1"}]}}}"###
+        );
+
+        Ok(())
+    }
+
+    // "a PM to C1 relation" should "error if the nodes are not connected"
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt")]
+    async fn pm_c1_error_if_not_connected(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+        let parent = t.parent().parse(
+            run_query_json!(
+                runner,
+                format!(
+                    r#"mutation {{
+                      createOneParent(data: {{p: "p1", p_1: "p", p_2: "1"}}) {{
+                        {selection}
+                      }}
+                    }}"#,
+                    selection = t.parent().selection()
+                )
+            ),
+            &["data", "createOneParent"],
+        )?;
+
+        assert_error!(
+            runner,
+            format!(r#"mutation {{
+              updateOneParent(
+                where: {parent}
+                data: {{
+                  childrenOpt: {{
+                    update: {{
+                      where: {{ c: "c1" }},
+                      data: {{ non_unique: {{ set: "updated" }} }}
+                    }}
+                  }}
+              }}){{
+                childrenOpt {{
+                  c
+                }}
+              }}
+            }}"#, parent = parent),
+            2025,
+            "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested update on relation 'ChildToParent'."
+        );
+
+        Ok(())
+    }
+
+    // "a PM to C1 relation" should "error if the node is connected but the additional filters don't match it"
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt")]
+    async fn pm_c1_error_if_filter_not_match(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+        let parent = t.parent().parse(
+            run_query_json!(
+                runner,
+                format!(
+                    r#"mutation {{
+                      createOneParent(data: {{
+                        p: "p1", p_1: "p", p_2: "1",
+                        childrenOpt: {{
+                          create: [{{c: "existingChild", c_1: "c", c_2: "1", non_unique: "0"}}]
+                        }}
+                      }}) {{
+                        {selection}
+                      }}
+                    }}"#,
+                    selection = t.parent().selection()
+                )
+            ),
+            &["data", "createOneParent"],
+        )?;
+
+        assert_error!(
+            runner,
+            format!(r#"mutation {{
+              updateOneParent(
+                where: {parent}
+                data:{{ childrenOpt: {{
+                  update: {{
+                    where: {{ c: "existingChild", non_unique: "1" }},
+                    data: {{ non_unique: "updated" }} }}
+                  }}
+                }}
+              ) {{
+                childrenOpt {{
+                  c
+                }}
+              }}
+            }}"#, parent = parent),
+            2025,
+            "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested update on relation 'ChildToParent'."
+        );
+
+        Ok(())
+    }
+
+    // ----------------------------------
+    // ------------ PM to CM ------------
+    // ----------------------------------
+
     // "A PM to CM relation relation" should "work"
     #[relation_link_test(on_parent = "ToMany", on_child = "ToMany")]
     async fn pm_cm_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
@@ -150,6 +428,143 @@ mod update_inside_update {
             }}
           }}"#, parent = parent, child = child)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"non_unique":"updated"},{"non_unique":null}]}}}"###
+        );
+
+        Ok(())
+    }
+
+    // "A PM to CM relation relation" should "work"
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToMany")]
+    async fn pm_cm_by_id_and_filters_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+        let res = run_query_json!(
+            runner,
+            format!(
+                r#"mutation {{
+                  createOneParent(data: {{
+                    p: "p1", p_1: "p", p_2: "1",
+                    childrenOpt: {{
+                      create: [{{c: "c1", c_1: "c", c_2: "1", non_unique: "0"}},{{c: "c2", c_1: "c", c_2: "2", non_unique: "1"}}]
+                    }}
+                  }}){{
+                    {parent_selection}
+                    childrenOpt{{
+                      {child_selection}
+                    }}
+                  }}
+                }}"#,
+                parent_selection = t.parent().selection(),
+                child_selection = t.child().selection()
+            )
+        );
+        let parent = t.parent().parse(res.clone(), &["data", "createOneParent"])?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, format!(r#"mutation {{
+            updateOneParent(
+              where: {parent}
+              data:{{
+                childrenOpt: {{
+                    update:  [
+                      {{where: {{ c: "c1", non_unique: "0" }}, data: {{non_unique: {{ set: "updated" }}}}}}
+                    ]
+                  }}
+            }}){{
+              childrenOpt (orderBy: {{ c: asc }} ){{
+                non_unique
+              }}
+            }}
+          }}"#, parent = parent)),
+          @r###"{"data":{"updateOneParent":{"childrenOpt":[{"non_unique":"updated"},{"non_unique":"1"}]}}}"###
+        );
+
+        Ok(())
+    }
+
+    // "a PM to CM relation" should "error if the nodes are not connected"
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToMany")]
+    async fn pm_cm_error_if_not_connected(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+        let parent = t.parent().parse(
+            run_query_json!(
+                runner,
+                format!(
+                    r#"mutation {{
+                      createOneParent(data: {{p: "p1", p_1: "p", p_2: "1"}}) {{
+                        {selection}
+                      }}
+                    }}"#,
+                    selection = t.parent().selection()
+                )
+            ),
+            &["data", "createOneParent"],
+        )?;
+
+        assert_error!(
+            runner,
+            format!(r#"mutation {{
+              updateOneParent(
+                where: {parent}
+                data: {{
+                  childrenOpt: {{
+                    update: {{
+                      where: {{ c: "c1" }},
+                      data: {{ non_unique: {{ set: "updated" }} }}
+                    }}
+                  }}
+              }}){{
+                childrenOpt {{
+                  c
+                }}
+              }}
+            }}"#, parent = parent),
+            2025,
+            "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested update on relation 'ChildToParent'."
+        );
+
+        Ok(())
+    }
+
+    // "a PM to CM relation" should "error if the node is connected but the additional filters don't match it"
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToMany")]
+    async fn pm_cm_error_if_filter_not_match(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+        let parent = t.parent().parse(
+            run_query_json!(
+                runner,
+                format!(
+                    r#"mutation {{
+                      createOneParent(data: {{
+                        p: "p1", p_1: "p", p_2: "1",
+                        childrenOpt: {{
+                          create: [{{c: "existingChild", c_1: "c", c_2: "1", non_unique: "0"}}]
+                        }}
+                      }}) {{
+                        {selection}
+                      }}
+                    }}"#,
+                    selection = t.parent().selection()
+                )
+            ),
+            &["data", "createOneParent"],
+        )?;
+
+        assert_error!(
+            runner,
+            format!(r#"mutation {{
+              updateOneParent(
+                where: {parent}
+                data:{{ childrenOpt: {{
+                  update: {{
+                    where: {{ c: "existingChild", non_unique: "1" }},
+                    data: {{ non_unique: "updated" }} }}
+                  }}
+                }}
+              ) {{
+                childrenOpt {{
+                  c
+                }}
+              }}
+            }}"#, parent = parent),
+            2025,
+            "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested update on relation 'ChildToParent'."
         );
 
         Ok(())
@@ -217,8 +632,8 @@ mod update_inside_update {
                 text
               }}
             }}"#, note_id = note_id),
-            2016,
-            "Query interpretation error. Error for binding '1': AssertionError(\"Expected a valid parent ID to be present for nested update to-one case.\")"
+            2025,
+            "An operation failed because it depends on one or more records that were required but not found. No 'Todo' record was found for a nested update on relation 'NoteToTodo'."
             // No Node for the model Todo with value DOES NOT EXIST for id found.
         );
 
@@ -276,8 +691,8 @@ mod update_inside_update {
               text
             }}
           }}"#, note_id = note_id),
-          2016,
-          "Query interpretation error. Error for binding '1': AssertionError(\"Expected a valid parent ID to be present for nested update to-one case.\")"
+          2025,
+          "An operation failed because it depends on one or more records that were required but not found. No 'Todo' record was found for a nested update on relation 'NoteToTodo'."
       );
 
         Ok(())
@@ -346,7 +761,7 @@ mod update_inside_update {
               }
             }"#,
             2009, // 3040
-            "`Mutation.updateOneNote.data.NoteUpdateInput.todos.TodoUpdateManyWithoutNotesInput.update.TodoUpdateWithWhereUniqueWithoutNotesInput.where.TodoWhereUniqueInput.unique`: A value is required but not set."
+            "`Mutation.updateOneNote.data.NoteUpdateInput.todos.TodoUpdateManyWithoutNotesNestedInput.update.TodoUpdateWithWhereUniqueWithoutNotesInput.where.TodoWhereUniqueInput.unique`: A value is required but not set."
         );
 
         Ok(())

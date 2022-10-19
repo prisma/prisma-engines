@@ -23,7 +23,13 @@ impl ConnectorTagInterface for MySqlConnectorTag {
         Box::new(SqlDatamodelRenderer::new())
     }
 
-    fn connection_string(&self, database: &str, is_ci: bool) -> String {
+    fn connection_string(
+        &self,
+        database: &str,
+        is_ci: bool,
+        _is_multi_schema: bool,
+        _: Option<&'static str>,
+    ) -> String {
         match self.version {
             Some(MySqlVersion::V5_6) if is_ci => format!("mysql://root:prisma@test-db-mysql-5-6:3306/{}", database),
             Some(MySqlVersion::V5_7) if is_ci => format!("mysql://root:prisma@test-db-mysql-5-7:3306/{}", database),
@@ -140,5 +146,5 @@ impl ToString for MySqlVersion {
 }
 
 fn mysql_capabilities() -> Vec<ConnectorCapability> {
-    sql_datamodel_connector::MYSQL.capabilities().to_owned()
+    psl::builtin_connectors::MYSQL.capabilities().to_owned()
 }

@@ -1,4 +1,5 @@
-use crate::{constants::filters, QueryGraphBuilderError, QueryGraphBuilderResult};
+use crate::{QueryGraphBuilderError, QueryGraphBuilderResult};
+use schema_builder::constants::filters;
 use std::str::FromStr;
 
 #[derive(Debug)]

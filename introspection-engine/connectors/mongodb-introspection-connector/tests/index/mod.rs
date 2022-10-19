@@ -160,82 +160,6 @@ fn single_column_deep_composite_index() {
 }
 
 #[test]
-fn single_column_descending_index_no_preview_enabled() {
-    let depth = CompositeTypeDepth::Infinite;
-
-    let res = introspect_features(depth, Default::default(), |db| async move {
-        db.create_collection("A", None).await?;
-        let collection = db.collection("A");
-        let docs = vec![doc! {"name": "Musti", "age": 9}];
-
-        collection.insert_many(docs, None).await.unwrap();
-
-        let options = IndexOptions::builder().unique(Some(false)).build();
-
-        let model = IndexModel::builder()
-            .keys(doc! { "age": -1 })
-            .options(Some(options))
-            .build();
-
-        collection.create_index(model, None).await?;
-
-        Ok(())
-    });
-
-    let expected = expect![[r#"
-        model A {
-          id   String @id @default(auto()) @map("_id") @db.ObjectId
-          age  Int
-          name String
-
-          @@index([age], map: "age_-1")
-        }
-    "#]];
-
-    expected.assert_eq(res.datamodel());
-}
-
-#[test]
-fn single_column_descending_composite_index_no_preview_enabled() {
-    let depth = CompositeTypeDepth::Infinite;
-
-    let res = introspect_features(depth, Default::default(), |db| async move {
-        db.create_collection("Cat", None).await?;
-        let collection = db.collection("Cat");
-        let docs = vec![doc! {"name": "Musti", "address": { "number": 27 }}];
-
-        collection.insert_many(docs, None).await.unwrap();
-
-        let options = IndexOptions::builder().unique(Some(false)).build();
-
-        let model = IndexModel::builder()
-            .keys(doc! { "address.number": -1 })
-            .options(Some(options))
-            .build();
-
-        collection.create_index(model, None).await?;
-
-        Ok(())
-    });
-
-    let expected = expect![[r#"
-        type CatAddress {
-          number Int
-        }
-
-        model Cat {
-          id      String     @id @default(auto()) @map("_id") @db.ObjectId
-          address CatAddress
-          name    String
-
-          @@index([address.number], map: "address.number_-1")
-        }
-    "#]];
-
-    expected.assert_eq(res.datamodel());
-}
-
-#[test]
 fn single_column_descending_index() {
     let res = introspect(|db| async move {
         db.create_collection("A", None).await?;
@@ -973,42 +897,6 @@ fn single_column_normal_composite_index_default_name() {
 }
 
 #[test]
-fn multi_column_normal_index_no_preview() {
-    let depth = CompositeTypeDepth::Infinite;
-
-    let res = introspect_features(depth, Default::default(), |db| async move {
-        db.create_collection("A", None).await?;
-        let collection = db.collection("A");
-        let docs = vec![doc! {"name": "Musti", "age": 9}];
-
-        collection.insert_many(docs, None).await.unwrap();
-
-        let options = IndexOptions::builder().unique(Some(false)).build();
-
-        let model = IndexModel::builder()
-            .keys(doc! { "age": 1, "name": -1 })
-            .options(Some(options))
-            .build();
-
-        collection.create_index(model, None).await?;
-
-        Ok(())
-    });
-
-    let expected = expect![[r#"
-        model A {
-          id   String @id @default(auto()) @map("_id") @db.ObjectId
-          age  Int
-          name String
-
-          @@index([age, name], map: "age_1_name_-1")
-        }
-    "#]];
-
-    expected.assert_eq(res.datamodel());
-}
-
-#[test]
 fn multi_column_normal_index() {
     let res = introspect(|db| async move {
         db.create_collection("A", None).await?;
@@ -1220,42 +1108,6 @@ fn single_column_unique_composite_index_default_name() {
           name String
 
           @@unique([info.age])
-        }
-    "#]];
-
-    expected.assert_eq(res.datamodel());
-}
-
-#[test]
-fn multi_column_unique_index_no_preview() {
-    let depth = CompositeTypeDepth::Infinite;
-
-    let res = introspect_features(depth, Default::default(), |db| async move {
-        db.create_collection("A", None).await?;
-        let collection = db.collection("A");
-        let docs = vec![doc! {"name": "Musti", "age": 9}];
-
-        collection.insert_many(docs, None).await.unwrap();
-
-        let options = IndexOptions::builder().unique(Some(true)).build();
-
-        let model = IndexModel::builder()
-            .keys(doc! { "age": 1, "name": -1 })
-            .options(Some(options))
-            .build();
-
-        collection.create_index(model, None).await?;
-
-        Ok(())
-    });
-
-    let expected = expect![[r#"
-        model A {
-          id   String @id @default(auto()) @map("_id") @db.ObjectId
-          age  Int
-          name String
-
-          @@unique([age, name], map: "age_1_name_-1")
         }
     "#]];
 
@@ -2096,4 +1948,83 @@ fn fulltext_index_pointing_to_non_existing_field_should_add_the_field() {
         "model": "A",
         "field": "age"
     }]));
+}
+
+#[test]
+fn composite_type_index_without_corresponding_data_should_not_crash() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection::<mongodb::bson::Document>("A");
+
+        let model = IndexModel::builder().keys(doc! { "foo": 1 }).build();
+
+        collection.create_index(model, None).await?;
+
+        let model = IndexModel::builder().keys(doc! { "foo.bar": 1 }).build();
+
+        collection.create_index(model, None).await?;
+
+        let model = IndexModel::builder().keys(doc! { "foo.baz.quux": 1 }).build();
+
+        collection.create_index(model, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id  String @id @default(auto()) @map("_id") @db.ObjectId
+          /// Field referred in an index, but found no data to define the type.
+          foo Json?
+
+          @@index([foo], map: "foo_1")
+          @@index([foo.bar], map: "foo.bar_1")
+          @@index([foo.baz.quux], map: "foo.baz.quux_1")
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn composite_type_index_with_non_composite_fields_in_the_middle_should_not_crash() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection::<mongodb::bson::Document>("A");
+
+        let model = IndexModel::builder().keys(doc! { "a.b.c": 1 }).build();
+        collection.create_index(model, None).await?;
+
+        let docs = vec![doc! { "a": { "b": 1, "d": { "c": 1 } } }];
+        collection.insert_many(docs, None).await.unwrap();
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        type AA {
+          b Int
+          d AaD
+          /// Field referred in an index, but found no data to define the type.
+          b AaB?
+        }
+
+        type AaB {
+          /// Field referred in an index, but found no data to define the type.
+          c Json?
+        }
+
+        type AaD {
+          c Int
+        }
+
+        model A {
+          id String @id @default(auto()) @map("_id") @db.ObjectId
+          a  AA
+
+          @@index([a.b.c], map: "a.b.c_1")
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
 }

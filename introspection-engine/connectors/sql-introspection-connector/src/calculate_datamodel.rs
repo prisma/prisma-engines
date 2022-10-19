@@ -1,56 +1,62 @@
-use crate::introspection_helpers::*;
-use crate::prisma_1_defaults::*;
-use crate::re_introspection::enrich;
-use crate::sanitize_datamodel_names::{sanitization_leads_to_duplicate_names, sanitize_datamodel_names};
-use crate::version_checker::VersionChecker;
-use crate::SqlIntrospectionResult;
-use crate::{commenting_out_guardrails::commenting_out_guardrails, introspection::introspect};
-use datamodel::dml::Datamodel;
+use crate::{introspection::introspect, SqlFamilyTrait, SqlIntrospectionResult};
 use introspection_connector::{IntrospectionContext, IntrospectionResult};
-use sql_schema_describer::*;
+use psl::{builtin_connectors::*, datamodel_connector::Connector, dml::Datamodel, Configuration};
+use quaint::prelude::SqlFamily;
+use sql_schema_describer::SqlSchema;
 use tracing::debug;
+
+pub(crate) struct CalculateDatamodelContext<'a> {
+    pub config: &'a Configuration,
+    pub render_config: bool,
+    pub previous_datamodel: &'a Datamodel,
+    pub schema: &'a SqlSchema,
+    pub sql_family: SqlFamily,
+}
+
+impl CalculateDatamodelContext<'_> {
+    pub(crate) fn is_cockroach(&self) -> bool {
+        self.active_connector().provider_name() == COCKROACH.provider_name()
+    }
+
+    pub(crate) fn foreign_keys_enabled(&self) -> bool {
+        self.config
+            .datasources
+            .first()
+            .unwrap()
+            .relation_mode()
+            .uses_foreign_keys()
+    }
+
+    pub(crate) fn active_connector(&self) -> &'static dyn Connector {
+        self.config.datasources.first().unwrap().active_connector
+    }
+}
 
 /// Calculate a data model from a database schema.
 pub fn calculate_datamodel(
     schema: &SqlSchema,
-    previous_data_model: &Datamodel,
-    ctx: IntrospectionContext,
+    ctx: &IntrospectionContext,
 ) -> SqlIntrospectionResult<IntrospectionResult> {
     debug!("Calculating data model.");
 
-    let mut version_check = VersionChecker::new(schema, &ctx);
-    let mut data_model = Datamodel::new();
+    let previous_datamodel = &ctx.previous_data_model;
+    let context = CalculateDatamodelContext {
+        config: ctx.configuration(),
+        render_config: ctx.render_config,
+        previous_datamodel,
+        schema,
+        sql_family: ctx.sql_family(),
+    };
 
-    // 1to1 translation of the sql schema
-    introspect(schema, &mut version_check, &mut data_model, &ctx)?;
+    let mut warnings = Vec::new();
 
-    if !sanitization_leads_to_duplicate_names(&data_model) {
-        // our opinionation about valid names
-        sanitize_datamodel_names(&mut data_model, &ctx);
-    }
+    let (version, data_model, is_empty) = introspect(&context, &mut warnings)?;
 
-    // deduplicating relation field names
-    deduplicate_relation_field_names(&mut data_model);
+    debug!("Done calculating datamodel.");
 
-    let mut warnings = vec![];
-    if !previous_data_model.is_empty() {
-        enrich(previous_data_model, &mut data_model, &ctx, &mut warnings);
-        tracing::debug!("Enriching datamodel is done: {:?}", data_model);
-    }
-
-    // commenting out models, fields, enums, enum values
-    warnings.append(&mut commenting_out_guardrails(&mut data_model, &ctx));
-
-    // try to identify whether the schema was created by a previous Prisma version
-    let version = version_check.version(&warnings, &data_model);
-
-    // if based on a previous Prisma version add id default opinionations
-    add_prisma_1_id_defaults(&version, &mut data_model, schema, &mut warnings, &ctx);
-
-    // renderer -> parser -> validator, is_commented_out gets lost between renderer and parser
-    debug!("Done calculating data model {:?}", data_model);
     Ok(IntrospectionResult {
         data_model,
+        is_empty,
         warnings,
         version,
     })

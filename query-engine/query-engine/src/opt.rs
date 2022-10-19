@@ -1,9 +1,6 @@
 use crate::{error::PrismaError, PrismaResult};
-use datamodel::dml::Datamodel;
-use datamodel::ValidatedConfiguration;
 use serde::Deserialize;
-use std::env;
-use std::{ffi::OsStr, fs::File, io::Read};
+use std::{env, ffi::OsStr, fs::File, io::Read};
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt, Clone)]
@@ -16,9 +13,6 @@ pub enum Subcommand {
 pub struct ExecuteRequestInput {
     /// GraphQL query to execute
     pub query: String,
-    /// Run in the legacy GraphQL mode
-    #[structopt(long)]
-    pub legacy: bool,
 }
 
 #[derive(Debug, Clone, StructOpt)]
@@ -26,6 +20,13 @@ pub struct ExecuteRequestInput {
 pub struct GetConfigInput {
     #[structopt(long)]
     pub ignore_env_var_errors: bool,
+}
+
+#[derive(Debug, Clone, StructOpt)]
+#[structopt(rename_all = "camelCase")]
+pub struct DebugPanicInput {
+    #[structopt(long)]
+    pub message: Option<String>,
 }
 
 #[derive(Debug, StructOpt, Clone)]
@@ -36,6 +37,8 @@ pub enum CliOpt {
     GetConfig(GetConfigInput),
     /// Executes one request and then terminates.
     ExecuteRequest(ExecuteRequestInput),
+    /// Artificially panic (for testing the CLI) with an optional message.
+    DebugPanic(DebugPanicInput),
 }
 
 #[derive(Debug, StructOpt, Clone)]
@@ -67,10 +70,6 @@ pub struct PrismaOpt {
     #[structopt(long, env = "OVERWRITE_DATASOURCES", parse(try_from_str = parse_base64_string))]
     pub overwrite_datasources: Option<String>,
 
-    /// Switches query schema generation to Prisma 1 compatible mode.
-    #[structopt(long, short)]
-    pub legacy: bool,
-
     /// Enables raw SQL queries with executeRaw/queryRaw mutation
     #[structopt(long, short = "r")]
     pub enable_raw_queries: bool,
@@ -83,6 +82,10 @@ pub struct PrismaOpt {
     #[structopt(long = "debug", short = "d")]
     pub enable_debug_mode: bool,
 
+    /// Enables the metrics endpoints
+    #[structopt(long, short = "m")]
+    pub enable_metrics: bool,
+
     /// Enable query logging [env: LOG_QUERIES=y]
     #[structopt(long, short = "o")]
     pub log_queries: bool,
@@ -93,10 +96,12 @@ pub struct PrismaOpt {
 
     /// Enable OpenTelemetry streaming from requests.
     #[structopt(long)]
-    pub open_telemetry: bool,
+    pub enable_open_telemetry: bool,
 
     /// The url to the OpenTelemetry collector.
-    #[structopt(long, default_value = "http://localhost:4317")]
+    /// Enabling this will send the OpenTelemtry tracing to a collector
+    /// and not via our custom stdout tracer
+    #[structopt(long, default_value)]
     pub open_telemetry_endpoint: String,
 
     #[structopt(subcommand)]
@@ -124,34 +129,47 @@ impl PrismaOpt {
         Ok(res)
     }
 
-    pub fn datamodel(&self) -> PrismaResult<Datamodel> {
+    pub fn schema(&self, ignore_env_errors: bool) -> PrismaResult<psl::ValidatedSchema> {
         let datamodel_str = self.datamodel_str()?;
+        let mut schema = psl::validate(datamodel_str.into());
 
-        let datamodel = datamodel::parse_datamodel(datamodel_str);
+        schema
+            .diagnostics
+            .to_result()
+            .map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))?;
 
-        match datamodel {
-            Err(errors) => Err(PrismaError::ConversionError(errors, datamodel_str.to_string())),
-            _ => Ok(datamodel.unwrap().subject),
+        let datasource_url_overrides: Vec<(String, String)> = if let Some(ref json) = self.overwrite_datasources {
+            let datasource_url_overrides: Vec<SourceOverride> = serde_json::from_str(json)?;
+            datasource_url_overrides.into_iter().map(|x| (x.name, x.url)).collect()
+        } else {
+            Vec::new()
+        };
+
+        if !ignore_env_errors {
+            schema
+                .configuration
+                .resolve_datasource_urls_from_env(&datasource_url_overrides, |key| env::var(key).ok())
+                .map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))?;
         }
+
+        Ok(schema)
     }
 
-    pub fn configuration(&self, ignore_env_errors: bool) -> PrismaResult<ValidatedConfiguration> {
+    pub fn configuration(&self, ignore_env_errors: bool) -> PrismaResult<psl::Configuration> {
         let datamodel_str = self.datamodel_str()?;
 
         let datasource_url_overrides: Vec<(String, String)> = if let Some(ref json) = self.overwrite_datasources {
             let datasource_url_overrides: Vec<SourceOverride> = serde_json::from_str(json)?;
             datasource_url_overrides.into_iter().map(|x| (x.name, x.url)).collect()
         } else {
-            vec![]
+            Vec::new()
         };
 
         let config_result = if ignore_env_errors {
-            datamodel::parse_configuration(datamodel_str)
+            psl::parse_configuration(datamodel_str)
         } else {
-            datamodel::parse_configuration(datamodel_str).and_then(|mut config| {
-                config
-                    .subject
-                    .resolve_datasource_urls_from_env(&datasource_url_overrides, |key| env::var(key).ok())?;
+            psl::parse_configuration(datamodel_str).and_then(|mut config| {
+                config.resolve_datasource_urls_from_env(&datasource_url_overrides, |key| env::var(key).ok())?;
 
                 Ok(config)
             })

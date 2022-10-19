@@ -4,15 +4,12 @@ mod sqlite;
 mod vitess;
 
 use barrel::types;
-use expect_test::expect;
-use indoc::formatdoc;
-use indoc::indoc;
+use indoc::{formatdoc, indoc};
 use introspection_engine_tests::{assert_eq_json, test_api::*};
 use quaint::prelude::Queryable;
 use serde_json::json;
-use test_macros::test_connector;
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 async fn mapped_model_name(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -32,7 +29,7 @@ async fn mapped_model_name(api: &TestApi) -> TestResult {
         model Custom_User {
             id               Int         @id @default(autoincrement())
 
-            @@map(name: "_User")
+            @@map("_User")
         }
     "#};
 
@@ -40,7 +37,7 @@ async fn mapped_model_name(api: &TestApi) -> TestResult {
         model Custom_User {
             id               Int         @id @default(autoincrement())
 
-            @@map(name: "_User")
+            @@map("_User")
         }
 
         model Unrelated {
@@ -63,7 +60,7 @@ async fn mapped_model_name(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 async fn manually_overwritten_mapped_field_name(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -115,7 +112,7 @@ async fn manually_overwritten_mapped_field_name(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Mssql, Mysql))]
+#[test_connector(exclude(Mssql, Mysql, CockroachDb))]
 async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -180,7 +177,7 @@ async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn manually_mapped_model_and_field_name(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -245,7 +242,7 @@ async fn manually_mapped_model_and_field_name(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 async fn mapped_field_name(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -282,7 +279,7 @@ async fn mapped_field_name(api: &TestApi) -> TestResult {
             unique_2    Int
 
             @@id([c_id_1, id_2])
-            @@index([c_index], name: "test2")
+            @@index([c_index], map: "test2")
             @@unique([c_unique_1, unique_2], map: "sqlite_autoindex_User_1")
         }
     "#};
@@ -296,7 +293,7 @@ async fn mapped_field_name(api: &TestApi) -> TestResult {
             unique_2    Int
 
             @@id([c_id_1, id_2])
-            @@index([c_index], name: "test2")
+            @@index([c_index], map: "test2")
             @@unique([c_unique_1, unique_2], map: "sqlite_autoindex_User_1")
         }
 
@@ -330,7 +327,7 @@ async fn mapped_field_name(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(capabilities(Enums))]
+#[test_connector(capabilities(Enums), exclude(CockroachDb))]
 async fn mapped_enum_name(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
@@ -418,7 +415,7 @@ async fn mapped_enum_name(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(capabilities(Enums))]
+#[test_connector(capabilities(Enums), exclude(CockroachDb))]
 async fn mapped_enum_value_name(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
@@ -503,7 +500,7 @@ async fn mapped_enum_value_name(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn manually_remapped_enum_value_name(api: &TestApi) -> TestResult {
     let sql = "CREATE Type color as ENUM (\'_black\', \'white\')";
     api.database().execute_raw(sql, &[]).await?;
@@ -566,7 +563,7 @@ async fn manually_remapped_enum_value_name(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn manually_re_mapped_enum_name(api: &TestApi) -> TestResult {
     let sql = "CREATE Type _color as ENUM (\'black\', \'white\')";
     api.database().execute_raw(sql, &[]).await?;
@@ -631,7 +628,7 @@ async fn manually_re_mapped_enum_name(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn manually_re_mapped_invalid_enum_values(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
@@ -716,7 +713,7 @@ async fn manually_re_mapped_invalid_enum_values(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Mysql, Mssql))]
+#[test_connector(exclude(Mysql, Mssql, CockroachDb, Sqlite))]
 async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -780,7 +777,7 @@ async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn custom_virtual_relation_field_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -835,7 +832,7 @@ async fn custom_virtual_relation_field_names(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 async fn custom_model_order(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -1023,7 +1020,7 @@ async fn custom_enum_order(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Mssql, Mysql, Sqlite))]
+#[test_connector(exclude(Mssql, Mysql, Sqlite, CockroachDb))]
 async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -1069,14 +1066,14 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
           id           Int         @id @default(autoincrement())
           user_id      Int         @unique
           user_id2     Int         @unique
-          custom_User  Custom_User @relation("CustomRelationName", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
           custom_User2 Custom_User @relation("AnotherCustomRelationName", fields: [user_id2], references: [id], onDelete: NoAction, onUpdate: NoAction)
+          custom_User  Custom_User @relation("CustomRelationName", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
         }
 
         model Custom_User {
           id           Int   @id @default(autoincrement())
-          custom_Post  Post? @relation("CustomRelationName")
           custom_Post2 Post? @relation("AnotherCustomRelationName")
+          custom_Post  Post? @relation("CustomRelationName")
 
           @@map("User")
         }
@@ -1091,7 +1088,7 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn virtual_cuid_default(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
@@ -1111,21 +1108,16 @@ async fn virtual_cuid_default(api: &TestApi) {
         .await
         .unwrap();
 
-    let input_dm = format!(
-        r#"
-        {datasource}
-
-        model User {{
+    let input_dm = r#"
+        model User {
             id        String    @id @default(cuid()) @db.VarChar(30)
             non_id    String    @default(cuid()) @db.VarChar(30)
-        }}
+        }
 
-        model User2 {{
+        model User2 {
             id        String    @id @default(uuid()) @db.VarChar(36)
-        }}
-        "#,
-        datasource = api.datasource_block()
-    );
+        }
+        "#;
 
     let final_dm = indoc! {r#"
         model User {
@@ -1142,13 +1134,61 @@ async fn virtual_cuid_default(api: &TestApi) {
         }
     "#};
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(&input_dm).await.unwrap());
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await.unwrap());
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(CockroachDb))]
+async fn virtual_cuid_default_cockroach(api: &TestApi) {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::varchar(30).primary(true));
+                t.add_column("non_id", types::varchar(30));
+            });
+
+            migration.create_table("User2", |t| {
+                t.add_column("id", types::varchar(36).primary(true));
+            });
+
+            migration.create_table("Unrelated", |t| {
+                t.add_column("id", types::primary());
+            });
+        })
+        .await
+        .unwrap();
+
+    let input_dm = r#"
+        model User {
+            id        String    @id @default(cuid()) @db.String(30)
+            non_id    String    @default(cuid()) @db.String(30)
+        }
+
+        model User2 {
+            id        String    @id @default(uuid()) @db.String(36)
+        }
+        "#;
+
+    let final_dm = indoc! {r#"
+        model User {
+            id        String    @id @default(cuid()) @db.String(30)
+            non_id    String    @default(cuid()) @db.String(30)
+        }
+
+        model User2 {
+            id        String    @id @default(uuid()) @db.String(36)
+        }
+
+        model Unrelated {
+            id               BigInt @id @default(autoincrement())
+        }
+    "#};
+
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await.unwrap());
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn comments_should_be_kept(api: &TestApi) -> TestResult {
-    let sql = "CREATE Type a as ENUM (\'A\')".to_string();
-    api.database().execute_raw(&sql, &[]).await?;
+    api.raw_cmd("CREATE TYPE a AS ENUM (\'A\')").await;
 
     api.barrel()
         .execute(|migration| {
@@ -1202,10 +1242,8 @@ async fn comments_should_be_kept(api: &TestApi) -> TestResult {
 
         /// A really helpful comment about the enum
         enum a {
-            A // A really helpful comment about enum variant
+            A
         }
-
-        /// just floating around here
     "#};
 
     api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
@@ -1213,7 +1251,7 @@ async fn comments_should_be_kept(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Mssql))]
+#[test_connector(exclude(Mssql, CockroachDb))]
 async fn updated_at(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
@@ -1237,34 +1275,29 @@ async fn updated_at(api: &TestApi) {
         ""
     };
     let input_dm = formatdoc! {r#"
-        {datasource}
-
         model User {{
             id           Int @id @default(autoincrement())
             lastupdated  DateTime?  @updatedAt {native_datetime}
         }}
         "#,
-        native_datetime = native_datetime,
-        datasource = api.datasource_block(),
     };
 
     let final_dm = formatdoc! {r#"
         model User {{
             id           Int @id @default(autoincrement())
-            lastupdated  DateTime?  @updatedAt {}
+            lastupdated  DateTime?  @updatedAt {native_datetime}
         }}
 
         model Unrelated {{
             id               Int @id @default(autoincrement())
         }}
-        "#,
-        native_datetime = native_datetime,
+        "#
     };
 
     api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await.unwrap());
 }
 
-#[test_connector(exclude(Vitess))]
+#[test_connector(exclude(Vitess, CockroachDb))]
 async fn multiple_many_to_many_on_same_model(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -1321,25 +1354,25 @@ async fn multiple_many_to_many_on_same_model(api: &TestApi) -> TestResult {
         }
     "#};
 
-    let final_dm = indoc! {r#"
+    let final_dm = expect![[r#"
         model B {
-            id              Int @id @default(autoincrement())
-            custom_A        A[]
-            special_A       A[] @relation("AToB2")
+          id        Int @id @default(autoincrement())
+          custom_A  A[]
+          special_A A[] @relation("AToB2")
         }
 
         model A {
-            id              Int @id @default(autoincrement())
-            custom_B        B[]
-            special_B       B[] @relation("AToB2")
+          id        Int @id @default(autoincrement())
+          custom_B  B[]
+          special_B B[] @relation("AToB2")
         }
 
         model Unrelated {
-            id Int @id @default(autoincrement())
+          id Int @id @default(autoincrement())
         }
-    "#};
+    "#]];
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
+    api.expect_re_introspected_datamodel(input_dm, final_dm).await;
 
     Ok(())
 }
@@ -1456,26 +1489,24 @@ async fn re_introspecting_mysql_enum_names_if_enum_is_reused(api: &TestApi) -> T
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn custom_repro(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("tag", |t| {
-                t.add_column("id", types::primary());
-                t.add_column("name", types::text().unique(true));
-            });
+    let sql = r#"
+        CREATE TABLE "tag" (
+            id SERIAL PRIMARY KEY,
+            name TEXT NOT NULL UNIQUE
+        );
 
-            migration.create_table("Post", |t| {
-                t.add_column("id", types::primary());
-                t.add_column("tag_id", types::integer().nullable(false));
-                t.add_foreign_key(&["tag_id"], "tag", &["id"]);
-            });
+        CREATE TABLE "Post" (
+            id SERIAL PRIMARY KEY,
+            tag_id INTEGER NOT NULL REFERENCES tag(id)
+        );
 
-            migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::primary());
-            });
-        })
-        .await?;
+        CREATE TABLE "Unrelated" (
+            id SERIAL PRIMARY KEY
+        );
+    "#;
+    api.raw_cmd(sql).await;
 
     let input_dm = indoc! {r#"
         model Post{
@@ -1517,7 +1548,7 @@ async fn custom_repro(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 async fn re_introspecting_ignore(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -1579,14 +1610,14 @@ async fn re_introspecting_ignore(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Vitess))]
+#[test_connector(exclude(Vitess, CockroachDb, Sqlite))]
 async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestApi) -> TestResult {
-    //we do not have enough information to correctly assign which field should point to column A in the
-    //join table and which one to B
-    //upon table creation this is dependant on lexicographic order of the names of the fields, but we
-    //cannot be sure that users keep the order the same when renaming. worst case would be we accidentally
-    //switch the directions when reintrospecting.
-    //the generated names are also not helpful though, but at least they don't give a false sense of correctness -.-
+    // We do not have enough information to correctly assign which field should point to column A in the
+    // join table and which one to B
+    // Upon table creation this is dependant on lexicographic order of the names of the fields, but we
+    // cannot be sure that users keep the order the same when renaming. worst case would be we accidentally
+    // switch the directions when reintrospecting.
+    // The generated names are also not helpful though, but at least they don't give a false sense of correctness -.-
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", move |t| {
@@ -1628,7 +1659,7 @@ async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestAp
     Ok(())
 }
 
-#[test_connector(tags(Postgres, Mssql))]
+#[test_connector(tags(Postgres, Mssql), exclude(CockroachDb))]
 async fn re_introspecting_custom_compound_unique_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -1689,7 +1720,7 @@ async fn re_introspecting_custom_compound_unique_names(api: &TestApi) -> TestRes
     Ok(())
 }
 
-#[test_connector(tags(Postgres, Mssql, Mysql, Sqlite))]
+#[test_connector(tags(Postgres, Mssql, Mysql, Sqlite), exclude(CockroachDb))]
 async fn re_introspecting_custom_compound_unique_upgrade(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -1747,7 +1778,7 @@ async fn re_introspecting_custom_compound_unique_upgrade(api: &TestApi) -> TestR
     Ok(())
 }
 
-#[test_connector(tags(Postgres, Mssql))]
+#[test_connector(tags(Postgres, Mssql), exclude(CockroachDb))]
 async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -1773,8 +1804,7 @@ async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult 
         })
         .await?;
 
-    let input_dm = api.dm_with_sources(
-        r#"
+    let input_dm = r#"
          model User {
              first  Int
              last   Int
@@ -1788,8 +1818,7 @@ async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult 
 
              @@id([first, last], name: "compound")
          }
-     "#,
-    );
+     "#;
 
     let final_dm = r#"
          model User {
@@ -1811,7 +1840,7 @@ async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult 
          }
      "#;
 
-    let re_introspected = api.re_introspect(&input_dm).await?;
+    let re_introspected = api.re_introspect(input_dm).await?;
 
     api.assert_eq_datamodels(final_dm, &re_introspected);
 
@@ -1824,7 +1853,111 @@ async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult 
         ]
     }]);
 
-    assert_eq_json!(expected, api.re_introspect_warnings(&input_dm).await?);
+    assert_eq_json!(expected, api.re_introspect_warnings(input_dm).await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres12))]
+async fn re_introspecting_custom_index_order(api: &TestApi) -> TestResult {
+    let schema_name = api.schema_name();
+    let create_table =
+        format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, a jsonb not null, b jsonb not null, c jsonb not null)",);
+    let create_idx_a = format!("CREATE INDEX \"aaaaaa\" ON \"{schema_name}\".\"A\" USING GIN (b);",);
+    let create_idx_b = format!("CREATE INDEX \"bbbbbb\" ON \"{schema_name}\".\"A\" USING GIN (a);",);
+    let create_idx_c = format!("CREATE INDEX \"cccccc\" ON \"{schema_name}\".\"A\" USING GIN (c);",);
+
+    api.database().raw_cmd(&create_table).await?;
+    api.database().raw_cmd(&create_idx_a).await?;
+    api.database().raw_cmd(&create_idx_b).await?;
+    api.database().raw_cmd(&create_idx_c).await?;
+
+    let input_dm = indoc! {r#"
+         model A {
+           id Int   @id
+           a  Json
+           b  Json
+
+           @@index([a], map: "bbbbbb", type: Gin)
+           @@index([b], map: "aaaaaa", type: Gin)
+         }
+    "#};
+
+    let re_introspected = api.re_introspect_dml(input_dm).await?;
+
+    let expected = expect![[r#"
+        model A {
+          id Int  @id @default(autoincrement())
+          a  Json
+          b  Json
+          c  Json
+
+          @@index([a], map: "bbbbbb", type: Gin)
+          @@index([b], map: "aaaaaa", type: Gin)
+          @@index([c], map: "cccccc", type: Gin)
+        }
+    "#]];
+
+    expected.assert_eq(&re_introspected);
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres))]
+async fn re_introspecting_with_schemas_property(api: &TestApi) -> TestResult {
+    let create_schema = "CREATE SCHEMA \"first\"";
+    let create_table = format!("CREATE TABLE \"first\".\"A\" (id TEXT PRIMARY KEY)",);
+
+    api.database().raw_cmd(&create_schema).await?;
+    api.database().raw_cmd(&create_table).await?;
+
+    let create_schema = "CREATE SCHEMA \"second\"";
+    let create_table = format!("CREATE TABLE \"second\".\"B\" (id TEXT PRIMARY KEY)",);
+
+    api.database().raw_cmd(&create_schema).await?;
+    api.database().raw_cmd(&create_table).await?;
+
+    let input_dm = indoc! {r#"
+          generator client {
+           provider        = "prisma-client-js"
+           previewFeatures = ["multiSchema"]
+         }
+         
+         datasource myds {
+           provider = "postgresql"
+           url      = env("DATABASE_URL")
+           schemas  = ["first", "second"]
+         }
+    "#};
+
+    let re_introspected = api.re_introspect_config(input_dm).await?;
+
+    let expected = expect![[r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["multiSchema"]
+        }
+
+        datasource myds {
+          provider = "postgresql"
+          url      = env("DATABASE_URL")
+          schemas  = ["first", "second"]
+        }
+
+        model A {
+          id String @id
+
+          @@schema("first")
+        }
+
+        model B {
+          id String @id
+
+          @@schema("second")
+        }
+    "#]];
+
+    expected.assert_eq(&re_introspected);
 
     Ok(())
 }

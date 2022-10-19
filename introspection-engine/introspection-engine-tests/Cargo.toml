@@ -5,15 +5,13 @@ authors = ["Julius de Bruijn <julius+github@nauk.io>"]
 edition = "2021"
 
 [dependencies]
-sql-datamodel-connector = { path = "../../libs/datamodel/connectors/sql-datamodel-connector" }
 sql-introspection-connector = { path = "../connectors/sql-introspection-connector" }
 migration-connector = { path = "../../migration-engine/connectors/migration-connector" }
 sql-migration-connector = { path = "../../migration-engine/connectors/sql-migration-connector" }
 introspection-connector = { path = "../connectors/introspection-connector" }
 introspection-core = { path = "../core" }
-datamodel-connector = { path = "../../libs/datamodel/connectors/datamodel-connector" }
 sql-schema-describer = { path = "../../libs/sql-schema-describer" }
-datamodel = { path = "../../libs/datamodel/core" }
+psl.workspace = true
 test-macros = { path = "../../libs/test-macros" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 test-setup = { path = "../../libs/test-setup" }
@@ -21,28 +19,15 @@ test-setup = { path = "../../libs/test-setup" }
 enumflags2 = "0.7"
 pretty_assertions = "0.6.1"
 tracing-futures = "0.2"
-tokio = { version = "1.0", features = ["macros"] }
+tokio.workspace = true
 serde_json = { version = "1.0", features = ["float_roundtrip"] }
 tracing = "0.1"
 indoc = "1"
 expect-test = "1.1.0"
 url = "2"
+quaint.workspace = true
 
 [dependencies.barrel]
 git = "https://github.com/prisma/barrel.git"
 features = ["sqlite3", "mysql", "pg", "mssql"]
 branch = "mssql-support"
-
-[dependencies.quaint]
-git = "https://github.com/prisma/quaint"
-features = [
-    "postgresql",
-    "mysql",
-    "mssql",
-    "sqlite",
-    "json",
-    "uuid",
-    "chrono",
-    "bigdecimal",
-    "vendored-openssl"
-]

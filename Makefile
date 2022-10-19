@@ -88,11 +88,23 @@ start-postgres14:
 dev-postgres14: start-postgres14
 	cp $(CONFIG_PATH)/postgres14 $(CONFIG_FILE)
 
-start-cockroach:
-	docker-compose -f docker-compose.yml up -d --remove-orphans cockroach
+start-postgres15:
+	docker-compose -f docker-compose.yml up -d --remove-orphans postgres15
 
-dev-cockroach: start-cockroach
+dev-postgres15: start-postgres15
+	cp $(CONFIG_PATH)/postgres15 $(CONFIG_FILE)
+
+start-cockroach_22_1_0:
+	docker-compose -f docker-compose.yml up -d --remove-orphans cockroach_22_1_0
+
+dev-cockroach_22_1_0: start-cockroach_22_1_0
 	cp $(CONFIG_PATH)/cockroach $(CONFIG_FILE)
+
+start-cockroach_21_2_0_patched:
+	docker-compose -f docker-compose.yml up -d --remove-orphans cockroach_21_2_0_patched
+
+dev-cockroach_21_2_0_patched: start-cockroach_21_2_0_patched
+	cp $(CONFIG_PATH)/cockroach_21_2_0_patched $(CONFIG_FILE)
 
 dev-pgbouncer:
 	docker-compose -f docker-compose.yml up -d --remove-orphans pgbouncer postgres11
@@ -125,6 +137,18 @@ start-mssql_2019:
 	docker-compose -f docker-compose.yml up -d --remove-orphans mssql-2019
 
 dev-mssql2019: start-mssql_2019
+	cp $(CONFIG_PATH)/sqlserver2019 $(CONFIG_FILE)
+
+start-mssql_2022:
+	docker-compose -f docker-compose.yml up -d --remove-orphans mssql-2022
+
+dev-mssql2022: start-mssql_2022
+	cp $(CONFIG_PATH)/sqlserver2022 $(CONFIG_FILE)
+
+start-mssql_edge:
+	docker-compose -f docker-compose.yml up -d --remove-orphans azure-edge
+
+dev-mssql_edge: start-mssql_edge
 	cp $(CONFIG_PATH)/sqlserver2019 $(CONFIG_FILE)
 
 start-mssql_2017:
@@ -183,7 +207,7 @@ validate:
 	cargo run --bin test-cli -- validate-datamodel dev_datamodel.prisma
 
 qe:
-	cargo run --bin query-engine -- --enable-playground --enable-raw-queries
+	cargo run --bin query-engine -- --enable-playground --enable-raw-queries --enable-metrics --enable-open-telemetry
 
 qe-dmmf:
 	cargo run --bin query-engine -- cli dmmf > dmmf.json
@@ -211,6 +235,8 @@ use-local-query-engine:
 	cp target/release/query-engine $(PRISMA2_BINARY_PATH)/runtime/
 	cp target/release/query-engine $(PRISMA2_BINARY_PATH)/query-engine-darwin
 
+show-metrics:
+	docker-compose -f docker-compose.yml up -d --remove-orphans grafana prometheus
 
 ## OpenTelemetry
 otel:

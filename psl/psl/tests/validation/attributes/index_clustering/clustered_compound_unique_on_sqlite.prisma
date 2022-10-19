@@ -1,0 +1,20 @@
+datasource test {
+    provider = "sqlite"
+    url = env("TEST_DATABASE_URL")
+}
+
+model A {
+  id Int @id @map("_id")
+  a  Int
+  b  Int
+
+  @@unique([a, b], clustered: true)
+}
+
+
+// [1;91merror[0m: [1mError parsing attribute "@@unique": Defining clustering is not supported in the current connector.[0m
+//   [1;94m-->[0m  [4mschema.prisma:11[0m
+// [1;94m   | [0m
+// [1;94m10 | [0m
+// [1;94m11 | [0m  [1;91m@@unique([a, b], clustered: true)[0m
+// [1;94m   | [0m

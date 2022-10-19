@@ -17,13 +17,30 @@ impl ConnectorTagInterface for SqlServerConnectorTag {
         Box::new(SqlDatamodelRenderer::new())
     }
 
-    fn connection_string(&self, database: &str, is_ci: bool) -> String {
-        match self.version {
-            Some(SqlServerVersion::V2017) if is_ci => format!("sqlserver://test-db-sqlserver-2017:1433;database=master;schema={};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED", database),
-            Some(SqlServerVersion::V2017) => format!("sqlserver://127.0.0.1:1434;database=master;schema={};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED", database),
+    fn connection_string(
+        &self,
+        database: &str,
+        is_ci: bool,
+        is_multi_schema: bool,
+        isolation_level: Option<&'static str>,
+    ) -> String {
+        let database = if is_multi_schema {
+            format!("database={};schema=dbo", database)
+        } else {
+            format!("database=master;schema={}", database)
+        };
 
-            Some(SqlServerVersion::V2019) if is_ci => format!("sqlserver://test-db-sqlserver-2019:1433;database=master;schema={};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED", database),
-            Some(SqlServerVersion::V2019) => format!("sqlserver://127.0.0.1:1433;database=master;schema={};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED", database),
+        let isolation_level = isolation_level.unwrap_or("READ UNCOMMITTED");
+
+        match self.version {
+            Some(SqlServerVersion::V2017) if is_ci => format!("sqlserver://test-db-sqlserver-2017:1433;{};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}", database),
+            Some(SqlServerVersion::V2017) => format!("sqlserver://127.0.0.1:1434;{};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}", database),
+
+            Some(SqlServerVersion::V2019) if is_ci => format!("sqlserver://test-db-sqlserver-2019:1433;{};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}", database),
+            Some(SqlServerVersion::V2019) => format!("sqlserver://127.0.0.1:1433;{};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}", database),
+
+            Some(SqlServerVersion::V2022) if is_ci => format!("sqlserver://test-db-sqlserver-2022:1433;{};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}", database),
+            Some(SqlServerVersion::V2022) => format!("sqlserver://127.0.0.1:1435;{};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}", database),
 
             None => unreachable!("A versioned connector must have a concrete version to run."),
         }
@@ -47,6 +64,7 @@ impl ConnectorTagInterface for SqlServerConnectorTag {
 pub enum SqlServerVersion {
     V2017,
     V2019,
+    V2022,
 }
 
 impl SqlServerConnectorTag {
@@ -73,6 +91,10 @@ impl SqlServerConnectorTag {
             },
             Self {
                 version: Some(SqlServerVersion::V2019),
+                capabilities: capabilities.clone(),
+            },
+            Self {
+                version: Some(SqlServerVersion::V2022),
                 capabilities,
             },
         ]
@@ -100,6 +122,7 @@ impl TryFrom<&str> for SqlServerVersion {
         let version = match s {
             "2017" => Self::V2017,
             "2019" => Self::V2019,
+            "2022" => Self::V2022,
             _ => return Err(TestError::parse_error(format!("Unknown SqlServer version `{}`", s))),
         };
 
@@ -112,11 +135,12 @@ impl ToString for SqlServerVersion {
         match self {
             SqlServerVersion::V2017 => "2017",
             SqlServerVersion::V2019 => "2019",
+            SqlServerVersion::V2022 => "2022",
         }
         .to_owned()
     }
 }
 
 fn sql_server_capabilities() -> Vec<ConnectorCapability> {
-    sql_datamodel_connector::MSSQL.capabilities().to_owned()
+    psl::builtin_connectors::MSSQL.capabilities().to_owned()
 }

@@ -1,14 +1,13 @@
 //! Database description. This crate is used heavily in the introspection and migration engines.
-#![allow(clippy::trivial_regex)] // this is allowed, because we want to do CoW replaces and these regexes will grow.
-#![allow(clippy::match_bool)] // we respectfully disagree that it makes the code less readable.
+
+#![deny(rust_2018_idioms, unsafe_code)]
+#![allow(clippy::derive_partial_eq_without_eq)]
 
 pub mod mssql;
 pub mod mysql;
 pub mod postgres;
 pub mod sqlite;
 pub mod walkers;
-
-pub(crate) mod common;
 
 mod connector_data;
 mod error;
@@ -19,17 +18,17 @@ mod parsers;
 pub use self::{
     error::{DescriberError, DescriberErrorKind, DescriberResult},
     ids::*,
+    walkers::*,
 };
 
 use once_cell::sync::Lazy;
-use prisma_value::PrismaValue;
+use psl::dml::PrismaValue;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::{
     any::Any,
     fmt::{self, Debug},
 };
-use walkers::{EnumWalker, TableWalker, UserDefinedTypeWalker, ViewWalker};
 
 /// A database description connector.
 #[async_trait::async_trait]
@@ -41,26 +40,37 @@ pub trait SqlSchemaDescriberBackend: Send + Sync {
     async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata>;
 
     /// Describe a database schema.
-    async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema>;
+    async fn describe(&self, schemas: &[&str]) -> DescriberResult<SqlSchema>;
 
     /// Get the database version.
-    async fn version(&self, schema: &str) -> DescriberResult<Option<String>>;
+    async fn version(&self) -> DescriberResult<Option<String>>;
 }
 
+/// The return type of get_metadata().
 pub struct SqlMetadata {
     pub table_count: usize,
     pub size_in_bytes: usize,
 }
 
 /// The result of describing a database schema.
-#[derive(Serialize, Deserialize, Debug, PartialEq, Default)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct SqlSchema {
+    /// Namespaces (schemas)
+    namespaces: Vec<String>,
     /// The schema's tables.
-    pub tables: Vec<Table>,
+    tables: Vec<Table>,
     /// The schema's enums.
     pub enums: Vec<Enum>,
-    /// The schema's sequences, unique to Postgres.
-    sequences: Vec<Sequence>,
+    /// The schema's columns.
+    columns: Vec<(TableId, Column)>,
+    /// All foreign keys.
+    foreign_keys: Vec<ForeignKey>,
+    /// Constrained and referenced columns of foreign keys.
+    foreign_key_columns: Vec<ForeignKeyColumn>,
+    /// All indexes and unique constraints.
+    indexes: Vec<Index>,
+    /// All columns of indexes.
+    index_columns: Vec<IndexColumn>,
     /// The schema's views,
     views: Vec<View>,
     /// The stored procedures.
@@ -73,22 +83,25 @@ pub struct SqlSchema {
 
 impl SqlSchema {
     /// Extract connector-specific constructs. The type parameter must be the right one.
+    #[track_caller]
     pub fn downcast_connector_data<T: 'static>(&self) -> &T {
-        self.connector_data.data.downcast_ref().unwrap()
+        self.connector_data.data.as_ref().unwrap().downcast_ref().unwrap()
     }
 
-    /// Extract connector-specific constructs. The type parameter must be the right one.
+    /// Extract connector-specific constructs mutably. The type parameter must be the right one.
+    #[track_caller]
     pub fn downcast_connector_data_mut<T: 'static>(&mut self) -> &mut T {
-        self.connector_data.data.downcast_mut().unwrap()
+        self.connector_data.data.as_mut().unwrap().downcast_mut().unwrap()
     }
 
+    /// Remove all namespaces from the schema.
+    pub fn clear_namespaces(&mut self) {
+        self.namespaces.clear();
+    }
+
+    /// Insert connector-specific data into the schema. This will replace existing connector data.
     pub fn set_connector_data(&mut self, data: Box<dyn Any + Send + Sync>) {
-        self.connector_data.data = data;
-    }
-
-    /// Get a table.
-    pub fn get_table(&self, name: &str) -> Option<&Table> {
-        self.tables.iter().find(|x| x.name == name)
+        self.connector_data.data = Some(data);
     }
 
     /// Get a view.
@@ -106,145 +119,219 @@ impl SqlSchema {
         self.procedures.iter().find(|x| x.name == name)
     }
 
+    /// Get a user defined type by name.
     pub fn get_user_defined_type(&self, name: &str) -> Option<&UserDefinedType> {
         self.user_defined_types.iter().find(|x| x.name == name)
     }
 
-    /// Is this schema empty?
-    pub fn is_empty(&self) -> bool {
-        matches!(
-            self,
-            SqlSchema {
-                tables,
-                enums,
-                sequences,
-                views,
-                procedures,
-                user_defined_types,
-                ..
-            } if tables.is_empty() && enums.is_empty() && sequences.is_empty() && views.is_empty() && procedures.is_empty() && user_defined_types.is_empty()
-        )
+    /// Get a namespaceId by name
+    pub fn get_namespace_id(&self, name: &str) -> NamespaceId {
+        let id = self.namespaces.iter().position(|ns| ns == name).unwrap();
+        NamespaceId(id as u32)
     }
 
-    pub fn iter_tables(&self) -> impl Iterator<Item = (TableId, &Table)> {
-        self.tables
-            .iter()
-            .enumerate()
-            .map(|(table_index, table)| (TableId(table_index as u32), table))
+    /// The total number of indexes in the schema.
+    pub fn indexes_count(&self) -> usize {
+        self.indexes.len()
     }
 
-    pub fn iter_tables_mut(&mut self) -> impl Iterator<Item = (TableId, &mut Table)> {
-        self.tables
-            .iter_mut()
-            .enumerate()
-            .map(|(table_index, table)| (TableId(table_index as u32), table))
-    }
-
-    pub fn table(&self, name: &str) -> core::result::Result<&Table, String> {
-        match self.tables.iter().find(|t| t.name == name) {
-            Some(t) => Ok(t),
-            None => Err(name.to_string()),
+    /// Make all fulltext indexes non-fulltext, for the preview feature's purpose.
+    pub fn make_fulltext_indexes_normal(&mut self) {
+        for idx in self.indexes.iter_mut() {
+            if matches!(idx.tpe, IndexType::Fulltext) {
+                idx.tpe = IndexType::Normal;
+            }
         }
     }
 
-    pub fn table_bang(&self, name: &str) -> &Table {
-        self.table(name).unwrap()
+    /// Add a column to the schema.
+    pub fn push_column(&mut self, table_id: TableId, column: Column) -> ColumnId {
+        let id = ColumnId(self.columns.len() as u32);
+        self.columns.push((table_id, column));
+        id
     }
 
-    /// Get a sequence.
-    pub fn get_sequence(&self, name: &str) -> Option<&Sequence> {
-        self.sequences.iter().find(|x| x.name == name)
+    /// Add a fulltext index to the schema.
+    pub fn push_fulltext_index(&mut self, table_id: TableId, index_name: String) -> IndexId {
+        let id = IndexId(self.indexes.len() as u32);
+        self.indexes.push(Index {
+            table_id,
+            index_name,
+            tpe: IndexType::Fulltext,
+        });
+        id
     }
 
-    pub fn empty() -> SqlSchema {
-        SqlSchema::default()
+    /// Add an index to the schema.
+    pub fn push_index(&mut self, table_id: TableId, index_name: String) -> IndexId {
+        let id = IndexId(self.indexes.len() as u32);
+        self.indexes.push(Index {
+            table_id,
+            index_name,
+            tpe: IndexType::Normal,
+        });
+        id
+    }
+
+    /// Add a primary key to the schema.
+    pub fn push_primary_key(&mut self, table_id: TableId, index_name: String) -> IndexId {
+        let id = IndexId(self.indexes.len() as u32);
+        self.indexes.push(Index {
+            table_id,
+            index_name,
+            tpe: IndexType::PrimaryKey,
+        });
+        id
+    }
+
+    /// Add a unique constraint/index to the schema.
+    pub fn push_unique_constraint(&mut self, table_id: TableId, index_name: String) -> IndexId {
+        let id = IndexId(self.indexes.len() as u32);
+        self.indexes.push(Index {
+            table_id,
+            index_name,
+            tpe: IndexType::Unique,
+        });
+        id
+    }
+
+    pub fn push_index_column(&mut self, column: IndexColumn) -> IndexColumnId {
+        let id = IndexColumnId(self.index_columns.len() as u32);
+        self.index_columns.push(column);
+        id
+    }
+
+    pub fn push_foreign_key(
+        &mut self,
+        constraint_name: Option<String>,
+        [constrained_table, referenced_table]: [TableId; 2],
+        [on_delete_action, on_update_action]: [ForeignKeyAction; 2],
+    ) -> ForeignKeyId {
+        let id = ForeignKeyId(self.foreign_keys.len() as u32);
+        self.foreign_keys.push(ForeignKey {
+            constrained_table,
+            constraint_name,
+            referenced_table,
+            on_delete_action,
+            on_update_action,
+        });
+        id
+    }
+
+    pub fn push_foreign_key_column(
+        &mut self,
+        foreign_key_id: ForeignKeyId,
+        [constrained_column, referenced_column]: [ColumnId; 2],
+    ) {
+        self.foreign_key_columns.push(ForeignKeyColumn {
+            foreign_key_id,
+            constrained_column,
+            referenced_column,
+        });
+    }
+
+    pub fn push_namespace(&mut self, name: String) -> NamespaceId {
+        let id = NamespaceId(self.namespaces.len() as u32);
+        self.namespaces.push(name);
+        id
+    }
+
+    pub fn push_table(&mut self, name: String, namespace_id: NamespaceId) -> TableId {
+        let id = TableId(self.tables.len() as u32);
+        self.tables.push(Table { namespace_id, name });
+        id
+    }
+
+    pub fn namespaces_count(&self) -> usize {
+        self.namespaces.len()
+    }
+
+    pub fn namespace_walker<'a>(&'a self, name: &str) -> Option<NamespaceWalker<'a>> {
+        let namespace_idx = self.namespaces.iter().position(|ns| ns == name)?;
+        Some(self.walk(NamespaceId(namespace_idx as u32)))
+    }
+
+    pub fn namespace_walkers(&self) -> impl Iterator<Item = NamespaceWalker<'_>> {
+        (0..self.namespaces.len()).map(move |namespace_index| NamespaceWalker {
+            schema: self,
+            id: NamespaceId(namespace_index as u32),
+        })
+    }
+
+    pub fn tables_count(&self) -> usize {
+        self.tables.len()
+    }
+
+    pub fn table_walker<'a>(&'a self, name: &str) -> Option<TableWalker<'a>> {
+        let table_idx = self.tables.iter().position(|table| table.name == name)?;
+        Some(self.walk(TableId(table_idx as u32)))
+    }
+
+    pub fn table_walker_ns<'a>(&'a self, namespace: &str, name: &str) -> Option<TableWalker<'a>> {
+        let namespace_idx = self.namespace_walker(namespace)?.id;
+
+        let table_idx = self
+            .tables
+            .iter()
+            .position(|table| table.name == name && table.namespace_id == namespace_idx)?;
+        Some(self.walk(TableId(table_idx as u32)))
     }
 
     pub fn table_walkers(&self) -> impl Iterator<Item = TableWalker<'_>> {
-        (0..self.tables.len()).map(move |table_index| TableWalker::new(self, TableId(table_index as u32)))
+        (0..self.tables.len()).map(move |table_index| TableWalker {
+            schema: self,
+            id: TableId(table_index as u32),
+        })
     }
 
     pub fn view_walkers(&self) -> impl Iterator<Item = ViewWalker<'_>> {
-        (0..self.views.len()).map(move |view_index| ViewWalker::new(self, view_index))
+        (0..self.views.len()).map(move |view_index| self.walk(ViewId(view_index as u32)))
     }
 
     pub fn udt_walkers(&self) -> impl Iterator<Item = UserDefinedTypeWalker<'_>> {
-        (0..self.user_defined_types.len()).map(move |udt_index| UserDefinedTypeWalker::new(self, udt_index))
+        (0..self.user_defined_types.len()).map(move |udt_index| self.walk(UdtId(udt_index as u32)))
     }
 
     pub fn enum_walkers(&self) -> impl Iterator<Item = EnumWalker<'_>> {
         (0..self.enums.len()).map(move |enum_index| EnumWalker {
             schema: self,
-            enum_index,
+            id: EnumId(enum_index as u32),
         })
+    }
+
+    pub fn walk_foreign_keys(&self) -> impl Iterator<Item = ForeignKeyWalker<'_>> {
+        (0..self.foreign_keys.len()).map(move |fk_idx| ForeignKeyWalker {
+            schema: self,
+            id: ForeignKeyId(fk_idx as u32),
+        })
+    }
+
+    /// Traverse a schema item by id.
+    pub fn walk<I>(&self, id: I) -> Walker<'_, I> {
+        Walker { id, schema: self }
+    }
+
+    /// Traverse all the columns in the schema.
+    pub fn walk_columns(&self) -> impl Iterator<Item = ColumnWalker<'_>> {
+        (0..self.columns.len()).map(|idx| self.walk(ColumnId(idx as u32)))
+    }
+
+    /// Traverse all namespaces in the catalog.
+    pub fn walk_namespaces(&self) -> impl ExactSizeIterator<Item = NamespaceWalker<'_>> {
+        (0..self.namespaces.len()).map(|idx| self.walk(NamespaceId(idx as u32)))
+    }
+
+    /// No tables or enums in the catalog.
+    pub fn is_empty(&self) -> bool {
+        self.tables.is_empty() && self.enums.is_empty()
     }
 }
 
 /// A table found in a schema.
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct Table {
-    /// The table's name.
-    pub name: String,
-    /// The table's columns.
-    pub columns: Vec<Column>,
-    /// The table's indices.
-    pub indices: Vec<Index>,
-    /// The table's primary key, if there is one.
-    pub primary_key: Option<PrimaryKey>,
-    /// The table's foreign keys.
-    pub foreign_keys: Vec<ForeignKey>,
-}
-
-impl Table {
-    pub fn column_bang(&self, name: &str) -> &Column {
-        self.column(name)
-            .unwrap_or_else(|| panic!("Column {} not found in Table {}", name, self.name))
-    }
-
-    pub fn column<'a>(&'a self, name: &str) -> Option<&'a Column> {
-        self.columns.iter().find(|c| c.name == name)
-    }
-
-    pub fn has_column(&self, name: &str) -> bool {
-        self.column(name).is_some()
-    }
-
-    pub fn is_part_of_foreign_key(&self, column: &str) -> bool {
-        self.foreign_key_for_column(column).is_some()
-    }
-
-    pub fn foreign_key_for_column(&self, column: &str) -> Option<&ForeignKey> {
-        self.foreign_keys
-            .iter()
-            .find(|fk| fk.columns.contains(&column.to_string()))
-    }
-
-    pub fn is_part_of_primary_key(&self, column: &str) -> bool {
-        match &self.primary_key {
-            Some(pk) => pk.columns.iter().any(|c| c.name() == column),
-            None => false,
-        }
-    }
-
-    pub fn primary_key_columns(&self) -> impl Iterator<Item = &PrimaryKeyColumn> + '_ {
-        match &self.primary_key {
-            Some(pk) => pk.columns.iter(),
-            None => [].iter(),
-        }
-    }
-
-    pub fn is_column_unique(&self, column_name: &str) -> bool {
-        self.indices.iter().any(|index| {
-            index.is_unique() && index.columns.len() == 1 && index.columns.iter().any(|c| c.name() == column_name)
-        })
-    }
-
-    pub fn is_column_primary_key(&self, column_name: &str) -> bool {
-        match &self.primary_key {
-            None => false,
-            Some(key) => key.is_single_primary_key(column_name),
-        }
-    }
+    namespace_id: NamespaceId,
+    name: String,
 }
 
 /// The type of an index.
@@ -256,39 +343,8 @@ pub enum IndexType {
     Normal,
     /// Fulltext type.
     Fulltext,
-}
-
-impl IndexType {
-    pub fn is_unique(&self) -> bool {
-        matches!(self, IndexType::Unique)
-    }
-}
-
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, Copy)]
-pub enum SQLIndexAlgorithm {
-    BTree,
-    Hash,
-}
-
-impl Default for SQLIndexAlgorithm {
-    fn default() -> Self {
-        Self::BTree
-    }
-}
-
-impl AsRef<str> for SQLIndexAlgorithm {
-    fn as_ref(&self) -> &str {
-        match self {
-            Self::BTree => "BTREE",
-            Self::Hash => "HASH",
-        }
-    }
-}
-
-impl fmt::Display for SQLIndexAlgorithm {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(self.as_ref())
-    }
+    /// The table's primary key
+    PrimaryKey,
 }
 
 /// The sort order of an index.
@@ -319,60 +375,27 @@ impl fmt::Display for SQLSortOrder {
     }
 }
 
-#[derive(Default, Serialize, Deserialize, PartialEq, Debug, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct IndexColumn {
-    pub name: String,
+    pub index_id: IndexId,
+    pub column_id: ColumnId,
     pub sort_order: Option<SQLSortOrder>,
     pub length: Option<u32>,
 }
 
-impl IndexColumn {
-    pub fn new(name: impl ToString) -> Self {
-        Self {
-            name: name.to_string(),
-            ..Default::default()
-        }
-    }
-
-    pub fn name(&self) -> &str {
-        &self.name
-    }
-
-    pub fn set_sort_order(&mut self, sort_order: SQLSortOrder) {
-        self.sort_order = Some(sort_order);
-    }
-}
-
-/// An index of a table.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
-pub struct Index {
-    /// Index name.
-    pub name: String,
-    /// Index columns.
-    pub columns: Vec<IndexColumn>,
-    /// Type of index.
-    pub tpe: IndexType,
-    /// BTree or Hash
-    pub algorithm: Option<SQLIndexAlgorithm>,
-}
-
-impl Index {
-    pub fn is_unique(&self) -> bool {
-        self.tpe == IndexType::Unique
-    }
-
-    pub fn is_fulltext(&self) -> bool {
-        self.tpe == IndexType::Fulltext
-    }
-
-    pub fn column_names(&self) -> impl ExactSizeIterator<Item = &str> + '_ {
-        self.columns.iter().map(|c| c.name())
-    }
+/// An index on a table.
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
+struct Index {
+    table_id: TableId,
+    index_name: String,
+    tpe: IndexType,
 }
 
 /// A stored procedure (like, the function inside your database).
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct Procedure {
+    ///Namespace of the procedure
+    namespace_id: NamespaceId,
     /// Procedure name.
     pub name: String,
     /// The definition of the procedure.
@@ -388,63 +411,7 @@ pub struct UserDefinedType {
     pub definition: Option<String>,
 }
 
-#[derive(Default, Serialize, Deserialize, Debug, Clone)]
-pub struct PrimaryKeyColumn {
-    pub name: String,
-    pub length: Option<u32>,
-    pub sort_order: Option<SQLSortOrder>,
-}
-
-impl PartialEq for PrimaryKeyColumn {
-    fn eq(&self, other: &Self) -> bool {
-        self.name == other.name && self.length == other.length && self.sort_order() == other.sort_order()
-    }
-}
-
-impl PrimaryKeyColumn {
-    pub fn new(name: impl ToString) -> Self {
-        Self {
-            name: name.to_string(),
-            ..Default::default()
-        }
-    }
-
-    pub fn name(&self) -> &str {
-        &self.name
-    }
-
-    pub fn set_sort_order(&mut self, sort_order: SQLSortOrder) {
-        self.sort_order = Some(sort_order);
-    }
-
-    pub fn sort_order(&self) -> SQLSortOrder {
-        self.sort_order.unwrap_or(SQLSortOrder::Asc)
-    }
-}
-
-/// The primary key of a table.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
-pub struct PrimaryKey {
-    /// Columns.
-    pub columns: Vec<PrimaryKeyColumn>,
-    /// The sequence optionally seeding this primary key.
-    pub sequence: Option<Sequence>,
-    /// The name of the primary key constraint, when available.
-    pub constraint_name: Option<String>,
-}
-
-impl PrimaryKey {
-    pub fn is_single_primary_key(&self, column: &str) -> bool {
-        self.columns.len() == 1 && self.columns.iter().any(|col| col.name() == column)
-    }
-
-    pub fn column_names(&self) -> impl ExactSizeIterator<Item = &str> + '_ {
-        self.columns.iter().map(|c| c.name())
-    }
-}
-
-/// A column of a table.
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Column {
     /// Column name.
     pub name: String,
@@ -456,14 +423,8 @@ pub struct Column {
     pub auto_increment: bool,
 }
 
-impl Column {
-    pub fn is_required(&self) -> bool {
-        self.tpe.arity == ColumnArity::Required
-    }
-}
-
 /// The type of a column.
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ColumnType {
     /// The full SQL data type, the sql string necessary to recreate the column, drawn directly from the db, used when there is no native type.
     pub full_data_type: String,
@@ -472,7 +433,8 @@ pub struct ColumnType {
     /// The arity of the column.
     pub arity: ColumnArity,
     /// The Native type of the column.
-    pub native_type: Option<serde_json::Value>,
+    #[serde(skip)]
+    pub native_type: Option<psl::datamodel_connector::NativeTypeInstance>,
 }
 
 impl ColumnType {
@@ -496,8 +458,7 @@ impl ColumnType {
 }
 
 /// Enumeration of column type families.
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
-// TODO: this name feels weird.
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub enum ColumnTypeFamily {
     /// Integer types.
     Int,
@@ -563,7 +524,7 @@ impl ColumnTypeFamily {
 }
 
 /// A column's arity.
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, Copy)]
 pub enum ColumnArity {
     /// Required column.
     Required,
@@ -617,50 +578,41 @@ impl ForeignKeyAction {
     }
 }
 
-/// A foreign key.
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct ForeignKey {
-    /// The database name of the foreign key constraint, when available.
-    pub constraint_name: Option<String>,
-    /// Column names.
-    pub columns: Vec<String>,
+#[derive(Serialize, Deserialize, Debug)]
+struct ForeignKey {
+    /// The table the foreign key is defined on.
+    constrained_table: TableId,
     /// Referenced table.
-    pub referenced_table: String,
-    /// Referenced columns.
-    pub referenced_columns: Vec<String>,
-    /// Action on deletion.
-    pub on_delete_action: ForeignKeyAction,
-    /// Action on update.
-    pub on_update_action: ForeignKeyAction,
+    referenced_table: TableId,
+    /// The foreign key constraint name, when available.
+    constraint_name: Option<String>,
+    on_delete_action: ForeignKeyAction,
+    on_update_action: ForeignKeyAction,
 }
 
-impl PartialEq for ForeignKey {
-    fn eq(&self, other: &Self) -> bool {
-        self.columns == other.columns
-            && self.referenced_table == other.referenced_table
-            && self.referenced_columns == other.referenced_columns
-    }
+#[derive(Serialize, Deserialize, Debug)]
+struct ForeignKeyColumn {
+    foreign_key_id: ForeignKeyId,
+    constrained_column: ColumnId,
+    referenced_column: ColumnId,
 }
 
 /// A SQL enum.
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct Enum {
+    /// The namespace the enum type belongs to, if applicable.
+    pub namespace_id: NamespaceId,
     /// Enum name.
     pub name: String,
     /// Possible enum values.
     pub values: Vec<String>,
 }
 
-/// A SQL sequence.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
-pub struct Sequence {
-    /// Sequence name.
-    pub name: String,
-}
-
 /// An SQL view.
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct View {
+    /// Namespace of the view
+    namespace_id: NamespaceId,
     /// Name of the view.
     pub name: String,
     /// The SQL definition of the view.
@@ -682,13 +634,15 @@ pub enum DefaultKind {
     Now,
     /// An expression generating a sequence.
     Sequence(String),
+    /// A unique row ID,
+    UniqueRowid,
     /// An unrecognized Default Value
-    DbGenerated(String),
+    DbGenerated(Option<String>),
 }
 
 impl DefaultValue {
     pub fn db_generated(val: impl Into<String>) -> Self {
-        Self::new(DefaultKind::DbGenerated(val.into()))
+        Self::new(DefaultKind::DbGenerated(Some(val.into())))
     }
 
     pub fn now() -> Self {
@@ -726,6 +680,13 @@ impl DefaultValue {
         self.constraint_name.as_deref()
     }
 
+    pub fn as_sequence(&self) -> Option<&str> {
+        match &self.kind {
+            DefaultKind::Sequence(name) => Some(name),
+            _ => None,
+        }
+    }
+
     pub fn as_value(&self) -> Option<&PrismaValue> {
         match self.kind {
             DefaultKind::Value(ref v) => Some(v),
@@ -749,13 +710,17 @@ impl DefaultValue {
         matches!(self.kind, DefaultKind::DbGenerated(_))
     }
 
+    pub fn unique_rowid() -> Self {
+        Self::new(DefaultKind::UniqueRowid)
+    }
+
     pub fn with_constraint_name(mut self, constraint_name: Option<String>) -> Self {
         self.constraint_name = constraint_name;
         self
     }
 }
 
-pub fn unquote_string(val: &str) -> String {
+fn unquote_string(val: &str) -> String {
     val.trim_start_matches('\'')
         .trim_end_matches('\'')
         .trim_start_matches('\\')

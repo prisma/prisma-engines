@@ -6,18 +6,18 @@ mod sql_server;
 mod sqlite;
 mod vitess;
 
-use cockroachdb::*;
-use datamodel_connector::ConnectorCapability;
-use enum_dispatch::enum_dispatch;
 pub use mongodb::*;
 pub use mysql::*;
 pub use postgres::*;
 pub use sql_server::*;
 pub use sqlite::*;
-use std::{convert::TryFrom, fmt};
 pub use vitess::*;
 
 use crate::{datamodel_rendering::DatamodelRenderer, TestConfig, TestError};
+use cockroachdb::*;
+use enum_dispatch::enum_dispatch;
+use psl::datamodel_connector::ConnectorCapability;
+use std::{convert::TryFrom, fmt};
 
 #[enum_dispatch]
 pub trait ConnectorTagInterface {
@@ -33,7 +33,13 @@ pub trait ConnectorTagInterface {
     ///   implementing connector, like a file or a schema.
     /// - `is_ci` signals whether or not the test run is done on CI or not. May be important if local
     ///   test run connection strings and CI connection strings differ because of networking.
-    fn connection_string(&self, test_database: &str, is_ci: bool) -> String;
+    fn connection_string(
+        &self,
+        test_database: &str,
+        is_ci: bool,
+        is_multi_schema: bool,
+        isolation_level: Option<&'static str>,
+    ) -> String;
 
     /// Capabilities of the implementing connector.
     fn capabilities(&self) -> &[ConnectorCapability];
@@ -53,7 +59,7 @@ pub trait ConnectorTagInterface {
     /// Defines where relational constraints are handled:
     ///   - "prisma" is handled in the Query Engine core
     ///   - "foreignKeys" lets the database handle them
-    fn referential_integrity(&self) -> &'static str {
+    fn relation_mode(&self) -> &'static str {
         "foreignKeys"
     }
 }

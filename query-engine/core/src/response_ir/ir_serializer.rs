@@ -1,7 +1,7 @@
 use super::{internal::serialize_internal, response::*, *};
-use crate::{CoreError, ExpressionResult, OutputFieldRef, OutputType, QueryResult};
-
+use crate::{CoreError, ExpressionResult, QueryResult};
 use prisma_models::PrismaValue;
+use schema::{OutputFieldRef, OutputType};
 use std::borrow::Borrow;
 
 #[derive(Debug)]
@@ -15,8 +15,8 @@ pub struct IrSerializer {
 }
 
 impl IrSerializer {
-    #[tracing::instrument(skip(self, result))]
     pub fn serialize(&self, result: ExpressionResult) -> crate::Result<ResponseData> {
+        let _span = info_span!("prisma:engine:serialize", user_facing = true);
         match result {
             ExpressionResult::Query(QueryResult::Json(json)) => {
                 Ok(ResponseData::new(self.key.clone(), Item::Json(json)))

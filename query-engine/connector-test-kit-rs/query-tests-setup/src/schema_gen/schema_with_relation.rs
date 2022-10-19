@@ -1,5 +1,5 @@
 use super::*;
-use datamodel_connector::ConnectorCapability;
+use psl::datamodel_connector::ConnectorCapability;
 use serde::{Deserialize, Serialize};
 use std::{convert::TryFrom, str::FromStr};
 
@@ -91,6 +91,7 @@ pub fn schema_with_relation(
             )
         },
     ];
+
     let child_unique_params = vec![
         QueryParams::new(
             "c",
@@ -185,12 +186,7 @@ pub fn schema_with_relation(
 
                                     @@unique([c_1, c_2])
                                 }}
-                            ",
-                                parent_field = parent_field,
-                                parent_id = parent_id,
-                                child_field = child_field,
-                                child_id = child_id
-                            };
+                            "};
 
                             let mut required_capabilities_for_dm = vec![];
 
@@ -239,12 +235,31 @@ fn render_relation_fields(
             parent.type_name(),
             parent_ref_to_child.render()
         );
-        let rendered_child = format!(
+
+        let mut rendered_child = format!(
             "{} {} {}",
             child.field_name(),
             child.type_name(),
             child_ref_to_parent.render()
         );
+
+        if !child.is_list() && !parent.is_list() {
+            let unique_attribute = match child_ref_to_parent {
+                RelationReference::SimpleChildId(_) => r#"@@unique([childId])"#,
+                RelationReference::SimpleParentId(_) => r#"@@unique([parentId])"#,
+                RelationReference::CompoundParentId(_) => r#"@@unique([parent_id_1, parent_id_2])"#,
+                RelationReference::CompoundChildId(_) => r#"@@unique([child_id_1, child_id_2])"#,
+                RelationReference::ParentReference(_) => r#"@@unique([parentRef])"#,
+                RelationReference::CompoundParentReference(_) => r#"@@unique([parent_p_1, parent_p_2])"#,
+                RelationReference::ChildReference(_) => r#"@@unique([parent_c])"#,
+                RelationReference::CompoundChildReference(_) => r#"@@unique([child_c_1, child_c_2])"#,
+                RelationReference::IdReference => "",
+                RelationReference::NoRef => "",
+            };
+
+            rendered_child.push('\n');
+            rendered_child.push_str(unique_attribute);
+        }
 
         (rendered_parent, rendered_child)
     }

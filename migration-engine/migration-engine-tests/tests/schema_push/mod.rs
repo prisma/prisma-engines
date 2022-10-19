@@ -134,8 +134,8 @@ fn schema_push_with_an_unexecutable_migration_returns_a_message_and_aborts(api: 
 fn indexes_and_unique_constraints_on_the_same_field_do_not_collide(api: TestApi) {
     let dm = r#"
         model User {
-            id     Int    @id @default(autoincrement())
-            email  String @unique
+            id     BigInt    @id @default(autoincrement())
+            email  String    @unique
             name   String
 
             @@index([email])
@@ -149,7 +149,7 @@ fn indexes_and_unique_constraints_on_the_same_field_do_not_collide(api: TestApi)
 fn multi_column_indexes_and_unique_constraints_on_the_same_fields_do_not_collide(api: TestApi) {
     let dm = r#"
         model User {
-            id     Int    @id @default(autoincrement())
+            id     BigInt    @id @default(autoincrement())
             email  String
             name   String
 
@@ -173,6 +173,7 @@ fn alter_constraint_name_push(api: TestApi) {
            @@unique([a, b])
            @@index([a])
          }
+
          model B {
            a   String
            b   String
@@ -221,7 +222,7 @@ fn alter_constraint_name_push(api: TestApi) {
 
     api.assert_schema().assert_table("A", |table| {
         if !no_named_pk {
-            table.assert_pk(|pk| pk.assert_constraint_name(Some("CustomId".into())));
+            table.assert_pk(|pk| pk.assert_constraint_name("CustomId"));
         };
         table.assert_has_index_name_and_type("CustomUnique", true);
         table.assert_has_index_name_and_type("CustomCompoundUnique", true);
@@ -230,7 +231,7 @@ fn alter_constraint_name_push(api: TestApi) {
 
     api.assert_schema().assert_table("B", |table| {
         if !no_named_pk {
-            table.assert_pk(|pk| pk.assert_constraint_name(Some("CustomCompoundId".into())));
+            table.assert_pk(|pk| pk.assert_constraint_name("CustomCompoundId"));
         };
         if !api.is_sqlite() {
             table.assert_fk_with_name("CustomFK");
@@ -395,7 +396,7 @@ fn implicit_relations_indices_are_not_renamed_unnecessarily(api: TestApi) {
         .assert_migration_directories_count(1);
 }
 
-#[test_connector(tags(Mysql), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mysql))]
 fn creating_index_on_long_varchar_without_length_fails(api: TestApi) {
     let plain_dm = r#"
      model User {
@@ -410,7 +411,7 @@ fn creating_index_on_long_varchar_without_length_fails(api: TestApi) {
     api.schema_push_w_datasource(plain_dm).send_unwrap_err();
 }
 
-#[test_connector(tags(Mysql), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mysql))]
 fn mysql_should_diff_column_ordering_correctly_issue_10983(api: TestApi) {
     // https://github.com/prisma/prisma/issues/10983
 
@@ -436,7 +437,7 @@ fn mysql_should_diff_column_ordering_correctly_issue_10983(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
 }
 
-#[test_connector(preview_features("extendedIndexes"))]
+#[test_connector]
 fn issue_repro_extended_indexes(api: TestApi) {
     // https://github.com/prisma/prisma/issues/11631
 

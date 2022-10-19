@@ -1,21 +1,66 @@
 //! SQLite description.
+
 use crate::{
-    common::purge_dangling_foreign_keys, getters::Getter, parsers::Parser, Column, ColumnArity, ColumnType,
-    ColumnTypeFamily, DefaultValue, DescriberResult, ForeignKey, ForeignKeyAction, Index, IndexColumn, IndexType, Lazy,
-    PrimaryKey, PrimaryKeyColumn, PrismaValue, Regex, SQLSortOrder, SqlMetadata, SqlSchema, SqlSchemaDescriberBackend,
-    Table, View,
+    getters::Getter, ids::*, parsers::Parser, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue,
+    DescriberResult, ForeignKeyAction, Lazy, PrismaValue, Regex, SQLSortOrder, SqlMetadata, SqlSchema,
+    SqlSchemaDescriberBackend, View,
 };
-use quaint::{ast::Value, prelude::Queryable};
+use indexmap::IndexMap;
+use quaint::{
+    ast::Value,
+    connector::{GetRow, ToColumnNames},
+    prelude::ResultRow,
+};
 use std::{any::type_name, borrow::Cow, collections::BTreeMap, convert::TryInto, fmt::Debug, path::Path};
 use tracing::trace;
 
+#[async_trait::async_trait]
+pub trait Connection {
+    async fn query_raw<'a>(
+        &'a self,
+        sql: &'a str,
+        params: &'a [quaint::prelude::Value<'a>],
+    ) -> quaint::Result<quaint::prelude::ResultSet>;
+}
+
+#[async_trait::async_trait]
+impl Connection for std::sync::Mutex<quaint::connector::rusqlite::Connection> {
+    async fn query_raw<'a>(
+        &'a self,
+        sql: &'a str,
+        params: &'a [quaint::prelude::Value<'a>],
+    ) -> quaint::Result<quaint::prelude::ResultSet> {
+        let conn = self.lock().unwrap();
+        let mut stmt = conn.prepare_cached(sql)?;
+        let mut rows = stmt.query(quaint::connector::rusqlite::params_from_iter(params.iter()))?;
+        let column_names = rows.to_column_names();
+        let mut converted_rows = Vec::new();
+        while let Some(row) = rows.next()? {
+            converted_rows.push(row.get_result_row().unwrap());
+        }
+
+        Ok(quaint::prelude::ResultSet::new(column_names, converted_rows))
+    }
+}
+
+#[async_trait::async_trait]
+impl Connection for quaint::single::Quaint {
+    async fn query_raw<'a>(
+        &'a self,
+        sql: &'a str,
+        params: &'a [quaint::prelude::Value<'a>],
+    ) -> quaint::Result<quaint::prelude::ResultSet> {
+        quaint::prelude::Queryable::query_raw(self, sql, params).await
+    }
+}
+
 pub struct SqlSchemaDescriber<'a> {
-    conn: &'a dyn Queryable,
+    conn: &'a (dyn Connection + Send + Sync),
 }
 
 impl Debug for SqlSchemaDescriber<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct(type_name::<SqlSchemaDescriber>()).finish()
+        f.debug_struct(type_name::<SqlSchemaDescriber<'_>>()).finish()
     }
 }
 
@@ -25,8 +70,9 @@ impl SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
         Ok(self.get_databases().await?)
     }
 
-    async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata> {
-        let table_count = self.get_table_names(schema).await?.len();
+    async fn get_metadata(&self, _schema: &str) -> DescriberResult<SqlMetadata> {
+        let mut sql_schema = SqlSchema::default();
+        let table_count = self.get_table_names(&mut sql_schema).await?.len();
         let size_in_bytes = self.get_size().await?;
 
         Ok(SqlMetadata {
@@ -35,49 +81,12 @@ impl SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
         })
     }
 
-    #[tracing::instrument]
-    async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema> {
-        let table_names: Vec<String> = self.get_table_names(schema).await?;
-
-        let mut tables = Vec::with_capacity(table_names.len());
-
-        for table_name in table_names.iter().filter(|table| !is_system_table(table)) {
-            tables.push(self.get_table(schema, table_name).await?)
-        }
-
-        // Since referential integrity is optional on SQLite, we remove foreign keys
-        // not pointing to an existing table ex post.
-        purge_dangling_foreign_keys(&mut tables);
-
-        // SQLite allows foreign key definitions without specifying the referenced columns, it then assumes the pk is used.
-        let mut foreign_keys_without_referenced_columns = vec![];
-        for (table_index, table) in tables.iter().enumerate() {
-            for (fk_index, foreign_key) in table.foreign_keys.iter().enumerate() {
-                if foreign_key.referenced_columns.is_empty() {
-                    let referenced_table = tables.iter().find(|t| t.name == foreign_key.referenced_table).unwrap();
-                    let referenced_pk = referenced_table.primary_key.as_ref().unwrap();
-                    foreign_keys_without_referenced_columns.push((table_index, fk_index, referenced_pk.columns.clone()))
-                }
-            }
-        }
-
-        for (table_index, fk_index, columns) in foreign_keys_without_referenced_columns {
-            tables[table_index].foreign_keys[fk_index].referenced_columns =
-                columns.into_iter().map(|c| c.name).collect()
-        }
-
-        let views = self.get_views().await?;
-
-        Ok(SqlSchema {
-            tables,
-            views,
-            ..Default::default()
-        })
+    async fn describe(&self, _schemas: &[&str]) -> DescriberResult<SqlSchema> {
+        self.describe_impl().await
     }
 
-    #[tracing::instrument]
-    async fn version(&self, _schema: &str) -> DescriberResult<Option<String>> {
-        Ok(self.conn.version().await?)
+    async fn version(&self) -> DescriberResult<Option<String>> {
+        Ok(Some(quaint::connector::sqlite_version().to_owned()))
     }
 }
 
@@ -85,11 +94,28 @@ impl Parser for SqlSchemaDescriber<'_> {}
 
 impl<'a> SqlSchemaDescriber<'a> {
     /// Constructor.
-    pub fn new(conn: &'a dyn Queryable) -> SqlSchemaDescriber<'a> {
+    pub fn new(conn: &'a (dyn Connection + Send + Sync)) -> SqlSchemaDescriber<'a> {
         SqlSchemaDescriber { conn }
     }
 
-    #[tracing::instrument]
+    pub async fn describe_impl(&self) -> DescriberResult<SqlSchema> {
+        let mut schema = SqlSchema::default();
+        let table_ids = self.get_table_names(&mut schema).await?;
+
+        for (table_name, table_id) in &table_ids {
+            self.push_table(table_name, *table_id, &mut schema).await?;
+        }
+
+        for (table_name, table_id) in &table_ids {
+            self.push_foreign_keys(table_name, *table_id, &table_ids, &mut schema)
+                .await?;
+        }
+
+        schema.views = self.get_views().await?;
+
+        Ok(schema)
+    }
+
     async fn get_databases(&self) -> DescriberResult<Vec<String>> {
         let sql = "PRAGMA database_list;";
         let rows = self.conn.query_raw(sql, &[]).await?;
@@ -112,51 +138,43 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(names)
     }
 
-    async fn get_table_names(&self, _schema: &str) -> DescriberResult<Vec<String>> {
+    async fn get_table_names(&self, schema: &mut SqlSchema) -> DescriberResult<IndexMap<String, TableId>> {
         let sql = r#"SELECT name FROM sqlite_master WHERE type='table' ORDER BY name ASC"#;
-        trace!("describing table names with query: '{}'", sql);
 
         let result_set = self.conn.query_raw(sql, &[]).await?;
 
         let names = result_set
             .into_iter()
             .map(|row| row.get("name").and_then(|x| x.to_string()).unwrap())
-            .filter(|n| n != "sqlite_sequence")
-            .collect();
+            .filter(|table_name| !is_system_table(table_name));
 
-        trace!("Found table names: {:?}", names);
+        let mut map = IndexMap::default();
 
-        Ok(names)
+        for name in names {
+            let cloned_name = name.clone();
+            let id = schema.push_table(name, Default::default());
+            map.insert(cloned_name, id);
+        }
+
+        Ok(map)
     }
 
-    #[tracing::instrument]
     async fn get_size(&self) -> DescriberResult<usize> {
         let sql = r#"SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size();"#;
         let result = self.conn.query_raw(sql, &[]).await?;
         let size: i64 = result
             .first()
-            .map(|row| row.get("size").and_then(|x| x.as_i64()).unwrap_or(0))
+            .map(|row| row.get("size").and_then(|x| x.as_integer()).unwrap_or(0))
             .unwrap();
 
         Ok(size.try_into().unwrap())
     }
 
-    #[tracing::instrument]
-    async fn get_table(&self, schema: &str, name: &str) -> DescriberResult<Table> {
-        let (columns, primary_key) = self.get_columns(name).await?;
-        let foreign_keys = self.get_foreign_keys(name).await?;
-        let indices = self.get_indices(name).await?;
-
-        Ok(Table {
-            name: name.to_string(),
-            columns,
-            indices,
-            primary_key,
-            foreign_keys,
-        })
+    async fn push_table(&self, name: &str, table_id: TableId, schema: &mut SqlSchema) -> DescriberResult<()> {
+        push_columns(name, table_id, schema, self.conn).await?;
+        push_indexes(name, table_id, schema, self.conn).await
     }
 
-    #[tracing::instrument]
     async fn get_views(&self) -> DescriberResult<Vec<View>> {
         let sql = "SELECT name AS view_name, sql AS view_sql FROM sqlite_master WHERE type = 'view'";
         let result_set = self.conn.query_raw(sql, &[]).await?;
@@ -164,6 +182,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for row in result_set.into_iter() {
             views.push(View {
+                namespace_id: NamespaceId(0),
                 name: row.get_expect_string("view_name"),
                 definition: row.get_string("view_sql"),
             })
@@ -172,344 +191,337 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(views)
     }
 
-    #[tracing::instrument]
-    async fn get_columns(&self, table: &str) -> DescriberResult<(Vec<Column>, Option<PrimaryKey>)> {
-        let sql = format!(r#"PRAGMA table_info ("{}")"#, table);
+    async fn push_foreign_keys(
+        &self,
+        table_name: &str,
+        table_id: TableId,
+        table_ids: &IndexMap<String, TableId>,
+        schema: &mut SqlSchema,
+    ) -> DescriberResult<()> {
+        let sql = format!(r#"PRAGMA foreign_key_list("{}");"#, table_name);
         let result_set = self.conn.query_raw(&sql, &[]).await?;
-        let mut pk_cols: BTreeMap<i64, String> = BTreeMap::new();
-        let mut cols: Vec<Column> = result_set
-            .into_iter()
-            .map(|row| {
-                trace!("Got column row {:?}", row);
-                let is_required = row.get("notnull").and_then(|x| x.as_bool()).expect("notnull");
+        let mut current_foreign_key: Option<(i64, ForeignKeyId)> = None;
+        let mut current_foreign_key_columns: Vec<(i64, ColumnId, Option<ColumnId>)> = Vec::new();
 
-                let arity = if is_required {
-                    ColumnArity::Required
-                } else {
-                    ColumnArity::Nullable
-                };
+        fn get_ids(
+            row: &ResultRow,
+            table_id: TableId,
+            table_ids: &IndexMap<String, TableId>,
+            schema: &SqlSchema,
+        ) -> Option<(ColumnId, TableId, Option<ColumnId>)> {
+            let column = schema.walk(table_id).column(&row.get_expect_string("from"))?.id;
+            let referenced_table = schema.walk(*table_ids.get(&row.get_expect_string("table"))?);
+            // this can be null if the primary key and shortened fk syntax was used
+            let referenced_column = row
+                .get_string("to")
+                .and_then(|colname| Some(referenced_table.column(&colname)?.id));
 
-                let tpe = get_column_type(&row.get("type").and_then(|x| x.to_string()).expect("type"), arity);
-
-                let default = match row.get("dflt_value") {
-                    None => None,
-                    Some(val) if val.is_null() => None,
-                    Some(Value::Text(Some(cow_string))) => {
-                        let default_string = cow_string.to_string();
-
-                        if default_string.to_lowercase() == "null" {
-                            None
-                        } else {
-                            Some(match &tpe.family {
-                                ColumnTypeFamily::Int => match Self::parse_int(&default_string) {
-                                    Some(int_value) => DefaultValue::value(int_value),
-                                    None => DefaultValue::db_generated(default_string),
-                                },
-                                ColumnTypeFamily::BigInt => match Self::parse_big_int(&default_string) {
-                                    Some(int_value) => DefaultValue::value(int_value),
-                                    None => DefaultValue::db_generated(default_string),
-                                },
-                                ColumnTypeFamily::Float => match Self::parse_float(&default_string) {
-                                    Some(float_value) => DefaultValue::value(float_value),
-                                    None => DefaultValue::db_generated(default_string),
-                                },
-                                ColumnTypeFamily::Decimal => match Self::parse_float(&default_string) {
-                                    Some(float_value) => DefaultValue::value(float_value),
-                                    None => DefaultValue::db_generated(default_string),
-                                },
-                                ColumnTypeFamily::Boolean => match Self::parse_int(&default_string) {
-                                    Some(PrismaValue::Int(1)) => DefaultValue::value(true),
-                                    Some(PrismaValue::Int(0)) => DefaultValue::value(false),
-                                    _ => match Self::parse_bool(&default_string) {
-                                        Some(bool_value) => DefaultValue::value(bool_value),
-                                        None => DefaultValue::db_generated(default_string),
-                                    },
-                                },
-                                ColumnTypeFamily::String => {
-                                    DefaultValue::value(unquote_sqlite_string_default(&default_string).into_owned())
-                                }
-                                ColumnTypeFamily::DateTime => match default_string.to_lowercase().as_str() {
-                                    "current_timestamp" | "datetime(\'now\')" | "datetime(\'now\', \'localtime\')" => {
-                                        DefaultValue::now()
-                                    }
-                                    _ => DefaultValue::db_generated(default_string),
-                                },
-                                ColumnTypeFamily::Binary => DefaultValue::db_generated(default_string),
-                                ColumnTypeFamily::Json => DefaultValue::db_generated(default_string),
-                                ColumnTypeFamily::Uuid => DefaultValue::db_generated(default_string),
-                                ColumnTypeFamily::Enum(_) => DefaultValue::value(PrismaValue::Enum(default_string)),
-                                ColumnTypeFamily::Unsupported(_) => DefaultValue::db_generated(default_string),
-                            })
-                        }
-                    }
-                    Some(_) => None,
-                };
-
-                let pk_col = row.get("pk").and_then(|x| x.as_i64()).expect("primary key");
-
-                let col = Column {
-                    name: row.get("name").and_then(|x| x.to_string()).expect("name"),
-                    tpe,
-                    default,
-                    auto_increment: false,
-                };
-
-                if pk_col > 0 {
-                    pk_cols.insert(pk_col, col.name.clone());
-                }
-
-                trace!(
-                    "Found column '{}', type: '{:?}', default: {:?}, primary key: {}",
-                    col.name,
-                    col.tpe,
-                    col.default,
-                    pk_col > 0
-                );
-
-                col
-            })
-            .collect();
-
-        let primary_key = if pk_cols.is_empty() {
-            trace!("Determined that table has no primary key");
-            None
-        } else {
-            let mut columns: Vec<PrimaryKeyColumn> = vec![];
-            let mut col_idxs: Vec<&i64> = pk_cols.keys().collect();
-
-            col_idxs.sort_unstable();
-
-            for i in col_idxs {
-                columns.push(PrimaryKeyColumn::new(pk_cols[i].clone()));
-            }
-
-            //Integer Id columns are always implemented with either row id or autoincrement
-            if pk_cols.len() == 1 {
-                let pk_col = &columns[0];
-                for col in cols.iter_mut() {
-                    if col.name == pk_col.name() && &col.tpe.full_data_type.to_lowercase() == "integer" {
-                        trace!(
-                            "Detected that the primary key column corresponds to rowid and \
-                                 is auto incrementing"
-                        );
-                        col.auto_increment = true;
-                        // It is impossible to write a null value to an
-                        // autoincrementing primary key column.
-                        col.tpe.arity = ColumnArity::Required;
-                    }
-                }
-            }
-
-            trace!("Determined that table has primary key with columns {:?}", columns);
-            Some(PrimaryKey {
-                columns,
-                sequence: None,
-                constraint_name: None,
-            })
-        };
-
-        Ok((cols, primary_key))
-    }
-
-    async fn get_foreign_keys(&self, table: &str) -> DescriberResult<Vec<ForeignKey>> {
-        struct IntermediateForeignKey {
-            pub columns: BTreeMap<i64, String>,
-            pub referenced_table: String,
-            pub referenced_columns: BTreeMap<i64, String>,
-            pub on_delete_action: ForeignKeyAction,
-            pub on_update_action: ForeignKeyAction,
+            Some((column, referenced_table.id, referenced_column))
         }
 
-        let sql = format!(r#"PRAGMA foreign_key_list("{}");"#, table);
-        trace!("describing table foreign keys, SQL: '{}'", sql);
-        let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for foreign keys");
+        fn get_referential_actions(row: &ResultRow) -> [ForeignKeyAction; 2] {
+            let on_delete_action = match row.get_expect_string("on_delete").to_lowercase().as_str() {
+                "no action" => ForeignKeyAction::NoAction,
+                "restrict" => ForeignKeyAction::Restrict,
+                "set null" => ForeignKeyAction::SetNull,
+                "set default" => ForeignKeyAction::SetDefault,
+                "cascade" => ForeignKeyAction::Cascade,
+                s => panic!("Unrecognized on delete action '{}'", s),
+            };
+            let on_update_action = match row.get_expect_string("on_update").to_lowercase().as_str() {
+                "no action" => ForeignKeyAction::NoAction,
+                "restrict" => ForeignKeyAction::Restrict,
+                "set null" => ForeignKeyAction::SetNull,
+                "set default" => ForeignKeyAction::SetDefault,
+                "cascade" => ForeignKeyAction::Cascade,
+                s => panic!("Unrecognized on update action '{}'", s),
+            };
+            [on_delete_action, on_update_action]
+        }
 
-        // Since one foreign key with multiple columns will be represented here as several
-        // rows with the same ID, we have to use an intermediate representation that gets
-        // translated into the real foreign keys in another pass
-        let mut intermediate_fks: BTreeMap<i64, IntermediateForeignKey> = BTreeMap::new();
+        fn flush_current_fk(
+            current_foreign_key: &mut Option<(i64, ForeignKeyId)>,
+            current_columns: &mut Vec<(i64, ColumnId, Option<ColumnId>)>,
+            schema: &mut SqlSchema,
+        ) {
+            current_columns.sort_by_key(|(seq, _, _)| *seq);
+            let fkid = if let Some((_, id)) = current_foreign_key {
+                *id
+            } else {
+                return;
+            };
+
+            // SQLite allows foreign key definitions without specifying the referenced columns, it then
+            // assumes the pk is used.
+            if current_columns[0].2.is_none() {
+                let referenced_table_pk_columns = schema
+                    .walk(fkid)
+                    .referenced_table()
+                    .primary_key_columns()
+                    .into_iter()
+                    .flatten()
+                    .map(|w| w.as_column().id)
+                    .collect::<Vec<_>>();
+
+                if referenced_table_pk_columns.len() == current_columns.len() {
+                    for (col, referenced) in current_columns.drain(..).zip(referenced_table_pk_columns) {
+                        schema.push_foreign_key_column(fkid, [col.1, referenced]);
+                    }
+                }
+            } else {
+                for (_, col, referenced) in current_columns.iter() {
+                    schema.push_foreign_key_column(fkid, [*col, referenced.unwrap()]);
+                }
+            }
+
+            *current_foreign_key = None;
+            current_columns.clear();
+        }
+
         for row in result_set.into_iter() {
             trace!("got FK description row {:?}", row);
-            let id = row.get("id").and_then(|x| x.as_i64()).expect("id");
-            let seq = row.get("seq").and_then(|x| x.as_i64()).expect("seq");
-            let column = row.get("from").and_then(|x| x.to_string()).expect("from");
-            // this can be null if the primary key and shortened fk syntax was used
-            let referenced_column = row.get("to").and_then(|x| x.to_string());
-            let referenced_table = row.get("table").and_then(|x| x.to_string()).expect("table");
-            match intermediate_fks.get_mut(&id) {
-                Some(fk) => {
-                    fk.columns.insert(seq, column);
-                    if let Some(column) = referenced_column {
-                        fk.referenced_columns.insert(seq, column);
-                    };
-                }
-                None => {
-                    let mut columns: BTreeMap<i64, String> = BTreeMap::new();
-                    columns.insert(seq, column);
-                    let mut referenced_columns: BTreeMap<i64, String> = BTreeMap::new();
-
-                    if let Some(column) = referenced_column {
-                        referenced_columns.insert(seq, column);
-                    };
-                    let on_delete_action = match row
-                        .get("on_delete")
-                        .and_then(|x| x.to_string())
-                        .expect("on_delete")
-                        .to_lowercase()
-                        .as_str()
-                    {
-                        "no action" => ForeignKeyAction::NoAction,
-                        "restrict" => ForeignKeyAction::Restrict,
-                        "set null" => ForeignKeyAction::SetNull,
-                        "set default" => ForeignKeyAction::SetDefault,
-                        "cascade" => ForeignKeyAction::Cascade,
-                        s => panic!("Unrecognized on delete action '{}'", s),
-                    };
-                    let on_update_action = match row
-                        .get("on_update")
-                        .and_then(|x| x.to_string())
-                        .expect("on_update")
-                        .to_lowercase()
-                        .as_str()
-                    {
-                        "no action" => ForeignKeyAction::NoAction,
-                        "restrict" => ForeignKeyAction::Restrict,
-                        "set null" => ForeignKeyAction::SetNull,
-                        "set default" => ForeignKeyAction::SetDefault,
-                        "cascade" => ForeignKeyAction::Cascade,
-                        s => panic!("Unrecognized on update action '{}'", s),
-                    };
-                    let fk = IntermediateForeignKey {
-                        columns,
-                        referenced_table,
-                        referenced_columns,
-                        on_delete_action,
-                        on_update_action,
-                    };
-                    intermediate_fks.insert(id, fk);
-                }
-            };
-        }
-
-        let mut fks: Vec<ForeignKey> = intermediate_fks
-            .values()
-            .map(|intermediate_fk| {
-                let mut column_keys: Vec<&i64> = intermediate_fk.columns.keys().collect();
-                column_keys.sort();
-                let mut columns: Vec<String> = vec![];
-                columns.reserve(column_keys.len());
-                for i in column_keys {
-                    columns.push(intermediate_fk.columns[i].to_owned());
-                }
-
-                let mut referenced_column_keys: Vec<&i64> = intermediate_fk.referenced_columns.keys().collect();
-                referenced_column_keys.sort();
-                let mut referenced_columns: Vec<String> = vec![];
-                referenced_columns.reserve(referenced_column_keys.len());
-                for i in referenced_column_keys {
-                    referenced_columns.push(intermediate_fk.referenced_columns[i].to_owned());
-                }
-
-                let fk = ForeignKey {
-                    columns,
-                    referenced_table: intermediate_fk.referenced_table.to_owned(),
-                    referenced_columns,
-                    on_delete_action: intermediate_fk.on_delete_action.to_owned(),
-                    on_update_action: intermediate_fk.on_update_action.to_owned(),
-
-                    // Not relevant in SQLite since we cannot ALTER or DROP foreign keys by
-                    // constraint name.
-                    constraint_name: None,
+            let id = row.get("id").and_then(|x| x.as_integer()).expect("id");
+            let seq = row.get("seq").and_then(|x| x.as_integer()).expect("seq");
+            let (column_id, referenced_table_id, referenced_column_id) =
+                if let Some(ids) = get_ids(&row, table_id, table_ids, schema) {
+                    ids
+                } else {
+                    continue;
                 };
 
-                trace!("Detected foreign key {:?}", fk);
+            match &mut current_foreign_key {
+                None => {
+                    let foreign_key_id =
+                        schema.push_foreign_key(None, [table_id, referenced_table_id], get_referential_actions(&row));
+                    current_foreign_key = Some((id, foreign_key_id));
+                }
+                Some((sqlite_id, _)) if *sqlite_id == id => {}
+                Some(_) => {
+                    // Flush current foreign key.
+                    flush_current_fk(&mut current_foreign_key, &mut current_foreign_key_columns, schema);
 
-                fk
-            })
-            .collect();
-
-        fks.sort_unstable_by_key(|fk| fk.columns.clone());
-
-        Ok(fks)
-    }
-
-    async fn get_indices(&self, table: &str) -> DescriberResult<Vec<Index>> {
-        let sql = format!(r#"PRAGMA index_list("{}");"#, table);
-        let result_set = self.conn.query_raw(&sql, &[]).await?;
-        trace!("Got indices description results: {:?}", result_set);
-
-        let mut indices = Vec::new();
-        let filtered_rows = result_set
-            .into_iter()
-            // Exclude primary keys, they are inferred separately.
-            .filter(|row| row.get("origin").and_then(|origin| origin.as_str()).unwrap() != "pk")
-            // Exclude partial indices
-            .filter(|row| !row.get("partial").and_then(|partial| partial.as_bool()).unwrap());
-
-        for row in filtered_rows {
-            let mut valid_index = true;
-
-            let is_unique = row.get("unique").and_then(|x| x.as_bool()).expect("get unique");
-            let name = row.get("name").and_then(|x| x.to_string()).expect("get name");
-            let mut index = Index {
-                name: name.clone(),
-                tpe: match is_unique {
-                    true => IndexType::Unique,
-                    false => IndexType::Normal,
-                },
-                columns: vec![],
-                algorithm: None,
-            };
-
-            let sql = format!(r#"PRAGMA index_info("{}");"#, name);
-            let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for index info");
-            trace!("Got index description results: {:?}", result_set);
-
-            for row in result_set.into_iter() {
-                //if the index is on a rowid or expression, the name of the column will be null, we ignore these for now
-                match row.get("name").and_then(|x| x.to_string()) {
-                    Some(name) => {
-                        let pos = row.get("seqno").and_then(|x| x.as_i64()).expect("get seqno") as usize;
-                        if index.columns.len() <= pos {
-                            index.columns.resize(pos + 1, IndexColumn::default());
-                        }
-                        index.columns[pos] = IndexColumn::new(name);
-                    }
-                    None => valid_index = false,
+                    let foreign_key_id =
+                        schema.push_foreign_key(None, [table_id, referenced_table_id], get_referential_actions(&row));
+                    current_foreign_key = Some((id, foreign_key_id));
                 }
             }
 
-            let sql = format!(r#"PRAGMA index_xinfo("{}");"#, name);
-            let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for index info");
-            trace!("Got index description results: {:?}", result_set);
-
-            for row in result_set.into_iter() {
-                //if the index is on a rowid or expression, the name of the column will be null, we ignore these for now
-                if row.get("name").and_then(|x| x.to_string()).is_some() {
-                    let pos = row.get("seqno").and_then(|x| x.as_i64()).expect("get seqno") as usize;
-
-                    let sort_order = row.get("desc").and_then(|r| r.as_i64()).map(|v| match v {
-                        0 => SQLSortOrder::Asc,
-                        _ => SQLSortOrder::Desc,
-                    });
-
-                    index.columns[pos].sort_order = sort_order;
-                }
-            }
-
-            if valid_index {
-                indices.push(index)
-            }
+            current_foreign_key_columns.push((seq, column_id, referenced_column_id));
         }
 
-        Ok(indices)
+        // Flush the last foreign key.
+        flush_current_fk(&mut current_foreign_key, &mut current_foreign_key_columns, schema);
+
+        Ok(())
     }
 }
 
-fn get_column_type(tpe: &str, arity: ColumnArity) -> ColumnType {
-    let tpe_lower = tpe.to_lowercase();
+async fn push_columns(
+    table_name: &str,
+    table_id: TableId,
+    schema: &mut SqlSchema,
+    conn: &(dyn Connection + Send + Sync),
+) -> DescriberResult<()> {
+    let sql = format!(r#"PRAGMA table_info ("{}")"#, table_name);
+    let result_set = conn.query_raw(&sql, &[]).await?;
+    let mut pk_cols: BTreeMap<i64, ColumnId> = BTreeMap::new();
+    for row in result_set {
+        trace!("Got column row {:?}", row);
+        let is_required = row.get("notnull").and_then(|x| x.as_bool()).expect("notnull");
 
-    let family = match tpe_lower.as_ref() {
+        let arity = if is_required {
+            ColumnArity::Required
+        } else {
+            ColumnArity::Nullable
+        };
+
+        let tpe = get_column_type(row.get_expect_string("type"), arity);
+
+        let default = match row.get("dflt_value") {
+            None => None,
+            Some(val) if val.is_null() => None,
+            Some(Value::Text(Some(cow_string))) => {
+                let default_string = cow_string.to_string();
+
+                if default_string.to_lowercase() == "null" {
+                    None
+                } else {
+                    Some(match &tpe.family {
+                        ColumnTypeFamily::Int => match SqlSchemaDescriber::parse_int(&default_string) {
+                            Some(int_value) => DefaultValue::value(int_value),
+                            None => DefaultValue::db_generated(default_string),
+                        },
+                        ColumnTypeFamily::BigInt => match SqlSchemaDescriber::parse_big_int(&default_string) {
+                            Some(int_value) => DefaultValue::value(int_value),
+                            None => DefaultValue::db_generated(default_string),
+                        },
+                        ColumnTypeFamily::Float => match SqlSchemaDescriber::parse_float(&default_string) {
+                            Some(float_value) => DefaultValue::value(float_value),
+                            None => DefaultValue::db_generated(default_string),
+                        },
+                        ColumnTypeFamily::Decimal => match SqlSchemaDescriber::parse_float(&default_string) {
+                            Some(float_value) => DefaultValue::value(float_value),
+                            None => DefaultValue::db_generated(default_string),
+                        },
+                        ColumnTypeFamily::Boolean => match SqlSchemaDescriber::parse_int(&default_string) {
+                            Some(PrismaValue::Int(1)) => DefaultValue::value(true),
+                            Some(PrismaValue::Int(0)) => DefaultValue::value(false),
+                            _ => match SqlSchemaDescriber::parse_bool(&default_string) {
+                                Some(bool_value) => DefaultValue::value(bool_value),
+                                None => DefaultValue::db_generated(default_string),
+                            },
+                        },
+                        ColumnTypeFamily::String => {
+                            DefaultValue::value(unquote_sqlite_string_default(&default_string).into_owned())
+                        }
+                        ColumnTypeFamily::DateTime => match default_string.to_lowercase().as_str() {
+                            "current_timestamp" | "datetime(\'now\')" | "datetime(\'now\', \'localtime\')" => {
+                                DefaultValue::now()
+                            }
+                            _ => DefaultValue::db_generated(default_string),
+                        },
+                        ColumnTypeFamily::Binary => DefaultValue::db_generated(default_string),
+                        ColumnTypeFamily::Json => DefaultValue::db_generated(default_string),
+                        ColumnTypeFamily::Uuid => DefaultValue::db_generated(default_string),
+                        ColumnTypeFamily::Enum(_) => DefaultValue::value(PrismaValue::Enum(default_string)),
+                        ColumnTypeFamily::Unsupported(_) => DefaultValue::db_generated(default_string),
+                    })
+                }
+            }
+            Some(_) => None,
+        };
+
+        let pk_col = row.get("pk").and_then(|x| x.as_integer()).expect("primary key");
+
+        let column_id = schema.push_column(
+            table_id,
+            Column {
+                name: row.get_expect_string("name"),
+                tpe,
+                default,
+                auto_increment: false,
+            },
+        );
+
+        if pk_col > 0 {
+            pk_cols.insert(pk_col, column_id);
+        }
+    }
+
+    if !pk_cols.is_empty() {
+        let pk_id = schema.push_primary_key(table_id, String::new());
+        for column_id in pk_cols.values() {
+            schema.push_index_column(crate::IndexColumn {
+                index_id: pk_id,
+                column_id: *column_id,
+                sort_order: None,
+                length: None,
+            });
+        }
+
+        // Integer ID columns are always implemented with either row id or autoincrement
+        if pk_cols.len() == 1 {
+            let pk_col_id = *pk_cols.values().next().unwrap();
+            let pk_col = &mut schema.columns[pk_col_id.0 as usize];
+            // See https://www.sqlite.org/lang_createtable.html for the exact logic.
+            if pk_col.1.tpe.full_data_type.eq_ignore_ascii_case("INTEGER") {
+                pk_col.1.auto_increment = true;
+                pk_col.1.tpe.arity = ColumnArity::Required;
+            }
+        }
+    }
+
+    Ok(())
+}
+
+async fn push_indexes(
+    table: &str,
+    table_id: TableId,
+    schema: &mut SqlSchema,
+    conn: &(dyn Connection + Send + Sync),
+) -> DescriberResult<()> {
+    let sql = format!(r#"PRAGMA index_list("{}");"#, table);
+    let result_set = conn.query_raw(&sql, &[]).await?;
+    let mut indexes = Vec::new(); // (index_name, is_unique, columns)
+
+    let filtered_rows = result_set
+        .into_iter()
+        // Exclude primary keys, they are inferred separately.
+        .filter(|row| row.get("origin").and_then(|origin| origin.as_str()).unwrap() != "pk")
+        // Exclude partial indices
+        .filter(|row| !row.get("partial").and_then(|partial| partial.as_bool()).unwrap());
+
+    for row in filtered_rows {
+        let mut valid_index = true;
+
+        let is_unique = row.get_expect_bool("unique");
+        let index_name = row.get_expect_string("name");
+        let mut columns = Vec::new();
+
+        let sql = format!(r#"PRAGMA index_info("{}");"#, index_name);
+        let result_set = conn.query_raw(&sql, &[]).await?;
+        trace!("Got index description results: {:?}", result_set);
+
+        for row in result_set.into_iter() {
+            // if the index is on a rowid or expression, the name of the column will be null,
+            // we ignore these for now
+            match row
+                .get_string("name")
+                .and_then(|name| schema.walk(table_id).column(&name))
+            {
+                Some(col) => {
+                    columns.push((col.id, SQLSortOrder::Asc));
+                }
+                None => valid_index = false,
+            }
+        }
+
+        let sql = format!(r#"PRAGMA index_xinfo("{}");"#, index_name);
+        let result_set = conn.query_raw(&sql, &[]).await?;
+        trace!("Got index description results: {:?}", result_set);
+
+        for row in result_set.into_iter() {
+            //if the index is on a rowid or expression, the name of the column will be null, we ignore these for now
+            if row.get("name").and_then(|x| x.to_string()).is_some() {
+                let pos = row.get_expect_i64("seqno");
+                let sort_order = match row.get_expect_i64("desc") {
+                    0 => SQLSortOrder::Asc,
+                    _ => SQLSortOrder::Desc,
+                };
+                if let Some(col) = columns.get_mut(pos as usize) {
+                    col.1 = sort_order;
+                }
+            }
+        }
+
+        if valid_index {
+            indexes.push((index_name, is_unique, columns))
+        }
+    }
+
+    for (index_name, unique, columns) in indexes {
+        let index_id = if unique {
+            schema.push_unique_constraint(table_id, index_name)
+        } else {
+            schema.push_index(table_id, index_name)
+        };
+
+        for (column_id, sort_order) in columns {
+            schema.push_index_column(crate::IndexColumn {
+                index_id,
+                column_id,
+                sort_order: Some(sort_order),
+                length: None,
+            });
+        }
+    }
+
+    Ok(())
+}
+
+fn get_column_type(mut tpe: String, arity: ColumnArity) -> ColumnType {
+    tpe.make_ascii_lowercase();
+    let family = match tpe.as_ref() {
         // SQLite only has a few native data types: https://www.sqlite.org/datatype3.html
         // It's tolerant though, and you can assign any data type you like to columns
         "int" => ColumnTypeFamily::Int,
@@ -543,7 +555,7 @@ fn get_column_type(tpe: &str, arity: ColumnArity) -> ColumnType {
         data_type => ColumnTypeFamily::Unsupported(data_type.into()),
     };
     ColumnType {
-        full_data_type: tpe.to_string(),
+        full_data_type: tpe,
         family,
         arity,
         native_type: None,

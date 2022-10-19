@@ -1,9 +1,7 @@
-use graphql_parser as gql;
-use query_core::{BatchDocument, Operation, QueryDocument};
+use super::GraphQLProtocolAdapter;
+use query_core::{BatchDocument, BatchDocumentTransaction, Operation, QueryDocument};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-
-use super::GraphQLProtocolAdapter;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", untagged)]
@@ -25,11 +23,16 @@ pub struct SingleQuery {
 pub struct MultiQuery {
     batch: Vec<SingleQuery>,
     transaction: bool,
+    isolation_level: Option<String>,
 }
 
 impl MultiQuery {
-    pub fn new(batch: Vec<SingleQuery>, transaction: bool) -> Self {
-        Self { batch, transaction }
+    pub fn new(batch: Vec<SingleQuery>, transaction: bool, isolation_level: Option<String>) -> Self {
+        Self {
+            batch,
+            transaction,
+            isolation_level,
+        }
     }
 }
 
@@ -54,8 +57,7 @@ impl GraphQlBody {
     pub(crate) fn into_doc(self) -> crate::Result<QueryDocument> {
         match self {
             GraphQlBody::Single(body) => {
-                let gql_doc = gql::parse_query(&body.query)?;
-                let operation = GraphQLProtocolAdapter::convert(gql_doc, body.operation_name)?;
+                let operation = GraphQLProtocolAdapter::convert_query_to_operation(&body.query, body.operation_name)?;
 
                 Ok(QueryDocument::Single(operation))
             }
@@ -63,16 +65,15 @@ impl GraphQlBody {
                 let operations: crate::Result<Vec<Operation>> = bodies
                     .batch
                     .into_iter()
-                    .map(|body| {
-                        let gql_doc = gql::parse_query(&body.query)?;
-                        GraphQLProtocolAdapter::convert(gql_doc, body.operation_name)
-                    })
+                    .map(|body| GraphQLProtocolAdapter::convert_query_to_operation(&body.query, body.operation_name))
                     .collect();
+                let transaction = if bodies.transaction {
+                    Some(BatchDocumentTransaction::new(bodies.isolation_level))
+                } else {
+                    None
+                };
 
-                Ok(QueryDocument::Multi(BatchDocument::new(
-                    operations?,
-                    bodies.transaction,
-                )))
+                Ok(QueryDocument::Multi(BatchDocument::new(operations?, transaction)))
             }
         }
     }

@@ -55,6 +55,7 @@ pub fn test_connector(attr: TokenStream, input: TokenStream) -> TokenStream {
     let exclude_tagged = &attrs.exclude_tagged;
     let capabilities = &attrs.capabilities;
     let preview_features = &attrs.preview_features;
+    let namespaces = &attrs.namespaces;
 
     let test_function_name = &sig.ident;
     let test_function_name_lit = sig.ident.to_string();
@@ -74,10 +75,9 @@ pub fn test_connector(attr: TokenStream, input: TokenStream) -> TokenStream {
             #[test]
             #ignore_attr
             fn #test_function_name() {
-                let args = test_setup::TestApiArgs::new(#test_function_name_lit, &[#(#preview_features,)*]);
+                let args = test_setup::TestApiArgs::new(#test_function_name_lit, &[#(#preview_features,)*], &[#(#namespaces,)*]);
 
                 if test_setup::should_skip_test(
-                    &args,
                     BitFlags::empty() #(| Tags::#include_tagged)*,
                     BitFlags::empty() #(| Tags::#exclude_tagged)*,
                     BitFlags::empty() #(| Capabilities::#capabilities)*,
@@ -96,10 +96,9 @@ pub fn test_connector(attr: TokenStream, input: TokenStream) -> TokenStream {
             #[test]
             #ignore_attr
             fn #test_function_name() {
-                let args = test_setup::TestApiArgs::new(#test_function_name_lit, &[#(#preview_features,)*]);
+                let args = test_setup::TestApiArgs::new(#test_function_name_lit, &[#(#preview_features,)*], &[#(#namespaces,)*]);
 
                 if test_setup::should_skip_test(
-                    &args,
                     BitFlags::empty() #(| Tags::#include_tagged)*,
                     BitFlags::empty() #(| Tags::#exclude_tagged)*,
                     BitFlags::empty() #(| Capabilities::#capabilities)*,
@@ -122,6 +121,7 @@ struct TestConnectorAttrs {
     exclude_tagged: Vec<syn::Path>,
     capabilities: Vec<syn::Path>,
     preview_features: Vec<syn::LitStr>,
+    namespaces: Vec<syn::LitStr>,
     ignore_reason: Option<LitStr>,
 }
 
@@ -137,6 +137,18 @@ impl TestConnectorAttrs {
                 for item in list.nested {
                     match item {
                         NestedMeta::Lit(Lit::Str(s)) => self.preview_features.push(s),
+                        other => return Err(syn::Error::new_spanned(other, "Unexpected argument")),
+                    }
+                }
+
+                return Ok(());
+            }
+            p if p.is_ident("db_schemas") => {
+                self.namespaces.reserve(list.nested.len());
+
+                for item in list.nested {
+                    match item {
+                        NestedMeta::Lit(Lit::Str(s)) => self.namespaces.push(s),
                         other => return Err(syn::Error::new_spanned(other, "Unexpected argument")),
                     }
                 }

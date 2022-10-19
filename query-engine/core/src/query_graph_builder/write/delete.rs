@@ -1,16 +1,16 @@
 use super::*;
 use crate::{
-    constants::args,
     query_ast::*,
     query_graph::{QueryGraph, QueryGraphDependency},
-    ArgumentListLookup, ConnectorContext, FilteredQuery, ParsedField,
+    ArgumentListLookup, FilteredQuery, ParsedField,
 };
 use connector::filter::Filter;
 use prisma_models::ModelRef;
+use schema::ConnectorContext;
+use schema_builder::constants::args;
 use std::{convert::TryInto, sync::Arc};
 
 /// Creates a top level delete record query and adds it to the query graph.
-#[tracing::instrument(skip(graph, model, field))]
 pub fn delete_record(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
@@ -57,7 +57,6 @@ pub fn delete_record(
 }
 
 /// Creates a top level delete many records query and adds it to the query graph.
-#[tracing::instrument(skip(graph, model, field))]
 pub fn delete_many_records(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,

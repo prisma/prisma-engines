@@ -1,9 +1,8 @@
 use crate::common::{IndexColumn, IteratorJoin};
 use std::{borrow::Cow, fmt::Display};
 
-#[derive(Debug, Default)]
 pub struct AlterTable<'a> {
-    pub table_name: PostgresIdentifier<'a>,
+    pub table_name: &'a dyn Display,
     pub clauses: Vec<AlterTableClause<'a>>,
 }
 
@@ -23,7 +22,6 @@ impl Display for AlterTable<'_> {
     }
 }
 
-#[derive(Debug)]
 pub enum AlterTableClause<'a> {
     AddColumn(Column<'a>),
     AddForeignKey(ForeignKey<'a>),
@@ -185,11 +183,10 @@ impl Display for DropView<'_> {
     }
 }
 
-#[derive(Debug)]
 pub struct ForeignKey<'a> {
     pub constraint_name: Option<Cow<'a, str>>,
     pub constrained_columns: Vec<Cow<'a, str>>,
-    pub referenced_table: Cow<'a, str>,
+    pub referenced_table: &'a dyn Display,
     pub referenced_columns: Vec<Cow<'a, str>>,
     pub on_delete: Option<ForeignKeyAction>,
     pub on_update: Option<ForeignKeyAction>,
@@ -209,7 +206,7 @@ impl Display for ForeignKey<'_> {
 
         self.constrained_columns.iter().map(|s| Ident(s)).join(", ", f)?;
 
-        write!(f, ") REFERENCES \"{}\"(", self.referenced_table)?;
+        write!(f, ") REFERENCES {}(", self.referenced_table)?;
 
         self.referenced_columns.iter().map(|s| Ident(s)).join(", ", f)?;
 
@@ -331,12 +328,16 @@ impl<'a> Display for CreateEnum<'a> {
 pub enum IndexAlgorithm {
     BTree,
     Hash,
+    Gist,
+    Gin,
+    SpGist,
+    Brin,
 }
 
 pub struct CreateIndex<'a> {
     pub index_name: PostgresIdentifier<'a>,
     pub is_unique: bool,
-    pub table_reference: PostgresIdentifier<'a>,
+    pub table_reference: &'a dyn Display,
     pub columns: Vec<IndexColumn<'a>>,
     pub using: Option<IndexAlgorithm>,
 }
@@ -345,6 +346,10 @@ impl<'a> Display for CreateIndex<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let using = match self.using {
             Some(IndexAlgorithm::Hash) => " USING HASH ",
+            Some(IndexAlgorithm::Gist) => " USING GIST ",
+            Some(IndexAlgorithm::Gin) => " USING GIN ",
+            Some(IndexAlgorithm::SpGist) => " USING SPGIST ",
+            Some(IndexAlgorithm::Brin) => " USING BRIN ",
             _ => "",
         };
 
@@ -361,6 +366,11 @@ impl<'a> Display for CreateIndex<'a> {
             .iter()
             .map(|c| {
                 let mut rendered = Ident(&c.name).to_string();
+
+                if let Some(opclass) = &c.operator_class {
+                    rendered.push(' ');
+                    rendered.push_str(opclass.as_ref());
+                }
 
                 if let Some(sort_order) = c.sort_order {
                     rendered.push(' ');
@@ -412,7 +422,7 @@ mod tests {
         let create_index = CreateIndex {
             is_unique: true,
             index_name: "meow_idx".into(),
-            table_reference: "Cat".into(),
+            table_reference: &PostgresIdentifier::Simple(Cow::Borrowed("Cat")),
             columns,
             using: None,
         };
@@ -430,7 +440,7 @@ mod tests {
         let create_index = CreateIndex {
             is_unique: false,
             index_name: "meow_idx".into(),
-            table_reference: "Cat".into(),
+            table_reference: &PostgresIdentifier::Simple(Cow::Borrowed("Cat")),
             columns,
             using: Some(IndexAlgorithm::Hash),
         };
@@ -459,7 +469,7 @@ mod tests {
         let create_index = CreateIndex {
             is_unique: true,
             index_name: "meow_idx".into(),
-            table_reference: "Cat".into(),
+            table_reference: &PostgresIdentifier::Simple("Cat".into()),
             columns,
             using: None,
         };
@@ -473,28 +483,28 @@ mod tests {
     #[test]
     fn full_alter_table_add_foreign_key() {
         let alter_table = AlterTable {
-            table_name: PostgresIdentifier::WithSchema("public".into(), "Cat".into()),
+            table_name: &PostgresIdentifier::WithSchema("public".into(), "Cat".into()),
             clauses: vec![AlterTableClause::AddForeignKey(ForeignKey {
                 constrained_columns: vec!["friendName".into(), "friendTemperament".into()],
                 constraint_name: Some("cat_friend".into()),
                 on_delete: None,
                 on_update: None,
                 referenced_columns: vec!["name".into(), "temperament".into()],
-                referenced_table: "Dog".into(),
+                referenced_table: &"Dog",
             })],
         };
 
         let expected =
-            "ALTER TABLE \"public\".\"Cat\" ADD CONSTRAINT \"cat_friend\" FOREIGN KEY (\"friendName\", \"friendTemperament\") REFERENCES \"Dog\"(\"name\", \"temperament\")";
+            "ALTER TABLE \"public\".\"Cat\" ADD CONSTRAINT \"cat_friend\" FOREIGN KEY (\"friendName\", \"friendTemperament\") REFERENCES Dog(\"name\", \"temperament\")";
 
         assert_eq!(alter_table.to_string(), expected);
     }
 
     #[test]
     fn rename_table() {
-        let expected = r#"ALTER TABLE "Cat" RENAME TO "Dog""#;
+        let expected = r#"ALTER TABLE Cat RENAME TO "Dog""#;
         let alter_table = AlterTable {
-            table_name: "Cat".into(),
+            table_name: &"Cat",
             clauses: vec![AlterTableClause::RenameTo("Dog".into())],
         };
 

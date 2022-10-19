@@ -50,8 +50,40 @@ mod create_many {
     }
 
     // Covers: AutoIncrement ID working with basic autonincrement functionality.
-    #[connector_test(schema(schema_2), capabilities(CreateManyWriteableAutoIncId))]
+    #[connector_test(schema(schema_2), capabilities(CreateManyWriteableAutoIncId), exclude(CockroachDb))]
     async fn basic_create_many_autoincrement(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            createManyTest(data: [
+              { id: 123, str1: "1", str2: "1", str3: "1"},
+              { id: 321, str1: "2",            str3: null},
+              {          str1: "1"},
+            ]) {
+              count
+            }
+          }"#),
+          @r###"{"data":{"createManyTest":{"count":3}}}"###
+        );
+
+        Ok(())
+    }
+
+    fn schema_2_cockroachdb() -> String {
+        let schema = indoc! {
+            r#"model Test {
+              #id(id, BigInt, @id @default(autoincrement()))
+              str1 String
+              str2 String?
+              str3 String? @default("SOME_DEFAULT")
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // Covers: AutoIncrement ID working with basic autonincrement functionality.
+    #[connector_test(schema(schema_2_cockroachdb), only(CockroachDb))]
+    async fn basic_create_many_autoincrement_cockroachdb(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
             createManyTest(data: [

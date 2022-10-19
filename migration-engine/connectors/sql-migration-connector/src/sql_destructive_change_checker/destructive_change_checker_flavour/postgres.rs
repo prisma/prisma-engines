@@ -9,9 +9,9 @@ use crate::{
     sql_migration::{AlterColumn, ColumnTypeChange},
     sql_schema_differ::ColumnChanges,
 };
+use migration_connector::{BoxFuture, ConnectorResult};
 use sql_schema_describer::walkers::ColumnWalker;
 
-#[async_trait::async_trait]
 impl DestructiveChangeCheckerFlavour for PostgresFlavour {
     fn check_alter_column(
         &self,
@@ -26,21 +26,21 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
             type_change,
         } = alter_column;
 
-        if changes.arity_changed() && columns.previous().arity().is_nullable() && columns.next().arity().is_required() {
+        if changes.arity_changed() && columns.previous.arity().is_nullable() && columns.next.arity().is_required() {
             plan.push_unexecutable(
                 UnexecutableStepCheck::MadeOptionalFieldRequired {
-                    column: columns.previous().name().to_owned(),
-                    table: columns.previous().table().name().to_owned(),
+                    column: columns.previous.name().to_owned(),
+                    table: columns.previous.table().name().to_owned(),
                 },
                 step_index,
             )
         }
 
-        if changes.arity_changed() && !columns.previous().arity().is_list() && columns.next().arity().is_list() {
+        if changes.arity_changed() && !columns.previous.arity().is_list() && columns.next.arity().is_list() {
             plan.push_unexecutable(
                 UnexecutableStepCheck::MadeScalarFieldIntoArrayField {
-                    table: columns.previous().table().name().to_owned(),
-                    column: columns.previous().name().to_owned(),
+                    table: columns.previous.table().name().to_owned(),
+                    column: columns.previous.name().to_owned(),
                 },
                 step_index,
             )
@@ -54,8 +54,8 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
             Some(ColumnTypeChange::RiskyCast) => {
                 plan.push_warning(
                     SqlMigrationWarningCheck::RiskyCast {
-                        table: columns.previous().table().name().to_owned(),
-                        column: columns.previous().name().to_owned(),
+                        table: columns.previous.table().name().to_owned(),
+                        column: columns.previous.name().to_owned(),
                         previous_type,
                         next_type,
                     },
@@ -65,8 +65,8 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
             Some(ColumnTypeChange::NotCastable) => {
                 plan.push_warning(
                     SqlMigrationWarningCheck::NotCastable {
-                        table: columns.previous().table().name().to_owned(),
-                        column: columns.previous().name().to_owned(),
+                        table: columns.previous.table().name().to_owned(),
+                        column: columns.previous.name().to_owned(),
                         previous_type,
                         next_type,
                     },
@@ -85,22 +85,22 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
     ) {
         // Unexecutable drop and recreate.
         if changes.arity_changed()
-            && columns.previous().arity().is_nullable()
-            && columns.next().arity().is_required()
-            && columns.next().default().is_none()
+            && columns.previous.arity().is_nullable()
+            && columns.next.arity().is_required()
+            && columns.next.default().is_none()
         {
             plan.push_unexecutable(
                 UnexecutableStepCheck::AddedRequiredFieldToTable {
-                    column: columns.previous().name().to_owned(),
-                    table: columns.previous().table().name().to_owned(),
+                    column: columns.previous.name().to_owned(),
+                    table: columns.previous.table().name().to_owned(),
                 },
                 step_index,
             )
-        } else if columns.next().arity().is_required() && columns.next().default().is_none() {
+        } else if columns.next.arity().is_required() && columns.next.default().is_none() {
             plan.push_unexecutable(
                 UnexecutableStepCheck::DropAndRecreateRequiredColumn {
-                    column: columns.previous().name().to_owned(),
-                    table: columns.previous().table().name().to_owned(),
+                    column: columns.previous.name().to_owned(),
+                    table: columns.previous.table().name().to_owned(),
                 },
                 step_index,
             )
@@ -108,26 +108,30 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
             // todo this is probably due to a not castable type change. we should give that info in the warning
             plan.push_warning(
                 SqlMigrationWarningCheck::DropAndRecreateColumn {
-                    column: columns.previous().name().to_owned(),
-                    table: columns.previous().table().name().to_owned(),
+                    column: columns.previous.name().to_owned(),
+                    table: columns.previous.table().name().to_owned(),
                 },
                 step_index,
             )
         }
     }
 
-    async fn count_rows_in_table(&mut self, table_name: &str) -> migration_connector::ConnectorResult<i64> {
-        let query = format!("SELECT COUNT(*) FROM \"{}\"", table_name);
-        let result_set = self.query_raw(&query, &[]).await?;
-        super::extract_table_rows_count(table_name, result_set)
+    fn count_rows_in_table<'a>(&'a mut self, table_name: &'a str) -> BoxFuture<'a, ConnectorResult<i64>> {
+        Box::pin(async move {
+            let query = format!("SELECT COUNT(*) FROM \"{}\"", table_name);
+            let result_set = self.query_raw(&query, &[]).await?;
+            super::extract_table_rows_count(table_name, result_set)
+        })
     }
 
-    async fn count_values_in_column(
-        &mut self,
-        (table, column): (&str, &str),
-    ) -> migration_connector::ConnectorResult<i64> {
-        let query = format!("SELECT COUNT(*) FROM \"{}\" WHERE \"{}\" IS NOT NULL", table, column);
-        let result_set = self.query_raw(&query, &[]).await?;
-        super::extract_column_values_count(result_set)
+    fn count_values_in_column<'a>(
+        &'a mut self,
+        (table, column): (&'a str, &'a str),
+    ) -> BoxFuture<'a, ConnectorResult<i64>> {
+        Box::pin(async move {
+            let query = format!("SELECT COUNT(*) FROM \"{}\" WHERE \"{}\" IS NOT NULL", table, column);
+            let result_set = self.query_raw(&query, &[]).await?;
+            super::extract_column_values_count(result_set)
+        })
     }
 }

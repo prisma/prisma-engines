@@ -25,7 +25,6 @@ pub fn execute<'conn>(
 }
 
 /// Queries a single record.
-#[tracing::instrument(skip(tx, query, trace_id))]
 fn read_one(
     tx: &mut dyn ConnectionLike,
     query: RecordQuery,

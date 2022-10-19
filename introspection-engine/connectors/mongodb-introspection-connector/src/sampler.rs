@@ -1,8 +1,9 @@
 mod field_type;
 mod statistics;
 
+use datamodel_renderer as render;
 use futures::TryStreamExt;
-use introspection_connector::{CompositeTypeDepth, IntrospectionResult, Version};
+use introspection_connector::{CompositeTypeDepth, IntrospectionContext, IntrospectionResult, Version};
 use mongodb::{
     bson::{doc, Document},
     options::AggregateOptions,
@@ -21,10 +22,10 @@ use statistics::*;
 /// - Indices are taken, but not if they are partial.
 pub(super) async fn sample(
     database: Database,
-    composite_type_depth: CompositeTypeDepth,
     schema: MongoSchema,
+    ctx: &IntrospectionContext,
 ) -> crate::Result<IntrospectionResult> {
-    let mut statistics = Statistics::new(composite_type_depth);
+    let mut statistics = Statistics::new(ctx.composite_type_depth);
     let mut warnings = Vec::new();
 
     for collection in schema.walk_collections() {
@@ -49,9 +50,20 @@ pub(super) async fn sample(
     }
 
     let data_model = statistics.into_datamodel(&mut warnings);
+    let is_empty = data_model.is_empty();
+
+    let data_model = if ctx.render_config {
+        let config = render::Configuration::from_psl(ctx.configuration());
+        let datamodel = psl::render_datamodel_to_string(&data_model, Some(ctx.configuration()));
+
+        format!("{}\n{}", config, datamodel)
+    } else {
+        psl::render_datamodel_to_string(&data_model, Some(ctx.configuration()))
+    };
 
     Ok(IntrospectionResult {
-        data_model,
+        data_model: psl::reformat(&data_model, 2).unwrap(),
+        is_empty,
         warnings,
         version: Version::NonPrisma,
     })

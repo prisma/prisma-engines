@@ -1,5 +1,45 @@
 extern crate proc_macro;
 
+#[proc_macro_derive(SimpleUserFacingError, attributes(user_facing))]
+pub fn derive_simple_user_facing_error(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let input = syn::parse_macro_input!(input as syn::DeriveInput);
+
+    let data = match &input.data {
+        syn::Data::Struct(data) => data,
+        _ => {
+            return syn::Error::new_spanned(input, "derive works only on structs")
+                .to_compile_error()
+                .into()
+        }
+    };
+
+    if !data.fields.is_empty() {
+        return syn::Error::new_spanned(&data.fields, "SimpleUserFacingError implementors cannot have fields")
+            .to_compile_error()
+            .into();
+    }
+
+    let UserErrorDeriveInput { ident, code, message } = match UserErrorDeriveInput::new(&input) {
+        Ok(input) => input,
+        Err(err) => return err.into_compile_error().into(),
+    };
+
+    proc_macro::TokenStream::from(quote::quote! {
+        impl serde::Serialize for #ident {
+            fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+                where S: serde::Serializer
+            {
+                serializer.serialize_none()
+            }
+        }
+
+        impl crate::SimpleUserFacingError for #ident {
+            const ERROR_CODE: &'static str = #code;
+            const MESSAGE: &'static str = #message;
+        }
+    })
+}
+
 #[proc_macro_derive(UserFacingError, attributes(user_facing))]
 pub fn derive_user_facing_error(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let input = syn::parse_macro_input!(input as syn::DeriveInput);

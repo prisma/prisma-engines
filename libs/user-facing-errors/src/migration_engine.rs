@@ -28,7 +28,7 @@ struct MigrationRollback {
 }
 
 // No longer used.
-#[derive(Debug, UserFacingError, Serialize)]
+#[derive(Debug, SimpleUserFacingError)]
 #[user_facing(
     code = "P3003",
     message = "The format of migrations changed, the saved migrations are no longer valid. To solve this problem, please follow the steps at: https://pris.ly/d/migrate"
@@ -44,7 +44,7 @@ pub struct MigrateSystemDatabase {
     pub database_name: String,
 }
 
-#[derive(Debug, UserFacingError, Serialize)]
+#[derive(Debug, SimpleUserFacingError)]
 #[user_facing(
     code = "P3005",
     message = "The database schema is not empty. Read more about how to baseline an existing production database: https://pris.ly/d/migrate-baseline"
@@ -117,7 +117,7 @@ pub struct FoundFailedMigrations {
     pub details: String,
 }
 
-#[derive(Debug, Serialize, UserFacingError)]
+#[derive(Debug, SimpleUserFacingError)]
 #[user_facing(
     code = "P3010",
     message = "The name of the migration is too long. It must not be longer than 200 characters (bytes)."
@@ -144,7 +144,7 @@ pub struct CannotRollBackSucceededMigration {
     pub migration_name: String,
 }
 
-#[derive(Debug, Serialize, UserFacingError)]
+#[derive(Debug, SimpleUserFacingError)]
 #[user_facing(
     code = "P3013",
     message = "Datasource provider arrays are no longer supported in migrate. Please change your datasource to use a single provider. Read more at https://pris.ly/multi-provider-deprecation"
@@ -246,24 +246,24 @@ pub struct ProviderSwitchedError {
     pub expected_provider: String,
 }
 
-#[derive(Debug, Serialize, UserFacingError)]
+#[derive(Debug, SimpleUserFacingError)]
 #[user_facing(
     code = "P3020",
     message = "The automatic creation of shadow databases is disabled on Azure SQL. Please set up a shadow database using the `shadowDatabaseUrl` datasource attribute.\nRead the docs page for more details: https://pris.ly/d/migrate-shadow"
 )]
 pub struct AzureMssqlShadowDb;
 
-#[derive(Debug, Serialize, UserFacingError)]
+#[derive(Debug, SimpleUserFacingError)]
 #[user_facing(
     code = "P3021",
     message = "Foreign keys cannot be created on this database. Learn more how to handle this: https://pris.ly/d/migrate-no-foreign-keys"
 )]
 pub struct ForeignKeyCreationNotAllowed;
 
-#[derive(Debug, Serialize, UserFacingError)]
+#[derive(Debug, SimpleUserFacingError)]
 #[user_facing(
     code = "P3022",
-    message = "Direct execution of DDL (Data Definition Language) SQL statements is disabled on this database. Please read more here how to handle this: https://pris.ly/d/migrate-no-direct-ddl"
+    message = "Direct execution of DDL (Data Definition Language) SQL statements is disabled on this database. Please read more here about how to handle this: https://pris.ly/d/migrate-no-direct-ddl"
 )]
 pub struct DirectDdlNotAllowed;
 

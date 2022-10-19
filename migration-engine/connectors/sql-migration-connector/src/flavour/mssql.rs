@@ -1,20 +1,16 @@
+mod connection;
 mod shadow_db;
 
-use crate::{
-    connection_wrapper::{connect, quaint_error_to_connector_error, Connection},
-    flavour::normalize_sql_schema,
-    SqlFlavour,
-};
+use self::connection::*;
+use crate::SqlFlavour;
 use connection_string::JdbcString;
-use datamodel::common::preview_features::PreviewFeature;
 use indoc::formatdoc;
 use migration_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult,
 };
 use quaint::{connector::MssqlUrl, prelude::Table};
-use sql_schema_describer::{mssql::MssqlSchemaExt, SqlSchema};
+use sql_schema_describer::SqlSchema;
 use std::{future, str::FromStr};
-use user_facing_errors::{introspection_engine::DatabaseSchemaInconsistent, KnownError};
 
 type State = super::State<Params, Connection>;
 
@@ -30,7 +26,7 @@ impl Params {
 }
 
 pub(crate) struct MssqlFlavour {
-    pub(crate) state: State,
+    state: State,
 }
 
 impl Default for MssqlFlavour {
@@ -78,53 +74,22 @@ impl SqlFlavour for MssqlFlavour {
         script: &'a str,
     ) -> BoxFuture<'a, ConnectorResult<()>> {
         with_connection(&mut self.state, move |_, connection| {
-            super::generic_apply_migration_script(migration_name, script, connection)
+            generic_apply_migration_script(migration_name, script, connection)
         })
     }
 
-    fn datamodel_connector(&self) -> &'static dyn datamodel::datamodel_connector::Connector {
-        sql_datamodel_connector::MSSQL
+    fn datamodel_connector(&self) -> &'static dyn psl::datamodel_connector::Connector {
+        psl::builtin_connectors::MSSQL
     }
 
     fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
-        use sql_schema_describer::{mssql as describer, DescriberErrorKind, SqlSchemaDescriberBackend};
         with_connection(&mut self.state, |params, connection| async move {
-            let mut schema = describer::SqlSchemaDescriber::new(connection.queryable())
-                .describe(params.url.schema())
-                .await
-                .map_err(|err| match err.into_kind() {
-                    DescriberErrorKind::QuaintError(err) => quaint_error_to_connector_error(
-                        err,
-                        &quaint::prelude::ConnectionInfo::Mssql(params.url.clone()),
-                    ),
-                    e @ DescriberErrorKind::CrossSchemaReference { .. } => {
-                        let err = KnownError::new(DatabaseSchemaInconsistent {
-                            explanation: e.to_string(),
-                        });
-
-                        ConnectorError::from(err)
-                    }
-                })?;
-
-            normalize_sql_schema(&mut schema, params.connector_params.preview_features);
-            let mssql_ext: &mut MssqlSchemaExt = schema.downcast_connector_data_mut();
-
-            // Remove this when the feature is GA
-            if !params
-                .connector_params
-                .preview_features
-                .contains(PreviewFeature::ExtendedIndexes)
-            {
-                mssql_ext.clustered_indexes.clear();
-                mssql_ext.nonclustered_primary_keys.clear();
-            }
-
-            Ok(schema)
+            connection.describe_schema(params).await
         })
     }
 
     fn migrations_table(&self) -> Table<'static> {
-        (self.schema_name().to_owned(), self.migrations_table_name().to_owned()).into()
+        (self.schema_name().to_owned(), crate::MIGRATIONS_TABLE_NAME.to_owned()).into()
     }
 
     fn connection_string(&self) -> Option<&str> {
@@ -142,17 +107,29 @@ impl SqlFlavour for MssqlFlavour {
             let params = self.state.get_unwrapped_params();
             let connection_string = &params.connector_params.connection_string;
             let (db_name, master_uri) = Self::master_url(connection_string)?;
-            let conn = connect(&master_uri.to_string()).await?;
+            let mut master_conn = Connection::new(&master_uri).await?;
 
             let query = format!("CREATE DATABASE [{}]", db_name);
-            conn.raw_cmd(&query).await?;
+            master_conn
+                .raw_cmd(
+                    &query,
+                    &Params {
+                        url: MssqlUrl::new(&master_uri).unwrap(),
+                        connector_params: ConnectorParams {
+                            connection_string: master_uri.clone(),
+                            preview_features: Default::default(),
+                            shadow_database_connection_string: None,
+                        },
+                    },
+                )
+                .await?;
 
-            let conn = connect(connection_string).await?;
+            let mut conn = Connection::new(&params.connector_params.connection_string).await?;
 
             // dbo is created automatically
-            if conn.connection_info().schema_name() != "dbo" {
-                let query = format!("CREATE SCHEMA {}", conn.connection_info().schema_name(),);
-                conn.raw_cmd(&query).await?;
+            if params.url.schema() != "dbo" {
+                let query = format!("CREATE SCHEMA {}", params.url.schema());
+                conn.raw_cmd(&query, params).await?;
             }
 
             Ok(db_name)
@@ -171,12 +148,9 @@ impl SqlFlavour for MssqlFlavour {
                 started_at              DATETIMEOFFSET NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 applied_steps_count     INT NOT NULL DEFAULT 0
             );
-        "#, self.schema_name(), self.migrations_table_name()};
+        "#, self.schema_name(), crate::MIGRATIONS_TABLE_NAME};
 
-        with_connection(
-            &mut self.state,
-            move |_, conn| async move { Ok(conn.raw_cmd(&sql).await?) },
-        )
+        Box::pin(async move { self.raw_cmd(&sql).await })
     }
 
     fn drop_database(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
@@ -198,31 +172,38 @@ impl SqlFlavour for MssqlFlavour {
             }
 
             let (db_name, master_uri) = Self::master_url(&params.connector_params.connection_string)?;
-            let conn = connect(&master_uri.to_string()).await?;
+            let mut conn = Connection::new(&master_uri.to_string()).await?;
 
             let query = format!("DROP DATABASE IF EXISTS [{}]", db_name);
-            conn.raw_cmd(&query).await?;
+            conn.raw_cmd(
+                &query,
+                &Params {
+                    connector_params: ConnectorParams {
+                        connection_string: master_uri.clone(),
+                        preview_features: Default::default(),
+                        shadow_database_connection_string: None,
+                    },
+                    url: MssqlUrl::new(&master_uri).unwrap(),
+                },
+            )
+            .await?;
 
             Ok(())
         })
     }
 
     fn drop_migrations_table(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
-        let sql = format!("DROP TABLE [{}].[{}]", self.schema_name(), self.migrations_table_name());
-        with_connection(
-            &mut self.state,
-            move |_, conn| async move { Ok(conn.raw_cmd(&sql).await?) },
-        )
+        let sql = format!("DROP TABLE [{}].[{}]", self.schema_name(), crate::MIGRATIONS_TABLE_NAME);
+        Box::pin(async move { self.raw_cmd(&sql).await })
     }
 
     fn query<'a>(
         &'a mut self,
         query: quaint::ast::Query<'a>,
     ) -> BoxFuture<'a, ConnectorResult<quaint::prelude::ResultSet>> {
-        with_connection(
-            &mut self.state,
-            move |_, conn| async move { Ok(conn.query(query).await?) },
-        )
+        with_connection(&mut self.state, move |params, conn| async move {
+            conn.query(query, params).await
+        })
     }
 
     fn query_raw<'a>(
@@ -230,13 +211,9 @@ impl SqlFlavour for MssqlFlavour {
         sql: &'a str,
         params: &'a [quaint::Value<'a>],
     ) -> BoxFuture<'a, ConnectorResult<quaint::prelude::ResultSet>> {
-        with_connection(&mut self.state, move |_, conn| async move {
-            Ok(conn.query_raw(sql, params).await?)
+        with_connection(&mut self.state, move |conn_params, conn| async move {
+            conn.query_raw(sql, params, conn_params).await
         })
-    }
-
-    fn run_query_script<'a>(&'a mut self, sql: &'a str) -> BoxFuture<'a, ConnectorResult<()>> {
-        self.raw_cmd(sql)
     }
 
     fn reset(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
@@ -346,30 +323,33 @@ impl SqlFlavour for MssqlFlavour {
                 schema_name
             );
 
-            connection.raw_cmd(&drop_procedures).await?;
-            connection.raw_cmd(&drop_views).await?;
-            connection.raw_cmd(&drop_shared_defaults).await?;
-            connection.raw_cmd(&drop_fks).await?;
-            connection.raw_cmd(&drop_tables).await?;
-            connection.raw_cmd(&drop_types).await?;
+            connection.raw_cmd(&drop_procedures, params).await?;
+            connection.raw_cmd(&drop_views, params).await?;
+            connection.raw_cmd(&drop_shared_defaults, params).await?;
+            connection.raw_cmd(&drop_fks, params).await?;
+            connection.raw_cmd(&drop_tables, params).await?;
+            connection.raw_cmd(&drop_types, params).await?;
 
             Ok(())
         })
     }
 
+    fn empty_database_schema(&self) -> SqlSchema {
+        let mut schema = SqlSchema::default();
+        schema.set_connector_data(Box::new(sql_schema_describer::mssql::MssqlSchemaExt::default()));
+        schema
+    }
+
     fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
-        Box::pin(self.raw_cmd("SELECT 1"))
+        self.raw_cmd("SELECT 1")
     }
 
     fn raw_cmd<'a>(&'a mut self, sql: &'a str) -> BoxFuture<'a, ConnectorResult<()>> {
-        with_connection(&mut self.state, move |_, connection| async move {
-            Ok(connection.raw_cmd(sql).await?)
-        })
+        with_connection(&mut self.state, move |params, conn| conn.raw_cmd(sql, params))
     }
 
     fn set_params(&mut self, connector_params: ConnectorParams) -> ConnectorResult<()> {
-        let url =
-            MssqlUrl::new(&connector_params.connection_string).map_err(|err| ConnectorError::url_parse_error(err))?;
+        let url = MssqlUrl::new(&connector_params.connection_string).map_err(ConnectorError::url_parse_error)?;
         let params = Params { connector_params, url };
         self.state.set_params(params);
         Ok(())
@@ -436,9 +416,8 @@ impl SqlFlavour for MssqlFlavour {
                 let create_database = format!("CREATE DATABASE [{}]", shadow_database_name);
 
                 main_connection
-                    .raw_cmd(&create_database)
+                    .raw_cmd(&create_database, params)
                     .await
-                    .map_err(ConnectorError::from)
                     .map_err(|err| err.into_shadow_db_creation_error())?;
 
                 let connection_string = format!("jdbc:{}", params.connector_params.connection_string);
@@ -469,15 +448,15 @@ impl SqlFlavour for MssqlFlavour {
                 // leaving shadow databases behind in case of e.g. faulty
                 // migrations.
                 let ret = shadow_db::sql_schema_from_migrations_history(migrations, shadow_database).await;
-                clean_up_shadow_database(&shadow_database_name, main_connection).await?;
+                clean_up_shadow_database(&shadow_database_name, main_connection, params).await?;
                 ret
             })
         }
     }
 
     fn version(&mut self) -> BoxFuture<'_, ConnectorResult<Option<String>>> {
-        with_connection(&mut self.state, |_, connection| async {
-            Ok(connection.version().await?)
+        with_connection(&mut self.state, |params, connection| async {
+            connection.version(params).await
         })
     }
 }
@@ -493,11 +472,21 @@ where
         super::State::Connected(p, c) => Box::pin(f(p, c)),
         state @ super::State::WithParams(_) => Box::pin(async move {
             state
-                .try_connect(|params| Box::pin(connect(&params.connector_params.connection_string)))
+                .try_connect(|params| Box::pin(Connection::new(&params.connector_params.connection_string)))
                 .await?;
             with_connection(state, f).await
         }),
     }
+}
+
+/// Call this on the _main_ database when you are done with a shadow database.
+async fn clean_up_shadow_database(
+    database_name: &str,
+    connection: &mut Connection,
+    params: &Params,
+) -> ConnectorResult<()> {
+    let drop_database = format!("DROP DATABASE [{database_name}]");
+    connection.raw_cmd(&drop_database, params).await
 }
 
 #[cfg(test)]
@@ -524,10 +513,4 @@ mod tests {
             assert!(!debugged.contains(word));
         }
     }
-}
-
-/// Call this on the _main_ database when you are done with a shadow database.
-async fn clean_up_shadow_database(database_name: &str, connection: &Connection) -> ConnectorResult<()> {
-    let drop_database = format!("DROP DATABASE [{}]", database = database_name);
-    Ok(connection.raw_cmd(&drop_database).await?)
 }

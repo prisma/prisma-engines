@@ -1,7 +1,14 @@
+use std::time::Instant;
+
 use super::pipeline::QueryPipeline;
-use crate::{IrSerializer, Operation, QueryGraph, QueryGraphBuilder, QueryInterpreter, QuerySchemaRef, ResponseData};
+use crate::{IrSerializer, Operation, QueryGraph, QueryGraphBuilder, QueryInterpreter, ResponseData};
 use connector::{Connection, ConnectionLike, Connector};
 use futures::future;
+use query_engine_metrics::{
+    histogram, increment_counter, metrics, PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, PRISMA_CLIENT_QUERIES_TOTAL,
+};
+use schema::QuerySchemaRef;
+use tracing::Instrument;
 use tracing_futures::WithSubscriber;
 
 pub async fn execute_single_operation(
@@ -10,12 +17,18 @@ pub async fn execute_single_operation(
     operation: &Operation,
     trace_id: Option<String>,
 ) -> crate::Result<ResponseData> {
+    let operation_timer = Instant::now();
     let interpreter = QueryInterpreter::new(conn);
     let (query_graph, serializer) = QueryGraphBuilder::new(query_schema.clone()).build(operation.clone())?;
 
-    QueryPipeline::new(query_graph, interpreter, serializer)
+    increment_counter!(PRISMA_CLIENT_QUERIES_TOTAL);
+
+    let result = QueryPipeline::new(query_graph, interpreter, serializer)
         .execute(trace_id)
-        .await
+        .await;
+
+    histogram!(PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, operation_timer.elapsed());
+    result
 }
 
 pub async fn execute_many_operations(
@@ -32,11 +45,14 @@ pub async fn execute_many_operations(
     let mut results = Vec::with_capacity(queries.len());
 
     for (query_graph, serializer) in queries {
+        increment_counter!(PRISMA_CLIENT_QUERIES_TOTAL);
+        let operation_timer = Instant::now();
         let interpreter = QueryInterpreter::new(conn);
         let result = QueryPipeline::new(query_graph, interpreter, serializer)
             .execute(trace_id.clone())
             .await?;
 
+        histogram!(PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, operation_timer.elapsed());
         results.push(Ok(result));
     }
 
@@ -51,7 +67,13 @@ pub async fn execute_single_self_contained<C: Connector + Send + Sync>(
     force_transactions: bool,
 ) -> crate::Result<ResponseData> {
     let (query_graph, serializer) = QueryGraphBuilder::new(query_schema).build(operation)?;
-    let conn = connector.get_connection().await?;
+    let connection_name = connector.name();
+    let conn_span = info_span!(
+        "prisma:engine:connection",
+        user_facing = true,
+        "db.type" = connection_name.as_str()
+    );
+    let conn = connector.get_connection().instrument(conn_span).await?;
     execute_self_contained(conn, query_graph, serializer, force_transactions, trace_id).await
 }
 
@@ -68,7 +90,15 @@ pub async fn execute_many_self_contained<C: Connector + Send + Sync>(
     for op in operations {
         match QueryGraphBuilder::new(query_schema.clone()).build(op.clone()) {
             Ok((graph, serializer)) => {
-                let conn = connector.get_connection().await?;
+                increment_counter!(PRISMA_CLIENT_QUERIES_TOTAL);
+
+                let connection_name = connector.name();
+                let conn_span = info_span!(
+                    "prisma:engine:connection",
+                    user_facing = true,
+                    "db.type" = connection_name.as_str()
+                );
+                let conn = connector.get_connection().instrument(conn_span).await?;
 
                 futures.push(tokio::spawn(
                     execute_self_contained(conn, graph, serializer, force_transactions, trace_id.clone())
@@ -91,7 +121,6 @@ pub async fn execute_many_self_contained<C: Connector + Send + Sync>(
 }
 
 /// Execute the operation as a self-contained operation, if necessary wrapped in a transaction.
-#[tracing::instrument(skip(conn, graph, serializer, force_transactions))]
 async fn execute_self_contained(
     mut conn: Box<dyn Connection>,
     graph: QueryGraph,
@@ -99,8 +128,9 @@ async fn execute_self_contained(
     force_transactions: bool,
     trace_id: Option<String>,
 ) -> crate::Result<ResponseData> {
-    if force_transactions || graph.needs_transaction() {
-        let mut tx = conn.start_transaction().await?;
+    let operation_timer = Instant::now();
+    let result = if force_transactions || graph.needs_transaction() {
+        let mut tx = conn.start_transaction(None).await?;
         let result = execute_on(tx.as_connection_like(), graph, serializer, trace_id).await;
 
         if result.is_ok() {
@@ -112,7 +142,10 @@ async fn execute_self_contained(
         result
     } else {
         execute_on(conn.as_connection_like(), graph, serializer, trace_id).await
-    }
+    };
+
+    histogram!(PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, operation_timer.elapsed());
+    result
 }
 
 // Simplest execution on anything that's a ConnectionLike. Caller decides handling of connections and transactions.
@@ -122,10 +155,9 @@ async fn execute_on(
     serializer: IrSerializer,
     trace_id: Option<String>,
 ) -> crate::Result<ResponseData> {
+    increment_counter!(PRISMA_CLIENT_QUERIES_TOTAL);
     let interpreter = QueryInterpreter::new(conn);
-    let result = QueryPipeline::new(graph, interpreter, serializer)
+    QueryPipeline::new(graph, interpreter, serializer)
         .execute(trace_id)
-        .await;
-
-    result
+        .await
 }

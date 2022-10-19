@@ -11,12 +11,9 @@ pub struct IntrospectionFailed {
     pub introspection_error: String,
 }
 
-#[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(code = "P4001", message = "The introspected database was empty: {connection_string}")]
-pub struct IntrospectionResultEmpty {
-    /// There were no models and no enums detected in the database.
-    pub connection_string: String,
-}
+#[derive(Debug, SimpleUserFacingError)]
+#[user_facing(code = "P4001", message = "The introspected database was empty.")]
+pub struct IntrospectionResultEmpty;
 
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(

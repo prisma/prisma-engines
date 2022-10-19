@@ -1,5 +1,8 @@
 use crate::common::{Indented, IndexColumn, IteratorJoin, SQL_INDENTATION};
-use std::{borrow::Cow, fmt::Display};
+use std::{
+    borrow::Cow,
+    fmt::{Display, Write as _},
+};
 
 struct Ident<'a>(&'a str);
 
@@ -206,7 +209,7 @@ impl Display for CreateIndex<'_> {
                 let mut rendered = Ident(&s.name).to_string();
 
                 if let Some(length) = s.length {
-                    rendered.push_str(&format!("({})", length));
+                    write!(rendered, "({})", length).unwrap();
                 }
 
                 if let Some(sort_order) = s.sort_order {
@@ -222,9 +225,8 @@ impl Display for CreateIndex<'_> {
     }
 }
 
-#[derive(Debug, Default)]
 pub struct CreateTable<'a> {
-    pub table_name: Cow<'a, str>,
+    pub table_name: &'a dyn Display,
     pub columns: Vec<Column<'a>>,
     pub indexes: Vec<IndexClause<'a>>,
     pub primary_key: Vec<IndexColumn<'a>>,
@@ -235,7 +237,7 @@ pub struct CreateTable<'a> {
 impl Display for CreateTable<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str("CREATE TABLE ")?;
-        Display::fmt(&Ident(self.table_name.as_ref()), f)?;
+        Display::fmt(self.table_name, f)?;
 
         f.write_str(" (\n")?;
 
@@ -256,10 +258,10 @@ impl Display for CreateTable<'_> {
             self.primary_key
                 .iter()
                 .map(|col| {
-                    let mut rendered = format!("{}", Ident(&col.name));
+                    let mut rendered = Ident(&col.name).to_string();
 
                     if let Some(length) = col.length {
-                        rendered.push_str(&format!("({})", length));
+                        write!(rendered, "({})", length).unwrap();
                     }
 
                     if let Some(sort_order) = col.sort_order {
@@ -354,7 +356,7 @@ impl Display for IndexClause<'_> {
                 let mut rendered = format!("{}", Ident(col.name.as_ref()));
 
                 if let Some(length) = col.length {
-                    rendered.push_str(&format!("({})", length));
+                    write!(rendered, "({})", length).unwrap();
                 };
 
                 if let Some(sort_order) = col.sort_order {
@@ -397,7 +399,7 @@ mod tests {
     #[test]
     fn full_create_table() {
         let stmt = CreateTable {
-            table_name: "Cat".into(),
+            table_name: &Ident("Cat"),
             columns: vec![
                 Column {
                     column_type: "INTEGER".into(),
@@ -421,7 +423,7 @@ mod tests {
             indexes: vec![],
             default_character_set: Some("utf8mb4".into()),
             collate: Some("utf8mb4_unicode_ci".into()),
-            ..Default::default()
+            primary_key: Vec::new(),
         };
 
         let expected = indoc!(

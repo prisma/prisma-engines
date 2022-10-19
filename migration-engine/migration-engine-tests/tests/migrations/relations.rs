@@ -1,8 +1,8 @@
 mod cockroachdb;
 mod vitess;
 
-use datamodel::dml::ReferentialAction;
 use migration_engine_tests::test_api::*;
+use psl::dml::ReferentialAction;
 use sql_schema_describer::{ColumnTypeFamily, ForeignKeyAction};
 
 #[test_connector(exclude(Vitess))]
@@ -534,7 +534,7 @@ fn relations_with_mappings_on_referencing_side_can_reference_multiple_fields(api
     });
 }
 
-#[test_connector(exclude(Vitess))]
+#[test_connector(exclude(Vitess, CockroachDb))]
 fn on_delete_referential_actions_should_work(api: TestApi) {
     let actions = &[
         (ReferentialAction::SetNull, ForeignKeyAction::SetNull),
@@ -636,13 +636,13 @@ fn on_update_referential_actions_should_work(api: TestApi) {
         let dm = format!(
             r#"
             model A {{
-                id Int @id @default(autoincrement())
+                id BigInt @id @default(autoincrement())
                 b      B[]
             }}
 
             model B {{
-                id   Int @id
-                aId  Int?
+                id   BigInt @id
+                aId  BigInt?
                 a    A?    @relation(fields: [aId], references: [id], onUpdate: {})
             }}
         "#,

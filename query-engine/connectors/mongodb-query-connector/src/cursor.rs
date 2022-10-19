@@ -79,7 +79,7 @@ fn cursor_conditions(mut order_data: Vec<OrderByData>, reverse: bool) -> Documen
     // let mut conditions = vec![];
     let num_orderings = order_data.len();
 
-    let doc = if num_orderings == 1 {
+    if num_orderings == 1 {
         let order_data = order_data.pop().unwrap();
         map_orderby_condition(&order_data, reverse, true)
     } else {
@@ -105,9 +105,7 @@ fn cursor_conditions(mut order_data: Vec<OrderByData>, reverse: bool) -> Documen
         }
 
         doc! { "$or": or_conditions }
-    };
-
-    doc
+    }
 }
 
 fn map_orderby_condition(order_data: &OrderByData, reverse: bool, include_eq: bool) -> Document {

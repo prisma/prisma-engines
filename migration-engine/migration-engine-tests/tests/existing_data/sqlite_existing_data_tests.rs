@@ -16,7 +16,7 @@ fn changing_a_column_from_optional_to_required_with_a_default_is_safe(api: TestA
     let insert = Insert::multi_into(api.render_table_name("Test"), &["id", "age"])
         .values(("a", 12))
         .values(("b", 22))
-        .values(("c", Value::Integer(None)));
+        .values(("c", Value::Int32(None)));
 
     api.query(insert.into());
 
@@ -41,7 +41,10 @@ fn changing_a_column_from_optional_to_required_with_a_default_is_safe(api: TestA
     {
         let data = api.dump_table("Test");
         assert_eq!(data.len(), 3);
-        let ages: Vec<Option<i64>> = data.into_iter().map(|row| row.get("age").unwrap().as_i64()).collect();
+        let ages: Vec<Option<i64>> = data
+            .into_iter()
+            .map(|row| row.get("age").unwrap().as_integer())
+            .collect();
 
         // TODO: this is NOT what users would expect (it's a consequence of the stepped migration
         // process), we should have a more specific warning for this.

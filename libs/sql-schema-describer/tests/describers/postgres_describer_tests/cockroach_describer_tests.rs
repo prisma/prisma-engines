@@ -1,5 +1,6 @@
 use crate::test_api::*;
-use sql_schema_describer::{ColumnTypeFamily, IndexColumn, SQLSortOrder};
+use psl::dml::PrismaValue;
+use sql_schema_describer::{postgres::PostgresSchemaExt, ColumnTypeFamily};
 
 #[test_connector(tags(CockroachDb))]
 fn views_can_be_described(api: TestApi) {
@@ -47,6 +48,7 @@ fn all_cockroach_column_types_must_work(api: TestApi) {
             float_col FLOAT,
             int_col INT,
             numeric_col NUMERIC,
+            oid_col OID,
             smallint_col SMALLINT,
             smallserial_col SMALLSERIAL,
             serial_col SERIAL,
@@ -161,6 +163,10 @@ fn all_cockroach_column_types_must_work(api: TestApi) {
             c.assert_full_data_type("bpchar")
                 .assert_column_type_family(ColumnTypeFamily::String)
         })
+        .assert_column("oid_col", |c| {
+            c.assert_full_data_type("oid")
+                .assert_column_type_family(ColumnTypeFamily::Int)
+        })
         .assert_column("time_col", |c| {
             c.assert_full_data_type("time")
                 .assert_column_type_family(ColumnTypeFamily::DateTime)
@@ -209,7 +215,7 @@ fn all_cockroach_column_types_must_work(api: TestApi) {
 }
 
 #[test_connector(tags(CockroachDb))]
-fn cockroach_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
+fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
     let schema = format!(
         r##"
             CREATE TABLE "{schema_name}"."indexes_test" (
@@ -224,47 +230,170 @@ fn cockroach_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestAp
         schema_name = api.schema_name()
     );
     api.raw_cmd(&schema);
-
-    let schema = api.describe();
-
-    let table = schema.table_bang("indexes_test");
-    let index = &table.indices[1];
-
-    assert_eq!(
-        &index.columns,
-        &[
-            IndexColumn {
-                name: "name".to_string(),
-                sort_order: Some(SQLSortOrder::Asc),
-                length: None
-            },
-            IndexColumn {
-                name: "age".to_string(),
-                sort_order: Some(SQLSortOrder::Asc),
-                length: None
-            },
-        ]
-    );
-    assert!(index.tpe.is_unique());
-
-    let index = &table.indices[0];
-
-    assert!(!index.tpe.is_unique());
-    assert_eq!(
-        &index.columns,
-        &[
-            IndexColumn {
-                name: "age".to_string(),
-                sort_order: Some(SQLSortOrder::Asc),
-                length: None
-            },
-            IndexColumn {
-                name: "name".to_string(),
-                sort_order: Some(SQLSortOrder::Asc),
-                length: None
-            },
-        ]
-    );
+    let expectation = expect![[r#"
+        SqlSchema {
+            namespaces: [
+                "prisma-tests",
+            ],
+            tables: [
+                Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
+                    name: "indexes_test",
+                },
+            ],
+            enums: [],
+            columns: [
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "id",
+                        tpe: ColumnType {
+                            full_data_type: "text",
+                            family: String,
+                            arity: Required,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "name",
+                        tpe: ColumnType {
+                            full_data_type: "text",
+                            family: String,
+                            arity: Required,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "age",
+                        tpe: ColumnType {
+                            full_data_type: "int4",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ),
+            ],
+            foreign_keys: [],
+            foreign_key_columns: [],
+            indexes: [
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "indexes_test_pkey",
+                    tpe: PrimaryKey,
+                },
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "my_idx",
+                    tpe: Unique,
+                },
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "my_idx2",
+                    tpe: Normal,
+                },
+            ],
+            index_columns: [
+                IndexColumn {
+                    index_id: IndexId(
+                        0,
+                    ),
+                    column_id: ColumnId(
+                        0,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        1,
+                    ),
+                    column_id: ColumnId(
+                        1,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        1,
+                    ),
+                    column_id: ColumnId(
+                        2,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        2,
+                    ),
+                    column_id: ColumnId(
+                        2,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        2,
+                    ),
+                    column_id: ColumnId(
+                        1,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+            ],
+            views: [],
+            procedures: [],
+            user_defined_types: [],
+            connector_data: <ConnectorData>,
+        }
+    "#]];
+    api.expect_schema(expectation);
 }
 
 #[test_connector(tags(CockroachDb))]
@@ -280,14 +409,171 @@ fn escaped_characters_in_string_defaults(api: TestApi) {
     "#;
     api.raw_cmd(init);
     let schema = api.describe();
-    let table = schema.table_bang("Fruit");
+    let table = schema.table_walker("Fruit").unwrap();
 
     let expect_col = |name: &str, expected: &str| {
-        let col = table.column_bang(name);
-        let default = col.default.as_ref().unwrap().as_value().unwrap().as_string().unwrap();
+        let col = table.column(name).unwrap();
+        let default = col.default().unwrap().as_value().unwrap().as_string().unwrap();
         assert_eq!(default, expected);
     };
     expect_col("seasonality", r#""summer""#);
     expect_col("contains", r#"'potassium'"#);
     expect_col("sideNames", "top\ndown");
+}
+
+#[test_connector(tags(CockroachDb))]
+fn cockroachdb_sequences_must_work(api: TestApi) {
+    // https://www.cockroachlabs.com/docs/v21.2/create-sequence.html
+    let sql = r#"
+        -- Defaults
+        CREATE SEQUENCE "test";
+
+        -- Not cycling. All crdb sequences are like that.
+        CREATE SEQUENCE "testnotcycling" NO CYCLE;
+
+        -- Other options
+        CREATE SEQUENCE "testmore" 
+            INCREMENT 4
+            MINVALUE 10
+            MAXVALUE 100
+            START 20
+            CACHE 7;
+    "#;
+    api.raw_cmd(sql);
+
+    let schema = api.describe();
+    let ext: &PostgresSchemaExt = schema.downcast_connector_data();
+    let expected_ext = expect![[r#"
+        PostgresSchemaExt {
+            opclasses: [],
+            indexes: [],
+            sequences: [
+                Sequence {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
+                    name: "test",
+                    start_value: 1,
+                    min_value: 1,
+                    max_value: 9223372036854775807,
+                    increment_by: 1,
+                    cycle: false,
+                    cache_size: 1,
+                    virtual: false,
+                },
+                Sequence {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
+                    name: "testmore",
+                    start_value: 20,
+                    min_value: 10,
+                    max_value: 100,
+                    increment_by: 4,
+                    cycle: false,
+                    cache_size: 7,
+                    virtual: false,
+                },
+                Sequence {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
+                    name: "testnotcycling",
+                    start_value: 1,
+                    min_value: 1,
+                    max_value: 9223372036854775807,
+                    increment_by: 1,
+                    cycle: false,
+                    cache_size: 1,
+                    virtual: false,
+                },
+            ],
+            extensions: [],
+        }
+    "#]];
+    expected_ext.assert_debug_eq(&ext);
+}
+
+#[test_connector(tags(CockroachDb))]
+fn int_expressions_in_defaults(api: TestApi) {
+    let schema = r#"
+        CREATE TABLE "defaults" (
+            mysum INT8 NOT NULL DEFAULT 5 + 32
+        );
+    "#;
+
+    api.raw_cmd(schema);
+    let schema = api.describe();
+    let table = schema.table_walkers().next().unwrap();
+    let col = table.column("mysum").unwrap();
+    let value = col.default().unwrap().as_value().unwrap();
+    assert!(matches!(value, PrismaValue::Int(37)));
+}
+
+#[test_connector(tags(CockroachDb))]
+fn array_column_defaults(api: TestApi) {
+    let schema = r#"
+        CREATE TYPE "color" AS ENUM ('RED', 'GREEN', 'BLUE');
+
+        CREATE TABLE "defaults" (
+            text_empty TEXT[] NOT NULL DEFAULT '{}',
+            text TEXT[] NOT NULL DEFAULT '{ ''abc'' }',
+            text_c_escape TEXT[] NOT NULL DEFAULT E'{ \'abc\', \'def\' }',
+            colors COLOR[] NOT NULL DEFAULT '{ RED, GREEN }',
+            int_defaults INT4[] NOT NULL DEFAULT '{ 9, 12999, -4, 0, 1249849 }',
+            float_defaults DOUBLE PRECISION[] NOT NULL DEFAULT '{ 0, 9.12, 3.14, 0.1242, 124949.124949 }',
+            bool_defaults BOOLEAN[] NOT NULL DEFAULT '{ true, true, true, false }',
+            datetime_defaults TIMESTAMPTZ[] NOT NULL DEFAULT '{ "2022-09-01T08:00Z","2021-09-01T08:00Z"}'
+        );
+    "#;
+
+    api.raw_cmd(schema);
+    let schema = api.describe();
+    let table = schema.table_walkers().next().unwrap();
+
+    let assert_default = |colname: &str, expected_default: Vec<PrismaValue>| {
+        let col = table.column(colname).unwrap();
+        let value = col.default().unwrap().as_value().unwrap();
+        assert_eq!(value, &PrismaValue::List(expected_default));
+    };
+
+    assert_default("text_empty", vec![]);
+    assert_default("text", vec![PrismaValue::String("abc".to_owned())]);
+    assert_default("text_c_escape", vec!["abc".into(), "def".into()]);
+    assert_default(
+        "colors",
+        vec![
+            PrismaValue::Enum("RED".to_owned()),
+            PrismaValue::Enum("GREEN".to_owned()),
+        ],
+    );
+    assert_default(
+        "int_defaults",
+        vec![
+            PrismaValue::Int(9),
+            PrismaValue::Int(12999),
+            PrismaValue::Int(-4),
+            PrismaValue::Int(0),
+            PrismaValue::Int(1249849),
+        ],
+    );
+    assert_default(
+        "float_defaults",
+        vec![
+            PrismaValue::Float("0.0".parse().unwrap()),
+            PrismaValue::Float("9.12".parse().unwrap()),
+            PrismaValue::Float("3.14".parse().unwrap()),
+            PrismaValue::Float("0.1242".parse().unwrap()),
+            PrismaValue::Float("124949.124949".parse().unwrap()),
+        ],
+    );
+    assert_default(
+        "bool_defaults",
+        vec![
+            PrismaValue::Boolean(true),
+            PrismaValue::Boolean(true),
+            PrismaValue::Boolean(true),
+            PrismaValue::Boolean(false),
+        ],
+    );
 }

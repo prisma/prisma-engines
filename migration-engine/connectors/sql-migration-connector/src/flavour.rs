@@ -7,25 +7,24 @@ mod mysql;
 mod postgres;
 mod sqlite;
 
-use enumflags2::BitFlags;
 pub(crate) use mssql::MssqlFlavour;
 pub(crate) use mysql::MysqlFlavour;
 pub(crate) use postgres::PostgresFlavour;
 pub(crate) use sqlite::SqliteFlavour;
 
 use crate::{
-    connection_wrapper::Connection, sql_destructive_change_checker::DestructiveChangeCheckerFlavour,
-    sql_renderer::SqlRenderer, sql_schema_calculator::SqlSchemaCalculatorFlavour,
-    sql_schema_differ::SqlSchemaDifferFlavour,
+    sql_destructive_change_checker::DestructiveChangeCheckerFlavour, sql_renderer::SqlRenderer,
+    sql_schema_calculator::SqlSchemaCalculatorFlavour, sql_schema_differ::SqlSchemaDifferFlavour,
 };
-use datamodel::{common::preview_features::PreviewFeature, ValidatedSchema};
+use enumflags2::BitFlags;
 use migration_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult,
+    MigrationRecord, PersistenceNotInitializedError,
 };
-use quaint::prelude::Table;
+use psl::{PreviewFeature, ValidatedSchema};
+use quaint::prelude::{ConnectionInfo, Table};
 use sql_schema_describer::SqlSchema;
 use std::fmt::Debug;
-use user_facing_errors::migration_engine::ApplyMigrationError;
 
 /// P is the params, C is a connection.
 pub(crate) enum State<P, C> {
@@ -102,7 +101,13 @@ where
 }
 
 pub(crate) trait SqlFlavour:
-    DestructiveChangeCheckerFlavour + SqlRenderer + SqlSchemaDifferFlavour + SqlSchemaCalculatorFlavour + Debug
+    DestructiveChangeCheckerFlavour
+    + SqlRenderer
+    + SqlSchemaDifferFlavour
+    + SqlSchemaCalculatorFlavour
+    + Send
+    + Sync
+    + Debug
 {
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
 
@@ -132,7 +137,7 @@ pub(crate) trait SqlFlavour:
     fn create_migrations_table(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
 
     /// The datamodel connector corresponding to the flavour
-    fn datamodel_connector(&self) -> &'static dyn datamodel::datamodel_connector::Connector;
+    fn datamodel_connector(&self) -> &'static dyn psl::datamodel_connector::Connector;
 
     fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<SqlSchema>>;
 
@@ -142,10 +147,85 @@ pub(crate) trait SqlFlavour:
     /// Drop the migrations table
     fn drop_migrations_table(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
 
+    /// Return an empty database schema. This happens in the flavour, because we need
+    /// SqlSchema::connector_data to be set.
+    fn empty_database_schema(&self) -> SqlSchema {
+        SqlSchema::default()
+    }
+
     /// Check a connection to make sure it is usable by the migration engine.
     /// This can include some set up on the database, like ensuring that the
     /// schema we connect to exists.
     fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
+
+    fn load_migrations_table(
+        &mut self,
+    ) -> BoxFuture<'_, ConnectorResult<Result<Vec<MigrationRecord>, PersistenceNotInitializedError>>> {
+        use quaint::prelude::*;
+        Box::pin(async move {
+            let select = Select::from_table(self.migrations_table())
+                .column("id")
+                .column("checksum")
+                .column("finished_at")
+                .column("migration_name")
+                .column("logs")
+                .column("rolled_back_at")
+                .column("started_at")
+                .column("applied_steps_count")
+                .order_by("started_at".ascend());
+
+            let rows = match self.query(select.into()).await {
+                Ok(result) => result,
+                Err(err)
+                    if err.is_user_facing_error::<user_facing_errors::query_engine::TableDoesNotExist>()
+                        || err.is_user_facing_error::<user_facing_errors::common::InvalidModel>() =>
+                {
+                    return Ok(Err(PersistenceNotInitializedError))
+                }
+                err @ Err(_) => err?,
+            };
+
+            let rows = rows
+                .into_iter()
+                .map(|row| -> ConnectorResult<_> {
+                    Ok(MigrationRecord {
+                        id: row.get("id").and_then(|v| v.to_string()).ok_or_else(|| {
+                            ConnectorError::from_msg("Failed to extract `id` from `_prisma_migrations` row.".into())
+                        })?,
+                        checksum: row.get("checksum").and_then(|v| v.to_string()).ok_or_else(|| {
+                            ConnectorError::from_msg(
+                                "Failed to extract `checksum` from `_prisma_migrations` row.".into(),
+                            )
+                        })?,
+                        finished_at: row.get("finished_at").and_then(|v| v.as_datetime()),
+                        migration_name: row.get("migration_name").and_then(|v| v.to_string()).ok_or_else(|| {
+                            ConnectorError::from_msg(
+                                "Failed to extract `migration_name` from `_prisma_migrations` row.".into(),
+                            )
+                        })?,
+                        logs: None,
+                        rolled_back_at: row.get("rolled_back_at").and_then(|v| v.as_datetime()),
+                        started_at: row.get("started_at").and_then(|v| v.as_datetime()).ok_or_else(|| {
+                            ConnectorError::from_msg(
+                                "Failed to extract `started_at` from `_prisma_migrations` row.".into(),
+                            )
+                        })?,
+                        applied_steps_count: row.get("applied_steps_count").and_then(|v| v.as_integer()).ok_or_else(
+                            || {
+                                ConnectorError::from_msg(
+                                    "Failed to extract `applied_steps_count` from `_prisma_migrations` row.".into(),
+                                )
+                            },
+                        )? as u32,
+                    })
+                })
+                .collect::<Result<Vec<_>, _>>()?;
+
+            tracing::debug!("Found {} migrations in the migrations table.", rows.len());
+
+            Ok(Ok(rows))
+        })
+    }
 
     fn query<'a>(
         &'a mut self,
@@ -175,20 +255,12 @@ pub(crate) trait SqlFlavour:
         shadow_database_url: Option<String>,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>>;
 
-    /// Runs a single SQL script.
-    fn run_query_script<'a>(&'a mut self, sql: &'a str) -> BoxFuture<'a, ConnectorResult<()>>;
-
     /// Receive and validate connector params.
     fn set_params(&mut self, connector_params: ConnectorParams) -> ConnectorResult<()>;
 
-    /// Table to store applied migrations, the name part.
-    fn migrations_table_name(&self) -> &'static str {
-        "_prisma_migrations"
-    }
-
     /// Table to store applied migrations.
     fn migrations_table(&self) -> Table<'static> {
-        self.migrations_table_name().into()
+        crate::MIGRATIONS_TABLE_NAME.into()
     }
 
     fn version(&mut self) -> BoxFuture<'_, ConnectorResult<Option<String>>>;
@@ -203,71 +275,27 @@ fn validate_connection_infos_do_not_match(previous: &str, next: &str) -> Connect
     }
 }
 
-async fn generic_apply_migration_script(migration_name: &str, script: &str, conn: &Connection) -> ConnectorResult<()> {
-    conn.raw_cmd(script).await.map_err(|sql_error| {
-        ConnectorError::user_facing(ApplyMigrationError {
-            migration_name: migration_name.to_owned(),
-            database_error_code: String::from(sql_error.error_code().unwrap_or("none")),
-            database_error: ConnectorError::from(sql_error).to_string(),
-        })
-    })
-}
-
 /// Remove all usage of non-enabled preview feature elements from the SqlSchema.
 fn normalize_sql_schema(sql_schema: &mut SqlSchema, preview_features: BitFlags<PreviewFeature>) {
-    use sql_schema_describer::IndexType;
-
-    fn filter_fulltext_capabilities(schema: &mut SqlSchema) {
-        let indices = schema
-            .iter_tables_mut()
-            .flat_map(|(_, t)| t.indices.iter_mut().filter(|i| i.is_fulltext()));
-
-        for index in indices {
-            index.tpe = IndexType::Normal;
-        }
-    }
-
-    fn filter_extended_index_capabilities(schema: &mut SqlSchema) {
-        for (_, table) in schema.iter_tables_mut() {
-            if let Some(ref mut pk) = &mut table.primary_key {
-                for col in pk.columns.iter_mut() {
-                    col.length = None;
-                    col.sort_order = None;
-                }
-            }
-
-            let mut kept_indexes = Vec::new();
-
-            while let Some(mut index) = table.indices.pop() {
-                let mut remove_index = false;
-
-                for col in index.columns.iter_mut() {
-                    if col.length.is_some() {
-                        remove_index = true;
-                    }
-
-                    col.sort_order = None;
-                }
-
-                index.algorithm = None;
-
-                if !remove_index {
-                    kept_indexes.push(index);
-                }
-            }
-
-            kept_indexes.reverse();
-            table.indices = kept_indexes;
-        }
-    }
-
-    // Remove this when the feature is GA
-    if !preview_features.contains(PreviewFeature::ExtendedIndexes) {
-        filter_extended_index_capabilities(sql_schema);
-    }
-
     // Remove this when the feature is GA
     if !preview_features.contains(PreviewFeature::FullTextIndex) {
-        filter_fulltext_capabilities(sql_schema);
+        sql_schema.make_fulltext_indexes_normal();
+    }
+
+    if !preview_features.contains(PreviewFeature::MultiSchema) {
+        sql_schema.clear_namespaces();
+    }
+}
+
+fn quaint_error_to_connector_error(error: quaint::error::Error, connection_info: &ConnectionInfo) -> ConnectorError {
+    match user_facing_errors::quaint::render_quaint_error(error.kind(), connection_info) {
+        Some(user_facing_error) => user_facing_error.into(),
+        None => {
+            let msg = error
+                .original_message()
+                .map(String::from)
+                .unwrap_or_else(|| error.to_string());
+            ConnectorError::from_msg(msg)
+        }
     }
 }

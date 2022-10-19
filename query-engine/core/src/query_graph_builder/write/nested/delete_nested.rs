@@ -20,7 +20,6 @@ use std::{convert::TryInto, sync::Arc};
 /// - If the relation is inlined but not in the parent, we can directly generate a delete on the record with the parent ID.
 ///
 /// We always need to make sure that the records are connected before deletion.
-#[tracing::instrument(skip(graph, parent_node, parent_relation_field, value, child_model))]
 pub fn nested_delete(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
@@ -86,16 +85,24 @@ pub fn nested_delete(
             ),
         )?;
     } else {
-        let val: PrismaValue = value.try_into()?;
-        let should_delete = if let PrismaValue::Boolean(b) = val { b } else { false };
+        let should_delete = match &value {
+            ParsedInputValue::Single(PrismaValue::Boolean(b)) => *b,
+            ParsedInputValue::Map(_) => true,
+            _ => false,
+        };
 
         if should_delete {
+            let filter = match value {
+                ParsedInputValue::Map(map) => extract_filter(map, child_model)?,
+                _ => Filter::empty(),
+            };
+
             let find_child_records_node =
-                utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, Filter::empty())?;
+                utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, filter.clone())?;
 
             let delete_record_node = graph.create_node(Query::Write(WriteQuery::DeleteRecord(DeleteRecord {
                 model: Arc::clone(&child_model),
-                record_filter: None,
+                record_filter: Some(filter.into()),
             })));
 
             utils::insert_emulated_on_delete(
@@ -124,7 +131,7 @@ pub fn nested_delete(
                         }?;
 
                         if let Node::Query(Query::Write(WriteQuery::DeleteRecord(ref mut dq))) = delete_record_node {
-                            dq.record_filter = Some(child_id.into());
+                            dq.set_selectors(vec![child_id]);
                         }
 
                         Ok(delete_record_node)
@@ -137,7 +144,6 @@ pub fn nested_delete(
     Ok(())
 }
 
-#[tracing::instrument(skip(graph, parent, parent_relation_field, value, child_model))]
 pub fn nested_delete_many(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,

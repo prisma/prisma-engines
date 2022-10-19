@@ -1,7 +1,6 @@
 [package]
 name = "user-facing-error-macros"
 version = "0.1.0"
-authors = ["Tom Houlé <tom@tomhoule.com>"]
 edition = "2021"
 
 [lib]

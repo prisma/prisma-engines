@@ -1,13 +1,10 @@
+use super::Name;
+use crate::sampler::field_type::FieldType;
 use convert_case::{Case, Casing};
 use introspection_connector::Warning;
 use mongodb_schema_describer::{IndexFieldProperty, IndexWalker};
+use psl::dml::{self, WithDatabaseName, WithName};
 use std::collections::BTreeMap;
-
-use datamodel::dml::{self, WithDatabaseName, WithName};
-
-use crate::sampler::field_type::FieldType;
-
-use super::Name;
 
 /// Add described indices to the models.
 pub(super) fn add_to_models(
@@ -30,7 +27,7 @@ pub(super) fn add_to_models(
                 .map(|f| {
                     let mut path = Vec::new();
                     let mut splitted_name = f.name().split('.');
-                    let mut next_type = None;
+                    let mut next_type: Option<&dml::CompositeType> = None;
 
                     if let Some(field_name) = splitted_name.next() {
                         next_type = model
@@ -48,18 +45,19 @@ pub(super) fn add_to_models(
                     }
 
                     for field_name in splitted_name {
-                        let ct = next_type.unwrap();
+                        let ct_name = next_type.as_ref().map(|ct| ct.name.clone());
                         let name = super::sanitize_string(field_name).unwrap_or_else(|| field_name.to_owned());
-                        path.push((name, Some(ct.name.to_owned())));
+                        path.push((name, ct_name));
 
-                        next_type = ct
-                            .fields
-                            .iter()
-                            .find(|f| f.database_name.as_deref() == Some(field_name) || f.name == field_name)
-                            .and_then(|f| match &f.r#type {
-                                dml::CompositeTypeFieldType::CompositeType(ref r#type) => types.get(r#type),
-                                _ => None,
-                            });
+                        next_type = next_type.as_ref().and_then(|ct| {
+                            ct.fields
+                                .iter()
+                                .find(|f| f.database_name.as_deref() == Some(field_name) || f.name == field_name)
+                                .and_then(|f| match &f.r#type {
+                                    dml::CompositeTypeFieldType::CompositeType(ref r#type) => types.get(r#type),
+                                    _ => None,
+                                })
+                        });
                     }
 
                     dml::IndexField {
@@ -70,6 +68,7 @@ pub(super) fn add_to_models(
                             IndexFieldProperty::Descending => Some(dml::SortOrder::Desc),
                         },
                         length: None,
+                        operator_class: None,
                     }
                 })
                 .collect();
@@ -164,10 +163,7 @@ fn add_missing_types_from_index(
                 .and_then(|f| f.as_scalar_field());
 
             next_type = match sf {
-                Some(sf) => {
-                    let type_name = sf.field_type.as_composite_type().unwrap();
-                    Some(type_name.to_string())
-                }
+                Some(sf) => sf.field_type.as_composite_type().map(|tyname| tyname.to_owned()),
                 None => {
                     let docs = String::from("Field referred in an index, but found no data to define the type.");
 
@@ -206,7 +202,10 @@ fn add_missing_types_from_index(
         }
 
         for (i, field_name) in splitted_name {
-            let type_name = next_type.take().unwrap();
+            let type_name = match next_type.take() {
+                Some(name) => name,
+                None => continue,
+            };
             let ct = types.get(&type_name).unwrap();
 
             let cf = ct
@@ -214,13 +213,10 @@ fn add_missing_types_from_index(
                 .iter()
                 .find(|f| f.database_name.as_deref() == Some(field_name) || f.name == field_name);
 
-            next_type = match cf {
-                Some(_) if i + 1 == path_length => None,
-                Some(cf) => {
-                    let type_name = cf.r#type.as_composite_type().unwrap();
-                    Some(type_name.to_string())
-                }
-                None => {
+            next_type = match (cf, cf.and_then(|cf| cf.r#type.as_composite_type())) {
+                (Some(_), _) if i + 1 == path_length => None,
+                (Some(_), Some(type_name)) => Some(type_name.to_string()),
+                (None, _) | (_, None) => {
                     let docs = String::from("Field referred in an index, but found no data to define the type.");
 
                     let (field_name, database_name) = match super::sanitize_string(field_name) {
@@ -246,10 +242,7 @@ fn add_missing_types_from_index(
                     } else {
                         unknown_fields.push((Name::CompositeType(type_name.clone()), field_name.clone()));
 
-                        (
-                            dml::CompositeTypeFieldType::Scalar(dml::ScalarType::Json, None, None),
-                            None,
-                        )
+                        (dml::CompositeTypeFieldType::Scalar(dml::ScalarType::Json, None), None)
                     };
 
                     let ct = types.get_mut(&type_name).unwrap();

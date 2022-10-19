@@ -2,7 +2,7 @@ use crate::prelude::*;
 use dml::{FieldArity, ReferentialAction, RelationInfo};
 use once_cell::sync::OnceCell;
 use std::{
-    fmt::Debug,
+    fmt::{Debug, Display},
     hash::{Hash, Hasher},
     sync::{Arc, Weak},
 };
@@ -111,7 +111,10 @@ impl RelationField {
             .get_or_init(|| {
                 self.model()
                     .internal_data_model()
-                    .find_relation(&self.relation_name)
+                    .find_relation(
+                        (&self.model().name, &self.relation_info.referenced_model),
+                        &self.relation_name,
+                    )
                     .unwrap()
             })
             .upgrade()
@@ -125,9 +128,9 @@ impl RelationField {
 
     /// Inlined in self / model of self
     pub fn relation_is_inlined_in_parent(&self) -> bool {
-        let relation = self.relation();
+        let relation = &self.relation();
 
-        match relation.manifestation {
+        match &relation.manifestation {
             RelationLinkManifestation::Inline(ref m) => {
                 let is_self_rel = relation.is_self_relation();
 
@@ -245,6 +248,12 @@ impl Debug for RelationField {
             .field("model", &"#ModelWeakRef#")
             .field("fields", &self.fields)
             .finish()
+    }
+}
+
+impl Display for RelationField {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}.{}", self.model().name, self.name)
     }
 }
 

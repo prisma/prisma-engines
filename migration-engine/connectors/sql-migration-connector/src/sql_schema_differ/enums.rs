@@ -9,13 +9,13 @@ pub(crate) struct EnumDiffer<'a> {
 impl<'a> EnumDiffer<'a> {
     pub(crate) fn created_values<'b>(&'b self) -> impl Iterator<Item = &'a str> + 'b {
         self.enums
-            .next()
+            .next
             .values()
             .iter()
             .filter(move |next_value| {
                 !self
                     .enums
-                    .previous()
+                    .previous
                     .values()
                     .iter()
                     .any(|previous_value| values_match(previous_value, next_value))
@@ -25,13 +25,13 @@ impl<'a> EnumDiffer<'a> {
 
     pub(crate) fn dropped_values<'b>(&'b self) -> impl Iterator<Item = &'a str> + 'b {
         self.enums
-            .previous()
+            .previous
             .values()
             .iter()
             .filter(move |previous_value| {
                 !self
                     .enums
-                    .next()
+                    .next
                     .values()
                     .iter()
                     .any(|next_value| values_match(previous_value, next_value))

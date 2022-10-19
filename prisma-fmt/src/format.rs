@@ -1,5 +1,5 @@
 use crate::FormatOpts;
-use datamodel::reformat;
+use psl::reformat;
 use std::{
     fs::{self, File},
     io::{self, BufWriter, Read, Write as _},
@@ -21,7 +21,7 @@ pub fn run(opts: FormatOpts) {
         }
     };
 
-    let reformatted = reformat(&datamodel_string, opts.tabwidth).unwrap_or_else(|err: &str| err.to_owned());
+    let reformatted = reformat(&datamodel_string, opts.tabwidth).unwrap_or(datamodel_string);
     match opts.output {
         Some(file_name) => {
             let file = File::open(&file_name).unwrap_or_else(|_| panic!("Unable to open file {}", file_name.display()));

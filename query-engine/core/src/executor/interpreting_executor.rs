@@ -1,12 +1,14 @@
 use super::execute_operation::{execute_many_operations, execute_many_self_contained, execute_single_self_contained};
 use crate::{
-    OpenTx, Operation, QueryExecutor, QuerySchemaRef, ResponseData, TransactionActorManager, TransactionError,
-    TransactionManager, TxId,
+    BatchDocumentTransaction, CoreError, OpenTx, Operation, QueryExecutor, ResponseData, TransactionActorManager,
+    TransactionError, TransactionManager, TxId,
 };
 
 use async_trait::async_trait;
 use connector::Connector;
+use schema::QuerySchemaRef;
 use tokio::time::{self, Duration};
+use tracing_futures::Instrument;
 
 /// Central query executor and main entry point into the query core.
 pub struct InterpretingExecutor<C> {
@@ -50,13 +52,16 @@ where
         if let Some(tx_id) = tx_id {
             self.itx_manager.execute(&tx_id, operation, trace_id).await
         } else {
-            execute_single_self_contained(
-                &self.connector,
-                query_schema,
-                operation,
-                trace_id,
-                self.force_transactions,
-            )
+            super::with_request_now(async move {
+                execute_single_self_contained(
+                    &self.connector,
+                    query_schema,
+                    operation,
+                    trace_id,
+                    self.force_transactions,
+                )
+                .await
+            })
             .await
         }
     }
@@ -73,22 +78,39 @@ where
     /// A failing operation does not fail the batch, instead, an error is returned alongside other responses.
     /// Note that individual operations executed in non-transactional mode can still be transactions in themselves
     /// if the query (e.g. a write op) requires it.
-    #[tracing::instrument(skip(self, operations, query_schema))]
     async fn execute_all(
         &self,
         tx_id: Option<TxId>,
         operations: Vec<Operation>,
-        transactional: bool,
+        transaction: Option<BatchDocumentTransaction>,
         query_schema: QuerySchemaRef,
         trace_id: Option<String>,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
         if let Some(tx_id) = tx_id {
+            let batch_isolation_level = transaction.and_then(|t| t.isolation_level());
+            if batch_isolation_level.is_some() {
+                return Err(CoreError::UnsupportedFeatureError(
+                    "Can not set batch isolation level within interactive transaction".into(),
+                ));
+            }
             self.itx_manager.batch_execute(&tx_id, operations, trace_id).await
-        } else if transactional {
-            let mut conn = self.connector.get_connection().await?;
-            let mut tx = conn.start_transaction().await?;
+        } else if let Some(transaction) = transaction {
+            let connection_name = self.connector.name();
+            let conn_span = info_span!(
+                "prisma:engine:connection",
+                user_facing = true,
+                "db.type" = connection_name.as_str()
+            );
+            let mut conn = self.connector.get_connection().instrument(conn_span).await?;
+            let mut tx = conn.start_transaction(transaction.isolation_level()).await?;
 
-            let results = execute_many_operations(query_schema, tx.as_connection_like(), &operations, trace_id).await;
+            let results = super::with_request_now(execute_many_operations(
+                query_schema,
+                tx.as_connection_like(),
+                &operations,
+                trace_id,
+            ))
+            .await;
 
             if results.is_err() {
                 tx.rollback().await?;
@@ -98,13 +120,16 @@ where
 
             results
         } else {
-            execute_many_self_contained(
-                &self.connector,
-                query_schema,
-                &operations,
-                trace_id,
-                self.force_transactions,
-            )
+            super::with_request_now(async move {
+                execute_many_self_contained(
+                    &self.connector,
+                    query_schema,
+                    &operations,
+                    trace_id,
+                    self.force_transactions,
+                )
+                .await
+            })
             .await
         }
     }
@@ -124,29 +149,40 @@ where
         query_schema: QuerySchemaRef,
         max_acquisition_millis: u64,
         valid_for_millis: u64,
+        isolation_level: Option<String>,
     ) -> crate::Result<TxId> {
-        let id = TxId::default();
-        trace!("[{}] Starting...", id);
-        let conn = time::timeout(
-            Duration::from_millis(max_acquisition_millis),
-            self.connector.get_connection(),
-        )
-        .await;
-
-        let conn = conn.map_err(|_| TransactionError::AcquisitionTimeout)??;
-        let c_tx = OpenTx::start(conn).await?;
-
-        self.itx_manager
-            .create_tx(
-                query_schema.clone(),
-                id.clone(),
-                c_tx,
-                Duration::from_millis(valid_for_millis),
+        super::with_request_now(async move {
+            let id = TxId::default();
+            trace!("[{}] Starting...", id);
+            let connection_name = self.connector.name();
+            let conn_span = info_span!(
+                "prisma:engine:connection",
+                user_facing = true,
+                "db.type" = connection_name.as_str()
+            );
+            let conn = time::timeout(
+                Duration::from_millis(max_acquisition_millis),
+                self.connector.get_connection(),
             )
+            .instrument(conn_span)
             .await;
 
-        debug!("[{}] Started.", id);
-        Ok(id)
+            let conn = conn.map_err(|_| TransactionError::AcquisitionTimeout)??;
+            let c_tx = OpenTx::start(conn, isolation_level).await?;
+
+            self.itx_manager
+                .create_tx(
+                    query_schema.clone(),
+                    id.clone(),
+                    c_tx,
+                    Duration::from_millis(valid_for_millis),
+                )
+                .await;
+
+            debug!("[{}] Started.", id);
+            Ok(id)
+        })
+        .await
     }
 
     async fn commit_tx(&self, tx_id: TxId) -> crate::Result<()> {

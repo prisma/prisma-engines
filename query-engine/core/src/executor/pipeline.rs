@@ -1,3 +1,5 @@
+use tracing::Instrument;
+
 use crate::{Env, Expressionista, IrSerializer, QueryGraph, QueryInterpreter, ResponseData};
 
 #[derive(Debug)]
@@ -16,11 +18,17 @@ impl<'conn> QueryPipeline<'conn> {
         }
     }
 
-    #[tracing::instrument(skip(trace_id))]
     pub async fn execute(mut self, trace_id: Option<String>) -> crate::Result<ResponseData> {
         let serializer = self.serializer;
         let expr = Expressionista::translate(self.graph)?;
-        let result = self.interpreter.interpret(expr, Env::default(), 0, trace_id).await;
+
+        let span = info_span!("prisma:engine:interpret");
+
+        let result = self
+            .interpreter
+            .interpret(expr, Env::default(), 0, trace_id)
+            .instrument(span)
+            .await;
 
         trace!("{}", self.interpreter.log_output());
         serializer.serialize(result?)

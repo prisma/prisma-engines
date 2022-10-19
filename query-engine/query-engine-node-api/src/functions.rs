@@ -1,9 +1,7 @@
 use crate::error::ApiError;
-use datamodel_connector::ConnectorCapabilities;
 use napi::{bindgen_prelude::*, JsUnknown};
 use napi_derive::napi;
-use prisma_models::InternalDataModelBuilder;
-use query_core::{schema_builder, BuildMode, QuerySchemaRef};
+use query_core::{schema::QuerySchemaRef, schema_builder};
 use request_handlers::dmmf;
 use std::{
     collections::{BTreeMap, HashMap},
@@ -27,31 +25,33 @@ pub fn version() -> Version {
 
 #[napi]
 pub fn dmmf(datamodel_string: String) -> napi::Result<String> {
-    let datamodel = datamodel::parse_datamodel(&datamodel_string)
-        .map_err(|errors| ApiError::conversion(errors, &datamodel_string))?;
+    let mut schema = psl::validate(datamodel_string.into());
 
-    let config = datamodel::parse_configuration(&datamodel_string)
-        .map_err(|errors| ApiError::conversion(errors, &datamodel_string))?;
-    let datasource = config.subject.datasources.first();
+    schema
+        .diagnostics
+        .to_result()
+        .map_err(|errors| ApiError::conversion(errors, schema.db.source()))?;
 
-    let capabilities = datasource
-        .map(|ds| ds.capabilities())
-        .unwrap_or_else(ConnectorCapabilities::empty);
+    let datasource = schema.configuration.datasources.first();
+    let datamodel = psl::lift(&schema);
 
-    let referential_integrity = datasource.map(|ds| ds.referential_integrity()).unwrap_or_default();
+    let connector = datasource
+        .map(|ds| ds.active_connector)
+        .unwrap_or(&psl::datamodel_connector::EmptyDatamodelConnector);
 
-    let internal_data_model = InternalDataModelBuilder::from(&datamodel.subject).build("".into());
+    let relation_mode = datasource.map(|ds| ds.relation_mode()).unwrap_or_default();
+
+    let internal_data_model = prisma_models::convert(&schema, "".into());
 
     let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
         internal_data_model,
-        BuildMode::Modern,
         true,
-        capabilities,
-        config.subject.preview_features().iter().collect(),
-        referential_integrity,
+        connector,
+        schema.configuration.preview_features().iter().collect(),
+        relation_mode,
     ));
 
-    let dmmf = dmmf::render_dmmf(&datamodel.subject, query_schema);
+    let dmmf = dmmf::render_dmmf(&datamodel, query_schema);
 
     Ok(serde_json::to_string(&dmmf)?)
 }
@@ -80,24 +80,24 @@ pub fn get_config(js_env: Env, options: JsUnknown) -> napi::Result<JsUnknown> {
     } = options;
 
     let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
-    let mut config =
-        datamodel::parse_configuration(&datamodel).map_err(|errors| ApiError::conversion(errors, &datamodel))?;
+    let mut config = psl::parse_configuration(&datamodel).map_err(|errors| ApiError::conversion(errors, &datamodel))?;
 
     if !ignore_env_var_errors {
         config
-            .subject
             .resolve_datasource_urls_from_env(&overrides, |key| env.get(key).map(ToString::to_string))
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
     }
 
-    let serialized = datamodel::mcf::config_to_mcf_json_value(&config);
+    let serialized = psl::get_config::config_to_mcf_json_value(&config);
 
     js_env.to_js_value(&serialized)
 }
 
 #[napi]
-pub fn debug_panic() -> napi::Result<()> {
-    let user_facing = user_facing_errors::Error::from_panic_payload(Box::new("Debug panic"));
+pub fn debug_panic(panic_message: Option<String>) -> napi::Result<()> {
+    let user_facing = user_facing_errors::Error::from_panic_payload(Box::new(
+        panic_message.unwrap_or_else(|| "query-engine-node-api debug panic".to_string()),
+    ));
     let message = serde_json::to_string(&user_facing).unwrap();
 
     Err(napi::Error::from_reason(message))

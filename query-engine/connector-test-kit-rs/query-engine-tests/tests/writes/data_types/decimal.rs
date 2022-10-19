@@ -65,4 +65,24 @@ mod decimal {
 
         Ok(())
     }
+
+    fn deicmal_id() -> String {
+        let schema = indoc! {
+            r#"model Model {
+              #id(id, Decimal, @id)
+             }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(deicmal_id), capabilities(DecimalType))]
+    async fn using_decimal_as_id(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneModel( data: { id: "1000000000" } ) { id } }"#),
+          @r###"{"data":{"createOneModel":{"id":"1000000000"}}}"###
+        );
+
+        Ok(())
+    }
 }

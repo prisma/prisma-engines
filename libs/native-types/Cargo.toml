@@ -1,9 +1,0 @@
-[package]
-name = "native-types"
-version = "0.1.0"
-authors = ["Marcus Böhm <wif.mboehm@gmx.de>"]
-edition = "2021"
-
-[dependencies]
-serde = { version = "1", features = ["derive"] }
-serde_json = { version = "1.0", features = ["float_roundtrip"] }

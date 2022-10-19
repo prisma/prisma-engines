@@ -1,6 +1,6 @@
 use crate::{
-    column_metadata, error::*, model_extensions::*, sql_trace::SqlTraceComment, AliasedCondition, ColumnMetadata,
-    SqlRow, ToSqlRow,
+    column_metadata, error::*, model_extensions::*, sql_info::SqlInfo, sql_trace::SqlTraceComment,
+    value_ext::IntoTypedJsonExtension, AliasedCondition, ColumnMetadata, SqlRow, ToSqlRow,
 };
 use async_trait::async_trait;
 use connector_interface::{filter::Filter, RecordFilter};
@@ -8,6 +8,7 @@ use futures::future::FutureExt;
 use itertools::Itertools;
 use opentelemetry::trace::TraceFlags;
 use prisma_models::*;
+use psl::PreviewFeature;
 use quaint::{
     ast::*,
     connector::{self, Queryable},
@@ -21,7 +22,7 @@ use std::{collections::HashMap, panic::AssertUnwindSafe};
 use crate::sql_trace::trace_parent_to_string;
 
 use opentelemetry::trace::TraceContextExt;
-use tracing::{span, Span};
+use tracing::{info_span, Span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 impl<'t> QueryExt for connector::Transaction<'t> {}
@@ -32,14 +33,13 @@ impl QueryExt for PooledConnection {}
 #[async_trait]
 pub trait QueryExt: Queryable + Send + Sync {
     /// Filter and map the resulting types with the given identifiers.
-    #[tracing::instrument(skip(self, q, idents))]
     async fn filter(
         &self,
         q: Query<'_>,
         idents: &[ColumnMetadata<'_>],
         trace_id: Option<String>,
     ) -> crate::Result<Vec<SqlRow>> {
-        let span = span!(tracing::Level::INFO, "filter read query");
+        let span = info_span!("filter read query");
 
         let otel_ctx = span.context();
         let span_ref = otel_ctx.span();
@@ -50,9 +50,7 @@ pub trait QueryExt: Queryable + Send + Sync {
                 Query::Select(Box::from(x.comment(trace_parent_to_string(span_ctx))))
             }
             // This is part of the required changes to pass a traceid
-            (Query::Select(x), Some(traceparent)) => {
-                Query::Select(Box::from(x.comment(format!("traceparent={}", traceparent))))
-            }
+            (Query::Select(x), trace_id) => Query::Select(Box::from(x.add_trace_id(trace_id))),
             (q, _) => q,
         };
 
@@ -69,16 +67,17 @@ pub trait QueryExt: Queryable + Send + Sync {
 
     /// Execute a singular SQL query in the database, returning an arbitrary
     /// JSON `Value` as a result.
-    #[tracing::instrument(skip(self, inputs))]
     async fn raw_json<'a>(
         &'a self,
+        _sql_info: SqlInfo,
+        _features: &[PreviewFeature],
         mut inputs: HashMap<String, PrismaValue>,
     ) -> std::result::Result<Value, crate::error::RawError> {
         // Unwrapping query & params is safe since it's already passed the query parsing stage
         let query = inputs.remove("query").unwrap().into_string().unwrap();
         let params = inputs.remove("parameters").unwrap().into_list().unwrap();
         let params = params.into_iter().map(convert_lossy).collect_vec();
-        let result_set = AssertUnwindSafe(self.query_raw(&query, &params))
+        let result_set = AssertUnwindSafe(self.query_raw_typed(&query, &params))
             .catch_unwind()
             .await??;
 
@@ -92,7 +91,7 @@ pub trait QueryExt: Queryable + Send + Sync {
             for (idx, p_value) in row.into_iter().enumerate() {
                 let column_name = columns.get(idx).unwrap_or(&format!("f{}", idx)).clone();
 
-                object.insert(column_name, Value::from(p_value));
+                object.insert(column_name, p_value.as_typed_json());
             }
 
             result.push(Value::Object(object));
@@ -103,16 +102,16 @@ pub trait QueryExt: Queryable + Send + Sync {
 
     /// Execute a singular SQL query in the database, returning the number of
     /// affected rows.
-    #[tracing::instrument(skip(self, inputs))]
     async fn raw_count<'a>(
         &'a self,
         mut inputs: HashMap<String, PrismaValue>,
+        _features: &[PreviewFeature],
     ) -> std::result::Result<usize, crate::error::RawError> {
         // Unwrapping query & params is safe since it's already passed the query parsing stage
         let query = inputs.remove("query").unwrap().into_string().unwrap();
         let params = inputs.remove("parameters").unwrap().into_list().unwrap();
         let params = params.into_iter().map(convert_lossy).collect_vec();
-        let changes = AssertUnwindSafe(self.execute_raw(&query, &params))
+        let changes = AssertUnwindSafe(self.execute_raw_typed(&query, &params))
             .catch_unwind()
             .await??;
 
@@ -120,7 +119,6 @@ pub trait QueryExt: Queryable + Send + Sync {
     }
 
     /// Select one row from the database.
-    #[tracing::instrument(skip(self, q, meta))]
     async fn find(
         &self,
         q: Select<'_>,
@@ -136,7 +134,6 @@ pub trait QueryExt: Queryable + Send + Sync {
 
     /// Process the record filter and either return directly with precomputed values,
     /// or fetch IDs from the database.
-    #[tracing::instrument(skip(self, model, record_filter))]
     async fn filter_selectors(
         &self,
         model: &ModelRef,
@@ -151,7 +148,6 @@ pub trait QueryExt: Queryable + Send + Sync {
     }
 
     /// Read the all columns as a (primary) identifier.
-    #[tracing::instrument(skip(self, model, filter))]
     async fn filter_ids(
         &self,
         model: &ModelRef,
@@ -165,12 +161,11 @@ pub trait QueryExt: Queryable + Send + Sync {
             .columns(id_cols)
             .append_trace(&Span::current())
             .add_trace_id(trace_id.clone())
-            .so_that(filter.aliased_cond(None));
+            .so_that(filter.aliased_condition_from(None, false));
 
         self.select_ids(select, model_id, trace_id).await
     }
 
-    #[tracing::instrument(skip(self, select, model_id))]
     async fn select_ids(
         &self,
         select: Select<'_>,

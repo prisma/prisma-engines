@@ -1,7 +1,6 @@
 use super::*;
 use std::fmt::{self, Display};
 
-#[tracing::instrument(name = "debug_query_graph", skip(graph))]
 pub fn format(graph: &QueryGraph) -> String {
     format!(
         "---- Query Graph ----\nResult Nodes: {}\nMarked Nodes: {}\nRoot Nodes: {}\n\n{}\n----------------------",
@@ -101,7 +100,10 @@ impl Display for QueryGraphDependency {
                 write!(
                     f,
                     "ProjectedDataDependency ({:?})",
-                    selection.prisma_names().collect::<Vec<_>>()
+                    selection
+                        .selections()
+                        .map(|f| format!("{}.{}", f.container().name(), f.prisma_name()))
+                        .collect::<Vec<_>>()
                 )
             }
             Self::Then => write!(f, "Then"),

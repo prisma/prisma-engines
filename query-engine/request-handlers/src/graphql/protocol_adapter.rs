@@ -23,7 +23,21 @@ use query_core::query_document::*;
 pub struct GraphQLProtocolAdapter;
 
 impl GraphQLProtocolAdapter {
-    #[tracing::instrument(name = "graphql_to_query_document", skip(gql_doc, operation))]
+    pub fn convert_query_to_operation(query: &str, operation_name: Option<String>) -> crate::Result<Operation> {
+        let gql_doc = match graphql_parser::parse_query(query) {
+            Ok(doc) => doc,
+            Err(err)
+                if err.to_string().contains("number too large to fit in target type")
+                    | err.to_string().contains("number too small to fit in target type") =>
+            {
+                return Err(HandlerError::ValueFitError("Query parsing failure: A number used in the query does not fit into a 64 bit signed integer. Consider using `BigInt` as field type if you're trying to store large integers.".to_owned()));
+            }
+            err @ Err(_) => err?,
+        };
+
+        Self::convert(gql_doc, operation_name)
+    }
+
     pub fn convert(gql_doc: Document<String>, operation: Option<String>) -> crate::Result<Operation> {
         let mut operations: Vec<Operation> = match operation {
             Some(ref op) => gql_doc
@@ -87,15 +101,9 @@ impl GraphQLProtocolAdapter {
                         .map(|(k, v)| Ok((k, Self::convert_value(v)?)))
                         .collect::<crate::Result<Vec<_>>>()?;
 
-                    let mut builder = Selection::builder(f.name);
-                    builder.set_arguments(arguments);
-                    builder.nested_selections(Self::convert_selection_set(f.selection_set)?);
+                    let nested_selections = Self::convert_selection_set(f.selection_set)?;
 
-                    if let Some(alias) = f.alias {
-                        builder.alias(alias);
-                    };
-
-                    Ok(builder.build())
+                    Ok(Selection::new(f.name, f.alias, arguments, nested_selections))
                 }
 
                 GqlSelection::FragmentSpread(fs) => Err(HandlerError::unsupported_feature(
@@ -163,5 +171,96 @@ impl GraphQLProtocolAdapter {
                 Ok(QueryValue::Object(values))
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn converts_single_query() {
+        let query = r#"
+            query findTheModelOperation {
+                findOneModel(where: {a_number: {gte: 1}}) {
+                    id,
+                    large_number,
+                    other {
+                        name
+                    }
+                }
+            }
+        "#;
+
+        let operation = GraphQLProtocolAdapter::convert_query_to_operation(query, None).unwrap();
+
+        assert_eq!(operation.name(), "findOneModel");
+        assert!(matches!(operation, Operation::Read(_)));
+
+        let read = operation.into_read().unwrap();
+
+        let where_args = QueryValue::Object(IndexMap::from([(
+            "a_number".to_string(),
+            QueryValue::Object([("gte".to_string(), QueryValue::Int(1))].into()),
+        )]));
+
+        assert_eq!(read.arguments(), [("where".to_string(), where_args)]);
+
+        let selections = Vec::from([
+            Selection::new("id", None, [], Vec::new()),
+            Selection::new("large_number", None, [], Vec::new()),
+            Selection::new("other", None, [], Vec::from([Selection::new("name", None, [], [])])),
+        ]);
+
+        assert_eq!(read.nested_selections(), selections);
+    }
+
+    #[test]
+    fn converts_single_mutation() {
+        let query = r#"
+        mutation {
+                createOnePost(data: {
+                    id: 1,
+                    categories: {create: [{id: 1}, {id: 2}]}
+            })  {
+                id,
+                categories {
+                    id
+                }
+            }
+        }
+        "#;
+
+        let operation = GraphQLProtocolAdapter::convert_query_to_operation(query, None).unwrap();
+
+        assert_eq!(operation.name(), "createOnePost");
+        assert!(matches!(operation, Operation::Write(_)));
+
+        let write = operation.into_write().unwrap();
+
+        let data_args = QueryValue::Object(
+            [
+                ("id".to_string(), QueryValue::Int(1)),
+                (
+                    "categories".to_string(),
+                    QueryValue::Object(
+                        [(
+                            "create".to_string(),
+                            QueryValue::List(
+                                [
+                                    QueryValue::Object([("id".to_string(), QueryValue::Int(1))].into()),
+                                    QueryValue::Object([("id".to_string(), QueryValue::Int(2))].into()),
+                                ]
+                                .into(),
+                            ),
+                        )]
+                        .into(),
+                    ),
+                ),
+            ]
+            .into(),
+        );
+        println!("args {:?}", write.arguments());
+        assert_eq!(write.arguments(), [("data".to_string(), data_args)]);
     }
 }

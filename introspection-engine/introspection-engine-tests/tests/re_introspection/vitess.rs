@@ -5,9 +5,9 @@ use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
 #[test_connector(tags(Vitess), preview_features("referentialIntegrity"))]
-async fn referential_integrity_parameter_is_not_removed(api: &TestApi) -> TestResult {
+async fn relation_mode_parameter_is_not_removed(api: &TestApi) -> TestResult {
     let result = api.re_introspect("").await?;
-    assert!(result.contains(r#"referentialIntegrity = "prisma""#));
+    assert!(result.contains(r#"relationMode = "prisma""#));
 
     Ok(())
 }

@@ -6,7 +6,6 @@ mod scalar;
 
 use super::utils;
 use crate::{
-    constants::filters,
     query_document::{ParsedInputMap, ParsedInputValue},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
@@ -15,14 +14,39 @@ use connector::{
 };
 use filter_fold::*;
 use filter_grouping::*;
+use indexmap::IndexMap;
 use prisma_models::{
     prelude::ParentContainer, CompositeFieldRef, Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef,
 };
+use schema_builder::constants::filters;
 use std::{collections::HashMap, convert::TryInto, str::FromStr};
 
 /// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.
-#[tracing::instrument(skip(value_map, model))]
 pub fn extract_unique_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraphBuilderResult<Filter> {
+    let tag = value_map.tag.clone();
+    // Partition the input into a map containing only the unique fields and one containing all the other filters
+    // so that we can parse them separately and ensure we AND both filters
+    let (unique_map, rest_map): (IndexMap<_, _>, IndexMap<_, _>) =
+        value_map
+            .into_iter()
+            .partition(|(field_name, _)| match model.fields().find_from_scalar(&field_name) {
+                Ok(field) => field.unique(),
+                Err(_) => utils::resolve_compound_field(&field_name, &model).is_some(),
+            });
+    let mut unique_map = ParsedInputMap::from(unique_map);
+    let mut rest_map = ParsedInputMap::from(rest_map);
+    unique_map.set_tag(tag.clone());
+    rest_map.set_tag(tag);
+
+    let unique_filters = internal_extract_unique_filter(unique_map, model)?;
+    let rest_filters = extract_filter(rest_map, model)?;
+
+    Ok(Filter::and(vec![unique_filters, rest_filters]))
+}
+
+/// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.
+/// The input map must only contain unique & compound unique fields.
+fn internal_extract_unique_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraphBuilderResult<Filter> {
     let filters = value_map
         .into_iter()
         .map(|(field_name, value): (String, ParsedInputValue)| {
@@ -200,8 +224,9 @@ fn fold_search_filters(filters: &Vec<Filter>) -> Vec<Filter> {
         match filter {
             Filter::Scalar(ref sf) => match sf.condition {
                 ScalarCondition::Search(ref pv, _) => {
+                    let pv = pv.as_value().unwrap();
                     // If there's already an entry, then store the "additional" projections that will need to be merged
-                    if let Some(projections) = projections_by_val.get_mut(&pv) {
+                    if let Some(projections) = projections_by_val.get_mut(pv) {
                         projections.push(sf.projection.clone());
                     } else {
                         // Otherwise, store the first search filter found on which we'll merge the additional projections
@@ -258,7 +283,8 @@ fn extract_scalar_filters(field: &ScalarFieldRef, value: ParsedInputValue) -> Qu
                 Some(i) => parse_query_mode(i)?,
                 None => QueryMode::Default,
             };
-            let mut filters: Vec<Filter> = scalar::parse(filter_map, field, false)?;
+
+            let mut filters: Vec<Filter> = scalar::ScalarFilterParser::new(field, false).parse(filter_map)?;
 
             filters.iter_mut().for_each(|f| f.set_mode(mode.clone()));
             Ok(filters)
@@ -277,19 +303,16 @@ fn extract_relation_filters(field: &RelationFieldRef, value: ParsedInputValue) -
         // Implicit is null filter (`where: { <field>: null }`)
         ParsedInputValue::Single(PrismaValue::Null) => Ok(vec![field.one_relation_is_null()]),
 
-        // Either implicit `is`, or complex filter.
+        // Complex relation filter
+        ParsedInputValue::Map(filter_map) if filter_map.is_relation_envelope() => filter_map
+            .clone()
+            .into_iter()
+            .map(|(k, v)| relation::parse(&k, field, v))
+            .collect::<QueryGraphBuilderResult<Vec<_>>>(),
+
+        // Implicit is
         ParsedInputValue::Map(filter_map) => {
-            // Two options: An intermediate object with `is`, `every`, etc., or directly the object to filter with implicit `is`.
-            // There are corner cases where it is unclear what object should be used, due to overlap of fields of the related model and the filter object.
-            // The parse heuristic is to first try to parse the map as the full filter object and if that fails, parse it as implicit `is` filter instead.
-            filter_map
-                .clone()
-                .into_iter()
-                .map(|(k, v)| relation::parse(&k, field, v))
-                .collect::<QueryGraphBuilderResult<Vec<_>>>()
-                .or_else(|_| {
-                    extract_filter(filter_map, &field.related_model()).map(|filter| vec![field.to_one_related(filter)])
-                })
+            extract_filter(filter_map, &field.related_model()).map(|filter| vec![field.to_one_related(filter)])
         }
 
         x => Err(QueryGraphBuilderError::InputError(format!(

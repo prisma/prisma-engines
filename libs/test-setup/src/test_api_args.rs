@@ -6,11 +6,11 @@ use std::{fmt::Display, io::Write as _};
 
 #[derive(Debug)]
 pub(crate) struct DbUnderTest {
-    capabilities: BitFlags<Capabilities>,
+    pub(crate) capabilities: BitFlags<Capabilities>,
     database_url: String,
     shadow_database_url: Option<String>,
     provider: &'static str,
-    tags: BitFlags<Tags>,
+    pub(crate) tags: BitFlags<Tags>,
 }
 
 const MISSING_TEST_DATABASE_URL_MSG: &str = r#"
@@ -113,23 +113,32 @@ pub(crate) fn db_under_test() -> &'static DbUnderTest {
 pub struct TestApiArgs {
     test_function_name: &'static str,
     preview_features: &'static [&'static str],
+    namespaces: &'static [&'static str],
     db: &'static DbUnderTest,
 }
 
 const EMPTY_PREVIEW_FEATURES: &[&str] = &[];
-const COCKROACH_PREVIEW_FEATURES: &[&str] = &["cockroachdb"];
 
 impl TestApiArgs {
-    pub fn new(test_function_name: &'static str, preview_features: &'static [&'static str]) -> Self {
+    pub fn new(
+        test_function_name: &'static str,
+        preview_features: &'static [&'static str],
+        namespaces: &'static [&'static str],
+    ) -> Self {
         TestApiArgs {
             test_function_name,
             preview_features,
+            namespaces,
             db: db_under_test(),
         }
     }
 
     pub fn preview_features(&self) -> &'static [&'static str] {
         self.preview_features
+    }
+
+    pub fn namespaces(&self) -> &'static [&'static str] {
+        self.namespaces
     }
 
     pub fn test_function_name(&self) -> &'static str {
@@ -164,17 +173,11 @@ impl TestApiArgs {
     }
 
     pub fn datasource_block<'a>(&'a self, url: &'a str, params: &'a [(&'a str, &'a str)]) -> DatasourceBlock<'a> {
-        let preview_features = if self.db.provider == "cockroachdb" {
-            COCKROACH_PREVIEW_FEATURES
-        } else {
-            EMPTY_PREVIEW_FEATURES
-        };
-
         DatasourceBlock {
             provider: self.db.provider,
             url,
             params,
-            preview_features,
+            preview_features: EMPTY_PREVIEW_FEATURES,
         }
     }
 

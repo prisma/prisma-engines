@@ -1,7 +1,8 @@
 use std::fmt::Display;
 
 use crate::{
-    CompositeFieldRef, DomainError, Field, PrismaValueExtensions, RelationField, ScalarFieldRef, SelectionResult,
+    parent_container::ParentContainer, CompositeFieldRef, DomainError, Field, PrismaValueExtensions, RelationField,
+    ScalarFieldRef, SelectionResult,
 };
 use itertools::Itertools;
 use prisma_value::PrismaValue;
@@ -171,6 +172,13 @@ impl SelectedField {
         }
     }
 
+    pub fn container(&self) -> &ParentContainer {
+        match self {
+            SelectedField::Scalar(sf) => sf.container(),
+            SelectedField::Composite(cs) => cs.field.container(),
+        }
+    }
+
     /// Coerces a value to fit the selection. If the conversion is not possible, an error will be thrown.
     pub fn coerce_value(&self, value: PrismaValue) -> crate::Result<PrismaValue> {
         match self {
@@ -287,11 +295,11 @@ impl Display for FieldSelection {
 impl Display for SelectedField {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            SelectedField::Scalar(sf) => write!(f, "{}", sf.name),
+            SelectedField::Scalar(sf) => write!(f, "{sf}"),
             SelectedField::Composite(cs) => write!(
                 f,
                 "{} {{ {} }}",
-                cs.field.name,
+                cs.field,
                 cs.selections
                     .iter()
                     .map(|selection| format!("{}", selection))

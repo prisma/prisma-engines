@@ -98,7 +98,7 @@ mod int_id_create {
     }
 
     // "Creating an item with an id field of type Int with autoincrement" should "work"
-    #[connector_test(schema(schema_int_autoinc), capabilities(AutoIncrement))]
+    #[connector_test(schema(schema_int_autoinc), capabilities(AutoIncrement), exclude(CockroachDb))]
     async fn create_id_int_with_autoinc(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
@@ -131,7 +131,11 @@ mod int_id_create {
     }
 
     // "Creating an item with an id field of type Int with autoincrement and providing an id" should "error for checked inputs"
-    #[connector_test(schema(schema_int_autoinc_provide_id), capabilities(AutoIncrement))]
+    #[connector_test(
+        schema(schema_int_autoinc_provide_id),
+        capabilities(AutoIncrement),
+        exclude(CockroachDb)
+    )]
     async fn create_id_int_autoinc_providing_id(runner: Runner) -> TestResult<()> {
         assert_error!(
             &runner,
@@ -143,6 +147,41 @@ mod int_id_create {
             }"#,
             2009
         );
+
+        Ok(())
+    }
+}
+
+#[test_suite]
+mod int_id_create_cockroachdb {
+    use indoc::indoc;
+
+    fn schema_int_autoinc() -> String {
+        let schema = indoc! {
+            r#"model Todo {
+              #id(id, BigInt, @id, @default(autoincrement()))
+              title String
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // "Creating an item with an id field of type Int with autoincrement" should "work"
+    #[connector_test(schema(schema_int_autoinc), only(CockroachDb))]
+    async fn create_id_int_with_autoinc(runner: Runner) -> TestResult<()> {
+        let result = run_query_json!(
+            &runner,
+            r#"mutation {
+            createOneTodo(data: { title: "the title"}){
+              id
+              title
+            }
+          }"#
+        );
+
+        assert!(result["data"]["createOneTodo"]["id"].as_str().is_some());
+        assert_eq!(result["data"]["createOneTodo"]["title"].as_str().unwrap(), "the title");
 
         Ok(())
     }

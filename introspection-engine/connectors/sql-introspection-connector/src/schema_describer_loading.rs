@@ -1,13 +1,11 @@
-use datamodel::common::preview_features::PreviewFeature;
-use enumflags2::BitFlags;
+use psl::builtin_connectors::POSTGRES;
 use quaint::prelude::{ConnectionInfo, Queryable, SqlFamily};
 use sql_schema_describer::{postgres::Circumstances, SqlSchemaDescriberBackend};
 
-#[tracing::instrument(skip(connection))]
 pub async fn load_describer<'a>(
-    connection: &'a dyn Queryable,
+    connection: &'a quaint::single::Quaint,
     connection_info: &ConnectionInfo,
-    preview_features: BitFlags<PreviewFeature>,
+    provider: Option<&str>,
 ) -> Result<Box<dyn SqlSchemaDescriberBackend + 'a>, crate::SqlError> {
     let version = connection.version().await?;
 
@@ -17,6 +15,10 @@ pub async fn load_describer<'a>(
 
             if version.map(|version| version.contains("CockroachDB")).unwrap_or(false) {
                 circumstances |= Circumstances::Cockroach;
+
+                if provider == Some(POSTGRES.provider_name()) {
+                    circumstances |= Circumstances::CockroachWithPostgresNativeTypes;
+                }
             }
 
             Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(

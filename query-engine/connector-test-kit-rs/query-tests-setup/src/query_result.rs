@@ -1,5 +1,6 @@
 use request_handlers::{GQLError, PrismaResponse};
 
+#[derive(Debug)]
 pub struct QueryResult {
     response: PrismaResponse,
 }
@@ -14,7 +15,9 @@ impl QueryResult {
 
     /// Asserts absence of errors in the result. Panics with assertion error.
     pub fn assert_success(&self) {
-        assert!(!self.failed())
+        if self.failed() {
+            panic!("{}", self.to_string());
+        }
     }
 
     /// Asserts presence of errors in the result.
@@ -65,6 +68,14 @@ impl QueryResult {
             PrismaResponse::Single(ref s) => s.errors().collect(),
             PrismaResponse::Multi(ref m) => m.errors().collect(),
         }
+    }
+
+    pub fn to_json_value(&self) -> serde_json::Value {
+        serde_json::to_value(&self.response).unwrap()
+    }
+
+    pub fn to_string_pretty(&self) -> String {
+        serde_json::to_string_pretty(&self.response).unwrap()
     }
 }
 

@@ -4,32 +4,6 @@ use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
 #[test_connector(tags(Mssql))]
-async fn geometry_should_be_unsupported(api: &TestApi) -> TestResult {
-    let setup = r#"
-        CREATE TABLE [geometry_should_be_unsupported].[A] (
-            id INT IDENTITY,
-            location GEOGRAPHY,
-            CONSTRAINT [A_pkey] PRIMARY KEY (id)
-        );
-    "#;
-
-    api.raw_cmd(setup).await;
-
-    let result = api.introspect_dml().await?;
-
-    let expected = expect![[r#"
-        model A {
-          id       Int                       @id @default(autoincrement())
-          location Unsupported("geography")?
-        }
-    "#]];
-
-    expected.assert_eq(&result);
-
-    Ok(())
-}
-
-#[test_connector(tags(Mssql))]
 async fn user_defined_type_aliases_should_map_to_the_system_type(api: &TestApi) -> TestResult {
     let create_type = format!("CREATE TYPE [{}].[Name] FROM [nvarchar](50) NULL", api.schema_name());
     api.database().raw_cmd(&create_type).await?;
@@ -90,7 +64,7 @@ async fn ms_xml_indexes_are_skipped(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mssql))]
 async fn non_standard_id_clustering(api: &TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE [$schema].[test] (
@@ -115,30 +89,6 @@ async fn non_standard_id_clustering(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql))]
-async fn non_standard_id_clustering_no_preview(api: &TestApi) -> TestResult {
-    let setup = r#"
-        CREATE TABLE [$schema].[test] (
-            id INT IDENTITY,
-            CONSTRAINT [test_pkey] PRIMARY KEY NONCLUSTERED (id)
-        );
-    "#
-    .replace("$schema", api.schema_name());
-
-    api.raw_cmd(&setup).await;
-
-    let expected = expect![[r#"
-        model test {
-          id Int @id @default(autoincrement())
-        }
-    "#]];
-
-    let result = api.introspect_dml().await?;
-    expected.assert_eq(&result);
-
-    Ok(())
-}
-
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
 async fn standard_id_clustering(api: &TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE [$schema].[test] (
@@ -162,7 +112,7 @@ async fn standard_id_clustering(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mssql))]
 async fn non_standard_compound_id_clustering(api: &TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE [$schema].[test] (
@@ -191,34 +141,6 @@ async fn non_standard_compound_id_clustering(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql))]
-async fn non_standard_compound_id_clustering_no_preview(api: &TestApi) -> TestResult {
-    let setup = r#"
-        CREATE TABLE [$schema].[test] (
-            a INT,
-            b INT,
-            CONSTRAINT [test_pkey] PRIMARY KEY NONCLUSTERED (a, b)
-        );
-    "#
-    .replace("$schema", api.schema_name());
-
-    api.raw_cmd(&setup).await;
-
-    let expected = expect![[r#"
-        model test {
-          a Int
-          b Int
-
-          @@id([a, b])
-        }
-    "#]];
-
-    let result = api.introspect_dml().await?;
-    expected.assert_eq(&result);
-
-    Ok(())
-}
-
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
 async fn standard_compound_id_clustering(api: &TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE [$schema].[test] (
@@ -246,7 +168,7 @@ async fn standard_compound_id_clustering(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mssql))]
 async fn non_standard_unique_clustering(api: &TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE [$schema].[test] (
@@ -271,30 +193,6 @@ async fn non_standard_unique_clustering(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql))]
-async fn non_standard_unique_clustering_no_preview(api: &TestApi) -> TestResult {
-    let setup = r#"
-        CREATE TABLE [$schema].[test] (
-            a INT NOT NULL,
-            CONSTRAINT [test_a_key] UNIQUE CLUSTERED (a)
-        );
-    "#
-    .replace("$schema", api.schema_name());
-
-    api.raw_cmd(&setup).await;
-
-    let expected = expect![[r#"
-        model test {
-          a Int @unique
-        }
-    "#]];
-
-    let result = api.introspect_dml().await?;
-    expected.assert_eq(&result);
-
-    Ok(())
-}
-
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
 async fn standard_unique_clustering(api: &TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE [$schema].[test] (
@@ -318,7 +216,7 @@ async fn standard_unique_clustering(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mssql))]
 async fn non_standard_compound_unique_clustering(api: &TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE [$schema].[test] (
@@ -347,34 +245,6 @@ async fn non_standard_compound_unique_clustering(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql))]
-async fn non_standard_compound_unique_clustering_no_preview(api: &TestApi) -> TestResult {
-    let setup = r#"
-        CREATE TABLE [$schema].[test] (
-            a INT NOT NULL,
-            b INT NOT NULL,
-            CONSTRAINT [test_a_b_key] UNIQUE CLUSTERED (a, b)
-        );
-    "#
-    .replace("$schema", api.schema_name());
-
-    api.raw_cmd(&setup).await;
-
-    let expected = expect![[r#"
-        model test {
-          a Int
-          b Int
-
-          @@unique([a, b])
-        }
-    "#]];
-
-    let result = api.introspect_dml().await?;
-    expected.assert_eq(&result);
-
-    Ok(())
-}
-
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
 async fn standard_compound_unique_clustering(api: &TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE [$schema].[test] (
@@ -402,7 +272,7 @@ async fn standard_compound_unique_clustering(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mssql))]
 async fn non_standard_index_clustering(api: &TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE [$schema].[test] (
@@ -433,36 +303,6 @@ async fn non_standard_index_clustering(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql))]
-async fn non_standard_index_clustering_no_preview(api: &TestApi) -> TestResult {
-    let setup = r#"
-        CREATE TABLE [$schema].[test] (
-            id INT IDENTITY,
-            a INT NOT NULL,
-            CONSTRAINT [test_pkey] PRIMARY KEY NONCLUSTERED (id)
-        );
-
-        CREATE CLUSTERED INDEX [test_a_idx] ON [$schema].[test] (a);
-    "#
-    .replace("$schema", api.schema_name());
-
-    api.raw_cmd(&setup).await;
-
-    let expected = expect![[r#"
-        model test {
-          id Int @id @default(autoincrement())
-          a  Int
-
-          @@index([a])
-        }
-    "#]];
-
-    let result = api.introspect_dml().await?;
-    expected.assert_eq(&result);
-
-    Ok(())
-}
-
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
 async fn standard_index_clustering(api: &TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE [$schema].[test] (

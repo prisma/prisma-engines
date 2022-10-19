@@ -1,14 +1,11 @@
 use std::convert::TryInto;
 
 use super::*;
-use crate::{
-    constants::args, query_document::ParsedField, AggregateRecordsQuery, ArgumentListLookup, ParsedInputValue,
-    ReadQuery,
-};
+use crate::{query_document::ParsedField, AggregateRecordsQuery, ArgumentListLookup, ParsedInputValue, ReadQuery};
 use connector::Filter;
 use prisma_models::{ModelRef, OrderBy, ScalarFieldRef};
+use schema_builder::constants::args;
 
-#[tracing::instrument(skip(field, model))]
 pub fn group_by(mut field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
     let name = field.name;
     let alias = field.alias;
@@ -135,8 +132,21 @@ fn collect_scalar_fields(filter: &Filter) -> Vec<&ScalarFieldRef> {
         Filter::And(inner) => inner.iter().flat_map(collect_scalar_fields).collect(),
         Filter::Or(inner) => inner.iter().flat_map(collect_scalar_fields).collect(),
         Filter::Not(inner) => inner.iter().flat_map(collect_scalar_fields).collect(),
-        Filter::Scalar(sf) => sf.projection.scalar_fields(),
-        Filter::Aggregation(_) => vec![], // Aggregations have no effect here.
+        Filter::Scalar(sf) => sf.scalar_fields(),
+        // Referenced fields in an aggregation filter need to be grouped by too.
+        Filter::Aggregation(af) => collect_aggregate_field_refs(af.filter()),
+        _ => unreachable!(),
+    }
+}
+
+/// Collects all referenced fields that are used in an aggregate filter
+fn collect_aggregate_field_refs(filter: &Filter) -> Vec<&ScalarFieldRef> {
+    match filter {
+        Filter::And(inner) => inner.iter().flat_map(collect_aggregate_field_refs).collect(),
+        Filter::Or(inner) => inner.iter().flat_map(collect_aggregate_field_refs).collect(),
+        Filter::Not(inner) => inner.iter().flat_map(collect_aggregate_field_refs).collect(),
+        Filter::Scalar(sf) => sf.as_field_ref().map(|sf| vec![sf]).unwrap_or_default(),
+        Filter::Aggregation(af) => collect_aggregate_field_refs(af.filter()),
         _ => unreachable!(),
     }
 }

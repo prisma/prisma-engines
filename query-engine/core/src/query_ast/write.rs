@@ -1,5 +1,5 @@
 //! Write query AST
-use super::FilteredQuery;
+use super::{FilteredNestedMutation, FilteredQuery};
 use connector::{filter::Filter, DatasourceFieldName, RecordFilter, WriteArgs};
 use prisma_models::prelude::*;
 use std::{collections::HashMap, sync::Arc};
@@ -20,7 +20,6 @@ pub enum WriteQuery {
 
 impl WriteQuery {
     /// Takes a SelectionResult and writes its contents into the write arguments of the underlying query.
-    #[tracing::instrument(skip(self, result))]
     pub fn inject_result_into_args(&mut self, result: SelectionResult) {
         let model = self.model();
         let args = match self {
@@ -37,10 +36,18 @@ impl WriteQuery {
             )
         }
 
-        args.update_datetimes(model);
+        args.update_datetimes(&model);
     }
 
-    #[tracing::instrument(skip(self, field_selection))]
+    pub fn set_selectors(&mut self, selectors: Vec<SelectionResult>) {
+        match self {
+            Self::UpdateManyRecords(x) => x.set_selectors(selectors),
+            Self::UpdateRecord(x) => x.set_selectors(selectors),
+            Self::DeleteRecord(x) => x.set_selectors(selectors),
+            _ => return,
+        }
+    }
+
     pub fn returns(&self, field_selection: &FieldSelection) -> bool {
         let returns_id = &self.model().primary_identifier() == field_selection;
 
@@ -61,7 +68,6 @@ impl WriteQuery {
         }
     }
 
-    #[tracing::instrument(skip(self))]
     pub fn model(&self) -> ModelRef {
         match self {
             Self::CreateRecord(q) => Arc::clone(&q.model),
@@ -135,7 +141,6 @@ pub struct CreateManyRecords {
 }
 
 impl CreateManyRecords {
-    #[tracing::instrument(skip(self, result))]
     pub fn inject_result_into_all(&mut self, result: SelectionResult) {
         for (selected_field, value) in result {
             for args in self.args.iter_mut() {
@@ -238,7 +243,27 @@ impl FilteredQuery for DeleteRecord {
             Some(ref mut rf) => rf.filter = filter,
             None => self.record_filter = Some(filter.into()),
         }
+    }
+}
 
-        //.filter = Some(filter)
+impl FilteredNestedMutation for UpdateRecord {
+    fn set_selectors(&mut self, selectors: Vec<SelectionResult>) {
+        self.record_filter.selectors = Some(selectors);
+    }
+}
+
+impl FilteredNestedMutation for UpdateManyRecords {
+    fn set_selectors(&mut self, selectors: Vec<SelectionResult>) {
+        self.record_filter.selectors = Some(selectors);
+    }
+}
+
+impl FilteredNestedMutation for DeleteRecord {
+    fn set_selectors(&mut self, selectors: Vec<SelectionResult>) {
+        if let Some(ref mut rf) = self.record_filter {
+            rf.selectors = Some(selectors);
+        } else {
+            self.record_filter = Some(selectors.into())
+        }
     }
 }

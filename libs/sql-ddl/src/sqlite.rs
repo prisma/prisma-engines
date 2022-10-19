@@ -9,9 +9,8 @@ impl<T: Display> Display for SqliteIdentifier<T> {
     }
 }
 
-#[derive(Debug, Default)]
 pub struct CreateTable<'a> {
-    pub table_name: Cow<'a, str>,
+    pub table_name: &'a dyn Display,
     pub columns: Vec<Column<'a>>,
     pub primary_key: Option<Vec<Cow<'a, str>>>,
     pub foreign_keys: Vec<ForeignKey<'a>>,
@@ -19,7 +18,7 @@ pub struct CreateTable<'a> {
 
 impl Display for CreateTable<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        writeln!(f, "CREATE TABLE \"{}\" (", self.table_name)?;
+        writeln!(f, "CREATE TABLE {} (", self.table_name)?;
 
         self.columns.iter().map(Indented).join(",\n", f)?;
 
@@ -162,7 +161,7 @@ mod tests {
     #[test]
     fn basic_create_table() {
         let create_table = CreateTable {
-            table_name: "Cat".into(),
+            table_name: &SqliteIdentifier("Cat"),
             columns: vec![
                 Column {
                     name: "id".into(),
@@ -177,7 +176,8 @@ mod tests {
                     ..Default::default()
                 },
             ],
-            ..Default::default()
+            primary_key: None,
+            foreign_keys: Vec::new(),
         };
 
         let expected = indoc::indoc!(
@@ -195,7 +195,7 @@ mod tests {
     #[test]
     fn create_table_with_primary_key() {
         let create_table = CreateTable {
-            table_name: "Cat".into(),
+            table_name: &SqliteIdentifier("Cat"),
             columns: vec![
                 Column {
                     name: "id".into(),
@@ -210,7 +210,7 @@ mod tests {
                 },
             ],
             primary_key: Some(vec!["id".into(), "boxId".into()]),
-            ..Default::default()
+            foreign_keys: Vec::new(),
         };
 
         let expected = indoc!(
@@ -230,7 +230,7 @@ mod tests {
     #[test]
     fn create_table_with_primary_key_and_foreign_keys() {
         let create_table = CreateTable {
-            table_name: "Cat".into(),
+            table_name: &SqliteIdentifier("Cat"),
             columns: vec![
                 Column {
                     name: "id".into(),

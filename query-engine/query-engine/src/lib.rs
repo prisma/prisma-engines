@@ -1,9 +1,12 @@
+#![allow(clippy::derive_partial_eq_without_eq)]
+
 pub mod cli;
 pub mod context;
 pub mod error;
 pub mod logger;
 pub mod opt;
 pub mod server;
+pub mod tracer;
 
 use error::PrismaError;
 

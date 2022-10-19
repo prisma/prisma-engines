@@ -9,20 +9,21 @@ mod one2one_req {
         let schema = indoc! {
             r#"model Parent {
                 #id(id, Int, @id)
+                name String?
                 uniq Int @unique
                 child Child?
               }
               
               model Child {
                 #id(id, Int, @id)
-                parentUniq  Int
+                parentUniq  Int @unique
                 parent    Parent @relation(fields: [parentUniq], references: [uniq], onUpdate: Cascade)
                 child2 Child2?
               }
               
               model Child2 {
                 #id(id, Int, @id)
-                childUniq Int
+                childUniq Int @unique
                 child   Child @relation(fields: [childUniq], references: [parentUniq], onUpdate: Cascade)
               }
               "#
@@ -79,6 +80,12 @@ mod one2one_req {
           @r###"{"data":{"findManyParent":[{"uniq":4,"child":{"parentUniq":4,"child2":{"childUniq":4}}}]}}"###
         );
 
+        // Checks that it work when no FK is updated
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation { upsertOneParent(where: { id: 1 }, update: { name: "Bob" }, create: { id: 1, uniq: 1 }) { name uniq } }"#),
+          @r###"{"data":{"upsertOneParent":{"name":"Bob","uniq":4}}}"###
+        );
+
         Ok(())
     }
 
@@ -98,6 +105,8 @@ mod one2one_req {
               parent_uniq_1 String
               parent_uniq_2 String
               parent        Parent @relation(fields: [parent_uniq_1, parent_uniq_2], references: [uniq_1, uniq_2], onUpdate: Cascade)
+
+              @@unique([parent_uniq_1, parent_uniq_2])
             }"#
         };
 
@@ -144,14 +153,14 @@ mod one2one_opt {
               
               model Child {
                 #id(id, Int, @id)
-                parentUniq  Int?
+                parentUniq  Int? @unique
                 parent    Parent? @relation(fields: [parentUniq], references: [uniq], onUpdate: Cascade)
                 child2Opt Child2?
               }
               
               model Child2 {
                 #id(id, Int, @id)
-                childUniq Int?
+                childUniq Int? @unique
                 child   Child? @relation(fields: [childUniq], references: [parentUniq], onUpdate: Cascade)
               }
               "#
@@ -160,6 +169,7 @@ mod one2one_opt {
         schema.to_owned()
     }
 
+    // Updating the parent updates the child FK as well.
     #[connector_test(schema(optional))]
     async fn update_parent_cascade(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
@@ -229,6 +239,8 @@ mod one2one_opt {
               parent_uniq_1 String?
               parent_uniq_2 String?
               parent        Parent? @relation(fields: [parent_uniq_1, parent_uniq_2], references: [uniq_1, uniq_2], onUpdate: Cascade)
+
+              @@unique([parent_uniq_1, parent_uniq_2])
             }"#
         };
 
@@ -254,6 +266,51 @@ mod one2one_opt {
         insta::assert_snapshot!(
           run_query!(&runner, r#"query { findManyChild { id parent_uniq_1 parent_uniq_2 }}"#),
           @r###"{"data":{"findManyChild":[{"id":1,"parent_uniq_1":"u3","parent_uniq_2":"u2"}]}}"###
+        );
+
+        Ok(())
+    }
+
+    fn diff_id_name() -> String {
+        let schema = indoc! {
+            r#"model Parent {
+              #id(id, Int, @id)
+              uniq    Int? @unique
+              child   Child?
+            }
+            
+            model Child {
+              #id(childId, Int, @id)
+              childUniq       Int? @unique
+              parent           Parent? @relation(fields: [childUniq], references: [uniq], onUpdate: Cascade)
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // Updating the parent updates the child FK as well.
+    // Checks that it works even with different parent/child primary identifier names
+    #[connector_test(schema(diff_id_name))]
+    async fn update_parent_diff_id_name(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation { createOneParent(data: { id: 1, uniq: 1, child: { create: { childId: 1 } } }) { id } }"#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            updateOneParent(
+              where: { id: 1 }
+              data: { uniq: 2 }
+            ) {
+              id
+              uniq
+              child { childId childUniq }
+            }
+          }
+          "#),
+          @r###"{"data":{"updateOneParent":{"id":1,"uniq":2,"child":{"childId":1,"childUniq":2}}}}"###
         );
 
         Ok(())
@@ -437,7 +494,7 @@ mod multiple_cascading_paths {
     //   - User -> Comment
     //   - User -> Post -> Comment
     #[connector_test]
-    async fn should_work(runner: Runner) -> TestResult<()> {
+    async fn it_should_work(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,
             r#"mutation {

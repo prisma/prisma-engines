@@ -1,13 +1,13 @@
 use super::{inmemory_record_processor::InMemoryRecordProcessor, read};
 use crate::{interpreter::InterpretationResult, query_ast::*};
 use connector::{
-    self, filter::Filter, ConnectionLike, QueryArguments, RelAggregationRow, RelAggregationSelection, ScalarCompare,
+    self, filter::Filter, ConditionListValue, ConnectionLike, QueryArguments, RelAggregationRow,
+    RelAggregationSelection, ScalarCompare,
 };
 use prisma_models::{FieldSelection, ManyRecords, Record, RelationFieldRef, SelectionResult};
 use prisma_value::PrismaValue;
 use std::collections::HashMap;
 
-#[tracing::instrument(skip(tx, query, parent_result, processor))]
 pub async fn m2m(
     tx: &mut dyn ConnectionLike,
     query: &RelatedRecordsQuery,
@@ -60,7 +60,7 @@ pub async fn m2m(
             ManyRecords::from((child_ids, &query.selected_fields)).with_unique_records()
         } else {
             let mut args = query.args.clone();
-            let filter = child_link_id.is_in(child_ids);
+            let filter = child_link_id.is_in(ConditionListValue::list(child_ids));
 
             args.filter = match args.filter {
                 Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
@@ -81,10 +81,13 @@ pub async fn m2m(
     let mut id_map: HashMap<SelectionResult, Vec<SelectionResult>> = HashMap::new();
 
     for (parent_id, child_id) in ids {
+        let parent_id = parent_id.coerce_values()?;
+        let child_id = child_id.coerce_values()?;
+
         match id_map.get_mut(&child_id) {
             Some(v) => v.push(parent_id),
             None => {
-                id_map.insert(child_id.coerce_values()?, vec![parent_id.coerce_values()?]);
+                id_map.insert(child_id, vec![parent_id]);
             }
         };
     }
@@ -130,15 +133,6 @@ pub async fn m2m(
 }
 
 // [DTODO] This is implemented in an inefficient fashion, e.g. too much Arc cloning going on.
-#[tracing::instrument(skip(
-    tx,
-    parent_field,
-    parent_selections,
-    parent_result,
-    query_args,
-    selected_fields,
-    processor
-))]
 #[allow(clippy::too_many_arguments)]
 pub async fn one2m(
     tx: &mut dyn ConnectionLike,
@@ -200,7 +194,7 @@ pub async fn one2m(
     }
 
     let mut scalars = {
-        let filter = child_link_id.is_in(uniq_selections);
+        let filter = child_link_id.is_in(ConditionListValue::list(uniq_selections));
         let mut args = query_args;
 
         args.filter = match args.filter {

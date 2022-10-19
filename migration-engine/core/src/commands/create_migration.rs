@@ -1,6 +1,7 @@
 use crate::{json_rpc::types::*, CoreError, CoreResult};
 use migration_connector::{migrations_directory::*, DiffTarget, MigrationConnector};
-use std::path::Path;
+use psl::parser_database::SourceFile;
+use std::{path::Path, sync::Arc};
 use user_facing_errors::migration_engine::MigrationNameTooLong;
 
 /// Create a new migration.
@@ -24,7 +25,12 @@ pub async fn create_migration(
         .database_schema_from_diff_target(DiffTarget::Migrations(&previous_migrations), None)
         .await?;
     let to = connector
-        .database_schema_from_diff_target(DiffTarget::Datamodel(&input.prisma_schema), None)
+        .database_schema_from_diff_target(
+            DiffTarget::Datamodel(SourceFile::new_allocated(Arc::from(
+                input.prisma_schema.into_boxed_str(),
+            ))),
+            None,
+        )
         .await?;
     let migration = connector.diff(from, to)?;
 

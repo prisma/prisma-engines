@@ -5,12 +5,13 @@ pub mod bytes_filter;
 pub mod composite;
 pub mod decimal_filter;
 pub mod extended_relation_filters;
+pub mod field_reference;
 pub mod filter_regression;
 pub mod filter_unwrap;
 pub mod filters;
 pub mod insensitive_filters;
 pub mod json;
-pub mod json_path;
+pub mod json_filters;
 pub mod list_filters;
 pub mod many_relation;
 pub mod one2one_regression;
@@ -20,6 +21,7 @@ pub mod relation_null;
 pub mod search_filter;
 pub mod self_relation;
 pub mod self_relation_regression;
+pub mod uuid_filters;
 pub mod where_unique;
 
 /// Creates test data used by filter tests using the `common_nullable_types` schema.

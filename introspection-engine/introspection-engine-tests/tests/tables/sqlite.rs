@@ -1,7 +1,7 @@
 use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 
-#[test_connector(tags(Sqlite), preview_features("extendedIndexes"))]
+#[test_connector(tags(Sqlite))]
 async fn a_table_with_descending_unique(api: &TestApi) -> TestResult {
     let setup = indoc! {r#"
        CREATE TABLE "A" (
@@ -27,7 +27,7 @@ async fn a_table_with_descending_unique(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Sqlite), preview_features("extendedIndexes"))]
+#[test_connector(tags(Sqlite))]
 async fn a_table_with_descending_compound_unique(api: &TestApi) -> TestResult {
     let setup = indoc! {r#"
        CREATE TABLE "A" (
@@ -57,7 +57,7 @@ async fn a_table_with_descending_compound_unique(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Sqlite), preview_features("extendedIndexes"))]
+#[test_connector(tags(Sqlite))]
 async fn a_table_with_descending_index(api: &TestApi) -> TestResult {
     let setup = indoc! {r#"
        CREATE TABLE "A" (

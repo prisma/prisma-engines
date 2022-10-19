@@ -5,14 +5,14 @@ pub(crate) use name::Name;
 
 use super::{field_type::FieldType, CompositeTypeDepth};
 use convert_case::{Case, Casing};
-use datamodel::dml::{
-    self, CompositeType, CompositeTypeField, CompositeTypeFieldType, Datamodel, DefaultValue, Field, FieldArity, Model,
-    PrimaryKeyDefinition, PrimaryKeyField, ScalarField, ScalarType, ValueGenerator, WithDatabaseName,
-};
 use introspection_connector::Warning;
 use mongodb::bson::{Bson, Document};
 use mongodb_schema_describer::IndexWalker;
 use once_cell::sync::Lazy;
+use psl::dml::{
+    self, CompositeType, CompositeTypeField, CompositeTypeFieldType, Datamodel, DefaultValue, Field, FieldArity, Model,
+    PrimaryKeyDefinition, PrimaryKeyField, ScalarField, ScalarType, ValueGenerator, WithDatabaseName,
+};
 use regex::Regex;
 use std::{
     borrow::Cow,
@@ -105,7 +105,12 @@ impl<'a> Statistics<'a> {
     /// - if model is foo and field is bar, the type is FooBar
     /// - if a model already exists with the name, we'll use FooBar_
     fn composite_type_name(&self, model: &str, field: &str) -> Name {
-        let name = Name::Model(format!("{}_{}", model, field).to_case(Case::Pascal));
+        let combined: String = format!("{}_{}", model, field)
+            .chars()
+            .filter(|c| c.is_ascii())
+            .collect();
+
+        let name = Name::Model(combined.to_case(Case::Pascal));
 
         let name = if self.models.contains_key(&name) {
             format!("{}_", name)
@@ -546,7 +551,7 @@ fn filter_out_empty_types(
             match &field.field_type {
                 dml::FieldType::CompositeType(ct) if empty_types.contains(ct) => {
                     fields_with_an_empty_type.push((Name::Model(model_name.clone()), field.name.clone()));
-                    field.field_type = dml::FieldType::Scalar(ScalarType::Json, None, None);
+                    field.field_type = dml::FieldType::Scalar(ScalarType::Json, None);
                     field.documentation = Some(EMPTY_TYPE_DETECTED.to_owned());
                 }
                 _ => (),
@@ -560,7 +565,7 @@ fn filter_out_empty_types(
             match &field.r#type {
                 CompositeTypeFieldType::CompositeType(name) if empty_types.contains(name) => {
                     fields_with_an_empty_type.push((Name::CompositeType(type_name.clone()), field.name.clone()));
-                    field.r#type = CompositeTypeFieldType::Scalar(ScalarType::Json, None, None);
+                    field.r#type = CompositeTypeFieldType::Scalar(ScalarType::Json, None);
                     field.documentation = Some(EMPTY_TYPE_DETECTED.to_owned());
                 }
                 _ => (),

@@ -1,16 +1,13 @@
 use super::*;
-use crate::{
-    constants::{args, json_null, operations},
-    query_document::{ParsedInputMap, ParsedInputValue},
-    ObjectTag,
-};
+use crate::query_document::{ParsedInputMap, ParsedInputValue};
 use connector::{DatasourceFieldName, WriteArgs, WriteOperation};
 use prisma_models::{
     CompositeFieldRef, Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef, TypeIdentifier,
 };
+use schema_builder::constants::{args, json_null, operations};
 use std::{convert::TryInto, sync::Arc};
 
-#[derive(Default, Debug)]
+#[derive(Debug)]
 pub struct WriteArgsParser {
     pub args: WriteArgs,
     pub nested: Vec<(RelationFieldRef, ParsedInputMap)>,
@@ -19,10 +16,12 @@ pub struct WriteArgsParser {
 impl WriteArgsParser {
     /// Creates a new set of WriteArgsParser. Expects the parsed input map from the respective data key, not the enclosing map.
     /// E.g.: { data: { THIS MAP } } from the `data` argument of a write query.
-    #[tracing::instrument(name = "write_args_parser_from", skip(model, data_map))]
     pub fn from(model: &ModelRef, data_map: ParsedInputMap) -> QueryGraphBuilderResult<Self> {
         data_map.into_iter().try_fold(
-            WriteArgsParser::default(),
+            WriteArgsParser {
+                args: WriteArgs::new_empty(crate::executor::get_request_now()),
+                nested: Default::default(),
+            },
             |mut args, (k, v): (String, ParsedInputValue)| {
                 let field = model.fields().find_from_all(&k).unwrap();
 
@@ -54,10 +53,6 @@ impl WriteArgsParser {
             },
         )
     }
-}
-
-fn is_composite_envelope(map: &ParsedInputMap) -> bool {
-    matches!(map.tag, Some(ObjectTag::CompositeEnvelope))
 }
 
 fn parse_scalar(sf: &ScalarFieldRef, v: ParsedInputValue) -> Result<WriteOperation, QueryGraphBuilderError> {
@@ -124,7 +119,7 @@ fn parse_composite_writes(
         // - Operation envelope with further actions nested.
         // - Single object set shorthand.
         ParsedInputValue::Map(map) => {
-            if is_composite_envelope(&map) {
+            if map.is_composite_envelope() {
                 parse_composite_envelope(cf, map, path)
             } else {
                 let pv: PrismaValue = ParsedInputValue::Map(map).try_into()?;

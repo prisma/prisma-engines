@@ -3,8 +3,8 @@ use crate::PrismaResponse;
 use futures::FutureExt;
 use indexmap::IndexMap;
 use query_core::{
-    BatchDocument, CompactedDocument, Item, Operation, QueryDocument, QueryExecutor, QuerySchemaRef, QueryValue,
-    ResponseData, TxId,
+    schema::QuerySchemaRef, BatchDocument, BatchDocumentTransaction, CompactedDocument, Item, Operation, QueryDocument,
+    QueryExecutor, QueryValue, ResponseData, TxId,
 };
 use std::{fmt, panic::AssertUnwindSafe};
 
@@ -30,12 +30,15 @@ impl<'a> GraphQlHandler<'a> {
         match body.into_doc() {
             Ok(QueryDocument::Single(query)) => self.handle_single(query, tx_id, trace_id).await,
             Ok(QueryDocument::Multi(batch)) => match batch.compact() {
-                BatchDocument::Multi(batch, transactional) => {
-                    self.handle_batch(batch, transactional, tx_id, trace_id).await
+                BatchDocument::Multi(batch, transaction) => {
+                    self.handle_batch(batch, transaction, tx_id, trace_id).await
                 }
                 BatchDocument::Compact(compacted) => self.handle_compacted(compacted, tx_id, trace_id).await,
             },
-            Err(err) => PrismaResponse::Single(err.into()),
+            Err(err) => match err.as_known_error() {
+                Some(transformed) => PrismaResponse::Single(user_facing_errors::Error::new_known(transformed).into()),
+                None => PrismaResponse::Single(err.into()),
+            },
         }
     }
 
@@ -61,7 +64,7 @@ impl<'a> GraphQlHandler<'a> {
     async fn handle_batch(
         &self,
         queries: Vec<Operation>,
-        transactional: bool,
+        transaction: Option<BatchDocumentTransaction>,
         tx_id: Option<TxId>,
         trace_id: Option<String>,
     ) -> PrismaResponse {
@@ -70,7 +73,7 @@ impl<'a> GraphQlHandler<'a> {
         match AssertUnwindSafe(self.executor.execute_all(
             tx_id,
             queries,
-            transactional,
+            transaction,
             self.query_schema.clone(),
             trace_id,
         ))
@@ -99,7 +102,6 @@ impl<'a> GraphQlHandler<'a> {
         }
     }
 
-    #[tracing::instrument(skip(self, document))]
     async fn handle_compacted(
         &self,
         document: CompactedDocument,
@@ -138,8 +140,8 @@ impl<'a> GraphQlHandler<'a> {
                         // Copying here is mandatory due to some of the queries
                         // might be repeated with the same arguments in the original
                         // batch. We need to give the same answer for both of them.
-                        match data.get(&vals) {
-                            Some(result) => {
+                        match data.iter().find(|(k, _)| k == &vals) {
+                            Some((_, result)) => {
                                 // Filter out all the keys not selected in the
                                 // original query.
                                 let result: IndexMap<String, Item> = result

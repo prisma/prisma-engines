@@ -9,30 +9,50 @@ use introspection_engine_tests::test_api::*;
 use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres12), exclude(CockroachDb))]
 async fn should_not_remap_if_renaming_would_lead_to_duplicate_names(api: &TestApi) -> TestResult {
-    api.database()
-        .raw_cmd("CREATE TABLE nodes(id serial primary key)")
-        .await?;
+    let sql = r#"
+        CREATE TABLE nodes(id serial primary key);
+        CREATE TABLE _nodes(
+            node_a int NOT NULL,
+            node_b int NOT NULL,
+            CONSTRAINT _nodes_node_a_fkey FOREIGN KEY(node_a) REFERENCES nodes(id) ON DELETE CASCADE ON UPDATE CASCADE,
+            CONSTRAINT _nodes_node_b_fkey FOREIGN KEY(node_b) REFERENCES nodes(id) ON DELETE CASCADE ON UPDATE CASCADE
+        );
+        
+    "#;
+    api.raw_cmd(sql).await;
 
-    api.database()
-        .raw_cmd(
-            "CREATE TABLE _nodes(
-                node_a int not null,
-                node_b int not null,
-                constraint _nodes_node_a_fkey foreign key(node_a) references nodes(id) on delete cascade on update cascade,
-                constraint _nodes_node_b_fkey foreign key(node_b) references nodes(id) on delete cascade on update cascade
-            )
-        ",
-        )
-        .await?;
+    let expected = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
 
-    assert!(api.introspect().await.is_ok());
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
 
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        model _nodes {
+        node_a Int
+        node_b Int
+        nodes__nodes_node_aTonodes nodes @relation("_nodes_node_aTonodes", fields: [node_a], references: [id], onDelete: Cascade)
+        nodes__nodes_node_bTonodes nodes @relation("_nodes_node_bTonodes", fields: [node_b], references: [id], onDelete: Cascade)
+
+        @@ignore
+        }
+        model nodes {
+          id Int @id @default(autoincrement())
+          _nodes__nodes_node_aTonodes _nodes[] @relation("_nodes_node_aTonodes") @ignore
+          _nodes__nodes_node_bTonodes _nodes[] @relation("_nodes_node_bTonodes") @ignore
+        }
+    "#]];
+    api.expect_datamodel(&expected).await;
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 async fn remapping_fields_with_invalid_characters(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -79,7 +99,7 @@ async fn remapping_fields_with_invalid_characters(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 async fn remapping_tables_with_invalid_characters(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -114,7 +134,7 @@ async fn remapping_tables_with_invalid_characters(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Mssql, Sqlite, Vitess))]
+#[test_connector(exclude(Mssql, Sqlite, Vitess, CockroachDb))]
 async fn remapping_models_in_relations(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
@@ -166,7 +186,7 @@ async fn remapping_models_in_relations(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Mssql, Sqlite, Vitess))]
+#[test_connector(exclude(Mssql, Sqlite, Vitess, CockroachDb))]
 async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
@@ -218,7 +238,7 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
     Ok(())
 }
 
-#[test_connector(exclude(Sqlite, Mssql, Vitess))]
+#[test_connector(exclude(Sqlite, Mssql, Vitess, CockroachDb))]
 async fn remapping_fields_in_compound_relations(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
@@ -281,7 +301,7 @@ async fn remapping_fields_in_compound_relations(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(capabilities(Enums))]
+#[test_connector(capabilities(Enums), exclude(CockroachDb))]
 async fn remapping_enum_names(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
@@ -337,7 +357,7 @@ async fn remapping_enum_names(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(capabilities(Enums))]
+#[test_connector(capabilities(Enums), exclude(CockroachDb))]
 async fn remapping_enum_values(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
@@ -385,7 +405,7 @@ async fn remapping_enum_values(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(capabilities(Enums))]
+#[test_connector(capabilities(Enums), exclude(CockroachDb))]
 async fn remapping_enum_default_values(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
@@ -459,7 +479,7 @@ async fn remapping_compound_primary_keys(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 async fn not_automatically_remapping_invalid_compound_unique_key_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {

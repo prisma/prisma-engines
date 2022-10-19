@@ -3,61 +3,76 @@
 #![deny(missing_docs)]
 
 use crate::{
-    ids::IndexId, Column, ColumnArity, ColumnId, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey,
-    ForeignKeyAction, Index, IndexColumn, IndexType, PrimaryKey, PrimaryKeyColumn, SQLIndexAlgorithm, SQLSortOrder,
-    SqlSchema, Table, TableId, UserDefinedType, View,
+    ids::*, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, ForeignKeyAction,
+    ForeignKeyColumn, Index, IndexColumn, IndexType, SQLSortOrder, SqlSchema, Table, UserDefinedType, View,
 };
-use serde::de::DeserializeOwned;
-use std::fmt;
+use std::ops::Range;
 
-/// Traverse all the columns in the schema.
-pub fn walk_columns(schema: &SqlSchema) -> impl Iterator<Item = ColumnWalker<'_>> {
-    schema.iter_tables().flat_map(move |(table_id, table)| {
-        (0..table.columns.len()).map(move |column_id| ColumnWalker {
-            schema,
-            column_id: ColumnId(column_id as u32),
-            table_id,
-        })
-    })
-}
-
-/// Traverse a table column.
+/// A generic reference to a schema item. It holds a reference to the schema so it can offer a
+/// convenient API based on the Id type.
 #[derive(Clone, Copy)]
-pub struct ColumnWalker<'a> {
-    /// The schema the column is contained in.
-    schema: &'a SqlSchema,
-    column_id: ColumnId,
-    table_id: TableId,
+pub struct Walker<'a, Id> {
+    /// The identifier.
+    pub id: Id,
+    /// The schema for which the identifier is valid.
+    pub schema: &'a SqlSchema,
 }
 
-impl<'a> fmt::Debug for ColumnWalker<'a> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("ColumnWalker")
-            .field("column_id", &self.column_id)
-            .field("table_id", &self.table_id)
+impl<I: std::fmt::Debug> std::fmt::Debug for Walker<'_, I> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct(std::any::type_name::<Self>())
+            .field("id", &self.id)
             .finish()
     }
 }
 
+impl<'a, Id> Walker<'a, Id> {
+    /// Jump to the item identified by `other_id`.
+    pub fn walk<I>(self, other_id: I) -> Walker<'a, I> {
+        self.schema.walk(other_id)
+    }
+}
+
+/// Traverse a foreign key.
+pub type ForeignKeyWalker<'a> = Walker<'a, ForeignKeyId>;
+
+/// Traverse column.
+pub type ColumnWalker<'a> = Walker<'a, ColumnId>;
+
+/// Traverse a table.
+pub type TableWalker<'a> = Walker<'a, TableId>;
+
+/// Traverse an enum.
+pub type EnumWalker<'a> = Walker<'a, EnumId>;
+
+/// Traverse an index.
+pub type IndexWalker<'a> = Walker<'a, IndexId>;
+
+/// Traverse a specific column inside an index.
+pub type IndexColumnWalker<'a> = Walker<'a, IndexColumnId>;
+
+/// Traverse a namespace
+pub type NamespaceWalker<'a> = Walker<'a, NamespaceId>;
+
+/// Traverse a user-defined type
+pub type UserDefinedTypeWalker<'a> = Walker<'a, UdtId>;
+
+/// Traverse a view
+pub type ViewWalker<'a> = Walker<'a, ViewId>;
+
 impl<'a> ColumnWalker<'a> {
     /// The nullability and arity of the column.
-    pub fn arity(&self) -> &ColumnArity {
-        &self.column().tpe.arity
+    pub fn arity(self) -> ColumnArity {
+        self.get().1.tpe.arity
     }
 
-    /// A reference to the underlying Column struct.
-    pub fn column(&self) -> &'a Column {
-        &self.table().table()[self.column_id]
-    }
-
-    /// The index of the column in the parent table.
-    pub fn column_id(&self) -> ColumnId {
-        self.column_id
+    fn get(self) -> &'a (TableId, Column) {
+        &self.schema.columns[self.id.0 as usize]
     }
 
     /// Returns whether the column has the enum default value of the given enum type.
-    pub fn column_has_enum_default_value(&self, enum_name: &str, value: &str) -> bool {
-        self.column_type_family_as_enum().map(|enm| enm.name.as_str()) == Some(enum_name)
+    pub fn column_has_enum_default_value(self, enum_name: &str, value: &str) -> bool {
+        self.column_type_family_as_enum().map(|enm| enm.name()) == Some(enum_name)
             && self
                 .default()
                 .and_then(|default| default.as_value())
@@ -66,499 +81,295 @@ impl<'a> ColumnWalker<'a> {
     }
 
     /// Returns whether the type of the column matches the provided enum name.
-    pub fn column_type_is_enum(&self, enum_name: &str) -> bool {
+    pub fn column_type_is_enum(self, enum_name: &str) -> bool {
         self.column_type_family_as_enum()
-            .map(|enm| enm.name == enum_name)
+            .map(|enm| enm.name() == enum_name)
             .unwrap_or(false)
     }
 
     /// The type family.
-    pub fn column_type_family(&self) -> &'a ColumnTypeFamily {
-        &self.column().tpe.family
+    pub fn column_type_family(self) -> &'a ColumnTypeFamily {
+        &self.get().1.tpe.family
     }
 
     /// Extract an `Enum` column type family, or `None` if the family is something else.
-    pub fn column_type_family_as_enum(&self) -> Option<&'a Enum> {
+    pub fn column_type_family_as_enum(self) -> Option<EnumWalker<'a>> {
         self.column_type_family().as_enum().map(|enum_name| {
-            self.schema()
-                .get_enum(enum_name)
+            let idx = self
+                .schema
+                .enums
+                .iter()
+                .position(|enm| enm.name == enum_name)
                 .ok_or_else(|| panic!("Cannot find enum referenced in ColumnTypeFamily (`{}`)", enum_name))
-                .unwrap()
+                .unwrap();
+
+            self.walk(EnumId(idx as u32))
         })
     }
 
     /// The column name.
-    pub fn name(&self) -> &'a str {
-        &self.column().name
+    pub fn name(self) -> &'a str {
+        &self.get().1.name
     }
 
     /// The default value for the column.
-    pub fn default(&self) -> Option<&'a DefaultValue> {
-        self.column().default.as_ref()
+    pub fn default(self) -> Option<&'a DefaultValue> {
+        self.get().1.default.as_ref()
     }
 
     /// The full column type.
     pub fn column_type(self) -> &'a ColumnType {
-        &self.column().tpe
+        &self.get().1.tpe
     }
 
     /// The column native type.
-    pub fn column_native_type<T>(&self) -> Option<T>
-    where
-        T: DeserializeOwned,
-    {
-        self.column()
-            .tpe
-            .native_type
-            .as_ref()
-            .map(|val| serde_json::from_value(val.clone()).unwrap())
+    pub fn column_native_type<T: std::any::Any + 'static>(self) -> Option<&'a T> {
+        self.column_type().native_type.as_ref().map(|nt| nt.downcast_ref())
     }
 
     /// Is this column an auto-incrementing integer?
-    pub fn is_autoincrement(&self) -> bool {
-        self.column().auto_increment
+    pub fn is_autoincrement(self) -> bool {
+        self.get().1.auto_increment
     }
 
     /// Is this column indexed by a secondary index??
-    pub fn is_part_of_secondary_index(&self) -> bool {
-        let table = self.table();
-        let name = self.name();
-        table.indexes().any(|idx| idx.contains_column(name))
+    pub fn is_part_of_secondary_index(self) -> bool {
+        self.table().indexes().any(|idx| idx.contains_column(self.id))
     }
 
     /// Is this column a part of the table's primary key?
-    pub fn is_part_of_primary_key(&self) -> bool {
-        self.table().table().is_part_of_primary_key(self.name())
+    pub fn is_part_of_primary_key(self) -> bool {
+        match self.table().primary_key() {
+            Some(pk) => pk.contains_column(self.id),
+            None => false,
+        }
     }
 
-    /// Is this column a part of the table's primary key?
-    pub fn is_part_of_foreign_key(&self) -> bool {
-        self.table().table().is_part_of_foreign_key(self.name())
+    /// Is this column a part of one of the table's foreign keys?
+    pub fn is_part_of_foreign_key(self) -> bool {
+        let column_id = self.id;
+        self.table()
+            .foreign_keys()
+            .any(|fk| fk.constrained_columns().any(|col| col.id == column_id))
     }
 
     /// Returns whether two columns are named the same and belong to the same table.
-    pub fn is_same_column(&self, other: &ColumnWalker<'_>) -> bool {
+    pub fn is_same_column(self, other: ColumnWalker<'_>) -> bool {
         self.name() == other.name() && self.table().name() == other.table().name()
     }
 
     /// Returns whether this column is the primary key. If it is only part of the primary key, this will return false.
-    pub fn is_single_primary_key(&self) -> bool {
+    pub fn is_single_primary_key(self) -> bool {
         self.table()
             .primary_key()
-            .map(|pk| pk.columns.len() == 1 && pk.columns.first().map(|c| c.name() == self.name()).unwrap_or(false))
+            .map(|pk| pk.columns().len() == 1 && pk.columns().next().map(|c| c.name() == self.name()).unwrap_or(false))
             .unwrap_or(false)
     }
 
     /// Traverse to the column's table.
-    pub fn table(&self) -> TableWalker<'a> {
-        TableWalker {
-            schema: self.schema,
-            table_id: self.table_id,
-        }
+    pub fn table(self) -> TableWalker<'a> {
+        self.walk(self.get().0)
     }
-
-    /// Get a reference to the SQL schema the column is part of.
-    pub fn schema(&self) -> &'a SqlSchema {
-        self.schema
-    }
-}
-
-/// Traverse a view
-#[derive(Clone, Copy)]
-pub struct ViewWalker<'a> {
-    /// The schema the view is contained in.
-    schema: &'a SqlSchema,
-    /// The index of the view in the schema.
-    view_index: usize,
 }
 
 impl<'a> ViewWalker<'a> {
-    /// Create a ViewWalker from a schema and a reference to one of its views.
-    pub fn new(schema: &'a SqlSchema, view_index: usize) -> Self {
-        Self { schema, view_index }
-    }
-
     /// The name of the view
-    pub fn name(&self) -> &'a str {
+    pub fn name(self) -> &'a str {
         &self.view().name
     }
 
     /// The SQL definition of the view
-    pub fn definition(&self) -> Option<&'a str> {
+    pub fn definition(self) -> Option<&'a str> {
         self.view().definition.as_deref()
     }
 
-    /// The index of the view in the schema.
-    pub fn view_index(&self) -> usize {
-        self.view_index
+    fn view(self) -> &'a View {
+        &self.schema.views[self.id.0 as usize]
     }
-
-    fn view(&self) -> &'a View {
-        &self.schema.views[self.view_index]
-    }
-}
-
-/// Traverse a user-defined type
-#[derive(Clone, Copy)]
-pub struct UserDefinedTypeWalker<'a> {
-    schema: &'a SqlSchema,
-    udt_index: usize,
 }
 
 impl<'a> UserDefinedTypeWalker<'a> {
-    /// Create a UserDefinedTypeWalker from a schema and a reference to one of its udts.
-    pub fn new(schema: &'a SqlSchema, udt_index: usize) -> Self {
-        Self { schema, udt_index }
-    }
-
     /// The name of the type
-    pub fn name(&self) -> &'a str {
+    pub fn name(self) -> &'a str {
         &self.udt().name
     }
 
     /// The SQL definition of the type
-    pub fn definition(&self) -> Option<&'a str> {
+    pub fn definition(self) -> Option<&'a str> {
         self.udt().definition.as_deref()
     }
 
-    /// The index of the user-defined type in the schema.
-    pub fn udt_index(&self) -> usize {
-        self.udt_index
-    }
-
-    fn udt(&self) -> &'a UserDefinedType {
-        &self.schema.user_defined_types[self.udt_index]
-    }
-}
-
-/// Traverse a table.
-#[derive(Clone, Copy)]
-pub struct TableWalker<'a> {
-    /// The schema the table is contained in.
-    schema: &'a SqlSchema,
-    table_id: TableId,
-}
-
-impl<'a> fmt::Debug for TableWalker<'a> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("TableWalker").field("table_id", &self.table_id).finish()
+    fn udt(self) -> &'a UserDefinedType {
+        &self.schema.user_defined_types[self.id.0 as usize]
     }
 }
 
 impl<'a> TableWalker<'a> {
-    /// Create a TableWalker from a schema and a reference to one of its tables. This should stay private.
-    pub(crate) fn new(schema: &'a SqlSchema, table_id: TableId) -> Self {
-        Self { schema, table_id }
-    }
-
     /// Get a column in the table, by name.
-    pub fn column(&self, column_name: &str) -> Option<ColumnWalker<'a>> {
+    pub fn column(self, column_name: &str) -> Option<ColumnWalker<'a>> {
         self.columns().find(|column| column.name() == column_name)
     }
 
-    /// Get a column in the table by index.
-    pub fn column_at(&self, column_id: ColumnId) -> ColumnWalker<'a> {
-        ColumnWalker {
-            schema: self.schema,
-            column_id,
-            table_id: self.table_id,
-        }
+    /// Get a column in the table, by name.
+    pub fn column_case_insensitive(self, column_name: &str) -> Option<ColumnWalker<'a>> {
+        self.columns().find(|column| column.name() == column_name)
+    }
+
+    fn columns_range(self) -> Range<usize> {
+        range_for_key(&self.schema.columns, self.id, |(tid, _)| *tid)
     }
 
     /// Traverse the table's columns.
-    pub fn columns(&self) -> impl Iterator<Item = ColumnWalker<'a>> {
-        let schema = self.schema;
-        let table_id = self.table_id;
-
-        (0..self.table().columns.len()).map(move |column_id| ColumnWalker {
-            schema,
-            column_id: ColumnId(column_id as u32),
-            table_id,
-        })
+    pub fn columns(self) -> impl ExactSizeIterator<Item = ColumnWalker<'a>> {
+        self.columns_range()
+            .into_iter()
+            .map(move |idx| self.walk(ColumnId(idx as u32)))
     }
 
     /// The number of foreign key constraints on the table.
-    pub fn foreign_key_count(&self) -> usize {
-        self.table().foreign_keys.len()
-    }
-
-    /// Traverse to an index by index.
-    pub fn index_at(&self, index_index: usize) -> IndexWalker<'a> {
-        IndexWalker {
-            schema: self.schema,
-            table_id: self.table_id,
-            index_index,
-        }
+    pub fn foreign_key_count(self) -> usize {
+        self.foreign_keys_range().into_iter().len()
     }
 
     /// Traverse the indexes on the table.
-    pub fn indexes(&self) -> impl Iterator<Item = IndexWalker<'a>> {
-        let schema = self.schema;
-        let table_id = self.table_id;
-
-        (0..self.table().indices.len()).map(move |index_index| IndexWalker {
-            schema,
-            table_id,
-            index_index,
-        })
-    }
-
-    /// The number of indexes on the table.
-    pub fn indexes_count(&self) -> usize {
-        self.table().indices.len()
+    pub fn indexes(self) -> impl ExactSizeIterator<Item = IndexWalker<'a>> {
+        let range = range_for_key(&self.schema.indexes, self.id, |idx| idx.table_id);
+        range.map(move |idx| self.walk(IndexId(idx as u32)))
     }
 
     /// Traverse the foreign keys on the table.
-    pub fn foreign_keys(&self) -> impl Iterator<Item = ForeignKeyWalker<'a>> {
-        let table_id = self.table_id;
-        let schema = self.schema;
-
-        (0..self.table().foreign_keys.len()).map(move |foreign_key_index| ForeignKeyWalker {
-            foreign_key_index,
-            table_id,
-            schema,
-        })
+    pub fn foreign_keys(self) -> impl ExactSizeIterator<Item = ForeignKeyWalker<'a>> {
+        self.foreign_keys_range()
+            .map(move |id| self.walk(ForeignKeyId(id as u32)))
     }
 
     /// Traverse foreign keys from other tables, referencing current table.
-    pub fn referencing_foreign_keys(&self) -> impl Iterator<Item = ForeignKeyWalker<'a>> {
-        let table_id = self.table_id;
-
+    pub fn referencing_foreign_keys(self) -> impl Iterator<Item = ForeignKeyWalker<'a>> {
+        let table_id = self.id;
         self.schema
             .table_walkers()
-            .filter(move |t| t.table_id() != table_id)
+            .filter(move |t| t.id != table_id)
             .flat_map(|t| t.foreign_keys())
-            .filter(move |fk| fk.referenced_table().table_id() == table_id)
-    }
-
-    /// Get a foreign key by index.
-    pub fn foreign_key_at(&self, index: usize) -> ForeignKeyWalker<'a> {
-        ForeignKeyWalker {
-            schema: self.schema,
-            table_id: self.table_id,
-            foreign_key_index: index,
-        }
+            .filter(move |fk| fk.referenced_table().id == table_id)
     }
 
     /// The table name.
-    pub fn name(&self) -> &'a str {
+    pub fn name(self) -> &'a str {
         &self.table().name
     }
 
+    fn foreign_keys_range(self) -> Range<usize> {
+        range_for_key(&self.schema.foreign_keys, self.id, |fk| fk.constrained_table)
+    }
+
     /// Try to traverse a foreign key for a single column.
-    pub fn foreign_key_for_column(&self, column: &str) -> Option<&'a ForeignKey> {
-        self.table().foreign_key_for_column(column)
+    pub fn foreign_key_for_column(self, column: ColumnId) -> Option<ForeignKeyWalker<'a>> {
+        self.foreign_keys().find(|fk| {
+            let cols = fk.columns();
+            cols.len() == 1 && cols[0].constrained_column == column
+        })
+    }
+
+    /// The namespace the table belongs to, if defined.
+    pub fn namespace(self) -> Option<&'a str> {
+        self.schema
+            .namespaces
+            .get(self.table().namespace_id.0 as usize)
+            .map(|s| s.as_str())
+    }
+
+    /// The namespace the table belongs to.
+    pub fn namespace_id(self) -> NamespaceId {
+        self.table().namespace_id
     }
 
     /// Traverse to the primary key of the table.
-    pub fn primary_key(&self) -> Option<&'a PrimaryKey> {
-        self.table().primary_key.as_ref()
+    pub fn primary_key(self) -> Option<IndexWalker<'a>> {
+        self.indexes().find(|idx| idx.is_primary_key())
     }
 
     /// The columns that are part of the primary keys.
-    pub fn primary_key_columns(&'a self) -> Box<dyn ExactSizeIterator<Item = PrimaryKeyColumnWalker<'a>> + 'a> {
-        let as_walker = move |primary_key_column_id: usize, c: &PrimaryKeyColumn| {
-            let column_id = self.column(c.name()).map(|c| c.column_id).unwrap();
-
-            PrimaryKeyColumnWalker {
-                schema: self.schema,
-                primary_key_column_id,
-                table_id: self.table_id,
-                column_id,
-            }
-        };
-
-        match self.table().primary_key.as_ref() {
-            Some(pk) => Box::new(pk.columns.iter().enumerate().map(move |(i, c)| as_walker(i, c))),
-            None => Box::new(std::iter::empty()),
-        }
+    pub fn primary_key_columns(self) -> Option<impl ExactSizeIterator<Item = IndexColumnWalker<'a>>> {
+        self.primary_key().map(|pk| pk.columns())
     }
 
-    /// The names of the columns that are part of the primary key.
-    pub fn primary_key_column_names(&self) -> Option<Vec<String>> {
-        self.table()
-            .primary_key
-            .as_ref()
-            .map(|pk| pk.columns.iter().map(|c| c.name().to_string()).collect())
-    }
-
-    /// The SQLSchema the table belongs to.
-    pub fn schema(self) -> &'a SqlSchema {
-        self.schema
+    /// How many columns are in the primary key? Returns 0 in the absence of a pk.
+    pub fn primary_key_columns_count(self) -> usize {
+        self.primary_key_columns().map(|cols| cols.len()).unwrap_or(0)
     }
 
     /// Reference to the underlying `Table` struct.
-    pub fn table(&self) -> &'a Table {
-        &self.schema[self.table_id]
-    }
-
-    /// The index of the table in the schema.
-    pub fn table_id(&self) -> TableId {
-        self.table_id
-    }
-}
-
-/// A walker of a column in a primary key.
-#[derive(Clone, Copy)]
-pub struct PrimaryKeyColumnWalker<'a> {
-    schema: &'a SqlSchema,
-    primary_key_column_id: usize,
-    table_id: TableId,
-    column_id: ColumnId,
-}
-
-impl<'a> PrimaryKeyColumnWalker<'a> {
-    /// Conversion to a normal column walker.
-    pub fn as_column(self) -> ColumnWalker<'a> {
-        ColumnWalker {
-            schema: self.schema,
-            column_id: self.column_id,
-            table_id: self.table_id,
-        }
-    }
-
-    /// The length limit of the (text) column. Matters on MySQL only.
-    pub fn length(self) -> Option<u32> {
-        self.get().length
-    }
-
-    /// The BTree ordering. Matters on SQL Server only.
-    pub fn sort_order(self) -> Option<SQLSortOrder> {
-        self.get().sort_order
-    }
-
-    fn table(self) -> TableWalker<'a> {
-        TableWalker {
-            schema: self.schema,
-            table_id: self.table_id,
-        }
-    }
-
-    fn get(self) -> &'a PrimaryKeyColumn {
-        self.table()
-            .table()
-            .primary_key_columns()
-            .nth(self.primary_key_column_id)
-            .unwrap()
-    }
-}
-
-/// Traverse a foreign key.
-#[derive(Clone, Copy)]
-pub struct ForeignKeyWalker<'schema> {
-    /// The index of the foreign key in the table.
-    foreign_key_index: usize,
-    table_id: TableId,
-    schema: &'schema SqlSchema,
-}
-
-impl<'a> fmt::Debug for ForeignKeyWalker<'a> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("ForeignKeyWalker")
-            .field("foreign_key_index", &self.foreign_key_index)
-            .field("table_id", &self.table_id)
-            .field("__table_name", &self.table().name())
-            .field("__referenced_table", &self.foreign_key().referenced_table)
-            .field("__constrained_columns", &self.foreign_key().columns)
-            .field("__referenced_columns", &self.foreign_key().referenced_columns)
-            .finish()
+    fn table(self) -> &'a Table {
+        &self.schema.tables[self.id.0 as usize]
     }
 }
 
 impl<'schema> ForeignKeyWalker<'schema> {
-    /// The names of the foreign key columns on the referencing table.
-    pub fn constrained_column_names(&self) -> &'schema [String] {
-        &self.foreign_key().columns
+    fn columns(self) -> &'schema [ForeignKeyColumn] {
+        let range = range_for_key(&self.schema.foreign_key_columns, self.id, |col| col.foreign_key_id);
+        &self.schema.foreign_key_columns[range]
     }
 
     /// The foreign key columns on the referencing table.
-    pub fn constrained_columns<'b>(&'b self) -> impl Iterator<Item = ColumnWalker<'schema>> + 'b {
-        self.foreign_key()
-            .columns
-            .iter()
-            .filter_map(move |colname| self.table().columns().find(|column| colname == column.name()))
+    pub fn constrained_columns(self) -> impl ExactSizeIterator<Item = ColumnWalker<'schema>> {
+        self.columns().iter().map(move |col| self.walk(col.constrained_column))
     }
 
     /// The name of the foreign key constraint.
-    pub fn constraint_name(&self) -> Option<&'schema str> {
+    pub fn constraint_name(self) -> Option<&'schema str> {
         self.foreign_key().constraint_name.as_deref()
     }
 
-    /// The underlying ForeignKey struct.
-    pub fn foreign_key(&self) -> &'schema ForeignKey {
-        &self.table().table().foreign_keys[self.foreign_key_index]
-    }
-
-    /// The index of the foreign key in the parent table.
-    pub fn foreign_key_index(&self) -> usize {
-        self.foreign_key_index
-    }
-
-    /// Access the underlying ForeignKey struct.
-    pub fn inner(&self) -> &'schema ForeignKey {
-        self.foreign_key()
+    fn foreign_key(self) -> &'schema ForeignKey {
+        &self.schema.foreign_keys[self.id.0 as usize]
     }
 
     /// The `ON DELETE` behaviour of the foreign key.
-    pub fn on_delete_action(&self) -> &ForeignKeyAction {
-        &self.foreign_key().on_delete_action
+    pub fn on_delete_action(self) -> ForeignKeyAction {
+        self.foreign_key().on_delete_action
     }
 
     /// The `ON UPDATE` behaviour of the foreign key.
-    pub fn on_update_action(&self) -> &ForeignKeyAction {
-        &self.foreign_key().on_update_action
+    pub fn on_update_action(self) -> ForeignKeyAction {
+        self.foreign_key().on_update_action
     }
 
-    /// The names of the columns referenced by the foreign key on the referenced table.
-    pub fn referenced_column_names(&self) -> &'schema [String] {
-        &self.foreign_key().referenced_columns
-    }
-
-    /// The number of columns referenced by the constraint.
-    pub fn referenced_columns_count(&self) -> usize {
-        self.foreign_key().referenced_columns.len()
+    /// The columns referenced by the foreign key on the referenced table.
+    pub fn referenced_columns(self) -> impl ExactSizeIterator<Item = ColumnWalker<'schema>> {
+        self.columns().iter().map(move |col| self.walk(col.referenced_column))
     }
 
     /// The table the foreign key "points to".
-    pub fn referenced_table(&self) -> TableWalker<'schema> {
-        TableWalker {
-            schema: self.schema,
-            table_id: self
-                .schema
-                .table_walker(&self.foreign_key().referenced_table)
-                .ok_or_else(|| format!("Foreign key references unknown table. {:?}", self))
-                .unwrap()
-                .table_id,
-        }
+    pub fn referenced_table_name(self) -> &'schema str {
+        self.referenced_table().name()
+    }
+
+    /// The table the foreign key "points to".
+    pub fn referenced_table(self) -> TableWalker<'schema> {
+        self.walk(self.foreign_key().referenced_table)
     }
 
     /// Traverse to the referencing/constrained table.
-    pub fn table(&self) -> TableWalker<'schema> {
-        TableWalker {
-            schema: self.schema,
-            table_id: self.table_id,
-        }
+    pub fn table(self) -> TableWalker<'schema> {
+        self.walk(self.foreign_key().constrained_table)
     }
 
     /// True if relation is back to the same table.
-    pub fn is_self_relation(&self) -> bool {
-        self.table().name() == self.referenced_table().name()
+    pub fn is_self_relation(self) -> bool {
+        let fk = self.foreign_key();
+        fk.constrained_table == fk.referenced_table
     }
-}
-
-/// Traverse an index column.
-#[derive(Clone, Copy)]
-pub struct IndexColumnWalker<'a> {
-    schema: &'a SqlSchema,
-    index_column_id: usize,
-    table_id: TableId,
-    index_index: usize,
 }
 
 impl<'a> IndexColumnWalker<'a> {
     /// Get the index column data.
-    pub fn get(&self) -> &'a IndexColumn {
-        &self.index().get().columns[self.index_column_id]
+    pub fn get(self) -> &'a IndexColumn {
+        &self.schema.index_columns[self.id.0 as usize]
+    }
+
+    /// The name of the column.
+    pub fn name(self) -> &'a str {
+        self.as_column().name()
     }
 
     /// The length limit of the (text) column. Matters on MySQL only.
@@ -572,216 +383,111 @@ impl<'a> IndexColumnWalker<'a> {
     }
 
     /// The table where the column is located.
-    pub fn table(&self) -> TableWalker<'a> {
-        TableWalker {
-            table_id: self.table_id,
-            schema: self.schema,
-        }
+    pub fn table(self) -> TableWalker<'a> {
+        self.index().table()
     }
 
     /// The index of the column.
-    pub fn index(&self) -> IndexWalker<'a> {
-        IndexWalker {
-            schema: self.schema,
-            table_id: self.table_id,
-            index_index: self.index_index,
-        }
+    pub fn index(self) -> IndexWalker<'a> {
+        self.walk(self.get().index_id)
     }
 
     /// Convert to a normal column walker, losing the possible index arguments.
-    pub fn as_column(&self) -> ColumnWalker<'a> {
-        let column_id = self
-            .table()
-            .columns()
-            .enumerate()
-            .find_map(|(i, c)| {
-                if c.column().name == self.get().name() {
-                    Some(i)
-                } else {
-                    None
-                }
-            })
-            .expect("STATE ERROR BOOP");
-
-        ColumnWalker {
-            schema: self.schema,
-            column_id: ColumnId(column_id as u32),
-            table_id: self.table_id,
-        }
-    }
-}
-
-/// Traverse an index.
-#[derive(Clone, Copy)]
-pub struct IndexWalker<'a> {
-    schema: &'a SqlSchema,
-    /// The index of the table in the schema.
-    table_id: TableId,
-    /// The index of the database index in the table.
-    index_index: usize,
-}
-
-impl<'a> fmt::Debug for IndexWalker<'a> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("IndexWalker")
-            .field("index_index", &self.index_index)
-            .field("table_id", &self.table_id)
-            .finish()
+    pub fn as_column(self) -> ColumnWalker<'a> {
+        self.walk(self.get().column_id)
     }
 }
 
 impl<'a> IndexWalker<'a> {
     /// The names of the indexed columns.
-    pub fn column_names(&'a self) -> impl ExactSizeIterator<Item = &'a str> + 'a {
-        self.get().columns.iter().map(|c| c.name())
+    pub fn column_names(self) -> impl ExactSizeIterator<Item = &'a str> {
+        self.columns().map(|c| c.as_column().name())
     }
 
     /// Traverse the indexed columns.
-    pub fn columns<'b>(&'b self) -> impl ExactSizeIterator<Item = IndexColumnWalker<'a>> + 'b {
-        self.get()
-            .columns
-            .iter()
-            .enumerate()
-            .map(move |(index_column_id, _)| IndexColumnWalker {
-                schema: self.schema,
-                index_column_id,
-                table_id: self.table_id,
-                index_index: self.index_index,
-            })
+    pub fn columns(self) -> impl ExactSizeIterator<Item = IndexColumnWalker<'a>> {
+        range_for_key(&self.schema.index_columns, self.id, |i| i.index_id)
+            .map(move |idx| self.walk(IndexColumnId(idx as u32)))
     }
 
     /// True if index contains the given column.
-    pub fn contains_column(&self, column_name: &str) -> bool {
-        self.get().columns.iter().any(|column| column.name() == column_name)
+    pub fn contains_column(self, column_id: ColumnId) -> bool {
+        self.columns().any(|column| column.as_column().id == column_id)
     }
 
-    fn get(&self) -> &'a Index {
-        &self.table().table().indices[self.index_index]
-    }
-
-    /// The index of the index in the parent table.
-    pub fn index(&self) -> usize {
-        self.index_index
-    }
-
-    /// The identifier of the index.
-    pub fn index_id(&self) -> IndexId {
-        IndexId(self.table_id, self.index_index as u32)
+    fn get(self) -> &'a Index {
+        &self.schema.indexes[self.id.0 as usize]
     }
 
     /// The IndexType
-    pub fn index_type(&self) -> IndexType {
+    pub fn index_type(self) -> IndexType {
         self.get().tpe
     }
 
-    /// The name of the index.
-    pub fn name(&self) -> &'a str {
-        &self.get().name
+    /// Is this index the primary key of the table?
+    pub fn is_primary_key(self) -> bool {
+        matches!(self.get().tpe, IndexType::PrimaryKey)
     }
 
-    /// The SqlSchema the index belongs to
-    pub fn schema(self) -> &'a SqlSchema {
-        self.schema
+    /// Is this index a unique constraint? NB: This will return `false` for the primary key.
+    pub fn is_unique(self) -> bool {
+        matches!(self.get().tpe, IndexType::Unique)
+    }
+
+    /// The name of the index.
+    pub fn name(self) -> &'a str {
+        &self.get().index_name
     }
 
     /// Traverse to the table of the index.
-    pub fn table(&self) -> TableWalker<'a> {
-        TableWalker {
-            table_id: self.table_id,
-            schema: self.schema,
-        }
-    }
-
-    /// The hash algorithm used in the index.
-    pub fn algorithm(&self) -> Option<SQLIndexAlgorithm> {
-        self.get().algorithm
-    }
-}
-
-/// Traverse an enum.
-#[derive(Clone, Copy)]
-pub struct EnumWalker<'a> {
-    pub(crate) schema: &'a SqlSchema,
-    pub(crate) enum_index: usize,
-}
-
-impl<'a> fmt::Debug for EnumWalker<'a> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("EnumWalker")
-            .field("enum_index", &self.enum_index)
-            .finish()
+    pub fn table(self) -> TableWalker<'a> {
+        self.walk(self.get().table_id)
     }
 }
 
 impl<'a> EnumWalker<'a> {
-    /// The index of the enum in the parent schema.
-    pub fn enum_index(&self) -> usize {
-        self.enum_index
+    fn get(self) -> &'a Enum {
+        &self.schema.enums[self.id.0 as usize]
     }
 
-    fn get(&self) -> &'a Enum {
-        &self.schema.enums[self.enum_index]
+    /// The namespace the enum belongs to, if defined.
+    pub fn namespace(self) -> Option<&'a str> {
+        self.schema
+            .namespaces
+            .get(self.get().namespace_id.0 as usize)
+            .map(|s| s.as_str())
     }
 
     /// The name of the enum. This is a made up name on MySQL.
-    pub fn name(&self) -> &'a str {
+    pub fn name(self) -> &'a str {
         &self.get().name
     }
 
     /// The values of the enum
-    pub fn values(&self) -> &'a [String] {
+    pub fn values(self) -> &'a [String] {
         &self.get().values
     }
 }
 
-/// Extension methods for the traversal of a SqlSchema.
-pub trait SqlSchemaExt {
-    /// Find an enum by index.
-    fn enum_walker_at(&self, index: usize) -> EnumWalker<'_>;
-
-    /// Find a table by name.
-    fn table_walker<'a>(&'a self, name: &str) -> Option<TableWalker<'a>>;
-
-    /// Find a table by id.
-    fn table_walker_at(&self, table_id: TableId) -> TableWalker<'_>;
-
-    /// Find a view by index.
-    fn view_walker_at(&self, index: usize) -> ViewWalker<'_>;
-
-    /// Find a user-defined type by index.
-    fn udt_walker_at(&self, index: usize) -> UserDefinedTypeWalker<'_>;
+impl<'a> NamespaceWalker<'a> {
+    /// The namespace name.
+    pub fn name(self) -> &'a str {
+        &self.schema.namespaces[self.id.0 as usize]
+    }
 }
 
-impl SqlSchemaExt for SqlSchema {
-    fn enum_walker_at(&self, index: usize) -> EnumWalker<'_> {
-        EnumWalker {
-            schema: self,
-            enum_index: index,
-        }
-    }
-
-    fn table_walker<'a>(&'a self, name: &str) -> Option<TableWalker<'a>> {
-        Some(TableWalker {
-            table_id: TableId(self.tables.iter().position(|table| table.name == name)? as u32),
-            schema: self,
-        })
-    }
-
-    fn table_walker_at(&self, table_id: TableId) -> TableWalker<'_> {
-        TableWalker { table_id, schema: self }
-    }
-
-    fn view_walker_at(&self, index: usize) -> ViewWalker<'_> {
-        ViewWalker {
-            view_index: index,
-            schema: self,
-        }
-    }
-
-    fn udt_walker_at(&self, index: usize) -> UserDefinedTypeWalker<'_> {
-        UserDefinedTypeWalker {
-            udt_index: index,
-            schema: self,
-        }
-    }
+/// For a slice sorted by a key K, return the contiguous range of items matching the key.
+fn range_for_key<I, K>(slice: &[I], key: K, extract: fn(&I) -> K) -> Range<usize>
+where
+    K: Copy + Ord + PartialOrd + PartialEq,
+{
+    let seed = slice.binary_search_by_key(&key, extract).unwrap_or(0);
+    let mut iter = slice[..seed].iter();
+    let start = match iter.rposition(|i| extract(i) != key) {
+        None => 0,
+        Some(other) => other + 1,
+    };
+    let mut iter = slice[seed..].iter();
+    let end = seed + iter.position(|i| extract(i) != key).unwrap_or(slice.len() - seed);
+    start..end
 }

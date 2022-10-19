@@ -1,14 +1,14 @@
-use crate::{column_metadata::ColumnMetadata, error::SqlError};
+use crate::{column_metadata::ColumnMetadata, error::SqlError, value::to_prisma_value};
 use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
 use connector_interface::{coerce_null_to_zero_value, AggregationResult, AggregationSelection};
-use datamodel::dml::FieldArity;
 use prisma_models::{PrismaValue, Record, TypeIdentifier};
+use psl::dml::FieldArity;
 use quaint::{
     ast::{Expression, Value},
     connector::ResultRow,
 };
-use std::{convert::TryFrom, io, str::FromStr};
+use std::{io, str::FromStr};
 use uuid::Uuid;
 
 /// An allocated representation of a `Row` returned from the database.
@@ -18,7 +18,6 @@ pub struct SqlRow {
 }
 
 impl SqlRow {
-    #[tracing::instrument(skip(self, selections))]
     pub fn into_aggregation_results(self, selections: &[AggregationSelection]) -> Vec<AggregationResult> {
         let mut values = self.values;
         values.reverse();
@@ -89,7 +88,6 @@ pub trait ToSqlRow {
 }
 
 impl ToSqlRow for ResultRow {
-    #[tracing::instrument(skip(self, meta))]
     fn to_sql_row(self, meta: &[ColumnMetadata<'_>]) -> crate::Result<SqlRow> {
         let mut row = SqlRow::default();
         let row_width = meta.len();
@@ -124,8 +122,7 @@ impl ToSqlRow for ResultRow {
     }
 }
 
-#[tracing::instrument(skip(p_value, meta))]
-pub fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result<PrismaValue, SqlError> {
+fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result<PrismaValue, SqlError> {
     let create_error = |value: &Value| {
         let message = match meta.name() {
             Some(name) => {
@@ -149,7 +146,8 @@ pub fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Re
     Ok(match meta.identifier() {
         TypeIdentifier::Boolean => match p_value {
             value if value.is_null() => PrismaValue::Null,
-            Value::Integer(Some(i)) => PrismaValue::Boolean(i != 0),
+            Value::Int32(Some(i)) => PrismaValue::Boolean(i != 0),
+            Value::Int64(Some(i)) => PrismaValue::Boolean(i != 0),
             Value::Boolean(Some(b)) => PrismaValue::Boolean(b),
             Value::Bytes(Some(bytes)) if bytes.as_ref() == [0u8] => PrismaValue::Boolean(false),
             Value::Bytes(Some(bytes)) if bytes.as_ref() == [1u8] => PrismaValue::Boolean(true),
@@ -176,8 +174,8 @@ pub fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Re
         },
         TypeIdentifier::DateTime => match p_value {
             value if value.is_null() => PrismaValue::Null,
-            Value::DateTime(Some(dt)) => PrismaValue::DateTime(dt.into()),
-            Value::Integer(Some(ts)) => {
+            value if value.is_integer() => {
+                let ts = value.as_integer().unwrap();
                 let nsecs = ((ts % 1000) * 1_000_000) as u32;
                 let secs = (ts / 1000) as i64;
                 let naive = chrono::NaiveDateTime::from_timestamp(secs, nsecs);
@@ -185,6 +183,7 @@ pub fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Re
 
                 PrismaValue::DateTime(datetime.into())
             }
+            Value::DateTime(Some(dt)) => PrismaValue::DateTime(dt.into()),
             Value::Text(Some(ref dt_string)) => {
                 let dt = DateTime::parse_from_rfc3339(dt_string)
                     .or_else(|_| DateTime::parse_from_rfc2822(dt_string))
@@ -216,7 +215,11 @@ pub fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Re
                 f if f.is_infinite() => return Err(create_error(&p_value)),
                 _ => PrismaValue::Float(BigDecimal::from_f32(f).unwrap().normalized()),
             },
-            Value::Integer(Some(i)) => match BigDecimal::from_i64(i) {
+            Value::Int32(Some(i)) => match BigDecimal::from_i32(i) {
+                Some(dec) => PrismaValue::Float(dec),
+                None => return Err(create_error(&p_value)),
+            },
+            Value::Int64(Some(i)) => match BigDecimal::from_i64(i) {
                 Some(dec) => PrismaValue::Float(dec),
                 None => return Err(create_error(&p_value)),
             },
@@ -232,12 +235,13 @@ pub fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Re
             _ => return Err(create_error(&p_value)),
         },
         TypeIdentifier::Int | TypeIdentifier::BigInt => match p_value {
-            Value::Integer(Some(i)) => PrismaValue::Int(i),
+            Value::Int32(Some(i)) => PrismaValue::Int(i as i64),
+            Value::Int64(Some(i)) => PrismaValue::Int(i),
             Value::Bytes(Some(bytes)) => PrismaValue::Int(interpret_bytes_as_i64(&bytes)),
             Value::Text(Some(ref txt)) => {
                 PrismaValue::Int(i64::from_str(txt.trim_start_matches('\0')).map_err(|_| create_error(&p_value))?)
             }
-            other => PrismaValue::try_from(other)?,
+            other => to_prisma_value(other)?,
         },
         TypeIdentifier::String => match p_value {
             value if value.is_null() => PrismaValue::Null,
@@ -245,7 +249,7 @@ pub fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Re
             Value::Json(Some(ref json_value)) => {
                 PrismaValue::String(serde_json::to_string(json_value).map_err(|_| create_error(&p_value))?)
             }
-            other => PrismaValue::try_from(other)?,
+            other => to_prisma_value(other)?,
         },
         TypeIdentifier::Bytes => match p_value {
             value if value.is_null() => PrismaValue::Null,

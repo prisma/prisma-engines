@@ -12,11 +12,11 @@ mod migration_step_applier;
 mod schema_calculator;
 
 use client_wrapper::Client;
-use datamodel::common::preview_features::PreviewFeature;
 use enumflags2::BitFlags;
 use migration::MongoDbMigration;
 use migration_connector::{migrations_directory::MigrationDirectory, *};
 use mongodb_schema_describer::MongoSchema;
+use psl::PreviewFeature;
 use std::{future, sync::Arc};
 use tokio::sync::OnceCell;
 
@@ -52,8 +52,7 @@ impl MongoDbMigrationConnector {
     async fn mongodb_schema_from_diff_target(&self, target: DiffTarget<'_>) -> ConnectorResult<MongoSchema> {
         match target {
             DiffTarget::Datamodel(schema) => {
-                let validated_schema =
-                    datamodel::parse_schema_parserdb(schema).map_err(ConnectorError::new_schema_parser_error)?;
+                let validated_schema = psl::parse_schema(schema).map_err(ConnectorError::new_schema_parser_error)?;
                 Ok(schema_calculator::calculate(&validated_schema))
             }
             DiffTarget::Database => self.client().await?.describe().await,
@@ -157,6 +156,26 @@ impl MigrationConnector for MongoDbMigrationConnector {
 
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         Box::pin(future::ready(Ok(())))
+    }
+
+    fn introspect<'a>(
+        &'a mut self,
+        ctx: &'a IntrospectionContext,
+    ) -> BoxFuture<'a, ConnectorResult<IntrospectionResult>> {
+        Box::pin(async move {
+            let url: String = ctx.datasource().load_url(|v| std::env::var(v).ok()).map_err(|err| {
+                migration_connector::ConnectorError::new_schema_parser_error(
+                    err.to_pretty_string("schema.prisma", ctx.schema_string()),
+                )
+            })?;
+            let connector = mongodb_introspection_connector::MongoDbIntrospectionConnector::new(&url)
+                .await
+                .map_err(|err| ConnectorError::from_source(err, "Introspection error"))?;
+            connector
+                .introspect(ctx)
+                .await
+                .map_err(|err| ConnectorError::from_source(err, "Introspection error"))
+        })
     }
 
     fn render_script(

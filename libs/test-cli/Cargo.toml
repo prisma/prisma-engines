@@ -1,7 +1,6 @@
 [package]
 name = "test-cli"
 version = "0.1.0"
-authors = ["Tom Houlé <tom@tomhoule.com>"]
 edition = "2021"
 
 [dependencies]
@@ -13,8 +12,8 @@ migration-core = { path = "../../migration-engine/core" }
 migration-connector = { path = "../../migration-engine/connectors/migration-connector" }
 introspection-core = { path = "../../introspection-engine/core" }
 introspection-connector = { path = "../../introspection-engine/connectors/introspection-connector" }
-datamodel = { path = "../../libs/datamodel/core" }
-tokio = "1.0"
+psl.workspace = true
+tokio.workspace = true
 serde_json = { version = "1.0", features = ["float_roundtrip"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }

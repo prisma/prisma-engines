@@ -1,12 +1,13 @@
 use super::*;
 use crate::{
-    constants::args,
     query_ast::*,
     query_graph::{Flow, Node, QueryGraph, QueryGraphDependency},
-    ArgumentListLookup, ConnectorContext, ParsedField, ParsedInputMap,
+    ArgumentListLookup, ParsedField, ParsedInputMap,
 };
 use connector::IntoFilter;
 use prisma_models::ModelRef;
+use schema::ConnectorContext;
+use schema_builder::constants::args;
 use std::{convert::TryInto, sync::Arc};
 
 /// Handles a top-level upsert
@@ -51,7 +52,6 @@ use std::{convert::TryInto, sync::Arc};
 ///  │   Read Parent   │
 ///  └─────────────────┘
 /// ```
-#[tracing::instrument(skip(graph, model, field))]
 pub fn upsert_record(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,

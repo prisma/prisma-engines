@@ -1,15 +1,10 @@
 use indoc::formatdoc;
 use migration_engine_tests::test_api::*;
 
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mssql))]
 fn clustered_index(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
 
         model A {{
           id Int @id(clustered: false)
@@ -28,15 +23,10 @@ fn clustered_index(api: TestApi) {
     api.schema_push(&dm).send().assert_green().assert_no_steps();
 }
 
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mssql))]
 fn non_clustered_index(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
 
         model A {{
           id Int @id
@@ -55,15 +45,10 @@ fn non_clustered_index(api: TestApi) {
     api.schema_push(&dm).send().assert_green().assert_no_steps();
 }
 
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mssql))]
 fn default_clustered_index(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
 
         model A {{
           id Int @id
@@ -120,7 +105,7 @@ fn clustered_index_no_preview(api: TestApi) {
     api.schema_push(&dm).send().assert_green().assert_no_steps();
 }
 
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mssql))]
 fn non_clustered_to_clustered_index(api: TestApi) {
     let schema = api.schema_name();
 
@@ -145,11 +130,6 @@ fn non_clustered_to_clustered_index(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
 
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
-
         model A {{
           id Int @id(clustered: false)
           og Int
@@ -165,7 +145,7 @@ fn non_clustered_to_clustered_index(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mssql))]
 fn clustered_to_non_clustered_index(api: TestApi) {
     let schema = api.schema_name();
 
@@ -189,11 +169,6 @@ fn clustered_to_non_clustered_index(api: TestApi) {
 
     let dm = formatdoc! {r#"
         {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
 
         model A {{
           id Int @id(clustered: false)

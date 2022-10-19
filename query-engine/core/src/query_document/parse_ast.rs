@@ -1,10 +1,9 @@
 //! Parsed query document tree. Naming is WIP.
 //! Structures represent parsed and validated parts of the query document, used by the query builders.
-use std::ops::{Deref, DerefMut};
-
-use crate::{ObjectTag, OutputFieldRef};
 use indexmap::IndexMap;
 use prisma_models::{OrderBy, PrismaValue, ScalarFieldRef};
+use schema::{ObjectTag, OutputFieldRef};
+use std::ops::{Deref, DerefMut};
 
 pub type ParsedInputList = Vec<ParsedInputValue>;
 
@@ -17,6 +16,22 @@ pub struct ParsedInputMap {
 impl ParsedInputMap {
     pub fn set_tag(&mut self, tag: Option<ObjectTag>) {
         self.tag = tag;
+    }
+
+    pub fn is_relation_envelope(&self) -> bool {
+        matches!(&self.tag, Some(ObjectTag::RelationEnvelope))
+    }
+
+    pub fn is_composite_envelope(&self) -> bool {
+        matches!(&self.tag, Some(ObjectTag::CompositeEnvelope))
+    }
+
+    pub fn is_field_ref_type(&self) -> bool {
+        matches!(&self.tag, Some(ObjectTag::FieldRefType(_)))
+    }
+
+    pub fn is_nested_to_one_update_envelope(&self) -> bool {
+        matches!(&self.tag, Some(ObjectTag::NestedToOneUpdateEnvelope))
     }
 }
 

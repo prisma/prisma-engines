@@ -6,13 +6,14 @@ use connector_interface::{
     error::{ConnectorError, ErrorKind},
     Connection, Connector,
 };
-use datamodel::Datasource;
+use psl::{Datasource, PreviewFeature};
 use quaint::{connector::SqliteParams, error::ErrorKind as QuaintKind, pooled::Quaint, prelude::ConnectionInfo};
 use std::{convert::TryFrom, time::Duration};
 
 pub struct Sqlite {
     pool: Quaint,
     file_path: String,
+    features: Vec<PreviewFeature>,
 }
 
 impl Sqlite {
@@ -23,11 +24,20 @@ impl Sqlite {
     fn connection_info(&self) -> &ConnectionInfo {
         self.pool.connection_info()
     }
+
+    /// Get SQLite's preview features.
+    pub fn features(&self) -> &[PreviewFeature] {
+        self.features.as_ref()
+    }
 }
 
 #[async_trait]
 impl FromSource for Sqlite {
-    async fn from_source(_source: &Datasource, url: &str) -> connector_interface::Result<Sqlite> {
+    async fn from_source(
+        _source: &Datasource,
+        url: &str,
+        features: &[PreviewFeature],
+    ) -> connector_interface::Result<Sqlite> {
         let database_str = url;
 
         let connection_info = ConnectionInfo::from_url(database_str)
@@ -53,7 +63,11 @@ impl FromSource for Sqlite {
 
         let pool = builder.build();
 
-        Ok(Sqlite { pool, file_path })
+        Ok(Sqlite {
+            pool,
+            file_path,
+            features: features.to_owned(),
+        })
     }
 }
 
@@ -67,11 +81,10 @@ fn invalid_file_path_error(file_path: &str, connection_info: &ConnectionInfo) ->
 
 #[async_trait]
 impl Connector for Sqlite {
-    #[tracing::instrument(skip(self))]
     async fn get_connection<'a>(&'a self) -> connector::Result<Box<dyn Connection + Send + Sync + 'static>> {
         super::catch(self.connection_info().clone(), async move {
             let conn = self.pool.check_out().await.map_err(SqlError::from)?;
-            let conn = SqlConnection::new(conn, self.connection_info());
+            let conn = SqlConnection::new(conn, self.connection_info(), self.features.clone());
 
             Ok(Box::new(conn) as Box<dyn Connection + Send + Sync + 'static>)
         })

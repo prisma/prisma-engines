@@ -28,6 +28,14 @@ mod special_id_values {
             id String @id @default(dbgenerated("(uuid())"))
             name String
         }
+        model BinSwappedTest {
+            id Bytes @id @default(dbgenerated("(uuid_to_bin(uuid(), 1))")) @test.Binary(16)
+            name String
+        }
+        model BinNormalTest {
+            id Bytes @id @default(dbgenerated("(uuid_to_bin(uuid(), 0))")) @test.Binary(16)
+            name String
+        }
         "#};
 
         prisma.to_string()
@@ -121,6 +129,38 @@ mod special_id_values {
                 createOneStrTest(data: {id: "e27861d6-c0cb-4e0b-aac5-158aa6eced65", name: "test"}) {id}
             }"#,
             r#"{"data":{"createOneStrTest":{"id":"e27861d6-c0cb-4e0b-aac5-158aa6eced65"}}}"#
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn uuid_is_swapped(runner: Runner) -> TestResult<()> {
+        run_query!(
+            runner,
+            indoc! {r#"
+        mutation {
+            createOneBinSwappedTest(data: {
+                name: "foo"
+            }) { id }
+        }
+        "#}
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn uuid_is_normal(runner: Runner) -> TestResult<()> {
+        run_query!(
+            runner,
+            indoc! {r#"
+        mutation {
+            createOneBinNormalTest(data: {
+                name: "foo"
+            }) { id }
+        }
+        "#}
         );
 
         Ok(())

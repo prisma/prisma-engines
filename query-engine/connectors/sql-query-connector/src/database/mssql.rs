@@ -6,18 +6,30 @@ use connector_interface::{
     error::{ConnectorError, ErrorKind},
     Connection, Connector,
 };
-use datamodel::Datasource;
+use psl::{Datasource, PreviewFeature};
 use quaint::{pooled::Quaint, prelude::ConnectionInfo};
 use std::time::Duration;
 
 pub struct Mssql {
     pool: Quaint,
     connection_info: ConnectionInfo,
+    features: Vec<PreviewFeature>,
+}
+
+impl Mssql {
+    /// Get MSSQL's preview features.
+    pub fn features(&self) -> &[PreviewFeature] {
+        self.features.as_ref()
+    }
 }
 
 #[async_trait]
 impl FromSource for Mssql {
-    async fn from_source(_source: &Datasource, url: &str) -> connector_interface::Result<Self> {
+    async fn from_source(
+        _source: &Datasource,
+        url: &str,
+        features: &[PreviewFeature],
+    ) -> connector_interface::Result<Self> {
         let database_str = url;
 
         let connection_info = ConnectionInfo::from_url(database_str).map_err(|err| {
@@ -37,17 +49,20 @@ impl FromSource for Mssql {
         let pool = builder.build();
         let connection_info = pool.connection_info().to_owned();
 
-        Ok(Self { pool, connection_info })
+        Ok(Self {
+            pool,
+            connection_info,
+            features: features.to_owned(),
+        })
     }
 }
 
 #[async_trait]
 impl Connector for Mssql {
-    #[tracing::instrument(skip(self))]
     async fn get_connection<'a>(&'a self) -> connector::Result<Box<dyn Connection + Send + Sync + 'static>> {
         super::catch(self.connection_info.clone(), async move {
             let conn = self.pool.check_out().await.map_err(SqlError::from)?;
-            let conn = SqlConnection::new(conn, &self.connection_info);
+            let conn = SqlConnection::new(conn, &self.connection_info, self.features.clone());
 
             Ok(Box::new(conn) as Box<dyn Connection + Send + Sync + 'static>)
         })

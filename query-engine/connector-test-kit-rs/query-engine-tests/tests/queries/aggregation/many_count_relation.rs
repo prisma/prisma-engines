@@ -295,7 +295,7 @@ mod many_count_rel {
               createdAt DateTime  @default(now())
               updatedAt DateTime  @updatedAt
             }
-            
+
             model Comment {
               #id(id, Int, @id)
               post      Post     @relation(fields: [postId], references: [id])
@@ -346,23 +346,23 @@ mod many_count_rel {
               votes           Vote[]
               UserToObjective UserToObjective[]
             }
-            
+
             model Objective {
               #id(id, Int, @default(autoincrement()), @id)
               name            String            @unique
               UserToObjective UserToObjective[] @relation(name: "UserObjectives")
             }
-            
+
             model UserToObjective {
               user        User      @relation(fields: [userId], references: [id])
               userId      Int
               objective   Objective @relation(name: "UserObjectives", fields: [objectiveId], references: [id], onDelete: NoAction, onUpdate: NoAction)
               objectiveId Int
               votes       Vote[]
-            
+
               @@id([userId, objectiveId])
             }
-            
+
             model Vote {
               createdAt     DateTime        @default(now())
               user          User            @relation(fields: [userId], references: [id])
@@ -370,7 +370,7 @@ mod many_count_rel {
               userObjective UserToObjective @relation(fields: [objectiveId, followerId], references: [userId, objectiveId], onDelete: NoAction, onUpdate: NoAction)
               objectiveId   Int
               followerId    Int
-            
+
               @@id([userId, objectiveId])
             }"#
         };
@@ -379,8 +379,83 @@ mod many_count_rel {
     }
 
     // Regression test for: https://github.com/prisma/prisma/issues/7299
-    #[connector_test(schema(schema_one2m_multi_fks), capabilities(CompoundIds))]
+    #[connector_test(schema(schema_one2m_multi_fks), capabilities(CompoundIds), exclude(CockroachDb))]
     async fn count_one2m_compound_ids(runner: Runner) -> TestResult<()> {
+        run_query!(
+            runner,
+            r#"mutation {
+                createOneUserToObjective(
+                  data: {
+                    user: { create: {} }
+                    objective: { create: { name: "Objective 1" } }
+                    votes: { create: [{ user: { create: {} } }, { user: { create: {} } }] }
+                  }
+                ) {
+                  userId
+                  _count {
+                    votes
+                  }
+                }
+              }
+            "#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query {
+            findManyUserToObjective {
+              _count {
+                votes
+              }
+            }
+          }"#),
+          @r###"{"data":{"findManyUserToObjective":[{"_count":{"votes":2}}]}}"###
+        );
+
+        Ok(())
+    }
+
+    fn schema_one2m_multi_fks_cockroachdb() -> String {
+        let schema = indoc! {
+            r#"model User {
+              #id(id, BigInt, @id, @default(autoincrement()))
+              votes           Vote[]
+              UserToObjective UserToObjective[]
+            }
+
+            model Objective {
+              #id(id, BigInt, @default(autoincrement()), @id)
+              name            String            @unique
+              UserToObjective UserToObjective[] @relation(name: "UserObjectives")
+            }
+
+            model UserToObjective {
+              user        User      @relation(fields: [userId], references: [id])
+              userId      BigInt
+              objective   Objective @relation(name: "UserObjectives", fields: [objectiveId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+              objectiveId BigInt
+              votes       Vote[]
+
+              @@id([userId, objectiveId])
+            }
+
+            model Vote {
+              createdAt     DateTime        @default(now())
+              user          User            @relation(fields: [userId], references: [id])
+              userId        BigInt
+              userObjective UserToObjective @relation(fields: [objectiveId, followerId], references: [userId, objectiveId], onDelete: NoAction, onUpdate: NoAction)
+              objectiveId   BigInt
+              followerId    BigInt
+
+              @@id([userId, objectiveId])
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // Regression test for: https://github.com/prisma/prisma/issues/7299
+    #[connector_test(schema(schema_one2m_multi_fks_cockroachdb), only(CockroachDb))]
+    async fn count_one2m_compound_ids_cockroachdb(runner: Runner) -> TestResult<()> {
         run_query!(
             runner,
             r#"mutation {
@@ -426,6 +501,144 @@ mod many_count_rel {
         insta::assert_snapshot!(
           run_query!(runner, r#"{ findManyComment { post { id _count { comments } } } }"#),
           @r###"{"data":{"findManyComment":[{"post":{"id":1,"_count":{"comments":2}}},{"post":{"id":1,"_count":{"comments":2}}}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn filtered_count_one2m_m2m(runner: Runner) -> TestResult<()> {
+        // 1 comment / 2 categories
+        create_row(
+            &runner,
+            r#"{
+              id: 1,
+              title: "a",
+              comments: { create: [{id: 1}] },
+              categories: { create: [{id: 1}, {id: 2}] },
+            }"#,
+        )
+        .await?;
+        // 3 comment / 4 categories
+        create_row(
+            &runner,
+            r#"{
+              id: 2,
+              title: "b",
+              comments: { create: [{id: 2}, {id: 3}, {id: 4}] },
+              categories: { create: [{id: 3}, {id: 4}, {id: 5}, {id: 6}] }
+            }"#,
+        )
+        .await?;
+
+        // scalar filter
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findManyPost(orderBy: { id: asc }) {
+              _count {
+                comments(where: { id: { in: [1, 2, 3] } })
+                categories(where: { id: { in: [2, 3, 4] } })
+              }
+            }
+          }"#),
+          @r###"{"data":{"findManyPost":[{"_count":{"comments":1,"categories":1}},{"_count":{"comments":2,"categories":2}}]}}"###
+        );
+
+        // filter through relation
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findManyPost(orderBy: { id: asc }) {
+              _count {
+                comments(
+                  where: { post: { is: { categories: { some: { id: { in: [2, 3, 4] } } } } } }
+                )
+                categories(where: { posts: { some: { title: "a" } } })
+              }
+            }
+          }
+          "#),
+          @r###"{"data":{"findManyPost":[{"_count":{"comments":1,"categories":2}},{"_count":{"comments":3,"categories":0}}]}}"###
+        );
+
+        // filter to-one with orderBy aggregation
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findManyPost(orderBy: { comments: { _count: asc } }) {
+              _count {
+                comments(where: { post: { is: { title: "a" } } })
+              }
+            }
+          }"#),
+          @r###"{"data":{"findManyPost":[{"_count":{"comments":1}},{"_count":{"comments":0}}]}}"###
+        );
+
+        // filter with top-level stable cursor
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findManyPost(cursor: { id: 2 }, take: 2, orderBy: { comments: { _count: asc } }) {
+              _count {
+                comments(
+                  where: { post: { is: { categories: { some: { id: { in: [2, 3, 4] } } } } } }
+                )
+                categories(where: { posts: { some: { title: "a" } } })
+              }
+            }
+          }"#),
+          @r###"{"data":{"findManyPost":[{"_count":{"comments":3,"categories":0}}]}}"###
+        );
+
+        Ok(())
+    }
+
+    fn composite_schema() -> String {
+        let schema = indoc! {
+            r#"model TestModel {
+              #id(id, Int, @id)
+              children Child[]
+            }
+
+            model Child {
+              #id(id, Int, @id)
+              testId Int?
+              test TestModel? @relation(fields:[testId], references: [id])
+              composite Composite?
+            }
+            
+            type Composite {
+              name String
+            }
+            "#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(composite_schema), capabilities(CompositeTypes))]
+    async fn filtered_count_composite(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation { createOneTestModel(data: {
+                id: 1,
+                children: {
+                  create: [{ id: 1, composite: { name: "A" } }, { id: 2, composite: { name: "B" } }]
+                }
+              }) { id } }
+            "#
+        );
+        run_query!(
+            &runner,
+            r#"mutation { createOneTestModel(data: {
+                id: 2,
+                children: {
+                  create: [{ id: 3, composite: { name: "C" } }]
+                }
+              }) { id } }
+            "#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findManyTestModel { _count { children(where: { composite: { is: { name: { in: ["A", "C"] } } } }) } } }"#),
+          @r###"{"data":{"findManyTestModel":[{"_count":{"children":1}},{"_count":{"children":1}}]}}"###
         );
 
         Ok(())

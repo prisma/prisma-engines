@@ -1,18 +1,23 @@
+use crate::calculate_datamodel::CalculateDatamodelContext;
 use crate::introspection_helpers::{
-    is_old_migration_table, is_prisma_1_or_11_list_table, is_prisma_1_point_0_join_table,
-    is_prisma_1_point_1_or_2_join_table, is_relay_table,
+    has_created_at_and_updated_at, is_new_migration_table, is_old_migration_table, is_prisma_1_or_11_list_table,
+    is_prisma_1_point_0_join_table, is_prisma_1_point_1_or_2_join_table, is_relay_table,
 };
 use crate::SqlFamilyTrait;
-use datamodel::dml::{Datamodel, Model};
-use introspection_connector::{IntrospectionContext, Version, Warning};
-use native_types::{MySqlType, PostgresType};
+use introspection_connector::{Version, Warning};
+use psl::builtin_connectors::{MySqlType, PostgresType};
 use quaint::connector::SqlFamily;
-use sql_schema_describer::{Column, ForeignKey, ForeignKeyAction, PrimaryKey, SqlSchema, Table};
+use sql_schema_describer::ForeignKeyWalker;
+use sql_schema_describer::{
+    walkers::{ColumnWalker, TableWalker},
+    ForeignKeyAction,
+};
 use tracing::debug;
 
 #[derive(Debug)]
-pub struct VersionChecker {
+struct VersionChecker {
     sql_family: SqlFamily,
+    is_cockroachdb: bool,
     has_migration_table: bool,
     has_relay_table: bool,
     has_prisma_1_join_table: bool,
@@ -25,7 +30,7 @@ pub struct VersionChecker {
     has_inline_relations: bool,
 }
 
-const SQLITE_TYPES: &[&str] = &["BOOLEAN", "DATE", "REAL", "INTEGER", "TEXT"];
+const SQLITE_TYPES: &[&str] = &["boolean", "date", "real", "integer", "text"];
 
 const POSTGRES_TYPES: &[PostgresType] = &[
     PostgresType::Boolean,
@@ -49,100 +54,155 @@ const MYSQL_TYPES: &[MySqlType] = &[
     MySqlType::Char(36),
 ];
 
-impl VersionChecker {
-    pub fn new(schema: &SqlSchema, ctx: &IntrospectionContext) -> VersionChecker {
-        VersionChecker {
-            sql_family: ctx.sql_family(),
-            has_migration_table: schema.tables.iter().any(is_old_migration_table),
-            has_relay_table: schema.tables.iter().any(is_relay_table),
-            has_prisma_1_join_table: schema.tables.iter().any(is_prisma_1_point_0_join_table),
-            has_prisma_1_1_or_2_join_table: schema.tables.iter().any(is_prisma_1_point_1_or_2_join_table),
-            uses_on_delete: false,
-            uses_default_values: false,
-            always_has_created_at_updated_at: true,
-            always_has_p1_or_p_1_1_compatible_id: true,
-            uses_non_prisma_types: false,
-            has_inline_relations: false,
+pub(crate) fn check_prisma_version(ctx: &CalculateDatamodelContext, warnings: &mut Vec<Warning>) -> Version {
+    let mut version_checker = VersionChecker {
+        sql_family: ctx.sql_family(),
+        is_cockroachdb: ctx.is_cockroach(),
+        has_migration_table: ctx.schema.table_walkers().any(is_old_migration_table),
+        has_relay_table: ctx.schema.table_walkers().any(is_relay_table),
+        has_prisma_1_join_table: ctx.schema.table_walkers().any(is_prisma_1_point_0_join_table),
+        has_prisma_1_1_or_2_join_table: ctx.schema.table_walkers().any(is_prisma_1_point_1_or_2_join_table),
+        uses_on_delete: false,
+        uses_default_values: false,
+        always_has_created_at_updated_at: true,
+        always_has_p1_or_p_1_1_compatible_id: true,
+        uses_non_prisma_types: false,
+        has_inline_relations: false,
+    };
+
+    for table in ctx
+        .schema
+        .table_walkers()
+        .filter(|table| !is_old_migration_table(*table))
+        .filter(|table| !is_new_migration_table(*table))
+        .filter(|table| !is_prisma_1_point_1_or_2_join_table(*table))
+        .filter(|table| !is_prisma_1_point_0_join_table(*table))
+        .filter(|table| !is_relay_table(*table))
+    {
+        version_checker.always_has_created_at_updated_at(table);
+        version_checker.has_p1_compatible_primary_key_column(table);
+
+        for column in table.columns() {
+            version_checker.check_column_for_type_and_default_value(column);
+        }
+
+        let foreign_keys = table.foreign_keys();
+
+        if foreign_keys.len() > 0 {
+            version_checker.has_inline_relations(table);
+        }
+
+        for foreign_key in foreign_keys {
+            version_checker.uses_on_delete(foreign_key);
         }
     }
 
-    pub fn check_column_for_type_and_default_value(&mut self, column: &Column) {
-        match self.sql_family {
-            SqlFamily::Postgres => {
-                if let Some(native_type) = &column.tpe.native_type {
-                    let native_type: PostgresType = serde_json::from_value(native_type.clone()).unwrap();
+    debug!("{:?}", &version_checker);
 
-                    if !POSTGRES_TYPES.contains(&native_type) {
+    match version_checker.sql_family {
+        _ if ctx.schema.is_empty() => Version::NonPrisma,
+        SqlFamily::Sqlite if version_checker.is_prisma_2(warnings) => Version::Prisma2,
+        SqlFamily::Sqlite => Version::NonPrisma,
+        SqlFamily::Mysql if version_checker.is_prisma_2(warnings) => Version::Prisma2,
+        SqlFamily::Mysql if version_checker.is_prisma_1(warnings) => Version::Prisma1,
+        SqlFamily::Mysql if version_checker.is_prisma_1_1(warnings) => Version::Prisma11,
+        SqlFamily::Mysql => Version::NonPrisma,
+        SqlFamily::Postgres if version_checker.is_prisma_2(warnings) => Version::Prisma2,
+        SqlFamily::Postgres if version_checker.is_prisma_1(warnings) => Version::Prisma1,
+        SqlFamily::Postgres if version_checker.is_prisma_1_1(warnings) => Version::Prisma11,
+        SqlFamily::Postgres => Version::NonPrisma,
+        SqlFamily::Mssql => Version::NonPrisma,
+    }
+}
+
+impl VersionChecker {
+    fn check_column_for_type_and_default_value(&mut self, column: ColumnWalker<'_>) {
+        match self.sql_family {
+            SqlFamily::Postgres if self.is_cockroachdb => {
+                self.uses_non_prisma_types = true; // we can be sure it's not prisma 1
+            }
+            SqlFamily::Postgres => {
+                if let Some(native_type) = &column.column_type().native_type {
+                    let native_type: &PostgresType = native_type.downcast_ref();
+
+                    if !POSTGRES_TYPES.contains(native_type) {
                         self.uses_non_prisma_types = true
                     }
                 }
             }
             SqlFamily::Mysql => {
-                if let Some(native_type) = &column.tpe.native_type {
-                    let native_type: MySqlType = serde_json::from_value(native_type.clone()).unwrap();
+                if let Some(native_type) = &column.column_type().native_type {
+                    let native_type: &MySqlType = native_type.downcast_ref();
 
-                    if !MYSQL_TYPES.contains(&native_type) {
+                    if !MYSQL_TYPES.contains(native_type) {
                         self.uses_non_prisma_types = true
                     }
                 }
             }
-            SqlFamily::Sqlite if !SQLITE_TYPES.contains(&&*column.tpe.full_data_type) => {
+            SqlFamily::Sqlite if !SQLITE_TYPES.contains(&&*column.column_type().full_data_type) => {
                 self.uses_non_prisma_types = true
             }
             _ => (),
         }
 
-        if !column.auto_increment && column.default.is_some() {
+        if !column.is_autoincrement() && column.default().is_some() {
             self.uses_default_values = true;
         };
     }
 
-    pub fn has_inline_relations(&mut self, table: &Table) {
+    fn has_inline_relations(&mut self, table: TableWalker<'_>) {
         if !is_prisma_1_or_11_list_table(table) {
             self.has_inline_relations = true;
         }
     }
 
     #[allow(clippy::nonminimal_bool)] // more readable this way
-    pub fn uses_on_delete(&mut self, fk: &ForeignKey, table: &Table) {
-        if !(fk.on_delete_action == ForeignKeyAction::NoAction || fk.on_delete_action == ForeignKeyAction::SetNull)
-            && !is_prisma_1_or_11_list_table(table)
-            && fk.on_delete_action != ForeignKeyAction::Cascade
+    fn uses_on_delete(&mut self, fk: ForeignKeyWalker<'_>) {
+        let action = fk.on_delete_action();
+        if !(action == ForeignKeyAction::NoAction || action == ForeignKeyAction::SetNull)
+            && !is_prisma_1_or_11_list_table(fk.table())
+            && action != ForeignKeyAction::Cascade
         {
             self.uses_on_delete = true
         }
     }
 
-    pub fn always_has_created_at_updated_at(&mut self, table: &Table, model: &Model) {
-        if !is_prisma_1_or_11_list_table(table) && !is_relay_table(table) && !model.has_created_at_and_updated_at() {
+    fn always_has_created_at_updated_at(&mut self, table: TableWalker<'_>) {
+        if !is_prisma_1_or_11_list_table(table) && !is_relay_table(table) && !has_created_at_and_updated_at(table) {
             self.always_has_created_at_updated_at = false
         }
     }
 
-    pub fn has_p1_compatible_primary_key_column(&mut self, table: &Table) {
+    fn has_p1_compatible_primary_key_column(&mut self, table: TableWalker<'_>) {
+        if self.is_cockroachdb {
+            // we rule out crdb + P1
+            return;
+        }
+
         if !is_prisma_1_or_11_list_table(table) && !is_relay_table(table) {
-            if let Some(PrimaryKey { columns, .. }) = &table.primary_key {
-                if columns.len() == 1 {
-                    let tpe = &table.column_bang(columns.first().unwrap().name()).tpe;
+            if let Some(pk) = table.primary_key() {
+                if pk.columns().len() == 1 {
+                    let col = pk.columns().next().unwrap();
+                    let tpe = col.as_column().column_type();
 
                     if self.sql_family == SqlFamily::Postgres {
                         if let Some(native_type) = &tpe.native_type {
-                            let native_type: PostgresType = serde_json::from_value(native_type.clone()).unwrap();
+                            let native_type: &PostgresType = native_type.downcast_ref();
 
-                            if native_type != PostgresType::VarChar(Some(25))
-                                && native_type != PostgresType::VarChar(Some(36))
-                                && native_type != PostgresType::Integer
+                            if native_type != &PostgresType::VarChar(Some(25))
+                                && native_type != &PostgresType::VarChar(Some(36))
+                                && native_type != &PostgresType::Integer
                             {
                                 self.always_has_p1_or_p_1_1_compatible_id = false
                             }
                         }
                     } else if self.sql_family == SqlFamily::Mysql {
                         if let Some(native_type) = &tpe.native_type {
-                            let native_type: MySqlType = serde_json::from_value(native_type.clone()).unwrap();
+                            let native_type: &MySqlType = native_type.downcast_ref();
 
-                            if native_type != MySqlType::Char(25)
-                                && native_type != MySqlType::Char(36)
-                                && native_type != MySqlType::Int
+                            if native_type != &MySqlType::Char(25)
+                                && native_type != &MySqlType::Char(36)
+                                && native_type != &MySqlType::Int
                             {
                                 self.always_has_p1_or_p_1_1_compatible_id = false
                             }
@@ -183,23 +243,5 @@ impl VersionChecker {
             && self.always_has_created_at_updated_at
             && self.always_has_p1_or_p_1_1_compatible_id
             && warnings.is_empty()
-    }
-
-    pub fn version(&self, warnings: &[Warning], data_model: &Datamodel) -> Version {
-        debug!("{:?}", &self);
-        match self.sql_family {
-            _ if data_model.is_empty() => Version::NonPrisma,
-            SqlFamily::Sqlite if self.is_prisma_2(warnings) => Version::Prisma2,
-            SqlFamily::Sqlite => Version::NonPrisma,
-            SqlFamily::Mysql if self.is_prisma_2(warnings) => Version::Prisma2,
-            SqlFamily::Mysql if self.is_prisma_1(warnings) => Version::Prisma1,
-            SqlFamily::Mysql if self.is_prisma_1_1(warnings) => Version::Prisma11,
-            SqlFamily::Mysql => Version::NonPrisma,
-            SqlFamily::Postgres if self.is_prisma_2(warnings) => Version::Prisma2,
-            SqlFamily::Postgres if self.is_prisma_1(warnings) => Version::Prisma1,
-            SqlFamily::Postgres if self.is_prisma_1_1(warnings) => Version::Prisma11,
-            SqlFamily::Postgres => Version::NonPrisma,
-            SqlFamily::Mssql => Version::NonPrisma,
-        }
     }
 }

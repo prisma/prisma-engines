@@ -1,90 +1,25 @@
 use super::{
-    build_composites, field_builders::RelationFieldBuilder, relation_builder::RelationBuilder, CompositeTypeBuilder,
-    FieldBuilder, IndexBuilder, ModelBuilder, PrimaryKeyBuilder,
+    field_builders::RelationFieldBuilder, relation_builder::RelationBuilder, CompositeTypeBuilder, FieldBuilder,
+    IndexBuilder, ModelBuilder, PrimaryKeyBuilder,
 };
 use crate::{
     builders::{CompositeFieldBuilder, ScalarFieldBuilder},
     extensions::*,
-    IndexType, InlineRelation, InternalDataModel, InternalDataModelRef, InternalEnum, InternalEnumValue,
-    RelationLinkManifestation, RelationSide, RelationTable, TypeIdentifier,
+    IndexType, InlineRelation, InternalEnum, InternalEnumValue, RelationLinkManifestation, RelationSide, RelationTable,
+    TypeIdentifier,
 };
-use datamodel::dml::{self, CompositeTypeFieldType, Datamodel, Ignorable, WithDatabaseName};
-use itertools::Itertools;
-use once_cell::sync::OnceCell;
-use std::sync::Arc;
+use psl::{
+    datamodel_connector::RelationMode,
+    dml::{self, CompositeTypeFieldType, Datamodel, Ignorable, WithDatabaseName},
+};
 
-#[derive(Debug, Default)]
-pub struct InternalDataModelBuilder {
-    pub models: Vec<ModelBuilder>,
-    pub relations: Vec<RelationBuilder>,
-    pub enums: Vec<InternalEnum>,
-    pub composite_types: Vec<CompositeTypeBuilder>,
-}
-
-impl InternalDataModelBuilder {
-    pub fn new(datamodel: &str) -> Self {
-        let datamodel = datamodel::parse_datamodel(datamodel)
-            .expect("Expected valid datamodel.")
-            .subject;
-
-        Self::from(&datamodel)
-    }
-
-    pub fn build(self, db_name: String) -> InternalDataModelRef {
-        let internal_data_model = Arc::new(InternalDataModel {
-            models: OnceCell::new(),
-            composite_types: OnceCell::new(),
-            relations: OnceCell::new(),
-            relation_fields: OnceCell::new(),
-            db_name,
-            enums: self.enums.into_iter().map(Arc::new).collect(),
-        });
-
-        let composite_types = build_composites(self.composite_types, Arc::downgrade(&internal_data_model));
-        internal_data_model.composite_types.set(composite_types).unwrap();
-
-        let models = self
-            .models
-            .into_iter()
-            .map(|mt| {
-                mt.build(
-                    Arc::downgrade(&internal_data_model),
-                    internal_data_model.composite_types.get().unwrap(),
-                )
-            })
-            .collect();
-
-        internal_data_model.models.set(models).unwrap();
-
-        let relations = self
-            .relations
-            .into_iter()
-            .map(|rt| rt.build(Arc::downgrade(&internal_data_model)))
-            .collect();
-
-        internal_data_model.relations.set(relations).unwrap();
-        internal_data_model.finalize();
-        internal_data_model
-    }
-}
-
-impl From<&dml::Datamodel> for InternalDataModelBuilder {
-    fn from(datamodel: &dml::Datamodel) -> Self {
-        let relation_placeholders = relation_placeholders(datamodel);
-
-        Self {
-            models: model_builders(datamodel, &relation_placeholders),
-            relations: relation_builders(&relation_placeholders),
-            enums: convert_enums(datamodel),
-            composite_types: composite_type_builders(datamodel),
-        }
-    }
-}
-
-fn model_builders(datamodel: &Datamodel, relation_placeholders: &[RelationPlaceholder]) -> Vec<ModelBuilder> {
+pub(crate) fn model_builders(
+    datamodel: &Datamodel,
+    relation_placeholders: &[RelationPlaceholder],
+) -> Vec<ModelBuilder> {
     datamodel
         .models()
-        .filter(|model| !model.is_ignored)
+        .filter(|model| !model.is_ignored())
         .filter(|model| model.is_supported())
         .map(|model| ModelBuilder {
             name: model.name.clone(),
@@ -177,7 +112,7 @@ fn composite_field_builders(datamodel: &Datamodel, composite: &dml::CompositeTyp
                 // No defaults on composite fields of type composite
                 default_value: None,
             })),
-            CompositeTypeFieldType::Scalar(_, _, _) | CompositeTypeFieldType::Enum(_) => {
+            CompositeTypeFieldType::Scalar(_, _) | CompositeTypeFieldType::Enum(_) => {
                 let type_ident = field.type_identifier();
 
                 if type_ident == TypeIdentifier::Unsupported {
@@ -204,7 +139,10 @@ fn composite_field_builders(datamodel: &Datamodel, composite: &dml::CompositeTyp
         .collect()
 }
 
-fn relation_builders(placeholders: &[RelationPlaceholder]) -> Vec<RelationBuilder> {
+pub(crate) fn relation_builders(
+    placeholders: &[RelationPlaceholder],
+    relation_mode: RelationMode,
+) -> Vec<RelationBuilder> {
     placeholders
         .iter()
         .filter(|r| r.model_a.is_relation_supported(&r.field_a) && r.model_b.is_relation_supported(&r.field_b))
@@ -213,6 +151,7 @@ fn relation_builders(placeholders: &[RelationPlaceholder]) -> Vec<RelationBuilde
             manifestation: r.manifestation(),
             model_a_name: r.model_a.name.clone(),
             model_b_name: r.model_b.name.clone(),
+            relation_mode,
         })
         .collect()
 }
@@ -248,7 +187,7 @@ fn pk_builder(model: &dml::Model) -> Option<PrimaryKeyBuilder> {
     })
 }
 
-fn composite_type_builders(datamodel: &Datamodel) -> Vec<CompositeTypeBuilder> {
+pub(crate) fn composite_type_builders(datamodel: &Datamodel) -> Vec<CompositeTypeBuilder> {
     datamodel
         .composite_types
         .iter()
@@ -259,7 +198,7 @@ fn composite_type_builders(datamodel: &Datamodel) -> Vec<CompositeTypeBuilder> {
         .collect()
 }
 
-fn convert_enums(datamodel: &Datamodel) -> Vec<InternalEnum> {
+pub(crate) fn convert_enums(datamodel: &Datamodel) -> Vec<InternalEnum> {
     datamodel
         .enums()
         .map(|e| InternalEnum {
@@ -279,12 +218,16 @@ fn convert_enum_values(enm: &dml::Enum) -> Vec<InternalEnumValue> {
 }
 
 /// Calculates placeholders that are used to compute builders dependent on some relation information being present already.
-fn relation_placeholders(datamodel: &dml::Datamodel) -> Vec<RelationPlaceholder> {
+pub(crate) fn relation_placeholders(datamodel: &dml::Datamodel) -> Vec<RelationPlaceholder> {
     let mut result = Vec::new();
+
     for model in datamodel.models().filter(|model| !model.is_ignored) {
         for field in model.relation_fields().filter(|field| !field.is_ignored) {
             let dml::RelationInfo {
-                to, references, name, ..
+                referenced_model: to,
+                references,
+                name,
+                ..
             } = &field.relation_info;
 
             let related_model = datamodel
@@ -373,21 +316,26 @@ fn relation_placeholders(datamodel: &dml::Datamodel) -> Vec<RelationPlaceholder>
                 },
             };
 
-            result.push(RelationPlaceholder {
+            let placeholder = RelationPlaceholder {
                 name: name.clone(),
                 model_a,
                 model_b,
                 field_a,
                 field_b,
                 manifestation,
-            })
+            };
+
+            // Skip duplicate placeholders
+            if !result.contains(&placeholder) {
+                result.push(placeholder);
+            }
         }
     }
 
-    result.into_iter().unique_by(|rel| rel.name()).collect()
+    result
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct RelationPlaceholder {
     pub name: String,
     pub model_a: dml::Model,

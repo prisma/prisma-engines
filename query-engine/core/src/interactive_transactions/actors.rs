@@ -1,18 +1,21 @@
-use crate::{execute_many_operations, execute_single_operation, OpenTx, Operation, TxId};
-use crate::{QuerySchemaRef, ResponseData};
+use super::{CachedTx, TransactionError, TxOpRequest, TxOpRequestMsg, TxOpResponse};
+use crate::{
+    execute_many_operations, execute_single_operation, set_span_link_from_trace_id, OpenTx, Operation, ResponseData,
+    TxId,
+};
+use schema::QuerySchemaRef;
 use std::{collections::HashMap, sync::Arc};
-use tokio::sync::mpsc::channel;
-use tokio::task::JoinHandle;
 use tokio::{
     sync::{
-        mpsc::{Receiver, Sender},
+        mpsc::{channel, Receiver, Sender},
         oneshot, RwLock,
     },
+    task::JoinHandle,
     time::{self, Duration},
 };
+use tracing::Span;
+use tracing_futures::Instrument;
 use tracing_futures::WithSubscriber;
-
-use super::{CachedTx, TransactionError, TxOpRequest, TxOpRequestMsg, TxOpResponse};
 
 #[derive(PartialEq)]
 enum RunState {
@@ -71,26 +74,10 @@ impl ITXServer {
         }
     }
 
-    async fn process_eviction_state_msg(&mut self, op: TxOpRequest) {
-        let msg = match self.cached_tx {
-            CachedTx::Committed => TxOpResponse::Committed(Ok(())),
-            CachedTx::RolledBack => TxOpResponse::RolledBack(Ok(())),
-            CachedTx::Expired => TxOpResponse::Expired,
-            _ => {
-                error!("[{}] unexpected state {}", self.id.to_string(), self.cached_tx);
-                let _ = self.rollback(true).await;
-                let msg = "The transaction was in an unexpected state and rolledback".to_string();
-                let err = Err(TransactionError::Unknown { reason: msg }.into());
-                TxOpResponse::RolledBack(err)
-            }
-        };
-
-        // we ignore any errors when sending
-        let _ = op.respond_to.send(msg);
-    }
-
-    #[tracing::instrument(skip(self, operation))]
     async fn execute_single(&mut self, operation: &Operation, trace_id: Option<String>) -> crate::Result<ResponseData> {
+        let span = info_span!("prisma:engine:itx_query_builder", user_facing = true);
+        set_span_link_from_trace_id(&span, trace_id.clone());
+
         let conn = self.cached_tx.as_open()?;
         execute_single_operation(
             self.query_schema.clone(),
@@ -98,15 +85,17 @@ impl ITXServer {
             operation,
             trace_id,
         )
+        .instrument(span)
         .await
     }
 
-    #[tracing::instrument(skip(self, operations))]
     async fn execute_batch(
         &mut self,
         operations: &[Operation],
         trace_id: Option<String>,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
+        let span = info_span!("prisma:engine:itx_execute", user_facing = true);
+
         let conn = self.cached_tx.as_open()?;
         execute_many_operations(
             self.query_schema.clone(),
@@ -114,6 +103,7 @@ impl ITXServer {
             operations,
             trace_id,
         )
+        .instrument(span)
         .await
     }
 
@@ -210,7 +200,7 @@ impl ITXClient {
         if let Err(err) = self.send.send(req).await {
             debug!("channel send error {err}");
             return Err(TransactionError::Closed {
-                reason: "Cound not perform operation".to_string(),
+                reason: "Could not perform operation".to_string(),
             }
             .into());
         }
@@ -218,7 +208,7 @@ impl ITXClient {
         match receiver.await {
             Ok(resp) => Ok(resp),
             Err(_err) => Err(TransactionError::Closed {
-                reason: "Cound not perform operation".to_string(),
+                reason: "Could not perform operation".to_string(),
             }
             .into()),
         }
@@ -259,7 +249,6 @@ pub fn spawn_itx_actor(
     value: OpenTx,
     timeout: Duration,
     channel_size: usize,
-    cache_eviction_secs: u64,
     send_done: Sender<TxId>,
 ) -> ITXClient {
     let (tx_to_server, rx_from_client) = channel::<TxOpRequest>(channel_size);
@@ -269,11 +258,21 @@ pub fn spawn_itx_actor(
         tx_id: tx_id.clone(),
     };
 
-    let mut server = ITXServer::new(tx_id, CachedTx::Open(value), timeout, rx_from_client, query_schema);
+    let mut server = ITXServer::new(
+        tx_id.clone(),
+        CachedTx::Open(value),
+        timeout,
+        rx_from_client,
+        query_schema,
+    );
     let dispatcher = crate::get_current_dispatcher();
+    let span = Span::current();
+
+    let tx_id_str = tx_id.to_string();
+    span.record("itx_id", &tx_id_str.as_str());
 
     tokio::task::spawn(
-        async move {
+        crate::executor::with_request_now(async move {
             let sleep = time::sleep(timeout);
             tokio::pin!(sleep);
 
@@ -297,25 +296,12 @@ pub fn spawn_itx_actor(
             }
 
             trace!("[{}] completed with {}", server.id.to_string(), server.cached_tx);
-            let eviction_sleep = time::sleep(Duration::from_secs(cache_eviction_secs));
-            tokio::pin!(eviction_sleep);
-
-            loop {
-                tokio::select! {
-                    _ = &mut eviction_sleep => {
-                        break;
-                    }
-                    msg = server.receive.recv() => {
-                        if let Some(op) = msg {
-                                server.process_eviction_state_msg(op).await;
-                            }
-                        }
-                }
-            }
 
             let _ = send_done.send(server.id.clone()).await;
+
             trace!("[{}] has stopped with {}", server.id.to_string(), server.cached_tx);
-        }
+        })
+        .instrument(span)
         .with_subscriber(dispatcher),
     );
 
@@ -365,13 +351,19 @@ pub fn spawn_itx_actor(
 */
 pub fn spawn_client_list_clear_actor(
     clients: Arc<RwLock<HashMap<TxId, ITXClient>>>,
+    closed_txs: Arc<RwLock<lru::LruCache<TxId, ()>>>,
     mut rx: Receiver<TxId>,
 ) -> JoinHandle<()> {
     tokio::task::spawn(async move {
         loop {
             if let Some(id) = rx.recv().await {
                 trace!("removing {} from client list", id);
-                clients.write().await.remove(&id);
+
+                let mut clients_guard = clients.write().await;
+                clients_guard.remove(&id);
+                drop(clients_guard);
+
+                closed_txs.write().await.put(id, ());
             }
         }
     })

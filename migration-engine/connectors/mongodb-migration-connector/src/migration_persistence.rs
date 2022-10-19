@@ -1,56 +1,59 @@
 use crate::MongoDbMigrationConnector;
-use migration_connector::MigrationPersistence;
+use migration_connector::{BoxFuture, ConnectorResult, MigrationPersistence};
 
-#[async_trait::async_trait]
 impl MigrationPersistence for MongoDbMigrationConnector {
-    async fn baseline_initialize(&mut self) -> migration_connector::ConnectorResult<()> {
-        Err(crate::unsupported_command_error())
+    fn baseline_initialize(&mut self) -> migration_connector::BoxFuture<'_, ConnectorResult<()>> {
+        unsupported_command_error()
     }
 
-    async fn initialize(&mut self) -> migration_connector::ConnectorResult<()> {
-        Err(crate::unsupported_command_error())
+    fn initialize(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
+        unsupported_command_error()
     }
 
-    async fn mark_migration_applied_impl(
+    fn mark_migration_applied_impl(
         &mut self,
         _migration_name: &str,
         _checksum: &str,
-    ) -> migration_connector::ConnectorResult<String> {
-        Err(crate::unsupported_command_error())
+    ) -> BoxFuture<'_, ConnectorResult<String>> {
+        unsupported_command_error()
     }
 
-    async fn mark_migration_rolled_back_by_id(
-        &mut self,
-        _migration_id: &str,
-    ) -> migration_connector::ConnectorResult<()> {
-        Err(crate::unsupported_command_error())
+    fn mark_migration_rolled_back_by_id(&mut self, _migration_id: &str) -> BoxFuture<'_, ConnectorResult<()>> {
+        unsupported_command_error()
     }
 
-    async fn record_migration_started_impl(
+    fn record_migration_started_impl(
         &mut self,
         _migration_name: &str,
         _checksum: &str,
-    ) -> migration_connector::ConnectorResult<String> {
-        Err(crate::unsupported_command_error())
+    ) -> BoxFuture<'_, ConnectorResult<String>> {
+        unsupported_command_error()
     }
 
-    async fn record_successful_step(&mut self, _id: &str) -> migration_connector::ConnectorResult<()> {
-        Err(crate::unsupported_command_error())
+    fn record_successful_step(&mut self, _id: &str) -> BoxFuture<'_, ConnectorResult<()>> {
+        unsupported_command_error()
     }
 
-    async fn record_failed_step(&mut self, _id: &str, _logs: &str) -> migration_connector::ConnectorResult<()> {
-        Err(crate::unsupported_command_error())
+    fn record_failed_step(&mut self, _id: &str, _logs: &str) -> BoxFuture<'_, ConnectorResult<()>> {
+        unsupported_command_error()
     }
 
-    async fn record_migration_finished(&mut self, _id: &str) -> migration_connector::ConnectorResult<()> {
-        Err(crate::unsupported_command_error())
+    fn record_migration_finished(&mut self, _id: &str) -> BoxFuture<'_, ConnectorResult<()>> {
+        unsupported_command_error()
     }
 
-    async fn list_migrations(
+    fn list_migrations(
         &mut self,
-    ) -> migration_connector::ConnectorResult<
-        Result<Vec<migration_connector::MigrationRecord>, migration_connector::PersistenceNotInitializedError>,
+    ) -> BoxFuture<
+        '_,
+        ConnectorResult<
+            Result<Vec<migration_connector::MigrationRecord>, migration_connector::PersistenceNotInitializedError>,
+        >,
     > {
-        Err(crate::unsupported_command_error())
+        unsupported_command_error()
     }
+}
+
+fn unsupported_command_error<T: Send + Sync + 'static>() -> BoxFuture<'static, ConnectorResult<T>> {
+    Box::pin(std::future::ready(Err(crate::unsupported_command_error())))
 }

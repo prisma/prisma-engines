@@ -4,6 +4,7 @@ use migration_connector::{
     ConnectorError, MigrationConnector, MigrationRecord, PersistenceNotInitializedError,
 };
 use std::{path::Path, time::Instant};
+use tracing::Instrument;
 use user_facing_errors::migration_engine::FoundFailedMigrations;
 
 pub async fn apply_migrations(
@@ -43,69 +44,56 @@ pub async fn apply_migrations(
     tracing::info!(analysis_duration_ms, "Analysis run in {}ms", analysis_duration_ms,);
 
     let mut applied_migration_names: Vec<String> = Vec::with_capacity(unapplied_migrations.len());
-    let apply_migrations_start = Instant::now();
 
     for unapplied_migration in unapplied_migrations {
-        let span = tracing::info_span!(
+        let fut = async {
+            let script = unapplied_migration
+                .read_migration_script()
+                .map_err(ConnectorError::from)?;
+
+            tracing::info!(
+                script = script.as_str(),
+                "Applying `{}`",
+                unapplied_migration.migration_name()
+            );
+
+            let migration_id = connector
+                .migration_persistence()
+                .record_migration_started(unapplied_migration.migration_name(), &script)
+                .await?;
+
+            match connector
+                .apply_script(unapplied_migration.migration_name(), &script)
+                .await
+            {
+                Ok(()) => {
+                    tracing::debug!("Successfully applied the script.");
+                    let p = connector.migration_persistence();
+                    p.record_successful_step(&migration_id).await?;
+                    p.record_migration_finished(&migration_id).await?;
+                    applied_migration_names.push(unapplied_migration.migration_name().to_owned());
+                    Ok(())
+                }
+                Err(err) => {
+                    tracing::debug!("Failed to apply the script.");
+
+                    let logs = err.to_string();
+
+                    connector
+                        .migration_persistence()
+                        .record_failed_step(&migration_id, &logs)
+                        .await?;
+
+                    Err(err)
+                }
+            }
+        };
+        fut.instrument(tracing::info_span!(
             "Applying migration",
             migration_name = unapplied_migration.migration_name(),
-        );
-        let _span = span.enter();
-        let migration_apply_start = Instant::now();
-
-        let script = unapplied_migration
-            .read_migration_script()
-            .map_err(ConnectorError::from)?;
-
-        tracing::info!(
-            script = script.as_str(),
-            "Applying `{}`",
-            unapplied_migration.migration_name()
-        );
-
-        let migration_id = connector
-            .migration_persistence()
-            .record_migration_started(unapplied_migration.migration_name(), &script)
-            .await?;
-
-        match connector
-            .apply_script(unapplied_migration.migration_name(), &script)
-            .await
-        {
-            Ok(()) => {
-                tracing::debug!("Successfully applied the script.");
-                let p = connector.migration_persistence();
-                p.record_successful_step(&migration_id).await?;
-                p.record_migration_finished(&migration_id).await?;
-                applied_migration_names.push(unapplied_migration.migration_name().to_owned());
-                let migration_duration_ms = Instant::now().duration_since(migration_apply_start).as_millis() as u64;
-                tracing::info!(
-                    migration_duration_ms = migration_duration_ms,
-                    "Migration executed in {}ms",
-                    migration_duration_ms
-                );
-            }
-            Err(err) => {
-                tracing::debug!("Failed to apply the script.");
-
-                let logs = err.to_string();
-
-                connector
-                    .migration_persistence()
-                    .record_failed_step(&migration_id, &logs)
-                    .await?;
-
-                return Err(err);
-            }
-        }
+        ))
+        .await?
     }
-
-    let apply_migrations_ms = Instant::now().duration_since(apply_migrations_start).as_millis() as u64;
-    tracing::info!(
-        apply_migrations_duration_ms = apply_migrations_ms,
-        "All the migrations executed in {}ms",
-        apply_migrations_ms
-    );
 
     Ok(ApplyMigrationsOutput {
         applied_migration_names,
@@ -129,16 +117,19 @@ fn detect_failed_migrations(migrations_from_database: &[MigrationRecord]) -> Cor
     let mut details = String::new();
 
     for failed_migration in failed_migrations {
+        let logs = failed_migration
+            .logs
+            .as_deref()
+            .map(|s| s.trim())
+            .filter(|s| !s.is_empty())
+            .map(|s| format!(" with the following logs:\n{s}"))
+            .unwrap_or_default();
+
         writeln!(
             details,
-            "The `{name}` migration started at {started_at} failed with the following logs:\n{logs}",
+            "The `{name}` migration started at {started_at} failed{logs}",
             name = failed_migration.migration_name,
             started_at = failed_migration.started_at,
-            logs = if let Some(logs) = &failed_migration.logs {
-                format!("with the following logs:\n{}", logs)
-            } else {
-                String::new()
-            }
         )
         .unwrap();
     }

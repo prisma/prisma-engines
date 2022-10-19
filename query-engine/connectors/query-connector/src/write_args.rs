@@ -2,7 +2,6 @@ use crate::{
     error::{ConnectorError, ErrorKind},
     Filter,
 };
-use chrono::Utc;
 use indexmap::{map::Keys, IndexMap};
 use prisma_models::{
     CompositeFieldRef, Field, ModelProjection, ModelRef, PrismaValue, ScalarFieldRef, SelectedField, SelectionResult,
@@ -10,8 +9,9 @@ use prisma_models::{
 use std::{borrow::Borrow, convert::TryInto, ops::Deref};
 
 /// WriteArgs represent data to be written to an underlying data source.
-#[derive(Debug, PartialEq, Clone, Default)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct WriteArgs {
+    pub request_now: PrismaValue,
     pub args: IndexMap<DatasourceFieldName, WriteOperation>,
 }
 
@@ -352,23 +352,16 @@ impl TryInto<PrismaValue> for WriteOperation {
     }
 }
 
-impl From<IndexMap<DatasourceFieldName, WriteOperation>> for WriteArgs {
-    fn from(args: IndexMap<DatasourceFieldName, WriteOperation>) -> Self {
-        Self { args }
-    }
-}
-
-impl From<Vec<(DatasourceFieldName, WriteOperation)>> for WriteArgs {
-    fn from(pairs: Vec<(DatasourceFieldName, WriteOperation)>) -> Self {
-        Self {
-            args: pairs.into_iter().collect(),
-        }
-    }
-}
-
 impl WriteArgs {
-    pub fn new() -> Self {
-        Self { args: IndexMap::new() }
+    pub fn new(args: IndexMap<DatasourceFieldName, WriteOperation>, request_now: PrismaValue) -> Self {
+        Self { args, request_now }
+    }
+
+    pub fn new_empty(request_now: PrismaValue) -> Self {
+        Self {
+            args: Default::default(),
+            request_now,
+        }
     }
 
     pub fn insert<T, V>(&mut self, key: T, arg: V)
@@ -403,26 +396,21 @@ impl WriteArgs {
         self.args.len()
     }
 
+    // @updatedAt
     pub fn add_datetimes(&mut self, model: &ModelRef) {
-        let now = PrismaValue::DateTime(Utc::now().into());
-        let updated_at_field = model.fields().updated_at();
+        let updated_at_fields = model.fields().updated_at();
+        let value = &self.request_now;
 
-        if let Some(f) = updated_at_field {
+        for f in updated_at_fields {
             if self.args.get(f.db_name()).is_none() {
-                self.args.insert(f.into(), WriteOperation::scalar_set(now));
+                self.args.insert(f.into(), WriteOperation::scalar_set(value.clone()));
             }
         }
     }
 
-    pub fn update_datetimes(&mut self, model: ModelRef) {
+    pub fn update_datetimes(&mut self, model: &ModelRef) {
         if !self.args.is_empty() {
-            if let Some(field) = model.fields().updated_at() {
-                if self.args.get(field.db_name()).is_none() {
-                    let now = PrismaValue::DateTime(Utc::now().into());
-
-                    self.args.insert(field.into(), WriteOperation::scalar_set(now));
-                }
-            }
+            self.add_datetimes(model)
         }
     }
 
@@ -456,7 +444,7 @@ impl WriteArgs {
 /// Picks all arguments out of `args` that are updating a value for a field
 /// contained in `projection`, as those need to be merged into the records later on.
 pub fn pick_args(projection: &ModelProjection, args: &WriteArgs) -> WriteArgs {
-    let pairs: Vec<_> = projection
+    let pairs = projection
         .scalar_fields()
         .into_iter()
         .filter_map(|field| {
@@ -465,7 +453,7 @@ pub fn pick_args(projection: &ModelProjection, args: &WriteArgs) -> WriteArgs {
         })
         .collect();
 
-    WriteArgs::from(pairs)
+    WriteArgs::new(pairs, args.request_now.clone())
 }
 
 /// Merges the incoming write argument values into the given, already loaded, ids. Overwrites existing values.

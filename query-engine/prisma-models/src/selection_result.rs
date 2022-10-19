@@ -1,10 +1,25 @@
 use crate::{DomainError, FieldSelection, PrismaValue, ScalarFieldRef, SelectedField};
+use itertools::Itertools;
 use std::convert::TryFrom;
 
 /// Represents a set of results.
-#[derive(Default, Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Default, Clone, PartialEq, Eq, Hash)]
 pub struct SelectionResult {
     pub pairs: Vec<(SelectedField, PrismaValue)>,
+}
+
+impl std::fmt::Debug for SelectionResult {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_list()
+            .entries(
+                &self
+                    .pairs
+                    .iter()
+                    .map(|pair| (format!("{}", pair.0), pair.1.clone()))
+                    .collect_vec(),
+            )
+            .finish()
+    }
 }
 
 impl SelectionResult {

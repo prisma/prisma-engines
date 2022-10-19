@@ -1,15 +1,11 @@
 use crate::{flavour::SqlFlavour, pair::Pair};
-use datamodel::dml::PrismaValue;
 use enumflags2::BitFlags;
+use psl::dml::PrismaValue;
 use sql_schema_describer::{walkers::ColumnWalker, DefaultKind};
 
 pub(crate) fn all_changes(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> ColumnChanges {
     let mut changes = BitFlags::empty();
     let type_change = flavour.column_type_change(cols);
-
-    if cols.previous.name() != cols.next.name() {
-        changes |= ColumnChange::Renaming;
-    };
 
     if cols.previous.arity() != cols.next.arity() {
         changes |= ColumnChange::Arity
@@ -23,9 +19,9 @@ pub(crate) fn all_changes(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour
         changes |= ColumnChange::Default;
     };
 
-    if cols.previous.is_autoincrement() != cols.next.is_autoincrement() {
-        changes |= ColumnChange::Sequence;
-    };
+    if flavour.column_autoincrement_changed(cols) {
+        changes |= ColumnChange::Autoincrement;
+    }
 
     ColumnChanges { type_change, changes }
 }
@@ -41,10 +37,10 @@ fn defaults_match(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> boo
         return true;
     }
 
-    let prev = cols.previous().default();
-    let next = cols.next().default();
+    let prev = cols.previous.default();
+    let next = cols.next.default();
 
-    let defaults = (&prev.as_ref().map(|d| d.kind()), &next.as_ref().map(|d| d.kind()));
+    let defaults = (prev.map(|d| d.kind()), next.map(|d| d.kind()));
 
     let names_match = {
         let prev_constraint = prev.and_then(|v| v.constraint_name());
@@ -54,6 +50,17 @@ fn defaults_match(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> boo
     };
 
     match defaults {
+        (Some(DefaultKind::DbGenerated(_)), Some(DefaultKind::Value(PrismaValue::List(_))))
+        | (Some(DefaultKind::Value(PrismaValue::List(_))), Some(DefaultKind::DbGenerated(_)))
+            if cols.previous.column_type_family().is_datetime() || cols.next.column_type_family().is_datetime() =>
+        {
+            true
+        }
+
+        (Some(DefaultKind::Value(PrismaValue::List(prev))), Some(DefaultKind::Value(PrismaValue::List(next)))) => {
+            list_defaults_match(prev, next, flavour)
+        }
+
         // Avoid naive string comparisons for JSON defaults.
         (
             Some(DefaultKind::Value(PrismaValue::Json(prev_json))),
@@ -68,6 +75,12 @@ fn defaults_match(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> boo
             Some(DefaultKind::Value(PrismaValue::String(next_json))),
         ) => json_defaults_match(prev_json, next_json) && names_match,
 
+        // Avoid naive string comparisons for datetime defaults.
+        (Some(DefaultKind::Value(PrismaValue::DateTime(_))), Some(_))
+        | (Some(_), Some(DefaultKind::Value(PrismaValue::DateTime(_)))) => true, // can't diff these in at present
+
+        (Some(DefaultKind::Value(PrismaValue::Int(i))), Some(DefaultKind::Value(PrismaValue::BigInt(j))))
+        | (Some(DefaultKind::Value(PrismaValue::BigInt(i))), Some(DefaultKind::Value(PrismaValue::Int(j)))) => i == j,
         (Some(DefaultKind::Value(prev)), Some(DefaultKind::Value(next))) => (prev == next) && names_match,
         (Some(DefaultKind::Value(_)), Some(DefaultKind::Now)) => false,
         (Some(DefaultKind::Value(_)), None) => false,
@@ -79,20 +92,23 @@ fn defaults_match(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> boo
         (Some(DefaultKind::DbGenerated(_)), Some(DefaultKind::Value(_))) => false,
         (Some(DefaultKind::DbGenerated(_)), Some(DefaultKind::Now)) => false,
         (Some(DefaultKind::DbGenerated(_)), None) => false,
+        (_, Some(DefaultKind::DbGenerated(None))) => true,
 
         (Some(DefaultKind::Sequence(_)), None) => true, // sequences are dropped separately
         (Some(DefaultKind::Sequence(_)), Some(DefaultKind::Value(_))) => false,
         (Some(DefaultKind::Sequence(_)), Some(DefaultKind::Now)) => false,
 
+        (Some(DefaultKind::UniqueRowid), Some(DefaultKind::UniqueRowid)) => true,
+        (Some(DefaultKind::UniqueRowid), _) | (_, Some(DefaultKind::UniqueRowid)) => false,
+
         (None, None) => true,
         (None, Some(DefaultKind::Value(_))) => false,
         (None, Some(DefaultKind::Now)) => false,
 
-        (Some(DefaultKind::DbGenerated(prev)), Some(DefaultKind::DbGenerated(next))) => {
+        (Some(DefaultKind::DbGenerated(Some(prev))), Some(DefaultKind::DbGenerated(Some(next)))) => {
             (prev.eq_ignore_ascii_case(next)) && names_match
         }
         (_, Some(DefaultKind::DbGenerated(_))) => false,
-        // Sequence migrations are handled separately.
         (_, Some(DefaultKind::Sequence(_))) => true,
     }
 }
@@ -104,15 +120,38 @@ fn json_defaults_match(previous: &str, next: &str) -> bool {
         .unwrap_or(true)
 }
 
+fn list_defaults_match(prev: &[PrismaValue], next: &[PrismaValue], flavour: &dyn SqlFlavour) -> bool {
+    if prev.len() != next.len() {
+        return false;
+    }
+
+    prev.iter()
+        .zip(next.iter())
+        .all(|(prev_value, next_value)| match (prev_value, next_value) {
+            (PrismaValue::String(string_val), PrismaValue::Json(json_val))
+            | (PrismaValue::Json(json_val), PrismaValue::String(string_val)) => {
+                json_defaults_match(string_val, json_val)
+            }
+
+            (PrismaValue::DateTime(_), _) | (_, PrismaValue::DateTime(_)) => true,
+
+            (PrismaValue::Enum(enum_val), PrismaValue::Bytes(bytes_val))
+            | (PrismaValue::Bytes(bytes_val), PrismaValue::Enum(enum_val)) => {
+                flavour.string_matches_bytes(enum_val, bytes_val)
+            }
+
+            _ => prev_value == next_value,
+        })
+}
+
 #[enumflags2::bitflags]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(u8)]
 pub(crate) enum ColumnChange {
-    Renaming,
     Arity,
     Default,
     TypeChanged,
-    Sequence,
+    Autoincrement,
 }
 
 // This should be pub(crate), but SqlMigration is exported, so it has to be
@@ -141,7 +180,7 @@ impl ColumnChanges {
     }
 
     pub(crate) fn autoincrement_changed(&self) -> bool {
-        self.changes.contains(ColumnChange::Sequence)
+        self.changes.contains(ColumnChange::Autoincrement)
     }
 
     pub(crate) fn iter(&self) -> impl Iterator<Item = ColumnChange> + '_ {
@@ -166,10 +205,6 @@ impl ColumnChanges {
 
     pub(crate) fn only_type_changed(&self) -> bool {
         self.changes == ColumnChange::TypeChanged
-    }
-
-    pub(crate) fn column_was_renamed(&self) -> bool {
-        self.changes.contains(ColumnChange::Renaming)
     }
 }
 

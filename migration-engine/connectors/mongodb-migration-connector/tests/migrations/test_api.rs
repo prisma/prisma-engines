@@ -1,11 +1,16 @@
-use datamodel::common::preview_features::PreviewFeature;
 use enumflags2::BitFlags;
 use futures::TryStreamExt;
 use migration_connector::{ConnectorParams, DiffTarget, MigrationConnector};
 use mongodb::bson::{self, doc};
 use mongodb_migration_connector::MongoDbMigrationConnector;
 use once_cell::sync::Lazy;
-use std::{collections::BTreeMap, fmt::Write as _, io::Write as _, sync::atomic::AtomicUsize};
+use psl::{parser_database::SourceFile, PreviewFeature};
+use std::{
+    collections::BTreeMap,
+    fmt::Write as _,
+    io::Write as _,
+    sync::{atomic::AtomicUsize, Arc},
+};
 use tokio::sync::OnceCell;
 
 static CONN_STR: Lazy<String> = Lazy::new(|| match std::env::var("TEST_DATABASE_URL") {
@@ -167,7 +172,8 @@ pub(crate) fn test_scenario(scenario_name: &str) {
     }
 
     RT.block_on(async move {
-        let parsed_schema = datamodel::parse_schema_parserdb(&schema).unwrap();
+        let schema = SourceFile::new_allocated(Arc::from(schema.into_boxed_str()));
+        let parsed_schema = psl::parse_schema(schema.clone()).unwrap();
         let (db_name, mut connector) = new_connector(parsed_schema.configuration.preview_features());
         let client = client().await;
         let db = client.database(&db_name);
@@ -179,7 +185,7 @@ pub(crate) fn test_scenario(scenario_name: &str) {
             .await
             .unwrap();
         let to = connector
-            .database_schema_from_diff_target(DiffTarget::Datamodel(&schema), None)
+            .database_schema_from_diff_target(DiffTarget::Datamodel(schema.clone()), None)
             .await
             .unwrap();
         let migration = connector.diff(from, to).unwrap();
@@ -221,7 +227,7 @@ Snapshot comparison failed. Run the test again with UPDATE_EXPECT=1 in the envir
             .await
             .unwrap();
         let to = connector
-            .database_schema_from_diff_target(DiffTarget::Datamodel(&schema), None)
+            .database_schema_from_diff_target(DiffTarget::Datamodel(schema), None)
             .await
             .unwrap();
         let migration = connector.diff(from, to).unwrap();

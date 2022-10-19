@@ -2,14 +2,9 @@ use serde::{Deserialize, Serialize};
 use std::{any::Any, fmt};
 
 /// A helper for arbitrary connector-specific data in SqlSchema.
+#[derive(Default)]
 pub(crate) struct ConnectorData {
-    pub(crate) data: Box<dyn Any + Send + Sync + 'static>,
-}
-
-impl Default for ConnectorData {
-    fn default() -> Self {
-        ConnectorData { data: Box::new(()) }
-    }
+    pub(crate) data: Option<Box<dyn Any + Send + Sync + 'static>>,
 }
 
 impl PartialEq for ConnectorData {

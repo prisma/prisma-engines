@@ -7,13 +7,13 @@ pub use test_macros::test_connector;
 pub use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Capabilities, Tags};
 
 use crate::{commands::*, multi_engine_test_api::TestApi as RootTestApi};
-use datamodel::common::preview_features::PreviewFeature;
 use migration_core::{
     commands::diff,
     migration_connector::{
         BoxFuture, ConnectorHost, ConnectorResult, DiffTarget, MigrationConnector, MigrationPersistence,
     },
 };
+use psl::{parser_database::SourceFile, PreviewFeature};
 use quaint::{
     prelude::{ConnectionInfo, ResultSet},
     Value,
@@ -161,6 +161,11 @@ impl TestApi {
         self.root.is_postgres()
     }
 
+    /// Returns true only when testing on postgres version 15.
+    pub fn is_postgres_15(&self) -> bool {
+        self.root.is_postgres_15()
+    }
+
     /// Returns true only when testing on cockroach.
     pub fn is_cockroach(&self) -> bool {
         self.root.is_cockroach()
@@ -275,6 +280,14 @@ impl TestApi {
         Reset::new(&mut self.connector)
     }
 
+    pub fn expect_sql_for_schema(&mut self, schema: &'static str, sql: &expect_test::Expect) {
+        // let dir = tempfile::tempdir().unwrap();
+        // let schema_path = dir.path().join("schema.prisma");
+        // std::fs::write(&schema_path, schema).unwrap();
+        let found = self.connector_diff(DiffTarget::Empty, DiffTarget::Datamodel(SourceFile::new_static(schema)));
+        sql.assert_eq(&found);
+    }
+
     /// Plan a `schemaPush` command adding the datasource
     pub fn schema_push_w_datasource(&mut self, dm: impl Into<String>) -> SchemaPush<'_> {
         let schema = self.datamodel_with_provider(&dm.into());
@@ -299,7 +312,7 @@ impl TestApi {
                 .contains(PreviewFeature::ReferentialIntegrity);
 
         let params = if no_foreign_keys {
-            vec![("referentialIntegrity", r#""prisma""#)]
+            vec![("relationMode", r#""prisma""#)]
         } else {
             Vec::new()
         };

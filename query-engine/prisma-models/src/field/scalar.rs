@@ -2,7 +2,7 @@ use crate::{parent_container::ParentContainer, prelude::*, InternalEnum};
 use dml::{DefaultValue, FieldArity, NativeTypeInstance};
 use once_cell::sync::OnceCell;
 use std::{
-    fmt::Debug,
+    fmt::{Debug, Display},
     hash::{Hash, Hasher},
     sync::{Arc, Weak},
 };
@@ -83,10 +83,16 @@ impl Debug for ScalarField {
             .field("arity", &self.arity)
             .field("db_name", &self.db_name)
             .field("default_value", &self.default_value)
-            .field("model", &"#ModelWeakRef#")
+            .field("container", &self.container().name())
             .field("is_unique", &self.is_unique)
             .field("read_only", &self.read_only)
             .finish()
+    }
+}
+
+impl Display for ScalarField {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}.{}", self.container().name(), self.name)
     }
 }
 

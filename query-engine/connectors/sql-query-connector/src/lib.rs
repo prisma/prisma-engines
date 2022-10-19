@@ -23,6 +23,8 @@ mod query_ext;
 mod row;
 mod sql_info;
 mod sql_trace;
+mod value;
+mod value_ext;
 
 use column_metadata::*;
 use filter_conversion::*;

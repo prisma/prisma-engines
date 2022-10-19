@@ -9,9 +9,9 @@ use crate::{
     sql_migration::{AlterColumn, ColumnTypeChange},
     sql_schema_differ::ColumnChanges,
 };
+use migration_connector::{BoxFuture, ConnectorResult};
 use sql_schema_describer::{walkers::ColumnWalker, ColumnArity};
 
-#[async_trait::async_trait]
 impl DestructiveChangeCheckerFlavour for SqliteFlavour {
     fn check_alter_column(
         &self,
@@ -20,7 +20,7 @@ impl DestructiveChangeCheckerFlavour for SqliteFlavour {
         plan: &mut DestructiveCheckPlan,
         step_index: usize,
     ) {
-        let arity_change_is_safe = match (columns.previous().arity(), columns.next().arity()) {
+        let arity_change_is_safe = match (columns.previous.arity(), columns.next.arity()) {
             // column became required
             (ColumnArity::Nullable, ColumnArity::Required) => false,
             // column became nullable
@@ -36,13 +36,13 @@ impl DestructiveChangeCheckerFlavour for SqliteFlavour {
         }
 
         if alter_column.changes.arity_changed()
-            && columns.next().arity().is_required()
-            && columns.next().default().is_none()
+            && columns.next.arity().is_required()
+            && columns.next.default().is_none()
         {
             plan.push_unexecutable(
                 UnexecutableStepCheck::MadeOptionalFieldRequired {
-                    table: columns.previous().table().name().to_owned(),
-                    column: columns.previous().name().to_owned(),
+                    table: columns.previous.table().name().to_owned(),
+                    column: columns.previous.name().to_owned(),
                 },
                 step_index,
             );
@@ -53,10 +53,10 @@ impl DestructiveChangeCheckerFlavour for SqliteFlavour {
             Some(ColumnTypeChange::RiskyCast) => {
                 plan.push_warning(
                     SqlMigrationWarningCheck::RiskyCast {
-                        table: columns.previous().table().name().to_owned(),
-                        column: columns.previous().name().to_owned(),
-                        previous_type: format!("{:?}", columns.previous().column_type_family()),
-                        next_type: format!("{:?}", columns.next().column_type_family()),
+                        table: columns.previous.table().name().to_owned(),
+                        column: columns.previous.name().to_owned(),
+                        previous_type: format!("{:?}", columns.previous.column_type_family()),
+                        next_type: format!("{:?}", columns.next.column_type_family()),
                     },
                     step_index,
                 );
@@ -75,18 +75,22 @@ impl DestructiveChangeCheckerFlavour for SqliteFlavour {
         unreachable!("check_drop_and_recreate_column on SQLite");
     }
 
-    async fn count_rows_in_table(&mut self, table_name: &str) -> migration_connector::ConnectorResult<i64> {
-        let query = format!("SELECT COUNT(*) FROM \"{}\"", table_name);
-        let result_set = self.query_raw(&query, &[]).await?;
-        super::extract_table_rows_count(table_name, result_set)
+    fn count_rows_in_table<'a>(&'a mut self, table_name: &'a str) -> BoxFuture<'a, ConnectorResult<i64>> {
+        Box::pin(async move {
+            let query = format!("SELECT COUNT(*) FROM \"{}\"", table_name);
+            let result_set = self.query_raw(&query, &[]).await?;
+            super::extract_table_rows_count(table_name, result_set)
+        })
     }
 
-    async fn count_values_in_column(
-        &mut self,
-        (table, column): (&str, &str),
-    ) -> migration_connector::ConnectorResult<i64> {
-        let query = format!("SELECT COUNT(*) FROM \"{}\" WHERE \"{}\" IS NOT NULL", table, column);
-        let result_set = self.query_raw(&query, &[]).await?;
-        super::extract_column_values_count(result_set)
+    fn count_values_in_column<'a>(
+        &'a mut self,
+        (table, column): (&'a str, &'a str),
+    ) -> BoxFuture<'a, ConnectorResult<i64>> {
+        Box::pin(async move {
+            let query = format!("SELECT COUNT(*) FROM \"{}\" WHERE \"{}\" IS NOT NULL", table, column);
+            let result_set = self.query_raw(&query, &[]).await?;
+            super::extract_column_values_count(result_set)
+        })
     }
 }

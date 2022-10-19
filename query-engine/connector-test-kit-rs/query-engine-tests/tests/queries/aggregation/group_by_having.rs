@@ -350,6 +350,7 @@ mod aggr_group_by_having {
         Ok(())
     }
 
+    #[connector_test]
     async fn having_without_aggr_sel(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, float: 10, int: 10, string: "group1" }"#).await?;
         create_row(&runner, r#"{ id: 2, float: 0, int: 0, string: "group1" }"#).await?;
@@ -378,7 +379,7 @@ mod aggr_group_by_having {
             groupByTestModel(
               by: [string]
               having: {
-                AND: [{ int: { _max: { gt: 1 } } }, { decimal: { _sum: { gt: 1 } } }]
+                AND: [{ int: { _max: { gt: 1 } } }, { int: { _sum: { gt: 1 } } }]
               }
             ) { string }
           }"#,

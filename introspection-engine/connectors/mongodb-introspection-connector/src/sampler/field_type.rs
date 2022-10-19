@@ -1,9 +1,11 @@
-use datamodel::dml::{self, NativeTypeInstance, ScalarType};
-use mongodb::bson::Bson;
-use native_types::MongoDbType;
-use std::fmt;
-
 use super::statistics::Name;
+use mongodb::bson::Bson;
+use psl::{
+    builtin_connectors::MongoDbType,
+    datamodel_connector,
+    dml::{self, NativeTypeInstance, ScalarType},
+};
+use std::fmt;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub(super) enum FieldType {
@@ -85,24 +87,28 @@ impl fmt::Display for FieldType {
 impl From<FieldType> for dml::CompositeTypeFieldType {
     fn from(r#type: FieldType) -> Self {
         match r#type {
-            FieldType::String => dml::CompositeTypeFieldType::Scalar(ScalarType::String, None, None),
-            FieldType::Double => dml::CompositeTypeFieldType::Scalar(ScalarType::Float, None, None),
-            FieldType::BinData => dml::CompositeTypeFieldType::Scalar(ScalarType::Bytes, None, None),
+            FieldType::String => dml::CompositeTypeFieldType::Scalar(ScalarType::String, None),
+            FieldType::Double => dml::CompositeTypeFieldType::Scalar(ScalarType::Float, None),
+            FieldType::BinData => dml::CompositeTypeFieldType::Scalar(ScalarType::Bytes, None),
             FieldType::ObjectId => dml::CompositeTypeFieldType::Scalar(
                 ScalarType::String,
-                None,
-                Some(NativeTypeInstance::new("ObjectId", Vec::new(), &MongoDbType::ObjectId)),
+                Some(NativeTypeInstance::new(
+                    datamodel_connector::NativeTypeInstance::new::<MongoDbType>(MongoDbType::ObjectId),
+                    psl::builtin_connectors::MONGODB,
+                )),
             ),
-            FieldType::Bool => dml::CompositeTypeFieldType::Scalar(ScalarType::Boolean, None, None),
+            FieldType::Bool => dml::CompositeTypeFieldType::Scalar(ScalarType::Boolean, None),
             FieldType::Date => dml::CompositeTypeFieldType::Scalar(
                 ScalarType::DateTime,
-                None,
-                Some(NativeTypeInstance::new("Date", Vec::new(), &MongoDbType::Date)),
+                Some(NativeTypeInstance::new(
+                    datamodel_connector::NativeTypeInstance::new::<MongoDbType>(MongoDbType::Date),
+                    psl::builtin_connectors::MONGODB,
+                )),
             ),
-            FieldType::Int32 => dml::CompositeTypeFieldType::Scalar(ScalarType::Int, None, None),
-            FieldType::Timestamp => dml::CompositeTypeFieldType::Scalar(ScalarType::DateTime, None, None),
-            FieldType::Int64 => dml::CompositeTypeFieldType::Scalar(ScalarType::BigInt, None, None),
-            FieldType::Json => dml::CompositeTypeFieldType::Scalar(ScalarType::Json, None, None),
+            FieldType::Int32 => dml::CompositeTypeFieldType::Scalar(ScalarType::Int, None),
+            FieldType::Timestamp => dml::CompositeTypeFieldType::Scalar(ScalarType::DateTime, None),
+            FieldType::Int64 => dml::CompositeTypeFieldType::Scalar(ScalarType::BigInt, None),
+            FieldType::Json => dml::CompositeTypeFieldType::Scalar(ScalarType::Json, None),
             FieldType::Document(name) => dml::CompositeTypeFieldType::CompositeType(name),
             FieldType::Array(r#type) => dml::CompositeTypeFieldType::from(*r#type),
             FieldType::Unsupported(name) => dml::CompositeTypeFieldType::Unsupported(name.to_string()),
@@ -113,24 +119,28 @@ impl From<FieldType> for dml::CompositeTypeFieldType {
 impl From<FieldType> for dml::FieldType {
     fn from(r#type: FieldType) -> Self {
         match r#type {
-            FieldType::String => dml::FieldType::Scalar(ScalarType::String, None, None),
-            FieldType::Double => dml::FieldType::Scalar(ScalarType::Float, None, None),
-            FieldType::BinData => dml::FieldType::Scalar(ScalarType::Bytes, None, None),
+            FieldType::String => dml::FieldType::Scalar(ScalarType::String, None),
+            FieldType::Double => dml::FieldType::Scalar(ScalarType::Float, None),
+            FieldType::BinData => dml::FieldType::Scalar(ScalarType::Bytes, None),
             FieldType::ObjectId => dml::FieldType::Scalar(
                 ScalarType::String,
-                None,
-                Some(NativeTypeInstance::new("ObjectId", Vec::new(), &MongoDbType::ObjectId)),
+                Some(NativeTypeInstance::new(
+                    datamodel_connector::NativeTypeInstance::new::<MongoDbType>(MongoDbType::ObjectId),
+                    psl::builtin_connectors::MONGODB,
+                )),
             ),
-            FieldType::Bool => dml::FieldType::Scalar(ScalarType::Boolean, None, None),
+            FieldType::Bool => dml::FieldType::Scalar(ScalarType::Boolean, None),
             FieldType::Date => dml::FieldType::Scalar(
                 ScalarType::DateTime,
-                None,
-                Some(NativeTypeInstance::new("Date", Vec::new(), &MongoDbType::Date)),
+                Some(NativeTypeInstance::new(
+                    datamodel_connector::NativeTypeInstance::new::<MongoDbType>(MongoDbType::Date),
+                    psl::builtin_connectors::MONGODB,
+                )),
             ),
-            FieldType::Int32 => dml::FieldType::Scalar(ScalarType::Int, None, None),
-            FieldType::Timestamp => dml::FieldType::Scalar(ScalarType::DateTime, None, None),
-            FieldType::Int64 => dml::FieldType::Scalar(ScalarType::BigInt, None, None),
-            FieldType::Json => dml::FieldType::Scalar(ScalarType::Json, None, None),
+            FieldType::Int32 => dml::FieldType::Scalar(ScalarType::Int, None),
+            FieldType::Timestamp => dml::FieldType::Scalar(ScalarType::DateTime, None),
+            FieldType::Int64 => dml::FieldType::Scalar(ScalarType::BigInt, None),
+            FieldType::Json => dml::FieldType::Scalar(ScalarType::Json, None),
             FieldType::Document(name) => dml::FieldType::CompositeType(name),
             FieldType::Array(r#type) => dml::FieldType::from(*r#type),
             FieldType::Unsupported(type_name) => dml::FieldType::Unsupported(type_name.to_string()),

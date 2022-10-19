@@ -29,7 +29,9 @@ fn altering_the_type_of_a_column_in_a_non_empty_table_warns(api: TestApi) {
     "#;
 
     api.schema_push_w_datasource(dm2).send().assert_warnings(&[
-        if api.is_postgres() {
+        if api.is_cockroach() {
+            "You are about to alter the column `dogs` on the `User` table, which contains 1 non-null values. The data in that column will be cast from `Int8` to `Int4`.".into()
+        } else if api.is_postgres() {
             "You are about to alter the column `dogs` on the `User` table, which contains 1 non-null values. The data in that column will be cast from `BigInt` to `Integer`.".into()
         } else if api.lower_cases_table_names() {
             "You are about to alter the column `dogs` on the `user` table, which contains 1 non-null values. The data in that column will be cast from `BigInt` to `Int`.".into()
@@ -162,7 +164,7 @@ fn changing_an_int_array_column_to_scalar_is_not_possible(api: TestApi) {
     });
 }
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 fn int_to_string_conversions_work(api: TestApi) {
     let dm1 = r#"
         model Cat {
@@ -191,7 +193,7 @@ fn int_to_string_conversions_work(api: TestApi) {
         .assert_single_row(|row| row.assert_text_value("tag", "20"));
 }
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 fn string_to_int_conversions_are_risky(api: TestApi) {
     let dm1 = r#"
         model Cat {

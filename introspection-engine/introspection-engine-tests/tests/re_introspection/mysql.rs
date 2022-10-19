@@ -2,10 +2,41 @@ use barrel::types;
 use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 
+#[test_connector(tags(Mysql))]
+async fn empty_preview_features_are_kept(api: &TestApi) -> TestResult {
+    let schema = indoc! {r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = []
+        }
+
+        datasource db {
+          provider   = "mysql"
+          url        = "env(TEST_DATABASE_URL)"
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = []
+        }
+
+        datasource db {
+          provider = "mysql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+    "#]];
+
+    expectation.assert_eq(&api.re_introspect_config(schema).await?);
+
+    Ok(())
+}
+
 #[test_connector(tags(Mysql), exclude(Vitess), preview_features("referentialIntegrity"))]
-async fn referential_integrity_parameter_is_not_added(api: &TestApi) -> TestResult {
+async fn relation_mode_parameter_is_not_added(api: &TestApi) -> TestResult {
     let result = api.re_introspect("").await?;
-    assert!(!result.contains(r#"referentialIntegrity = "#));
+    assert!(!result.contains(r#"relationMode = "#));
 
     Ok(())
 }
@@ -224,6 +255,54 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
     "#]];
 
     expected.assert_eq(&api.re_introspect_dml(input_dm).await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Mysql))]
+async fn mysql_keeps_renamed_enum_defaults(api: &TestApi) -> TestResult {
+    let init = formatdoc! {r#"
+        CREATE TABLE `A` (
+          `id` int NOT NULL AUTO_INCREMENT,
+          `val` enum('0','1') NOT NULL DEFAULT '0',
+          PRIMARY KEY (`id`)
+        );
+    "#};
+
+    api.raw_cmd(&init).await;
+
+    let input = indoc! {r#"
+        model A {
+          id  Int   @id
+          val A_val @default(is_false)
+        }
+
+        enum A_val {
+          is_false @map("0")
+          is_true  @map("1")
+        }
+    "#};
+
+    let expected = expect![[r#"
+        model A {
+          id  Int   @id @default(autoincrement())
+          val A_val @default(is_false)
+        }
+
+        enum A_val {
+          is_false @map("0")
+          is_true  @map("1")
+        }
+    "#]];
+
+    let result = api.re_introspect_dml(input).await?;
+    expected.assert_eq(&result);
+
+    let expected = expect![[
+        r#"[{"code":10,"message":"These enum values were enriched with `@map` information taken from the previous Prisma schema.","affected":[{"enm":"A_val","value":"is_false"},{"enm":"A_val","value":"is_true"}]},{"code":20,"message":"Default values were enriched with custom enum variants taken from the previous Prisma schema.","affected":[{"model":"A","field":"val","value":"is_false"}]}]"#
+    ]];
+
+    expected.assert_eq(&api.re_introspect_warnings(input).await?);
 
     Ok(())
 }

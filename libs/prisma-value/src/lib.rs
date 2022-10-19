@@ -1,8 +1,6 @@
 pub mod arithmetic;
 
 mod error;
-#[cfg(feature = "sql-ext")]
-mod sql_ext;
 
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::prelude::*;
@@ -98,6 +96,35 @@ impl TryFrom<serde_json::Value> for PrismaValue {
 
                     Ok(PrismaValue::DateTime(date))
                 }
+                Some("bigint") => {
+                    let value = obj
+                        .get("prisma__value")
+                        .and_then(|v| v.as_str())
+                        .ok_or_else(|| ConversionFailure::new("JSON bigint value", "PrismaValue"))?;
+
+                    i64::from_str(value)
+                        .map(PrismaValue::BigInt)
+                        .map_err(|_| ConversionFailure::new("JSON bigint value", "PrismaValue"))
+                }
+                Some("decimal") => {
+                    let value = obj
+                        .get("prisma__value")
+                        .and_then(|v| v.as_str())
+                        .ok_or_else(|| ConversionFailure::new("JSON decimal value", "PrismaValue"))?;
+
+                    BigDecimal::from_str(value)
+                        .map(PrismaValue::Float)
+                        .map_err(|_| ConversionFailure::new("JSON decimal value", "PrismaValue"))
+                }
+                Some("bytes") => {
+                    let value = obj
+                        .get("prisma__value")
+                        .and_then(|v| v.as_str())
+                        .ok_or_else(|| ConversionFailure::new("JSON bytes value", "PrismaValue"))?;
+
+                    decode_bytes(value).map(PrismaValue::Bytes)
+                }
+
                 _ => Ok(PrismaValue::Json(serde_json::to_string(&obj).unwrap())),
             },
         }

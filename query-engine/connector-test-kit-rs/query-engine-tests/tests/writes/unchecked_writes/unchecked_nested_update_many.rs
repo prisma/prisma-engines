@@ -205,7 +205,11 @@ mod unchecked_nested_um {
     }
 
     // "Unchecked nested many updates" should "allow to write to autoincrement IDs directly"
-    #[connector_test(schema(schema_3), capabilities(AutoIncrement, WritableAutoincField))]
+    #[connector_test(
+        schema(schema_3),
+        capabilities(AutoIncrement, WritableAutoincField),
+        exclude(CockroachDb)
+    )]
     async fn allow_write_autoinc_id(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,
@@ -221,6 +225,45 @@ mod unchecked_nested_um {
             }
           }"#),
           @r###"{"data":{"updateOneModelB":{"a":[{"id":111}]}}}"###
+        );
+
+        Ok(())
+    }
+
+    fn schema_3_cockroachdb() -> String {
+        let schema = indoc! {
+            r#"model ModelA {
+              #id(id, BigInt, @id, @default(autoincrement()))
+              b_id Int
+              b    ModelB @relation(fields: [b_id], references: [id])
+            }
+
+            model ModelB {
+              #id(id, Int, @id)
+              a  ModelA[]
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // "Unchecked nested many updates" should "allow to write to autoincrement IDs directly"
+    #[connector_test(schema(schema_3_cockroachdb), only(CockroachDb))]
+    async fn allow_write_autoinc_id_cockroachdb(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation { createOneModelA(data: { b: { create: { id: 1 }} }) { id } }"#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            updateOneModelB(where: { id: 1 }, data: {
+              a: { updateMany: { where: { id: { not: 0 }}, data: { id: 111 }}}
+            }) {
+              a { id }
+            }
+          }"#),
+          @r###"{"data":{"updateOneModelB":{"a":[{"id":"111"}]}}}"###
         );
 
         Ok(())

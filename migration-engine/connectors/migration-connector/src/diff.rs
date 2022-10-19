@@ -1,10 +1,11 @@
 use crate::migrations_directory::MigrationDirectory;
+use psl::parser_database::SourceFile;
 use std::fmt::Debug;
 
 /// Diffable things
 pub enum DiffTarget<'a> {
     /// A Prisma schema.
-    Datamodel(&'a str),
+    Datamodel(SourceFile),
     /// A migrations folder. What is diffable is the state of the database schema at the end of the
     /// migrations history.
     Migrations(&'a [MigrationDirectory]),
@@ -29,7 +30,7 @@ impl DiffTarget<'_> {
     /// Try interpreting the DiffTarget as a Datamodel variant.
     pub fn as_datamodel(&self) -> Option<&str> {
         match self {
-            DiffTarget::Datamodel(schema) => Some(schema),
+            DiffTarget::Datamodel(schema) => Some(schema.as_str()),
             _ => None,
         }
     }

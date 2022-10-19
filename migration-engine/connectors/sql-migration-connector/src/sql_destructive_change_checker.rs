@@ -31,10 +31,7 @@ use destructive_check_plan::DestructiveCheckPlan;
 use migration_connector::{
     BoxFuture, ConnectorResult, DestructiveChangeChecker, DestructiveChangeDiagnostics, Migration,
 };
-use sql_schema_describer::{
-    walkers::{ColumnWalker, SqlSchemaExt},
-    ColumnArity,
-};
+use sql_schema_describer::{walkers::ColumnWalker, ColumnArity};
 use unexecutable_step_check::UnexecutableStepCheck;
 use warning_check::SqlMigrationWarningCheck;
 
@@ -106,17 +103,17 @@ impl SqlMigrationConnector {
                 }) => {
                     // The table in alter_table is the updated table, but we want to
                     // check against the current state of the table.
-                    let tables = schemas.tables(table_id);
+                    let tables = schemas.walk(*table_id);
 
                     for change in changes {
                         match change {
                             TableChange::DropColumn { column_id } => {
-                                let column = tables.previous().column_at(*column_id);
+                                let column = schemas.previous.walk(*column_id);
 
                                 self.check_column_drop(&column, &mut plan, step_index);
                             }
                             TableChange::AlterColumn(alter_column) => {
-                                let columns = tables.columns(&alter_column.column_id);
+                                let columns = schemas.walk(alter_column.column_id);
 
                                 self.flavour()
                                     .check_alter_column(alter_column, &columns, &mut plan, step_index)
@@ -125,18 +122,18 @@ impl SqlMigrationConnector {
                                 column_id,
                                 has_virtual_default,
                             } => {
-                                let column = tables.next().column_at(*column_id);
+                                let column = schemas.next.walk(*column_id);
 
                                 self.check_add_column(&column, *has_virtual_default, &mut plan, step_index)
                             }
                             TableChange::DropPrimaryKey { .. } => plan.push_warning(
                                 SqlMigrationWarningCheck::PrimaryKeyChange {
-                                    table: tables.previous().name().to_owned(),
+                                    table: tables.previous.name().to_owned(),
                                 },
                                 step_index,
                             ),
                             TableChange::DropAndRecreateColumn { column_id, changes } => {
-                                let columns = tables.columns(column_id);
+                                let columns = schemas.walk(*column_id);
 
                                 self.flavour
                                     .check_drop_and_recreate_column(&columns, changes, &mut plan, step_index)
@@ -148,19 +145,19 @@ impl SqlMigrationConnector {
                 }
                 SqlMigrationStep::RedefineTables(redefine_tables) => {
                     for redefine_table in redefine_tables {
-                        let tables = schemas.tables(&redefine_table.table_ids);
+                        let tables = schemas.walk(redefine_table.table_ids);
 
                         if redefine_table.dropped_primary_key {
                             plan.push_warning(
                                 SqlMigrationWarningCheck::PrimaryKeyChange {
-                                    table: tables.previous().name().to_owned(),
+                                    table: tables.previous.name().to_owned(),
                                 },
                                 step_index,
                             )
                         }
 
                         for added_column_idx in &redefine_table.added_columns {
-                            let column = tables.next().column_at(*added_column_idx);
+                            let column = schemas.next.walk(*added_column_idx);
                             let has_virtual_default = redefine_table
                                 .added_columns_with_virtual_defaults
                                 .contains(added_column_idx);
@@ -168,21 +165,22 @@ impl SqlMigrationConnector {
                         }
 
                         for dropped_column_idx in &redefine_table.dropped_columns {
-                            let column = tables.previous().column_at(*dropped_column_idx);
+                            let column = schemas.previous.walk(*dropped_column_idx);
                             self.check_column_drop(&column, &mut plan, step_index);
                         }
 
                         for (column_ides, changes, type_change) in redefine_table.column_pairs.iter() {
-                            let columns = tables.columns(column_ides);
+                            let columns = schemas.walk(*column_ides);
 
-                            let arity_change_is_safe = match (&columns.previous().arity(), &columns.next().arity()) {
+                            let arity_change_is_safe = match (&columns.previous.arity(), &columns.next.arity()) {
                                 // column became required
                                 (ColumnArity::Nullable, ColumnArity::Required) => false,
                                 // column became nullable
                                 (ColumnArity::Required, ColumnArity::Nullable) => true,
                                 // nothing changed
                                 (ColumnArity::Required, ColumnArity::Required)
-                                | (ColumnArity::Nullable, ColumnArity::Nullable) => true,
+                                | (ColumnArity::Nullable, ColumnArity::Nullable)
+                                | (ColumnArity::List, ColumnArity::List) => true,
                                 // not supported on SQLite
                                 (ColumnArity::List, _) | (_, ColumnArity::List) => unreachable!(),
                             };
@@ -192,40 +190,37 @@ impl SqlMigrationConnector {
                             }
 
                             if changes.arity_changed()
-                                && columns.next().arity().is_required()
-                                && columns.next().default().is_none()
+                                && columns.next.arity().is_required()
+                                && columns.next.default().is_none()
                             {
                                 plan.push_unexecutable(
                                     UnexecutableStepCheck::MadeOptionalFieldRequired {
-                                        table: columns.previous().table().name().to_owned(),
-                                        column: columns.previous().name().to_owned(),
+                                        table: columns.previous.table().name().to_owned(),
+                                        column: columns.previous.name().to_owned(),
                                     },
                                     step_index,
                                 );
                             }
 
-                            // can this just use the flavour??
-                            // todo pull up type rendering and native type check here
                             match type_change {
                                 Some(ColumnTypeChange::SafeCast) | None => (),
                                 Some(ColumnTypeChange::RiskyCast) => {
                                     plan.push_warning(
                                         SqlMigrationWarningCheck::RiskyCast {
-                                            table: columns.previous().table().name().to_owned(),
-                                            column: columns.previous().name().to_owned(),
-                                            previous_type: format!("{:?}", columns.previous().column_type_family()),
-                                            next_type: format!("{:?}", columns.next().column_type_family()),
+                                            table: columns.previous.table().name().to_owned(),
+                                            column: columns.previous.name().to_owned(),
+                                            previous_type: format!("{:?}", columns.previous.column_type_family()),
+                                            next_type: format!("{:?}", columns.next.column_type_family()),
                                         },
                                         step_index,
                                     );
                                 }
-                                //todo why no precise type warnings here if native types are on?
                                 Some(ColumnTypeChange::NotCastable) => plan.push_warning(
                                     SqlMigrationWarningCheck::NotCastable {
-                                        table: columns.previous().table().name().to_owned(),
-                                        column: columns.previous().name().to_owned(),
-                                        previous_type: format!("{:?}", columns.previous().column_type_family()),
-                                        next_type: format!("{:?}", columns.next().column_type_family()),
+                                        table: columns.previous.table().name().to_owned(),
+                                        column: columns.previous.name().to_owned(),
+                                        previous_type: format!("{:?}", columns.previous.column_type_family()),
+                                        next_type: format!("{:?}", columns.next.column_type_family()),
                                     },
                                     step_index,
                                 ),
@@ -234,37 +229,32 @@ impl SqlMigrationConnector {
                     }
                 }
                 SqlMigrationStep::DropTable { table_id } => {
-                    self.check_table_drop(
-                        schemas.previous().table_walker_at(*table_id).name(),
-                        &mut plan,
-                        step_index,
-                    );
+                    self.check_table_drop(schemas.previous.walk(*table_id).name(), &mut plan, step_index);
                 }
                 SqlMigrationStep::CreateIndex {
-                    table_id: (Some(_), table_id),
-                    index_index,
+                    table_id: (Some(_), _),
+                    index_id,
                     from_drop_and_recreate: false,
                 } => {
-                    let index = schemas.next().table_walker_at(*table_id).index_at(*index_index);
-
-                    if index.index_type().is_unique() {
+                    let index = schemas.next.walk(*index_id);
+                    if index.is_unique() {
                         plan.push_warning(
                             SqlMigrationWarningCheck::UniqueConstraintAddition {
                                 table: index.table().name().to_owned(),
-                                columns: index.columns().map(|col| col.get().name().to_owned()).collect(),
+                                columns: index.columns().map(|col| col.as_column().name().to_owned()).collect(),
                             },
                             step_index,
                         )
                     }
                 }
                 SqlMigrationStep::AlterEnum(AlterEnum {
-                    index,
+                    id,
                     created_variants: _,
                     dropped_variants,
                     previous_usages_as_default: _,
                 }) if !dropped_variants.is_empty() => plan.push_warning(
                     SqlMigrationWarningCheck::EnumValueRemoval {
-                        enm: schemas.next().enum_walker_at(*index.next()).name().to_owned(),
+                        enm: schemas.next.walk(id.next).name().to_owned(),
                         values: dropped_variants.clone(),
                     },
                     step_index,

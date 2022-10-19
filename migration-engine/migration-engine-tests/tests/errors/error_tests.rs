@@ -287,11 +287,11 @@ fn datamodel_parser_errors_must_return_a_known_error(api: TestApi) {
     assert_eq!(error, expected_error);
 }
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb, Sqlite))]
 fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: TestApi) {
     let dm = r#"
         model Fruit {
-            id Int @id @default(autoincrement())
+            id   Int @id @default(autoincrement())
             name String
         }
     "#;
@@ -307,7 +307,7 @@ fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: TestApi
 
     let dm2 = r#"
         model Fruit {
-            id Int @id @default(autoincrement())
+            id   Int @id @default(autoincrement())
             name String @unique
         }
     "#;

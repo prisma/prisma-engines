@@ -1,21 +1,15 @@
- generator js {
-   provider        = "prisma-client-js"
-   previewFeatures = ["extendedIndexes"]
- }
+model User {
+  id        Int    @id
+  firstName String
+  lastName  String
+  age       Int
 
- model User {
-   id Int @id
-   firstName String
-   lastName String
-   age Int
+  @@index([firstName, lastName(sort: Desc), age])
+}
 
-   @@index([firstName, lastName(sort: Desc), age])
- }
+model Post {
+  id    Int    @id
+  title String
 
- model Post {
-   id Int @id
-   title String
-
-   @@index([title(sort: Desc)])
- }
-
+  @@index([title(sort: Desc)])
+}

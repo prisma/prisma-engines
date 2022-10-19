@@ -13,7 +13,7 @@ mod one2one_regression {
                 name     String?
                 friendOf User?   @relation("Userfriend")
                 friend   User?   @relation("Userfriend", fields: [friendId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-                friendId Int?
+                friendId Int? @unique
             }
             "#
         };

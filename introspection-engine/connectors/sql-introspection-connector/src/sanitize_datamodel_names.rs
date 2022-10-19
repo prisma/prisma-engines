@@ -1,14 +1,12 @@
-use crate::SqlFamilyTrait;
-use datamodel::{
+use crate::{calculate_datamodel::CalculateDatamodelContext as Context, SqlFamilyTrait};
+use once_cell::sync::Lazy;
+use psl::{
     dml::{
-        Datamodel, DefaultKind, DefaultValue, Field, FieldType, IndexField, Model, PrimaryKeyField, ValueGenerator,
-        WithDatabaseName, WithName,
+        Datamodel, DefaultKind, DefaultValue, Field, FieldType, IndexField, Model, PrimaryKeyField, PrismaValue,
+        ValueGenerator, WithDatabaseName, WithName,
     },
     is_reserved_type_name,
 };
-use introspection_connector::IntrospectionContext;
-use once_cell::sync::Lazy;
-use prisma_value::PrismaValue;
 use quaint::prelude::SqlFamily;
 use regex::Regex;
 use std::collections::HashMap;
@@ -18,9 +16,9 @@ static EMPTY_ENUM_PLACEHOLDER: &str = "EMPTY_ENUM_VALUE";
 static RE_START: Lazy<Regex> = Lazy::new(|| Regex::new("^[^a-zA-Z]+").unwrap());
 static RE: Lazy<Regex> = Lazy::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
 
-pub fn sanitize_datamodel_names(datamodel: &mut Datamodel, ctx: &IntrospectionContext) {
-    let enum_renames = sanitize_models(datamodel, ctx);
-    sanitize_enums(datamodel, &enum_renames);
+pub(crate) fn sanitize_datamodel_names(ctx: &Context, datamodel: &mut Datamodel) {
+    let enum_renames = sanitize_models(ctx, datamodel);
+    sanitize_enums(&enum_renames, datamodel);
 }
 
 // if after opionated renames we have duplicated names, e.g. a database with
@@ -44,8 +42,9 @@ pub fn sanitization_leads_to_duplicate_names(datamodel: &Datamodel) -> bool {
 }
 
 // Todo: Sanitizing might need to be adjusted to also change the fields in the RelationInfo
-fn sanitize_models(datamodel: &mut Datamodel, ctx: &IntrospectionContext) -> HashMap<String, (String, Option<String>)> {
+fn sanitize_models(ctx: &Context, datamodel: &mut Datamodel) -> HashMap<String, (String, Option<String>)> {
     let mut enum_renames = HashMap::new();
+    let sql_family = ctx.sql_family();
 
     for model in datamodel.models_mut() {
         rename_reserved(model);
@@ -66,7 +65,7 @@ fn sanitize_models(datamodel: &mut Datamodel, ctx: &IntrospectionContext) -> Has
                     let info = &mut rf.relation_info;
 
                     info.name = sanitize_string(&info.name);
-                    info.to = sanitize_string(&reformat_reserved_string(&info.to));
+                    info.referenced_model = sanitize_string(&reformat_reserved_string(&info.referenced_model));
 
                     info.references = sanitize_strings(&info.references);
                     info.fields = sanitize_strings(&info.fields);
@@ -77,7 +76,7 @@ fn sanitize_models(datamodel: &mut Datamodel, ctx: &IntrospectionContext) -> Has
                         // Enums in MySQL are defined on the column and do not have a separate name.
                         // Introspection generates an enum name for MySQL as `<model_name>_<field_type>`.
                         // If the sanitization changes the enum name, we need to make sure it's changed everywhere.
-                        let (sanitized_enum_name, db_name) = if let SqlFamily::Mysql = ctx.sql_family() {
+                        let (sanitized_enum_name, db_name) = if let SqlFamily::Mysql = sql_family {
                             if model_db_name.is_none() && sf.database_name.is_none() {
                                 (enum_name.to_owned(), None)
                             } else {
@@ -133,7 +132,7 @@ fn sanitize_models(datamodel: &mut Datamodel, ctx: &IntrospectionContext) -> Has
     enum_renames
 }
 
-fn sanitize_enums(datamodel: &mut Datamodel, enum_renames: &HashMap<String, (String, Option<String>)>) {
+fn sanitize_enums(enum_renames: &HashMap<String, (String, Option<String>)>, datamodel: &mut Datamodel) {
     for enm in datamodel.enums_mut() {
         if let Some((sanitized_name, db_name)) = enum_renames.get(&enm.name) {
             if enm.database_name().is_none() {
@@ -203,7 +202,7 @@ where
     };
 }
 
-fn sanitize_string(s: &str) -> String {
+pub(super) fn sanitize_string(s: &str) -> String {
     let needs_sanitation = RE_START.is_match(s) || RE.is_match(s);
 
     if needs_sanitation {

@@ -1,8 +1,6 @@
-use datamodel_connector::Connector;
-use mongodb_datamodel_connector::MongoDbDatamodelConnector;
-
 use super::*;
 use crate::{MongoDbSchemaRenderer, TestError, TestResult};
+use psl::builtin_connectors::MONGODB;
 
 #[derive(Debug, Default, Clone)]
 pub struct MongoDbConnectorTag {
@@ -19,7 +17,13 @@ impl ConnectorTagInterface for MongoDbConnectorTag {
         Box::new(MongoDbSchemaRenderer::new())
     }
 
-    fn connection_string(&self, database: &str, is_ci: bool) -> String {
+    fn connection_string(
+        &self,
+        database: &str,
+        is_ci: bool,
+        _is_multi_schema: bool,
+        _: Option<&'static str>,
+    ) -> String {
         match self.version {
             Some(MongoDbVersion::V4_2) if is_ci => format!(
                 "mongodb://prisma:prisma@test-db-mongodb-4-2:27016/{}?authSource=admin&retryWrites=true",
@@ -68,7 +72,7 @@ impl ConnectorTagInterface for MongoDbConnectorTag {
         true
     }
 
-    fn referential_integrity(&self) -> &'static str {
+    fn relation_mode(&self) -> &'static str {
         "prisma"
     }
 }
@@ -153,5 +157,5 @@ impl ToString for MongoDbVersion {
 }
 
 fn mongo_capabilities() -> Vec<ConnectorCapability> {
-    MongoDbDatamodelConnector.capabilities().to_owned()
+    MONGODB.capabilities().to_owned()
 }

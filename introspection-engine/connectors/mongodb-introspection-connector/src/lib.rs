@@ -4,7 +4,6 @@ mod warnings;
 
 pub use error::*;
 
-use datamodel::{common::preview_features::PreviewFeature, dml::Datamodel};
 use enumflags2::BitFlags;
 use futures::TryStreamExt;
 use indoc::formatdoc;
@@ -14,6 +13,7 @@ use introspection_connector::{
 };
 use mongodb::{Client, Database};
 use mongodb_schema_describer::MongoSchema;
+use psl::PreviewFeature;
 use user_facing_errors::{common::InvalidConnectionString, KnownError};
 
 #[derive(Debug)]
@@ -73,10 +73,6 @@ impl MongoDbIntrospectionConnector {
             schema.remove_fulltext_indexes();
         }
 
-        if !preview_features.contains(PreviewFeature::ExtendedIndexes) {
-            schema.normalize_index_attributes();
-        }
-
         Ok(schema)
     }
 
@@ -127,13 +123,8 @@ impl IntrospectionConnector for MongoDbIntrospectionConnector {
         Ok(self.version().await.unwrap())
     }
 
-    async fn introspect(
-        &self,
-        // TODO: Re-introspection.
-        _existing_data_model: &Datamodel,
-        ctx: IntrospectionContext,
-    ) -> ConnectorResult<IntrospectionResult> {
-        let schema = self.describe(ctx.preview_features).await?;
-        Ok(sampler::sample(self.database(), ctx.composite_type_depth, schema).await?)
+    async fn introspect(&self, ctx: &IntrospectionContext) -> ConnectorResult<IntrospectionResult> {
+        let schema = self.describe(ctx.preview_features()).await?;
+        Ok(sampler::sample(self.database(), schema, ctx).await?)
     }
 }

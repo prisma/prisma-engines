@@ -1,7 +1,6 @@
 use super::*;
 use crate::utils::quote_connector;
 use darling::FromMeta;
-use itertools::Itertools;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use quote::quote;
@@ -19,15 +18,13 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
         return err.write_errors().into();
     };
 
+    let excluded_features = args.exclude_features.features();
+    let db_schemas = args.db_schemas.schemas();
     let connectors = args.connectors_to_test();
     let handler = args.schema.unwrap().handler_path;
 
     // Renders the connectors as list to use in the code.
-    let connectors = connectors.into_iter().map(quote_connector).fold1(|aggr, next| {
-        quote! {
-            #aggr, #next
-        }
-    });
+    let connectors = connectors.into_iter().map(quote_connector);
 
     let mut test_function = parse_macro_input!(input as ItemFn);
 
@@ -57,50 +54,33 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
     // Combination of test name and test mod name.
     let test_name = test_fn_ident.to_string();
     let suite_name = args.suite.expect("A test must have a test suite.");
-    let test_database = format!("{}_{}", suite_name, test_name);
-    let capabilities: Vec<_> = args
-        .capabilities
-        .idents
-        .into_iter()
-        .map(|cap| {
-            quote! {
-                ConnectorCapability::#cap
-            }
-        })
-        .collect();
+    let test_database_name = format!("{}_{}", suite_name, test_name);
+    let capabilities = args.capabilities.idents;
+
+    let referential_override = match args.relation_mode.or(args.referential_integrity) {
+        Some(ref_override) => {
+            let wat = ref_override.to_string();
+            quote! { Some(#wat.to_string()) }
+        }
+        None => quote! { None },
+    };
 
     // The actual test is a shell function that gets the name of the original function,
     // which is then calling `{orig_name}_run` in the end (see `runner_fn_ident`).
     let test = quote! {
         #[test]
         fn #test_fn_ident() {
-            let config = &query_tests_setup::CONFIG;
-            let enabled_connectors = vec![
-                #connectors
-            ];
-
-            let capabilities: Vec<ConnectorCapability> = vec![
-                #(#capabilities),*
-            ];
-
-            if ConnectorTag::should_run(&config, &enabled_connectors, &capabilities, #test_name) {
-                let template = #handler();
-                let datamodel = query_tests_setup::render_test_datamodel(config, #test_database, template);
-                let connector = config.test_connector_tag().unwrap();
-
-                query_tests_setup::run_with_tokio(async move {
-                    tracing::debug!("Used datamodel:\n {}", datamodel.yellow());
-
-                    query_tests_setup::setup_project(&datamodel).await.unwrap();
-
-                    let requires_teardown = connector.requires_teardown();
-                    let runner = Runner::load(config.runner(), datamodel.clone(), connector).await.unwrap();
-
-                    #runner_fn_ident(runner).await.unwrap();
-
-                    if requires_teardown { query_tests_setup::teardown_project(&datamodel).await.unwrap(); }
-                }.with_subscriber(test_tracing_subscriber(std::env::var("LOG_LEVEL").unwrap_or("info".to_string()))));
-            }
+            query_tests_setup::run_connector_test(
+                #test_name,
+                #test_database_name,
+                &[#(#connectors,)*],
+                &[#(ConnectorCapability::#capabilities),*],
+                &[#(#excluded_features),*],
+                #handler,
+                &[#(#db_schemas),*],
+                #referential_override,
+                #runner_fn_ident,
+            );
         }
 
         #test_function

@@ -1,20 +1,20 @@
-use datamodel::{
+use mongodb_schema_describer::{IndexField, IndexFieldProperty, MongoSchema};
+use psl::{
+    builtin_connectors::MONGODB,
     datamodel_connector::walker_ext_traits::*,
     parser_database::{IndexType, SortOrder},
     ValidatedSchema,
 };
-use mongodb_schema_describer::{IndexField, IndexFieldProperty, MongoSchema};
 
 /// Datamodel -> MongoSchema
 pub(crate) fn calculate(datamodel: &ValidatedSchema) -> MongoSchema {
     let mut schema = MongoSchema::default();
-    let connector = mongodb_datamodel_connector::MongoDbDatamodelConnector;
 
     for model in datamodel.db.walk_models() {
         let collection_id = schema.push_collection(model.database_name().to_owned());
 
         for index in model.indexes() {
-            let name = index.constraint_name(&connector);
+            let name = index.constraint_name(MONGODB);
 
             let fields = index
                 .scalar_field_attributes()

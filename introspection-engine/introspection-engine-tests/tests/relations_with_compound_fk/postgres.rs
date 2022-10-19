@@ -3,7 +3,7 @@ use expect_test::expect;
 use introspection_engine_tests::test_api::*;
 use test_macros::test_connector;
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn compound_foreign_keys_for_one_to_many_relations(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -51,7 +51,7 @@ async fn compound_foreign_keys_for_one_to_many_relations(api: &TestApi) -> TestR
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn compound_foreign_keys_for_required_one_to_one_relations(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -103,7 +103,7 @@ async fn compound_foreign_keys_for_required_one_to_one_relations(api: &TestApi) 
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn compound_foreign_keys_for_one_to_many_relations_with_non_unique_index(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -149,7 +149,7 @@ async fn compound_foreign_keys_for_one_to_many_relations_with_non_unique_index(a
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn compound_foreign_keys_for_one_to_many_relations_with_mixed_requiredness(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -187,6 +187,39 @@ async fn compound_foreign_keys_for_one_to_many_relations_with_mixed_requiredness
           Post Post[]
 
           @@unique([id, age], map: "user_unique")
+        }
+    "#]];
+
+    expected.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+async fn compound_foreign_keys_with_defaults(api: &TestApi) -> TestResult {
+    api.raw_cmd(r#"
+        CREATE TABLE "Person" (
+            id          SERIAL,
+            age         INTEGER NOT NULL,
+            partner_id  INT4 NOT NULL DEFAULT 0,
+            partner_age INT4 NOT NULL DEFAULT 0,
+
+            CONSTRAINT post_user_unique UNIQUE (id, age),
+            CONSTRAINT "Person_partner_id_partner_age_fkey" FOREIGN KEY (partner_id, partner_age) REFERENCES "Person"(id, age),
+            CONSTRAINT "Person_pkey" PRIMARY KEY (id)
+        );
+    "#).await;
+
+    let expected = expect![[r#"
+        model Person {
+          id           Int      @id @default(autoincrement())
+          age          Int
+          partner_id   Int      @default(0)
+          partner_age  Int      @default(0)
+          Person       Person   @relation("PersonToPerson", fields: [partner_id, partner_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction)
+          other_Person Person[] @relation("PersonToPerson")
+
+          @@unique([id, age], map: "post_user_unique")
         }
     "#]];
 

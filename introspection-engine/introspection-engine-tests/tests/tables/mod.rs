@@ -1,3 +1,4 @@
+mod cockroachdb;
 mod mssql;
 mod mysql;
 mod postgres;
@@ -34,7 +35,7 @@ async fn nul_default_bytes(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 async fn a_simple_table_with_gql_types(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -88,7 +89,7 @@ async fn a_simple_table_with_gql_types(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 async fn should_ignore_prisma_helper_tables(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -166,7 +167,7 @@ async fn a_table_with_compound_primary_keys(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 async fn a_table_with_unique_index(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -192,7 +193,7 @@ async fn a_table_with_unique_index(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 async fn a_table_with_multi_column_unique_index(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -220,7 +221,7 @@ async fn a_table_with_multi_column_unique_index(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 async fn a_table_with_required_and_optional_columns(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -247,7 +248,7 @@ async fn a_table_with_required_and_optional_columns(api: &TestApi) -> TestResult
     Ok(())
 }
 
-#[test_connector(exclude(Mssql))]
+#[test_connector(exclude(Mssql, CockroachDb))]
 async fn a_table_with_default_values(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -291,7 +292,7 @@ async fn a_table_with_default_values(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 async fn a_table_with_a_non_unique_index(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -309,7 +310,7 @@ async fn a_table_with_a_non_unique_index(api: &TestApi) -> TestResult {
         model User {
             a       Int
             id      Int @id @default(autoincrement())
-            @@index([a], name: "test")
+            @@index([a], map: "test")
         }
     "##};
 
@@ -318,7 +319,7 @@ async fn a_table_with_a_non_unique_index(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 async fn a_table_with_a_multi_column_non_unique_index(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -338,7 +339,7 @@ async fn a_table_with_a_multi_column_non_unique_index(api: &TestApi) -> TestResu
             a  Int
             b  Int
             id Int @id @default(autoincrement())
-            @@index([a,b], name: "test")
+            @@index([a,b], map: "test")
         }
     "##};
 
@@ -362,47 +363,19 @@ async fn a_table_with_non_id_autoincrement(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let dm = indoc! {r#"
+    let dm = expect![[r#"
         model Test {
-            id       Int @id
-            authorId Int @default(autoincrement()) @unique
+          id       Int @id
+          authorId Int @unique @default(autoincrement())
         }
-    "#};
+    "#]];
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    api.expect_re_introspected_datamodel("", dm).await;
 
     Ok(())
 }
 
-// Cockroach can return non-deterministic results if the UNIQUE constraint is defined twice
-// (it does not collapse similar unique constraints). This variation does not include the
-// doubly defined unique constraint.
-#[test_connector(tags(CockroachDb))]
-async fn a_table_with_non_id_autoincrement_cockroach(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("Test", |t| {
-                t.add_column("id", types::integer());
-                t.add_column("authorId", types::serial().unique(true));
-
-                t.add_constraint("Test_pkey", types::primary_constraint(vec!["id"]));
-            });
-        })
-        .await?;
-
-    let dm = indoc! {r#"
-        model Test {
-            id       Int @id
-            authorId Int @default(autoincrement()) @unique
-        }
-    "#};
-
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
-
-    Ok(())
-}
-
-#[test_connector(exclude(Mssql))]
+#[test_connector(exclude(Mssql, CockroachDb))]
 async fn default_values(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -436,10 +409,12 @@ async fn default_values(api: &TestApi) -> TestResult {
     } else {
         ""
     };
-    let varchar_native = if !api.sql_family().is_sqlite() {
-        "@db.VarChar(5)"
-    } else {
+    let varchar_native = if api.sql_family().is_sqlite() {
         ""
+    } else if api.is_cockroach() {
+        "@db.String(5)"
+    } else {
+        "@db.VarChar(5)"
     };
 
     let float_native = if api.sql_family().is_mssql() {
@@ -475,7 +450,7 @@ async fn default_values(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb, Postgres14))]
+#[test_connector(tags(Postgres), exclude(CockroachDb, Postgres14, Postgres15))]
 async fn pg_default_value_as_dbgenerated(api: &TestApi) -> TestResult {
     let sequence = "CREATE SEQUENCE test_seq START 1".to_string();
     api.database().execute_raw(&sequence, &[]).await?;
@@ -601,35 +576,8 @@ async fn a_table_with_an_index_that_contains_expressions_should_be_ignored(api: 
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
-async fn default_values_on_lists_should_be_ignored(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("User", |t| {
-                t.add_column("id", types::primary());
-                t.inject_custom("ints integer[] DEFAULT array[]::integer[]");
-                t.inject_custom("ints2 integer[] DEFAULT '{}'");
-            });
-        })
-        .await?;
-
-    let dm = indoc! {r#"
-        model User {
-            id      Int @id @default(autoincrement())
-            ints    Int[]
-            ints2   Int[]
-        }
-    "#};
-
-    let result = api.introspect().await?;
-
-    api.assert_eq_datamodels(dm, &result);
-
-    Ok(())
-}
-
 // MySQL doesn't have partial indices.
-#[test_connector(exclude(Mysql))]
+#[test_connector(exclude(Mysql, CockroachDb))]
 async fn a_table_with_partial_indexes_should_ignore_them(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -658,56 +606,6 @@ async fn a_table_with_partial_indexes_should_ignore_them(api: &TestApi) -> TestR
     };
 
     api.assert_eq_datamodels(dm, &api.introspect().await?);
-
-    Ok(())
-}
-
-#[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn introspecting_a_table_with_json_type_must_work(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("Blog", |t| {
-                t.add_column("id", types::primary());
-                t.add_column("json", types::json());
-            });
-        })
-        .await?;
-
-    let dm = indoc! {r#"
-        model Blog {
-            id      Int @id @default(autoincrement())
-            json    Json @db.Json
-        }
-    "#};
-
-    let result = api.introspect().await?;
-
-    api.assert_eq_datamodels(dm, &result);
-
-    Ok(())
-}
-
-#[test_connector(tags(CockroachDb))]
-async fn introspecting_a_table_with_json_type_must_work_cockroach(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("Blog", |t| {
-                t.add_column("id", types::primary());
-                t.add_column("json", types::json());
-            });
-        })
-        .await?;
-
-    let dm = indoc! {r#"
-        model Blog {
-            id      Int @id @default(autoincrement())
-            json    Json
-        }
-    "#};
-
-    let result = api.introspect().await?;
-
-    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }
@@ -745,7 +643,7 @@ async fn different_default_values_should_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Sqlite, Mssql))]
+#[test_connector(exclude(Sqlite, Mssql, CockroachDb))]
 async fn negative_default_values_should_work(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -782,33 +680,6 @@ async fn negative_default_values_should_work(api: &TestApi) -> TestResult {
     "##, float_native = float_native};
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
-
-    Ok(())
-}
-
-#[test_connector(tags(Mysql))]
-async fn partial_indexes_should_be_ignored_on_mysql(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("Blog", move |t| {
-                t.add_column("id", types::primary());
-                t.add_column("int_col", types::integer());
-                t.inject_custom("blob_col mediumblob");
-                t.inject_custom("Index `partial_blob_col_index` (blob_col(10))");
-                t.inject_custom("Index `partial_compound` (blob_col(10), int_col)");
-            });
-        })
-        .await?;
-
-    let expected = expect![[r#"
-        model Blog {
-          id       Int    @id @default(autoincrement())
-          int_col  Int
-          blob_col Bytes? @db.MediumBlob
-        }
-    "#]];
-
-    expected.assert_eq(&api.introspect_dml().await?);
 
     Ok(())
 }
@@ -857,7 +728,16 @@ async fn casing_should_not_lead_to_mix_ups(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let dm = indoc! {r##"
+    let expectation = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "mysql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
         model ADDRESS {
           ADDRESSID Int @id
         }
@@ -869,10 +749,9 @@ async fn casing_should_not_lead_to_mix_ups(api: &TestApi) -> TestResult {
         model address {
           addressid Int @id
         }
-    "##};
+    "#]];
 
-    let result = &api.introspect().await?;
-    api.assert_eq_datamodels(dm, result);
+    api.expect_datamodel(&expectation).await;
 
     Ok(())
 }
@@ -945,19 +824,16 @@ async fn unique_and_id_on_same_field_works_sqlite(api: &TestApi) -> TestResult {
 
 #[test_connector(tags(Mssql))]
 async fn unique_and_id_on_same_field_works_mssql(api: &TestApi) -> TestResult {
-    let setup = format!(
-        r#"
-        CREATE TABLE [{}].users (
+    let setup = r#"
+        CREATE TABLE users (
             id INT IDENTITY,
 
             CONSTRAINT users_id_key UNIQUE (id),
             CONSTRAINT users_pkey PRIMARY KEY (id)
         );
-        "#,
-        schema = api.schema_name(),
-    );
+        "#;
 
-    api.raw_cmd(&setup).await;
+    api.raw_cmd(setup).await;
 
     let dm = indoc! {r##"
         model users {

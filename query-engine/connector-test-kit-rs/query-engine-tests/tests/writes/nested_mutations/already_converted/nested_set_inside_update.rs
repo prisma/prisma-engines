@@ -61,6 +61,117 @@ mod set_inside_update {
         Ok(())
     }
 
+    // "a PM to C1  relation with the child already in a relation" should "be setable through a nested mutation by unique"
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt")]
+    async fn pm_c1_child_inrel_with_filters(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+        run_query!(
+            runner,
+            format!(
+                r#"mutation {{
+                  createOneParent(data: {{
+                    p: "p1", p_1: "p", p_2: "1"
+                    childrenOpt: {{
+                      create: [{{c: "c1", c_1: "c1", c_2: "c2", non_unique: "0"}}, {{c: "c2", c_1: "c3", c_2: "c4", non_unique: "1" }}]
+                    }}
+                  }}){{
+                    {selection}
+                    childrenOpt{{
+                      c
+                    }}
+                  }}
+                }}"#,
+                selection = t.parent().selection()
+            )
+        );
+        let parent = t.parent().parse(
+            run_query_json!(
+                runner,
+                format!(
+                    r#"mutation {{
+                      createOneParent(data: {{p: "p2", p_1: "wqe", p_2: "qt12t"}}){{
+                        p
+                        {selection}
+                      }}
+                    }}"#,
+                    selection = t.parent().selection()
+                )
+            ),
+            &["data", "createOneParent"],
+        )?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, format!(r#"mutation {{
+            updateOneParent(
+            where: {parent}
+            data:{{
+              childrenOpt: {{set: [{{c: "c1", non_unique: "0"}},{{c: "c2", non_unique: "1" }},{{c: "c2", non_unique: "1"}}]}}
+            }}){{
+              childrenOpt {{
+                c
+              }}
+            }}
+          }}"#, parent = parent)),
+          @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c1"},{"c":"c2"}]}}}"###
+        );
+
+        Ok(())
+    }
+
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt")]
+    async fn pm_c1_child_inrel_fails_if_no_match(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+        run_query!(
+            runner,
+            format!(
+                r#"mutation {{
+                  createOneParent(data: {{
+                    p: "p1", p_1: "p", p_2: "1"
+                    childrenOpt: {{
+                      create: [{{c: "c1", c_1: "c1", c_2: "c2", non_unique: "0"}}, {{c: "c2", c_1: "c3", c_2: "c4", non_unique: "1" }}]
+                    }}
+                  }}){{
+                    {selection}
+                    childrenOpt{{
+                      c
+                    }}
+                  }}
+                }}"#,
+                selection = t.parent().selection()
+            )
+        );
+        let parent = t.parent().parse(
+            run_query_json!(
+                runner,
+                format!(
+                    r#"mutation {{
+                      createOneParent(data: {{p: "p2", p_1: "wqe", p_2: "qt12t"}}){{
+                        p
+                        {selection}
+                      }}
+                    }}"#,
+                    selection = t.parent().selection()
+                )
+            ),
+            &["data", "createOneParent"],
+        )?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, format!(r#"mutation {{
+            updateOneParent(
+            where: {parent}
+            data:{{
+              childrenOpt: {{set: [{{c: "c1", non_unique: "1"}}]}}
+            }}){{
+              childrenOpt {{
+                c
+              }}
+            }}
+          }}"#, parent = parent)),
+          @r###"{"data":{"updateOneParent":{"childrenOpt":[]}}}"###
+        );
+
+        Ok(())
+    }
+
     // "a PM to C1  relation with the child without a relation" should "be setable through a nested mutation by unique"
     #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt")]
     async fn pm_c1_child_wo_rel(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {

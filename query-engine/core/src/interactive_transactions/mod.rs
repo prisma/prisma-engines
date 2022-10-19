@@ -24,18 +24,17 @@ pub use messages::*;
 /// TransactionActorManager, it looks for the client in the hashmap and passes the operation to the client. The ITXClient sends a message to the
 /// ITXServer and waits for a response. The ITXServer will then perform the operation and return the result. The ITXServer will perform one
 /// operation at a time. All other operations will sit in the message queue waiting to be processed.
-/// The ITXServer will handle all messages until it transitions state, e.g "rollback" or "commit".
-
-/// After that the ITXServer will move into the cache eviction state. In this state, the connection is closed, and any messages it receives, it will
-/// will reply with its last state. i.e committed, rollbacked or timeout. The eviction state is there so that if a prisma wants to
-// perform an action on a iTx that has completed it will get a better message rather than the error message that this transaction doesn't exist
-
-/// Once the eviction timeout is exceeded, the ITXServer will send a message to the Background Client list Actor to say that it is completed,
-/// and the ITXServer will end. The Background Client list Actor removes the client from the list of clients that are active.
-
-/// During the time the ITXServer is active there is a timer running and if that timeout is exceeded, the
-/// transaction is rolledback and the connection to the database is closed. The ITXServer will then move into the eviction state.
 ///
+/// The ITXServer will handle all messages until:
+/// - It transitions state, e.g "rollback" or "commit"
+/// - It exceeds its timeout, in which case the iTx is rolledback and the connection to the database is closed.
+
+/// Once the ITXServer is done handling messages from the iTx Client, it sends a last message to the Background Client list Actor to say that it is completed and then shuts down.
+/// The Background Client list Actor removes the client from the list of active clients and keeps in cache the iTx id of the closed transaction.
+
+/// We keep a list of closed transactions so that if any further messages are received for this iTx id,
+/// the TransactionActorManager can reply with a helpful error message which explains that no operation can be performed on a closed transaction
+/// rather than an error message stating that the transaction does not exist.
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub struct TxId(String);
@@ -111,12 +110,12 @@ pub struct OpenTx {
 }
 
 impl OpenTx {
-    pub async fn start(mut conn: Box<dyn Connection>) -> crate::Result<Self> {
+    pub async fn start(mut conn: Box<dyn Connection>, isolation_level: Option<String>) -> crate::Result<Self> {
         // Forces static lifetime for the transaction, disabling the lifetime checks for `tx`.
         // Why is this okay? We store the connection the tx depends on with its lifetime next to
         // the tx in the struct. Neither the connection nor the tx are moved out of this struct.
         // The `OpenTx` struct is dropped as a unit.
-        let transaction: Box<dyn Transaction + '_> = conn.start_transaction().await?;
+        let transaction: Box<dyn Transaction + '_> = conn.start_transaction(isolation_level).await?;
         let tx = unsafe {
             let tx: Box<dyn Transaction + 'static> = std::mem::transmute(transaction);
             tx

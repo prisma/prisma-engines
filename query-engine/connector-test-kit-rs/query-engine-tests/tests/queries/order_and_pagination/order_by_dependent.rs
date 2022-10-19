@@ -9,7 +9,7 @@ mod order_by_dependent {
         let schema = indoc! {
             r#"model ModelA {
               #id(id, Int, @id)
-              b_id Int?
+              b_id Int? @unique
               b    ModelB? @relation(fields: [b_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
               c    ModelC?
             }
@@ -18,14 +18,14 @@ mod order_by_dependent {
               #id(id, Int, @id)
               a  ModelA?
 
-              c_id Int?
+              c_id Int? @unique
               c    ModelC? @relation(fields: [c_id], references: [id])
             }
 
             model ModelC {
               #id(id, Int, @id)
               b    ModelB?
-              a_id Int?
+              a_id Int? @unique
               a    ModelA? @relation(fields: [a_id], references: [id])
             }"#
         };
@@ -343,7 +343,7 @@ mod order_by_dependent {
           r#"
         model ModelA {
           #id(id, Int, @id)
-          b_id Int?
+          b_id Int? @unique
           b    ModelB? @relation(fields: [b_id], references: [id])
         }
 
@@ -351,7 +351,7 @@ mod order_by_dependent {
           #id(id, Int, @id)
           a  ModelA?
 
-          c_id Int?
+          c_id Int? @unique
           c    ModelC? @relation(fields: [c_id], references: [id])
         }
 
@@ -449,6 +449,113 @@ mod order_by_dependent {
         if let Some(query) = follow_up {
             runner.query(query).await?.assert_success();
         };
+
+        Ok(())
+    }
+
+    fn schema_self_rel() -> String {
+        let schema = indoc! {
+            r#"model Parent {
+            #id(id, Int, @id)
+          
+            resource   Resource @relation("Resource", fields: [resourceId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+            resourceId Int      @unique
+          }
+          
+          model Resource {
+            #id(id, Int, @id)
+          
+            dependsOnId Int?
+            dependsOn   Resource?  @relation("DependsOn", fields: [dependsOnId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+          
+            dependedOn  Resource[] @relation("DependsOn")
+            parent      Parent?    @relation("Resource")
+          }
+          "#
+        };
+
+        schema.to_owned()
+    }
+
+    // Regression test for: https://github.com/prisma/prisma/issues/12003
+    #[connector_test(schema(schema_self_rel))]
+    async fn self_relation_works(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation {
+              createOneParent(
+                data: {
+                  id: 1
+                  resource: {
+                    create: {
+                      id: 1
+                      dependsOn: { create: { id: 2, dependsOn: { create: { id: 3 } } } }
+                    }
+                  }
+                }
+              ) {
+                id
+              }
+            }            
+            "#
+        );
+        run_query!(
+            &runner,
+            r#"mutation {
+              createOneParent(
+                data: {
+                  id: 2
+                  resource: {
+                    create: {
+                      id: 4
+                      dependsOn: { create: { id: 5, dependsOn: { create: { id: 6 } } } }
+                    }
+                  }
+                }
+              ) {
+                id
+              }
+            }            
+          "#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findManyParent(orderBy: { resource: { dependsOn: { id: asc } } }) {
+              id
+              resource { dependsOn { id } }
+            }
+          }"#),
+          @r###"{"data":{"findManyParent":[{"id":1,"resource":{"dependsOn":{"id":2}}},{"id":2,"resource":{"dependsOn":{"id":5}}}]}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findManyParent(orderBy: { resource: { dependsOn: { id: desc } } }) {
+              id
+              resource { dependsOn { id } }
+            }
+          }"#),
+          @r###"{"data":{"findManyParent":[{"id":2,"resource":{"dependsOn":{"id":5}}},{"id":1,"resource":{"dependsOn":{"id":2}}}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findManyParent(orderBy: { resource: { dependsOn: { dependsOn: { id: asc } } } }) {
+              id
+              resource { dependsOn { dependsOn { id } } }
+            }
+          }"#),
+          @r###"{"data":{"findManyParent":[{"id":1,"resource":{"dependsOn":{"dependsOn":{"id":3}}}},{"id":2,"resource":{"dependsOn":{"dependsOn":{"id":6}}}}]}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findManyParent(orderBy: { resource: { dependsOn: { dependsOn: { id: desc } } } }) {
+              id
+              resource { dependsOn { dependsOn { id } } }
+            }
+          }"#),
+          @r###"{"data":{"findManyParent":[{"id":2,"resource":{"dependsOn":{"dependsOn":{"id":6}}}},{"id":1,"resource":{"dependsOn":{"dependsOn":{"id":3}}}}]}}"###
+        );
 
         Ok(())
     }

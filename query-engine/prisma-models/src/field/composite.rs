@@ -1,7 +1,7 @@
 use crate::{parent_container::ParentContainer, CompositeTypeRef};
-use datamodel::dml::FieldArity;
+use psl::dml::FieldArity;
 use std::{
-    fmt::Debug,
+    fmt::{Debug, Display},
     hash::{Hash, Hasher},
     sync::{Arc, Weak},
 };
@@ -48,6 +48,12 @@ impl Debug for CompositeField {
             .field("container", &self.container)
             .field("composite_type", &self.typ.name)
             .finish()
+    }
+}
+
+impl Display for CompositeField {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}.{}", self.container().name(), self.name)
     }
 }
 

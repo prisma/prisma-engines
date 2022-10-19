@@ -1,36 +1,36 @@
 use crate::{ConnectorTag, RunnerInterface, TestResult, TxResult};
-use prisma_models::InternalDataModelBuilder;
-use query_core::{executor, schema_builder, BuildMode, QueryExecutor, QuerySchemaRef, TxId};
+use query_core::{executor, schema::QuerySchemaRef, schema_builder, QueryExecutor, TxId};
+use query_engine_metrics::MetricRegistry;
 use request_handlers::{GraphQlBody, GraphQlHandler, MultiQuery};
 use std::{env, sync::Arc};
 
 pub(crate) type Executor = Box<dyn QueryExecutor + Send + Sync>;
 
-/// Direct engine runner.   
+/// Direct engine runner.
 pub struct DirectRunner {
     executor: Executor,
     query_schema: QuerySchemaRef,
     connector_tag: ConnectorTag,
     current_tx_id: Option<TxId>,
+    metrics: MetricRegistry,
 }
 
 #[async_trait::async_trait]
 impl RunnerInterface for DirectRunner {
-    async fn load(datamodel: String, connector_tag: ConnectorTag) -> TestResult<Self> {
-        let config = datamodel::parse_configuration(&datamodel).unwrap().subject;
-        let data_source = config.datasources.first().expect("No valid data source found");
-        let preview_features: Vec<_> = config.preview_features().iter().collect();
+    async fn load(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<Self> {
+        let schema = psl::parse_schema(datamodel).unwrap();
+        let data_source = schema.configuration.datasources.first().unwrap();
+        let preview_features: Vec<_> = schema.configuration.preview_features().iter().collect();
         let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
         let (db_name, executor) = executor::load(data_source, &preview_features, &url).await?;
-        let internal_data_model = InternalDataModelBuilder::new(&datamodel).build(db_name);
+        let internal_data_model = prisma_models::convert(&schema, db_name);
 
         let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
             internal_data_model,
-            BuildMode::Modern,
             true,
-            data_source.capabilities(),
+            data_source.active_connector,
             preview_features,
-            data_source.referential_integrity(),
+            data_source.relation_mode(),
         ));
 
         Ok(Self {
@@ -38,6 +38,7 @@ impl RunnerInterface for DirectRunner {
             query_schema,
             connector_tag,
             current_tx_id: None,
+            metrics,
         })
     }
 
@@ -48,20 +49,36 @@ impl RunnerInterface for DirectRunner {
         Ok(handler.handle(query, self.current_tx_id.clone(), None).await.into())
     }
 
-    async fn batch(&self, queries: Vec<String>, transaction: bool) -> TestResult<crate::QueryResult> {
+    async fn batch(
+        &self,
+        queries: Vec<String>,
+        transaction: bool,
+        isolation_level: Option<String>,
+    ) -> TestResult<crate::QueryResult> {
         let handler = GraphQlHandler::new(&*self.executor, &self.query_schema);
         let query = GraphQlBody::Multi(MultiQuery::new(
             queries.into_iter().map(Into::into).collect(),
             transaction,
+            isolation_level,
         ));
 
         Ok(handler.handle(query, self.current_tx_id.clone(), None).await.into())
     }
 
-    async fn start_tx(&self, max_acquisition_millis: u64, valid_for_millis: u64) -> TestResult<TxId> {
+    async fn start_tx(
+        &self,
+        max_acquisition_millis: u64,
+        valid_for_millis: u64,
+        isolation_level: Option<String>,
+    ) -> TestResult<TxId> {
         let id = self
             .executor
-            .start_tx(self.query_schema.clone(), max_acquisition_millis, valid_for_millis)
+            .start_tx(
+                self.query_schema.clone(),
+                max_acquisition_millis,
+                valid_for_millis,
+                isolation_level,
+            )
             .await?;
         Ok(id)
     }
@@ -96,5 +113,9 @@ impl RunnerInterface for DirectRunner {
 
     fn clear_active_tx(&mut self) {
         self.current_tx_id = None;
+    }
+
+    fn get_metrics(&self) -> MetricRegistry {
+        self.metrics.clone()
     }
 }

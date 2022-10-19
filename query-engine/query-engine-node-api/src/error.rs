@@ -1,11 +1,11 @@
-use datamodel::diagnostics::Diagnostics;
+use psl::diagnostics::Diagnostics;
 use query_connector::error::ConnectorError;
 use query_core::CoreError;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum ApiError {
-    #[error("{}", _0)]
+    #[error("{:?}", _0)]
     Conversion(Diagnostics, String),
 
     #[error("{}", _0)]

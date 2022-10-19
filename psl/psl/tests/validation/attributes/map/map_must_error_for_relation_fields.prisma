@@ -1,0 +1,16 @@
+model User {
+  id Int @id
+  fooId Int
+  relationField  Foo @relation(fields: [fooId], references: [id]) @map("custom_name")
+}
+
+model Foo {
+  id Int @id
+}
+
+// [1;91merror[0m: [1mError parsing attribute "@map": The attribute `@map` cannot be used on relation fields.[0m
+//   [1;94m-->[0m  [4mschema.prisma:4[0m
+// [1;94m   | [0m
+// [1;94m 3 | [0m  fooId Int
+// [1;94m 4 | [0m  relationField  Foo @relation(fields: [fooId], references: [id]) [1;91m@map("custom_name")[0m
+// [1;94m   | [0m

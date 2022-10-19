@@ -33,6 +33,16 @@ impl QueryParams {
         Ok(val)
     }
 
+    /// Parses the JSON result of a mutation sent to the Query Engine in order to extract the generated id(s).
+    /// Returns a string that's formatted to be included in another query. eg:
+    /// "{ "id": "my_fancy_id" }"
+    /// Equivalent of `.where()` in Scala
+    pub fn parse_extend(&self, json: serde_json::Value, path: &[&str], meta: &str) -> Result<String, TestError> {
+        let val = self.where_.parse_extend(json, path, meta)?;
+
+        Ok(val)
+    }
+
     /// Parses the JSON _array_ result of a mutation sent to the Query Engine in order to extract the generated id(s).
     /// Returns a Vec<String> where each id is formatted to be included in another query. eg:
     /// vec![{ "id": "my_fancy_id" }, { "id": "my_fancy_id_2" }]
@@ -90,8 +100,19 @@ impl QueryParamsWhere {
 
     pub fn parse(&self, json: serde_json::Value, path: &[&str]) -> Result<String, TestError> {
         match self {
-            QueryParamsWhere::Identifier(field) => parse_id(field, &json, path),
-            QueryParamsWhere::CompoundIdentifier(fields, arg_name) => parse_compound_id(fields, arg_name, &json, path),
+            QueryParamsWhere::Identifier(field) => parse_id(field, &json, path, ""),
+            QueryParamsWhere::CompoundIdentifier(fields, arg_name) => {
+                parse_compound_id(fields, arg_name, &json, path, "")
+            }
+        }
+    }
+
+    pub fn parse_extend(&self, json: serde_json::Value, path: &[&str], meta: &str) -> Result<String, TestError> {
+        match self {
+            QueryParamsWhere::Identifier(field) => parse_id(field, &json, path, meta),
+            QueryParamsWhere::CompoundIdentifier(fields, arg_name) => {
+                parse_compound_id(fields, arg_name, &json, path, meta)
+            }
         }
     }
 }

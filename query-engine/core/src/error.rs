@@ -2,6 +2,7 @@ use crate::{
     InterpreterError, QueryGraphBuilderError, QueryGraphError, QueryParserError, QueryParserErrorKind,
     RelationViolation, TransactionError,
 };
+use bigdecimal::BigDecimal;
 use connector::error::ConnectorError;
 use prisma_models::DomainError;
 use thiserror::Error;
@@ -48,8 +49,12 @@ pub enum CoreError {
     #[error("Unsupported feature: {}", _0)]
     UnsupportedFeatureError(String),
 
-    #[error("{}", _0)]
-    ConversionError(String),
+    #[error("Unable to convert {from_type} value \"{value}\" to type {to_type}")]
+    ConversionError {
+        value: String,
+        from_type: String,
+        to_type: String,
+    },
 
     #[error("{}", _0)]
     SerializationError(String),
@@ -73,6 +78,14 @@ impl CoreError {
             "Inconsistent query result: Field {} is required to return data, got `null` instead.",
             field_name
         ))
+    }
+
+    pub fn decimal_conversion_error(decimal: &BigDecimal, to_type: &str) -> Self {
+        CoreError::ConversionError {
+            value: decimal.to_string(),
+            from_type: "BigDecimal".into(),
+            to_type: to_type.into(),
+        }
     }
 }
 
@@ -133,6 +146,7 @@ impl From<CoreError> for user_facing_errors::Error {
                 })
                 .into()
             }
+
             CoreError::ConnectorError(ConnectorError {
                 user_facing_error: Some(user_facing_error),
                 ..
@@ -141,6 +155,7 @@ impl From<CoreError> for user_facing_errors::Error {
                 user_facing_error: Some(user_facing_error),
                 ..
             })) => user_facing_error.into(),
+
             CoreError::QueryParserError(query_parser_error)
             | CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(query_parser_error)) => {
                 let known_error = match query_parser_error.error_kind {
@@ -157,6 +172,7 @@ impl From<CoreError> for user_facing_errors::Error {
 
                 known_error.into()
             }
+
             CoreError::QueryGraphBuilderError(QueryGraphBuilderError::MissingRequiredArgument {
                 argument_name,
                 object_name,
@@ -167,6 +183,7 @@ impl From<CoreError> for user_facing_errors::Error {
                 object_name,
             })
             .into(),
+
             CoreError::QueryGraphBuilderError(QueryGraphBuilderError::RelationViolation(RelationViolation {
                 relation_name,
                 model_a_name,
@@ -184,6 +201,7 @@ impl From<CoreError> for user_facing_errors::Error {
                 model_b_name,
             })
             .into(),
+
             CoreError::QueryGraphBuilderError(QueryGraphBuilderError::RecordNotFound(details))
             | CoreError::InterpreterError(InterpreterError::QueryGraphBuilderError(
                 QueryGraphBuilderError::RecordNotFound(details),
@@ -191,9 +209,11 @@ impl From<CoreError> for user_facing_errors::Error {
                 details,
             })
             .into(),
+
             CoreError::QueryGraphBuilderError(QueryGraphBuilderError::InputError(details)) => {
                 user_facing_errors::KnownError::new(user_facing_errors::query_engine::InputError { details }).into()
             }
+
             CoreError::InterpreterError(InterpreterError::InterpretationError(msg, Some(cause))) => {
                 match cause.as_ref() {
                     InterpreterError::QueryGraphBuilderError(QueryGraphBuilderError::RecordNotFound(cause)) => {
@@ -230,6 +250,7 @@ impl From<CoreError> for user_facing_errors::Error {
                     .into(),
                 }
             }
+
             CoreError::FieldConversionError(FieldConversionError {
                 field,
                 expected_type,
@@ -240,6 +261,14 @@ impl From<CoreError> for user_facing_errors::Error {
                 found,
             })
             .into(),
+
+            CoreError::ConversionError { .. } => {
+                user_facing_errors::KnownError::new(user_facing_errors::query_engine::ValueOutOfRange {
+                    details: err.to_string(),
+                })
+                .into()
+            }
+
             _ => user_facing_errors::Error::from_dyn_error(&err),
         }
     }

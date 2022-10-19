@@ -14,13 +14,13 @@ jobs:
       fail-fast: true
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: |
             ~/.cargo/registry
@@ -36,7 +36,7 @@ jobs:
           mkdir -p /tmp/cargo-doc-output
           mv target/doc /tmp/cargo-doc-output/doc
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           ref: gh-pages
 

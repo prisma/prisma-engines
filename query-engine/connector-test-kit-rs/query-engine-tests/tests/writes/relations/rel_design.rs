@@ -10,7 +10,7 @@ mod rel_design {
             r#"model List{
               #id(id, Int, @id)
               uList  String? @unique
-              todoId Int?
+              todoId Int? @unique
 
               todo  Todo?   @relation(fields: [todoId], references: [id])
            }

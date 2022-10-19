@@ -2,7 +2,7 @@
 
 ## Concepts
 
-### Core / Connector
+### Core / Connector
 
 Migrate exposes the same API on all supported databases. That API is defined by
 the `migration-core` crate in the `migration-engine/core` directory. The core
@@ -474,3 +474,11 @@ Note that the Client API for this schema will not be as ergonomic as a proper
 many-to-many relations API. There are issues about this problem,
 https://github.com/prisma/prisma/issues/6135 for example. Please participate in
 these discussions to help push design work forward.
+
+### Why do the migrations we generate not use CREATE IF NOT EXISTS type queries?
+
+Our stance so far has been "never use IF NOT EXISTS, we should always know if
+something exists or not in diffing". We have a first exception in a work in
+progress proposal, motivated by not wanting to make the feature a
+breaking change, but the general rule is that we want diffing to be as precise
+as possible, so generated migrations should not rely on IF NOT EXISTS.

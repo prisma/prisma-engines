@@ -1,8 +1,9 @@
-use crate::{ConnectorTag, RunnerInterface, TestResult, TxResult};
+use crate::{ConnectorTag, RunnerInterface, TestError, TestResult, TxResult};
 use hyper::{Body, Method, Request, Response};
 use query_core::TxId;
 use query_engine::opt::PrismaOpt;
 use query_engine::server::{routes, setup, State};
+use query_engine_metrics::MetricRegistry;
 use request_handlers::{GQLBatchResponse, GQLError, GQLResponse, GraphQlBody, MultiQuery, PrismaResponse};
 
 pub struct BinaryRunner {
@@ -13,9 +14,9 @@ pub struct BinaryRunner {
 
 #[async_trait::async_trait]
 impl RunnerInterface for BinaryRunner {
-    async fn load(datamodel: String, connector_tag: ConnectorTag) -> TestResult<Self> {
+    async fn load(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<Self> {
         let opts = PrismaOpt::from_list(&["binary", "--enable-raw-queries", "--datamodel", &datamodel]);
-        let state = setup(&opts).await.unwrap();
+        let state = setup(&opts, metrics).await.unwrap();
 
         Ok(BinaryRunner {
             state,
@@ -45,10 +46,16 @@ impl RunnerInterface for BinaryRunner {
         Ok(PrismaResponse::Single(gql_response).into())
     }
 
-    async fn batch(&self, queries: Vec<String>, transaction: bool) -> TestResult<crate::QueryResult> {
+    async fn batch(
+        &self,
+        queries: Vec<String>,
+        transaction: bool,
+        isolation_level: Option<String>,
+    ) -> TestResult<crate::QueryResult> {
         let query = GraphQlBody::Multi(MultiQuery::new(
             queries.into_iter().map(Into::into).collect(),
             transaction,
+            isolation_level,
         ));
 
         let body = serde_json::to_vec(&query).unwrap();
@@ -87,10 +94,16 @@ impl RunnerInterface for BinaryRunner {
         Ok(PrismaResponse::Multi(batch_response).into())
     }
 
-    async fn start_tx(&self, max_acquisition_millis: u64, valid_for_millis: u64) -> TestResult<TxId> {
+    async fn start_tx(
+        &self,
+        max_acquisition_millis: u64,
+        valid_for_millis: u64,
+        isolation_level: Option<String>,
+    ) -> TestResult<TxId> {
         let body = serde_json::json!({
             "max_wait": max_acquisition_millis,
-            "timeout": valid_for_millis
+            "timeout": valid_for_millis,
+            "isolation_level": isolation_level,
         });
 
         let body_bytes = serde_json::to_vec(&body).unwrap();
@@ -103,9 +116,14 @@ impl RunnerInterface for BinaryRunner {
 
         let resp = routes(self.state.clone(), req).await.unwrap();
         let json_resp = response_to_json(resp).await;
-        let tx_id = json_resp.as_object().unwrap().get("id").unwrap().as_str().unwrap();
+        let json_obj = json_resp.as_object().unwrap();
 
-        Ok(tx_id.into())
+        match json_obj.get("error_code") {
+            Some(_) => Err(TestError::InteractiveTransactionError(
+                serde_json::to_string(json_obj).unwrap(),
+            )),
+            None => Ok(json_obj.get("id").unwrap().as_str().unwrap().into()),
+        }
     }
 
     async fn commit_tx(&self, tx_id: TxId) -> TestResult<TxResult> {
@@ -161,6 +179,10 @@ impl RunnerInterface for BinaryRunner {
 
     fn clear_active_tx(&mut self) {
         self.current_tx_id = None;
+    }
+
+    fn get_metrics(&self) -> MetricRegistry {
+        self.state.get_metrics()
     }
 }
 

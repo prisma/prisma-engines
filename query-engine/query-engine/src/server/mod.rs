@@ -1,16 +1,17 @@
 use crate::{context::PrismaContext, opt::PrismaOpt, PrismaResult};
-use datamodel::common::preview_features::PreviewFeature;
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{header::CONTENT_TYPE, Body, HeaderMap, Method, Request, Response, Server, StatusCode};
 use opentelemetry::{global, propagation::Extractor, Context};
+use psl::PreviewFeature;
 use query_core::{schema::QuerySchemaRenderer, TxId};
+use query_engine_metrics::{MetricFormat, MetricRegistry};
 use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlHandler, TxInput};
 use serde_json::json;
+use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use std::time::Instant;
-use tracing::Level;
-use tracing_futures::Instrument;
+use tracing::{field, Instrument, Span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 const TRANSACTION_ID_HEADER: &str = "X-transaction-id";
@@ -21,17 +22,29 @@ pub struct State {
     enable_playground: bool,
     enable_debug_mode: bool,
     enable_itx: bool,
+    enable_metrics: bool,
 }
 
 impl State {
     /// Create a new instance of `State`.
-    fn new(cx: PrismaContext, enable_playground: bool, enable_debug_mode: bool, enable_itx: bool) -> Self {
+    fn new(
+        cx: PrismaContext,
+        enable_playground: bool,
+        enable_debug_mode: bool,
+        enable_itx: bool,
+        enable_metrics: bool,
+    ) -> Self {
         Self {
             cx: Arc::new(cx),
             enable_playground,
             enable_debug_mode,
             enable_itx,
+            enable_metrics,
         }
+    }
+
+    pub fn get_metrics(&self) -> MetricRegistry {
+        self.cx.metrics.clone()
     }
 }
 
@@ -42,33 +55,44 @@ impl Clone for State {
             enable_playground: self.enable_playground,
             enable_debug_mode: self.enable_debug_mode,
             enable_itx: self.enable_itx,
+            enable_metrics: self.enable_metrics,
         }
     }
 }
 
-pub async fn setup(opts: &PrismaOpt) -> PrismaResult<State> {
-    let config = opts.configuration(false)?.subject;
+pub async fn setup(opts: &PrismaOpt, metrics: MetricRegistry) -> PrismaResult<State> {
+    let datamodel = opts.schema(false)?;
+    let config = &datamodel.configuration;
     config.validate_that_one_datasource_is_provided()?;
+
+    let span = tracing::info_span!("prisma:engine:connect");
 
     let enable_itx = config
         .preview_features()
         .contains(PreviewFeature::InteractiveTransactions);
 
-    let datamodel = opts.datamodel()?;
-    let cx = PrismaContext::builder(config, datamodel)
-        .legacy(opts.legacy)
+    let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics);
+
+    let cx = PrismaContext::builder(datamodel)
+        .set_metrics(metrics)
         .enable_raw_queries(opts.enable_raw_queries)
         .build()
+        .instrument(span)
         .await?;
 
-    let state = State::new(cx, opts.enable_playground, opts.enable_debug_mode, enable_itx);
+    let state = State::new(
+        cx,
+        opts.enable_playground,
+        opts.enable_debug_mode,
+        enable_itx,
+        enable_metrics,
+    );
     Ok(state)
 }
 
 /// Starts up the graphql query engine server
-#[tracing::instrument(skip(opts))]
-pub async fn listen(opts: PrismaOpt) -> PrismaResult<()> {
-    let state = setup(&opts).await?;
+pub async fn listen(opts: PrismaOpt, metrics: MetricRegistry) -> PrismaResult<()> {
+    let state = setup(&opts, metrics).await?;
 
     let query_engine = make_service_fn(move |_| {
         let state = state.clone();
@@ -94,6 +118,13 @@ pub async fn routes(state: State, req: Request<Body>) -> Result<Response<Body>, 
 
     if req.method() == Method::POST && req.uri().path().contains("transaction") && state.enable_itx {
         return handle_transaction(state, req).await;
+    }
+
+    if [Method::POST, Method::GET].contains(req.method())
+        && req.uri().path().contains("metrics")
+        && state.enable_metrics
+    {
+        return handle_metrics(state, req).await;
     }
 
     let mut res = match (req.method(), req.uri().path()) {
@@ -158,11 +189,24 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
         return Ok(handle_debug_headers(&req));
     }
 
-    let cx = get_parent_span_context(&req);
-    let span = tracing::span!(Level::TRACE, "graphql_handler");
-    span.set_parent(cx);
-
     let tx_id = get_transaction_id_from_header(&req);
+
+    let span = if tx_id.is_none() {
+        let cx = get_parent_span_context(&req);
+        let span = info_span!("prisma:engine", user_facing = true);
+        span.set_parent(cx);
+        span
+    } else {
+        Span::none()
+    };
+
+    let trace_id = match req.headers().get("traceparent") {
+        Some(traceparent) => {
+            let s = traceparent.to_str().unwrap_or_default().to_string();
+            Some(s)
+        }
+        _ => None,
+    };
 
     let work = async move {
         let body_start = req.into_body();
@@ -172,7 +216,7 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
         match serde_json::from_slice(full_body.as_ref()) {
             Ok(body) => {
                 let handler = GraphQlHandler::new(&*state.cx.executor, state.cx.query_schema());
-                let result = handler.handle(body, tx_id, None).await;
+                let result = handler.handle(body, tx_id, trace_id).instrument(span).await;
 
                 let result_bytes = serde_json::to_vec(&result).unwrap();
 
@@ -195,7 +239,7 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
         }
     };
 
-    work.instrument(span).await
+    work.await
 }
 
 /// Expose the GraphQL playground if enabled.
@@ -212,6 +256,49 @@ fn playground_handler() -> Response<Body> {
         .header(CONTENT_TYPE, "text/html")
         .body(Body::from(playground))
         .unwrap()
+}
+
+async fn handle_metrics(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+    let format = if let Some(query) = req.uri().query() {
+        if query.contains("format=json") {
+            MetricFormat::Json
+        } else {
+            MetricFormat::Prometheus
+        }
+    } else {
+        MetricFormat::Prometheus
+    };
+
+    let body_start = req.into_body();
+    // block and buffer request until the request has completed
+    let full_body = hyper::body::to_bytes(body_start).await?;
+
+    let global_labels: HashMap<String, String> = match serde_json::from_slice(full_body.as_ref()) {
+        Ok(map) => map,
+        Err(_e) => HashMap::new(),
+    };
+
+    if format == MetricFormat::Json {
+        let metrics = state.cx.metrics.to_json(global_labels);
+
+        let res = Response::builder()
+            .status(StatusCode::OK)
+            .header(CONTENT_TYPE, "application/json")
+            .body(Body::from(metrics.to_string()))
+            .unwrap();
+
+        return Ok(res);
+    }
+
+    let metrics = state.cx.metrics.to_prometheus(global_labels);
+
+    let res = Response::builder()
+        .status(StatusCode::OK)
+        .header(CONTENT_TYPE, "text/plain; version=0.0.4")
+        .body(Body::from(metrics))
+        .unwrap();
+
+    Ok(res)
 }
 
 /// Sadly the routing doesn't make it obvious what the transaction routes are:
@@ -262,15 +349,26 @@ async fn handle_transaction(state: State, req: Request<Body>) -> Result<Response
 }
 
 async fn transaction_start_handler(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+    let cx = get_parent_span_context(&req);
+
     let body_start = req.into_body();
     // block and buffer request until the request has completed
     let full_body = hyper::body::to_bytes(body_start).await?;
     let input: TxInput = serde_json::from_slice(full_body.as_ref()).unwrap();
 
+    let span = tracing::info_span!("prisma:engine:itx_runner", user_facing = true, itx_id = field::Empty);
+    span.set_parent(cx);
+
     match state
         .cx
         .executor
-        .start_tx(state.cx.query_schema().clone(), input.max_wait, input.timeout)
+        .start_tx(
+            state.cx.query_schema().clone(),
+            input.max_wait,
+            input.timeout,
+            input.isolation_level,
+        )
+        .instrument(span)
         .await
     {
         Ok(tx_id) => {

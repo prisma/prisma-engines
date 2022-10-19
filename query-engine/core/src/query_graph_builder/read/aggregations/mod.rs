@@ -1,3 +1,5 @@
+use crate::FieldPair;
+
 use super::*;
 
 mod aggregate;
@@ -6,14 +8,13 @@ mod group_by;
 pub use aggregate::*;
 pub use group_by::*;
 
-use crate::{constants::aggregations::*, FieldPair};
 use connector::AggregationSelection;
 use itertools::Itertools;
 use prisma_models::{ModelRef, ScalarFieldRef};
+use schema_builder::constants::aggregations::*;
 
 /// Resolves the given field as a aggregation query.
 #[allow(clippy::unnecessary_wraps)]
-#[tracing::instrument(skip(field, model))]
 fn resolve_query(
     field: FieldPair,
     model: &ModelRef,
@@ -24,7 +25,7 @@ fn resolve_query(
             .parsed_field
             .nested_fields
             .as_mut()
-            .expect("Expected at least one selection for aggregate");
+            .expect("Expected at least one selection for aggregate");
 
         let all_position = nested_fields
             .fields

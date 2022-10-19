@@ -25,7 +25,7 @@ mod compound_batch {
             r#"query { findUniqueArtist(where: { firstName_lastName: { firstName:"Musti", lastName:"Naukio" }}) { firstName lastName }}"#.to_string()
         ];
 
-        let batch_results = runner.batch(queries, false).await?;
+        let batch_results = runner.batch(queries, false, None).await?;
         insta::assert_snapshot!(
             batch_results.to_string(),
             @r###"{"batchResult":[{"data":{"findUniqueArtist":{"firstName":"Musti","lastName":"Naukio"}}}]}"###
@@ -44,7 +44,7 @@ mod compound_batch {
             r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"Naukio",lastName:"Musti"}}) {firstName lastName}}"#.to_string(),
         ];
 
-        let batch_results = runner.batch(queries, false).await?;
+        let batch_results = runner.batch(queries, false, None).await?;
         insta::assert_snapshot!(
             batch_results.to_string(),
             @r###"{"batchResult":[{"data":{"findUniqueArtist":{"firstName":"Musti","lastName":"Naukio"}}},{"data":{"findUniqueArtist":null}},{"data":{"findUniqueArtist":{"firstName":"Naukio","lastName":"Musti"}}}]}"###
@@ -62,7 +62,7 @@ mod compound_batch {
             r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"Naukio",lastName:"Musti"}}) {lastName firstName}}"#.to_string(),
         ];
 
-        let batch_results = runner.batch(queries, false).await?;
+        let batch_results = runner.batch(queries, false, None).await?;
         insta::assert_snapshot!(
             batch_results.to_string(),
             @r###"{"batchResult":[{"data":{"findUniqueArtist":{"firstName":"Musti","lastName":"Naukio"}}},{"data":{"findUniqueArtist":{"firstName":"Naukio","lastName":"Musti"}}}]}"###
@@ -82,7 +82,7 @@ mod compound_batch {
            r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"Naukio",lastName:"Musti"}}) {firstName lastName}}"#.to_string(),
         ];
 
-        let batch_results = runner.batch(queries, false).await?;
+        let batch_results = runner.batch(queries, false, None).await?;
         insta::assert_snapshot!(
             batch_results.to_string(),
             @r###"{"batchResult":[{"data":{"findUniqueArtist":{"firstName":"Musti","lastName":"Naukio"}}},{"data":{"findUniqueArtist":null}},{"data":{"findUniqueArtist":{"firstName":"Naukio","lastName":"Musti"}}}]}"###
@@ -100,7 +100,7 @@ mod compound_batch {
                 .to_string(),
         ];
 
-        let batch_results = runner.batch(queries, false).await?;
+        let batch_results = runner.batch(queries, false, None).await?;
         insta::assert_snapshot!(
             batch_results.to_string(),
             @r###"{"batchResult":[{"data":{"findUniqueArtist":null}}]}"###
@@ -118,7 +118,7 @@ mod compound_batch {
             r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"NO",lastName:"AVAIL"}}) {firstName lastName}}"#.to_string(),
         ];
 
-        let batch_results = runner.batch(queries, false).await?;
+        let batch_results = runner.batch(queries, false, None).await?;
         insta::assert_snapshot!(
             batch_results.to_string(),
             @r###"{"batchResult":[{"data":{"findUniqueArtist":{"firstName":"Musti","lastName":"Naukio"}}},{"data":{"findUniqueArtist":null}}]}"###

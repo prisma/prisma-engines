@@ -4,7 +4,6 @@ use prisma_models::ModelRef;
 use prisma_value::PrismaValue;
 use std::{collections::HashMap, convert::TryInto};
 
-#[tracing::instrument(skip(graph, field))]
 pub fn execute_raw(graph: &mut QueryGraph, field: ParsedField) -> QueryGraphBuilderResult<()> {
     let raw_query = Query::Write(WriteQuery::ExecuteRaw(raw_query(None, None, field)?));
 
@@ -12,7 +11,6 @@ pub fn execute_raw(graph: &mut QueryGraph, field: ParsedField) -> QueryGraphBuil
     Ok(())
 }
 
-#[tracing::instrument(skip(graph, field))]
 pub fn query_raw(
     graph: &mut QueryGraph,
     model: Option<ModelRef>,

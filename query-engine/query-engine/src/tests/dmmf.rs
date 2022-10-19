@@ -3,33 +3,30 @@ use crate::{
     opt::{CliOpt, PrismaOpt, Subcommand},
     PrismaResult,
 };
-use datamodel_connector::ConnectorCapabilities;
-use prisma_models::InternalDataModelBuilder;
-use query_core::{schema_builder, BuildMode, QuerySchema};
+use query_core::{schema::QuerySchema, schema_builder};
 use serial_test::serial;
 use std::sync::Arc;
 
-pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml::Datamodel) {
-    let config = datamodel::parse_configuration(datamodel_string).unwrap();
-    let dm = datamodel::parse_datamodel(datamodel_string).unwrap().subject;
-    let datasource = config.subject.datasources.first();
+pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, psl::dml::Datamodel) {
+    let config = psl::parse_configuration(datamodel_string).unwrap();
+    let dm = psl::parse_schema(datamodel_string).unwrap();
+    let datasource = config.datasources.first();
 
-    let capabilities = datasource
-        .map(|ds| ds.capabilities())
-        .unwrap_or_else(ConnectorCapabilities::empty);
-    let referential_integrity = datasource.map(|ds| ds.referential_integrity()).unwrap_or_default();
+    let connector = datasource
+        .map(|ds| ds.active_connector)
+        .unwrap_or(&psl::datamodel_connector::EmptyDatamodelConnector);
+    let relation_mode = datasource.map(|ds| ds.relation_mode()).unwrap_or_default();
 
-    let internal_ref = InternalDataModelBuilder::from(&dm).build("db".to_owned());
+    let internal_ref = prisma_models::convert(&dm, "db".to_owned());
     let schema = schema_builder::build(
         internal_ref,
-        BuildMode::Modern,
         false,
-        capabilities,
-        config.subject.preview_features().iter().collect(),
-        referential_integrity,
+        connector,
+        config.preview_features().iter().collect(),
+        relation_mode,
     );
 
-    (schema, dm)
+    (schema, psl::lift(&dm))
 }
 
 // Tests in this file run serially because the function `get_query_schema` depends on setting an env var.
@@ -104,14 +101,14 @@ fn test_dmmf_cli_command(schema: &str) -> PrismaResult<()> {
         enable_debug_mode: false,
         enable_raw_queries: false,
         enable_playground: false,
-        legacy: false,
+        enable_metrics: true,
         log_format: None,
         log_queries: true,
         overwrite_datasources: None,
         port: 123,
         unix_path: None,
         subcommand: Some(Subcommand::Cli(CliOpt::Dmmf)),
-        open_telemetry: false,
+        enable_open_telemetry: false,
         open_telemetry_endpoint: String::new(),
     };
 

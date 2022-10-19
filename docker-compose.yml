@@ -1,11 +1,20 @@
 version: "3"
 services:
-  cockroach:
-    image: prismagraphql/cockroachdb-custom:22.1.0-alpha.1
+  cockroach_22_1_0:
+    image: prismagraphql/cockroachdb-custom:22.1.0
     restart: always
     command: start-single-node --insecure
     ports:
       - "26257:26257"
+    networks:
+      - databases
+
+  cockroach_21_2_0_patched:
+    image: prismagraphql/cockroachdb-custom:21.2.0-patched
+    restart: always
+    command: start-single-node --insecure
+    ports:
+      - "26258:26257"
     networks:
       - databases
 
@@ -30,12 +39,10 @@ services:
     command: postgres -c 'max_connections=1000'
     environment:
       POSTGRES_PASSWORD: "prisma"
-      PGDATA: "/pgtmpfs9"
     ports:
       - "5431:5432"
     networks:
       - databases
-    tmpfs: /pgtmpfs9:size=4g
 
   postgres10:
     image: postgres:10
@@ -43,12 +50,10 @@ services:
     command: postgres -c 'max_connections=1000'
     environment:
       POSTGRES_PASSWORD: "prisma"
-      PGDATA: "/pgtmpfs10"
     ports:
       - "5432:5432"
     networks:
       - databases
-    tmpfs: /pgtmpfs10:size=4g
 
   postgres11:
     image: postgres:11
@@ -56,12 +61,10 @@ services:
     command: postgres -c 'max_connections=1000'
     environment:
       POSTGRES_PASSWORD: "prisma"
-      PGDATA: "/pgtmpfs11"
     ports:
       - "5433:5432"
     networks:
       - databases
-    tmpfs: /pgtmpfs11:size=4g
 
   postgres12:
     image: postgres:12
@@ -69,12 +72,10 @@ services:
     command: postgres -c 'max_connections=1000'
     environment:
       POSTGRES_PASSWORD: "prisma"
-      PGDATA: "/pgtmpfs12"
     ports:
       - "5434:5432"
     networks:
       - databases
-    tmpfs: /pgtmpfs12:size=4g
 
   postgres13:
     image: postgres:13
@@ -82,12 +83,10 @@ services:
     command: postgres -c 'max_connections=1000'
     environment:
       POSTGRES_PASSWORD: "prisma"
-      PGDATA: "/pgtmpfs13"
     ports:
       - "5435:5432"
     networks:
       - databases
-    tmpfs: /pgtmpfs13:size=4g
 
   postgres14:
     image: postgres:14
@@ -102,10 +101,24 @@ services:
     networks:
       - databases
 
+  postgres15:
+    image: postgres:15
+    restart: always
+    command: postgres -c 'max_connections=1000'
+    environment:
+      POSTGRES_PASSWORD: "prisma"
+      POSTGRES_HOST_AUTH_METHOD: "md5"
+      POSTGRES_INITDB_ARGS: "--auth-host=md5"
+    ports:
+      - "5438:5432"
+    networks:
+      - databases
+
   mysql-5-6:
     image: mysql:5.6.50
     command: mysqld
     restart: always
+    platform: linux/x86_64
     environment:
       MYSQL_USER: root
       MYSQL_ROOT_PASSWORD: prisma
@@ -120,6 +133,7 @@ services:
     image: mysql:5.7.32
     command: mysqld
     restart: always
+    platform: linux/x86_64
     environment:
       MYSQL_USER: root
       MYSQL_ROOT_PASSWORD: prisma
@@ -134,6 +148,7 @@ services:
     image: mysql:8.0.28
     command: mysqld
     restart: always
+    platform: linux/x86_64
     environment:
       MYSQL_ROOT_PASSWORD: prisma
       MYSQL_DATABASE: prisma
@@ -214,16 +229,6 @@ services:
       - "1433:1433"
     networks:
       - databases
-  azure-edge:
-    image: mcr.microsoft.com/azure-sql-edge
-    restart: always
-    environment:
-      ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: "<YourStrong@Passw0rd>"
-    ports:
-      - "1433:1433"
-    networks:
-      - databases
 
   mssql-2017:
     image: mcr.microsoft.com/mssql/server:2017-latest
@@ -233,6 +238,28 @@ services:
       SA_PASSWORD: "<YourStrong@Passw0rd>"
     ports:
       - "1434:1433"
+    networks:
+      - databases
+
+  mssql-2022:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    restart: always
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "<YourStrong@Passw0rd>"
+    ports:
+      - "1435:1433"
+    networks:
+      - databases
+
+  azure-edge:
+    image: mcr.microsoft.com/azure-sql-edge
+    restart: always
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "<YourStrong@Passw0rd>"
+    ports:
+      - "1433:1433"
     networks:
       - databases
 
@@ -323,11 +350,36 @@ services:
       - databases
 
   otel:
-    image: jaegertracing/opentelemetry-all-in-one:latest
+    image: jaegertracing/all-in-one:1.35
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+      COLLECTOR_ZIPKIN_HOST_PORT: ":9411"
     ports:
-      - 13133:13133
+      - 6831:6831/udp
+      - 6832:6832/udp
+      - 5778:5778
       - 16686:16686
-      - 4317:55680
+      - 4317:4317
+      - 4318:4318
+      - 14250:14250
+      - 14268:14268
+      - 14269:14269
+      - 9411:9411
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ${PWD}/metrics/prometheus:/prometheus-data
+    command: --config.file=/prometheus-data/prometheus.yml
+    ports:
+      - 9090:9090
+  grafana:
+    image: grafana/grafana
+    volumes:
+      - ${PWD}/metrics/grafana/datasources:/etc/grafana/provisioning/datasources/
+      - ${PWD}/metrics/grafana/dashboards:/etc/grafana/provisioning/dashboards/
+    ports:
+      - 3000:3000
 
 networks:
   databases: null

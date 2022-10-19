@@ -11,7 +11,6 @@ use futures::stream::{FuturesUnordered, StreamExt};
 use prisma_models::*;
 use quaint::ast::*;
 
-#[tracing::instrument(skip(conn, model, filter, selected_fields))]
 pub async fn get_single_record(
     conn: &dyn QueryExt,
     model: &ModelRef,
@@ -55,7 +54,6 @@ pub async fn get_single_record(
     Ok(record)
 }
 
-#[tracing::instrument(skip(conn, model, query_arguments, selected_fields, aggr_selections, sql_info))]
 pub async fn get_many_records(
     conn: &dyn QueryExt,
     model: &ModelRef,
@@ -157,7 +155,6 @@ pub async fn get_many_records(
     Ok(records)
 }
 
-#[tracing::instrument(skip(conn, from_field, from_record_ids))]
 pub async fn get_related_m2m_record_ids(
     conn: &dyn QueryExt,
     from_field: &RelationFieldRef,
@@ -227,7 +224,6 @@ pub async fn get_related_m2m_record_ids(
         .collect())
 }
 
-#[tracing::instrument(skip(conn, model, query_arguments, selections, group_by, having))]
 pub async fn aggregate(
     conn: &dyn QueryExt,
     model: &ModelRef,
@@ -246,7 +242,6 @@ pub async fn aggregate(
     }
 }
 
-#[tracing::instrument(skip(conn, model, query_arguments, selections))]
 async fn plain_aggregate(
     conn: &dyn QueryExt,
     model: &ModelRef,
@@ -272,7 +267,6 @@ async fn plain_aggregate(
     Ok(row.into_aggregation_results(&selections))
 }
 
-#[tracing::instrument(skip(conn, model, query_arguments, selections, group_by, having))]
 async fn group_by_aggregate(
     conn: &dyn QueryExt,
     model: &ModelRef,

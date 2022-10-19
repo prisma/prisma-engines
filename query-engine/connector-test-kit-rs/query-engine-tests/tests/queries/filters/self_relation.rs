@@ -11,11 +11,11 @@ mod self_relation_filters {
             model Human {
                 #id(id, String, @id)
                 name       String
-                wife_id    String?
+                wife_id    String? @unique
                 mother_id  String?
                 father_id  String?
                 singer_id  String?
-                title_id   String?
+                title_id   String? @unique
 
                 husband       Human? @relation(name: "Marriage")
                 wife          Human? @relation(name: "Marriage",  fields: [wife_id],   references: [id], onDelete: NoAction, onUpdate: NoAction)

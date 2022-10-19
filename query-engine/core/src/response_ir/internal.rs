@@ -1,14 +1,12 @@
 use super::*;
-use crate::{
-    constants::{aggregations::*, output_fields::*},
-    schema::{IntoArc, ObjectTypeStrongRef, OutputType, OutputTypeRef, ScalarType},
-    CoreError, DatabaseEnumType, EnumType, OutputFieldRef, QueryResult, RecordAggregations, RecordSelection,
-};
+use crate::{CoreError, QueryResult, RecordAggregations, RecordSelection};
 use bigdecimal::ToPrimitive;
 use connector::{AggregationResult, RelAggregationResult, RelAggregationRow};
 use indexmap::IndexMap;
 use itertools::Itertools;
 use prisma_models::{CompositeFieldRef, Field, PrismaValue, SelectionResult};
+use schema::*;
+use schema_builder::constants::{aggregations::*, output_fields::*};
 use std::{borrow::Borrow, collections::HashMap};
 
 /// A grouping of items to their parent record.
@@ -35,7 +33,6 @@ type UncheckedItemsWithParents = IndexMap<Option<SelectionResult>, Vec<Item>>;
 /// // todo more here
 ///
 /// Returns a map of pairs of (parent ID, response)
-#[tracing::instrument(skip(result, field, is_list))]
 pub fn serialize_internal(
     result: QueryResult,
     field: &OutputFieldRef,
@@ -61,7 +58,6 @@ pub fn serialize_internal(
     }
 }
 
-#[tracing::instrument(skip(output_field, record_aggregations))]
 fn serialize_aggregations(
     output_field: &OutputFieldRef,
     record_aggregations: RecordAggregations,
@@ -216,7 +212,6 @@ fn coerce_non_numeric(value: PrismaValue, output: &OutputType) -> PrismaValue {
     }
 }
 
-#[tracing::instrument(skip(record_selection, field, typ, is_list))]
 fn serialize_record_selection(
     record_selection: RecordSelection,
     field: &OutputFieldRef,
@@ -282,7 +277,6 @@ fn serialize_record_selection(
 /// Serializes the given result into objects of given type.
 /// Doesn't validate the shape of the result set ("unchecked" result).
 /// Returns a vector of serialized objects (as Item::Map), grouped into a map by parent, if present.
-#[tracing::instrument(skip(result, typ))]
 fn serialize_objects(
     mut result: RecordSelection,
     typ: ObjectTypeStrongRef,
@@ -381,7 +375,6 @@ fn serialize_objects(
 }
 
 /// Unwraps are safe due to query validation.
-#[tracing::instrument(skip(record_id, items_with_parent, into, enclosing_type))]
 fn write_nested_items(
     record_id: &Option<SelectionResult>,
     items_with_parent: &mut HashMap<String, CheckedItemsWithParents>,
@@ -415,7 +408,6 @@ fn write_nested_items(
 }
 
 /// Processes nested results into a more ergonomic structure of { <nested field name> -> { parent ID -> item (list, map, ...) } }.
-#[tracing::instrument(skip(nested, enclosing_type))]
 fn process_nested_results(
     nested: Vec<QueryResult>,
     enclosing_type: &ObjectTypeStrongRef,
@@ -505,7 +497,7 @@ fn serialize_composite(cf: &CompositeFieldRef, out_field: &OutputFieldRef, value
 fn serialize_scalar(field: &OutputFieldRef, value: PrismaValue) -> crate::Result<Item> {
     match (&value, field.field_type.as_ref()) {
         (PrismaValue::Null, _) if field.is_nullable => Ok(Item::Value(PrismaValue::Null)),
-        (_, OutputType::Enum(et)) => match et.borrow() {
+        (_, OutputType::Enum(et)) => match *et.into_arc() {
             EnumType::Database(ref db) => convert_enum(value, db),
             _ => unreachable!(),
         },
@@ -521,7 +513,7 @@ fn serialize_scalar(field: &OutputFieldRef, value: PrismaValue) -> crate::Result
             OutputType::Enum(et) => {
                 let items = unwrap_prisma_value(value)
                     .into_iter()
-                    .map(|v| match et.borrow() {
+                    .map(|v| match *et.into_arc() {
                         EnumType::Database(ref dbt) => convert_enum(v, dbt),
                         _ => unreachable!(),
                     })
@@ -548,20 +540,22 @@ fn convert_prisma_value(field: &OutputFieldRef, value: PrismaValue, st: &ScalarT
         (ScalarType::Json, PrismaValue::String(s)) => PrismaValue::Json(s),
         (ScalarType::Json, PrismaValue::Json(s)) => PrismaValue::Json(s),
 
-        (ScalarType::Int, PrismaValue::Float(f)) => PrismaValue::Int(f.to_i64().unwrap()),
+        (ScalarType::Int, PrismaValue::Float(f)) => {
+            PrismaValue::Int(f.to_i64().ok_or(CoreError::decimal_conversion_error(&f, "i64"))?)
+        }
         (ScalarType::Int, PrismaValue::Int(i)) => PrismaValue::Int(i),
 
         (ScalarType::Float, PrismaValue::Float(f)) => PrismaValue::Float(f),
-        (ScalarType::Float, PrismaValue::Int(i)) => {
-            PrismaValue::Int(i.to_i64().expect("Unable to convert BigDecimal to i64."))
-        }
+        (ScalarType::Float, PrismaValue::Int(i)) => PrismaValue::Int(i),
 
         (ScalarType::Decimal, PrismaValue::Int(i)) => PrismaValue::String(i.to_string()),
         (ScalarType::Decimal, PrismaValue::Float(f)) => PrismaValue::String(f.to_string()),
 
         (ScalarType::BigInt, PrismaValue::BigInt(i)) => PrismaValue::BigInt(i),
         (ScalarType::BigInt, PrismaValue::Int(i)) => PrismaValue::BigInt(i),
-        (ScalarType::BigInt, PrismaValue::Float(f)) => PrismaValue::BigInt(f.to_i64().unwrap()),
+        (ScalarType::BigInt, PrismaValue::Float(f)) => {
+            PrismaValue::BigInt(f.to_i64().ok_or(CoreError::decimal_conversion_error(&f, "i64"))?)
+        }
 
         (ScalarType::Boolean, PrismaValue::Boolean(b)) => PrismaValue::Boolean(b),
         (ScalarType::Int, PrismaValue::Boolean(b)) => PrismaValue::Int(b as i64),
@@ -590,13 +584,15 @@ fn convert_enum(value: PrismaValue, dbt: &DatabaseEnumType) -> Result<Item, Core
             Some(inum) => Ok(Item::Value(inum)),
             None => Err(CoreError::SerializationError(format!(
                 "Value '{}' not found in enum '{}'",
-                s, dbt.name
+                s,
+                dbt.identifier().name()
             ))),
         },
 
         val => Err(CoreError::SerializationError(format!(
             "Attempted to serialize non-enum-compatible value '{}' for enum '{}'",
-            val, dbt.name
+            val,
+            dbt.identifier().name()
         ))),
     }
 }

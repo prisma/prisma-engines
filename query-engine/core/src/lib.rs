@@ -13,7 +13,9 @@
     clippy::mem_replace_with_default,
     clippy::clone_on_copy,
     clippy::needless_borrow,
-    clippy::needless_collect
+    clippy::needless_collect,
+    clippy::needless_return,
+    clippy::derive_partial_eq_without_eq
 )]
 #![warn(warnings)] // Todo deny warnings once done
 
@@ -30,8 +32,7 @@ pub mod query_graph;
 pub mod query_graph_builder;
 pub mod response_ir;
 pub mod result_ast;
-pub mod schema;
-pub mod schema_builder;
+pub mod trace_helpers;
 
 pub use error::*;
 pub use executor::*;
@@ -43,8 +44,11 @@ pub use query_graph::*;
 pub use query_graph_builder::*;
 pub use response_ir::*;
 pub use result_ast::*;
-pub use schema::*;
-pub use schema_builder::*;
+pub use trace_helpers::*;
 
 /// Result type tying all sub-result type hierarchies of the core together.
 pub type Result<T> = std::result::Result<T, CoreError>;
+
+// Re-exports
+pub extern crate schema;
+pub extern crate schema_builder;

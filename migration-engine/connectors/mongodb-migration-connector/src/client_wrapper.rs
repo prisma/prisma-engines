@@ -1,9 +1,9 @@
-use datamodel::common::preview_features::PreviewFeature;
 use enumflags2::BitFlags;
 use migration_connector::{ConnectorError, ConnectorResult};
 use mongodb::{error::Error as MongoError, options::WriteConcern};
 use mongodb_client::MongoConnectionString;
 use mongodb_schema_describer::MongoSchema;
+use psl::PreviewFeature;
 
 /// Abstraction over a mongodb connection (exposed for tests).
 pub struct Client {
@@ -41,10 +41,6 @@ impl Client {
 
         if !self.preview_features.contains(PreviewFeature::FullTextIndex) {
             schema.remove_fulltext_indexes();
-        }
-
-        if !self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-            schema.normalize_index_attributes();
         }
 
         Ok(schema)

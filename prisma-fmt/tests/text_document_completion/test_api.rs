@@ -32,7 +32,7 @@ pub(crate) fn test_scenario(scenario_name: &str) {
         context: None,
     };
 
-    let result = prisma_fmt::text_document_completion(&schema, &serde_json::to_string_pretty(&params).unwrap());
+    let result = prisma_fmt::text_document_completion(schema, &serde_json::to_string_pretty(&params).unwrap());
     // Prettify the JSON
     let result =
         serde_json::to_string_pretty(&serde_json::from_str::<lsp_types::CompletionList>(&result).unwrap()).unwrap();

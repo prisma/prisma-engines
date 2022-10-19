@@ -1,6 +1,6 @@
 use super::SqlSchemaDifferFlavour;
 use crate::{flavour::MysqlFlavour, pair::Pair, sql_schema_differ::ColumnTypeChange};
-use native_types::MySqlType;
+use psl::builtin_connectors::MySqlType;
 use sql_schema_describer::{
     walkers::{ColumnWalker, IndexWalker},
     ColumnTypeFamily,
@@ -40,14 +40,14 @@ impl SqlSchemaDifferFlavour for MysqlFlavour {
             differ.next.column_type_family_as_enum(),
         ) {
             (Some(previous_enum), Some(next_enum)) => {
-                if previous_enum.values == next_enum.values {
+                if previous_enum.values() == next_enum.values() {
                     return None;
                 }
 
                 return if previous_enum
-                    .values
+                    .values()
                     .iter()
-                    .all(|previous_value| next_enum.values.iter().any(|next_value| previous_value == next_value))
+                    .all(|previous_value| next_enum.values().iter().any(|next_value| previous_value == next_value))
                 {
                     Some(ColumnTypeChange::SafeCast)
                 } else {
@@ -69,7 +69,7 @@ impl SqlSchemaDifferFlavour for MysqlFlavour {
         None
     }
 
-    fn index_should_be_renamed(&self, indexes: &Pair<IndexWalker<'_>>) -> bool {
+    fn index_should_be_renamed(&self, indexes: Pair<IndexWalker<'_>>) -> bool {
         // Implements correct comparison for truncated index names.
         let (previous_name, next_name) = indexes.as_ref().map(|idx| idx.name()).into_tuple();
 
@@ -94,9 +94,9 @@ impl SqlSchemaDifferFlavour for MysqlFlavour {
 
     fn table_names_match(&self, names: Pair<&str>) -> bool {
         if self.lower_cases_table_names() {
-            names.previous().eq_ignore_ascii_case(names.next())
+            names.previous.eq_ignore_ascii_case(names.next)
         } else {
-            names.previous() == names.next()
+            names.previous == names.next
         }
     }
 }
@@ -113,10 +113,10 @@ fn safe() -> ColumnTypeChange {
     ColumnTypeChange::SafeCast
 }
 
-fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
-    let next = types.next();
+fn native_type_change(types: Pair<&MySqlType>) -> Option<ColumnTypeChange> {
+    let next = &types.next;
 
-    Some(match types.previous() {
+    Some(match &types.previous {
         MySqlType::BigInt => match next {
             MySqlType::BigInt => return None,
 

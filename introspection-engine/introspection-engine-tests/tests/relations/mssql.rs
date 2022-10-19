@@ -509,3 +509,47 @@ async fn multiple_foreign_key_constraints_are_taken_always_in_the_same_order(api
 
     Ok(())
 }
+
+#[test_connector(tags(Mssql))]
+async fn a_self_relation(api: &TestApi) -> TestResult {
+    let sql = formatdoc!(
+        r#"
+        CREATE TABLE [{schema}].[User] (
+            id INTEGER,
+            recruited_by INTEGER,
+            direct_report INTEGER,
+            
+            CONSTRAINT [User_pkey] PRIMARY KEY ([id]),
+            CONSTRAINT [recruited_by_fkey] FOREIGN KEY ([recruited_by]) REFERENCES [{schema}].[User]([id]),
+            CONSTRAINT [direct_report_fkey] FOREIGN KEY ([direct_report]) REFERENCES [{schema}].[User]([id])
+        );
+
+        "#,
+        schema = api.schema_name()
+    );
+    api.raw_cmd(&sql).await;
+
+    let expected = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "sqlserver"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model User {
+          id                                  Int    @id
+          recruited_by                        Int?
+          direct_report                       Int?
+          User_UserToUser_direct_report       User?  @relation("UserToUser_direct_report", fields: [direct_report], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "direct_report_fkey")
+          User_UserToUser_recruited_by        User?  @relation("UserToUser_recruited_by", fields: [recruited_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "recruited_by_fkey")
+          other_User_UserToUser_direct_report User[] @relation("UserToUser_direct_report")
+          other_User_UserToUser_recruited_by  User[] @relation("UserToUser_recruited_by")
+        }
+    "#]];
+
+    api.expect_datamodel(&expected).await;
+    Ok(())
+}

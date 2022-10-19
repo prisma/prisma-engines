@@ -16,45 +16,49 @@ impl ConnectorTagInterface for PostgresConnectorTag {
         Box::new(SqlDatamodelRenderer::new())
     }
 
-    fn connection_string(&self, database: &str, is_ci: bool) -> String {
+    fn connection_string(&self, database: &str, is_ci: bool, is_multi_schema: bool, _: Option<&'static str>) -> String {
+        let database = if is_multi_schema {
+            database.to_string()
+        } else {
+            format!("db?schema={}", database)
+        };
+
         match self.version {
-            Some(PostgresVersion::V9) if is_ci => format!(
-                "postgresql://postgres:prisma@test-db-postgres-9:5432/db?schema={}",
-                database
-            ),
-            Some(PostgresVersion::V10) if is_ci => format!(
-                "postgresql://postgres:prisma@test-db-postgres-10:5432/db?schema={}",
-                database
-            ),
-            Some(PostgresVersion::V11) if is_ci => format!(
-                "postgresql://postgres:prisma@test-db-postgres-11:5432/db?schema={}",
-                database
-            ),
-            Some(PostgresVersion::V12) if is_ci => format!(
-                "postgresql://postgres:prisma@test-db-postgres-12:5432/db?schema={}",
-                database
-            ),
-            Some(PostgresVersion::V13) if is_ci => format!(
-                "postgresql://postgres:prisma@test-db-postgres-13:5432/db?schema={}",
-                database
-            ),
-            Some(PostgresVersion::V14) if is_ci => format!(
-                "postgresql://postgres:prisma@test-db-postgres-14:5432/db?schema={}",
-                database
-            ),
+            Some(PostgresVersion::V9) if is_ci => {
+                format!("postgresql://postgres:prisma@test-db-postgres-9:5432/{}", database)
+            }
+            Some(PostgresVersion::V10) if is_ci => {
+                format!("postgresql://postgres:prisma@test-db-postgres-10:5432/{}", database)
+            }
+            Some(PostgresVersion::V11) if is_ci => {
+                format!("postgresql://postgres:prisma@test-db-postgres-11:5432/{}", database)
+            }
+            Some(PostgresVersion::V12) if is_ci => {
+                format!("postgresql://postgres:prisma@test-db-postgres-12:5432/{}", database)
+            }
+            Some(PostgresVersion::V13) if is_ci => {
+                format!("postgresql://postgres:prisma@test-db-postgres-13:5432/{}", database)
+            }
+            Some(PostgresVersion::V14) if is_ci => {
+                format!("postgresql://postgres:prisma@test-db-postgres-14:5432/{}", database)
+            }
+            Some(PostgresVersion::V15) if is_ci => {
+                format!("postgresql://postgres:prisma@test-db-postgres-15:5432/{}", database)
+            }
             Some(PostgresVersion::PgBouncer) if is_ci => format!(
-                "postgresql://postgres:prisma@test-db-pgbouncer:6432/db?schema={}&pgbouncer=true",
+                "postgresql://postgres:prisma@test-db-pgbouncer:6432/{}&pgbouncer=true",
                 database
             ),
 
-            Some(PostgresVersion::V9) => format!("postgresql://postgres:prisma@127.0.0.1:5431/db?schema={}", database),
-            Some(PostgresVersion::V10) => format!("postgresql://postgres:prisma@127.0.0.1:5432/db?schema={}", database),
-            Some(PostgresVersion::V11) => format!("postgresql://postgres:prisma@127.0.0.1:5433/db?schema={}", database),
-            Some(PostgresVersion::V12) => format!("postgresql://postgres:prisma@127.0.0.1:5434/db?schema={}", database),
-            Some(PostgresVersion::V13) => format!("postgresql://postgres:prisma@127.0.0.1:5435/db?schema={}", database),
-            Some(PostgresVersion::V14) => format!("postgresql://postgres:prisma@127.0.0.1:5437/db?schema={}", database),
+            Some(PostgresVersion::V9) => format!("postgresql://postgres:prisma@127.0.0.1:5431/{}", database),
+            Some(PostgresVersion::V10) => format!("postgresql://postgres:prisma@127.0.0.1:5432/{}", database),
+            Some(PostgresVersion::V11) => format!("postgresql://postgres:prisma@127.0.0.1:5433/{}", database),
+            Some(PostgresVersion::V12) => format!("postgresql://postgres:prisma@127.0.0.1:5434/{}", database),
+            Some(PostgresVersion::V13) => format!("postgresql://postgres:prisma@127.0.0.1:5435/{}", database),
+            Some(PostgresVersion::V14) => format!("postgresql://postgres:prisma@127.0.0.1:5437/{}", database),
+            Some(PostgresVersion::V15) => format!("postgresql://postgres:prisma@127.0.0.1:5438/{}", database),
             Some(PostgresVersion::PgBouncer) => format!(
-                "postgresql://postgres:prisma@127.0.0.1:6432/db?schema={}&pgbouncer=true",
+                "postgresql://postgres:prisma@127.0.0.1:6432/db?{}&pgbouncer=true",
                 database
             ),
 
@@ -88,6 +92,7 @@ pub enum PostgresVersion {
     V12,
     V13,
     V14,
+    V15,
     PgBouncer,
 }
 
@@ -133,6 +138,10 @@ impl PostgresConnectorTag {
                 capabilities: capabilities.clone(),
             },
             Self {
+                version: Some(PostgresVersion::V15),
+                capabilities: capabilities.clone(),
+            },
+            Self {
                 version: Some(PostgresVersion::PgBouncer),
                 capabilities,
             },
@@ -165,6 +174,7 @@ impl TryFrom<&str> for PostgresVersion {
             "12" => Self::V12,
             "13" => Self::V13,
             "14" => Self::V14,
+            "15" => Self::V15,
             "pgbouncer" => Self::PgBouncer,
             _ => return Err(TestError::parse_error(format!("Unknown Postgres version `{}`", s))),
         };
@@ -182,6 +192,7 @@ impl ToString for PostgresVersion {
             PostgresVersion::V12 => "12",
             PostgresVersion::V13 => "13",
             PostgresVersion::V14 => "14",
+            PostgresVersion::V15 => "15",
             PostgresVersion::PgBouncer => "pgbouncer",
         }
         .to_owned()
@@ -189,5 +200,5 @@ impl ToString for PostgresVersion {
 }
 
 fn postgres_capabilities() -> Vec<ConnectorCapability> {
-    sql_datamodel_connector::POSTGRES.capabilities().to_owned()
+    psl::builtin_connectors::POSTGRES.capabilities().to_owned()
 }

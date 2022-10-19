@@ -11,7 +11,7 @@ mod relation_is_null {
             model Message {
                 #id(id, String, @id, @default(cuid()))
                 messageName String?
-                image_id    String?
+                image_id    String? @unique
                 image       Image?  @relation(fields: [image_id], references: [id])
             }
 

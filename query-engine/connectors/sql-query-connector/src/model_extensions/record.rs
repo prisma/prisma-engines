@@ -1,7 +1,6 @@
-use crate::SqlError;
+use crate::{value::to_prisma_value, SqlError};
 use prisma_models::{DomainError, ModelProjection, SelectionResult};
 use quaint::connector::ResultSet;
-use std::convert::TryInto;
 
 pub fn try_convert(model_projection: &ModelProjection, result_set: ResultSet) -> crate::Result<SelectionResult> {
     let columns: Vec<String> = result_set.columns().iter().map(|c| c.to_string()).collect();
@@ -11,7 +10,7 @@ pub fn try_convert(model_projection: &ModelProjection, result_set: ResultSet) ->
         for (i, val) in row.into_iter().enumerate() {
             match model_projection.map_db_name(columns[i].as_str()) {
                 Some(field) => {
-                    record_projection.add((field, val.try_into()?));
+                    record_projection.add((field, to_prisma_value(val)?));
                 }
                 None => {
                     return Err(SqlError::DomainError(DomainError::ScalarFieldNotFound {

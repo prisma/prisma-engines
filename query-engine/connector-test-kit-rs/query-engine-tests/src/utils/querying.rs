@@ -53,9 +53,18 @@ macro_rules! is_one_of {
 #[macro_export]
 macro_rules! run_query {
     ($runner:expr, $q:expr) => {{
-        let res = $runner.query($q).await?;
+        let res = $runner.query($q.to_string()).await?;
         res.assert_success();
         res.to_string()
+    }};
+}
+
+#[macro_export]
+macro_rules! run_query_pretty {
+    ($runner:expr, $q:expr) => {{
+        let res = $runner.query($q.to_string()).await?;
+        res.assert_success();
+        res.to_string_pretty()
     }};
 }
 

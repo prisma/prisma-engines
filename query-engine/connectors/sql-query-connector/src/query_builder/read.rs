@@ -1,6 +1,6 @@
 use crate::{
-    cursor_condition, filter_conversion::AliasedCondition, model_extensions::*, nested_aggregations, ordering,
-    sql_trace::SqlTraceComment,
+    cursor_condition, filter_conversion::AliasedCondition, model_extensions::*, nested_aggregations,
+    ordering::OrderByBuilder, sql_trace::SqlTraceComment,
 };
 use connector_interface::{filter::Filter, AggregationSelection, QueryArguments, RelAggregationSelection};
 use itertools::Itertools;
@@ -52,14 +52,13 @@ impl SelectDefinition for Select<'static> {
 }
 
 impl SelectDefinition for QueryArguments {
-    #[tracing::instrument(skip(self, model, aggr_selections))]
     fn into_select(
         self,
         model: &ModelRef,
         aggr_selections: &[RelAggregationSelection],
         trace_id: Option<String>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
-        let order_by_definitions = ordering::build(&self, &model);
+        let order_by_definitions = OrderByBuilder::default().build(&self);
         let (table_opt, cursor_condition) = cursor_condition::build(&self, &model, &order_by_definitions);
         let aggregation_joins = nested_aggregations::build(aggr_selections);
 
@@ -68,7 +67,7 @@ impl SelectDefinition for QueryArguments {
 
         let filter: ConditionTree = self
             .filter
-            .map(|f| f.aliased_cond(None))
+            .map(|f| f.aliased_condition_from(None, false))
             .unwrap_or(ConditionTree::NoCondition);
 
         let conditions = match (filter, cursor_condition) {
@@ -112,7 +111,6 @@ impl SelectDefinition for QueryArguments {
     }
 }
 
-#[tracing::instrument(skip(model, columns, aggr_selections, query))]
 pub fn get_records<T>(
     model: &ModelRef,
     columns: impl Iterator<Item = Column<'static>>,
@@ -159,7 +157,6 @@ where
 /// ```
 /// Important note: Do not use the AsColumn trait here as we need to construct column references that are relative,
 /// not absolute - e.g. `SELECT "field" FROM (...)` NOT `SELECT "full"."path"."to"."field" FROM (...)`.
-#[tracing::instrument(skip(model, selections, args))]
 pub fn aggregate(
     model: &ModelRef,
     selections: &[AggregationSelection],
@@ -208,7 +205,6 @@ pub fn aggregate(
     )
 }
 
-#[tracing::instrument(skip(model, args, selections, group_by, having))]
 pub fn group_by_aggregate(
     model: &ModelRef,
     args: QueryArguments,
@@ -257,12 +253,11 @@ pub fn group_by_aggregate(
     );
 
     match having {
-        Some(filter) => grouped.having(filter.aliased_cond(None)),
+        Some(filter) => grouped.having(filter.aliased_condition_from(None, false)),
         None => grouped,
     }
 }
 
-#[tracing::instrument(skip(model, selections))]
 fn extract_columns(model: &ModelRef, selections: &[AggregationSelection]) -> Vec<Column<'static>> {
     let fields: Vec<_> = selections
         .iter()

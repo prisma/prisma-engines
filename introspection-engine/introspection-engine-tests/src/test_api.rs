@@ -1,20 +1,19 @@
 pub use super::TestResult;
 pub use expect_test::expect;
+pub use indoc::{formatdoc, indoc};
+pub use quaint::prelude::Queryable;
 pub use test_macros::test_connector;
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
 use crate::{BarrelMigrationExecutor, Result};
-use datamodel::common::preview_features::PreviewFeature;
-use datamodel::{dml::Datamodel, Configuration};
 use introspection_connector::{
     CompositeTypeDepth, ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionContext,
     IntrospectionResult, Version,
 };
 use migration_connector::{ConnectorParams, MigrationConnector};
-use quaint::{
-    prelude::{Queryable, SqlFamily},
-    single::Quaint,
-};
+use psl::Configuration;
+use psl::PreviewFeature;
+use quaint::{prelude::SqlFamily, single::Quaint};
 use sql_introspection_connector::SqlIntrospectionConnector;
 use sql_migration_connector::SqlMigrationConnector;
 use std::fmt::Write;
@@ -22,11 +21,12 @@ use test_setup::{sqlite_test_url, DatasourceBlock, TestApiArgs};
 use tracing::Instrument;
 
 pub struct TestApi {
-    api: SqlIntrospectionConnector,
+    pub api: SqlIntrospectionConnector,
     database: Quaint,
     args: TestApiArgs,
     connection_string: String,
     preview_features: BitFlags<PreviewFeature>,
+    namespaces: Vec<String>,
 }
 
 impl TestApi {
@@ -39,6 +39,8 @@ impl TestApi {
             .iter()
             .flat_map(|f| PreviewFeature::parse_opt(f))
             .collect();
+
+        let namespaces = args.namespaces().iter().map(|ns| ns.to_string()).collect();
 
         let (database, connection_string): (Quaint, String) = if tags.intersects(Tags::Vitess) {
             let params = ConnectorParams {
@@ -64,7 +66,6 @@ impl TestApi {
                 q.raw_cmd(
                     r#"
                     SET default_int_size = 4;
-                    SET serial_normalization = 'sql_sequence';
                     "#,
                 )
                 .await
@@ -90,6 +91,7 @@ impl TestApi {
             args,
             connection_string,
             preview_features,
+            namespaces,
         }
     }
 
@@ -106,21 +108,17 @@ impl TestApi {
     }
 
     pub async fn introspect(&self) -> Result<String> {
-        let introspection_result = self.test_introspect_internal(Datamodel::new()).await?;
+        let previous_schema = psl::validate(self.pure_config().into());
+        let introspection_result = self.test_introspect_internal(previous_schema, true).await?;
 
-        Ok(datamodel::render_datamodel_and_config_to_string(
-            &introspection_result.data_model,
-            &self.configuration(),
-        ))
+        Ok(introspection_result.data_model)
     }
 
     pub async fn introspect_dml(&self) -> Result<String> {
-        let introspection_result = self.test_introspect_internal(Datamodel::new()).await?;
+        let previous_schema = psl::validate(self.pure_config().into());
+        let introspection_result = self.test_introspect_internal(previous_schema, false).await?;
 
-        Ok(datamodel::render_datamodel_to_string(
-            &introspection_result.data_model,
-            Some(&self.configuration()),
-        ))
+        Ok(introspection_result.data_model)
     }
 
     pub fn is_cockroach(&self) -> bool {
@@ -140,19 +138,21 @@ impl TestApi {
         self.preview_features
     }
 
-    #[tracing::instrument(skip(self))]
-    #[track_caller]
-    async fn test_introspect_internal(&self, data_model: Datamodel) -> ConnectorResult<IntrospectionResult> {
-        let config = self.configuration();
+    pub fn namespaces(&self) -> &[String] {
+        &self.namespaces
+    }
 
-        let ctx = IntrospectionContext {
-            preview_features: self.preview_features(),
-            source: config.datasources.into_iter().next().unwrap(),
-            composite_type_depth: CompositeTypeDepth::Infinite,
-        };
+    #[track_caller]
+    async fn test_introspect_internal(
+        &self,
+        previous_schema: psl::ValidatedSchema,
+        render_config: bool,
+    ) -> ConnectorResult<IntrospectionResult> {
+        let mut ctx = IntrospectionContext::new(previous_schema, CompositeTypeDepth::Infinite);
+        ctx.render_config = render_config;
 
         self.api
-            .introspect(&data_model, ctx)
+            .introspect(&ctx)
             .instrument(tracing::info_span!("introspect"))
             .await
     }
@@ -160,46 +160,48 @@ impl TestApi {
     #[tracing::instrument(skip(self, data_model_string))]
     #[track_caller]
     pub async fn re_introspect(&self, data_model_string: &str) -> Result<String> {
-        let config = self.configuration();
-        let data_model = parse_datamodel(data_model_string);
-        let introspection_result = self.test_introspect_internal(data_model).await?;
+        let schema = format!("{}{}", self.pure_config(), data_model_string);
+        let schema = parse_datamodel(&schema);
+        let introspection_result = self.test_introspect_internal(schema, true).await?;
 
-        let rendering_span = tracing::info_span!("render_datamodel after introspection");
-        let _span = rendering_span.enter();
-        let dm = datamodel::render_datamodel_and_config_to_string(&introspection_result.data_model, &config);
-
-        Ok(dm)
+        Ok(introspection_result.data_model)
     }
 
     #[tracing::instrument(skip(self, data_model_string))]
     #[track_caller]
     pub async fn re_introspect_dml(&self, data_model_string: &str) -> Result<String> {
-        let config = self.configuration();
+        let data_model = parse_datamodel(&format!("{}{}", self.pure_config(), data_model_string));
+        let introspection_result = self.test_introspect_internal(data_model, false).await?;
+
+        Ok(introspection_result.data_model)
+    }
+
+    #[tracing::instrument(skip(self, data_model_string))]
+    #[track_caller]
+    pub async fn re_introspect_config(&self, data_model_string: &str) -> Result<String> {
         let data_model = parse_datamodel(data_model_string);
-        let introspection_result = self.test_introspect_internal(data_model).await?;
+        let introspection_result = self.test_introspect_internal(data_model, true).await?;
 
-        let rendering_span = tracing::info_span!("render_datamodel after introspection");
-        let _span = rendering_span.enter();
-        let dm = datamodel::render_datamodel_to_string(&introspection_result.data_model, Some(&config));
-
-        Ok(dm)
+        Ok(introspection_result.data_model)
     }
 
     pub async fn re_introspect_warnings(&self, data_model_string: &str) -> Result<String> {
-        let data_model = parse_datamodel(data_model_string);
-        let introspection_result = self.test_introspect_internal(data_model).await?;
+        let data_model = parse_datamodel(&format!("{}{}", self.pure_config(), data_model_string));
+        let introspection_result = self.test_introspect_internal(data_model, false).await?;
 
         Ok(serde_json::to_string(&introspection_result.warnings)?)
     }
 
     pub async fn introspect_version(&self) -> Result<Version> {
-        let introspection_result = self.test_introspect_internal(Datamodel::new()).await?;
+        let previous_schema = psl::validate(self.pure_config().into());
+        let introspection_result = self.test_introspect_internal(previous_schema, false).await?;
 
         Ok(introspection_result.version)
     }
 
     pub async fn introspection_warnings(&self) -> Result<String> {
-        let introspection_result = self.test_introspect_internal(Datamodel::new()).await?;
+        let previous_schema = psl::validate(self.pure_config().into());
+        let introspection_result = self.test_introspect_internal(previous_schema, false).await?;
 
         Ok(serde_json::to_string(&introspection_result.warnings)?)
     }
@@ -250,56 +252,84 @@ impl TestApi {
         self.args.tags()
     }
 
-    pub fn datasource_block(&self) -> DatasourceBlock<'_> {
-        let no_foreign_keys =
-            self.is_vitess() && self.preview_features().contains(PreviewFeature::ReferentialIntegrity);
+    pub fn datasource_block_string(&self) -> String {
+        let relation_mode =
+            if self.is_vitess() && self.preview_features().contains(PreviewFeature::ReferentialIntegrity) {
+                "\nrelationMode = \"prisma\""
+            } else {
+                ""
+            };
 
-        if no_foreign_keys {
-            self.args
-                .datasource_block(&self.connection_string, &[("referentialIntegrity", r#""prisma""#)])
+        let namespaces: Vec<String> = self.namespaces().iter().map(|ns| format!(r#""{}""#, ns)).collect();
+
+        let namespaces = if namespaces.is_empty() {
+            "".to_string()
         } else {
-            self.args.datasource_block(&self.connection_string, &[])
-        }
+            format!("\nschemas = [{}]", namespaces.join(", "))
+        };
+
+        let provider = &self.args.provider();
+        let datasource_block = format!(
+            r#"datasource db {{
+                 provider = "{}"
+                 url = "{}"{}{}
+               }}"#,
+            provider, "env(TEST_DATABASE_URL)", namespaces, relation_mode
+        );
+        datasource_block
+    }
+
+    pub fn datasource_block(&self) -> DatasourceBlock<'_> {
+        self.args.datasource_block(
+            "env(TEST_DATABASE_URL)",
+            if self.is_vitess() && self.preview_features().contains(PreviewFeature::ReferentialIntegrity) {
+                &[("relationMode", r#""prisma""#)]
+            } else {
+                &[]
+            },
+        )
+    }
+
+    fn pure_config(&self) -> String {
+        format!("{}\n{}", &self.datasource_block_string(), &self.generator_block())
     }
 
     pub fn configuration(&self) -> Configuration {
-        datamodel::parse_configuration(&format!("{}\n{}", &self.datasource_block(), &self.generator_block()))
-            .unwrap()
-            .subject
+        psl::parse_configuration(&self.pure_config()).unwrap()
+    }
+
+    #[track_caller]
+    pub async fn expect_datamodel(&self, expectation: &expect_test::Expect) {
+        let found = self.introspect().await.unwrap();
+        expectation.assert_eq(&found);
+    }
+
+    #[track_caller]
+    pub async fn expect_re_introspected_datamodel(&self, schema: &str, expectation: expect_test::Expect) {
+        let data_model = parse_datamodel(&format!("{}{}", self.pure_config(), schema));
+        let reintrospected = self.test_introspect_internal(data_model, false).await.unwrap();
+
+        expectation.assert_eq(&reintrospected.data_model);
     }
 
     #[track_caller]
     pub fn assert_eq_datamodels(&self, expected_without_header: &str, result_with_header: &str) {
         let expected_with_source = self.dm_with_sources(expected_without_header);
         let expected_with_generator = self.dm_with_generator_and_preview_flags(&expected_with_source);
+        let reformatted_expected = psl::reformat(&expected_with_generator, 2).unwrap();
 
-        let parsed_expected = datamodel::parse_datamodel(&expected_with_generator)
-            .map_err(|err| err.to_pretty_string("schema.prisma", &expected_with_generator))
-            .unwrap()
-            .subject;
-
-        let parsed_result = datamodel::parse_datamodel(result_with_header).unwrap().subject;
-
-        let reformatted_expected =
-            datamodel::render_datamodel_and_config_to_string(&parsed_expected, &self.configuration());
-        let reformatted_result =
-            datamodel::render_datamodel_and_config_to_string(&parsed_result, &self.configuration());
-
-        println!("{}", reformatted_expected);
-        println!("{}", reformatted_result);
-
-        pretty_assertions::assert_eq!(reformatted_expected, reformatted_result);
+        pretty_assertions::assert_eq!(reformatted_expected, result_with_header);
     }
 
-    pub fn dm_with_sources(&self, schema: &str) -> String {
+    fn dm_with_sources(&self, schema: &str) -> String {
         let mut out = String::with_capacity(320 + schema.len());
 
-        write!(out, "{}\n{}", self.datasource_block(), schema).unwrap();
+        write!(out, "{}\n{}", self.datasource_block_string(), schema).unwrap();
 
         out
     }
 
-    pub fn dm_with_generator_and_preview_flags(&self, schema: &str) -> String {
+    fn dm_with_generator_and_preview_flags(&self, schema: &str) -> String {
         let mut out = String::with_capacity(320 + schema.len());
 
         write!(out, "{}\n{}", self.generator_block(), schema).unwrap();
@@ -336,9 +366,6 @@ impl TestApi {
 }
 
 #[track_caller]
-fn parse_datamodel(dm: &str) -> Datamodel {
-    datamodel::parse_datamodel(dm)
-        .map_err(|diagnostics| diagnostics.to_pretty_string("schema.prisma", dm))
-        .unwrap()
-        .subject
+fn parse_datamodel(dm: &str) -> psl::ValidatedSchema {
+    psl::parse_schema(dm).unwrap()
 }

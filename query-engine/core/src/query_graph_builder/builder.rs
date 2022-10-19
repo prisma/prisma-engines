@@ -19,22 +19,25 @@ impl QueryGraphBuilder {
     }
 
     /// Maps an operation to a query.
-    #[tracing::instrument(skip(self, operation))]
     pub fn build(self, operation: Operation) -> QueryGraphBuilderResult<(QueryGraph, IrSerializer)> {
+        let _span = info_span!("prisma:engine:build_graph");
         match operation {
             Operation::Read(selection) => self.build_internal(selection, &self.query_schema.query()),
             Operation::Write(selection) => self.build_internal(selection, &self.query_schema.mutation()),
         }
     }
 
-    #[tracing::instrument(skip(self, selection, root_object))]
     fn build_internal(
         &self,
         selection: Selection,
         root_object: &ObjectTypeStrongRef, // Either the query or mutation object.
     ) -> QueryGraphBuilderResult<(QueryGraph, IrSerializer)> {
         let mut selections = vec![selection];
-        let mut parsed_object = QueryDocumentParser::parse_object(QueryPath::default(), &selections, root_object)?;
+        let mut parsed_object = QueryDocumentParser::new(crate::executor::get_request_now()).parse_object(
+            QueryPath::default(),
+            &selections,
+            root_object,
+        )?;
 
         // Because we're processing root objects, there can only be one query / mutation.
         let field_pair = parsed_object.fields.pop().unwrap();
@@ -52,7 +55,6 @@ impl QueryGraphBuilder {
         }
     }
 
-    #[tracing::instrument(skip(self, field_pair))]
     #[rustfmt::skip]
     fn dispatch_build(&self, field_pair: FieldPair) -> QueryGraphBuilderResult<QueryGraph> {
         let query_info = field_pair.schema_field.query_info.as_ref().unwrap();

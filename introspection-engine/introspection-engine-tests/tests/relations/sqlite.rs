@@ -6,6 +6,50 @@ use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
 #[test_connector(tags(Sqlite))]
+async fn a_many_to_many_relation_with_an_id(api: &TestApi) -> TestResult {
+    let sql = r#"
+        CREATE TABLE "User" (
+            id INTEGER PRIMARY KEY
+        );
+
+        CREATE TABLE "Post" (
+            id INTEGER PRIMARY KEY
+        );
+
+        CREATE TABLE "PostsToUsers" (
+            id INTEGER PRIMARY KEY,
+            user_id INTEGER NOT NULL REFERENCES "User"("id"),
+            post_id INTEGER NOT NULL REFERENCES "Post"("id")
+        );
+    "#;
+    api.raw_cmd(sql).await;
+
+    let expected = expect![[r#"
+        model Post {
+          id           Int            @id @default(autoincrement())
+          PostsToUsers PostsToUsers[]
+        }
+
+        model PostsToUsers {
+          id      Int  @id @default(autoincrement())
+          user_id Int
+          post_id Int
+          Post    Post @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+          User    User @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+        }
+
+        model User {
+          id           Int            @id @default(autoincrement())
+          PostsToUsers PostsToUsers[]
+        }
+    "#]];
+
+    expected.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Sqlite))]
 async fn a_one_to_one_relation_referencing_non_id(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -248,10 +292,7 @@ async fn multiple_foreign_key_constraints_are_taken_always_in_the_same_order(api
         }
     "#]];
 
-    for _ in 0..10 {
-        expected.assert_eq(&api.introspect_dml().await?);
-    }
-
+    expected.assert_eq(&api.introspect_dml().await?);
     Ok(())
 }
 
@@ -296,24 +337,18 @@ async fn a_self_relation(api: &TestApi) -> TestResult {
 
 #[test_connector(tags(Sqlite))]
 async fn a_one_to_many_relation(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("User", |t| {
-                t.add_column("id", types::integer().increments(true));
-                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
-            });
+    let sql = r#"
+        CREATE TABLE "User" (
+            id INTEGER PRIMARY KEY
+        );
 
-            migration.create_table("Post", |t| {
-                t.add_column("id", types::integer().increments(true));
-                t.add_column("user_id", types::integer().unique(false).nullable(true));
-                t.add_constraint(
-                    "user_id_fkey",
-                    types::foreign_constraint(&["user_id"], "User", &["id"], None, None),
-                );
-                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
-            });
-        })
-        .await?;
+        CREATE TABLE "Post" (
+            id INTEGER PRIMARY KEY,
+            user_id INTEGER,
+            CONSTRAINT "user_id_fkey" FOREIGN KEY (user_id) REFERENCES "User"(id)
+        );
+    "#;
+    api.raw_cmd(sql).await;
 
     let expected = expect![[r#"
         model Post {

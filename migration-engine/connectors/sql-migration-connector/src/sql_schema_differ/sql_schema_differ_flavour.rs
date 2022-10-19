@@ -36,6 +36,11 @@ pub(crate) trait SqlSchemaDifferFlavour {
     /// Controls whether we will generate `RenameForeignKey` steps for this flavour.
     fn can_rename_foreign_key(&self) -> bool;
 
+    /// This method must return whether a column became or ceased to be autoincrementing.
+    fn column_autoincrement_changed(&self, columns: Pair<ColumnWalker<'_>>) -> bool {
+        columns.previous.is_autoincrement() != columns.next.is_autoincrement()
+    }
+
     /// Return whether a column's type needs to be migrated, and how.
     fn column_type_change(&self, differ: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
         if differ.previous.column_type_family() != differ.next.column_type_family() {
@@ -48,6 +53,15 @@ pub(crate) trait SqlSchemaDifferFlavour {
     /// Push enum-related steps.
     fn push_enum_steps(&self, _steps: &mut Vec<SqlMigrationStep>, _db: &DifferDatabase<'_>) {}
 
+    /// Push AlterSequence steps.
+    fn push_alter_sequence_steps(&self, _steps: &mut Vec<SqlMigrationStep>, _db: &DifferDatabase<'_>) {}
+
+    /// Push AlterExtension steps.
+    fn push_extension_steps(&self, _steps: &mut Vec<SqlMigrationStep>, _db: &DifferDatabase<'_>) {}
+
+    /// Define database-specific extension modules.
+    fn define_extensions(&self, _db: &mut DifferDatabase<'_>) {}
+
     /// Connector-specific criterias deciding whether two indexes match.
     fn indexes_match(&self, _a: IndexWalker<'_>, _b: IndexWalker<'_>) -> bool {
         true
@@ -59,8 +73,8 @@ pub(crate) trait SqlSchemaDifferFlavour {
     }
 
     /// Return whether an index should be renamed by the migration.
-    fn index_should_be_renamed(&self, indexes: &Pair<IndexWalker<'_>>) -> bool {
-        indexes.previous().name() != indexes.next().name()
+    fn index_should_be_renamed(&self, indexes: Pair<IndexWalker<'_>>) -> bool {
+        indexes.previous.name() != indexes.next.name()
     }
 
     fn lower_cases_table_names(&self) -> bool {
@@ -116,7 +130,7 @@ pub(crate) trait SqlSchemaDifferFlavour {
     }
 
     /// Whether a specific index should *not* be produced.
-    fn should_skip_index_for_new_table(&self, _index: &IndexWalker<'_>) -> bool {
+    fn should_skip_index_for_new_table(&self, _index: IndexWalker<'_>) -> bool {
         false
     }
 
@@ -126,8 +140,13 @@ pub(crate) trait SqlSchemaDifferFlavour {
         false
     }
 
+    /// Does the sql expression string match the provided byte array?
+    fn string_matches_bytes(&self, string: &str, bytes: &[u8]) -> bool {
+        string.as_bytes() == bytes
+    }
+
     fn table_names_match(&self, names: Pair<&str>) -> bool {
-        names.previous() == names.next()
+        names.previous == names.next
     }
 
     /// Return the tables that cannot be migrated without being redefined. This

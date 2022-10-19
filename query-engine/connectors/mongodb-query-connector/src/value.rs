@@ -1,4 +1,5 @@
 use crate::{
+    filter::FilterPrefix,
     output_meta::{CompositeOutputMeta, OutputMeta, ScalarOutputMeta},
     IntoBson, MongoError,
 };
@@ -6,8 +7,10 @@ use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{TimeZone, Utc};
 use itertools::Itertools;
 use mongodb::bson::{oid::ObjectId, spec::BinarySubtype, Binary, Bson, Document, Timestamp};
-use native_types::MongoDbType;
-use prisma_models::{CompositeFieldRef, Field, PrismaValue, ScalarFieldRef, SelectedField, TypeIdentifier};
+use prisma_models::{
+    CompositeFieldRef, Field, PrismaValue, RelationFieldRef, ScalarFieldRef, SelectedField, TypeIdentifier,
+};
+use psl::builtin_connectors::MongoDbType;
 use serde_json::Value;
 use std::{convert::TryFrom, fmt::Display};
 
@@ -80,12 +83,35 @@ fn convert_composite_object(cf: &CompositeFieldRef, pairs: Vec<(String, PrismaVa
     Ok(Bson::Document(doc))
 }
 
+impl IntoBson for (&FilterPrefix, &ScalarFieldRef) {
+    fn into_bson(self) -> crate::Result<Bson> {
+        let (prefix, sf) = self;
+
+        Ok(Bson::String(prefix.render_with(sf.db_name().to_string())))
+    }
+}
+
+impl IntoBson for (&FilterPrefix, &CompositeFieldRef) {
+    fn into_bson(self) -> crate::Result<Bson> {
+        let (prefix, cf) = self;
+
+        Ok(Bson::String(prefix.render_with(cf.db_name().to_string())))
+    }
+}
+
+impl IntoBson for (&FilterPrefix, &RelationFieldRef) {
+    fn into_bson(self) -> crate::Result<Bson> {
+        let (prefix, rf) = self;
+
+        Ok(Bson::String(prefix.render_with(rf.relation().name.to_owned())))
+    }
+}
+
 impl IntoBson for (&ScalarFieldRef, PrismaValue) {
     fn into_bson(self) -> crate::Result<Bson> {
         let (sf, value) = self;
 
-        // This is _insanely_ inefficient, but we have no real choice with the current interface.
-        let mongo_type: Option<MongoDbType> = sf.native_type.as_ref().map(|nt| nt.deserialize_native_type());
+        let mongo_type: Option<&MongoDbType> = sf.native_type.as_ref().map(|nt| nt.deserialize_native_type());
 
         // If we have a native type, use that one as source of truth for mapping, else use the type ident for defaults.
         match (mongo_type, &sf.type_identifier, value) {
@@ -98,7 +124,7 @@ impl IntoBson for (&ScalarFieldRef, PrismaValue) {
 }
 
 /// Conversion using an explicit native type.
-impl IntoBson for (MongoDbType, PrismaValue) {
+impl IntoBson for (&MongoDbType, PrismaValue) {
     fn into_bson(self) -> crate::Result<Bson> {
         Ok(match self {
             // ObjectId
@@ -139,7 +165,7 @@ impl IntoBson for (MongoDbType, PrismaValue) {
             // Array
             (typ, PrismaValue::List(vals)) => Bson::Array(
                 vals.into_iter()
-                    .map(|val| (typ.clone(), val).into_bson())
+                    .map(|val| (typ, val).into_bson())
                     .collect::<crate::Result<Vec<_>>>()?,
             ),
 
@@ -396,7 +422,11 @@ fn read_composite_value(bson: Bson, meta: &CompositeOutputMeta) -> crate::Result
                         (None, OutputMeta::Composite(meta)) if meta.list => {
                             pairs.push((field.clone(), PrismaValue::List(Vec::new())))
                         }
-                        // Fill missing fields with nulls.
+                        // Coerce missing scalars with their default values
+                        (None, OutputMeta::Scalar(meta)) if meta.default.is_some() => {
+                            pairs.push((field.clone(), meta.default.clone().unwrap()))
+                        }
+                        // Fill missing fields without default values with nulls.
                         (None, _) => pairs.push((field.clone(), PrismaValue::Null)),
                     }
                 }

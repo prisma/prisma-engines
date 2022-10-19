@@ -1,19 +1,18 @@
 use super::*;
 use crate::{
-    constants::args,
     query_ast::*,
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
-    ParsedInputMap, ParsedInputValue,
+    Computation, ParsedInputMap, ParsedInputValue,
 };
 use connector::{Filter, IntoFilter};
-use prisma_models::{ModelRef, RelationFieldRef};
+use prisma_models::{ModelRef, RelationFieldRef, SelectionResult};
+use schema_builder::constants::args;
 use std::{convert::TryInto, sync::Arc};
 
 /// Handles nested connect or create cases.
 ///
 /// The resulting graph can take multiple forms, based on the relation type to the parent model.
 /// Information on the graph shapes can be found on the individual handlers.
-#[tracing::instrument(skip(graph, parent_node, parent_relation_field, value, child_model))]
 pub fn nested_connect_or_create(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
@@ -89,7 +88,6 @@ pub fn nested_connect_or_create(
 ///                          │     Connect     │◀─┘
 ///                          └─────────────────┘
 /// ```
-#[tracing::instrument(skip(graph, parent_node, parent_relation_field, values, child_model))]
 fn handle_many_to_many(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
@@ -147,7 +145,6 @@ fn handle_many_to_many(
 }
 
 /// Dispatcher for one-to-many relations.
-#[tracing::instrument(skip(graph, parent_node, parent_relation_field, values, child_model))]
 fn handle_one_to_many(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
@@ -178,7 +175,6 @@ fn handle_one_to_many(
 }
 
 /// Dispatcher for one-to-one relations.
-#[tracing::instrument(skip(graph, parent_node, parent_relation_field, values, child_model))]
 fn handle_one_to_one(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
@@ -250,7 +246,6 @@ fn handle_one_to_one(
 /// └─▶│  Update Child   │   │  Create Child   │◀─┘
 ///    └─────────────────┘   └─────────────────┘
 /// ```
-#[tracing::instrument(skip(graph, parent_node, parent_relation_field, values, child_model))]
 fn one_to_many_inlined_child(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
@@ -392,7 +387,6 @@ fn one_to_many_inlined_child(
 ///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐
 ///          Result
 ///    └ ─ ─ ─ ─ ─ ─ ─ ─ ┘
-#[tracing::instrument(skip(graph, parent_node, parent_relation_field, values, child_model))]
 fn one_to_many_inlined_parent(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
@@ -564,7 +558,6 @@ fn one_to_many_inlined_parent(
 ///
 /// Important note: We can't inject directly from the if node into the parent if the parent is a non-create, because we need to perform a check in between,
 /// and updating the record with the injection beforehand prevents that check. Instead, we need an additional update.
-#[tracing::instrument(skip(graph, parent_node, parent_relation_field, filter, create_data, child_model))]
 fn one_to_one_inlined_parent(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
@@ -728,68 +721,62 @@ fn one_to_one_inlined_parent(
 /// Handles one-to-one relations where the inlining is done on the child record
 /// The resulting graph:
 /// ```text
-///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
-/// ┌──          Parent         │─────────────────────────┬──────────────────────────────────────────┐
-/// │  └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                          │                                          │
-/// │               │                                     │(If non-create)                           │
-/// │                                      ┌───  ────  ───┼  ────  ────  ────  ────  ────  ────  ──┐ │
-/// │               │                                     ▼                                        │ │
-/// │               ▼                        ┌────────────────────────┐                              │
-/// │  ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─           │ │     Read ex. child     │──┐                           │
-/// │         Read Result       │          │ └────────────────────────┘  │                         │ │
-/// │  └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─           │              │              │                         │ │
-/// │                                      │              ▼              │(Fail on c > 0 if child  │ │
-/// ├───────────────┐                        ┌────────────────────────┐  │     side required)      │ │
-/// │               │                        │ If c > 0 && c. inlined │  │                           │
-/// │               │                      │ └────────────────────────┘  │                           │
-/// │               │                      │         then │              │                         │ │
-/// │               │                      │              ▼              │                         │ │
-/// │               │                      │ ┌────────────────────────┐  │                         │ │
-/// │               │                        │    Update ex. child    │◀─┘                   ┌───┐ │ │
-/// │               │                        └────────────────────────┘                      │ 2 │   │
-/// │               ▼                      │                                                 └───┘   │
-/// │  ┌────────────────────────┐          └──  ────  ────  ────  ────  ────  ────  ────  ────  ───┘ │
-/// │  │       Read Child       │━━━┳─────────────────┐                                              │
-/// │  └────────────────────────┘   ┃                 │                                              │
-/// │               │               ┃                 │                                              │
-/// │               │               ┃                 │                                              │
-/// │               ▼               ┃                 │                                              │
-/// │  ┌────────────────────────┐   ┃                 │                                              │
-/// │  │      If (exists)       │───╋──────Then───────┤                                              │
-/// │  └────────────────────────┘   ┃                 │                                              │
-/// │               │Else           ┃                 │                                              │
-/// │               │               ┃                 │                                              │
-/// │               ▼               ┃  ┌─── ──── ──── ▼─── ──── ──── ──── ──── ──── ──── ──── ─┐     │
-/// │  ┌────────────────────────┐   ┃  │ ┌────────────────────────┐                            │     │
-/// └─▶│      Create Child      │   ┃ ┌┼─│    Read ex. Parent     │──┐                         │     │
-///    └────────────────────────┘   ┃ ││ └────────────────────────┘  │                               │
-///                                 ┃ ││              │              │                         │     │
-///                                 ┃ │               ▼              │(Fail on p > 0 if parent │     │
-///                                 ┃ ││ ┌────────────────────────┐  │     side required)      │     │
-///                                 ┃ ││ │ If p > 0 && p. inlined │  │                         │     │
-///                                 ┃ ││ └────────────────────────┘  │                               │
-///                                 ┃ ││              │              │                         │     │
-///                                 ┃ │               ▼              │                         │     │
-///                                 ┃ ││ ┌────────────────────────┐  │                         │     │
-///                                 ┃ ││ │   Update ex. parent    │◀─┘                         │     │
-///                                 ┃ ││ └────────────────────────┘                      ┌───┐       │
-///                                 ┃ ││         then                                    │ 1 │ │     │
-///                                 ┃ │                                                  └───┘ │     │
-///                                 ┃ │└─── ──── ──── ──── ──── ──── ──── ──── ──── ──── ──── ─┘     │
-///                                 ┃ │                                                              │
-///                                 ┃ │                                                              │
-///                                 ┃ │  ┌────────────────────────┐                                  │
-///                                 ┗━┻━▶│      Update Child      │◀─────────────────────────────────┘
-///                                      └────────────────────────┘
+///            ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+/// ┌──────┬───          Parent         │──────────────────────────┬──────────────────────────┐
+/// │      │   └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                           │                          │
+/// │      │                │                                      │                          │
+/// │      │                │                                      │                          │
+/// │      │                ▼                                      │                          │
+/// │      │   ┌────────────────────────┐                          │                          │
+/// │ ┌──┬─┼───│     Read new child     │────────────────────────────────────────────────┐    │
+/// │ │  │ │   └────────────────────────┘                          │                     │    │
+/// │ │  │ │                │                                      │                     │    │
+/// │ │  │ │                │                                      │                     │    │
+/// │ │  │ │                ▼                                      ▼                     │    │
+/// │ │  │ │   ┌────────────────────────┐             ┌────────────────────────┐         │    │
+/// │ │  │ │   │      If (exists)       │──────Else──▶│      Create Child      │         │    │
+/// │ │  │ │   └────────────────────────┘             └────────────────────────┘         │    │
+/// │ │  │ │                │                                                            │    │
+/// │ │  │ │                │                                                            │    │
+/// │ │  │ │              Then                                                           │    │
+/// │ │  │ │                │                                 (If create)                │    │
+/// │ │  │ │                ├─────────────────────────────────────────────┐              │    │
+/// │ │  │ │                │                                             │              │    │
+/// │ │  │ │                │(If non-create)                              │              │    │
+/// │ │  │ │┌───  ────  ────│ ────  ────  ────  ────  ──┐  ┌───  ────  ───┼  ────  ────  │    │
+/// │ │  │ ││               ▼                           │                 ▼              │    │
+/// │ │  │ ││  ┌────────────────────────┐                    ┌────────────────────────┐  │    │
+/// │ │  │ └┼─▶│     Read old child     │────────┐         │ │    Update new child    │◀─┘────┘
+/// │ │  │  │  └────────────────────────┘        │      │  │ └────────────────────────┘
+/// │ │  │                  │                    │      │  │
+/// │ │  │                  ▼                    │      │  └  ────  ────  ────  ────  ───┘
+/// │ │  │  │  ┌────────────────────────┐        │      │
+/// │ │  └──┼─▶│          Diff          │        │
+/// │ │     │  └────────────────────────┘     Fail if
+/// │ │     │               │               relation to │
+/// │ │                     ▼                 parent    │
+/// │ │        ┌────────────────────────┐    required   │
+/// │ │     │  │   If (not the same)    │        │      │
+/// │ │     │  └────────────────────────┘        │
+/// │ │     │               │                    │
+/// │ │     │             Then                   │      │
+/// │ │                     │                    │      │
+/// │ │                     ▼                    │      │
+/// │ │     │  ┌────────────────────────┐        │      │
+/// │ │     │  │    Update old child    │        │
+/// │ │     │  │      (disconnect)      │◀───────┘
+/// │ │     │  └────────────────────────┘               │
+/// │ │                     │                           │
+/// │ │                     │                           │
+/// │ │     │               ▼                           │
+/// │ │     │  ┌────────────────────────┐
+/// └─┴─────┼─▶│    Update new child    │
+///         │  └────────────────────────┘               │
+///                                                     │
+///          ────  ────  ────  ────  ────  ────  ────  ─┘
 /// ```
-/// - Checks in [1] are required because the child exists, which in turn implies that a parent must exist if the relation is required.
-///   If this would disconnect the existing parent, we error out. If it doesn't require the parent but exists, we disconnect the relation first.
-/// - Checks in [2] are required if the parent is NOT a create operation, as this means the parent record exists in some form. If this disconnects
-///   a child record that requires a parent record, we error out. If it doesn't require the parent but exists, we disconnect the relation first.
-///
-/// Important note: We can't inject directly from the if node into the parent if the parent is a non-create, because we need to perform a check in between,
-/// and updating the record with the injection beforehand prevents that check. Instead, we need an additional update.
-#[tracing::instrument(skip(graph, parent_node, parent_relation_field, filter, create_data, child_model))]
+/// Note that two versions of this graph can be build: the create and non-create case,
+/// but they're never build at the same time (denoted by the dashed boxes).
 fn one_to_one_inlined_child(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
@@ -799,27 +786,26 @@ fn one_to_one_inlined_child(
     create_data: ParsedInputMap,
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
+    let child_model_identifier = child_model.primary_identifier();
     let parent_link = parent_relation_field.linking_fields();
     let child_link = parent_relation_field.related_field().linking_fields();
+    let child_relation_field = parent_relation_field.related_field();
 
-    let read_node = graph.create_node(utils::read_ids_infallible(
+    let read_new_child_node = graph.create_node(utils::read_ids_infallible(
         child_model.clone(),
         child_link.clone(),
         filter,
     ));
 
-    if !utils::node_is_create(graph, &parent_node) {
-        // Perform checks that no existing child in a required relation is violated.
-        utils::insert_existing_1to1_related_model_checks(graph, &parent_node, &parent_relation_field)?;
-    }
-
-    graph.create_edge(&parent_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
+    // Edge: Parent -> read new child
+    graph.create_edge(&parent_node, &read_new_child_node, QueryGraphDependency::ExecutionOrder)?;
 
     let if_node = graph.create_node(Flow::default_if());
-    let create_node = create::create_record_node(graph, connector_ctx, Arc::clone(child_model), create_data)?;
+    let create_node = create::create_record_node(graph, connector_ctx, child_model.clone(), create_data)?;
 
+    // Edge: Read new child -> if node
     graph.create_edge(
-        &read_node,
+        &read_new_child_node,
         &if_node,
         QueryGraphDependency::ProjectedDataDependency(
             child_model.primary_identifier(),
@@ -833,54 +819,21 @@ fn one_to_one_inlined_child(
         ),
     )?;
 
-    // Then branch handling
-    let child_model = parent_relation_field.related_model();
-    let update_child_node = utils::update_records_node_placeholder(graph, Filter::empty(), child_model.clone());
+    // *** Else branch handling ***
+    // Edge: If node -> create node (else)
+    graph.create_edge(&if_node, &create_node, QueryGraphDependency::Else)?;
 
-    let read_ex_parent_node =
-        utils::insert_existing_1to1_related_model_checks(graph, &read_node, &parent_relation_field.related_field())?;
-
-    graph.create_edge(&if_node, &read_ex_parent_node, QueryGraphDependency::Then)?;
-    graph.create_edge(
-        &read_ex_parent_node,
-        &update_child_node,
-        QueryGraphDependency::ExecutionOrder,
-    )?;
-
-    let relation_name = parent_relation_field.relation().name.clone();
-    let child_model_name = child_model.name.clone();
-
-    graph.create_edge(
-        &read_node,
-        &update_child_node,
-        QueryGraphDependency::ProjectedDataDependency(
-            child_model.primary_identifier(),
-            Box::new(move |mut update_child_node, mut child_ids| {
-                let child_id = match child_ids.pop() {
-                    Some(id) => Ok(id),
-                    None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                        "No '{}' record (needed to find '{}' record(s) to update) was found for a nested connect or create on one-to-one relation '{}'.",
-                        child_model_name.clone(), child_model_name, relation_name
-                    ))),
-                }?;
-
-                if let Node::Query(ref mut q) = update_child_node {
-                    q.add_filter(child_id.filter());
-                }
-
-                Ok(update_child_node)
-            }),
-        ),
-    )?;
-
+    // *** Then branch handling ***
+    let update_new_child_node = utils::update_records_node_placeholder(graph, Filter::empty(), child_model.clone());
     let relation_name = parent_relation_field.relation().name.clone();
     let parent_model_name = parent_relation_field.model().name.clone();
     let child_model_name = child_model.name.clone();
 
+    // Edge: Parent node -> update new child node
     graph.create_edge(
         &parent_node,
-        &update_child_node,
-        QueryGraphDependency::ProjectedDataDependency(parent_link.clone(), Box::new(move |mut update_child_node, mut parent_links| {
+        &update_new_child_node,
+        QueryGraphDependency::ProjectedDataDependency(parent_link.clone(), Box::new(move |mut update_new_child_node, mut parent_links| {
             let parent_link = match parent_links.pop() {
                 Some(link) => Ok(link),
                 None => Err(QueryGraphBuilderError::RecordNotFound(format!(
@@ -889,25 +842,24 @@ fn one_to_one_inlined_child(
                 ))),
             }?;
 
-            if let Node::Query(Query::Write(ref mut wq)) = update_child_node {
+            if let Node::Query(Query::Write(ref mut wq)) = update_new_child_node {
                 wq.inject_result_into_args(child_link.assimilate(parent_link)?);
             }
 
-            Ok(update_child_node)
+            Ok(update_new_child_node)
         })),
     )?;
 
-    // Else branch handling
-    let child_link = parent_relation_field.related_field().linking_fields();
     let relation_name = parent_relation_field.relation().name.clone();
     let parent_model_name = parent_relation_field.model().name.clone();
     let child_model_name = child_model.name.clone();
+    let child_link = parent_relation_field.related_field().linking_fields();
 
-    graph.create_edge(&if_node, &create_node, QueryGraphDependency::Else)?;
+    // Edge: Parent node -> create new child node
     graph.create_edge(
         &parent_node,
         &create_node,
-        QueryGraphDependency::ProjectedDataDependency(parent_link, Box::new(move |mut update_child_node, mut parent_links| {
+        QueryGraphDependency::ProjectedDataDependency(parent_link.clone(), Box::new(move |mut create_node, mut parent_links| {
             let parent_link = match parent_links.pop() {
                 Some(link) => Ok(link),
                 None => Err(QueryGraphBuilderError::RecordNotFound(format!(
@@ -916,13 +868,144 @@ fn one_to_one_inlined_child(
                 ))),
             }?;
 
-            if let Node::Query(Query::Write(ref mut wq)) = update_child_node {
+            if let Node::Query(Query::Write(ref mut wq)) = create_node {
                 wq.inject_result_into_args(child_link.assimilate(parent_link)?);
             }
 
-            Ok(update_child_node)
+            Ok(create_node)
         })),
     )?;
+
+    let relation_name = parent_relation_field.relation().name.clone();
+    let parent_model_name = parent_relation_field.model().name.clone();
+    let child_model_name = child_model.name.clone();
+    let child_link = parent_relation_field.related_field().linking_fields();
+
+    // Edge: Read new child node -> update new child node
+    graph.create_edge(
+        &read_new_child_node,
+        &update_new_child_node,
+        QueryGraphDependency::ProjectedDataDependency(child_model_identifier.clone(), Box::new(move |mut update_new_child_node, mut new_child_ids| {
+            let old_child_id = match new_child_ids.pop() {
+                Some(id) => Ok(id),
+                None => Err(QueryGraphBuilderError::RecordNotFound(format!(
+                    "No '{}' record (needed to find '{}' record(s) to update) was found for a nested connect or create on one-to-one relation '{}'.",
+                    parent_model_name, child_model_name, relation_name
+                ))),
+            }?;
+
+            if let Node::Query(Query::Write(ref mut wq)) = update_new_child_node {
+                wq.add_filter(old_child_id.filter());
+            }
+
+            Ok(update_new_child_node)
+        })),
+    )?;
+
+    if utils::node_is_create(graph, &parent_node) {
+        // 1) A create can't have a previous child connected, we can skip those checks.
+        // 2) Since the relation is inlined in the child, we can simply override the old value, it will automatically disconnect the old one.
+        // 3) The parent -> old child relationship can't be required, so it's always okay to disconnect.
+
+        // Edge: If node -> update new child node
+        graph.create_edge(&if_node, &update_new_child_node, QueryGraphDependency::Then)?;
+    } else {
+        let read_old_child_node =
+            utils::insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, Filter::empty())?;
+
+        // Edge: If node -> read old child node
+        graph.create_edge(&if_node, &read_old_child_node, QueryGraphDependency::Then)?;
+
+        let diff_node = graph.create_node(Node::Computation(Computation::empty_diff()));
+
+        // Edge: Read old child node -> diff node
+        graph.create_edge(
+            &read_new_child_node,
+            &diff_node,
+            QueryGraphDependency::ProjectedDataDependency(
+                child_model_identifier.clone(),
+                Box::new(move |mut diff_node, child_ids| {
+                    if let Node::Computation(Computation::Diff(ref mut diff)) = diff_node {
+                        diff.left = child_ids.into_iter().collect();
+                    }
+
+                    Ok(diff_node)
+                }),
+            ),
+        )?;
+
+        // Edge: Read old child node -> diff node
+        graph.create_edge(
+            &read_old_child_node,
+            &diff_node,
+            QueryGraphDependency::ProjectedDataDependency(
+                child_model_identifier.clone(),
+                Box::new(move |mut diff_node, child_ids| {
+                    if let Node::Computation(Computation::Diff(ref mut diff)) = diff_node {
+                        diff.right = child_ids.into_iter().collect();
+                    }
+
+                    Ok(diff_node)
+                }),
+            ),
+        )?;
+
+        let if_node = graph.create_node(Flow::default_if());
+        graph.create_edge(
+            &diff_node,
+            &if_node,
+            QueryGraphDependency::DataDependency(Box::new(move |if_node, result| {
+                let diff_result = result.as_diff_result().unwrap();
+                let should_disconnect = !diff_result.left.is_empty();
+
+                if let Node::Flow(Flow::If(_)) = if_node {
+                    Ok(Node::Flow(Flow::If(Box::new(move || should_disconnect))))
+                } else {
+                    unreachable!()
+                }
+            })),
+        )?;
+
+        // update old child, set link to null
+        let update_old_child_node = utils::update_records_node_placeholder(graph, Filter::empty(), child_model.clone());
+        let relation_name = parent_relation_field.relation().name.clone();
+        let parent_model_name = parent_relation_field.model().name.clone();
+        let child_model_name = child_model.name.clone();
+
+        // Edge: Read old child node -> update old child
+        graph.create_edge(
+            &read_old_child_node,
+            &update_old_child_node,
+            QueryGraphDependency::ProjectedDataDependency(child_model_identifier.clone(), Box::new(move |mut update_old_child_node, mut old_child_ids| {
+                if child_relation_field.is_required() && !old_child_ids.is_empty() {
+                    // Error out, this violates the relation because we'd disconnect the old relation, but it's required.
+                    todo!()
+                }
+
+                let old_child_id = match old_child_ids.pop() {
+                    Some(id) => Ok(id),
+                    None => Err(QueryGraphBuilderError::RecordNotFound(format!(
+                        "No '{}' record (needed to find '{}' record(s) to update) was found for a nested connect or create on one-to-one relation '{}'.",
+                        parent_model_name, child_model_name, relation_name
+                    ))),
+                }?;
+
+                if let Node::Query(Query::Write(ref mut wq)) = update_old_child_node {
+                    wq.add_filter(old_child_id.filter());
+                    wq.inject_result_into_args(SelectionResult::from(&child_link));
+                }
+
+                Ok(update_old_child_node)
+            })),
+        )?;
+
+        graph.create_edge(&if_node, &update_old_child_node, QueryGraphDependency::Then)?;
+        graph.create_edge(
+            &update_old_child_node,
+            &update_new_child_node,
+            QueryGraphDependency::ExecutionOrder,
+        )?;
+    }
 
     Ok(())
 }

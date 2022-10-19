@@ -13,7 +13,7 @@ pub struct Fields {
     composite: OnceCell<Vec<CompositeFieldWeak>>,
     model: ModelWeakRef,
     // created_at: OnceCell<Option<ScalarFieldRef>>,
-    updated_at: OnceCell<Option<ScalarFieldRef>>,
+    updated_at: OnceCell<Vec<ScalarFieldRef>>,
 }
 
 impl Fields {
@@ -77,12 +77,13 @@ impl Fields {
         }
     }
 
-    pub fn updated_at(&self) -> &Option<ScalarFieldRef> {
+    pub fn updated_at(&self) -> &Vec<ScalarFieldRef> {
         self.updated_at.get_or_init(|| {
             self.scalar_weak()
                 .iter()
                 .map(|sf| sf.upgrade().unwrap())
-                .find(|sf| sf.is_updated_at)
+                .filter(|sf| sf.is_updated_at)
+                .collect()
         })
     }
 
@@ -122,6 +123,14 @@ impl Fields {
         self.composite
             .get_or_init(|| self.all.iter().fold(Vec::new(), Self::composite_filter))
             .as_slice()
+    }
+
+    pub fn non_relational(&self) -> Vec<Field> {
+        self.scalar()
+            .into_iter()
+            .map(Field::from)
+            .chain(self.composite().into_iter().map(Field::from))
+            .collect()
     }
 
     pub fn find_many_from_all(&self, names: &BTreeSet<String>) -> Vec<&Field> {
@@ -238,5 +247,12 @@ impl Fields {
             .iter()
             .flat_map(|field| field.scalar_fields().into_iter().map(|f| f.db_name().to_owned()))
             .unique()
+    }
+
+    pub fn filter_all<P>(&self, predicate: P) -> Vec<Field>
+    where
+        P: FnMut(&&Field) -> bool,
+    {
+        self.all.iter().filter(predicate).map(Clone::clone).collect()
     }
 }

@@ -1,0 +1,8 @@
+[package]
+name = "diagnostics"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+colored = "2"
+pest = "2.1.3"

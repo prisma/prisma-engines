@@ -1,7 +1,6 @@
 use super::*;
 use crate::utils::quote_connector;
 use darling::FromMeta;
-use itertools::Itertools;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use query_tests_setup::schema_with_relation;
@@ -57,11 +56,8 @@ pub fn relation_link_test_impl(attr: TokenStream, input: TokenStream) -> TokenSt
 
     // Renders the connectors as list to use in the code.
     let connectors = args.connectors_to_test();
-    let connectors = connectors.into_iter().map(quote_connector).fold1(|aggr, next| {
-        quote! {
-            #aggr, #next
-        }
-    });
+    let connectors = connectors.into_iter().map(quote_connector);
+    let connectors = quote!(#(#connectors,)*);
 
     let mut test_function = parse_macro_input!(input as ItemFn);
     if test_function.sig.inputs.len() != 2 {
@@ -124,16 +120,16 @@ pub fn relation_link_test_impl(attr: TokenStream, input: TokenStream) -> TokenSt
             .get(i)
             .expect("Could not find some required capabilities")
             .iter()
-            .map(|cap| format!("{}", cap))
+            .map(|cap| cap.to_string())
             .collect::<Vec<_>>();
 
         let ts = quote! {
             #[test]
             fn #test_fn_ident() {
               query_tests_setup::run_relation_link_test(
-                  vec![#connectors],
+                  &[#connectors],
                   &mut vec![#(#capabilities),*],
-                  vec![#(#required_capabilities),*],
+                  &[#(#required_capabilities),*],
                   #datamodel,
                   #dm_with_params,
                   #test_name,
@@ -146,18 +142,8 @@ pub fn relation_link_test_impl(attr: TokenStream, input: TokenStream) -> TokenSt
         ts
     });
 
-    let all_funcs: proc_macro2::TokenStream = test_shells
-        .fold1(|aggr, next| {
-            quote! {
-                #aggr
-
-                #next
-            }
-        })
-        .unwrap();
-
     let all_funcs_with_original_func = quote! {
-        #all_funcs
+        #(#test_shells)*
 
         #test_function
     };

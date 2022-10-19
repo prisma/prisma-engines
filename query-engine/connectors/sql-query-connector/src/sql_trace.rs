@@ -4,11 +4,11 @@ use tracing::Span;
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 pub fn trace_parent_to_string(context: &SpanContext) -> String {
-    let trace_id = context.trace_id().to_hex();
-    let span_id = context.span_id().to_hex();
+    let trace_id = context.trace_id();
+    let span_id = context.span_id();
 
     // see https://www.w3.org/TR/trace-context/#traceparent-header-field-values
-    format!("traceparent=00-{}-{}-01", trace_id, span_id)
+    format!("traceparent=00-{:032x}-{:032x}-01", trace_id, span_id)
 }
 
 pub trait SqlTraceComment: Sized {
@@ -33,13 +33,21 @@ macro_rules! sql_trace {
             // Temporary method to pass the traceid in an operation
             fn add_trace_id(self, trace_id: Option<String>) -> Self {
                 if let Some(traceparent) = trace_id {
-                    self.comment(format!("traceparent={}", traceparent))
+                    if should_sample(&traceparent) {
+                        self.comment(format!("traceparent={}", traceparent))
+                    } else {
+                        self
+                    }
                 } else {
                     self
                 }
             }
         }
     };
+}
+
+fn should_sample(traceparent: &str) -> bool {
+    traceparent.split('-').count() == 4 && traceparent.ends_with("-01")
 }
 
 sql_trace!(Insert<'_>);

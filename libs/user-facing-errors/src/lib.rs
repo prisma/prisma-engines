@@ -1,4 +1,6 @@
-#![deny(warnings, rust_2018_idioms)]
+#![deny(unsafe_code, warnings, rust_2018_idioms)]
+#![allow(clippy::derive_partial_eq_without_eq)]
+
 mod panic_hook;
 
 pub mod common;
@@ -17,6 +19,25 @@ pub trait UserFacingError: serde::Serialize {
     const ERROR_CODE: &'static str;
 
     fn message(&self) -> String;
+}
+
+/// A less dynamic type of user-facing errors. This is used in the introspection and migration
+/// engines for simpler, more robust and helpful error handling — extra details are attached
+/// opportunistically.
+pub trait SimpleUserFacingError {
+    const ERROR_CODE: &'static str;
+    const MESSAGE: &'static str;
+}
+
+impl<T> UserFacingError for T
+where
+    T: SimpleUserFacingError + Serialize,
+{
+    const ERROR_CODE: &'static str = <Self as SimpleUserFacingError>::ERROR_CODE;
+
+    fn message(&self) -> String {
+        <Self as SimpleUserFacingError>::MESSAGE.to_owned()
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Debug)]

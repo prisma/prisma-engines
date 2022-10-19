@@ -1,4 +1,4 @@
-use datamodel::diagnostics::{DatamodelError, DatamodelWarning};
+use psl::diagnostics::{DatamodelError, DatamodelWarning};
 
 #[derive(serde::Serialize)]
 pub struct MiniError {
@@ -9,51 +9,34 @@ pub struct MiniError {
 }
 
 pub(crate) fn run(schema: &str) -> String {
-    let datamodel_result = datamodel::parse_datamodel(schema);
+    let schema = psl::validate(schema.into());
+    let diagnostics = &schema.diagnostics;
 
-    match datamodel_result {
-        Err(err) => {
-            let mut mini_errors: Vec<MiniError> = err
-                .errors()
-                .iter()
-                .map(|err: &DatamodelError| MiniError {
-                    start: err.span().start,
-                    end: err.span().end,
-                    text: format!("{}", err),
-                    is_warning: false,
-                })
-                .collect();
+    let mut mini_errors: Vec<MiniError> = diagnostics
+        .errors()
+        .iter()
+        .map(|err: &DatamodelError| MiniError {
+            start: err.span().start,
+            end: err.span().end,
+            text: err.message().to_string(),
+            is_warning: false,
+        })
+        .collect();
 
-            let mut mini_warnings: Vec<MiniError> = err
-                .warnings()
-                .iter()
-                .map(|warn: &DatamodelWarning| MiniError {
-                    start: warn.span().start,
-                    end: warn.span().end,
-                    text: format!("{}", warn),
-                    is_warning: true,
-                })
-                .collect();
+    let mut mini_warnings: Vec<MiniError> = diagnostics
+        .warnings()
+        .iter()
+        .map(|warn: &DatamodelWarning| MiniError {
+            start: warn.span().start,
+            end: warn.span().end,
+            text: warn.message().to_owned(),
+            is_warning: true,
+        })
+        .collect();
 
-            mini_errors.append(&mut mini_warnings);
+    mini_errors.append(&mut mini_warnings);
 
-            print_diagnostics(mini_errors)
-        }
-        Ok(validated_datamodel) => {
-            let mini_warnings: Vec<MiniError> = validated_datamodel
-                .warnings
-                .into_iter()
-                .map(|warn: DatamodelWarning| MiniError {
-                    start: warn.span().start,
-                    end: warn.span().end,
-                    text: format!("{}", warn),
-                    is_warning: true,
-                })
-                .collect();
-
-            print_diagnostics(mini_warnings)
-        }
-    }
+    print_diagnostics(mini_errors)
 }
 
 fn print_diagnostics(diagnostics: Vec<MiniError>) -> String {
@@ -70,39 +53,6 @@ mod tests {
         let value: serde_json::Value = serde_json::from_str(&result).unwrap();
 
         serde_json::to_string_pretty(&value).unwrap()
-    }
-
-    #[test]
-    fn type_aliases_should_give_a_warning() {
-        let dml = indoc! {r#"
-            datasource db {
-              provider = "postgresql"
-              url      = env("DATABASE_URL")
-            }
-
-            generator client {
-              provider = "prisma-client-js"
-            }
-
-            type MyString = String @default("A")
-
-            model Code {
-              id  String   @id
-              val MyString
-            }
-        "#};
-
-        let expected = expect![[r#"
-            [
-              {
-                "start": 132,
-                "end": 168,
-                "text": "Type aliases are an undocumented feature that is getting deprecated. Please chime in in the issue if you need it: https://github.com/prisma/prisma/issues/9939",
-                "is_warning": true
-              }
-            ]"#]];
-
-        expected.assert_eq(&lint(dml));
     }
 
     #[test]

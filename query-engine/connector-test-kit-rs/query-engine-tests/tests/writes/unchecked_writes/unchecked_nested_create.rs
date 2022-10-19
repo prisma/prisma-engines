@@ -201,9 +201,9 @@ mod unchecked_nested_create {
         let schema = indoc! {
             r#"model ModelA {
               #id(id, Int, @id)
-              b_id Int
-              c_id Int
-              d_id Int
+              b_id Int @unique
+              c_id Int @unique
+              d_id Int @unique
 
               b ModelB @relation(fields: [b_id], references: [id])
               c ModelC @relation(fields: [c_id], references: [id])
@@ -263,8 +263,8 @@ mod unchecked_nested_create {
         let schema = indoc! {
             r#"model ModelA {
               #id(id, Int, @id)
-              b_id Int
-              d_id Int
+              b_id Int @unique
+              d_id Int @unique
 
               b ModelB  @relation(fields: [b_id], references: [id])
               c ModelC?
@@ -278,7 +278,7 @@ mod unchecked_nested_create {
 
             model ModelC {
               #id(id, Int, @id)
-              a_id Int
+              a_id Int @unique
               a    ModelA @relation(fields: [a_id], references: [id])
             }
 
@@ -324,7 +324,7 @@ mod unchecked_nested_create {
         let schema = indoc! {
             r#"model ModelA {
               #id(id, Int, @id)
-              b_id Int
+              b_id Int @unique
               c_id Int    @default(1)
               b    ModelB @relation(fields: [b_id], references: [id])
               c    ModelC @relation(fields: [c_id], references: [id])
@@ -368,7 +368,7 @@ mod unchecked_nested_create {
         let schema = indoc! {
             r#"model ModelA {
               #id(id, Int, @id, @default(autoincrement()))
-              b_id Int
+              b_id Int @unique
               b    ModelB @relation(fields: [b_id], references: [id])
             }
 
@@ -382,7 +382,11 @@ mod unchecked_nested_create {
     }
 
     // "Unchecked nested creates" should "allow to write to autoincrement IDs directly"
-    #[connector_test(schema(schema_7), capabilities(AutoIncrement, WritableAutoincField))]
+    #[connector_test(
+        schema(schema_7),
+        capabilities(AutoIncrement, WritableAutoincField),
+        exclude(CockroachDb)
+    )]
     async fn allow_write_autoinc_ids(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
@@ -394,6 +398,41 @@ mod unchecked_nested_create {
             }
           }"#),
           @r###"{"data":{"createOneModelB":{"a":{"id":2}}}}"###
+        );
+
+        Ok(())
+    }
+
+    fn schema_7_cockroachdb() -> String {
+        let schema = indoc! {
+            r#"model ModelA {
+              #id(id, BigInt, @id, @default(autoincrement()))
+              b_id BigInt @unique
+              b    ModelB @relation(fields: [b_id], references: [id])
+            }
+
+            model ModelB {
+              #id(id, BigInt, @id)
+              a  ModelA?
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // "Unchecked nested creates" should "allow to write to autoincrement IDs directly"
+    #[connector_test(schema(schema_7_cockroachdb), only(CockroachDb))]
+    async fn allow_write_autoinc_ids_cockroachdb(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            createOneModelB(data: {
+              id: 1
+              a: { create: { id: 2 }}
+            }) {
+              a { id }
+            }
+          }"#),
+          @r###"{"data":{"createOneModelB":{"a":{"id":"2"}}}}"###
         );
 
         Ok(())

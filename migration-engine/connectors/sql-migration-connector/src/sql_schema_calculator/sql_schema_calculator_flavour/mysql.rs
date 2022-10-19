@@ -1,10 +1,11 @@
-use super::SqlSchemaCalculatorFlavour;
+use super::{super::Context, SqlSchemaCalculatorFlavour};
 use crate::flavour::MysqlFlavour;
-use datamodel::{datamodel_connector::ScalarType, parser_database::walkers::*, ValidatedSchema};
+use psl::parser_database::walkers::*;
 use sql_schema_describer as sql;
 
 impl SqlSchemaCalculatorFlavour for MysqlFlavour {
-    fn calculate_enums(&self, datamodel: &ValidatedSchema) -> Vec<sql::Enum> {
+    fn calculate_enums(&self, ctx: &Context<'_>) -> Vec<sql::Enum> {
+        let datamodel = ctx.datamodel;
         // This is a lower bound for the size of the generated enums (we assume
         // each enum is used at least once).
         let mut enums = Vec::new();
@@ -17,6 +18,7 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
 
         for (field, enum_tpe) in enum_fields {
             let sql_enum = sql::Enum {
+                namespace_id: Default::default(),
                 name: format!(
                     "{model_name}_{field_name}",
                     model_name = field.model().database_name(),
@@ -29,10 +31,6 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
         }
 
         enums
-    }
-
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
-        sql_datamodel_connector::MYSQL.default_native_type_for_scalar_type(scalar_type)
     }
 
     fn enum_column_type(&self, field: ScalarFieldWalker<'_>, _db_name: &str) -> sql::ColumnType {

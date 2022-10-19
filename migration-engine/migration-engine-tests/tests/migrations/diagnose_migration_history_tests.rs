@@ -746,7 +746,7 @@ fn dmh_with_an_invalid_unapplied_migration_should_report_it(api: TestApi) {
     );
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn drift_can_be_detected_without_migrations_table(api: TestApi) {
     let directory = api.create_migrations_directory();
 
@@ -911,11 +911,10 @@ fn shadow_database_creation_error_is_special_cased_mssql(api: TestApi) {
         r#"
         datasource db {{
             provider = "sqlserver"
-            url = "sqlserver://{dbhost}:{dbport};database={dbname};user=prismashadowdbtestuser;password=1234batmanZ;trustservercertificate=true"
+            url = "sqlserver://{dbhost}:{dbport};user=prismashadowdbtestuser;password=1234batmanZ;trustservercertificate=true"
         }}
         "#,
         dbhost = api.connection_info().host(),
-        dbname = api.connection_info().dbname().unwrap(),
         dbport = api.connection_info().port().unwrap(),
     );
 

@@ -1,5 +1,8 @@
+mod extensions;
+
 use migration_core::migration_connector::DiffTarget;
 use migration_engine_tests::test_api::*;
+use psl::parser_database::SourceFile;
 use quaint::Value;
 use sql_schema_describer::ColumnTypeFamily;
 use std::fmt::Write;
@@ -69,6 +72,9 @@ fn existing_postgis_tables_must_not_be_migrated(api: TestApi) {
         CREATE TABLE IF NOT EXISTS "spatial_ref_sys" ( id SERIAL PRIMARY KEY );
         /* The capitalized Geometry is intentional here, because we want the matching to be case-insensitive. */
         CREATE TABLE IF NOT EXISTS "Geometry_columns" ( id SERIAL PRIMARY KEY );
+        CREATE TABLE IF NOT EXISTS "geography_columns" ( id SERIAL PRIMARY KEY );
+        CREATE TABLE IF NOT EXISTS "raster_columns" ( id SERIAL PRIMARY KEY );
+        CREATE TABLE IF NOT EXISTS "raster_overviews" ( id SERIAL PRIMARY KEY );
     "#;
 
     api.raw_cmd(create_tables);
@@ -76,7 +82,10 @@ fn existing_postgis_tables_must_not_be_migrated(api: TestApi) {
 
     api.assert_schema()
         .assert_has_table("spatial_ref_sys")
-        .assert_has_table("Geometry_columns");
+        .assert_has_table("Geometry_columns")
+        .assert_has_table("geography_columns")
+        .assert_has_table("raster_columns")
+        .assert_has_table("raster_overviews");
 }
 
 // Reference for the views created by PostGIS: https://postgis.net/docs/manual-1.4/ch04.html#id418599
@@ -399,7 +408,10 @@ fn foreign_key_renaming_to_default_works(api: TestApi) {
         }
     "#;
 
-    let migration = api.connector_diff(DiffTarget::Database, DiffTarget::Datamodel(target_schema));
+    let migration = api.connector_diff(
+        DiffTarget::Database,
+        DiffTarget::Datamodel(SourceFile::new_static(target_schema)),
+    );
     let expected = expect![[r#"
         -- RenameForeignKey
         ALTER TABLE "Dog" RENAME CONSTRAINT "favouriteFood" TO "Dog_favourite_food_id_fkey";
@@ -490,11 +502,6 @@ fn connecting_to_a_postgres_database_with_the_cockroach_connector_fails(_api: Te
             provider = "cockroachdb"
             url = env("TEST_DATABASE_URL")
         }
-
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["cockroachdb"]
-        }
     "#;
 
     let engine = migration_core::migration_api(None, None).unwrap();
@@ -509,7 +516,246 @@ fn connecting_to_a_postgres_database_with_the_cockroach_connector_fails(_api: Te
     .to_string();
 
     let expected_error = expect![[r#"
-        You are trying to connect to a postgresql database, but the provider in your Prisma schema is `cockroachdb`. Please change it to `postgresql`.
+        You are trying to connect to a PostgreSQL database, but the provider in your Prisma schema is `cockroachdb`. Please change it to `postgresql`.
     "#]];
     expected_error.assert_eq(&err);
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn scalar_list_defaults_work(api: TestApi) {
+    let schema = r#"
+        datasource db {
+          provider = "postgresql"
+          url = "postgres://"
+        }
+
+        enum Color {
+            RED
+            GREEN
+            BLUE
+        }
+
+        model Model {
+            id Int @id
+            int_empty Int[] @default([])
+            int Int[] @default([0, 1, 1, 2, 3, 5, 8, 13, 21])
+            float Float[] @default([3.20, 4.20, 3.14, 0, 9.9999999, 1000.7])
+            string String[] @default(["Arrabbiata", "Carbonara", "Al Ragù"])
+            boolean Boolean[] @default([false, true ,true, true])
+            dateTime DateTime[] @default(["2019-06-17T14:20:57Z", "2020-09-21T20:00:00+02:00"])
+            colors Color[] @default([GREEN, BLUE])
+            colors_empty Color[] @default([])
+            bytes    Bytes[] @default(["aGVsbG8gd29ybGQ="])
+            json     Json[]  @default(["{ \"a\": [\"b\"] }", "3"])
+            decimal  Decimal[]  @default(["121.10299000124800000001", "0.4", "1.1", "-68.0"])
+        }
+    "#;
+
+    api.schema_push(schema)
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
+    api.schema_push(schema).send().assert_green().assert_no_steps();
+
+    let expected_sql = expect![[r#"
+        -- CreateEnum
+        CREATE TYPE "Color" AS ENUM ('RED', 'GREEN', 'BLUE');
+
+        -- CreateTable
+        CREATE TABLE "Model" (
+            "id" INTEGER NOT NULL,
+            "int_empty" INTEGER[] DEFAULT ARRAY[]::INTEGER[],
+            "int" INTEGER[] DEFAULT ARRAY[0, 1, 1, 2, 3, 5, 8, 13, 21]::INTEGER[],
+            "float" DOUBLE PRECISION[] DEFAULT ARRAY[3.20, 4.20, 3.14, 0, 9.9999999, 1000.7]::DOUBLE PRECISION[],
+            "string" TEXT[] DEFAULT ARRAY['Arrabbiata', 'Carbonara', 'Al Ragù']::TEXT[],
+            "boolean" BOOLEAN[] DEFAULT ARRAY[false, true, true, true]::BOOLEAN[],
+            "dateTime" TIMESTAMP(3)[] DEFAULT ARRAY['2019-06-17 14:20:57 +00:00', '2020-09-21 20:00:00 +02:00']::TIMESTAMP(3)[],
+            "colors" "Color"[] DEFAULT ARRAY['GREEN', 'BLUE']::"Color"[],
+            "colors_empty" "Color"[] DEFAULT ARRAY[]::"Color"[],
+            "bytes" BYTEA[] DEFAULT ARRAY['\x68656c6c6f20776f726c64']::BYTEA[],
+            "json" JSONB[] DEFAULT ARRAY['{ "a": ["b"] }', '3']::JSONB[],
+            "decimal" DECIMAL(65,30)[] DEFAULT ARRAY[121.10299000124800000001, 0.4, 1.1, -68.0]::DECIMAL(65,30)[],
+
+            CONSTRAINT "Model_pkey" PRIMARY KEY ("id")
+        );
+    "#]];
+
+    api.expect_sql_for_schema(schema, &expected_sql);
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn scalar_list_default_diffing(api: TestApi) {
+    let schema_1 = r#"
+        datasource db {
+          provider = "postgresql"
+          url = env("DATABASE_URL")
+        }
+
+        enum Color {
+            RED
+            GREEN
+            BLUE
+        }
+
+        model Model {
+            id Int @id
+            int_empty Int[] @default([])
+            int Int[] @default([0, 1, 1, 2, 3, 5, 8, 13, 21])
+            float Float[] @default([3.20, 4.20, 3.14, 0, 9.9999999, 1000.7])
+            string String[] @default(["Arrabbiata", "Carbonara", "Al Ragù"])
+            boolean Boolean[] @default([false, true ,true, true])
+            dateTime DateTime[] @default(["2019-06-17T14:20:57Z", "2020-09-21T20:00:00+02:00"])
+            colors Color[] @default([GREEN, BLUE])
+            colors_empty Color[] @default([])
+            bytes    Bytes[] @default(["aGVsbG8gd29ybGQ="])
+            json     Json[]  @default(["{ \"a\": [\"b\"] }", "3"])
+            decimal  Decimal[]  @default(["121.10299000124800000001", "0.4", "1.1", "-68.0"])
+        }
+    "#;
+
+    let schema_2 = r#"
+        datasource db {
+          provider = "postgresql"
+          url = env("DATABASE_URL")
+        }
+
+        enum Color {
+            RED
+            GREEN
+            BLUE
+        }
+
+        model Model {
+            id Int @id
+            int_empty Int[] @default([])
+            int Int[] @default([0, 1, 1, 2, 3, 5, 8, 13, 22])
+            float Float[] @default([3.20, 4.20, 9.9999999, 1000.7])
+            string String[] @default(["Arrabbiata", "Quattro Formaggi","Al Ragù"])
+            boolean Boolean[] @default([true, true ,true, true])
+            dateTime DateTime[] @default(["2019-06-17T14:20:57Z", "2020-09-21T20:00:00+02:00"])
+            colors Color[] @default([BLUE, GREEN])
+            colors_empty Color[] @default([])
+            bytes    Bytes[] @default(["aGVsbG8gd29ybGQ=", "aGVsbG8gd37ybGQ="])
+            json     Json[]  @default(["{ \"a\": [\"b\"] }", "4"])
+            decimal  Decimal[]  @default(["0.4", "1.1", "-68.0"])
+        }
+    "#;
+
+    let migration = api.connector_diff(
+        DiffTarget::Datamodel(SourceFile::new_static(schema_1)),
+        DiffTarget::Datamodel(SourceFile::new_static(schema_2)),
+    );
+
+    let expected_migration = expect![[r#"
+        -- AlterTable
+        ALTER TABLE "Model" ALTER COLUMN "int" SET DEFAULT ARRAY[0, 1, 1, 2, 3, 5, 8, 13, 22]::INTEGER[],
+        ALTER COLUMN "float" SET DEFAULT ARRAY[3.20, 4.20, 9.9999999, 1000.7]::DOUBLE PRECISION[],
+        ALTER COLUMN "string" SET DEFAULT ARRAY['Arrabbiata', 'Quattro Formaggi', 'Al Ragù']::TEXT[],
+        ALTER COLUMN "boolean" SET DEFAULT ARRAY[true, true, true, true]::BOOLEAN[],
+        ALTER COLUMN "colors" SET DEFAULT ARRAY['BLUE', 'GREEN']::"Color"[],
+        ALTER COLUMN "bytes" SET DEFAULT ARRAY['\x68656c6c6f20776f726c64', '\x68656c6c6f20777ef26c64']::BYTEA[],
+        ALTER COLUMN "json" SET DEFAULT ARRAY['{ "a": ["b"] }', '4']::JSONB[],
+        ALTER COLUMN "decimal" SET DEFAULT ARRAY[0.4, 1.1, -68.0]::DECIMAL(65,30)[];
+    "#]];
+
+    expected_migration.assert_eq(&migration);
+
+    api.schema_push(schema_1).send().assert_green();
+    api.schema_push(schema_1).send().assert_green().assert_no_steps();
+    api.schema_push(schema_2)
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
+    api.schema_push(schema_2).send().assert_green().assert_no_steps();
+}
+
+// https://github.com/prisma/prisma/issues/12095
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn json_defaults_with_escaped_quotes_work(api: TestApi) {
+    let schema = r#"
+        datasource db {
+          provider = "postgresql"
+          url      = env("DATABASE_URL")
+        }
+
+        model Foo {
+          id             Int   @id
+          bar Json? @default("{\"message\": \"This message includes a quote: Here''s it!\"}")
+        }
+    "#;
+
+    api.schema_push(schema)
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
+    api.schema_push(schema).send().assert_green().assert_no_steps();
+
+    let sql = expect![[r#"
+        -- CreateTable
+        CREATE TABLE "Foo" (
+            "id" INTEGER NOT NULL,
+            "bar" JSONB DEFAULT '{"message": "This message includes a quote: Here''''s it!"}',
+
+            CONSTRAINT "Foo_pkey" PRIMARY KEY ("id")
+        );
+    "#]];
+
+    api.expect_sql_for_schema(schema, &sql);
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn bigint_defaults_work(api: TestApi) {
+    let schema = r#"
+        datasource mypg {
+            provider = "postgresql"
+            url = env("TEST_DATABASE_URL")
+        }
+
+        model foo {
+          id  String @id
+          bar BigInt @default(0)
+        }
+    "#;
+    let sql = expect![[r#"
+        -- CreateTable
+        CREATE TABLE "foo" (
+            "id" TEXT NOT NULL,
+            "bar" BIGINT NOT NULL DEFAULT 0,
+
+            CONSTRAINT "foo_pkey" PRIMARY KEY ("id")
+        );
+    "#]];
+    api.expect_sql_for_schema(schema, &sql);
+
+    api.schema_push(schema).send().assert_green();
+    api.schema_push(schema).send().assert_green().assert_no_steps();
+}
+
+// https://github.com/prisma/prisma/issues/14799
+#[test_connector(tags(Postgres12), exclude(CockroachDb))]
+fn dbgenerated_on_generated_columns_is_idempotent(api: TestApi) {
+    let sql = r#"
+        CREATE TABLE "table" (
+         "id" TEXT NOT NULL,
+         "hereBeDragons" TEXT NOT NULL GENERATED ALWAYS AS ('this row ID is: '::text || "id") STORED,
+
+         CONSTRAINT "table_pkey" PRIMARY KEY ("id")
+        );
+    "#;
+
+    api.raw_cmd(sql);
+
+    let schema = r#"
+        datasource db {
+            provider = "postgresql"
+            url = env("TEST_DATABASE_URL")
+        }
+
+        model table {
+            id String @id
+            hereBeDragons String @default(dbgenerated())
+        }
+    "#;
+
+    api.schema_push(schema).send().assert_green().assert_no_steps();
 }

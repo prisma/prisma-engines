@@ -1,7 +1,8 @@
 use super::*;
-use crate::{constants::aggregations::*, FieldPair, ParsedField, ReadQuery};
+use crate::{ArgumentListLookup, FieldPair, ParsedField, ReadQuery};
 use connector::RelAggregationSelection;
 use prisma_models::prelude::*;
+use schema_builder::constants::{aggregations::*, args};
 use std::sync::Arc;
 
 pub fn collect_selection_order(from: &[FieldPair]) -> Vec<String> {
@@ -137,26 +138,33 @@ pub fn merge_cursor_fields(selected_fields: FieldSelection, cursor: &Option<Sele
     }
 }
 
-pub fn collect_relation_aggr_selections(from: &[FieldPair], model: &ModelRef) -> Vec<RelAggregationSelection> {
-    from.iter()
-        .flat_map(|pair| match pair.parsed_field.name.as_str() {
+pub fn collect_relation_aggr_selections(
+    from: Vec<FieldPair>,
+    model: &ModelRef,
+) -> QueryGraphBuilderResult<Vec<RelAggregationSelection>> {
+    let mut selections = vec![];
+
+    for pair in from {
+        match pair.parsed_field.name.as_str() {
             UNDERSCORE_COUNT => {
-                let nested_fields = pair.parsed_field.nested_fields.as_ref().unwrap();
+                let nested_fields = pair.parsed_field.nested_fields.unwrap();
 
-                nested_fields
-                    .fields
-                    .iter()
-                    .map(|nested_pair| {
-                        let rf = model
-                            .fields()
-                            .find_from_relation_fields(&nested_pair.parsed_field.name)
-                            .unwrap();
+                for mut nested_pair in nested_fields.fields {
+                    let rf = model
+                        .fields()
+                        .find_from_relation_fields(&nested_pair.parsed_field.name)
+                        .unwrap();
+                    let filter = match nested_pair.parsed_field.arguments.lookup(args::WHERE) {
+                        Some(where_arg) => Some(extract_filter(where_arg.value.try_into()?, rf.related_model())?),
+                        _ => None,
+                    };
 
-                        RelAggregationSelection::Count(rf)
-                    })
-                    .collect::<Vec<_>>()
+                    selections.push(RelAggregationSelection::Count(rf, filter));
+                }
             }
             field_name => panic!("Unknown field name \"{}\" for a relation aggregation", field_name),
-        })
-        .collect::<Vec<_>>()
+        }
+    }
+
+    Ok(selections)
 }

@@ -11,7 +11,7 @@ mod sr_regression {
             model Category {
                 #id(id, String, @id, @default(cuid()))
                 name      String
-                parent_id String?
+                parent_id String? @unique
 
                 parent   Category? @relation(name: "C", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
                 opposite Category? @relation(name: "C")

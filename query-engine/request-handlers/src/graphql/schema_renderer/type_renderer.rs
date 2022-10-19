@@ -24,19 +24,14 @@ impl<'a> GqlTypeRenderer<'a> {
             }
 
             InputType::Enum(et) => {
-                // Not sure how this fits together with the enum handling below.
-                let _ = et.into_renderer().render(ctx);
-                et.name().to_string()
+                let et = et.into_arc();
+                et.into_renderer().render(ctx);
+                et.identifier().name().to_string()
             }
 
             InputType::List(ref l) => {
                 let substring = self.render_input_type(l, ctx);
                 format!("[{}]", substring)
-            }
-
-            InputType::Scalar(ScalarType::Enum(et)) => {
-                let _ = et.into_renderer().render(ctx);
-                et.name().to_string()
             }
 
             InputType::Scalar(ref scalar) => {
@@ -53,7 +48,6 @@ impl<'a> GqlTypeRenderer<'a> {
                     ScalarType::JsonList => "Json",
                     ScalarType::Xml => "Xml",
                     ScalarType::Bytes => "Bytes",
-                    ScalarType::Enum(_) => unreachable!("Encountered enum type during GQL scalar rendering."), // Handled separately above.
                     ScalarType::Null => unreachable!("Null types should not be picked for GQL rendering."),
                 };
 
@@ -70,19 +64,14 @@ impl<'a> GqlTypeRenderer<'a> {
             }
 
             OutputType::Enum(et) => {
-                // Not sure how this fits together with the enum handling below.
-                let _ = et.into_renderer().render(ctx);
-                et.name().to_string()
+                let et = et.into_arc();
+                et.into_renderer().render(ctx);
+                et.identifier().name().to_string()
             }
 
             OutputType::List(l) => {
                 let substring = self.render_output_type(l, ctx);
                 format!("[{}]", substring)
-            }
-
-            OutputType::Scalar(ScalarType::Enum(et)) => {
-                let _ = et.into_renderer().render(ctx);
-                et.name().to_string()
             }
 
             OutputType::Scalar(ref scalar) => {
@@ -99,7 +88,6 @@ impl<'a> GqlTypeRenderer<'a> {
                     ScalarType::JsonList => "Json",
                     ScalarType::Xml => "Xml",
                     ScalarType::Bytes => "Bytes",
-                    ScalarType::Enum(_) => unreachable!("Encountered enum type during GQL scalar rendering."), // Handled separately above.
                     ScalarType::Null => unreachable!("Null types should not be picked for GQL rendering."),
                 };
 

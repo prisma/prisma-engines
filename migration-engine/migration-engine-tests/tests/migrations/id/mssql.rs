@@ -2,15 +2,10 @@ use indoc::{formatdoc, indoc};
 use migration_engine_tests::test_api::*;
 use sql_schema_describer::SQLSortOrder;
 
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mssql))]
 fn non_clustered_id(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
 
         model A {{
           id Int @id(clustered: false)
@@ -25,7 +20,7 @@ fn non_clustered_id(api: TestApi) {
     api.schema_push(&dm).send().assert_green().assert_no_steps();
 }
 
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mssql))]
 fn non_clustered_to_clustered_change(api: TestApi) {
     let schema = api.schema_name();
 
@@ -39,11 +34,6 @@ fn non_clustered_to_clustered_change(api: TestApi) {
 
     let dm = formatdoc! {r#"
         {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
 
         model A {{
           id Int @id
@@ -62,7 +52,7 @@ fn non_clustered_to_clustered_change(api: TestApi) {
     api.schema_push(&dm).send().assert_green().assert_no_steps();
 }
 
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mssql))]
 fn clustered_to_non_clustered_change(api: TestApi) {
     let schema = api.schema_name();
 
@@ -75,11 +65,6 @@ fn clustered_to_non_clustered_change(api: TestApi) {
 
     let dm = formatdoc! {r#"
         {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
 
         model A {{
           id Int @id(clustered: false)
@@ -99,34 +84,9 @@ fn clustered_to_non_clustered_change(api: TestApi) {
 }
 
 #[test_connector(tags(Mssql))]
-fn clustered_change_no_preview(api: TestApi) {
-    let schema = api.schema_name();
-
-    let query =
-        format!("CREATE TABLE [{schema}].[A] (id INT NOT NULL, CONSTRAINT A_pkey PRIMARY KEY NONCLUSTERED (id DESC))");
-
-    api.raw_cmd(&query);
-
-    let dm = formatdoc! {r#"
-        {}
-
-        model A {{
-          id Int @id
-        }}
-    "#, api.datasource_block()};
-
-    api.schema_push(&dm).send().assert_green().assert_no_steps();
-}
-
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
 fn clustered_id(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
 
         model A {{
           id Int @id(clustered: true)
@@ -141,15 +101,10 @@ fn clustered_id(api: TestApi) {
     api.schema_push(&dm).send().assert_green().assert_no_steps();
 }
 
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mssql))]
 fn default_id_clustering(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
 
         model A {{
           id Int @id
@@ -164,15 +119,10 @@ fn default_id_clustering(api: TestApi) {
     api.schema_push(&dm).send().assert_green().assert_no_steps();
 }
 
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mssql))]
 fn non_clustered_compound_id(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
 
         model A {{
           a Int
@@ -190,15 +140,10 @@ fn non_clustered_compound_id(api: TestApi) {
     api.schema_push(&dm).send().assert_green().assert_no_steps();
 }
 
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
+#[test_connector(tags(Mssql))]
 fn descending_primary_key(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
 
         model A {{
           id Int @id(sort: Desc)
@@ -213,57 +158,40 @@ fn descending_primary_key(api: TestApi) {
 }
 
 #[test_connector(tags(Mssql))]
-fn should_not_change_primary_key_sort_order_without_preview_feature(api: TestApi) {
-    let query = formatdoc! {r#"
-        CREATE TABLE [{}].[A] (id VARCHAR(255) NOT NULL, CONSTRAINT A_pkey PRIMARY KEY (id DESC))
-    "#, api.schema_name()};
-
-    api.raw_cmd(&query);
-
+fn altering_descending_primary_key(api: TestApi) {
     let dm = indoc! {r#"
+        datasource slqserverdb {
+            provider = "sqlserver"
+            url = env("TEST_DATABASE_URL")
+        }
+
         model A {
-          id String @id @db.VarChar(255)
+          id Int @id(sort: Desc)
         }
     "#};
 
-    api.schema_push_w_datasource(dm).send().assert_no_steps();
-}
-
-#[test_connector(tags(Mssql), preview_features("extendedIndexes"))]
-fn altering_descending_primary_key(api: TestApi) {
-    let dm = formatdoc! {r#"
-        {}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
-
-        model A {{
-          id Int @id(sort: Desc)
-        }}
-    "#, api.datasource_block()};
-
-    api.schema_push(&dm).send().assert_green();
+    api.schema_push(dm).send().assert_green();
 
     api.assert_schema().assert_table("A", |table| {
         table.assert_pk(|pk| pk.assert_column("id", |attr| attr.assert_sort_order(SQLSortOrder::Desc)))
     });
 
-    let dm = formatdoc! {r#"
-        {}
+    let dm = indoc! {r#"
+        datasource slqserverdb {
+            provider = "sqlserver"
+            url = env("TEST_DATABASE_URL")
+        }
 
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["extendedIndexes"]
-        }}
-
-        model A {{
+        model A {
           id Int @id
-        }}
-    "#, api.datasource_block()};
+        }
+    "#};
 
-    api.schema_push(&dm).force(true).send().assert_green();
+    api.schema_push(dm)
+        .force(true)
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
 
     api.assert_schema().assert_table("A", |table| {
         table.assert_pk(|pk| pk.assert_column("id", |attr| attr.assert_sort_order(SQLSortOrder::Asc)))
@@ -292,7 +220,7 @@ fn making_an_existing_id_field_autoincrement_works_with_indices(api: TestApi) {
     });
 
     // Data to see we don't lose anything in the translation.
-    for (i, content) in (&["A", "B", "C"]).iter().enumerate() {
+    for (i, content) in ["A", "B", "C"].iter().enumerate() {
         let insert = Insert::single_into(api.render_table_name("Post"))
             .value("content", *content)
             .value("id", i);
@@ -372,7 +300,7 @@ fn making_an_existing_id_field_autoincrement_works_with_foreign_keys(api: TestAp
     });
 
     // Data to see we don't lose anything in the translation.
-    for (i, content) in (&["A", "B", "C"]).iter().enumerate() {
+    for (i, content) in ["A", "B", "C"].iter().enumerate() {
         let insert = Insert::single_into(api.render_table_name("Author"));
 
         let author_id = api
@@ -381,7 +309,7 @@ fn making_an_existing_id_field_autoincrement_works_with_foreign_keys(api: TestAp
             .unwrap()
             .into_single()
             .unwrap()
-            .as_i64()
+            .as_integer()
             .unwrap();
 
         let insert = Insert::single_into(api.render_table_name("Post"))

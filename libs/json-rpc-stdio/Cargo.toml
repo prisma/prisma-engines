@@ -1,12 +1,11 @@
 [package]
 name = "json-rpc-stdio"
 version = "0.1.0"
-authors = ["Tom Houlé <tom@tomhoule.com>"]
 edition = "2021"
 
 [dependencies]
 jsonrpc-core = "17"
-serde_json = "1.0"
-serde = { version = "1.0", features = ["derive"] }
-tokio = { version = "1.0", features = ["io-std", "io-util", "macros", "sync"] }
+serde_json.workspace = true
+serde.workspace = true
+tokio.workspace = true
 tracing = "0.1.12"

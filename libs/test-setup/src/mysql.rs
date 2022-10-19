@@ -7,10 +7,10 @@ use url::Url;
 ///
 /// Source: https://dev.mysql.com/doc/mysql-reslimits-excerpt/5.5/en/identifier-length.html
 fn mysql_safe_identifier(identifier: &str) -> &str {
-    if identifier.len() < 64 {
+    if identifier.len() <= 64 {
         identifier
     } else {
-        identifier.get(0..63).expect("mysql identifier truncation")
+        identifier.get(0..64).expect("mysql identifier truncation")
     }
 }
 
@@ -31,7 +31,10 @@ pub(crate) fn get_mysql_tags(database_url: &str) -> Result<BitFlags<Tags>, Strin
             .first()
             .ok_or_else(|| "Got an empty result set when fetching metadata".to_owned())?;
 
-        if let Some(1) = first_row.get("lower_cases_table_names").and_then(|lctn| lctn.as_i64()) {
+        if let Some(1) = first_row
+            .get("lower_cases_table_names")
+            .and_then(|lctn| lctn.as_integer())
+        {
             tags |= Tags::LowerCasesTableNames;
         }
 
@@ -40,24 +43,26 @@ pub(crate) fn get_mysql_tags(database_url: &str) -> Result<BitFlags<Tags>, Strin
             Some(version) => {
                 eprintln!("Version: {:?}", version);
 
-                if version.contains("5.6") {
-                    tags |= Tags::Mysql56
-                }
-
-                if version.contains("5.7") {
-                    tags |= Tags::Mysql57
-                }
-
-                if version.contains("8.") {
-                    tags |= Tags::Mysql8
-                }
+                // order matters...
 
                 if version.contains("MariaDB") {
                     tags |= Tags::Mariadb
-                }
+                } else {
+                    if version.contains("vitess") {
+                        tags |= Tags::Vitess;
+                    }
 
-                if version.contains("vitess") {
-                    tags |= Tags::Vitess;
+                    if version.contains("5.6") {
+                        tags |= Tags::Mysql56
+                    }
+
+                    if version.contains("5.7") {
+                        tags |= Tags::Mysql57
+                    }
+
+                    if version.contains("8.") {
+                        tags |= Tags::Mysql8
+                    }
                 }
 
                 eprintln!("Inferred tags: {:?}", tags);
@@ -73,10 +78,7 @@ pub(crate) fn get_mysql_tags(database_url: &str) -> Result<BitFlags<Tags>, Strin
 /// Returns a connection to the new database, as well as the corresponding
 /// complete connection string.
 #[allow(clippy::needless_lifetimes)] // clippy is wrong
-pub(crate) async fn create_mysql_database<'a>(
-    database_url: &str,
-    db_name: &'a str,
-) -> Result<(&'a str, String), AnyError> {
+pub async fn create_mysql_database<'a>(database_url: &str, db_name: &'a str) -> Result<(&'a str, String), AnyError> {
     let mut url: Url = database_url.parse()?;
     let mut mysql_db_url = url.clone();
     let db_name = mysql_safe_identifier(db_name);
@@ -86,12 +88,12 @@ pub(crate) async fn create_mysql_database<'a>(
 
     debug_assert!(!db_name.is_empty());
     debug_assert!(
-        db_name.len() < 64,
-        "db_name should be less than 64 characters, got {:?}",
+        db_name.len() <= 64,
+        "db_name should be at most 64 characters, got {:?}",
         db_name.len()
     );
 
-    let conn = Quaint::new(&mysql_db_url.to_string()).await?;
+    let conn = Quaint::new(mysql_db_url.as_ref()).await?;
 
     let drop = format!(
         r#"

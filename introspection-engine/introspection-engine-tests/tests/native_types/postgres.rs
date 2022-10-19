@@ -173,7 +173,7 @@ async fn cdb_char_is_a_char(api: &TestApi) -> TestResult {
     let expected = expect![[r#"
         model Blog {
           id Int    @id
-          ch String @default(dbgenerated("'Y':::STRING::\"char\"")) @db.Char
+          ch String @default("Y") @db.CatalogSingleChar
         }
     "#]];
 

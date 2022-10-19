@@ -25,6 +25,50 @@ mod m2m {
         Ok(())
     }
 
+    fn m2m_sharing_same_row_schema() -> String {
+        let schema = indoc! {
+            r#"model User {
+                #id(userId, BigInt, @id)
+                #m2m(tags, Tag[], tagId, String)
+              }
+              
+              model Tag {
+                #id(tagId, String, @id, @default(uuid()))
+                name  String
+                #m2m(users, User[], userId, BigInt)
+              }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(m2m_sharing_same_row_schema))]
+    async fn m2m_sharing_same_row(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation {
+                createOneUser(
+                  data: {
+                    userId: "1"
+                    tags: {
+                      create: [{ tagId: "1", name: "tag_a" }, { tagId: "2", name: "tag_b" }]
+                    }
+                  }
+                ) {
+                  userId
+                }
+              }              
+          "#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findManyTag  { tagId users { userId } } }"#),
+          @r###"{"data":{"findManyTag":[{"tagId":"1","users":[{"userId":"1"}]},{"tagId":"2","users":[{"userId":"1"}]}]}}"###
+        );
+
+        Ok(())
+    }
+
     async fn test_data(runner: &Runner) -> TestResult<()> {
         runner
             .query(

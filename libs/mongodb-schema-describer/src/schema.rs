@@ -22,7 +22,7 @@ pub struct CollectionData {
     pub(crate) name: String,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 /// The type of an index.
 pub enum IndexType {
     /// Mapped as `@@index`.
@@ -145,18 +145,6 @@ impl MongoSchema {
             self.push_index(collection_id, name, r#type, fields);
         }
     }
-
-    /// Make all index attributes of type `Asc`. We basically need
-    /// this until the `extendedIndexes` is GA.
-    pub fn normalize_index_attributes(&mut self) {
-        for field in self.indexes.iter_mut().flat_map(|i| i.fields.iter_mut()) {
-            if matches!(field.property, IndexFieldProperty::Text) {
-                continue;
-            }
-
-            field.property = IndexFieldProperty::Ascending;
-        }
-    }
 }
 
 impl ops::Index<CollectionId> for MongoSchema {
@@ -175,7 +163,7 @@ impl ops::Index<IndexId> for MongoSchema {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 /// A field that is part of an index.
 pub struct IndexField {
     /// The name of the field.
@@ -202,7 +190,7 @@ impl fmt::Display for IndexField {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 /// Defines the property in the field that is part of an index.
 pub enum IndexFieldProperty {
     /// Defines a full-text index.

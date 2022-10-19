@@ -20,7 +20,7 @@ mod compound_uniq_rel_field {
             r#"model Parent {
               #id(id, Int, @id)
               p        String
-              child_id Int
+              child_id Int @unique
 
               child Child  @relation(fields: [child_id], references: [id])
               @@unique([child_id, p])
@@ -235,6 +235,7 @@ mod compound_uniq_rel_field {
 
               child Child  @relation(fields: [child_id, child_c], references: [id, c])
               @@unique([child_id, child_c, p])
+              @@unique([child_id, child_c])
             }
 
             model Child {
@@ -456,7 +457,7 @@ mod compound_uniq_rel_field {
             r#"model Parent {
               #id(id, Int, @id)
               p        String
-              child_id Int
+              child_id Int @unique
 
               child Child  @relation(fields: [child_id], references: [id])
               @@unique([child_id, p])
@@ -718,6 +719,7 @@ mod compound_uniq_rel_field {
 
               child Child  @relation(fields: [child_id, child_c], references: [id, c])
               @@unique([child_id, child_c, p])
+              @@unique([child_id, child_c])
             }
 
             model Child {

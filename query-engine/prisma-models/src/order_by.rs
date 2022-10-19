@@ -1,5 +1,4 @@
 use crate::{CompositeFieldRef, RelationFieldRef, ScalarFieldRef};
-use quaint::prelude::Order;
 use std::string::ToString;
 
 #[derive(Clone, Copy, PartialEq, Debug, Eq, Hash)]
@@ -8,15 +7,10 @@ pub enum SortOrder {
     Descending,
 }
 
-impl SortOrder {
-    pub fn into_order(self, reverse: bool) -> Order {
-        match (self, reverse) {
-            (SortOrder::Ascending, false) => Order::Asc,
-            (SortOrder::Descending, false) => Order::Desc,
-            (SortOrder::Ascending, true) => Order::Desc,
-            (SortOrder::Descending, true) => Order::Asc,
-        }
-    }
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum NullsOrder {
+    First,
+    Last,
 }
 
 #[derive(Clone, Copy, PartialEq, Debug, Eq, Hash)]
@@ -71,11 +65,17 @@ impl OrderBy {
         }
     }
 
-    pub fn scalar(field: ScalarFieldRef, path: Vec<OrderByHop>, sort_order: SortOrder) -> Self {
+    pub fn scalar(
+        field: ScalarFieldRef,
+        path: Vec<OrderByHop>,
+        sort_order: SortOrder,
+        nulls_order: Option<NullsOrder>,
+    ) -> Self {
         Self::Scalar(OrderByScalar {
             field,
             path,
             sort_order,
+            nulls_order,
         })
     }
 
@@ -115,10 +115,19 @@ impl OrderBy {
 }
 
 /// Describes a hop over to a relation or composite for an orderBy statement.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub enum OrderByHop {
     Relation(RelationFieldRef),
     Composite(CompositeFieldRef),
+}
+
+impl std::fmt::Debug for OrderByHop {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Relation(rf) => f.debug_tuple("Relation").field(&format!("{rf}")).finish(),
+            Self::Composite(cf) => f.debug_tuple("Composite").field(&format!("{cf}")).finish(),
+        }
+    }
 }
 
 impl OrderByHop {
@@ -159,6 +168,7 @@ pub struct OrderByScalar {
     pub field: ScalarFieldRef,
     pub path: Vec<OrderByHop>,
     pub sort_order: SortOrder,
+    pub nulls_order: Option<NullsOrder>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -198,6 +208,7 @@ impl From<ScalarFieldRef> for OrderBy {
             field,
             path: vec![],
             sort_order: SortOrder::Ascending,
+            nulls_order: None,
         })
     }
 }

@@ -9,9 +9,9 @@ use crate::{
     sql_migration::{AlterColumn, ColumnTypeChange},
     sql_schema_differ::ColumnChanges,
 };
+use migration_connector::{BoxFuture, ConnectorResult};
 use sql_schema_describer::walkers::ColumnWalker;
 
-#[async_trait::async_trait]
 impl DestructiveChangeCheckerFlavour for MssqlFlavour {
     fn check_alter_column(
         &self,
@@ -30,11 +30,11 @@ impl DestructiveChangeCheckerFlavour for MssqlFlavour {
             return;
         }
 
-        if changes.arity_changed() && columns.next().arity().is_required() {
+        if changes.arity_changed() && columns.next.arity().is_required() {
             plan.push_unexecutable(
                 UnexecutableStepCheck::MadeOptionalFieldRequired {
-                    column: columns.previous().name().to_owned(),
-                    table: columns.previous().table().name().to_owned(),
+                    column: columns.previous.name().to_owned(),
+                    table: columns.previous.table().name().to_owned(),
                 },
                 step_index,
             );
@@ -50,8 +50,8 @@ impl DestructiveChangeCheckerFlavour for MssqlFlavour {
 
                 plan.push_warning(
                     SqlMigrationWarningCheck::RiskyCast {
-                        table: columns.previous().table().name().to_owned(),
-                        column: columns.previous().name().to_owned(),
+                        table: columns.previous.table().name().to_owned(),
+                        column: columns.previous.name().to_owned(),
                         previous_type,
                         next_type,
                     },
@@ -61,10 +61,10 @@ impl DestructiveChangeCheckerFlavour for MssqlFlavour {
             Some(ColumnTypeChange::NotCastable) => {
                 plan.push_warning(
                     SqlMigrationWarningCheck::NotCastable {
-                        table: columns.previous().table().name().to_owned(),
-                        column: columns.previous().name().to_owned(),
-                        previous_type: format!("{:?}", columns.previous().column_type_family()),
-                        next_type: format!("{:?}", columns.next().column_type_family()),
+                        table: columns.previous.table().name().to_owned(),
+                        column: columns.previous.name().to_owned(),
+                        previous_type: format!("{:?}", columns.previous.column_type_family()),
+                        next_type: format!("{:?}", columns.next.column_type_family()),
                     },
                     step_index,
                 );
@@ -81,57 +81,61 @@ impl DestructiveChangeCheckerFlavour for MssqlFlavour {
     ) {
         // Unexecutable drop and recreate.
         if changes.arity_changed()
-            && columns.previous().arity().is_nullable()
-            && columns.next().arity().is_required()
-            && columns.next().default().is_none()
+            && columns.previous.arity().is_nullable()
+            && columns.next.arity().is_required()
+            && columns.next.default().is_none()
         {
             plan.push_unexecutable(
                 UnexecutableStepCheck::AddedRequiredFieldToTable {
-                    column: columns.previous().name().to_owned(),
-                    table: columns.previous().table().name().to_owned(),
+                    column: columns.previous.name().to_owned(),
+                    table: columns.previous.table().name().to_owned(),
                 },
                 step_index,
             )
-        } else if columns.next().arity().is_required() && columns.next().default().is_none() {
+        } else if columns.next.arity().is_required() && columns.next.default().is_none() {
             plan.push_unexecutable(
                 UnexecutableStepCheck::DropAndRecreateRequiredColumn {
-                    column: columns.previous().name().to_owned(),
-                    table: columns.previous().table().name().to_owned(),
+                    column: columns.previous.name().to_owned(),
+                    table: columns.previous.table().name().to_owned(),
                 },
                 step_index,
             )
         } else {
             plan.push_warning(
                 SqlMigrationWarningCheck::DropAndRecreateColumn {
-                    column: columns.previous().name().to_owned(),
-                    table: columns.previous().table().name().to_owned(),
+                    column: columns.previous.name().to_owned(),
+                    table: columns.previous.table().name().to_owned(),
                 },
                 step_index,
             )
         }
     }
 
-    async fn count_rows_in_table(&mut self, table_name: &str) -> migration_connector::ConnectorResult<i64> {
-        let query = {
-            let schema_name = self.schema_name();
-            format!("SELECT COUNT(*) FROM [{}].[{}]", schema_name, table_name)
-        };
-        let result_set = self.query_raw(&query, &[]).await?;
-        super::extract_table_rows_count(table_name, result_set)
+    fn count_rows_in_table<'a>(&'a mut self, table_name: &'a str) -> BoxFuture<'a, ConnectorResult<i64>> {
+        Box::pin(async move {
+            let query = {
+                let schema_name = self.schema_name();
+                format!("SELECT COUNT(*) FROM [{}].[{}]", schema_name, table_name)
+            };
+            let result_set = self.query_raw(&query, &[]).await?;
+            super::extract_table_rows_count(table_name, result_set)
+        })
     }
 
-    async fn count_values_in_column(
-        &mut self,
-        (table, column): (&str, &str),
-    ) -> migration_connector::ConnectorResult<i64> {
-        let query = {
-            let schema_name = self.schema_name();
-            format!(
-                "SELECT COUNT(*) FROM [{}].[{}] WHERE [{}] IS NOT NULL",
-                schema_name, table, column
-            )
-        };
-        let result_set = self.query_raw(&query, &[]).await?;
-        super::extract_column_values_count(result_set)
+    fn count_values_in_column<'a>(
+        &'a mut self,
+        (table, column): (&'a str, &'a str),
+    ) -> BoxFuture<'a, ConnectorResult<i64>> {
+        Box::pin(async move {
+            let query = {
+                let schema_name = self.schema_name();
+                format!(
+                    "SELECT COUNT(*) FROM [{}].[{}] WHERE [{}] IS NOT NULL",
+                    schema_name, table, column
+                )
+            };
+            let result_set = self.query_raw(&query, &[]).await?;
+            super::extract_column_values_count(result_set)
+        })
     }
 }

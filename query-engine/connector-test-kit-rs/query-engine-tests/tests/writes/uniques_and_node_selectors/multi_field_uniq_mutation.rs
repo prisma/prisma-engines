@@ -18,7 +18,7 @@ mod multi_field_uniq_mut {
               #id(id, Int, @id)
               title     String
               category  String
-              author_id Int?
+              author_id Int? @unique
 
               author   User? @relation(fields: [author_id], references: [id])
               @@unique([title, category])
