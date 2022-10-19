@@ -313,7 +313,7 @@ fn render_native_type_attribute(
     out: &mut String,
 ) {
     if datasource.active_connector.native_type_is_default_for_scalar_type(
-        native_type.serialized_native_type.clone(),
+        native_type.inner(),
         &dml_scalar_type_to_parser_database_scalar_type(*scalar_type),
     ) {
         return;
@@ -322,9 +322,10 @@ fn render_native_type_attribute(
     out.push_str(" @");
     out.push_str(&datasource.name);
     out.push('.');
-    out.push_str(&native_type.name);
+    let (name, args) = datasource.active_connector.native_type_to_parts(native_type.inner());
+    out.push_str(name);
 
-    let mut args = native_type.args.iter().map(|arg| (None, arg.clone())).collect();
+    let mut args = args.into_iter().map(|arg| (None, arg)).collect();
     render_arguments(&mut args, out);
 }
 

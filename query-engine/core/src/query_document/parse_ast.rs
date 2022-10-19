@@ -29,6 +29,10 @@ impl ParsedInputMap {
     pub fn is_field_ref_type(&self) -> bool {
         matches!(&self.tag, Some(ObjectTag::FieldRefType(_)))
     }
+
+    pub fn is_nested_to_one_update_envelope(&self) -> bool {
+        matches!(&self.tag, Some(ObjectTag::NestedToOneUpdateEnvelope))
+    }
 }
 
 impl From<IndexMap<String, ParsedInputValue>> for ParsedInputMap {

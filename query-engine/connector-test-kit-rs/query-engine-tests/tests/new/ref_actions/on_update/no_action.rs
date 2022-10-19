@@ -1,7 +1,12 @@
 use indoc::indoc;
 use query_engine_tests::*;
 
-#[test_suite(suite = "noaction_onU_1to1_req", schema(required))]
+#[test_suite(
+    suite = "noaction_onU_1to1_req",
+    schema(required),
+    relation_mode = "prisma",
+    exclude(Postgres, Sqlite)
+)]
 mod one2one_req {
     fn required() -> String {
         let schema = indoc! {
@@ -21,9 +26,10 @@ mod one2one_req {
         schema.to_owned()
     }
 
-    /// Updating the parent must fail if a child is connected.
-    #[connector_test(exclude(MongoDb))]
-    async fn update_parent_failure(runner: Runner) -> TestResult<()> {
+    /// Updating the parent leaves the data in a integrity-violating state.
+    /// All supported dbs throw key constraint violations.
+    #[connector_test]
+    async fn update_parent_violation(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
@@ -32,32 +38,8 @@ mod one2one_req {
         assert_error!(
             &runner,
             r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,
-            2003,
-            "Foreign key constraint failed on the field"
-        );
-
-        assert_error!(
-            &runner,
-            r#"mutation { updateManyParent(where: { id: 1 }, data: { uniq: "u1" }) { count }}"#,
-            2003,
-            "Foreign key constraint failed on the field"
-        );
-
-        Ok(())
-    }
-
-    /// Updating the parent leaves the data in a integrity-violating state.
-    /// All supported dbs except mongo throw key violations.
-    #[connector_test(only(MongoDb))]
-    async fn update_parent_violation(runner: Runner) -> TestResult<()> {
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
-          @r###"{"data":{"createOneParent":{"id":1}}}"###
-        );
-
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#),
-          @r###"{"data":{"updateOneParent":{"id":1}}}"###
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         insta::assert_snapshot!(
@@ -69,17 +51,19 @@ mod one2one_req {
     }
 
     /// Updating the parent leaves the data in a integrity-violating state.
-    /// All supported dbs except mongo throw key violations.
-    #[connector_test(only(MongoDb))]
+    /// All supported dbs throw key constraint violations.
+    #[connector_test]
     async fn update_many_parent_violation(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { updateManyParent(data: { uniq: "u1" }) { count }}"#),
-          @r###"{"data":{"updateManyParent":{"count":1}}}"###
+        assert_error!(
+          &runner,
+          r#"mutation { updateManyParent(data: { uniq: "u1" }) { count }}"#,
+          2014,
+          "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         insta::assert_snapshot!(
@@ -91,17 +75,19 @@ mod one2one_req {
     }
 
     /// Updating the parent leaves the data in a integrity-violating state.
-    /// All supported dbs except mongo throw key violations.
-    #[connector_test(only(MongoDb))]
+    /// All supported dbs throw key constraint violations.
+    #[connector_test]
     async fn upsert_parent_violation(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { upsertOneParent(where: { id: 1 }, update: { uniq: "u1" }, create: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
-          @r###"{"data":{"upsertOneParent":{"id":1}}}"###
+        assert_error!(
+          &runner,
+          r#"mutation { upsertOneParent(where: { id: 1 }, update: { uniq: "u1" }, create: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#,
+          2014,
+          "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         insta::assert_snapshot!(
@@ -113,7 +99,12 @@ mod one2one_req {
     }
 }
 
-#[test_suite(suite = "noaction_onU_1to1_opt", schema(optional))]
+#[test_suite(
+    suite = "noaction_onU_1to1_opt",
+    schema(optional),
+    relation_mode = "prisma",
+    exclude(Postgres, Sqlite)
+)]
 mod one2one_opt {
     fn optional() -> String {
         let schema = indoc! {
@@ -134,7 +125,7 @@ mod one2one_opt {
     }
 
     /// Updating the parent must fail if a child is connected.
-    #[connector_test(exclude(MongoDb))]
+    #[connector_test]
     async fn update_parent_failure(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
@@ -144,15 +135,15 @@ mod one2one_opt {
         assert_error!(
             &runner,
             r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,
-            2003,
-            "Foreign key constraint failed on the field"
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         assert_error!(
             &runner,
             r#"mutation { updateManyParent(where: { id: 1 }, data: { uniq: "u1" }) { count }}"#,
-            2003,
-            "Foreign key constraint failed on the field"
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         Ok(())
@@ -201,17 +192,19 @@ mod one2one_opt {
     }
 
     /// Updating the parent leaves the data in a integrity-violating state.
-    /// All supported dbs except mongo throw key violations.
-    #[connector_test(only(MongoDb))]
+    /// All supported dbs throw key constraint violations.
+    #[connector_test]
     async fn update_parent_violation(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#),
-          @r###"{"data":{"updateOneParent":{"id":1}}}"###
+        assert_error!(
+          &runner,
+          r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,
+          2014,
+          "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         insta::assert_snapshot!(
@@ -223,17 +216,19 @@ mod one2one_opt {
     }
 
     /// Updating the parent leaves the data in a integrity-violating state.
-    /// All supported dbs except mongo throw key violations.
-    #[connector_test(only(MongoDb))]
+    /// All supported dbs throw key constraint violations.
+    #[connector_test]
     async fn update_many_parent_violation(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { updateManyParent(data: { uniq: "u1" }) { count }}"#),
-          @r###"{"data":{"updateManyParent":{"count":1}}}"###
+        assert_error!(
+          &runner,
+          r#"mutation { updateManyParent(data: { uniq: "u1" }) { count }}"#,
+          2014,
+          "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         insta::assert_snapshot!(
@@ -245,17 +240,19 @@ mod one2one_opt {
     }
 
     /// Updating the parent leaves the data in a integrity-violating state.
-    /// All supported dbs except mongo throw key violations.
-    #[connector_test(only(MongoDb))]
+    /// All supported dbs throw key constraint violations.
+    #[connector_test]
     async fn upsert_parent_violation(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { upsertOneParent(where: { id: 1 }, update: { uniq: "u1" }, create: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
-          @r###"{"data":{"upsertOneParent":{"id":1}}}"###
+        assert_error!(
+          &runner,
+          r#"mutation { upsertOneParent(where: { id: 1 }, update: { uniq: "u1" }, create: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#,
+          2014,
+          "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         insta::assert_snapshot!(
@@ -267,7 +264,12 @@ mod one2one_opt {
     }
 }
 
-#[test_suite(suite = "noaction_onU_1toM_req", schema(required))]
+#[test_suite(
+    suite = "noaction_onU_1toM_req",
+    schema(required),
+    relation_mode = "prisma",
+    exclude(Postgres, Sqlite)
+)]
 mod one2many_req {
     fn required() -> String {
         let schema = indoc! {
@@ -285,31 +287,6 @@ mod one2many_req {
         };
 
         schema.to_owned()
-    }
-
-    /// Updating the parent must fail if a child is connected.
-    #[connector_test(exclude(MongoDb))]
-    async fn update_parent_failure(runner: Runner) -> TestResult<()> {
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
-          @r###"{"data":{"createOneParent":{"id":1}}}"###
-        );
-
-        assert_error!(
-            &runner,
-            r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,
-            2003,
-            "Foreign key constraint failed on the field"
-        );
-
-        assert_error!(
-            &runner,
-            r#"mutation { updateManyParent(where: { id: 1 }, data: { uniq: "u1" }) { count }}"#,
-            2003,
-            "Foreign key constraint failed on the field"
-        );
-
-        Ok(())
     }
 
     /// Updating the parent succeeds if no child is connected.
@@ -339,16 +316,18 @@ mod one2many_req {
     }
 
     /// Updating the parent leaves the data in a integrity-violating state.
-    #[connector_test(only(MongoDb))]
+    #[connector_test]
     async fn update_parent_violation(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#),
-          @r###"{"data":{"updateOneParent":{"id":1}}}"###
+        assert_error!(
+          &runner,
+          r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,
+          2014,
+          "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         insta::assert_snapshot!(
@@ -360,17 +339,19 @@ mod one2many_req {
     }
 
     /// Updating the parent leaves the data in a integrity-violating state.
-    /// All supported dbs except mongo throw key violations.
-    #[connector_test(only(MongoDb))]
+    /// All supported dbs throw key constraint violations.
+    #[connector_test]
     async fn update_many_parent_violation(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { updateManyParent(data: { uniq: "u1" }) { count }}"#),
-          @r###"{"data":{"updateManyParent":{"count":1}}}"###
+        assert_error!(
+          &runner,
+          r#"mutation { updateManyParent(data: { uniq: "u1" }) { count }}"#,
+          2014,
+          "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         insta::assert_snapshot!(
@@ -382,17 +363,19 @@ mod one2many_req {
     }
 
     /// Updating the parent leaves the data in a integrity-violating state.
-    /// All supported dbs except mongo throw key violations.
-    #[connector_test(only(MongoDb))]
+    /// All supported dbs throw key constraint violations.
+    #[connector_test]
     async fn upsert_parent_violation(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { upsertOneParent(where: { id: 1 }, update: { uniq: "u1" }, create: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
-          @r###"{"data":{"upsertOneParent":{"id":1}}}"###
+        assert_error!(
+          &runner,
+          r#"mutation { upsertOneParent(where: { id: 1 }, update: { uniq: "u1" }, create: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#,
+          2014,
+          "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         insta::assert_snapshot!(
@@ -404,7 +387,12 @@ mod one2many_req {
     }
 }
 
-#[test_suite(suite = "noaction_onU_1toM_opt", schema(optional))]
+#[test_suite(
+    suite = "noaction_onU_1toM_opt",
+    schema(optional),
+    relation_mode = "prisma",
+    exclude(Postgres, Sqlite)
+)]
 mod one2many_opt {
     fn optional() -> String {
         let schema = indoc! {
@@ -425,7 +413,7 @@ mod one2many_opt {
     }
 
     /// Updating the parent must fail if a child is connected.
-    #[connector_test(exclude(MongoDb))]
+    #[connector_test]
     async fn update_parent_failure(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
@@ -433,17 +421,16 @@ mod one2many_opt {
         );
 
         assert_error!(
-            &runner,
-            r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,
-            2003,
-            "Foreign key constraint failed on the field"
+          &runner,
+          r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,2014,
+          "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         assert_error!(
-            &runner,
-            r#"mutation { updateManyParent(where: { id: 1 }, data: { uniq: "u1" }) { count }}"#,
-            2003,
-            "Foreign key constraint failed on the field"
+          &runner,
+          r#"mutation { updateManyParent(where: { id: 1 }, data: { uniq: "u1" }) { count }}"#,
+          2014,
+          "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         Ok(())
@@ -476,16 +463,18 @@ mod one2many_opt {
     }
 
     /// Updating the parent leaves the data in a integrity-violating state.
-    #[connector_test(only(MongoDb))]
+    #[connector_test]
     async fn update_parent_violation(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#),
-          @r###"{"data":{"updateOneParent":{"id":1}}}"###
+        assert_error!(
+          &runner,
+          r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,
+          2014,
+          "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         insta::assert_snapshot!(
@@ -497,17 +486,19 @@ mod one2many_opt {
     }
 
     /// Updating the parent leaves the data in a integrity-violating state.
-    /// All supported dbs except mongo throw key violations.
-    #[connector_test(only(MongoDb))]
+    /// All supported dbs throw key constraint violations.
+    #[connector_test]
     async fn update_many_parent_violation(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { updateManyParent(data: { uniq: "u1" }) { count }}"#),
-          @r###"{"data":{"updateManyParent":{"count":1}}}"###
+        assert_error!(
+          &runner,
+          r#"mutation { updateManyParent(data: { uniq: "u1" }) { count }}"#,
+          2014,
+          "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         insta::assert_snapshot!(
@@ -519,17 +510,19 @@ mod one2many_opt {
     }
 
     /// Updating the parent leaves the data in a integrity-violating state.
-    /// All supported dbs except mongo throw key violations.
-    #[connector_test(only(MongoDb))]
+    /// All supported dbs throw key constraint violations.
+    #[connector_test]
     async fn upsert_parent_violation(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { upsertOneParent(where: { id: 1 }, update: { uniq: "u1" }, create: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
-          @r###"{"data":{"upsertOneParent":{"id":1}}}"###
+        assert_error!(
+          &runner,
+          r#"mutation { upsertOneParent(where: { id: 1 }, update: { uniq: "u1" }, create: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#,
+          2014,
+          "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         insta::assert_snapshot!(

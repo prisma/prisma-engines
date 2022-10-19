@@ -29,13 +29,13 @@ pub fn walk_json<'a>(json: &'a serde_json::Value, path: &[&str]) -> Result<&'a s
 /// Parses the JSON result of mutation sent to the Query Engine in order to extract the generated id.
 /// Returns a string that's already formatted to be included in another query. eg:
 /// { "id": "my_fancy_id" }
-pub fn parse_id(field: &str, json: &serde_json::Value, path: &[&str]) -> Result<String, TestError> {
+pub fn parse_id(field: &str, json: &serde_json::Value, path: &[&str], meta: &str) -> Result<String, TestError> {
     let mut path_with_field = path.to_vec();
     path_with_field.push(field);
 
     let value = walk_json(json, &path_with_field)?.to_string();
 
-    Ok(format!("{{ {}: {} }}", field, value))
+    Ok(format!("{{ {field}: {value}, {meta} }}"))
 }
 
 /// Parses the JSON result of mutation sent to the Query Engine in order to extract the generated compound ids.
@@ -46,6 +46,7 @@ pub fn parse_compound_id(
     arg_name: &str,
     json: &serde_json::Value,
     path: &[&str],
+    meta: &str,
 ) -> Result<String, TestError> {
     let field_values = fields
         .iter()
@@ -67,7 +68,8 @@ pub fn parse_compound_id(
         "{{
             {arg_name}: {{
               {arguments}
-            }}
+            }},
+            {meta}
         }}",
         arg_name = arg_name,
         arguments = arguments
@@ -85,7 +87,7 @@ pub fn parse_many_compound_ids(
         serde_json::Value::Array(arr) => {
             let compound_ids = arr
                 .iter()
-                .map(|json_val| parse_compound_id(fields, arg_name, json_val, &[]))
+                .map(|json_val| parse_compound_id(fields, arg_name, json_val, &[], ""))
                 .collect::<Result<Vec<_>, _>>()?;
 
             Ok(compound_ids)
@@ -103,7 +105,7 @@ pub fn parse_many_ids(field: &str, json: &serde_json::Value, path: &[&str]) -> R
         serde_json::Value::Array(arr) => {
             let ids = arr
                 .iter()
-                .map(|json_val| parse_id(field, json_val, &[]))
+                .map(|json_val| parse_id(field, json_val, &[], ""))
                 .collect::<Result<Vec<_>, _>>()?;
 
             Ok(ids)

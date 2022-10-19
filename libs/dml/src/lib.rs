@@ -46,13 +46,4 @@ pub fn render_datamodel_to_string(datamodel: &crate::Datamodel, configuration: O
     reformat(&out, DEFAULT_INDENT_WIDTH).expect("Internal error: failed to reformat introspected schema")
 }
 
-/// Renders a datamodel, sources and generators.
-pub fn render_datamodel_and_config_to_string(datamodel: &crate::Datamodel, config: &Configuration) -> String {
-    let mut out = String::new();
-    let datasource = config.datasources.first();
-    render::render_configuration(config, &mut out);
-    render::render_datamodel(render::RenderParams { datasource, datamodel }, &mut out);
-    reformat(&out, DEFAULT_INDENT_WIDTH).expect("Internal error: failed to reformat introspected schema")
-}
-
 const DEFAULT_INDENT_WIDTH: usize = 2;

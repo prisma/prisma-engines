@@ -12,13 +12,11 @@ fn set_null_is_not_valid_on_mandatory_fields() {
             provider = "prisma-client-js"
             previewFeatures = ["referentialIntegrity"]
         }
-
         datasource db {
             provider = "sqlite"
             url = "./dev.db"
             relationMode = "foreignKeys"
         }
-
         model SomeUser {
             id      Int      @id
             ref     Int
@@ -114,6 +112,72 @@ fn set_null_is_not_valid_on_mandatory_fields() {
     // action, required_field_name.name(), ReferentialAction :: SetNull,) = "Field onUpdate is required, but that is incompatible with the referential action user_ref: SetNull."
     // test set_null_is_not_valid_on_mandatory_fields ... ok
     validate(&relation);
+}
+
+#[test]
+fn no_action_is_alias_for_restrict_when_prisma_relation_mode() {
+    let datamodel = convert(
+        r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialIntegrity"]
+        }
+        datasource db {
+            provider = "mysql"
+            url      = "mysql://"
+            relationMode = "prisma"
+        }
+        model A {
+            id Int @id
+            bs B[]
+        }
+        model B {
+            id Int @id
+            aId Int
+            a A @relation(fields: [aId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+        }
+        "#,
+    );
+
+    let relations = datamodel.relations();
+    assert_eq!(relations.len(), 1);
+
+    let relation = &relations[0];
+    assert_eq!(relation.on_update(), ReferentialAction::Restrict);
+    assert_eq!(relation.on_delete(), ReferentialAction::Restrict);
+}
+
+#[test]
+fn no_action_is_not_alias_for_restrict_when_foreign_keys_relation_mode() {
+    let datamodel = convert(
+        r#"
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["referentialIntegrity"]
+        }
+        datasource db {
+            provider = "mysql"
+            url      = "mysql://"
+            relationMode = "foreignKeys"
+        }
+        model A {
+            id Int @id
+            bs B[]
+        }
+        model B {
+            id Int @id
+            aId Int
+            a A @relation(fields: [aId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+        }
+        "#,
+    );
+
+    let relations = datamodel.relations();
+    assert_eq!(relations.len(), 1);
+
+    let relation = &relations[0];
+    assert_eq!(relation.on_update(), ReferentialAction::NoAction);
+    assert_eq!(relation.on_delete(), ReferentialAction::NoAction);
 }
 
 #[test]

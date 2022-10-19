@@ -38,6 +38,8 @@ pub struct DmmfInputType {
 pub struct DmmfInputTypeConstraints {
     pub max_num_fields: Option<usize>,
     pub min_num_fields: Option<usize>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fields: Option<Vec<String>>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

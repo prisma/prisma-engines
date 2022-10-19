@@ -7,10 +7,10 @@ use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{TimeZone, Utc};
 use itertools::Itertools;
 use mongodb::bson::{oid::ObjectId, spec::BinarySubtype, Binary, Bson, Document, Timestamp};
-use native_types::MongoDbType;
 use prisma_models::{
     CompositeFieldRef, Field, PrismaValue, RelationFieldRef, ScalarFieldRef, SelectedField, TypeIdentifier,
 };
+use psl::builtin_connectors::MongoDbType;
 use serde_json::Value;
 use std::{convert::TryFrom, fmt::Display};
 
@@ -111,8 +111,7 @@ impl IntoBson for (&ScalarFieldRef, PrismaValue) {
     fn into_bson(self) -> crate::Result<Bson> {
         let (sf, value) = self;
 
-        // This is _insanely_ inefficient, but we have no real choice with the current interface.
-        let mongo_type: Option<MongoDbType> = sf.native_type.as_ref().map(|nt| nt.deserialize_native_type());
+        let mongo_type: Option<&MongoDbType> = sf.native_type.as_ref().map(|nt| nt.deserialize_native_type());
 
         // If we have a native type, use that one as source of truth for mapping, else use the type ident for defaults.
         match (mongo_type, &sf.type_identifier, value) {
@@ -125,7 +124,7 @@ impl IntoBson for (&ScalarFieldRef, PrismaValue) {
 }
 
 /// Conversion using an explicit native type.
-impl IntoBson for (MongoDbType, PrismaValue) {
+impl IntoBson for (&MongoDbType, PrismaValue) {
     fn into_bson(self) -> crate::Result<Bson> {
         Ok(match self {
             // ObjectId
@@ -166,7 +165,7 @@ impl IntoBson for (MongoDbType, PrismaValue) {
             // Array
             (typ, PrismaValue::List(vals)) => Bson::Array(
                 vals.into_iter()
-                    .map(|val| (typ.clone(), val).into_bson())
+                    .map(|val| (typ, val).into_bson())
                     .collect::<crate::Result<Vec<_>>>()?,
             ),
 

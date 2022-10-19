@@ -242,7 +242,8 @@ mod update {
     }
 
     // "An updateOne mutation" should "update enums"
-    #[connector_test(schema(schema_3), capabilities(Enums))]
+    // TODO: Flaky test on Cockroach, re-enable once figured out
+    #[connector_test(schema(schema_3), capabilities(Enums), exclude(CockroachDb))]
     async fn update_enums(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1 }"#).await?;
 
@@ -652,6 +653,27 @@ mod update {
         );
 
         Ok(res)
+    }
+
+    #[connector_test(schema(generic))]
+    async fn update_fails_if_filter_dont_match(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation { createOneTestModel(data: { id: 1, field: "hello" }) { id } }"#
+        );
+
+        assert_error!(
+            &runner,
+            r#"mutation {
+                  updateOneTestModel(where: { id: 1, field: "bonjour" }, data: { field: "updated" }) {
+                    id
+                  }
+                }"#,
+            2025,
+            "An operation failed because it depends on one or more records that were required but not found. Record to update not found."
+        );
+
+        Ok(())
     }
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {

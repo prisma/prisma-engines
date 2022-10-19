@@ -1,4 +1,4 @@
-use builtin_psl_connectors::postgres_datamodel_connector::PostgresDatasourceProperties;
+use builtin_psl_connectors::PostgresDatasourceProperties;
 
 use crate::common::*;
 

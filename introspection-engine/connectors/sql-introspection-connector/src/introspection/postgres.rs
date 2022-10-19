@@ -1,7 +1,5 @@
 use datamodel_renderer as render;
-use psl::{
-    builtin_connectors::postgres_datamodel_connector::PostgresDatasourceProperties, Configuration, PreviewFeature,
-};
+use psl::{builtin_connectors::PostgresDatasourceProperties, Configuration, PreviewFeature};
 use sql_schema_describer::{postgres::PostgresSchemaExt, SqlSchema};
 
 use crate::sanitize_datamodel_names::sanitize_string;
@@ -25,7 +23,7 @@ pub(super) fn add_extensions<'a>(
         .downcast_ref::<PostgresDatasourceProperties>();
 
     let previous_extensions = connector_data.and_then(|p| p.extensions());
-    let mut next_extensions = render::Array::default();
+    let mut next_extensions = render::Array::new();
 
     for ext in pg_schema_ext.extension_walkers() {
         let sanitized_name = sanitize_string(ext.name());

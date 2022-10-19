@@ -1,4 +1,4 @@
-use super::{fields::data_input_mapper::*, *};
+use super::{arguments, fields::data_input_mapper::*, *};
 use constants::args;
 use psl::datamodel_connector::ConnectorCapability;
 
@@ -206,6 +206,39 @@ pub(crate) fn update_one_where_combination_object(
 
     let fields = vec![
         input_field(args::WHERE, InputType::object(where_input_object), None),
+        input_field(args::DATA, update_types, None),
+    ];
+
+    input_object.set_fields(fields);
+    Arc::downgrade(&input_object)
+}
+
+/// Builds "<x>UpdateWithWhereUniqueWithout<y>Input" input object types.
+/// Simple combination object of "where" and "data" for to-one relations.
+pub(crate) fn update_to_one_rel_where_combination_object(
+    ctx: &mut BuilderContext,
+    update_types: Vec<InputType>,
+    parent_field: &RelationFieldRef,
+) -> InputObjectTypeWeakRef {
+    let related_model = parent_field.related_model();
+    let ident = Identifier::new(
+        format!(
+            "{}UpdateToOneWithWhereWithout{}Input",
+            related_model.name,
+            capitalize(&parent_field.related_field().name)
+        ),
+        PRISMA_NAMESPACE,
+    );
+
+    return_cached_input!(ctx, &ident);
+
+    let mut input_object = init_input_object_type(ident.clone());
+    input_object.set_tag(ObjectTag::NestedToOneUpdateEnvelope);
+    let input_object = Arc::new(input_object);
+    ctx.cache_input_type(ident, input_object.clone());
+
+    let fields = vec![
+        arguments::where_argument(ctx, &related_model),
         input_field(args::DATA, update_types, None),
     ];
 

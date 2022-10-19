@@ -5,7 +5,7 @@ use crate::{
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputMap, ParsedInputValue,
 };
-use connector::{Filter, IntoFilter};
+use connector::Filter;
 use prisma_models::RelationFieldRef;
 use schema_builder::constants::args;
 use std::{convert::TryInto, sync::Arc};
@@ -110,20 +110,30 @@ pub fn nested_upsert(
         let mut as_map: ParsedInputMap = value.try_into()?;
         let create_input = as_map.remove(args::CREATE).expect("create argument is missing");
         let update_input = as_map.remove(args::UPDATE).expect("update argument is missing");
+        let where_input = as_map.remove(args::WHERE);
 
         // Read child(ren) node
-        let filter: Filter = if parent_relation_field.is_list() {
-            let where_input: ParsedInputMap = as_map
-                .remove(args::WHERE)
-                .expect("where argument is missing")
-                .try_into()?;
-            extract_unique_filter(where_input, &child_model)?
-        } else {
-            Filter::empty()
+        let filter = match (where_input, parent_relation_field.is_list()) {
+            // On a to-many relation the filter is a WhereUniqueInput
+            (Some(where_input), true) => {
+                let where_input: ParsedInputMap = where_input.try_into()?;
+
+                extract_unique_filter(where_input, &child_model)?
+            }
+            // That filter is required. This should be caught by the schema validation.
+            (None, true) => unreachable!("where argument is missing"),
+            // On a to-one relation, the filter is a WhereInput (because the record is pinned by the QE automatically)
+            (Some(where_input), false) => {
+                let where_input: ParsedInputMap = where_input.try_into()?;
+
+                extract_filter(where_input, &child_model)?
+            }
+            // That filter is optional since the record is pinned by the QE
+            (None, false) => Filter::empty(),
         };
 
         let read_children_node =
-            utils::insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, filter)?;
+            utils::insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, filter.clone())?;
 
         let if_node = graph.create_node(Flow::default_if());
         let create_node =
@@ -131,7 +141,7 @@ pub fn nested_upsert(
         let update_node = update::update_record_node(
             graph,
             connector_ctx,
-            Filter::empty(),
+            filter.clone(),
             Arc::clone(&child_model),
             update_input.try_into()?,
         )?;
@@ -160,7 +170,7 @@ pub fn nested_upsert(
             QueryGraphDependency::ProjectedDataDependency(
                 child_model_identifier.clone(),
                 Box::new(move |mut update_node, mut child_ids| {
-                    if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut wq))) = update_node {
+                    if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = update_node {
                         let child_id = match child_ids.pop() {
                             Some(id) => Ok(id),
                             None => Err(QueryGraphBuilderError::RecordNotFound(format!(
@@ -169,7 +179,7 @@ pub fn nested_upsert(
                             ))),
                         }?;
 
-                        wq.add_filter(child_id.filter());
+                        ur.set_selectors(vec![child_id]);
                     }
 
                     Ok(update_node)
@@ -209,7 +219,7 @@ pub fn nested_upsert(
             let parent_model_name = parent_model.name.clone();
             let relation_name = parent_relation_field.relation().name.clone();
             let parent_model_id = parent_model.primary_identifier();
-            let update_node = utils::update_records_node_placeholder(graph, Filter::empty(), parent_model);
+            let update_node = utils::update_records_node_placeholder(graph, filter, parent_model);
 
             // Edge to retrieve the finder
             graph.create_edge(
@@ -225,7 +235,7 @@ pub fn nested_upsert(
                     }?;
 
                     if let Node::Query(Query::Write(ref mut wq)) = update_node {
-                        wq.add_filter(parent_id.filter());
+                        wq.set_selectors(vec![parent_id]);
                     }
 
                     Ok(update_node)

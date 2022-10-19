@@ -8,7 +8,10 @@ use crate::{
     IndexType, InlineRelation, InternalEnum, InternalEnumValue, RelationLinkManifestation, RelationSide, RelationTable,
     TypeIdentifier,
 };
-use psl::dml::{self, CompositeTypeFieldType, Datamodel, Ignorable, WithDatabaseName};
+use psl::{
+    datamodel_connector::RelationMode,
+    dml::{self, CompositeTypeFieldType, Datamodel, Ignorable, WithDatabaseName},
+};
 
 pub(crate) fn model_builders(
     datamodel: &Datamodel,
@@ -136,7 +139,10 @@ fn composite_field_builders(datamodel: &Datamodel, composite: &dml::CompositeTyp
         .collect()
 }
 
-pub(crate) fn relation_builders(placeholders: &[RelationPlaceholder]) -> Vec<RelationBuilder> {
+pub(crate) fn relation_builders(
+    placeholders: &[RelationPlaceholder],
+    relation_mode: RelationMode,
+) -> Vec<RelationBuilder> {
     placeholders
         .iter()
         .filter(|r| r.model_a.is_relation_supported(&r.field_a) && r.model_b.is_relation_supported(&r.field_b))
@@ -145,6 +151,7 @@ pub(crate) fn relation_builders(placeholders: &[RelationPlaceholder]) -> Vec<Rel
             manifestation: r.manifestation(),
             model_a_name: r.model_a.name.clone(),
             model_b_name: r.model_b.name.clone(),
+            relation_mode,
         })
         .collect()
 }

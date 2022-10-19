@@ -3,16 +3,19 @@
 mod default;
 mod extensions;
 
+pub use extensions::{DatabaseExtension, ExtensionId, ExtensionWalker};
+
 use self::default::get_default_value;
 use super::*;
 use crate::getters::Getter;
 use enumflags2::BitFlags;
-pub use extensions::{DatabaseExtension, ExtensionId, ExtensionWalker};
 use indexmap::IndexMap;
 use indoc::indoc;
-use native_types::{CockroachType, NativeType, PostgresType};
-use quaint::Value::Array;
-use quaint::{connector::ResultRow, prelude::Queryable};
+use psl::{
+    builtin_connectors::{CockroachType, PostgresType},
+    datamodel_connector::NativeTypeInstance,
+};
+use quaint::{connector::ResultRow, prelude::Queryable, Value::Array};
 use regex::Regex;
 use std::{any::type_name, collections::BTreeMap, convert::TryInto};
 use tracing::trace;
@@ -1283,7 +1286,7 @@ fn get_column_type_postgresql(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         full_data_type,
         family,
         arity,
-        native_type: native_type.map(|x| x.to_json()),
+        native_type: native_type.map(NativeTypeInstance::new::<PostgresType>),
     }
 }
 
@@ -1367,6 +1370,6 @@ fn get_column_type_cockroachdb(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         full_data_type,
         family,
         arity,
-        native_type: native_type.map(|x| x.to_json()),
+        native_type: native_type.map(NativeTypeInstance::new::<CockroachType>),
     }
 }

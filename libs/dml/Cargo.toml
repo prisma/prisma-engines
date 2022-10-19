@@ -7,7 +7,6 @@ edition = "2021"
 prisma-value = { path = "../prisma-value" }
 psl-core = { path = "../../psl/psl-core" }
 schema-ast = { path = "../../psl/schema-ast" }
-native-types = { path = "../native-types" }
 
 uuid.workspace = true
 cuid = { version = "1.2", optional = true }

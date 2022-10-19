@@ -2,9 +2,7 @@ use super::{super::Context, SqlSchemaCalculatorFlavour};
 use crate::flavour::{PostgresFlavour, SqlFlavour};
 use either::Either;
 use psl::{
-    builtin_connectors::{
-        cockroach_datamodel_connector::SequenceFunction, postgres_datamodel_connector::PostgresDatasourceProperties,
-    },
+    builtin_connectors::{cockroach_datamodel_connector::SequenceFunction, PostgresDatasourceProperties},
     datamodel_connector::walker_ext_traits::IndexWalkerExt,
     parser_database::{walkers::*, IndexAlgorithm, OperatorClass},
 };

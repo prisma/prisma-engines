@@ -201,13 +201,9 @@ async fn dbgenerated_in_unsupported(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn commenting_out_a_table_without_columns(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("Test", |_t| {});
-        })
-        .await?;
+    api.raw_cmd("CREATE TABLE \"Test\" ();").await;
 
     let expected = json!([{
         "code": 14,
@@ -221,14 +217,22 @@ async fn commenting_out_a_table_without_columns(api: &TestApi) -> TestResult {
 
     assert_eq_json!(expected, api.introspection_warnings().await?);
 
-    let dm = indoc! {r#"
+    let expected = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
         // We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
         // model Test {
+        // 
         // }
-    "#};
-
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
-
+    "#]];
+    api.expect_datamodel(&expected).await;
     Ok(())
 }
 

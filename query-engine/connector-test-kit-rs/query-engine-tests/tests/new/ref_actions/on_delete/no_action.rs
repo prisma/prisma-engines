@@ -1,7 +1,12 @@
 use indoc::indoc;
 use query_engine_tests::*;
 
-#[test_suite(suite = "noaction_onD_1to1_req", schema(required))]
+#[test_suite(
+    suite = "noaction_onD_1to1_req",
+    schema(required),
+    relation_mode = "prisma",
+    exclude(Postgres, Sqlite)
+)]
 mod one2one_req {
     fn required() -> String {
         let schema = indoc! {
@@ -21,7 +26,7 @@ mod one2one_req {
     }
 
     /// Deleting the parent must fail if a child is connected.
-    #[connector_test(exclude(MongoDb))]
+    #[connector_test]
     async fn delete_parent_failure(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, child: { create: { id: 1 }}}) { id }}"#),
@@ -31,43 +36,26 @@ mod one2one_req {
         assert_error!(
             runner,
             "mutation { deleteOneParent(where: { id: 1 }) { id }}",
-            2003,
-            "Foreign key constraint failed on the field"
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         assert_error!(
             runner,
             "mutation { deleteManyParent(where: { id: 1 }) { count }}",
-            2003,
-            "Foreign key constraint failed on the field"
-        );
-
-        Ok(())
-    }
-
-    /// Deleting the parent leaves the data in a integrity-violating state.
-    #[connector_test(only(MongoDb))]
-    async fn delete_parent_violation(runner: Runner) -> TestResult<()> {
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, child: { create: { id: 1 }}}) { id }}"#),
-          @r###"{"data":{"createOneParent":{"id":1}}}"###
-        );
-
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { deleteOneParent(where: { id: 1 }) { id }}"#),
-          @r###"{"data":{"deleteOneParent":{"id":1}}}"###
-        );
-
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyChild { parent_id }}"#),
-          @r###"{"data":{"findManyChild":[{"parent_id":1}]}}"###
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         Ok(())
     }
 }
 
-#[test_suite(suite = "noaction_onD_1to1_opt", schema(optional), exclude(MongoDb))]
+#[test_suite(
+    suite = "noaction_onD_1to1_opt",
+    schema(optional),
+    exclude(Postgres, Sqlite, MongoDb)
+)]
 mod one2one_opt {
     fn optional() -> String {
         let schema = indoc! {
@@ -145,9 +133,11 @@ mod one2one_opt {
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { deleteOneParent(where: { id: 1 }) { id }}"#),
-          @r###"{"data":{"deleteOneParent":{"id":1}}}"###
+        assert_error!(
+            runner,
+            "mutation { deleteOneParent(where: { id: 1 }) { id }}",
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         insta::assert_snapshot!(
@@ -159,7 +149,12 @@ mod one2one_opt {
     }
 }
 
-#[test_suite(suite = "noaction_onD_1toM_req", schema(required), exclude(MongoDb))]
+#[test_suite(
+    suite = "noaction_onD_1toM_req",
+    schema(required),
+    relation_mode = "prisma",
+    exclude(Postgres, Sqlite)
+)]
 mod one2many_req {
     fn required() -> String {
         let schema = indoc! {
@@ -189,15 +184,15 @@ mod one2many_req {
         assert_error!(
             runner,
             "mutation { deleteOneParent(where: { id: 1 }) { id }}",
-            2003,
-            "Foreign key constraint failed on the field"
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         assert_error!(
             runner,
             "mutation { deleteManyParent(where: { id: 1 }) { count }}",
-            2003,
-            "Foreign key constraint failed on the field"
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         Ok(())
@@ -230,16 +225,18 @@ mod one2many_req {
     }
 
     /// Deleting the parent leaves the data in a integrity-violating state.
-    #[connector_test(only(MongoDb))]
+    #[connector_test]
     async fn delete_parent_violation(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, children: { create: { id: 1 }}}) { id }}"#),
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { deleteOneParent(where: { id: 1 }) { id }}"#),
-          @r###"{"data":{"deleteOneParent":{"id":1}}}"###
+        assert_error!(
+            runner,
+            "mutation { deleteOneParent(where: { id: 1 }) { id }}",
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         insta::assert_snapshot!(
@@ -251,7 +248,11 @@ mod one2many_req {
     }
 }
 
-#[test_suite(suite = "noaction_onD_1toM_opt", schema(optional), exclude(MongoDb))]
+#[test_suite(
+    suite = "noaction_onD_1toM_opt",
+    schema(optional),
+    exclude(Postgres, Sqlite, MongoDb)
+)]
 mod one2many_opt {
     fn optional() -> String {
         let schema = indoc! {
@@ -329,9 +330,11 @@ mod one2many_opt {
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { deleteOneParent(where: { id: 1 }) { id }}"#),
-          @r###"{"data":{"deleteOneParent":{"id":1}}}"###
+        assert_error!(
+            runner,
+            "mutation { deleteOneParent(where: { id: 1 }) { id }}",
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         insta::assert_snapshot!(

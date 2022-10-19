@@ -42,7 +42,7 @@ fn display_column_type(
     connector: &dyn psl::datamodel_connector::Connector,
 ) -> String {
     match &column.column_type().native_type {
-        Some(tpe) => connector.introspect_native_type(tpe.clone()).to_string(),
+        Some(tpe) => connector.native_type_to_string(tpe),
         _ => format!("{:?}", column.column_type_family()),
     }
 }

@@ -6,7 +6,6 @@ use crate::{
     ids::*, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, ForeignKeyAction,
     ForeignKeyColumn, Index, IndexColumn, IndexType, SQLSortOrder, SqlSchema, Table, UserDefinedType, View,
 };
-use serde::de::DeserializeOwned;
 use std::ops::Range;
 
 /// A generic reference to a schema item. It holds a reference to the schema so it can offer a
@@ -124,14 +123,8 @@ impl<'a> ColumnWalker<'a> {
     }
 
     /// The column native type.
-    pub fn column_native_type<T>(self) -> Option<T>
-    where
-        T: DeserializeOwned,
-    {
-        self.column_type()
-            .native_type
-            .as_ref()
-            .map(|val| serde_json::from_value(val.clone()).unwrap())
+    pub fn column_native_type<T: std::any::Any + 'static>(self) -> Option<&'a T> {
+        self.column_type().native_type.as_ref().map(|nt| nt.downcast_ref())
     }
 
     /// Is this column an auto-incrementing integer?

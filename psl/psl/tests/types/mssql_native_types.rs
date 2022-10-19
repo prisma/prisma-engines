@@ -1,5 +1,5 @@
 use crate::common::*;
-use native_types::{MsSqlType, MsSqlTypeParameter::*};
+use psl::builtin_connectors::{MsSqlType, MsSqlTypeParameter::*};
 
 #[test]
 fn text_type_should_fail_on_unique() {
@@ -826,7 +826,7 @@ fn should_fail_on_bad_type_params() {
     "#};
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mInvalid argument for type NVarChar: Ma. Allowed values: a number or `Max`.[0m
+        [1;91merror[0m: [1mExpected an integer or `Max`, but found (Ma).[0m
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id     Int    @id
@@ -890,9 +890,9 @@ macro_rules! test_type {
                         .unwrap()
                         .clone();
 
-                    let result: MsSqlType = instance.deserialize_native_type();
+                    let result: &MsSqlType = instance.deserialize_native_type();
 
-                    assert_eq!($output, result);
+                    assert_eq!(&$output, result);
                 )+
             }
         }
