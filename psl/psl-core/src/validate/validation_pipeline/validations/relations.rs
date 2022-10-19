@@ -546,8 +546,8 @@ pub(crate) fn required_relation_cannot_use_set_null(relation: InlineRelationWalk
 
     if let Some(ReferentialAction::SetNull) = forward.explicit_on_delete() {
         ctx.push_error(DatamodelError::new_attribute_validation_error(
-            r#"The `onDelete` referential action of a relation must not be set to `SetNull` when the referenced field is required.
-Either use another referential action, or make the field optional."#,
+            r#"The `onDelete` referential action of a relation must not be set to `SetNull` when a referenced field is required.
+Either choose another referential action, or make the referenced fields optional."#,
             RELATION_ATTRIBUTE_NAME,
             forward.ast_field().span(),
         ))
@@ -555,8 +555,8 @@ Either use another referential action, or make the field optional."#,
 
     if let Some(ReferentialAction::SetNull) = forward.explicit_on_update() {
         ctx.push_error(DatamodelError::new_attribute_validation_error(
-            r#"The `onUpdate` referential action of a relation must not be set to `SetNull` when the referenced field is required.
-Either use another referential action, or make the field optional."#,
+            r#"The `onUpdate` referential action of a relation must not be set to `SetNull` when a referenced field is required.
+Either choose another referential action, or make the referenced fields optional."#,
             RELATION_ATTRIBUTE_NAME,
             forward.ast_field().span(),
         ))
