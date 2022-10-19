@@ -18,7 +18,6 @@ mod error;
 mod operation;
 mod parse_ast;
 mod parser;
-mod query_value;
 mod selection;
 mod transformers;
 
@@ -26,10 +25,10 @@ pub use error::*;
 pub use operation::*;
 pub use parse_ast::*;
 pub use parser::*;
-pub use query_value::*;
 pub use selection::*;
 pub use transformers::*;
 
+use prisma_value::PrismaValue;
 use schema_builder::constants::args;
 
 pub type QueryParserResult<T> = std::result::Result<T, QueryParserError>;
@@ -38,6 +37,7 @@ pub type QueryParserResult<T> = std::result::Result<T, QueryParserError>;
 pub enum QueryDocument {
     Single(Operation),
     Multi(BatchDocument),
+    Compact(CompactedDocument),
 }
 
 impl QueryDocument {
@@ -47,41 +47,42 @@ impl QueryDocument {
             _ => self,
         }
     }
+
+    pub fn batch_or_compact(operations: Vec<Operation>, transaction: Option<BatchDocumentTransaction>) -> Self {
+        if can_compact(&operations) {
+            Self::Compact(CompactedDocument::from(operations))
+        } else {
+            Self::Multi(BatchDocument::new(operations, transaction))
+        }
+    }
+}
+
+fn can_compact(operations: &Vec<Operation>) -> bool {
+    match operations.split_first() {
+        Some((first, rest)) if first.is_find_unique() => rest.iter().all(|op| {
+            op.is_find_unique()
+                && first.name() == op.name()
+                && first.nested_selections().len() == op.nested_selections().len()
+                && first
+                    .nested_selections()
+                    .iter()
+                    .all(|fop| op.nested_selections().contains(fop))
+        }),
+        _ => false,
+    }
 }
 
 #[derive(Debug)]
-pub enum BatchDocument {
-    Multi(Vec<Operation>, Option<BatchDocumentTransaction>),
-    Compact(CompactedDocument),
+pub struct BatchDocument {
+    pub operations: Vec<Operation>,
+    pub transaction: Option<BatchDocumentTransaction>,
 }
 
 impl BatchDocument {
     pub fn new(operations: Vec<Operation>, transaction: Option<BatchDocumentTransaction>) -> Self {
-        Self::Multi(operations, transaction)
-    }
-
-    fn can_compact(&self) -> bool {
-        match self {
-            Self::Multi(operations, _) => match operations.split_first() {
-                Some((first, rest)) if first.is_find_unique() => rest.iter().all(|op| {
-                    op.is_find_unique()
-                        && first.name() == op.name()
-                        && first.nested_selections().len() == op.nested_selections().len()
-                        && first
-                            .nested_selections()
-                            .iter()
-                            .all(|fop| op.nested_selections().contains(fop))
-                }),
-                _ => false,
-            },
-            Self::Compact(_) => false,
-        }
-    }
-
-    pub fn compact(self) -> Self {
-        match self {
-            Self::Multi(operations, _) if self.can_compact() => Self::Compact(CompactedDocument::from(operations)),
-            _ => self,
+        Self {
+            operations,
+            transaction,
         }
     }
 }
@@ -103,7 +104,7 @@ impl BatchDocumentTransaction {
 
 #[derive(Debug, Clone)]
 pub struct CompactedDocument {
-    pub arguments: Vec<Vec<(String, QueryValue)>>,
+    pub arguments: Vec<Vec<(String, PrismaValue)>>,
     pub nested_selection: Vec<String>,
     pub operation: Operation,
     pub keys: Vec<String>,
@@ -156,7 +157,7 @@ impl From<Vec<Operation>> for CompactedDocument {
                 match obj.values().next() {
                     // This means our query has a nested object, meaning we have
                     // a compound filter in a form of {"col1_col2": {"col1": .., "col2": ..}}
-                    Some(QueryValue::Object(obj)) => obj
+                    Some(PrismaValue::Object(obj)) => obj
                         .iter()
                         .fold(acc, |acc, (key, val)| acc.push(key.clone(), val.clone())),
                     // ...or a singular argument in a form of {"col1": ..}
@@ -195,10 +196,10 @@ impl From<Vec<Operation>> for CompactedDocument {
 
         // Convert the selections into a vector of arguments. This defines the
         // response order and how we fetch the right data from the response set.
-        let arguments: Vec<Vec<(String, QueryValue)>> = selections
+        let arguments: Vec<Vec<(String, PrismaValue)>> = selections
             .into_iter()
             .map(|mut sel| {
-                let mut obj: Vec<(String, QueryValue)> = sel
+                let mut obj: Vec<(String, PrismaValue)> = sel
                     .pop_argument()
                     .unwrap()
                     .1
@@ -209,7 +210,7 @@ impl From<Vec<Operation>> for CompactedDocument {
 
                 // The trick again to detect if we have a compound key or not. (sigh)
                 match obj.pop() {
-                    Some((_, QueryValue::Object(obj))) => obj.into_iter().collect(),
+                    Some((_, PrismaValue::Object(obj))) => obj.into_iter().collect(),
                     Some(pair) => {
                         obj.push(pair);
                         obj
@@ -222,7 +223,7 @@ impl From<Vec<Operation>> for CompactedDocument {
         // The trick again to detect if we have a compound key or not. (sigh)
         // Gets the argument keys for later mapping.
         let keys = match arguments[0].get(0) {
-            Some((_, QueryValue::Object(obj))) => obj.iter().map(|(k, _)| k.to_string()).collect(),
+            Some((_, PrismaValue::Object(obj))) => obj.iter().map(|(k, _)| k.to_string()).collect(),
             _ => arguments[0].iter().map(|(k, _)| k.to_string()).collect(),
         };
 

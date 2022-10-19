@@ -4,6 +4,7 @@ mod error;
 
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::prelude::*;
+use indexmap::IndexMap;
 use serde::de::Unexpected;
 use serde::{ser::Serializer, Deserialize, Deserializer, Serialize};
 use std::{convert::TryFrom, fmt, str::FromStr};
@@ -13,7 +14,8 @@ pub use error::ConversionFailure;
 pub type PrismaValueResult<T> = std::result::Result<T, ConversionFailure>;
 pub type PrismaListValue = Vec<PrismaValue>;
 
-#[derive(Debug, PartialEq, Clone, Eq, Hash, Serialize, Deserialize, PartialOrd, Ord)]
+#[allow(clippy::derive_hash_xor_eq)]
+#[derive(Clone, Debug, Eq, Hash, Serialize, Deserialize, PartialOrd, Ord)]
 #[serde(untagged)]
 pub enum PrismaValue {
     String(String),
@@ -251,6 +253,19 @@ impl PrismaValue {
         }
     }
 
+    pub fn into_object(self) -> Option<IndexMap<String, PrismaValue>> {
+        match self {
+            Self::Object(map) => {
+                let x = map.into_iter().fold(IndexMap::new(), |mut acc, (key, value)| {
+                    acc.insert(key, value);
+                    acc
+                });
+                Some(x)
+            }
+            _ => None,
+        }
+    }
+
     pub fn new_float(float: f64) -> PrismaValue {
         PrismaValue::Float(BigDecimal::from_f64(float).unwrap())
     }
@@ -295,6 +310,32 @@ impl fmt::Display for PrismaValue {
 
                 write!(f, "{{ {} }}", joined)
             }
+        }
+    }
+}
+
+impl PartialEq for PrismaValue {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (PrismaValue::Int(n1), PrismaValue::Int(n2)) => n1 == n2,
+            (PrismaValue::BigInt(n1), PrismaValue::BigInt(n2)) => n1 == n2,
+            (PrismaValue::Float(n1), PrismaValue::Float(n2)) => n1 == n2,
+            (PrismaValue::String(s1), PrismaValue::String(s2)) => s1 == s2,
+            (PrismaValue::Boolean(b1), PrismaValue::Boolean(b2)) => b1 == b2,
+            (PrismaValue::Uuid(u1), PrismaValue::Uuid(u2)) => u1 == u2,
+            (PrismaValue::Json(j1), PrismaValue::Json(j2)) => j1 == j2,
+            (PrismaValue::Xml(x1), PrismaValue::Xml(x2)) => x1 == x2,
+            (PrismaValue::Bytes(b1), PrismaValue::Bytes(b2)) => b1 == b2,
+            (PrismaValue::Null, PrismaValue::Null) => true,
+            (PrismaValue::Enum(kind1), PrismaValue::Enum(kind2)) => kind1 == kind2,
+            (PrismaValue::List(list1), PrismaValue::List(list2)) => list1 == list2,
+            (PrismaValue::Object(t1), PrismaValue::Object(t2)) => t1 == t2,
+            (PrismaValue::DateTime(t1), PrismaValue::DateTime(t2)) => t1 == t2,
+            (PrismaValue::String(t1), PrismaValue::DateTime(t2))
+            | (PrismaValue::DateTime(t2), PrismaValue::String(t1)) => chrono::DateTime::parse_from_rfc3339(t1)
+                .map(|t1| &t1 == t2)
+                .unwrap_or_else(|_| t1 == stringify_date(t2).as_str()),
+            _ => false,
         }
     }
 }

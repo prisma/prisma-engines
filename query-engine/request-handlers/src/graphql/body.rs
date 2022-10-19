@@ -1,5 +1,5 @@
 use super::GraphQLProtocolAdapter;
-use query_core::{BatchDocument, BatchDocumentTransaction, Operation, QueryDocument};
+use query_core::{BatchDocumentTransaction, Operation, QueryDocument};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -54,7 +54,7 @@ impl From<&str> for SingleQuery {
 
 impl GraphQlBody {
     /// Convert a `GraphQlBody` into a `QueryDocument`.
-    pub(crate) fn into_doc(self) -> crate::Result<QueryDocument> {
+    pub(crate) fn into_query_doc(self) -> crate::Result<QueryDocument> {
         match self {
             GraphQlBody::Single(body) => {
                 let operation = GraphQLProtocolAdapter::convert_query_to_operation(&body.query, body.operation_name)?;
@@ -73,7 +73,7 @@ impl GraphQlBody {
                     None
                 };
 
-                Ok(QueryDocument::Multi(BatchDocument::new(operations?, transaction)))
+                Ok(QueryDocument::batch_or_compact(operations?, transaction))
             }
         }
     }

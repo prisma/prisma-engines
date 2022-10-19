@@ -13,3 +13,4 @@ bigdecimal = "0.3"
 serde.workspace = true
 serde_json.workspace = true
 uuid.workspace = true
+indexmap = { version = "1.7", features = ["serde-1"] }

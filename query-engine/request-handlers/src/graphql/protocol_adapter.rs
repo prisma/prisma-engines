@@ -3,7 +3,7 @@ use bigdecimal::{BigDecimal, FromPrimitive};
 use graphql_parser::query::{
     Definition, Document, OperationDefinition, Selection as GqlSelection, SelectionSet, Value,
 };
-use indexmap::IndexMap;
+use psl::dml::PrismaValue;
 use query_core::query_document::*;
 
 /// Protocol adapter for GraphQL -> Query Document.
@@ -13,7 +13,7 @@ use query_core::query_document::*;
 /// - Every field of a single `mutation { ... }` is mapped to an `Operation::Write`.
 /// - If the JSON payload specifies an operation name, only that specific operation is picked and the rest ignored.
 /// - Fields on the queries are mapped to `Field`s, including arguments.
-/// - Concrete values (e.g. in arguments) are mapped to `QueryValue`s.
+/// - Concrete values (e.g. in arguments) are mapped to `PrismaValue`s.
 ///
 /// Currently unsupported features:
 /// - Fragments in any form.
@@ -95,7 +95,7 @@ impl GraphQLProtocolAdapter {
             .into_iter()
             .map(|item| match item {
                 GqlSelection::Field(f) => {
-                    let arguments: Vec<(String, QueryValue)> = f
+                    let arguments: Vec<(String, PrismaValue)> = f
                         .arguments
                         .into_iter()
                         .map(|(k, v)| Ok((k, Self::convert_value(v)?)))
@@ -133,42 +133,42 @@ impl GraphQLProtocolAdapter {
         }
     }
 
-    fn convert_value(value: Value<String>) -> crate::Result<QueryValue> {
-        match value {
+    fn convert_value(value: Value<String>) -> crate::Result<PrismaValue> {
+        match value.clone() {
             Value::Variable(name) => Err(HandlerError::unsupported_feature(
                 "Variable usage",
                 format!("Variable '{}'.", name),
             )),
             Value::Int(i) => match i.as_i64() {
-                Some(i) => Ok(QueryValue::Int(i)),
+                Some(i) => Ok(PrismaValue::Int(i)),
                 None => Err(HandlerError::query_conversion(format!(
                     "Invalid 64 bit integer: {:?}",
                     i
                 ))),
             },
             Value::Float(f) => match BigDecimal::from_f64(f) {
-                Some(dec) => Ok(QueryValue::Float(dec)),
+                Some(dec) => Ok(PrismaValue::Float(dec)),
                 None => Err(HandlerError::query_conversion(format!("invalid 64-bit float: {:?}", f))),
             },
-            Value::String(s) => Ok(QueryValue::String(s)),
-            Value::Boolean(b) => Ok(QueryValue::Boolean(b)),
-            Value::Null => Ok(QueryValue::Null),
-            Value::Enum(e) => Ok(QueryValue::Enum(e)),
+            Value::String(s) => Ok(PrismaValue::String(s)),
+            Value::Boolean(b) => Ok(PrismaValue::Boolean(b)),
+            Value::Null => Ok(PrismaValue::Null),
+            Value::Enum(e) => Ok(PrismaValue::Enum(e)),
             Value::List(values) => {
-                let values: Vec<QueryValue> = values
+                let values: Vec<PrismaValue> = values
                     .into_iter()
                     .map(Self::convert_value)
-                    .collect::<crate::Result<Vec<QueryValue>>>()?;
+                    .collect::<crate::Result<Vec<PrismaValue>>>()?;
 
-                Ok(QueryValue::List(values))
+                Ok(PrismaValue::List(values))
             }
             Value::Object(map) => {
                 let values = map
                     .into_iter()
                     .map(|(k, v)| Self::convert_value(v).map(|v| (k, v)))
-                    .collect::<crate::Result<IndexMap<String, QueryValue>>>()?;
+                    .collect::<crate::Result<Vec<(String, PrismaValue)>>>()?;
 
-                Ok(QueryValue::Object(values))
+                Ok(PrismaValue::Object(values))
             }
         }
     }
@@ -199,9 +199,9 @@ mod tests {
 
         let read = operation.into_read().unwrap();
 
-        let where_args = QueryValue::Object(IndexMap::from([(
+        let where_args = PrismaValue::Object(Vec::from([(
             "a_number".to_string(),
-            QueryValue::Object([("gte".to_string(), QueryValue::Int(1))].into()),
+            PrismaValue::Object([("gte".to_string(), PrismaValue::Int(1))].into()),
         )]));
 
         assert_eq!(read.arguments(), [("where".to_string(), where_args)]);
@@ -238,18 +238,18 @@ mod tests {
 
         let write = operation.into_write().unwrap();
 
-        let data_args = QueryValue::Object(
+        let data_args = PrismaValue::Object(
             [
-                ("id".to_string(), QueryValue::Int(1)),
+                ("id".to_string(), PrismaValue::Int(1)),
                 (
                     "categories".to_string(),
-                    QueryValue::Object(
+                    PrismaValue::Object(
                         [(
                             "create".to_string(),
-                            QueryValue::List(
+                            PrismaValue::List(
                                 [
-                                    QueryValue::Object([("id".to_string(), QueryValue::Int(1))].into()),
-                                    QueryValue::Object([("id".to_string(), QueryValue::Int(2))].into()),
+                                    PrismaValue::Object([("id".to_string(), PrismaValue::Int(1))].into()),
+                                    PrismaValue::Object([("id".to_string(), PrismaValue::Int(2))].into()),
                                 ]
                                 .into(),
                             ),
@@ -260,7 +260,6 @@ mod tests {
             ]
             .into(),
         );
-        println!("args {:?}", write.arguments());
         assert_eq!(write.arguments(), [("data".to_string(), data_args)]);
     }
 }
