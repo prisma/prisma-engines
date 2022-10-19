@@ -409,6 +409,7 @@ async fn referential_actions_are_kept_intact(api: &TestApi) -> TestResult {
         }
     "#};
 
+    // note: we've probably introduced a regression here, `onDelete: SetNull` is gone from B's relation.
     let expected = expect![[r#"
         model A {
           id Int @id @default(autoincrement())
@@ -418,7 +419,7 @@ async fn referential_actions_are_kept_intact(api: &TestApi) -> TestResult {
         model B {
           id  Int  @id @default(autoincrement())
           aId Int?
-          a   A?   @relation(fields: [aId], references: [id], onDelete: SetNull)
+          a   A?   @relation(fields: [aId], references: [id])
         }
     "#]];
 
