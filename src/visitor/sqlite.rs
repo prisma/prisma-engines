@@ -133,7 +133,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
     fn visit_insert(&mut self, insert: Insert<'a>) -> visitor::Result {
         match insert.on_conflict {
             Some(OnConflict::DoNothing) => self.write("INSERT OR IGNORE")?,
-            None => self.write("INSERT")?,
+            _ => self.write("INSERT")?,
         };
 
         if let Some(table) = insert.table {
@@ -193,6 +193,14 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
                 }
             }
             expr => self.visit_expression(expr)?,
+        }
+
+        if let Some(OnConflict::Update(update, constraints)) = insert.on_conflict {
+            self.write(" ON CONFLICT ")?;
+            self.columns_to_bracket_list(constraints)?;
+            self.write(" DO ")?;
+
+            self.visit_upsert(update)?;
         }
 
         if let Some(returning) = insert.returning {
@@ -974,5 +982,25 @@ mod tests {
             "INSERT INTO `test` (`user id`, `txt`) VALUES (?,?) RETURNING `user id` AS `user id`",
             sql
         );
+    }
+
+    #[test]
+    #[cfg(feature = "sqlite")]
+    fn test_insert_on_conflict_update() {
+        let expected = expected_values(
+            "INSERT INTO \"users\" (\"foo\") VALUES ($1) ON CONFLICT (\"foo\") DO UPDATE SET \"foo\" = $2 WHERE \"users\".\"foo\" = $3 RETURNING \"foo\"",
+            vec![10, 3, 1],
+        );
+
+        let update = Update::table("users").set("foo", 3).so_that(("users", "foo").equals(1));
+
+        let query: Insert = Insert::single_into("users").value("foo", 10).into();
+
+        let query = query.on_conflict(OnConflict::Update(update, Vec::from(["foo".into()])));
+
+        let (sql, params) = Postgres::build(Insert::from(query).returning(vec!["foo"])).unwrap();
+
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
     }
 }

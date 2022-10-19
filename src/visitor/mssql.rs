@@ -527,6 +527,10 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         Ok(())
     }
 
+    fn visit_upsert(&mut self, _update: crate::ast::Update<'a>) -> visitor::Result {
+        unimplemented!("Upsert not supported for the underlying database.")
+    }
+
     fn parameter_substitution(&mut self) -> visitor::Result {
         self.write("@P")?;
         self.write(self.parameters.len())

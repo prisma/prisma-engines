@@ -181,7 +181,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
     fn visit_insert(&mut self, insert: Insert<'a>) -> visitor::Result {
         match insert.on_conflict {
             Some(OnConflict::DoNothing) => self.write("INSERT IGNORE ")?,
-            None => self.write("INSERT ")?,
+            _ => self.write("INSERT ")?,
         };
 
         if let Some(table) = insert.table {
@@ -247,8 +247,11 @@ impl<'a> Visitor<'a> for Mysql<'a> {
             self.write(" ")?;
             self.visit_comment(comment)?;
         }
-
         Ok(())
+    }
+
+    fn visit_upsert(&mut self, _update: crate::ast::Update<'a>) -> visitor::Result {
+        unimplemented!("Upsert not supported for the underlying database.")
     }
 
     /// MySql will error if a `Update` or `Delete` query has a subselect

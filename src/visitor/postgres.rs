@@ -128,7 +128,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
     fn visit_insert(&mut self, insert: Insert<'a>) -> visitor::Result {
         self.write("INSERT ")?;
 
-        if let Some(table) = insert.table {
+        if let Some(table) = insert.table.clone() {
             self.write("INTO ")?;
             self.visit_table(table, true)?;
         }
@@ -187,9 +187,17 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             expr => self.surround_with("(", ")", |ref mut s| s.visit_expression(expr))?,
         }
 
-        if let Some(OnConflict::DoNothing) = insert.on_conflict {
-            self.write(" ON CONFLICT DO NOTHING")?;
-        };
+        match insert.on_conflict {
+            Some(OnConflict::DoNothing) => self.write(" ON CONFLICT DO NOTHING")?,
+            Some(OnConflict::Update(update, constraints)) => {
+                self.write(" ON CONFLICT")?;
+                self.columns_to_bracket_list(constraints)?;
+                self.write(" DO ")?;
+
+                self.visit_upsert(update)?;
+            }
+            None => (),
+        }
 
         if let Some(returning) = insert.returning {
             if !returning.is_empty() {
@@ -562,6 +570,26 @@ mod tests {
             vec![10],
         );
         let query = Insert::single_into("users").value("foo", 10);
+        let (sql, params) = Postgres::build(Insert::from(query).returning(vec!["foo"])).unwrap();
+
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
+    }
+
+    #[test]
+    #[cfg(feature = "postgresql")]
+    fn test_insert_on_conflict_update() {
+        let expected = expected_values(
+            "INSERT INTO \"users\" (\"foo\") VALUES ($1) ON CONFLICT (\"foo\") DO UPDATE SET \"foo\" = $2 WHERE \"users\".\"foo\" = $3 RETURNING \"foo\"",
+            vec![10, 3, 1],
+        );
+
+        let update = Update::table("users").set("foo", 3).so_that(("users", "foo").equals(1));
+
+        let query: Insert = Insert::single_into("users").value("foo", 10).into();
+
+        let query = query.on_conflict(OnConflict::Update(update, Vec::from(["foo".into()])));
+
         let (sql, params) = Postgres::build(Insert::from(query).returning(vec!["foo"])).unwrap();
 
         assert_eq!(expected.0, sql);

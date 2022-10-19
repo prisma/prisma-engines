@@ -7,7 +7,7 @@ pub struct Insert<'a> {
     pub(crate) table: Option<Table<'a>>,
     pub(crate) columns: Vec<Column<'a>>,
     pub(crate) values: Expression<'a>,
-    pub(crate) on_conflict: Option<OnConflict>,
+    pub(crate) on_conflict: Option<OnConflict<'a>>,
     pub(crate) returning: Option<Vec<Column<'a>>>,
     pub(crate) comment: Option<Cow<'a, str>>,
 }
@@ -29,8 +29,9 @@ pub struct MultiRowInsert<'a> {
 }
 
 /// `INSERT` conflict resolution strategies.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum OnConflict {
+#[allow(clippy::large_enum_variant)]
+#[derive(Clone, Debug, PartialEq)]
+pub enum OnConflict<'a> {
     /// When a row already exists, do nothing. Works with PostgreSQL, MySQL or
     /// SQLite without schema information.
     ///
@@ -86,6 +87,8 @@ pub enum OnConflict {
     /// [`DefaultValue::Generated`]: enum.DefaultValue.html#variant.Generated
     /// [column has a default value]: struct.Column.html#method.default
     DoNothing,
+    /// ON CONFLICT UPDATE is supported for Sqlite and Postgres
+    Update(Update<'a>, Vec<Column<'a>>),
 }
 
 impl<'a> From<Insert<'a>> for Query<'a> {
@@ -216,7 +219,7 @@ impl<'a> Insert<'a> {
     }
 
     /// Sets the conflict resolution strategy.
-    pub fn on_conflict(mut self, on_conflict: OnConflict) -> Self {
+    pub fn on_conflict(mut self, on_conflict: OnConflict<'a>) -> Self {
         self.on_conflict = Some(on_conflict);
         self
     }

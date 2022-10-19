@@ -83,6 +83,22 @@ pub trait Visitor<'a> {
         self.write(end)
     }
 
+    fn columns_to_bracket_list(&mut self, columns: Vec<Column<'a>>) -> Result {
+        let len = columns.len();
+
+        self.write(" (")?;
+        for (i, c) in columns.into_iter().enumerate() {
+            self.visit_column(c.name.into_owned().into())?;
+
+            if i < (len - 1) {
+                self.write(",")?;
+            }
+        }
+        self.write(")")?;
+
+        Ok(())
+    }
+
     /// When called, the visitor decided to not render the parameter into the query,
     /// replacing it with the `C_PARAM`, calling `add_parameter` with the replaced value.
     fn add_parameter(&mut self, value: Value<'a>);
@@ -321,6 +337,37 @@ pub trait Visitor<'a> {
         if let Some(comment) = update.comment {
             self.write(" ")?;
             self.visit_comment(comment)?;
+        }
+
+        Ok(())
+    }
+
+    fn visit_upsert(&mut self, update: Update<'a>) -> Result {
+        self.write("UPDATE ")?;
+
+        self.write("SET ")?;
+        self.visit_update_set(update.clone())?;
+
+        if let Some(conditions) = update.conditions {
+            self.write(" WHERE ")?;
+            self.visit_conditions(conditions)?;
+        }
+
+        Ok(())
+    }
+
+    fn visit_update_set(&mut self, update: Update<'a>) -> Result {
+        let pairs = update.columns.into_iter().zip(update.values.into_iter());
+        let len = pairs.len();
+
+        for (i, (key, value)) in pairs.enumerate() {
+            self.visit_column(key)?;
+            self.write(" = ")?;
+            self.visit_expression(value)?;
+
+            if i < (len - 1) {
+                self.write(", ")?;
+            }
         }
 
         Ok(())
