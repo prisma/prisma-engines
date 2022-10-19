@@ -8,6 +8,7 @@ use super::constraint_namespace::ConstraintName;
 use crate::datamodel_connector::{walker_ext_traits::*, Connector, ConnectorCapability, RelationMode};
 use crate::{diagnostics::DatamodelError, validate::validation_pipeline::context::Context};
 use itertools::Itertools;
+use parser_database::ReferentialAction;
 use parser_database::{
     ast::WithSpan,
     walkers::{CompleteInlineRelationWalker, InlineRelationWalker, RelationFieldWalker},
@@ -523,5 +524,41 @@ fn is_empty_fields<T>(fields: Option<impl ExactSizeIterator<Item = T>>) -> bool 
     match fields {
         None => true,
         Some(fields) => fields.len() == 0,
+    }
+}
+
+/// There cannot be any required field in a relation where one of the referential actions is SetNull.
+pub(crate) fn required_relation_cannot_use_set_null(relation: InlineRelationWalker<'_>, ctx: &mut Context<'_>) {
+    // return early if there's no relation field on the referencing model
+    let forward = match relation.forward_relation_field() {
+        Some(forward) => forward,
+        None => return,
+    };
+
+    // return early if no referencing field is required
+    if forward
+        .referencing_fields()
+        .map(|mut fields| fields.all(|f| !f.ast_field().arity.is_required()))
+        .unwrap_or_default()
+    {
+        return;
+    }
+
+    if let Some(ReferentialAction::SetNull) = forward.explicit_on_delete() {
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            r#"The `onDelete` referential action of a relation must not be set to `SetNull` when the referenced field is required.
+Either use another referential action, or make the field optional."#,
+            RELATION_ATTRIBUTE_NAME,
+            forward.ast_field().span(),
+        ))
+    }
+
+    if let Some(ReferentialAction::SetNull) = forward.explicit_on_update() {
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            r#"The `onUpdate` referential action of a relation must not be set to `SetNull` when the referenced field is required.
+Either use another referential action, or make the field optional."#,
+            RELATION_ATTRIBUTE_NAME,
+            forward.ast_field().span(),
+        ))
     }
 }

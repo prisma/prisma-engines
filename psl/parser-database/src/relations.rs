@@ -434,6 +434,11 @@ pub enum ReferentialAction {
 }
 
 impl ReferentialAction {
+    /// True if action is SetNull
+    pub fn is_set_null(self) -> bool {
+        matches!(self, ReferentialAction::SetNull)
+    }
+
     /// True if the action modifies the related items.
     pub fn triggers_modification(self) -> bool {
         !matches!(self, Self::NoAction | Self::Restrict)
