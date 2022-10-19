@@ -381,6 +381,7 @@ async fn field_renames_keeps_the_relation_intact(api: &TestApi) -> TestResult {
     Ok(())
 }
 
+// trigger CI here.
 #[test_connector(tags(Vitess), preview_features("referentialIntegrity"))]
 async fn referential_actions_are_kept_intact(api: &TestApi) -> TestResult {
     let dml = indoc! {r#"
