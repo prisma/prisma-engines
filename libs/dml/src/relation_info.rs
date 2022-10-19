@@ -57,6 +57,8 @@ pub enum ReferentialAction {
     /// deferred, this makes it possible to temporarily violate integrity in a
     /// transaction while making sure that subsequent operations in the
     /// transaction restore integrity.
+    /// When using relationMode = "prisma", NoAction becomes an alias of
+    /// the emulated Restrict (when supported).
     NoAction,
     /// Sets relation scalar fields to null if the relation is deleted or
     /// updated. This will always result in a runtime error if one or more of the
