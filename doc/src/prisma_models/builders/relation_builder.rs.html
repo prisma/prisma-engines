@@ -29,9 +29,13 @@
 <span id="29">29</span>
 <span id="30">30</span>
 <span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
 <span class="kw">use</span> <span class="ident">once_cell::sync::OnceCell</span>;
+<span class="kw">use</span> <span class="ident">psl::datamodel_connector::RelationMode</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">InternalDataModelWeakRef</span>, <span class="ident">Relation</span>, <span class="ident">RelationLinkManifestation</span>, <span class="ident">RelationRef</span>};
 
@@ -41,6 +45,7 @@
     <span class="kw">pub</span> <span class="ident">manifestation</span>: <span class="ident">RelationLinkManifestation</span>,
     <span class="kw">pub</span> <span class="ident">model_a_name</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">model_b_name</span>: <span class="ident">String</span>,
+    <span class="kw">pub</span> <span class="ident">relation_mode</span>: <span class="ident">RelationMode</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">RelationBuilder</span> {
@@ -50,6 +55,7 @@
             <span class="ident">manifestation</span>: <span class="self">self</span>.<span class="ident">manifestation</span>,
             <span class="ident">model_a_name</span>: <span class="self">self</span>.<span class="ident">model_a_name</span>,
             <span class="ident">model_b_name</span>: <span class="self">self</span>.<span class="ident">model_b_name</span>,
+            <span class="ident">relation_mode</span>: <span class="self">self</span>.<span class="ident">relation_mode</span>,
             <span class="ident">model_a</span>: <span class="ident">OnceCell::new</span>(),
             <span class="ident">model_b</span>: <span class="ident">OnceCell::new</span>(),
             <span class="ident">field_a</span>: <span class="ident">OnceCell::new</span>(),

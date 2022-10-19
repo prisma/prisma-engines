@@ -174,9 +174,26 @@
 <span id="174">174</span>
 <span id="175">175</span>
 <span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">dml::ReferentialAction</span>;
 <span class="kw">use</span> <span class="ident">once_cell::sync::OnceCell</span>;
+<span class="kw">use</span> <span class="ident">psl::datamodel_connector::RelationMode</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">fmt::Debug</span>,
     <span class="ident">sync</span>::{<span class="ident">Arc</span>, <span class="ident">Weak</span>},
@@ -201,6 +218,7 @@
 
     <span class="kw">pub</span> <span class="ident">manifestation</span>: <span class="ident">RelationLinkManifestation</span>,
     <span class="kw">pub</span> <span class="ident">internal_data_model</span>: <span class="ident">InternalDataModelWeakRef</span>,
+    <span class="kw">pub</span> <span class="ident">relation_mode</span>: <span class="ident">RelationMode</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Relation</span> {
@@ -300,20 +318,34 @@
 
     <span class="doccomment">/// Retrieves the onDelete policy for this relation.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ReferentialAction</span> {
-        <span class="self">self</span>.<span class="ident">field_a</span>()
+        <span class="kw">let</span> <span class="ident">action</span> <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">field_a</span>()
             .<span class="ident">on_delete</span>()
             .<span class="ident">cloned</span>()
             .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">field_b</span>().<span class="ident">on_delete</span>().<span class="ident">cloned</span>())
-            .<span class="ident">unwrap_or</span>(<span class="self">self</span>.<span class="ident">field_a</span>().<span class="ident">on_delete_default</span>)
+            .<span class="ident">unwrap_or</span>(<span class="self">self</span>.<span class="ident">field_a</span>().<span class="ident">on_delete_default</span>);
+
+        <span class="kw">match</span> (<span class="ident">action</span>, <span class="self">self</span>.<span class="ident">relation_mode</span>) {
+            <span class="comment">// NoAction is an alias for Restrict when relationMode = &quot;prisma&quot;</span>
+            (<span class="ident">ReferentialAction::NoAction</span>, <span class="ident">RelationMode::Prisma</span>) =&gt; <span class="ident">ReferentialAction::Restrict</span>,
+            (<span class="ident">action</span>, <span class="kw">_</span>) =&gt; <span class="ident">action</span>,
+        }
     }
 
     <span class="doccomment">/// Retrieves the onUpdate policy for this relation.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ReferentialAction</span> {
-        <span class="self">self</span>.<span class="ident">field_a</span>()
+        <span class="kw">let</span> <span class="ident">action</span> <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">field_a</span>()
             .<span class="ident">on_update</span>()
             .<span class="ident">cloned</span>()
             .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">field_b</span>().<span class="ident">on_update</span>().<span class="ident">cloned</span>())
-            .<span class="ident">unwrap_or</span>(<span class="self">self</span>.<span class="ident">field_a</span>().<span class="ident">on_update_default</span>)
+            .<span class="ident">unwrap_or</span>(<span class="self">self</span>.<span class="ident">field_a</span>().<span class="ident">on_update_default</span>);
+
+        <span class="kw">match</span> (<span class="ident">action</span>, <span class="self">self</span>.<span class="ident">relation_mode</span>) {
+            <span class="comment">// NoAction is an alias for Restrict when relationMode = &quot;prisma&quot;</span>
+            (<span class="ident">ReferentialAction::NoAction</span>, <span class="ident">RelationMode::Prisma</span>) =&gt; <span class="ident">ReferentialAction::Restrict</span>,
+            (<span class="ident">action</span>, <span class="kw">_</span>) =&gt; <span class="ident">action</span>,
+        }
     }
 }
 

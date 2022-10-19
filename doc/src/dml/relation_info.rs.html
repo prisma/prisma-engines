@@ -79,6 +79,8 @@
 <span id="79">79</span>
 <span id="80">80</span>
 <span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">enumflags2::bitflags</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 
@@ -138,6 +140,8 @@
     <span class="doccomment">/// deferred, this makes it possible to temporarily violate integrity in a</span>
     <span class="doccomment">/// transaction while making sure that subsequent operations in the</span>
     <span class="doccomment">/// transaction restore integrity.</span>
+    <span class="doccomment">/// When using relationMode = &quot;prisma&quot;, NoAction becomes an alias of</span>
+    <span class="doccomment">/// the emulated Restrict (when supported).</span>
     <span class="ident">NoAction</span>,
     <span class="doccomment">/// Sets relation scalar fields to null if the relation is deleted or</span>
     <span class="doccomment">/// updated. This will always result in a runtime error if one or more of the</span>
