@@ -19,9 +19,9 @@ fn on_delete_actions() {
             }}
 
             model B {{
-                id Int @id
-                aId Int
-                a A @relation(fields: [aId], references: [id], onDelete: {})
+                id  Int  @id
+                aId Int?
+                a   A?   @relation(fields: [aId], references: [id], onDelete: {})
             }}
         "#,
             action
@@ -47,9 +47,9 @@ fn on_update_actions() {
             }}
 
             model B {{
-                id Int @id
-                aId Int
-                a A @relation(fields: [aId], references: [id], onUpdate: {})
+                id  Int  @id
+                aId Int?
+                a   A?   @relation(fields: [aId], references: [id], onUpdate: {})
             }}
         "#,
             action
@@ -80,9 +80,9 @@ fn actions_on_mongo() {
             }}
 
             model B {{
-                id Int @id @map("_id")
-                aId Int
-                a A @relation(fields: [aId], references: [id], onDelete: {action})
+                id   Int @id @map("_id")
+                aId  Int?
+                a A? @relation(fields: [aId], references: [id], onDelete: {action})
             }}
         "#,
             action = action
@@ -119,9 +119,9 @@ fn actions_on_mysql_with_prisma_relation_mode() {
             }}
 
             model B {{
-                id Int @id
-                aId Int
-                a A @relation(fields: [aId], references: [id], onDelete: {action})
+                id  Int  @id
+                aId Int?
+                a   A?   @relation(fields: [aId], references: [id], onDelete: {action})
             }}
         "#,
             action = action
@@ -158,9 +158,9 @@ fn actions_on_sqlserver_with_prisma_relation_mode() {
             }}
 
             model B {{
-                id Int @id
-                aId Int
-                a A @relation(fields: [aId], references: [id], onDelete: {action})
+                id  Int  @id
+                aId Int?
+                a   A?   @relation(fields: [aId], references: [id], onDelete: {action})
             }}
         "#,
             action = action
@@ -197,9 +197,9 @@ fn actions_on_cockroachdb_with_prisma_relation_mode() {
             }}
 
             model B {{
-                id Int @id
-                aId Int
-                a A @relation(fields: [aId], references: [id], onDelete: {action})
+                id  Int  @id
+                aId Int?
+                a   A?   @relation(fields: [aId], references: [id], onDelete: {action})
             }}
         "#,
             action = action
@@ -236,9 +236,9 @@ fn actions_on_postgres_with_prisma_relation_mode() {
             }}
 
             model B {{
-                id Int @id
-                aId Int
-                a A @relation(fields: [aId], references: [id], onDelete: {action})
+                id  Int  @id
+                aId Int?
+                a   A?   @relation(fields: [aId], references: [id], onDelete: {action})
             }}
         "#,
             action = action
@@ -275,9 +275,9 @@ fn actions_on_sqlite_with_prisma_relation_mode() {
             }}
 
             model B {{
-                id Int @id
-                aId Int
-                a A @relation(fields: [aId], references: [id], onDelete: {action})
+                id  Int  @id
+                aId Int?
+                a   A?   @relation(fields: [aId], references: [id], onDelete: {action})
             }}
         "#,
             action = action
@@ -314,9 +314,9 @@ fn on_delete_actions_should_work_on_prisma_relation_mode() {
             }}
 
             model B {{
-                id Int @id
-                aId Int
-                a A @relation(fields: [aId], references: [id], onDelete: {action})
+                id  Int  @id
+                aId Int?
+                a   A?   @relation(fields: [aId], references: [id], onDelete: {action})
             }}
         "#,
             action = action
