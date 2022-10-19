@@ -2,7 +2,7 @@ use std::fmt;
 
 use psl::PreviewFeature;
 
-use crate::{value::Array, Commented, Env, Text};
+use crate::{Array, Documentation, Env, Text};
 
 /// The generator block of the datasource.
 #[derive(Debug)]
@@ -12,7 +12,7 @@ pub struct Generator<'a> {
     output: Option<Env<'a>>,
     preview_features: Option<Array<Text<PreviewFeature>>>,
     binary_targets: Array<Env<'a>>,
-    documentation: Option<Commented<'a>>,
+    documentation: Option<Documentation<'a>>,
     config: Vec<(&'a str, Text<&'a str>)>,
 }
 
@@ -84,7 +84,7 @@ impl<'a> Generator<'a> {
     /// }
     /// ```
     pub fn documentation(&mut self, docs: &'a str) {
-        self.documentation = Some(Commented::Documentation(docs));
+        self.documentation = Some(Documentation(docs));
     }
 
     /// Add a custom config value to the block. For now we support any
@@ -106,10 +106,10 @@ impl<'a> Generator<'a> {
     pub fn from_psl(psl_gen: &'a psl::Generator) -> Self {
         let preview_features = psl_gen
             .preview_features
-            .map(|f| f.iter().map(Text).collect())
-            .map(Array);
+            .map(|f| f.iter().map(Text).collect::<Vec<Text<_>>>())
+            .map(Array::from);
 
-        let binary_targets = psl_gen.binary_targets.iter().map(Env::from).collect();
+        let binary_targets: Vec<Env<'_>> = psl_gen.binary_targets.iter().map(Env::from).collect();
 
         let config = psl_gen
             .config
@@ -122,8 +122,8 @@ impl<'a> Generator<'a> {
             provider: Env::from(&psl_gen.provider),
             output: psl_gen.output.as_ref().map(Env::from),
             preview_features,
-            binary_targets: Array(binary_targets),
-            documentation: psl_gen.documentation.as_deref().map(Commented::Documentation),
+            binary_targets: Array::from(binary_targets),
+            documentation: psl_gen.documentation.as_deref().map(Documentation),
             config,
         }
     }

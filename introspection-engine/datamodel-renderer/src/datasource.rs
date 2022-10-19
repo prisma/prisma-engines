@@ -3,7 +3,7 @@ use std::default::Default;
 
 use psl::datamodel_connector::RelationMode;
 
-use crate::{Array, Commented, Env, Text, Value};
+use crate::{Array, Documentation, Env, Text, Value};
 
 /// The datasource block in a PSL file.
 #[derive(Debug)]
@@ -14,7 +14,7 @@ pub struct Datasource<'a> {
     shadow_database_url: Option<Env<'a>>,
     relation_mode: Option<RelationMode>,
     custom_properties: Vec<(&'a str, Value<'a>)>,
-    documentation: Option<Commented<'a>>,
+    documentation: Option<Documentation<'a>>,
     namespaces: Array<Text<&'a str>>,
 }
 
@@ -102,12 +102,13 @@ impl<'a> Datasource<'a> {
     /// }
     /// ```
     pub fn documentation(&mut self, documentation: &'a str) {
-        self.documentation = Some(Commented::Documentation(documentation));
+        self.documentation = Some(Documentation(documentation));
     }
 
     /// Create a rendering from a PSL datasource.
     pub fn from_psl(psl_ds: &'a psl::Datasource) -> Self {
         let shadow_database_url = psl_ds.shadow_database_url.as_ref().map(|(url, _)| Env::from(url));
+        let namespaces: Vec<Text<_>> = psl_ds.namespaces.iter().map(|(ns, _)| Text(ns.as_str())).collect();
 
         Self {
             name: &psl_ds.name,
@@ -115,9 +116,9 @@ impl<'a> Datasource<'a> {
             url: Env::from(&psl_ds.url),
             shadow_database_url,
             relation_mode: psl_ds.relation_mode,
-            documentation: psl_ds.documentation.as_deref().map(Commented::Documentation),
+            documentation: psl_ds.documentation.as_deref().map(Documentation),
             custom_properties: Default::default(),
-            namespaces: Array(psl_ds.namespaces.iter().map(|(ns, _)| Text(ns.as_str())).collect()),
+            namespaces: Array::from(namespaces),
         }
     }
 }
@@ -168,12 +169,9 @@ mod tests {
         datasource.shadow_database_url(Env::variable("SHADOW_DATABASE_URL"));
         datasource.relation_mode(RelationMode::ForeignKeys);
 
-        let mut w = Function::new("uuid_ossp");
-        w.push_param(("map", Text("uuid-ossp")));
-
         let mut extensions = Array::new();
         extensions.push(Function::new("postgis"));
-        extensions.push(w);
+        extensions.push(Function::new("uuid-ossp"));
 
         datasource.push_custom_property("extensions", extensions);
 
@@ -192,6 +190,6 @@ mod tests {
         "#]];
 
         let rendered = psl::reformat(&format!("{datasource}"), 2).unwrap();
-        expected.assert_eq(&rendered)
+        expected.assert_eq(&rendered);
     }
 }

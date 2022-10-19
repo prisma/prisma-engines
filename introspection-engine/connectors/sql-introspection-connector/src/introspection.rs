@@ -185,17 +185,62 @@ pub(crate) fn introspect(ctx: &Context, warnings: &mut Vec<Warning>) -> Result<(
     // if based on a previous Prisma version add id default opinionations
     add_prisma_1_id_defaults(&version, &mut datamodel, schema, warnings, ctx);
 
-    let data_model = if ctx.render_config {
-        format!(
-            "{}\n{}",
-            render_configuration(ctx.config, schema),
-            psl::render_datamodel_to_string(&datamodel, Some(ctx.config))
-        )
+    let config = if ctx.render_config {
+        render_configuration(ctx.config, schema).to_string()
     } else {
-        psl::render_datamodel_to_string(&datamodel, Some(ctx.config))
+        String::new()
     };
 
-    Ok((version, psl::reformat(&data_model, 2).unwrap(), datamodel.is_empty()))
+    let rendered = format!(
+        "{}\n{}\n{}",
+        config,
+        psl::render_datamodel_to_string(&datamodel, Some(ctx.config)),
+        render_datamodel(&datamodel),
+    );
+
+    Ok((version, psl::reformat(&rendered, 2).unwrap(), datamodel.is_empty()))
+}
+
+fn render_datamodel(dml: &Datamodel) -> render::Datamodel<'_> {
+    let mut data_model = render::Datamodel::new();
+
+    for dml_enum in dml.enums() {
+        let mut r#enum = render::Enum::new(&dml_enum.name);
+
+        if let Some(ref docs) = dml_enum.documentation {
+            r#enum.documentation(docs);
+        }
+
+        if let Some(ref schema) = dml_enum.schema {
+            r#enum.schema(schema);
+        }
+
+        if let Some(ref map) = dml_enum.database_name {
+            r#enum.map(map);
+        }
+
+        for dml_variant in dml_enum.values.iter() {
+            let mut variant = render::EnumVariant::new(&dml_variant.name);
+
+            if dml_variant.commented_out {
+                variant = variant.into_commented_out();
+            }
+
+            if let Some(ref map) = dml_variant.database_name {
+                variant.map(map);
+            }
+
+            if let Some(ref docs) = dml_variant.documentation {
+                variant.documentation(docs);
+            }
+
+            r#enum.push_variant(variant);
+        }
+
+        data_model.push_enum(dbg!(r#enum));
+    }
+
+    data_model
 }
 
 fn render_configuration<'a>(config: &'a Configuration, schema: &'a SqlSchema) -> render::Configuration<'a> {

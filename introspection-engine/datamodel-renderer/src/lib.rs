@@ -66,11 +66,23 @@
 #![warn(missing_docs)]
 
 mod configuration;
+mod datamodel;
 mod datasource;
+mod enumerator;
 mod generator;
 mod value;
 
 pub use configuration::Configuration;
+pub use datamodel::Datamodel;
 pub use datasource::Datasource;
+pub use enumerator::{Enum, EnumVariant};
 pub use generator::Generator;
-pub use value::{Array, Commented, Env, Function, FunctionParam, Text, Value};
+pub use value::{
+    array::Array,
+    constant::{Constant, ConstantNameValidationError},
+    documentation::Documentation,
+    env::Env,
+    function::{Function, FunctionParam},
+    text::Text,
+    Value,
+};
