@@ -191,6 +191,9 @@
 <span id="191">191</span>
 <span id="192">192</span>
 <span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">autoincrement</span>;
 <span class="kw">mod</span> <span class="ident">composite_types</span>;
 <span class="kw">mod</span> <span class="ident">constraint_namespace</span>;
@@ -347,6 +350,7 @@
                 <span class="ident">relations::field_arity</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
                 <span class="ident">relations::referencing_scalar_field_types</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
                 <span class="ident">relations::has_a_unique_constraint_name</span>(<span class="kw-2">&amp;</span><span class="ident">names</span>, <span class="ident">relation</span>, <span class="ident">ctx</span>);
+                <span class="ident">relations::required_relation_cannot_use_set_null</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
 
                 <span class="kw">if</span> <span class="ident">relation</span>.<span class="ident">is_one_to_one</span>() {
                     <span class="ident">relations::one_to_one::both_sides_are_defined</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
@@ -363,6 +367,7 @@
                     <span class="ident">relations::one_to_many::referential_actions</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
                 }
             }
+
             <span class="ident">RefinedRelationWalker::ImplicitManyToMany</span>(<span class="ident">relation</span>) =&gt; {
                 <span class="kw">use</span> <span class="ident">relations::many_to_many::implicit</span>;
 
@@ -371,6 +376,7 @@
                 <span class="ident">implicit::validate_no_referential_actions</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
                 <span class="ident">implicit::cannot_define_references_argument</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
             }
+
             <span class="ident">RefinedRelationWalker::TwoWayEmbeddedManyToMany</span>(<span class="ident">relation</span>) =&gt; {
                 <span class="kw">use</span> <span class="ident">relations::many_to_many::embedded</span>;
 

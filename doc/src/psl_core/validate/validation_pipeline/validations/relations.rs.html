@@ -525,6 +525,44 @@
 <span id="525">525</span>
 <span id="526">526</span>
 <span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">many_to_many</span>;
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">one_to_many</span>;
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">one_to_one</span>;
@@ -534,7 +572,9 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::constraint_namespace::ConstraintName</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::datamodel_connector</span>::{<span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>, <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">RelationMode</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">diagnostics::DatamodelError</span>, <span class="ident">validate::validation_pipeline::context::Context</span>};
+<span class="kw">use</span> <span class="ident">indoc::indoc</span>;
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
+<span class="kw">use</span> <span class="ident">parser_database::ReferentialAction</span>;
 <span class="kw">use</span> <span class="ident">parser_database</span>::{
     <span class="ident">ast::WithSpan</span>,
     <span class="ident">walkers</span>::{<span class="ident">CompleteInlineRelationWalker</span>, <span class="ident">InlineRelationWalker</span>, <span class="ident">RelationFieldWalker</span>},
@@ -1050,6 +1090,42 @@
     <span class="kw">match</span> <span class="ident">fields</span> {
         <span class="prelude-val">None</span> =&gt; <span class="bool-val">true</span>,
         <span class="prelude-val">Some</span>(<span class="ident">fields</span>) =&gt; <span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>,
+    }
+}
+
+<span class="doccomment">/// There cannot be any required field in a relation where one of the referential actions is SetNull.</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">required_relation_cannot_use_set_null</span>(<span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+    <span class="comment">// return early if there&#39;s no relation field on the referencing model</span>
+    <span class="kw">let</span> <span class="ident">forward</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">relation</span>.<span class="ident">forward_relation_field</span>() {
+        <span class="prelude-val">Some</span>(<span class="ident">forward</span>) =&gt; <span class="ident">forward</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
+    };
+
+    <span class="comment">// return early if no referencing field is required</span>
+    <span class="kw">if</span> <span class="ident">forward</span>
+        .<span class="ident">referencing_fields</span>()
+        .<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">fields</span><span class="op">|</span> <span class="ident">fields</span>.<span class="ident">all</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="op">!</span><span class="ident">f</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span>.<span class="ident">is_required</span>()))
+        .<span class="ident">unwrap_or_default</span>()
+    {
+        <span class="kw">return</span>;
+    }
+
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ReferentialAction::SetNull</span>) <span class="op">=</span> <span class="ident">forward</span>.<span class="ident">explicit_on_delete</span>() {
+        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
+            <span class="macro">indoc!</span> {<span class="string">&quot;The `onDelete` referential action of a relation must not be set to `SetNull` when a referenced field is required.
+Either choose another referential action, or make the referenced fields optional.&quot;</span>},
+            <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
+            <span class="ident">forward</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+        ))
+    }
+
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ReferentialAction::SetNull</span>) <span class="op">=</span> <span class="ident">forward</span>.<span class="ident">explicit_on_update</span>() {
+        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
+            <span class="macro">indoc!</span> {<span class="string">&quot;The `onUpdate` referential action of a relation must not be set to `SetNull` when a referenced field is required.
+Either choose another referential action, or make the referenced fields optional.&quot;</span>},
+            <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
+            <span class="ident">forward</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+        ))
     }
 }
 </code></pre></div>
