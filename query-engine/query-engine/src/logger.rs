@@ -142,7 +142,10 @@ fn create_env_filter(log_queries: bool) -> EnvFilter {
     }
 
     if log_queries {
-        filter = filter.add_directive("quaint[{is_query}]=trace".parse().unwrap());
+        // even when mongo queries are logged in debug mode, we want to log them if the log level is higher
+        filter = filter
+            .add_directive("quaint[{is_query}]=trace".parse().unwrap())
+            .add_directive("mongodb_query_connector=debug".parse().unwrap());
     }
 
     filter
