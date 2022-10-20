@@ -1906,23 +1906,23 @@ async fn re_introspecting_custom_index_order(api: &TestApi) -> TestResult {
 #[test_connector(tags(Postgres))]
 async fn re_introspecting_with_schemas_property(api: &TestApi) -> TestResult {
     let create_schema = "CREATE SCHEMA \"first\"";
-    let create_table = format!("CREATE TABLE \"first\".\"A\" (id TEXT PRIMARY KEY)",);
+    let create_table = "CREATE TABLE \"first\".\"A\" (id TEXT PRIMARY KEY)";
 
-    api.database().raw_cmd(&create_schema).await?;
-    api.database().raw_cmd(&create_table).await?;
+    api.database().raw_cmd(create_schema).await?;
+    api.database().raw_cmd(create_table).await?;
 
     let create_schema = "CREATE SCHEMA \"second\"";
-    let create_table = format!("CREATE TABLE \"second\".\"B\" (id TEXT PRIMARY KEY)",);
+    let create_table = "CREATE TABLE \"second\".\"B\" (id TEXT PRIMARY KEY)";
 
-    api.database().raw_cmd(&create_schema).await?;
-    api.database().raw_cmd(&create_table).await?;
+    api.database().raw_cmd(create_schema).await?;
+    api.database().raw_cmd(create_table).await?;
 
     let input_dm = indoc! {r#"
           generator client {
            provider        = "prisma-client-js"
            previewFeatures = ["multiSchema"]
          }
-         
+
          datasource myds {
            provider = "postgresql"
            url      = env("DATABASE_URL")
