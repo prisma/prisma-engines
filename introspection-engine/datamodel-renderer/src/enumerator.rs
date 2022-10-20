@@ -41,7 +41,7 @@ impl<'a> EnumVariant<'a> {
     /// }
     /// ```
     pub fn new(value: &'a str) -> Self {
-        let (kind, map) = match dbg!(Constant::new(value)) {
+        let (kind, map) = match Constant::new(value) {
             Ok(constant) => {
                 let kind = EnumVariantKind::Valid(constant);
                 (kind, None)

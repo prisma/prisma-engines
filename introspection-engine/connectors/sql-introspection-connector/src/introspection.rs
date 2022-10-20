@@ -237,7 +237,7 @@ fn render_datamodel(dml: &Datamodel) -> render::Datamodel<'_> {
             r#enum.push_variant(variant);
         }
 
-        data_model.push_enum(dbg!(r#enum));
+        data_model.push_enum(r#enum);
     }
 
     data_model
