@@ -714,7 +714,7 @@ mod json_update {
         Ok(())
     }
 
-    #[connector_test(capabilities(AdvancedJsonNullability))]
+    #[connector_test(capabilities(AdvancedJsonNullability), exclude(TiDB))]
     async fn update_json_adv(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1 }) { json }}"#),

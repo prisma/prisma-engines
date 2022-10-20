@@ -259,7 +259,7 @@ mod one2one_opt {
         let query = r#"mutation { updateOneA(where: { id: 1 }, data: { b_id: 2 }) { id } }"#;
 
         match runner.connector_version() {
-          ConnectorVersion::MongoDb(_) => assert_error!(
+          ConnectorVersion::MongoDb(_) | ConnectorVersion::TiDB => assert_error!(
               runner,
               query,
               2014,
@@ -759,7 +759,7 @@ mod one2many_opt {
         let query = r#"mutation { updateOneA(where: { id: 1 }, data: { b_id: 2 }) { id } }"#;
 
         match runner.connector_version() {
-        ConnectorVersion::MongoDb(_) => assert_error!(
+        ConnectorVersion::MongoDb(_) | ConnectorVersion::TiDB => assert_error!(
             runner,
             query,
             2014,

@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(only(MySql, Postgres, Sqlite, Vitess))]
+#[test_suite(only(MySql, Postgres, Sqlite, Vitess, TiDB))]
 //  bring_your_own_id
 mod byoid {
     use indoc::indoc;
@@ -55,7 +55,7 @@ mod byoid {
         );
 
         let error_target = match runner.connector_version() {
-            query_engine_tests::ConnectorVersion::MySql(_) => "constraint: `PRIMARY`",
+            query_engine_tests::ConnectorVersion::MySql(_) | query_engine_tests::ConnectorVersion::TiDB => "constraint: `PRIMARY`",
             query_engine_tests::ConnectorVersion::Vitess(_) => "(not available)",
             _ => "fields: (`id`)",
         };
@@ -83,7 +83,7 @@ mod byoid {
         );
 
         let error_target = match runner.connector_version() {
-            ConnectorVersion::MySql(_) => "constraint: `PRIMARY`",
+            ConnectorVersion::MySql(_) | ConnectorVersion::TiDB => "constraint: `PRIMARY`",
             ConnectorVersion::Vitess(_) => "(not available)",
             _ => "fields: (`id`)",
         };
@@ -141,7 +141,7 @@ mod byoid {
         );
 
         let error_target = match runner.connector_version() {
-            ConnectorVersion::MySql(_) => "constraint: `PRIMARY`",
+            ConnectorVersion::MySql(_) | ConnectorVersion::TiDB => "constraint: `PRIMARY`",
             ConnectorVersion::Vitess(_) => "(not available)",
             _ => "fields: (`id`)",
         };
@@ -169,7 +169,7 @@ mod byoid {
         );
 
         let error_target = match runner.connector_version() {
-            ConnectorVersion::MySql(_) => "constraint: `PRIMARY`",
+            ConnectorVersion::MySql(_) | ConnectorVersion::TiDB => "constraint: `PRIMARY`",
             ConnectorVersion::Vitess(_) => "(not available)",
             _ => "fields: (`id`)",
         };

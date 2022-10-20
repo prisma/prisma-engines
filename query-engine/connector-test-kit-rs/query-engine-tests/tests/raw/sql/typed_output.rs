@@ -215,7 +215,7 @@ mod typed_output {
         schema.to_owned()
     }
 
-    #[connector_test(schema(schema_mysql), only(MySql(5.7), MySql(8)))]
+    #[connector_test(schema(schema_mysql), only(MySql(5.7), MySql(8), TiDB))]
     async fn all_scalars_mysql(runner: Runner) -> TestResult<()> {
         create_row(
             &runner,

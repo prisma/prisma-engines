@@ -31,7 +31,7 @@ mod one2one_req {
         );
 
         match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
+            ConnectorVersion::MongoDb(_) | ConnectorVersion::TiDB => assert_error!(
                 runner,
                 "mutation { deleteOneParent(where: { id: 1 }) { id }}",
                 2014,
@@ -77,7 +77,7 @@ mod one2one_opt {
         );
 
         match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
+            ConnectorVersion::MongoDb(_) | ConnectorVersion::TiDB => assert_error!(
                 runner,
                 "mutation { deleteOneParent(where: { id: 1 }) { id }}",
                 2014,
@@ -184,7 +184,7 @@ mod one2many_req {
         );
 
         match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
+            ConnectorVersion::MongoDb(_) | ConnectorVersion::TiDB => assert_error!(
                 runner,
                 "mutation { deleteOneParent(where: { id: 1 }) { id }}",
                 2014,
@@ -256,7 +256,7 @@ mod one2many_opt {
         );
 
         match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
+            ConnectorVersion::MongoDb(_) | ConnectorVersion::TiDB => assert_error!(
                 runner,
                 "mutation { deleteOneParent(where: { id: 1 }) { id }}",
                 2014,

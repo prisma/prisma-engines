@@ -54,7 +54,7 @@ mod one2one_req {
 #[test_suite(
     suite = "noaction_onD_1to1_opt",
     schema(optional),
-    exclude(Postgres, Sqlite, MongoDb)
+    exclude(Postgres, Sqlite, MongoDb, TiDB)
 )]
 mod one2one_opt {
     fn optional() -> String {
@@ -251,7 +251,7 @@ mod one2many_req {
 #[test_suite(
     suite = "noaction_onD_1toM_opt",
     schema(optional),
-    exclude(Postgres, Sqlite, MongoDb)
+    exclude(Postgres, Sqlite, MongoDb, TiDB)
 )]
 mod one2many_opt {
     fn optional() -> String {

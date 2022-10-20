@@ -426,7 +426,8 @@ mod itx_isolation {
     use query_engine_tests::*;
 
     // All (SQL) connectors support serializable.
-    #[connector_test(exclude(MongoDb))]
+    // TiDB support snapshot isolation, but didn't support serializable isolation.
+    #[connector_test(exclude(MongoDb, TiDB))]
     async fn basic_serializable(mut runner: Runner) -> TestResult<()> {
         let tx_id = runner.start_tx(5000, 5000, Some("Serializable".to_owned())).await?;
         runner.set_active_tx(tx_id.clone());
@@ -450,7 +451,7 @@ mod itx_isolation {
 
     #[connector_test(exclude(MongoDb))]
     async fn casing_doesnt_matter(mut runner: Runner) -> TestResult<()> {
-        let tx_id = runner.start_tx(5000, 5000, Some("sErIaLiZaBlE".to_owned())).await?;
+        let tx_id = runner.start_tx(5000, 5000, Some("rEpEaTaBlErEaD".to_owned())).await?;
         runner.set_active_tx(tx_id.clone());
 
         let res = runner.commit_tx(tx_id).await?;

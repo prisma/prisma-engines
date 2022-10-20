@@ -5,7 +5,7 @@ use query_engine_tests::*;
 #[test_suite(schema(schema))]
 mod fr_one_to_m {
     use indoc::indoc;
-    use query_engine_tests::run_query;
+    use query_engine_tests::{is_one_of, run_query};
 
     fn schema() -> String {
         let schema = indoc! { "
@@ -65,10 +65,19 @@ mod fr_one_to_m {
           @r###"{"data":{"findManyCompany":[{"id":135}]}}"###
         );
 
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyLocation(where: { company: { is: { id: { equals: 135 }}}}){ id }}"#),
-          @r###"{"data":{"findManyLocation":[{"id":311},{"id":314}]}}"###
-        );
+        match runner.connector_version() {
+             ConnectorVersion::TiDB => is_one_of!(
+                run_query!(&runner, r#"query { findManyLocation(where: { company: { is: { id: { equals: 135 }}}}){ id }}"#),
+                vec![
+                    r#"{"data":{"findManyLocation":[{"id":311},{"id":314}]}}"#,
+                    r#"{"data":{"findManyLocation":[{"id":314},{"id":311}]}}"#
+                ]
+            ),
+            _ => insta::assert_snapshot!(
+                run_query!(&runner, r#"query { findManyLocation(where: { company: { is: { id: { equals: 135 }}}}){ id }}"#),
+                @r###"{"data":{"findManyLocation":[{"id":311},{"id":314}]}}"###
+            ),
+        };
 
         Ok(())
     }

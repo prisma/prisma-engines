@@ -298,7 +298,7 @@ mod update_many {
         let count = &res["data"]["updateManyTestModel"]["count"];
 
         // MySql does not count incrementing a null so the count is different
-        if !matches!(runner.connector(), ConnectorTag::MySql(_)) {
+        if !matches!(runner.connector(), ConnectorTag::MySql(_)) && !matches!(runner.connector(), ConnectorTag::TiDB(_)) {
             assert_eq!(count, 3);
         }
 
