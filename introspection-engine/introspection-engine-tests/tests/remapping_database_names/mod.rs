@@ -238,7 +238,7 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
     Ok(())
 }
 
-#[test_connector(exclude(Sqlite, Mssql, Vitess, CockroachDb))]
+#[test_connector(exclude(Sqlite, Mssql, Vitess, CockroachDb, TiDB))]
 async fn remapping_fields_in_compound_relations(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 

@@ -215,7 +215,7 @@ async fn introspect_postgres_prisma2(api: &TestApi) -> TestResult {
 
 //Mysql
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(TiDB))]
 async fn introspect_mysql_non_prisma(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {

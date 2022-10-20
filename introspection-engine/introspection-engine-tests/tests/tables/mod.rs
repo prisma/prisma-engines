@@ -708,7 +708,8 @@ async fn expression_indexes_should_be_ignored_on_sqlite(api: &TestApi) -> TestRe
     Ok(())
 }
 
-#[test_connector(tags(Mysql))]
+// TiDB table names are case-insensitive by default, related pingcap/tidb#5714
+#[test_connector(tags(Mysql), exclude(TiDB))]
 async fn casing_should_not_lead_to_mix_ups(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
