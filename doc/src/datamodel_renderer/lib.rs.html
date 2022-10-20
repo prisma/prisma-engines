@@ -74,6 +74,18 @@
 <span id="74">74</span>
 <span id="75">75</span>
 <span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of datastructures meant for rendering a Prisma data model as</span>
 <span class="doccomment">//! a string. We don&#39;t even try to make the result pretty. Please use</span>
 <span class="doccomment">//! the functionality of prisma-fmt for that.</span>
@@ -142,13 +154,25 @@
 <span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
 
 <span class="kw">mod</span> <span class="ident">configuration</span>;
+<span class="kw">mod</span> <span class="ident">datamodel</span>;
 <span class="kw">mod</span> <span class="ident">datasource</span>;
+<span class="kw">mod</span> <span class="ident">enumerator</span>;
 <span class="kw">mod</span> <span class="ident">generator</span>;
 <span class="kw">mod</span> <span class="ident">value</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">configuration::Configuration</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">datamodel::Datamodel</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">datasource::Datasource</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">enumerator</span>::{<span class="ident">Enum</span>, <span class="ident">EnumVariant</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">generator::Generator</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">value</span>::{<span class="ident">Array</span>, <span class="ident">Commented</span>, <span class="ident">Env</span>, <span class="ident">Function</span>, <span class="ident">FunctionParam</span>, <span class="ident">Text</span>, <span class="ident">Value</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">value</span>::{
+    <span class="ident">array::Array</span>,
+    <span class="ident">constant</span>::{<span class="ident">Constant</span>, <span class="ident">ConstantNameValidationError</span>},
+    <span class="ident">documentation::Documentation</span>,
+    <span class="ident">env::Env</span>,
+    <span class="ident">function</span>::{<span class="ident">Function</span>, <span class="ident">FunctionParam</span>},
+    <span class="ident">text::Text</span>,
+    <span class="ident">Value</span>,
+};
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="datamodel_renderer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
