@@ -551,7 +551,7 @@ mod max_integer {
                 "mutation {{ createOneTest(data: {{ tinyint: {} }}) {{ id }} }}",
                 U8_OVERFLOW_MAX
             ),
-            2009,
+            None,
             "Arithmetic overflow error converting expression to data type tinyint"
         );
         assert_error!(
@@ -560,7 +560,7 @@ mod max_integer {
                 "mutation {{ createOneTest(data: {{ tinyint: {} }}) {{ id }} }}",
                 OVERFLOW_MIN
             ),
-            2009,
+            None,
             "Arithmetic overflow error converting expression to data type tinyint"
         );
 
@@ -571,7 +571,7 @@ mod max_integer {
                 "mutation {{ createOneTest(data: {{ smallint: {} }}) {{ id }} }}",
                 I16_OVERFLOW_MAX
             ),
-            2009,
+            None,
             "Arithmetic overflow error converting expression to data type smallint"
         );
         assert_error!(
@@ -580,7 +580,7 @@ mod max_integer {
                 "mutation {{ createOneTest(data: {{ smallint: {} }}) {{ id }} }}",
                 I16_OVERFLOW_MIN
             ),
-            2009,
+            None,
             "Arithmetic overflow error converting expression to data type smallint."
         );
 
@@ -591,7 +591,7 @@ mod max_integer {
                 "mutation {{ createOneTest(data: {{ int: {} }}) {{ id }} }}",
                 I32_OVERFLOW_MAX
             ),
-            2009,
+            None,
             "Arithmetic overflow error converting expression to data type int"
         );
         assert_error!(
@@ -600,7 +600,7 @@ mod max_integer {
                 "mutation {{ createOneTest(data: {{ int: {} }}) {{ id }} }}",
                 I32_OVERFLOW_MIN
             ),
-            2009,
+            None,
             "Arithmetic overflow error converting expression to data type int"
         );
 
