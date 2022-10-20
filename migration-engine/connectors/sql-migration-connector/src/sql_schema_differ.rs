@@ -432,41 +432,6 @@ fn push_redefined_table_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferData
     steps.push(SqlMigrationStep::RedefineTables(tables_to_redefine))
 }
 
-/// Compare two foreign keys and return whether they should be considered
-/// equivalent for schema diffing purposes.
-fn foreign_keys_match(fks: Pair<&ForeignKeyWalker<'_>>, db: &DifferDatabase<'_>) -> bool {
-    let references_same_table = db.flavour.table_names_match(fks.map(|fk| fk.referenced_table().name()));
-
-    let references_same_column_count = fks.previous.referenced_columns().len() == fks.next.referenced_columns().len();
-    let constrains_same_column_count = fks.previous.constrained_columns().len() == fks.next.constrained_columns().len();
-
-    let constrains_same_columns = fks.interleave(|fk| fk.constrained_columns()).all(|cols| {
-        let type_changed = || db.column_changes_for_walkers(cols).type_changed();
-
-        let arities_ok = db.flavour.can_cope_with_foreign_key_column_becoming_non_nullable()
-            || (cols.previous.arity() == cols.next.arity()
-                || (cols.previous.arity().is_required() && cols.next.arity().is_nullable()));
-
-        cols.previous.name() == cols.next.name() && !type_changed() && arities_ok
-    });
-
-    // Foreign key references different columns or the same columns in a different order.
-    let references_same_columns = fks
-        .interleave(|fk| fk.referenced_columns().map(|c| c.name()))
-        .all(|pair| pair.previous == pair.next);
-
-    let same_on_delete_action = fks.previous.on_delete_action() == fks.next.on_delete_action();
-    let same_on_update_action = fks.previous.on_update_action() == fks.next.on_update_action();
-
-    references_same_table
-        && references_same_column_count
-        && constrains_same_column_count
-        && constrains_same_columns
-        && references_same_columns
-        && same_on_delete_action
-        && same_on_update_action
-}
-
 fn push_foreign_key_pair_changes(
     fk: Pair<ForeignKeyWalker<'_>>,
     steps: &mut Vec<SqlMigrationStep>,
