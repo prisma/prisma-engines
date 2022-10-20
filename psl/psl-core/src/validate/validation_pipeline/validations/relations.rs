@@ -7,6 +7,7 @@ mod visited_relation;
 use super::constraint_namespace::ConstraintName;
 use crate::datamodel_connector::{walker_ext_traits::*, Connector, ConnectorCapability, RelationMode};
 use crate::{diagnostics::DatamodelError, validate::validation_pipeline::context::Context};
+use indoc::indoc;
 use itertools::Itertools;
 use parser_database::ReferentialAction;
 use parser_database::{
@@ -546,8 +547,8 @@ pub(crate) fn required_relation_cannot_use_set_null(relation: InlineRelationWalk
 
     if let Some(ReferentialAction::SetNull) = forward.explicit_on_delete() {
         ctx.push_error(DatamodelError::new_attribute_validation_error(
-            r#"The `onDelete` referential action of a relation must not be set to `SetNull` when a referenced field is required.
-Either choose another referential action, or make the referenced fields optional."#,
+            indoc! {"The `onDelete` referential action of a relation must not be set to `SetNull` when a referenced field is required.
+Either choose another referential action, or make the referenced fields optional."},
             RELATION_ATTRIBUTE_NAME,
             forward.ast_field().span(),
         ))
@@ -555,8 +556,8 @@ Either choose another referential action, or make the referenced fields optional
 
     if let Some(ReferentialAction::SetNull) = forward.explicit_on_update() {
         ctx.push_error(DatamodelError::new_attribute_validation_error(
-            r#"The `onUpdate` referential action of a relation must not be set to `SetNull` when a referenced field is required.
-Either choose another referential action, or make the referenced fields optional."#,
+            indoc! {"The `onUpdate` referential action of a relation must not be set to `SetNull` when a referenced field is required.
+Either choose another referential action, or make the referenced fields optional."},
             RELATION_ATTRIBUTE_NAME,
             forward.ast_field().span(),
         ))
