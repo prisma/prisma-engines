@@ -201,6 +201,8 @@ pub(crate) fn introspect(ctx: &Context, warnings: &mut Vec<Warning>) -> Result<(
     Ok((version, psl::reformat(&rendered, 2).unwrap(), datamodel.is_empty()))
 }
 
+/// Render all of the data model. For now, just enums. More will be
+/// added in the upcoming days.
 fn render_datamodel(dml: &Datamodel) -> render::Datamodel<'_> {
     let mut data_model = render::Datamodel::new();
 
