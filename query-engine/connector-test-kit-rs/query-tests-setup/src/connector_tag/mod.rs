@@ -5,6 +5,7 @@ mod postgres;
 mod sql_server;
 mod sqlite;
 mod vitess;
+mod tidb;
 
 pub use mongodb::*;
 pub use mysql::*;
@@ -12,6 +13,7 @@ pub use postgres::*;
 pub use sql_server::*;
 pub use sqlite::*;
 pub use vitess::*;
+pub use tidb::*;
 
 use crate::{datamodel_rendering::DatamodelRenderer, TestConfig, TestError};
 use cockroachdb::*;
@@ -73,6 +75,7 @@ pub enum ConnectorTag {
     MongoDb(MongoDbConnectorTag),
     Sqlite(SqliteConnectorTag),
     Vitess(VitessConnectorTag),
+    TiDB(TiDBConnectorTag),
     Cockroach(CockroachDbConnectorTag),
 }
 
@@ -85,6 +88,7 @@ pub enum ConnectorVersion {
     Sqlite,
     CockroachDb,
     Vitess(Option<VitessVersion>),
+    TiDB,
 }
 
 impl From<&ConnectorTag> for ConnectorVersion {
@@ -97,6 +101,7 @@ impl From<&ConnectorTag> for ConnectorVersion {
             ConnectorTag::Sqlite(_) => ConnectorVersion::Sqlite,
             ConnectorTag::Cockroach(_) => ConnectorVersion::CockroachDb,
             ConnectorTag::Vitess(c) => ConnectorVersion::Vitess(c.version()),
+            ConnectorTag::TiDB(_) => ConnectorVersion::TiDB,
         }
     }
 }
@@ -111,6 +116,7 @@ impl fmt::Display for ConnectorTag {
             Self::Sqlite(_) => "SQLite",
             Self::Vitess(_) => "Vitess",
             Self::Cockroach(_) => "CockroachDB",
+            Self::TiDB(_) => "TiDB",
         };
 
         write!(f, "{}", printable)
@@ -142,6 +148,7 @@ impl fmt::Display for ConnectorVersion {
                 None => "Vitess (unknown)".to_string(),
             },
             Self::CockroachDb => "CockroachDB".to_string(),
+            Self::TiDB => "TiDB".to_string(),
         };
 
         write!(f, "{}", printable)
@@ -159,6 +166,7 @@ impl ConnectorTag {
             .chain(MongoDbConnectorTag::all().into_iter().map(Self::MongoDb))
             .chain(SqliteConnectorTag::all().into_iter().map(Self::Sqlite))
             .chain(CockroachDbConnectorTag::all().into_iter().map(Self::Cockroach))
+            .chain(TiDBConnectorTag::all().into_iter().map(Self::TiDB))
             .collect()
     }
 
@@ -210,6 +218,7 @@ impl TryFrom<(&str, Option<&str>)> for ConnectorTag {
             "sqlserver" => Self::SqlServer(SqlServerConnectorTag::new(version)?),
             "cockroachdb" => Self::Cockroach(CockroachDbConnectorTag::new()),
             "postgres" => Self::Postgres(PostgresConnectorTag::new(version)?),
+            "tidb" => Self::TiDB(TiDBConnectorTag::new()),
             "mysql" => Self::MySql(MySqlConnectorTag::new(version)?),
             "mongodb" => Self::MongoDb(MongoDbConnectorTag::new(version)?),
             "vitess" => Self::Vitess(VitessConnectorTag::new(version)?),
