@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::{calculate_datamodel::CalculateDatamodelContext as Context, SqlFamilyTrait};
 use once_cell::sync::Lazy;
 use psl::{
@@ -16,8 +18,8 @@ static RE_START: Lazy<Regex> = Lazy::new(|| Regex::new("^[^a-zA-Z]+").unwrap());
 static RE: Lazy<Regex> = Lazy::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
 
 pub(crate) fn sanitize_datamodel_names(ctx: &Context, datamodel: &mut Datamodel) {
-    sanitize_models(ctx, datamodel);
-    sanitize_enums(datamodel);
+    let enum_renames = sanitize_models(ctx, datamodel);
+    sanitize_enums(&enum_renames, datamodel);
 }
 
 // if after opionated renames we have duplicated names, e.g. a database with
@@ -41,7 +43,8 @@ pub fn sanitization_leads_to_duplicate_names(datamodel: &Datamodel) -> bool {
 }
 
 // Todo: Sanitizing might need to be adjusted to also change the fields in the RelationInfo
-fn sanitize_models(ctx: &Context, datamodel: &mut Datamodel) {
+fn sanitize_models(ctx: &Context, datamodel: &mut Datamodel) -> HashMap<String, (String, Option<String>)> {
+    let mut enum_renames = HashMap::new();
     let sql_family = ctx.sql_family();
 
     for model in datamodel.models_mut() {
@@ -74,15 +77,25 @@ fn sanitize_models(ctx: &Context, datamodel: &mut Datamodel) {
                         // Enums in MySQL are defined on the column and do not have a separate name.
                         // Introspection generates an enum name for MySQL as `<model_name>_<field_type>`.
                         // If the sanitization changes the enum name, we need to make sure it's changed everywhere.
-                        let sanitized_enum_name = if let SqlFamily::Mysql = sql_family {
+                        let (sanitized_enum_name, db_name) = if let SqlFamily::Mysql = sql_family {
                             if model_db_name.is_none() && sf.database_name.is_none() {
-                                enum_name.to_owned()
+                                (enum_name.to_owned(), None)
                             } else {
-                                format!("{}_{}", model_name, sf.name())
+                                (format!("{}_{}", model_name, sf.name()), Some(enum_name.to_owned()))
                             }
                         } else {
-                            sanitize_string(enum_name)
+                            let sanitized = sanitize_string(enum_name);
+
+                            if &sanitized != enum_name {
+                                (sanitized, Some(enum_name.to_owned()))
+                            } else {
+                                (sanitized, None)
+                            }
                         };
+
+                        if db_name.is_some() {
+                            enum_renames.insert(enum_name.to_owned(), (sanitized_enum_name.clone(), db_name));
+                        }
 
                         sf.field_type = FieldType::Enum(sanitized_enum_name);
 
@@ -116,14 +129,29 @@ fn sanitize_models(ctx: &Context, datamodel: &mut Datamodel) {
             sanitize_index_field_names(&mut index.fields);
         }
     }
+
+    enum_renames
 }
 
-fn sanitize_enums(datamodel: &mut Datamodel) {
+fn sanitize_enums(enum_renames: &HashMap<String, (String, Option<String>)>, datamodel: &mut Datamodel) {
     for enm in datamodel.enums_mut() {
-        sanitize_name(enm);
+        if let Some((sanitized_name, db_name)) = enum_renames.get(&enm.name) {
+            if enm.database_name().is_none() {
+                enm.set_database_name(db_name.clone());
+            }
+
+            enm.set_name(sanitized_name);
+        } else {
+            sanitize_name(enm);
+        }
 
         for enum_value in enm.values_mut() {
-            sanitize_name(enum_value);
+            if enum_value.name.is_empty() {
+                enum_value.name = EMPTY_ENUM_PLACEHOLDER.to_string();
+                enum_value.database_name = Some("".to_string());
+            } else {
+                sanitize_name(enum_value);
+            }
         }
     }
 }
