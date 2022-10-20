@@ -740,7 +740,7 @@ fn filter_to_types(api: &TestApi, to_types: &'static [&'static str]) -> Cow<'sta
     to_types.into()
 }
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(TiDB))]
 fn safe_casts_with_existing_data_should_work(api: TestApi) {
     let connector = psl::builtin_connectors::MYSQL;
     let mut dm1 = String::with_capacity(256);
@@ -785,7 +785,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
     }
 }
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(TiDB))]
 fn risky_casts_with_existing_data_should_warn(api: TestApi) {
     let connector = psl::builtin_connectors::MYSQL;
     let mut dm1 = String::with_capacity(256);
@@ -847,7 +847,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
     }
 }
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(TiDB))]
 fn impossible_casts_with_existing_data_should_warn(api: TestApi) {
     let connector = psl::builtin_connectors::MYSQL;
     let mut dm1 = String::with_capacity(256);

@@ -206,6 +206,8 @@ fn using_unsupported_and_ignore_should_work(api: TestApi) {
         "interval"
     } else if api.is_postgres() {
         "macaddr"
+    } else if api.is_tidb() {
+        "set('a', 'b')"
     } else if api.is_mysql() {
         "point"
     } else if api.is_mssql() {

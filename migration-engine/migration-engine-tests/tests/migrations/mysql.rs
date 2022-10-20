@@ -6,7 +6,7 @@ use std::fmt::Write as _;
 // We need to test this specifically for mysql, because foreign keys are indexes, and they are
 // inferred as both foreign key and index by the sql-schema-describer. We do not want to
 // create/delete a second index.
-#[test_connector(tags(Mysql), exclude(Vitess))]
+#[test_connector(tags(Mysql), exclude(Vitess, TiDB))]
 fn indexes_on_foreign_key_fields_are_not_created_twice(api: TestApi) {
     let schema = r#"
         model Human {
@@ -217,8 +217,18 @@ fn native_type_columns_can_be_created(api: TestApi) {
         ("decimal", "Decimal", "Decimal(5, 3)", "decimal(5,3)"),
         ("float", "Float", "Float", "float"),
         ("double", "Float", "Double", "double"),
-        ("bits", "Bytes", "Bit(10)", "bit(10)"),
-        ("bit", "Boolean", "Bit(1)", "bit(1)"),
+        (
+            "bits",
+            "Bytes",
+            "Bit(10)",
+            if api.is_tidb() { "bit(10) unsigned" } else { "bit(10)" },
+        ),
+        (
+            "bit",
+            "Boolean",
+            "Bit(1)",
+            if api.is_tidb() { "bit(1) unsigned" } else { "bit(1)" },
+        ),
         ("chars", "String", "Char(10)", "char(10)"),
         ("varchars", "String", "VarChar(500)", "varchar(500)"),
         ("binary", "Bytes", "Binary(230)", "binary(230)"),
@@ -240,7 +250,18 @@ fn native_type_columns_can_be_created(api: TestApi) {
             "Timestamp(3)",
             "timestamp(3)",
         ),
-        ("year", "Int", "Year", if api.is_mysql_8() { "year" } else { "year(4)" }),
+        (
+            "year",
+            "Int",
+            "Year",
+            if api.is_mysql_8() {
+                "year"
+            } else if api.is_tidb() {
+                "year(4) unsigned"
+            } else {
+                "year(4)"
+            }
+        ),
     ];
 
     let mut dm = r#"
@@ -491,7 +512,7 @@ fn dropping_m2m_relation_from_datamodel_works() {
     expected.assert_eq(&diff);
 }
 
-#[cfg_attr(not(target_os = "windows"), test_connector(tags(Mysql), exclude(Vitess)))]
+#[cfg_attr(not(target_os = "windows"), test_connector(tags(Mysql), exclude(Vitess, TiDB)))]
 fn alter_constraint_name(mut api: TestApi) {
     let plain_dm = api.datamodel_with_provider(
         r#"

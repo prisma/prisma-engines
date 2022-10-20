@@ -111,7 +111,7 @@ fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_table(api
     });
 }
 
-#[test_connector(exclude(Vitess))]
+#[test_connector(exclude(Vitess, TiDB))]
 fn specifying_a_db_name_for_an_inline_relation_must_work(api: TestApi) {
     let dm1 = r#"
         model A {
@@ -261,7 +261,7 @@ fn removing_an_inline_relation_must_work(api: TestApi) {
     });
 }
 
-#[test_connector(exclude(Vitess))]
+#[test_connector(exclude(Vitess, TiDB))]
 fn compound_foreign_keys_should_work_in_correct_order(api: TestApi) {
     let dm1 = r#"
         model A {
@@ -406,7 +406,7 @@ fn relations_can_reference_arbitrary_unique_fields_with_maps(api: TestApi) {
     });
 }
 
-#[test_connector(exclude(Vitess))]
+#[test_connector(exclude(Vitess, TiDB))]
 fn relations_can_reference_multiple_fields(api: TestApi) {
     let dm = r#"
         model User {
@@ -437,7 +437,7 @@ fn relations_can_reference_multiple_fields(api: TestApi) {
     });
 }
 
-#[test_connector(exclude(Vitess))]
+#[test_connector(exclude(Vitess, TiDB))]
 fn a_relation_with_mappings_on_both_sides_can_reference_multiple_fields(api: TestApi) {
     let dm = r#"
         model User {
@@ -470,7 +470,7 @@ fn a_relation_with_mappings_on_both_sides_can_reference_multiple_fields(api: Tes
     });
 }
 
-#[test_connector(exclude(Vitess))]
+#[test_connector(exclude(Vitess, TiDB))]
 fn relations_with_mappings_on_referenced_side_can_reference_multiple_fields(api: TestApi) {
     let dm = r#"
         model User {
@@ -502,7 +502,7 @@ fn relations_with_mappings_on_referenced_side_can_reference_multiple_fields(api:
     });
 }
 
-#[test_connector(exclude(Vitess))]
+#[test_connector(exclude(Vitess, TiDB))]
 fn relations_with_mappings_on_referencing_side_can_reference_multiple_fields(api: TestApi) {
     let dm = r#"
         model User {
@@ -624,7 +624,7 @@ fn on_delete_restrict_should_work(api: TestApi) {
     });
 }
 
-#[test_connector(exclude(Vitess))]
+#[test_connector(exclude(Vitess, TiDB))]
 fn on_update_referential_actions_should_work(api: TestApi) {
     let actions = &[
         (ReferentialAction::NoAction, ForeignKeyAction::NoAction),
@@ -787,7 +787,7 @@ fn on_delete_optional_default_action(api: TestApi) {
     });
 }
 
-#[test_connector(exclude(Vitess))]
+#[test_connector(exclude(Vitess, TiDB))]
 fn on_delete_compound_optional_optional_default_action(api: TestApi) {
     let dm = r#"
         model A {
@@ -817,7 +817,7 @@ fn on_delete_compound_optional_optional_default_action(api: TestApi) {
     });
 }
 
-#[test_connector(exclude(Mssql, Vitess))]
+#[test_connector(exclude(Mssql, Vitess, TiDB))]
 fn on_delete_compound_required_optional_default_action_with_restrict(api: TestApi) {
     let dm = r#"
         model A {
@@ -927,7 +927,7 @@ fn on_update_required_default_action(api: TestApi) {
     });
 }
 
-#[test_connector(exclude(Vitess, CockroachDb))]
+#[test_connector(exclude(Vitess, CockroachDb, TiDB))]
 fn adding_mutual_references_on_existing_tables_works(api: TestApi) {
     let dm1 = r#"
         model A {
@@ -1067,7 +1067,7 @@ fn removing_a_relation_field_must_work(api: TestApi) {
         .assert_table("User", |table| table.assert_does_not_have_column("address_name"));
 }
 
-#[test_connector(exclude(Vitess))]
+#[test_connector(exclude(Vitess, TiDB))]
 fn references_to_models_with_compound_primary_keys_must_work(api: TestApi) {
     let dm = r#"
         model User {
@@ -1101,7 +1101,7 @@ fn references_to_models_with_compound_primary_keys_must_work(api: TestApi) {
     });
 }
 
-#[test_connector(exclude(Vitess))]
+#[test_connector(exclude(Vitess, TiDB))]
 fn join_tables_between_models_with_compound_primary_keys_must_work(api: TestApi) {
     let dm = r#"
         model Human {
@@ -1161,7 +1161,7 @@ fn join_tables_between_models_with_compound_primary_keys_must_work(api: TestApi)
     });
 }
 
-#[test_connector(exclude(Vitess))]
+#[test_connector(exclude(Vitess, TiDB))]
 fn join_tables_between_models_with_mapped_compound_primary_keys_must_work(api: TestApi) {
     let dm = r#"
         model Human {

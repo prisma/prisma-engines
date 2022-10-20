@@ -33,7 +33,7 @@ fn advisory_locking_works(mut api: TestApi) {
             // We move the engines into the async block so they get dropped when they
             // are done with the request, releasing the lock as a consequence.
             async move {
-                second_me
+                first_me
                     .apply_migrations(&migrations_directory)
                     .send()
                     .await
@@ -41,7 +41,7 @@ fn advisory_locking_works(mut api: TestApi) {
                     .into_output()
             },
             async move {
-                first_me
+                second_me
                     .apply_migrations(&migrations_directory_2)
                     .send()
                     .await
