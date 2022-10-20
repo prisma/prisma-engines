@@ -2,8 +2,6 @@ use datamodel_renderer as render;
 use psl::{builtin_connectors::PostgresDatasourceProperties, Configuration, PreviewFeature};
 use sql_schema_describer::{postgres::PostgresSchemaExt, SqlSchema};
 
-use crate::sanitize_datamodel_names::sanitize_string;
-
 const EXTENSION_ALLOW_LIST: &[&str] = &["citext", "postgis", "pg_crypto", "uuid-ossp"];
 
 pub(super) fn add_extensions<'a>(
@@ -26,14 +24,7 @@ pub(super) fn add_extensions<'a>(
     let mut next_extensions = render::Array::new();
 
     for ext in pg_schema_ext.extension_walkers() {
-        let sanitized_name = sanitize_string(ext.name());
-        let is_sanitized = ext.name() != sanitized_name;
-
-        let mut next_extension = render::Function::new(sanitized_name);
-
-        if is_sanitized {
-            next_extension.push_param(("map", render::Text(ext.name())));
-        }
+        let mut next_extension = render::Function::new(ext.name());
 
         match previous_extensions.and_then(|e| e.find_by_name(ext.name())) {
             Some(prev) => {

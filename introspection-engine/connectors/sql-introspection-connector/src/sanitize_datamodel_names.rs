@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::{calculate_datamodel::CalculateDatamodelContext as Context, SqlFamilyTrait};
 use once_cell::sync::Lazy;
 use psl::{
@@ -9,7 +11,6 @@ use psl::{
 };
 use quaint::prelude::SqlFamily;
 use regex::Regex;
-use std::collections::HashMap;
 
 static EMPTY_ENUM_PLACEHOLDER: &str = "EMPTY_ENUM_VALUE";
 

@@ -26,50 +26,6 @@ pub(crate) fn render_datamodel(params: RenderParams<'_>, out: &mut String) {
     for model in params.datamodel.models().filter(|m| !m.is_generated) {
         render_model(model, params, out);
     }
-
-    for enm in params.datamodel.enums() {
-        render_enum(enm, out)
-    }
-}
-
-fn render_enum(enm: &Enum, out: &mut String) {
-    if let Some(docs) = &enm.documentation {
-        super::render_documentation(docs, false, out);
-    }
-    out.push_str("enum ");
-    out.push_str(&enm.name);
-    out.push_str("{\n");
-
-    for variant in enm.values.iter() {
-        if let Some(docs) = &variant.documentation {
-            super::render_documentation(docs, false, out);
-        }
-
-        if variant.commented_out {
-            out.push_str("// ");
-        }
-
-        out.push_str(&variant.name);
-
-        if let Some(mapped_name) = &variant.database_name {
-            render_map_attribute(mapped_name, "@", out);
-        }
-
-        out.push('\n');
-    }
-
-    if let Some(mapped_name) = &enm.database_name {
-        render_map_attribute(mapped_name, "@@", out);
-        out.push('\n');
-    }
-
-    // @@schema
-    if let Some(schema_name) = &enm.schema {
-        render_schema_attribute(schema_name, "@@", out);
-        out.push('\n');
-    }
-
-    out.push_str("}\n");
 }
 
 fn render_map_attribute(mapped_name: &str, owl: &str, out: &mut String) {

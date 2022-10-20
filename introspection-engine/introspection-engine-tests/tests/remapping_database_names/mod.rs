@@ -1,4 +1,6 @@
 mod mssql;
+mod mysql;
+mod postgresql;
 mod sqlite;
 
 use barrel::types;
@@ -19,7 +21,6 @@ async fn should_not_remap_if_renaming_would_lead_to_duplicate_names(api: &TestAp
             CONSTRAINT _nodes_node_a_fkey FOREIGN KEY(node_a) REFERENCES nodes(id) ON DELETE CASCADE ON UPDATE CASCADE,
             CONSTRAINT _nodes_node_b_fkey FOREIGN KEY(node_b) REFERENCES nodes(id) ON DELETE CASCADE ON UPDATE CASCADE
         );
-        
     "#;
     api.raw_cmd(sql).await;
 
@@ -297,62 +298,6 @@ async fn remapping_fields_in_compound_relations(api: &TestApi) -> TestResult {
     "#]];
 
     expected.assert_eq(&api.introspect_dml().await?);
-
-    Ok(())
-}
-
-#[test_connector(capabilities(Enums), exclude(CockroachDb))]
-async fn remapping_enum_names(api: &TestApi) -> TestResult {
-    let sql_family = api.sql_family();
-
-    if sql_family.is_postgres() {
-        api.database()
-            .raw_cmd("CREATE TYPE \"123color\" AS ENUM ('black')")
-            .await?;
-    }
-
-    api.barrel()
-        .execute(move |migration| {
-            migration.create_table("123Book", move |t| {
-                t.add_column("id", types::primary());
-
-                let typ = if sql_family.is_mysql() {
-                    "ENUM ('black')"
-                } else {
-                    "\"123color\""
-                };
-
-                t.add_column("1color", types::custom(typ).nullable(true));
-            });
-        })
-        .await?;
-
-    let enum_name = if sql_family.is_mysql() { "Book_color" } else { "color" };
-
-    let renamed_enum = if sql_family.is_mysql() {
-        "123Book_1color"
-    } else {
-        "123color"
-    };
-
-    let dm = format!(
-        r#"
-        model Book {{
-            id      Int @id @default(autoincrement())
-            color   {0}? @map("1color")
-
-            @@map("123Book")
-        }}
-
-        enum {0} {{
-            black
-            @@map("{1}")
-        }}
-    "#,
-        enum_name, renamed_enum
-    );
-
-    api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
     Ok(())
 }
