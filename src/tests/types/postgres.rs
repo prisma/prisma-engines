@@ -33,6 +33,14 @@ test_type!(int2(
     Value::int32(i16::MAX),
 ));
 
+test_type!(int2_with_int64(
+    postgresql,
+    "int2",
+    (Value::Int64(None), Value::Int32(None)),
+    (Value::int64(i16::MIN), Value::int32(i16::MIN)),
+    (Value::int64(i16::MAX), Value::int32(i16::MAX))
+));
+
 test_type!(int2_array(
     postgresql,
     "int2[]",
@@ -45,6 +53,15 @@ test_type!(int2_array(
     ]),
 ));
 
+test_type!(int2_array_with_i64(
+    postgresql,
+    "int2[]",
+    (
+        Value::array(vec![Value::int64(i16::MIN), Value::int64(i16::MAX), Value::Int64(None)]),
+        Value::array(vec![Value::int32(i16::MIN), Value::int32(i16::MAX), Value::Int32(None)])
+    )
+));
+
 test_type!(int4(
     postgresql,
     "int4",
@@ -53,16 +70,28 @@ test_type!(int4(
     Value::int32(i32::MAX),
 ));
 
+test_type!(int4_with_i64(
+    postgresql,
+    "int4",
+    (Value::Int64(None), Value::Int32(None)),
+    (Value::int64(i32::MIN), Value::int32(i32::MIN)),
+    (Value::int64(i32::MAX), Value::int32(i32::MAX))
+));
+
 test_type!(int4_array(
     postgresql,
     "int4[]",
     Value::Array(None),
-    Value::array(vec![
-        Value::int32(1),
-        Value::int32(2),
-        Value::int32(3),
-        Value::Int32(None)
-    ]),
+    Value::array(vec![Value::int32(i32::MIN), Value::int32(i32::MAX), Value::Int32(None)]),
+));
+
+test_type!(int4_array_with_i64(
+    postgresql,
+    "int4[]",
+    (
+        Value::array(vec![Value::int64(i32::MIN), Value::int64(i32::MAX), Value::Int64(None)]),
+        Value::array(vec![Value::int32(i32::MIN), Value::int32(i32::MAX), Value::Int32(None)])
+    )
 ));
 
 test_type!(int8(
@@ -108,9 +137,23 @@ test_type!(float8_array(
     Value::array(vec![Value::double(1.1234), Value::double(4.321), Value::Double(None)])
 ));
 
-// NOTE: OIDs are unsigned 4 byte integers, see https://www.postgresql.org/docs/9.4/datatype-oid.html
-// but a u32 cannot fit in i32, so we use i64
-test_type!(oid(postgresql, "oid", Value::Int64(None), Value::int64(10000)));
+// NOTE: OIDs are unsigned 32-bit integers (see https://www.postgresql.org/docs/9.4/datatype-oid.html)
+// but a u32 cannot fit in an i32, so we always read OIDs back from the database as i64s.
+test_type!(oid_with_i32(
+    postgresql,
+    "oid",
+    (Value::Int32(None), Value::Int64(None)),
+    (Value::int32(i32::MAX), Value::int64(i32::MAX)),
+    (Value::int32(u32::MIN as i32), Value::int64(u32::MIN)),
+));
+
+test_type!(oid_with_i64(
+    postgresql,
+    "oid",
+    Value::Int64(None),
+    Value::int64(u32::MAX),
+    Value::int64(u32::MIN),
+));
 
 test_type!(oid_array(
     postgresql,

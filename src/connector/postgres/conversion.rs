@@ -632,11 +632,53 @@ impl<'a> ToSql for Value<'a> {
     ) -> Result<IsNull, Box<dyn StdError + 'static + Send + Sync>> {
         let res =
             match (self, ty) {
-                (Value::Int32(integer), &PostgresType::INT2) => integer.map(|integer| (integer as i16).to_sql(ty, out)),
+                (Value::Int32(integer), &PostgresType::INT2) => match integer {
+                    Some(i) => {
+                        let integer = i16::try_from(*i).map_err(|_| {
+                            let kind = ErrorKind::conversion(format!(
+                                "Unable to fit integer value '{}' into an INT2 (16-bit signed integer).",
+                                i
+                            ));
+
+                            Error::builder(kind).build()
+                        })?;
+
+                        Some(integer.to_sql(ty, out))
+                    }
+                    _ => None,
+                },
                 (Value::Int32(integer), &PostgresType::INT4) => integer.map(|integer| (integer as i32).to_sql(ty, out)),
                 (Value::Int32(integer), &PostgresType::INT8) => integer.map(|integer| (integer as i64).to_sql(ty, out)),
-                (Value::Int64(integer), &PostgresType::INT2) => integer.map(|integer| (integer as i16).to_sql(ty, out)),
-                (Value::Int64(integer), &PostgresType::INT4) => integer.map(|integer| (integer as i32).to_sql(ty, out)),
+                (Value::Int64(integer), &PostgresType::INT2) => match integer {
+                    Some(i) => {
+                        let integer = i16::try_from(*i).map_err(|_| {
+                            let kind = ErrorKind::conversion(format!(
+                                "Unable to fit integer value '{}' into an INT2 (16-bit signed integer).",
+                                i
+                            ));
+
+                            Error::builder(kind).build()
+                        })?;
+
+                        Some(integer.to_sql(ty, out))
+                    }
+                    _ => None,
+                },
+                (Value::Int64(integer), &PostgresType::INT4) => match integer {
+                    Some(i) => {
+                        let integer = i32::try_from(*i).map_err(|_| {
+                            let kind = ErrorKind::conversion(format!(
+                                "Unable to fit integer value '{}' into an INT4 (32-bit signed integer).",
+                                i
+                            ));
+
+                            Error::builder(kind).build()
+                        })?;
+
+                        Some(integer.to_sql(ty, out))
+                    }
+                    _ => None,
+                },
                 (Value::Int64(integer), &PostgresType::INT8) => integer.map(|integer| (integer as i64).to_sql(ty, out)),
                 #[cfg(feature = "bigdecimal")]
                 (Value::Int32(integer), &PostgresType::NUMERIC) => integer
@@ -654,7 +696,36 @@ impl<'a> ToSql for Value<'a> {
                 (Value::Int64(integer), &PostgresType::TEXT) => {
                     integer.map(|integer| format!("{}", integer).to_sql(ty, out))
                 }
-                (Value::Int64(integer), &PostgresType::OID) => integer.map(|integer| (integer as u32).to_sql(ty, out)),
+                (Value::Int32(integer), &PostgresType::OID) => match integer {
+                    Some(i) => {
+                        let integer = u32::try_from(*i).map_err(|_| {
+                            let kind = ErrorKind::conversion(format!(
+                                "Unable to fit integer value '{}' into an OID (32-bit unsigned integer).",
+                                i
+                            ));
+
+                            Error::builder(kind).build()
+                        })?;
+
+                        Some(integer.to_sql(ty, out))
+                    }
+                    _ => None,
+                },
+                (Value::Int64(integer), &PostgresType::OID) => match integer {
+                    Some(i) => {
+                        let integer = u32::try_from(*i).map_err(|_| {
+                            let kind = ErrorKind::conversion(format!(
+                                "Unable to fit integer value '{}' into an OID (32-bit unsigned integer).",
+                                i
+                            ));
+
+                            Error::builder(kind).build()
+                        })?;
+
+                        Some(integer.to_sql(ty, out))
+                    }
+                    _ => None,
+                },
                 (Value::Int32(integer), _) => integer.map(|integer| integer.to_sql(ty, out)),
                 (Value::Int64(integer), _) => integer.map(|integer| integer.to_sql(ty, out)),
                 (Value::Float(float), &PostgresType::FLOAT8) => float.map(|float| (float as f64).to_sql(ty, out)),
