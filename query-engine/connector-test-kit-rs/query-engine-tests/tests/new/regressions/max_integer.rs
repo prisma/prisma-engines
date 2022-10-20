@@ -97,8 +97,9 @@ mod max_integer {
     // All connectors error differently based on their database driver.
     // We just assert that a basic overflowing int errors without checking specifically for the message.
     // Specific messages are asserted down below for native types.
-    // MongoDB is excluded intentionally because it should automatically upcast the value as an i64.
-    #[connector_test(exclude(MongoDb))]
+    // MongoDB is excluded because it automatically upcasts a value as an i64 if doesn't fit in an i32.
+    // MySQL 5.6 is excluded because it never overflows but inserts the min or max of the range of the column type instead.
+    #[connector_test(exclude(MongoDb, MySql(5.6)))]
     async fn unfitted_int_should_fail(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
@@ -254,7 +255,7 @@ mod max_integer {
         schema.to_owned()
     }
 
-    #[connector_test(schema(overflow_mysql), only(MySql))]
+    #[connector_test(schema(overflow_mysql), only(MySql(5.7, 8, "mariadb")))]
     async fn unfitted_int_should_fail_mysql(runner: Runner) -> TestResult<()> {
         // tinyint
         assert_error!(
