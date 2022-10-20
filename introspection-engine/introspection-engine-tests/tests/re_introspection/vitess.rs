@@ -390,7 +390,7 @@ async fn referential_actions_are_kept_intact(api: &TestApi) -> TestResult {
 
         CREATE TABLE `B` (
             id  INT AUTO_INCREMENT PRIMARY KEY,
-            aId INT NOT NULL
+            aId INT NULL
         );
     "#};
 
@@ -403,9 +403,9 @@ async fn referential_actions_are_kept_intact(api: &TestApi) -> TestResult {
         }
 
         model B {
-          id  Int @id @default(autoincrement())
-          aId Int
-          a   A   @relation(fields: [aId], references: [id], onDelete: SetNull)
+          id  Int  @id @default(autoincrement())
+          aId Int?
+          a   A?   @relation(fields: [aId], references: [id], onDelete: Restrict)
         }
     "#};
 
@@ -416,9 +416,9 @@ async fn referential_actions_are_kept_intact(api: &TestApi) -> TestResult {
         }
 
         model B {
-          id  Int @id @default(autoincrement())
-          aId Int
-          a   A   @relation(fields: [aId], references: [id], onDelete: SetNull)
+          id  Int  @id @default(autoincrement())
+          aId Int?
+          a   A?   @relation(fields: [aId], references: [id], onDelete: Restrict)
         }
     "#]];
 
