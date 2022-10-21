@@ -563,6 +563,10 @@
 <span id="563">563</span>
 <span id="564">564</span>
 <span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">many_to_many</span>;
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">one_to_many</span>;
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">one_to_one</span>;
@@ -1112,8 +1116,10 @@
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ReferentialAction::SetNull</span>) <span class="op">=</span> <span class="ident">forward</span>.<span class="ident">explicit_on_delete</span>() {
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-            <span class="macro">indoc!</span> {<span class="string">&quot;The `onDelete` referential action of a relation must not be set to `SetNull` when a referenced field is required.
-Either choose another referential action, or make the referenced fields optional.&quot;</span>},
+            <span class="macro">indoc!</span> {<span class="string">r#&quot;
+                The `onDelete` referential action of a relation must not be set to `SetNull` when a referenced field is required.
+                Either choose another referential action, or make the referenced fields optional.
+            &quot;#</span>},
             <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
             <span class="ident">forward</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
         ))
@@ -1121,8 +1127,10 @@ Either choose another referential action, or make the referenced fields optional
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ReferentialAction::SetNull</span>) <span class="op">=</span> <span class="ident">forward</span>.<span class="ident">explicit_on_update</span>() {
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-            <span class="macro">indoc!</span> {<span class="string">&quot;The `onUpdate` referential action of a relation must not be set to `SetNull` when a referenced field is required.
-Either choose another referential action, or make the referenced fields optional.&quot;</span>},
+            <span class="macro">indoc!</span> {<span class="string">r#&quot;
+                The `onUpdate` referential action of a relation must not be set to `SetNull` when a referenced field is required.
+                Either choose another referential action, or make the referenced fields optional.
+            &quot;#</span>},
             <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
             <span class="ident">forward</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
         ))
