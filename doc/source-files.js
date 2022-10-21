@@ -291,6 +291,7 @@ var sourcesIndex = JSON.parse('{\
 "sqlformat":["",[],["formatter.rs","indentation.rs","inline_block.rs","lib.rs","params.rs","tokenizer.rs"]],\
 "static_assertions":["",[],["assert_cfg.rs","assert_eq_align.rs","assert_eq_size.rs","assert_fields.rs","assert_impl.rs","assert_obj_safe.rs","assert_trait.rs","assert_type.rs","const_assert.rs","lib.rs"]],\
 "stringprep":["",[],["lib.rs","rfc3454.rs","tables.rs"]],\
+"strip_ansi_escapes":["",[],["lib.rs"]],\
 "strsim":["",[],["lib.rs"]],\
 "structopt":["",[],["lib.rs"]],\
 "structopt_derive":["",[],["attrs.rs","doc_comments.rs","lib.rs","parse.rs","spanned.rs","ty.rs"]],\
@@ -352,9 +353,12 @@ var sourcesIndex = JSON.parse('{\
 "user_facing_error_macros":["",[],["lib.rs"]],\
 "user_facing_errors":["",[],["common.rs","introspection_engine.rs","lib.rs","migration_engine.rs","panic_hook.rs","quaint.rs","query_engine.rs"]],\
 "utf8_width":["",[],["lib.rs"]],\
+"utf8parse":["",[],["lib.rs","types.rs"]],\
 "uuid":["",[["external",[],["mod.rs","serde_support.rs"]]],["builder.rs","error.rs","fmt.rs","lib.rs","macros.rs","parser.rs","rng.rs","v4.rs"]],\
 "vec_map":["",[],["lib.rs"]],\
 "void":["",[],["lib.rs"]],\
+"vte":["",[],["definitions.rs","lib.rs","params.rs","table.rs"]],\
+"vte_generate_state_changes":["",[],["lib.rs"]],\
 "want":["",[],["lib.rs"]],\
 "wasm_bindgen":["",[["cache",[],["intern.rs","mod.rs"]],["convert",[],["closures.rs","impls.rs","mod.rs","slices.rs","traits.rs"]]],["cast.rs","closure.rs","describe.rs","externref.rs","lib.rs"]],\
 "wasm_bindgen_backend":["",[],["ast.rs","codegen.rs","encode.rs","error.rs","lib.rs","util.rs"]],\

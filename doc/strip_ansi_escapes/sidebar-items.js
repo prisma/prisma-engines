@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":[["strip","Strip ANSI escapes from `data` and return the remaining bytes as a `Vec<u8>`."]],"struct":[["Writer","`Writer` wraps an underlying type that implements `Write`, stripping ANSI escape sequences from bytes written to it before passing them to the underlying writer."]]};
