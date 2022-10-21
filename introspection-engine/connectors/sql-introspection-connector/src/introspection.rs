@@ -207,7 +207,7 @@ fn render_datamodel(dml: &Datamodel) -> render::Datamodel<'_> {
     let mut data_model = render::Datamodel::new();
 
     for dml_enum in dml.enums() {
-        let mut r#enum = render::Enum::new(&dml_enum.name);
+        let mut r#enum = render::datamodel::Enum::new(&dml_enum.name);
 
         if let Some(ref docs) = dml_enum.documentation {
             r#enum.documentation(docs);
@@ -222,7 +222,7 @@ fn render_datamodel(dml: &Datamodel) -> render::Datamodel<'_> {
         }
 
         for dml_variant in dml_enum.values.iter() {
-            let mut variant = render::EnumVariant::new(&dml_variant.name);
+            let mut variant = render::datamodel::EnumVariant::new(&dml_variant.name);
 
             if dml_variant.commented_out {
                 variant = variant.into_commented_out();
@@ -248,7 +248,7 @@ fn render_datamodel(dml: &Datamodel) -> render::Datamodel<'_> {
 fn render_configuration<'a>(config: &'a Configuration, schema: &'a SqlSchema) -> render::Configuration<'a> {
     let mut output = render::Configuration::default();
     let prev_ds = config.datasources.first().unwrap();
-    let mut datasource = render::Datasource::from_psl(prev_ds);
+    let mut datasource = render::configuration::Datasource::from_psl(prev_ds);
 
     if prev_ds.active_connector.is_provider("postgres") {
         postgres::add_extensions(&mut datasource, schema, config);
@@ -257,7 +257,7 @@ fn render_configuration<'a>(config: &'a Configuration, schema: &'a SqlSchema) ->
     output.push_datasource(datasource);
 
     for prev in config.generators.iter() {
-        output.push_generator(render::Generator::from_psl(prev));
+        output.push_generator(render::configuration::Generator::from_psl(prev));
     }
 
     output

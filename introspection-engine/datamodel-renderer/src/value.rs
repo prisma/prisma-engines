@@ -1,19 +1,20 @@
-pub mod array;
-pub mod constant;
-pub mod documentation;
-pub mod env;
-pub mod function;
-pub mod text;
+//! Common types needed in the configuration and datamodel.
+
+mod array;
+mod constant;
+mod documentation;
+mod env;
+mod function;
+mod text;
+
+pub use array::Array;
+pub use constant::{Constant, ConstantNameValidationError};
+pub use documentation::Documentation;
+pub use env::Env;
+pub use function::{Function, FunctionParam};
+pub use text::Text;
 
 use std::fmt;
-
-use self::{
-    array::Array,
-    constant::{Constant, ConstantNameValidationError},
-    env::Env,
-    function::Function,
-    text::Text,
-};
 
 /// A PSL value representation.
 #[derive(Debug)]

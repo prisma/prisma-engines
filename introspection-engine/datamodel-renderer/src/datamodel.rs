@@ -1,6 +1,16 @@
-use std::fmt;
+//! Types related to the _datamodel section_ in the PSL.
+//!
+//! Includes the `model`, `enum` and `type` definitions.
 
-use crate::Enum;
+mod attributes;
+mod composite_type;
+mod default;
+mod enumerator;
+
+pub use composite_type::{CompositeType, CompositeTypeField};
+pub use default::DefaultValue;
+pub use enumerator::{Enum, EnumVariant};
+use std::fmt;
 
 /// The PSL data model declaration.
 #[derive(Default, Debug)]
@@ -38,7 +48,7 @@ impl<'a> fmt::Display for Datamodel<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::*;
+    use super::*;
     use expect_test::expect;
 
     #[test]

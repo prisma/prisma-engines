@@ -1,6 +1,6 @@
+use super::attributes::{BlockAttribute, FieldAttribute};
+use crate::value::{Constant, ConstantNameValidationError, Documentation, Function};
 use std::fmt;
-
-use crate::{Constant, ConstantNameValidationError, Documentation, Function};
 
 static ENUM_EMPTY_VALUE: &str = "EMPTY_ENUM_VALUE";
 static ENUM_EMPTY_NAME: &str = "ENUM_EMPTY_NAME";
@@ -52,7 +52,7 @@ impl<'a> EnumVariant<'a> {
 
                 let kind = EnumVariantKind::Valid(sanitized);
 
-                (kind, Some(FieldAttribute(fun)))
+                (kind, Some(FieldAttribute::new(fun)))
             }
             Err(ConstantNameValidationError::OriginalEmpty) => {
                 let mut fun = Function::new("map");
@@ -60,7 +60,7 @@ impl<'a> EnumVariant<'a> {
 
                 let kind = EnumVariantKind::Valid(Constant::new_no_validate(ENUM_EMPTY_VALUE));
 
-                (kind, Some(FieldAttribute(fun)))
+                (kind, Some(FieldAttribute::new(fun)))
             }
             Err(ConstantNameValidationError::SanitizedEmpty) => {
                 let mut fun = Function::new("map");
@@ -68,7 +68,7 @@ impl<'a> EnumVariant<'a> {
 
                 let kind = EnumVariantKind::CommentedOut(Constant::new_no_validate(value));
 
-                (kind, Some(FieldAttribute(fun)))
+                (kind, Some(FieldAttribute::new(fun)))
             }
         };
 
@@ -91,7 +91,7 @@ impl<'a> EnumVariant<'a> {
         let mut map = Function::new("map");
         map.push_param(value);
 
-        self.map = Some(FieldAttribute(map));
+        self.map = Some(FieldAttribute::new(map));
     }
 
     /// Comments the variant out in the declaration.
@@ -131,52 +131,16 @@ impl<'a> From<&'a str> for EnumVariant<'a> {
 
 impl<'a> fmt::Display for EnumVariant<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        if let Some(ref docs) = self.documentation {
+            docs.fmt(f)?;
+        }
+
         self.kind.fmt(f)?;
 
-        if let Some(map) = &self.map {
+        if let Some(ref map) = self.map {
             f.write_str(" ")?;
             map.fmt(f)?;
         }
-
-        Ok(())
-    }
-}
-
-/// Defines a field attribute, wrapping a function.
-///
-/// ```ignore
-/// model X {
-///   field Int @map("lol")
-///             ^^^^^^^^^^^ this
-/// }
-/// ```
-#[derive(Debug)]
-struct FieldAttribute<'a>(Function<'a>);
-
-impl<'a> fmt::Display for FieldAttribute<'a> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str("@")?;
-        self.0.fmt(f)?;
-
-        Ok(())
-    }
-}
-
-/// Defines a block attribute, wrapping a function.
-///
-/// ```ignore
-/// model X {
-///   @@map("lol")
-///   ^^^^^^^^^^^^ this
-/// }
-/// ```
-#[derive(Debug)]
-struct BlockAttribute<'a>(Function<'a>);
-
-impl<'a> fmt::Display for BlockAttribute<'a> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str("@@")?;
-        self.0.fmt(f)?;
 
         Ok(())
     }
@@ -302,10 +266,6 @@ impl<'a> fmt::Display for Enum<'a> {
         writeln!(f, "enum {} {{", self.name)?;
 
         for variant in self.variants.iter() {
-            if let Some(docs) = &variant.documentation {
-                docs.fmt(f)?;
-            }
-
             writeln!(f, "{variant}")?;
         }
 
@@ -325,7 +285,7 @@ impl<'a> fmt::Display for Enum<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::*;
+    use super::*;
     use expect_test::expect;
 
     #[test]

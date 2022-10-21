@@ -1,9 +1,7 @@
+use crate::value::{Array, Documentation, Env, Text, Value};
 use core::fmt;
-use std::default::Default;
-
 use psl::datamodel_connector::RelationMode;
-
-use crate::{Array, Documentation, Env, Text, Value};
+use std::default::Default;
 
 /// The datasource block in a PSL file.
 #[derive(Debug)]
@@ -157,7 +155,7 @@ impl<'a> fmt::Display for Datasource<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::*;
+    use crate::{configuration::*, value::*};
     use expect_test::expect;
     use psl::datamodel_connector::RelationMode;
 

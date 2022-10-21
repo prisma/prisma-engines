@@ -1,8 +1,5 @@
+use super::{Constant, ConstantNameValidationError, Text, Value};
 use std::fmt;
-
-use crate::{Constant, Value};
-
-use super::{text::Text, ConstantNameValidationError};
 
 /// Represents a function parameter in the PSL.
 #[derive(Debug)]
@@ -22,6 +19,12 @@ impl<'a> From<Value<'a>> for FunctionParam<'a> {
 impl<'a> From<&'a str> for FunctionParam<'a> {
     fn from(v: &'a str) -> Self {
         Self::OnlyValue(Value::Text(Text(v)))
+    }
+}
+
+impl<'a> From<Constant<'a>> for FunctionParam<'a> {
+    fn from(v: Constant<'a>) -> Self {
+        Self::OnlyValue(Value::Constant(v))
     }
 }
 

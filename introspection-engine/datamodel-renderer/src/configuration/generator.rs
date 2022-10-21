@@ -1,8 +1,6 @@
-use std::fmt;
-
+use crate::value::{Array, Documentation, Env, Text};
 use psl::PreviewFeature;
-
-use crate::{Array, Documentation, Env, Text};
+use std::fmt;
 
 /// The generator block of the datasource.
 #[derive(Debug)]
@@ -162,7 +160,7 @@ impl<'a> fmt::Display for Generator<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::*;
+    use crate::{configuration::*, value::*};
     use expect_test::expect;
     use psl::PreviewFeature;
 
