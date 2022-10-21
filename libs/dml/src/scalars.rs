@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::str::FromStr;
+use std::{fmt, str::FromStr};
 
 /// Prisma's builtin scalar types.
 #[derive(Debug, Copy, PartialEq, Clone, Serialize, Deserialize, Eq, Hash)]
@@ -39,6 +39,7 @@ impl ScalarType {
 
 impl FromStr for ScalarType {
     type Err = String;
+
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "Int" => Ok(ScalarType::Int),
@@ -55,18 +56,24 @@ impl FromStr for ScalarType {
     }
 }
 
-impl ToString for ScalarType {
-    fn to_string(&self) -> String {
+impl AsRef<str> for ScalarType {
+    fn as_ref(&self) -> &str {
         match self {
-            ScalarType::Int => String::from("Int"),
-            ScalarType::BigInt => String::from("BigInt"),
-            ScalarType::Float => String::from("Float"),
-            ScalarType::Boolean => String::from("Boolean"),
-            ScalarType::String => String::from("String"),
-            ScalarType::DateTime => String::from("DateTime"),
-            ScalarType::Json => String::from("Json"),
-            ScalarType::Bytes => String::from("Bytes"),
-            ScalarType::Decimal => String::from("Decimal"),
+            ScalarType::Int => "Int",
+            ScalarType::BigInt => "BigInt",
+            ScalarType::Float => "Float",
+            ScalarType::Boolean => "Boolean",
+            ScalarType::String => "String",
+            ScalarType::DateTime => "DateTime",
+            ScalarType::Json => "Json",
+            ScalarType::Bytes => "Bytes",
+            ScalarType::Decimal => "Decimal",
         }
+    }
+}
+
+impl fmt::Display for ScalarType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.as_ref().fmt(f)
     }
 }

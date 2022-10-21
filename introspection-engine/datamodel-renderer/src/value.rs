@@ -8,6 +8,7 @@ mod function;
 mod text;
 
 pub use array::Array;
+use base64::display::Base64Display;
 pub use constant::{Constant, ConstantNameValidationError};
 pub use documentation::Documentation;
 pub use env::Env;
@@ -17,12 +18,13 @@ pub use text::Text;
 use std::fmt;
 
 /// A PSL value representation.
-#[derive(Debug)]
 pub enum Value<'a> {
     /// A string value, quoted and escaped accordingly.
     Text(Text<&'a str>),
+    /// A byte value, quoted and base64-encoded.
+    Bytes(Text<Base64Display<'a>>),
     /// A constant value without quoting.
-    Constant(Constant<'a>),
+    Constant(Constant<Box<dyn fmt::Display + 'a>>),
     /// An array of values.
     Array(Array<Value<'a>>),
     /// A function has a name, and optionally named parameters.
@@ -31,19 +33,31 @@ pub enum Value<'a> {
     Env(Env<'a>),
 }
 
-impl<'a> From<Text<&'a str>> for Value<'a> {
-    fn from(t: Text<&'a str>) -> Self {
-        Self::Text(t)
+impl<'a> fmt::Debug for Value<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Value::Text(t) => f.debug_tuple("Text").field(t).finish(),
+            Value::Constant(val) => {
+                write!(f, "Constant({val})")
+            }
+            Value::Array(ary) => f.debug_tuple("Array").field(ary).finish(),
+            Value::Function(fun) => f.debug_tuple("Function").field(fun).finish(),
+            Value::Env(e) => f.debug_tuple("Env").field(e).finish(),
+            Value::Bytes(Text(b)) => write!(f, "Bytes({b})"),
+        }
     }
 }
 
-impl<'a> TryFrom<&'a str> for Value<'a> {
-    type Error = ConstantNameValidationError<'a>;
+impl<'a> From<&'a [u8]> for Value<'a> {
+    fn from(bytes: &'a [u8]) -> Self {
+        let display = Base64Display::with_config(bytes, base64::STANDARD);
+        Self::Bytes(Text(display))
+    }
+}
 
-    fn try_from(value: &'a str) -> Result<Self, Self::Error> {
-        let constant = Constant::new(value)?;
-
-        Ok(Self::Constant(constant))
+impl<'a> From<Text<&'a str>> for Value<'a> {
+    fn from(t: Text<&'a str>) -> Self {
+        Self::Text(t)
     }
 }
 
@@ -82,6 +96,9 @@ impl<'a> fmt::Display for Value<'a> {
             }
             Value::Env(env) => {
                 env.fmt(f)?;
+            }
+            Value::Bytes(val) => {
+                write!(f, "{val}")?;
             }
         }
 
