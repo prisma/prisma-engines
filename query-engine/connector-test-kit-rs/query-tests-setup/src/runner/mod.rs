@@ -8,7 +8,7 @@ pub use node_api::*;
 use query_core::TxId;
 use query_engine_metrics::MetricRegistry;
 
-use crate::{ConnectorTag, ConnectorVersion, QueryResult, TestError, TestResult};
+use crate::{ConnectorTag, ConnectorVersion, QueryResult, TestError, TestLogCapture, TestResult};
 use colored::*;
 
 pub type TxResult = Result<(), user_facing_errors::Error>;
@@ -55,7 +55,7 @@ pub trait RunnerInterface: Sized {
     fn get_metrics(&self) -> MetricRegistry;
 }
 
-pub enum Runner {
+enum RunnerType {
     /// Using the QE crate directly for queries.
     Direct(DirectRunner),
 
@@ -66,19 +66,27 @@ pub enum Runner {
     Binary(BinaryRunner),
 }
 
+pub struct Runner {
+    log_capture: TestLogCapture,
+    inner: RunnerType,
+}
+
 impl Runner {
     pub async fn load(
         ident: &str,
         datamodel: String,
         connector_tag: ConnectorTag,
         metrics: MetricRegistry,
+        log_capture: TestLogCapture,
     ) -> TestResult<Self> {
-        match ident {
+        let inner = match ident {
             "direct" => Self::direct(datamodel, connector_tag, metrics).await,
-            "node-api" => Ok(Self::NodeApi(NodeApiRunner {})),
+            "node-api" => Ok(RunnerType::NodeApi(NodeApiRunner {})),
             "binary" => Self::binary(datamodel, connector_tag, metrics).await,
             unknown => Err(TestError::parse_error(format!("Unknown test runner '{}'", unknown))),
-        }
+        }?;
+
+        Ok(Self { log_capture, inner })
     }
 
     pub async fn query<T>(&self, gql_query: T) -> TestResult<QueryResult>
@@ -88,10 +96,10 @@ impl Runner {
         let gql_query = gql_query.into();
         tracing::debug!("Querying: {}", gql_query.clone().green());
 
-        let response = match self {
-            Runner::Direct(r) => r.query(gql_query).await,
-            Runner::NodeApi(_) => todo!(),
-            Runner::Binary(r) => r.query(gql_query).await,
+        let response = match &self.inner {
+            RunnerType::Direct(r) => r.query(gql_query).await,
+            RunnerType::NodeApi(_) => todo!(),
+            RunnerType::Binary(r) => r.query(gql_query).await,
         }?;
 
         if response.failed() {
@@ -109,32 +117,32 @@ impl Runner {
         valid_for_millis: u64,
         isolation_level: Option<String>,
     ) -> TestResult<TxId> {
-        match self {
-            Runner::Direct(r) => {
+        match &self.inner {
+            RunnerType::Direct(r) => {
                 r.start_tx(max_acquisition_millis, valid_for_millis, isolation_level)
                     .await
             }
-            Runner::Binary(r) => {
+            RunnerType::Binary(r) => {
                 r.start_tx(max_acquisition_millis, valid_for_millis, isolation_level)
                     .await
             }
-            Runner::NodeApi(_) => todo!(),
+            RunnerType::NodeApi(_) => todo!(),
         }
     }
 
     pub async fn commit_tx(&self, tx_id: TxId) -> TestResult<TxResult> {
-        match self {
-            Runner::Direct(r) => r.commit_tx(tx_id).await,
-            Runner::NodeApi(_) => todo!(),
-            Runner::Binary(r) => r.commit_tx(tx_id).await,
+        match &self.inner {
+            RunnerType::Direct(r) => r.commit_tx(tx_id).await,
+            RunnerType::NodeApi(_) => todo!(),
+            RunnerType::Binary(r) => r.commit_tx(tx_id).await,
         }
     }
 
     pub async fn rollback_tx(&self, tx_id: TxId) -> TestResult<TxResult> {
-        match self {
-            Runner::Direct(r) => r.rollback_tx(tx_id).await,
-            Runner::NodeApi(_) => todo!(),
-            Runner::Binary(r) => r.rollback_tx(tx_id).await,
+        match &self.inner {
+            RunnerType::Direct(r) => r.rollback_tx(tx_id).await,
+            RunnerType::NodeApi(_) => todo!(),
+            RunnerType::Binary(r) => r.rollback_tx(tx_id).await,
         }
     }
 
@@ -144,62 +152,66 @@ impl Runner {
         transaction: bool,
         isolation_level: Option<String>,
     ) -> TestResult<QueryResult> {
-        match self {
-            Runner::Direct(r) => r.batch(queries, transaction, isolation_level).await,
-            Runner::NodeApi(_) => todo!(),
-            Runner::Binary(r) => r.batch(queries, transaction, isolation_level).await,
+        match &self.inner {
+            RunnerType::Direct(r) => r.batch(queries, transaction, isolation_level).await,
+            RunnerType::NodeApi(_) => todo!(),
+            RunnerType::Binary(r) => r.batch(queries, transaction, isolation_level).await,
         }
     }
 
-    async fn direct(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<Self> {
+    async fn direct(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<RunnerType> {
         let runner = DirectRunner::load(datamodel, connector_tag, metrics).await?;
 
-        Ok(Self::Direct(runner))
+        Ok(RunnerType::Direct(runner))
     }
 
-    async fn binary(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<Self> {
+    async fn binary(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<RunnerType> {
         let runner = BinaryRunner::load(datamodel, connector_tag, metrics).await?;
 
-        Ok(Self::Binary(runner))
+        Ok(RunnerType::Binary(runner))
     }
 
     pub fn connector(&self) -> &ConnectorTag {
-        match self {
-            Runner::Direct(r) => r.connector(),
-            Runner::NodeApi(_) => todo!(),
-            Runner::Binary(r) => r.connector(),
+        match &self.inner {
+            RunnerType::Direct(r) => r.connector(),
+            RunnerType::NodeApi(_) => todo!(),
+            RunnerType::Binary(r) => r.connector(),
         }
     }
 
     pub fn connector_version(&self) -> ConnectorVersion {
-        match self {
-            Runner::Direct(r) => ConnectorVersion::from(r.connector()),
-            Runner::NodeApi(_) => todo!(),
-            Runner::Binary(r) => ConnectorVersion::from(r.connector()),
+        match &self.inner {
+            RunnerType::Direct(r) => ConnectorVersion::from(r.connector()),
+            RunnerType::NodeApi(_) => todo!(),
+            RunnerType::Binary(r) => ConnectorVersion::from(r.connector()),
         }
     }
 
     pub fn set_active_tx(&mut self, tx_id: TxId) {
-        match self {
-            Runner::Direct(r) => r.set_active_tx(tx_id),
-            Runner::NodeApi(_) => todo!(),
-            Runner::Binary(r) => r.set_active_tx(tx_id),
+        match &mut self.inner {
+            RunnerType::Direct(r) => r.set_active_tx(tx_id),
+            RunnerType::NodeApi(_) => todo!(),
+            RunnerType::Binary(r) => r.set_active_tx(tx_id),
         }
     }
 
     pub fn clear_active_tx(&mut self) {
-        match self {
-            Runner::Direct(r) => r.clear_active_tx(),
-            Runner::NodeApi(_) => todo!(),
-            Runner::Binary(r) => r.clear_active_tx(),
+        match &mut self.inner {
+            RunnerType::Direct(r) => r.clear_active_tx(),
+            RunnerType::NodeApi(_) => todo!(),
+            RunnerType::Binary(r) => r.clear_active_tx(),
         }
     }
 
     pub fn get_metrics(&self) -> MetricRegistry {
-        match self {
-            Runner::Direct(r) => r.get_metrics(),
-            Runner::NodeApi(_) => todo!(),
-            Runner::Binary(r) => r.get_metrics(),
+        match &self.inner {
+            RunnerType::Direct(r) => r.get_metrics(),
+            RunnerType::NodeApi(_) => todo!(),
+            RunnerType::Binary(r) => r.get_metrics(),
         }
+    }
+
+    pub async fn get_logs(&mut self) -> Vec<String> {
+        self.log_capture.get_logs().await
     }
 }

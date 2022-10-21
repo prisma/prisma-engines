@@ -1,6 +1,8 @@
 use query_engine_metrics::MetricRegistry;
 use tracing_error::ErrorLayer;
-use tracing_subscriber::{layer::Layered, prelude::*, EnvFilter, Registry};
+use tracing_subscriber::{layer::Layered, prelude::*, EnvFilter, Layer, Registry};
+
+use crate::LogEmit;
 
 // Pretty ugly. I'm not sure how to make this better
 type Sub = Layered<
@@ -25,11 +27,11 @@ type Sub = Layered<
     >,
 >;
 
-pub fn test_tracing_subscriber(log_config: &str, metrics: MetricRegistry) -> Sub {
+pub fn test_tracing_subscriber(log_config: &str, metrics: MetricRegistry, log_tx: LogEmit) -> Sub {
     let filter = create_env_filter(true, log_config);
 
     let fmt_layer = tracing_subscriber::fmt::layer()
-        .with_writer(PrintWriter)
+        .with_writer(PrintWriter::new(log_tx))
         .with_filter(filter);
 
     tracing_subscriber::registry()
@@ -66,19 +68,34 @@ fn create_env_filter(log_queries: bool, qe_log_level: &str) -> EnvFilter {
 /// specific test outputs for readability.
 ///
 /// It is used from test_macros.
-pub struct PrintWriter;
+pub struct PrintWriter {
+    tx: LogEmit,
+}
+
+impl PrintWriter {
+    fn new(tx: LogEmit) -> Self {
+        Self { tx }
+    }
+}
 
 impl tracing_subscriber::fmt::MakeWriter<'_> for PrintWriter {
     type Writer = PrintWriter;
 
     fn make_writer(&self) -> Self::Writer {
-        PrintWriter
+        PrintWriter::new(self.tx.clone())
     }
 }
 
 impl std::io::Write for PrintWriter {
     fn write(&mut self, buf: &[u8]) -> Result<usize, std::io::Error> {
-        eprint!("{}", std::str::from_utf8(buf).unwrap_or("<invalid UTF-8>"));
+        let log = std::str::from_utf8(buf).unwrap_or("<invalid UTF-8>");
+
+        if log.contains("quaint") || log.contains("mongodb_query_connector") {
+            let plain_bytes = strip_ansi_escapes::strip(buf)?;
+            let plain_log = std::str::from_utf8(&plain_bytes).unwrap_or("<invalid UTF-8>");
+            let _ = self.tx.send(plain_log.to_string());
+        }
+        eprint!("{}", log);
         Ok(buf.len())
     }
 
