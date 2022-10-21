@@ -9,7 +9,8 @@ use indoc::indoc;
 use once_cell::sync::Lazy;
 use query_engine_tests::{
     query_core::TxId, render_test_datamodel, setup_metrics, setup_project, test_tracing_subscriber, ConnectorTag,
-    QueryResult, Runner, TestConfig, TestError, TestResult, TryFrom, WithSubscriber, ENV_LOG_LEVEL,
+    LogEmit, QueryResult, Runner, TestConfig, TestError, TestLogCapture, TestResult, TryFrom, WithSubscriber,
+    ENV_LOG_LEVEL,
 };
 use tokio::sync::mpsc;
 
@@ -53,8 +54,9 @@ enum Response {
 impl Actor {
     /// Spawns a new query engine to the runtime.
     pub async fn spawn() -> TestResult<Self> {
-        async fn with_logs<T>(fut: impl Future<Output = T>) -> T {
-            fut.with_subscriber(test_tracing_subscriber(&ENV_LOG_LEVEL, setup_metrics()))
+        let (log_capture, log_tx) = TestLogCapture::new();
+        async fn with_logs<T>(fut: impl Future<Output = T>, log_tx: LogEmit) -> T {
+            fut.with_subscriber(test_tracing_subscriber(&ENV_LOG_LEVEL, setup_metrics(), log_tx))
                 .await
         }
 
@@ -75,21 +77,21 @@ impl Actor {
 
         setup_project(&datamodel, &[]).await?;
 
-        let mut runner = Runner::load("direct", datamodel, tag, setup_metrics()).await?;
+        let mut runner = Runner::load("direct", datamodel, tag, setup_metrics(), log_capture).await?;
 
         tokio::spawn(async move {
             while let Some(message) = query_receiver.recv().await {
                 match message {
                     Message::Query(query) => {
-                        let result = with_logs(runner.query(query)).await;
+                        let result = with_logs(runner.query(query), log_tx.clone()).await;
                         response_sender.send(Response::Query(result)).await.unwrap();
                     }
                     Message::BeginTransaction => {
-                        let response = with_logs(runner.start_tx(10000, 10000, None)).await;
+                        let response = with_logs(runner.start_tx(10000, 10000, None), log_tx.clone()).await;
                         response_sender.send(Response::Tx(response)).await.unwrap();
                     }
                     Message::RollbackTransaction(tx_id) => {
-                        let response = with_logs(runner.rollback_tx(tx_id)).await?;
+                        let response = with_logs(runner.rollback_tx(tx_id), log_tx.clone()).await?;
                         response_sender.send(Response::Rollback(response)).await.unwrap();
                     }
                     Message::SetActiveTx(tx_id) => {

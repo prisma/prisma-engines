@@ -36,3 +36,4 @@ query-engine-metrics = {path = "../../metrics"}
 # Only this version is vetted, upgrade only after going through the code,
 # as this is a small crate with little user base.
 parse-hyperlinks = "0.23.3"
+strip-ansi-escapes = "0.1.1"

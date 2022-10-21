@@ -28,6 +28,7 @@ use query_engine_metrics::MetricRegistry;
 use std::future::Future;
 use std::sync::Once;
 use tokio::runtime::Builder;
+use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
 use tracing_futures::WithSubscriber;
 
 pub type TestResult<T> = Result<T, TestError>;
@@ -156,13 +157,14 @@ fn run_relation_link_test_impl(
         let requires_teardown = connector.requires_teardown();
         let metrics = setup_metrics();
         let metrics_for_subscriber = metrics.clone();
+        let (log_capture, log_tx) = TestLogCapture::new();
 
         run_with_tokio(
             async move {
                 tracing::debug!("Used datamodel:\n {}", datamodel.clone().yellow());
                 setup_project(&datamodel, Default::default()).await.unwrap();
 
-                let runner = Runner::load(config.runner(), datamodel.clone(), connector, metrics)
+                let runner = Runner::load(config.runner(), datamodel.clone(), connector, metrics, log_capture)
                     .await
                     .unwrap();
 
@@ -172,7 +174,7 @@ fn run_relation_link_test_impl(
                     teardown_project(&datamodel, Default::default()).await.unwrap();
                 }
             }
-            .with_subscriber(test_tracing_subscriber(&ENV_LOG_LEVEL, metrics_for_subscriber)),
+            .with_subscriber(test_tracing_subscriber(&ENV_LOG_LEVEL, metrics_for_subscriber, log_tx)),
         );
     }
 }
@@ -261,14 +263,22 @@ pub fn run_connector_test_impl(
     let metrics = crate::setup_metrics();
     let metrics_for_subscriber = metrics.clone();
 
+    let (log_capture, log_tx) = TestLogCapture::new();
+
     crate::run_with_tokio(
         async {
             crate::setup_project(&datamodel, db_schemas).await.unwrap();
 
             let requires_teardown = connector.requires_teardown();
-            let runner = Runner::load(crate::CONFIG.runner(), datamodel.clone(), connector, metrics)
-                .await
-                .unwrap();
+            let runner = Runner::load(
+                crate::CONFIG.runner(),
+                datamodel.clone(),
+                connector,
+                metrics,
+                log_capture,
+            )
+            .await
+            .unwrap();
 
             test_fn(runner).await.unwrap();
 
@@ -276,6 +286,27 @@ pub fn run_connector_test_impl(
                 crate::teardown_project(&datamodel, db_schemas).await.unwrap();
             }
         }
-        .with_subscriber(test_tracing_subscriber(&ENV_LOG_LEVEL, metrics_for_subscriber)),
+        .with_subscriber(test_tracing_subscriber(&ENV_LOG_LEVEL, metrics_for_subscriber, log_tx)),
     );
+}
+
+pub type LogEmit = UnboundedSender<String>;
+pub struct TestLogCapture {
+    rx: UnboundedReceiver<String>,
+}
+
+impl TestLogCapture {
+    pub fn new() -> (Self, LogEmit) {
+        let (tx, rx) = unbounded_channel();
+        (Self { rx }, tx)
+    }
+
+    pub async fn get_logs(&mut self) -> Vec<String> {
+        let mut logs = Vec::new();
+        while let Ok(log_line) = self.rx.try_recv() {
+            logs.push(log_line)
+        }
+
+        logs
+    }
 }
