@@ -9,7 +9,8 @@ model Profile {
   user_id Int       @unique
 }
 // [1;91merror[0m: [1mError parsing attribute "@relation": The `onDelete` referential action of a relation must not be set to `SetNull` when a referenced field is required.
-// Either choose another referential action, or make the referenced fields optional.[0m
+// Either choose another referential action, or make the referenced fields optional.
+// [0m
 //   [1;94m-->[0m  [4mschema.prisma:8[0m
 // [1;94m   | [0m
 // [1;94m 7 | [0m  id      Int       @id
@@ -17,7 +18,8 @@ model Profile {
 // [1;94m 9 | [0m  user_id Int       @unique
 // [1;94m   | [0m
 // [1;91merror[0m: [1mError parsing attribute "@relation": The `onUpdate` referential action of a relation must not be set to `SetNull` when a referenced field is required.
-// Either choose another referential action, or make the referenced fields optional.[0m
+// Either choose another referential action, or make the referenced fields optional.
+// [0m
 //   [1;94m-->[0m  [4mschema.prisma:8[0m
 // [1;94m   | [0m
 // [1;94m 7 | [0m  id      Int       @id
