@@ -53,7 +53,7 @@ fn create_env_filter(log_queries: bool, qe_log_level: &str) -> EnvFilter {
         .add_directive(format!("query_core={}", &qe_log_level).parse().unwrap())
         .add_directive(format!("query_connector={}", &qe_log_level).parse().unwrap())
         .add_directive(format!("sql_query_connector={}", &qe_log_level).parse().unwrap())
-        .add_directive(format!("mongodb_query_connector={}", &qe_log_level).parse().unwrap());
+        .add_directive("mongodb_query_connector=debug".parse().unwrap());
 
     if log_queries {
         filter = filter.add_directive("quaint[{is_query}]=trace".parse().unwrap());
