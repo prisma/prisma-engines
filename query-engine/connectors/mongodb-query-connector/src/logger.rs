@@ -170,8 +170,12 @@ pub(crate) fn log_update_many_vec(coll: &str, filter: &Document, docs: &[Documen
         write!(&mut buffer, ", [").unwrap();
     }
 
-    for doc in docs {
-        fmt_doc(&mut buffer, doc, 1).unwrap();
+    if let Some((last, docs)) = docs.split_last() {
+        for doc in docs {
+            fmt_doc(&mut buffer, doc, 1).unwrap();
+            writeln!(&mut buffer, ",").unwrap();
+        }
+        fmt_doc(&mut buffer, last, 1).unwrap();
     }
 
     write!(&mut buffer, "])").unwrap();
