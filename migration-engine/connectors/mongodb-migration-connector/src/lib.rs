@@ -71,6 +71,7 @@ impl MigrationConnector for MongoDbMigrationConnector {
         &'a mut self,
         diff_target: DiffTarget<'a>,
         _shadow_database_connection_string: Option<String>,
+        _namespaces: Vec<String>,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
         Box::pin(async {
             let schema = self.mongodb_schema_from_diff_target(diff_target).await?;

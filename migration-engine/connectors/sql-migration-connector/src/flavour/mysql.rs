@@ -275,6 +275,7 @@ impl SqlFlavour for MysqlFlavour {
         &'a mut self,
         migrations: &'a [MigrationDirectory],
         shadow_database_connection_string: Option<String>,
+        namespaces: Vec<String>,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
         let shadow_database_connection_string = shadow_database_connection_string.or_else(|| {
             self.state
@@ -299,6 +300,7 @@ impl SqlFlavour for MysqlFlavour {
                         .params()
                         .map(|p| p.connector_params.preview_features)
                         .unwrap_or_default(),
+                    namespaces,
                     shadow_database_connection_string: None,
                 };
 
@@ -326,6 +328,7 @@ impl SqlFlavour for MysqlFlavour {
                     let shadow_db_params = ConnectorParams {
                         connection_string: shadow_database_url.to_string(),
                         preview_features: params.connector_params.preview_features,
+                        namespaces,
                         shadow_database_connection_string: None,
                     };
 
@@ -396,6 +399,7 @@ mod tests {
         let params = ConnectorParams {
             connection_string: url.to_owned(),
             preview_features: Default::default(),
+            namespaces: vec![],
             shadow_database_connection_string: None,
         };
         flavour.set_params(params).unwrap();

@@ -189,6 +189,7 @@ pub trait MigrationConnector: Send + Sync + 'static {
         &'a mut self,
         target: DiffTarget<'a>,
         shadow_database_connection_string: Option<String>,
+        namespaces: Vec<String>,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>>;
 
     /// In-tro-spec-shon.

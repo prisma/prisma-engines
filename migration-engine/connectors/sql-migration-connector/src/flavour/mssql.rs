@@ -118,6 +118,7 @@ impl SqlFlavour for MssqlFlavour {
                         connector_params: ConnectorParams {
                             connection_string: master_uri.clone(),
                             preview_features: Default::default(),
+                            namespaces: vec![],
                             shadow_database_connection_string: None,
                         },
                     },
@@ -181,6 +182,7 @@ impl SqlFlavour for MssqlFlavour {
                     connector_params: ConnectorParams {
                         connection_string: master_uri.clone(),
                         preview_features: Default::default(),
+                        namespaces: vec![],
                         shadow_database_connection_string: None,
                     },
                     url: MssqlUrl::new(&master_uri).unwrap(),
@@ -359,6 +361,7 @@ impl SqlFlavour for MssqlFlavour {
         &'a mut self,
         migrations: &'a [MigrationDirectory],
         shadow_database_connection_string: Option<String>,
+        namespaces: Vec<String>,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
         let shadow_database_connection_string = shadow_database_connection_string.or_else(|| {
             self.state
@@ -383,6 +386,7 @@ impl SqlFlavour for MssqlFlavour {
                         .params()
                         .map(|cp| cp.connector_params.preview_features)
                         .unwrap_or_default(),
+                    namespaces,
                     shadow_database_connection_string: None,
                 };
                 shadow_database.set_params(shadow_db_params)?;
@@ -434,6 +438,7 @@ impl SqlFlavour for MssqlFlavour {
                 let shadow_db_params = ConnectorParams {
                     connection_string: jdbc_string,
                     preview_features: params.connector_params.preview_features,
+                    namespaces,
                     shadow_database_connection_string: None,
                 };
                 shadow_database.set_params(shadow_db_params)?;
@@ -500,6 +505,7 @@ mod tests {
         let params = ConnectorParams {
             connection_string: url.to_owned(),
             preview_features: Default::default(),
+            namespaces: vec![],
             shadow_database_connection_string: None,
         };
 

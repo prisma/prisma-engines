@@ -253,6 +253,7 @@ pub(crate) trait SqlFlavour:
         &'a mut self,
         migrations: &'a [MigrationDirectory],
         shadow_database_url: Option<String>,
+        namespaces: Vec<String>,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>>;
 
     /// Receive and validate connector params.
