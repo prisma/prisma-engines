@@ -202,6 +202,7 @@ impl MigrationConnector for MongoDbMigrationConnector {
     fn validate_migrations<'a>(
         &'a mut self,
         _migrations: &'a [MigrationDirectory],
+        _namespaces: Vec<String>,
     ) -> BoxFuture<'a, ConnectorResult<()>> {
         Box::pin(future::ready(Ok(())))
     }

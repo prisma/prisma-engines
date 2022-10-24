@@ -46,6 +46,8 @@ impl TestApi {
             let params = ConnectorParams {
                 connection_string: connection_string.to_owned(),
                 preview_features,
+                // TODO: is this okay?
+                namespaces: vec![],
                 shadow_database_connection_string: None,
             };
             let mut me = SqlMigrationConnector::new_mysql();

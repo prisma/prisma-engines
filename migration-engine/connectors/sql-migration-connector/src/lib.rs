@@ -113,6 +113,7 @@ impl SqlMigrationConnector {
         &mut self,
         target: DiffTarget<'_>,
         shadow_database_connection_string: Option<String>,
+        namespaces: Vec<String>,
     ) -> ConnectorResult<SqlDatabaseSchema> {
         match target {
             DiffTarget::Datamodel(schema) => {
@@ -124,7 +125,7 @@ impl SqlMigrationConnector {
             }
             DiffTarget::Migrations(migrations) => self
                 .flavour
-                .sql_schema_from_migration_history(migrations, shadow_database_connection_string)
+                .sql_schema_from_migration_history(migrations, shadow_database_connection_string, namespaces)
                 .await
                 .map(From::from),
             DiffTarget::Database => self.flavour.describe_schema().await.map(From::from),
@@ -191,9 +192,10 @@ impl MigrationConnector for SqlMigrationConnector {
         &'a mut self,
         diff_target: DiffTarget<'a>,
         shadow_database_connection_string: Option<String>,
+        namespaces: Vec<String>,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
         Box::pin(async move {
-            self.db_schema_from_diff_target(diff_target, shadow_database_connection_string)
+            self.db_schema_from_diff_target(diff_target, shadow_database_connection_string, namespaces)
                 .await
                 .map(From::from)
         })
@@ -284,9 +286,10 @@ impl MigrationConnector for SqlMigrationConnector {
     fn validate_migrations<'a>(
         &'a mut self,
         migrations: &'a [MigrationDirectory],
+        namespaces: Vec<String>,
     ) -> BoxFuture<'a, ConnectorResult<()>> {
         Box::pin(async move {
-            self.flavour.sql_schema_from_migration_history(migrations, None).await?;
+            self.flavour.sql_schema_from_migration_history(migrations, None, namespaces).await?;
             Ok(())
         })
     }

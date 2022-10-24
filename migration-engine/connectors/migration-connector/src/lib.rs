@@ -202,5 +202,6 @@ pub trait MigrationConnector: Send + Sync + 'static {
     fn validate_migrations<'a>(
         &'a mut self,
         _migrations: &'a [MigrationDirectory],
+        _namespaces: Vec<String>,
     ) -> BoxFuture<'a, ConnectorResult<()>>;
 }

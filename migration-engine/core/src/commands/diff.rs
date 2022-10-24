@@ -84,7 +84,7 @@ async fn json_rpc_diff_target_to_connector(
             let mut connector = crate::schema_to_connector(&schema_contents, schema_dir)?;
             connector.ensure_connection_validity().await?;
             let schema = connector
-                .database_schema_from_diff_target(McDiff::Database, None)
+                .database_schema_from_diff_target(McDiff::Database, None, vec![])
                 .await?;
             Ok(Some((connector, schema)))
         }
@@ -95,6 +95,7 @@ async fn json_rpc_diff_target_to_connector(
                 .database_schema_from_diff_target(
                     McDiff::Datamodel(SourceFile::new_allocated(Arc::from(schema_contents.into_boxed_str()))),
                     None,
+                    vec![],
                 )
                 .await?;
             Ok(Some((connector, schema)))
@@ -103,7 +104,7 @@ async fn json_rpc_diff_target_to_connector(
             let mut connector = crate::connector_for_connection_string(url.clone(), None, BitFlags::empty())?;
             connector.ensure_connection_validity().await?;
             let schema = connector
-                .database_schema_from_diff_target(McDiff::Database, None)
+                .database_schema_from_diff_target(McDiff::Database, None, vec![])
                 .await?;
             Ok(Some((connector, schema)))
         }
@@ -117,6 +118,7 @@ async fn json_rpc_diff_target_to_connector(
                         .database_schema_from_diff_target(
                             McDiff::Migrations(&directories),
                             Some(shadow_database_url.to_owned()),
+                            vec![],
                         )
                         .await?;
                     Ok(Some((connector, schema)))
@@ -125,7 +127,7 @@ async fn json_rpc_diff_target_to_connector(
                     let mut connector = crate::connector_for_provider("sqlite")?;
                     let directories = migration_connector::migrations_directory::list_migrations(Path::new(path))?;
                     let schema = connector
-                        .database_schema_from_diff_target(McDiff::Migrations(&directories), None)
+                        .database_schema_from_diff_target(McDiff::Migrations(&directories), None, vec![])
                         .await?;
                     Ok(Some((connector, schema)))
                 }

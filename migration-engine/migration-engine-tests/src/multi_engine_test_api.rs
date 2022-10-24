@@ -48,6 +48,7 @@ impl TestApi {
                 connection_string: args.database_url().to_owned(),
                 preview_features,
                 shadow_database_connection_string: args.shadow_database_url().map(String::from),
+                namespaces: vec![],
             };
             let mut conn = SqlMigrationConnector::new_mysql();
             conn.set_params(params).unwrap();
@@ -181,6 +182,7 @@ impl TestApi {
             connection_string,
             preview_features: self.preview_features,
             shadow_database_connection_string,
+            namespaces: vec![],
         };
 
         let mut connector = match &connection_info {

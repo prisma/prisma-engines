@@ -42,6 +42,7 @@ fn connector_for_connection_string(
                 connection_string,
                 preview_features,
                 shadow_database_connection_string,
+                namespaces: vec![], // Okay, this is where this breaks down :(
             };
             let mut connector = SqlMigrationConnector::new_postgres();
             connector.set_params(params)?;
@@ -52,6 +53,7 @@ fn connector_for_connection_string(
                 connection_string,
                 preview_features,
                 shadow_database_connection_string,
+                namespaces: vec![], // Okay, this is where this breaks down :(
             };
             let mut connector = SqlMigrationConnector::new_sqlite();
             connector.set_params(params)?;
@@ -62,6 +64,7 @@ fn connector_for_connection_string(
                 connection_string,
                 preview_features,
                 shadow_database_connection_string,
+                namespaces: vec![], // Okay, this is where this breaks down :(
             };
             let mut connector = SqlMigrationConnector::new_mysql();
             connector.set_params(params)?;
@@ -72,6 +75,7 @@ fn connector_for_connection_string(
                 connection_string,
                 preview_features,
                 shadow_database_connection_string,
+                namespaces: vec![], // Okay, this is where this breaks down :(
             };
             let mut connector = SqlMigrationConnector::new_mssql();
             connector.set_params(params)?;
@@ -82,6 +86,7 @@ fn connector_for_connection_string(
                 connection_string,
                 preview_features,
                 shadow_database_connection_string,
+                namespaces: vec![], // Okay, this is where this breaks down :(
             };
             let connector = MongoDbMigrationConnector::new(params);
             Ok(Box::new(connector))
@@ -114,6 +119,7 @@ fn schema_to_connector_unchecked(schema: &str) -> CoreResult<Box<dyn migration_c
             connection_string,
             preview_features,
             shadow_database_connection_string: source.load_shadow_database_url().ok().flatten(),
+            namespaces: vec![], // Okay, this is where this breaks down :(
         })?;
     }
 
@@ -135,6 +141,7 @@ fn schema_to_connector(
         connection_string: url,
         preview_features,
         shadow_database_connection_string: shadow_database_url,
+        namespaces: vec![], // Okay, this is where this breaks down :(
     };
 
     let mut connector = connector_for_provider(source.active_provider)?;
@@ -154,6 +161,7 @@ fn connector_for_provider(provider: &str) -> CoreResult<Box<dyn migration_connec
             connection_string: String::new(),
             preview_features: Default::default(),
             shadow_database_connection_string: None,
+            namespaces: vec![],
         }))),
         provider => Err(CoreError::from_msg(format!(
             "`{}` is not a supported connector.",

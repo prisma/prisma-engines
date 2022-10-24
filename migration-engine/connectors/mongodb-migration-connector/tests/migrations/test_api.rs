@@ -79,6 +79,7 @@ fn new_connector(preview_features: BitFlags<PreviewFeature>) -> (String, MongoDb
     let params = ConnectorParams {
         connection_string: url.to_string(),
         preview_features,
+        namespaces: vec![],
         shadow_database_connection_string: None,
     };
     (db_name, MongoDbMigrationConnector::new(params))
@@ -181,11 +182,11 @@ pub(crate) fn test_scenario(scenario_name: &str) {
         apply_state(&db, state).await;
 
         let from = connector
-            .database_schema_from_diff_target(DiffTarget::Database, None)
+            .database_schema_from_diff_target(DiffTarget::Database, None, vec![])
             .await
             .unwrap();
         let to = connector
-            .database_schema_from_diff_target(DiffTarget::Datamodel(schema.clone()), None)
+            .database_schema_from_diff_target(DiffTarget::Datamodel(schema.clone()), None, vec![])
             .await
             .unwrap();
         let migration = connector.diff(from, to).unwrap();
@@ -223,11 +224,11 @@ Snapshot comparison failed. Run the test again with UPDATE_EXPECT=1 in the envir
 
         // Check that the migration is idempotent.
         let from = connector
-            .database_schema_from_diff_target(DiffTarget::Database, None)
+            .database_schema_from_diff_target(DiffTarget::Database, None, vec![])
             .await
             .unwrap();
         let to = connector
-            .database_schema_from_diff_target(DiffTarget::Datamodel(schema), None)
+            .database_schema_from_diff_target(DiffTarget::Datamodel(schema), None, vec![])
             .await
             .unwrap();
         let migration = connector.diff(from, to).unwrap();
