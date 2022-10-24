@@ -168,7 +168,7 @@ tests:
 - `make dev-mysql8`: MySQL 8
 - `make dev-postgres`: PostgreSQL 10
 - `make dev-sqlite`: SQLite
-- `make dev-mongodb5`: MongoDB 5
+- `make dev-mongodb_5`: MongoDB 5
 
 \*_On windows:_
 If not using WSL, `make` is not available and you should just see what your
