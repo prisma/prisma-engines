@@ -31,6 +31,7 @@ impl Connection {
             .await
             .map_err(|err| match err.into_kind() {
                 DescriberErrorKind::QuaintError(err) => quaint_err_url(&params.url)(err),
+                e @ DescriberErrorKind::SchemaDoesNotExist(_) => ConnectorError::from_msg(e.to_string()),
                 e @ DescriberErrorKind::CrossSchemaReference { .. } => {
                     let err = KnownError::new(DatabaseSchemaInconsistent {
                         explanation: e.to_string(),

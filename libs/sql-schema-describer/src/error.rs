@@ -31,6 +31,11 @@ impl DescriberError {
     pub fn span_trace(&self) -> SpanTrace {
         self.context.clone()
     }
+
+    /// Construct an error about an input schema not existing in the database.
+    pub fn new_schema_does_not_exist(name: String) -> Self {
+        DescriberErrorKind::SchemaDoesNotExist(name).into()
+    }
 }
 
 impl From<DescriberErrorKind> for DescriberError {
@@ -47,6 +52,8 @@ impl From<DescriberErrorKind> for DescriberError {
 pub enum DescriberErrorKind {
     /// An error originating from Quaint or the database.
     QuaintError(quaint::error::Error),
+    /// An input schema for description does not exist.
+    SchemaDoesNotExist(String),
     /// An illegal cross-schema reference.
     CrossSchemaReference {
         /// Qualified path of the source table.
@@ -74,6 +81,10 @@ impl Display for DescriberErrorKind {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::QuaintError(err) => err.fmt(f),
+            Self::SchemaDoesNotExist(unknown_schema) => {
+                f.write_str("The following schema does not exist in the database: ")?;
+                f.write_str(unknown_schema)
+            }
             Self::CrossSchemaReference { from, to, constraint } => {
                 write!(
                     f,
@@ -89,7 +100,7 @@ impl Error for DescriberError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         match &self.kind {
             DescriberErrorKind::QuaintError(err) => Some(err),
-            DescriberErrorKind::CrossSchemaReference { .. } => None,
+            DescriberErrorKind::CrossSchemaReference { .. } | DescriberErrorKind::SchemaDoesNotExist(_) => None,
         }
     }
 }

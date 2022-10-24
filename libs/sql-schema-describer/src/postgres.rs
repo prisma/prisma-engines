@@ -456,9 +456,16 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
     async fn describe(&self, schemas: &[&str]) -> DescriberResult<SqlSchema> {
         let mut sql_schema = SqlSchema::default();
         let mut pg_ext = PostgresSchemaExt::default();
+        let namespaces = fetch_namespaces(self.conn).await?;
+
+        for namespace in namespaces {
+            sql_schema.push_namespace((*namespace).into());
+        }
 
         for schema in schemas {
-            sql_schema.push_namespace((*schema).into());
+            if sql_schema.get_namespace_id(schema).is_none() {
+                return Err(DescriberError::new_schema_does_not_exist((*schema).to_owned()));
+            }
         }
 
         //TODO(matthias) can we get rid of the table names map and instead just use tablewalker_ns everywhere like in get_columns?
@@ -576,7 +583,9 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for row in rows.into_iter() {
             procedures.push(Procedure {
-                namespace_id: sql_schema.get_namespace_id(&row.get_expect_string("namespace")),
+                namespace_id: sql_schema
+                    .get_namespace_id(&row.get_expect_string("namespace"))
+                    .unwrap(),
                 name: row.get_expect_string("name"),
                 definition: row.get_string("definition"),
             });
@@ -608,7 +617,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for (table_name, namespace) in names {
             let cloned_name = table_name.clone();
-            let id = sql_schema.push_table(table_name, sql_schema.get_namespace_id(&namespace));
+            let id = sql_schema.push_table(table_name, sql_schema.get_namespace_id(&namespace).unwrap());
             map.insert((namespace, cloned_name), id);
         }
 
@@ -651,7 +660,9 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for row in result_set.into_iter() {
             views.push(View {
-                namespace_id: sql_schema.get_namespace_id(&row.get_expect_string("namespace")),
+                namespace_id: sql_schema
+                    .get_namespace_id(&row.get_expect_string("namespace"))
+                    .unwrap(),
                 name: row.get_expect_string("view_name"),
                 definition: row.get_string("view_sql"),
             })
@@ -1143,7 +1154,9 @@ impl<'a> SqlSchemaDescriber<'a> {
             )
             .await?;
         let sequences = rows.into_iter().map(|seq| Sequence {
-            namespace_id: sql_schema.get_namespace_id(&seq.get_expect_string("namespace")),
+            namespace_id: sql_schema
+                .get_namespace_id(&seq.get_expect_string("namespace"))
+                .unwrap(),
             name: seq.get_expect_string("sequence_name"),
             start_value: seq.get_expect_i64("start_value"),
             min_value: seq.get_expect_i64("min_value"),
@@ -1191,7 +1204,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         let mut enums: Vec<Enum> = enum_values
             .into_iter()
             .map(|((name, namespace), values)| Enum {
-                namespace_id: sql_schema.get_namespace_id(&namespace),
+                namespace_id: sql_schema.get_namespace_id(&namespace).unwrap(),
                 name,
                 values,
             })
@@ -1372,4 +1385,17 @@ fn get_column_type_cockroachdb(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         arity,
         native_type: native_type.map(NativeTypeInstance::new::<CockroachType>),
     }
+}
+
+async fn fetch_namespaces(conn: &dyn Queryable) -> Result<Vec<String>, DescriberError> {
+    let rows = conn
+        .query_raw(include_str!("postgres/namespaces_query.sql"), &[])
+        .await?;
+    let mut namespaces = Vec::with_capacity(rows.len());
+
+    for row in rows {
+        namespaces.push(row.at(0).unwrap().to_string().unwrap())
+    }
+
+    Ok(namespaces)
 }

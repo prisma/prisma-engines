@@ -124,10 +124,12 @@ impl SqlSchema {
         self.user_defined_types.iter().find(|x| x.name == name)
     }
 
-    /// Get a namespaceId by name
-    pub fn get_namespace_id(&self, name: &str) -> NamespaceId {
-        let id = self.namespaces.iter().position(|ns| ns == name).unwrap();
-        NamespaceId(id as u32)
+    /// Get a namespace id by name
+    pub fn get_namespace_id(&self, name: &str) -> Option<NamespaceId> {
+        self.namespaces
+            .binary_search_by(|ns_name| ns_name.as_str().cmp(name))
+            .ok()
+            .map(|pos| NamespaceId(pos as u32))
     }
 
     /// The total number of indexes in the schema.

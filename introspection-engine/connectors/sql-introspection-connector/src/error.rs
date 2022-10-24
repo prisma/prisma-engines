@@ -206,7 +206,8 @@ impl From<QuaintError> for SqlError {
 impl From<sql_schema_describer::DescriberError> for SqlError {
     fn from(error: sql_schema_describer::DescriberError) -> Self {
         match error.kind() {
-            sql_schema_describer::DescriberErrorKind::QuaintError(..) => {
+            sql_schema_describer::DescriberErrorKind::QuaintError(..)
+            | sql_schema_describer::DescriberErrorKind::SchemaDoesNotExist(_) => {
                 SqlError::QueryError(anyhow::anyhow!("{}", error))
             }
             sql_schema_describer::DescriberErrorKind::CrossSchemaReference { .. } => {

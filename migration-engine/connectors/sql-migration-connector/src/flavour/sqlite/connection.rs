@@ -29,6 +29,7 @@ impl Connection {
                 DescriberErrorKind::QuaintError(err) => {
                     ConnectorError::from_source(err, "Error describing the database.")
                 }
+                e @ DescriberErrorKind::SchemaDoesNotExist(_) => ConnectorError::from_msg(e.to_string()),
                 DescriberErrorKind::CrossSchemaReference { .. } => {
                     unreachable!("No schemas on SQLite")
                 }
