@@ -19,15 +19,15 @@ mod max_integer {
     const I16_OVERFLOW_MAX: i64 = (i16::MAX as i64) + 1;
     const I16_OVERFLOW_MIN: i64 = (i16::MIN as i64) - 1;
 
-    const I24_OVERFLOW_MAX: i64 = (8388607 as i64) + 1;
-    const I24_OVERFLOW_MIN: i64 = (-8388608 as i64) - 1;
+    const I24_OVERFLOW_MAX: i64 = 8388607 + 1;
+    const I24_OVERFLOW_MIN: i64 = -8388608 - 1;
 
     const I32_OVERFLOW_MAX: i64 = (i32::MAX as i64) + 1;
     const I32_OVERFLOW_MIN: i64 = (i32::MIN as i64) - 1;
 
     const U8_OVERFLOW_MAX: i64 = (u8::MAX as i64) + 1;
     const U16_OVERFLOW_MAX: i64 = (u16::MAX as i64) + 1;
-    const U24_OVERFLOW_MAX: i64 = (16777215 as i64) + 1;
+    const U24_OVERFLOW_MAX: i64 = 16777215 + 1;
     const U32_OVERFLOW_MAX: i64 = (u32::MAX as i64) + 1;
     const OVERFLOW_MIN: i8 = -1;
 
