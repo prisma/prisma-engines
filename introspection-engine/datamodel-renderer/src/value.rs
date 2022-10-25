@@ -8,13 +8,13 @@ mod function;
 mod text;
 
 pub use array::Array;
-use base64::display::Base64Display;
 pub use constant::{Constant, ConstantNameValidationError};
 pub use documentation::Documentation;
 pub use env::Env;
 pub use function::{Function, FunctionParam};
 pub use text::Text;
 
+use base64::display::Base64Display;
 use std::fmt;
 
 /// A PSL value representation.
