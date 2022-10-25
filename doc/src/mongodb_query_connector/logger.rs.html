@@ -241,6 +241,10 @@
 <span id="241">241</span>
 <span id="242">242</span>
 <span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::query_builder::MongoReadQuery</span>;
 <span class="kw">use</span> <span class="ident">mongodb</span>::{
     <span class="ident">bson</span>::{<span class="ident">Bson</span>, <span class="ident">Document</span>},
@@ -413,8 +417,12 @@
         <span class="macro">write!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buffer</span>, <span class="string">&quot;, [&quot;</span>).<span class="ident">unwrap</span>();
     }
 
-    <span class="kw">for</span> <span class="ident">doc</span> <span class="kw">in</span> <span class="ident">docs</span> {
-        <span class="ident">fmt_doc</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buffer</span>, <span class="ident">doc</span>, <span class="number">1</span>).<span class="ident">unwrap</span>();
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">last</span>, <span class="ident">docs</span>)) <span class="op">=</span> <span class="ident">docs</span>.<span class="ident">split_last</span>() {
+        <span class="kw">for</span> <span class="ident">doc</span> <span class="kw">in</span> <span class="ident">docs</span> {
+            <span class="ident">fmt_doc</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buffer</span>, <span class="ident">doc</span>, <span class="number">1</span>).<span class="ident">unwrap</span>();
+            <span class="macro">writeln!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buffer</span>, <span class="string">&quot;,&quot;</span>).<span class="ident">unwrap</span>();
+        }
+        <span class="ident">fmt_doc</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buffer</span>, <span class="ident">last</span>, <span class="number">1</span>).<span class="ident">unwrap</span>();
     }
 
     <span class="macro">write!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buffer</span>, <span class="string">&quot;])&quot;</span>).<span class="ident">unwrap</span>();
