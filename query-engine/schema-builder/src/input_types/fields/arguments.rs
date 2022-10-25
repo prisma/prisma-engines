@@ -76,9 +76,16 @@ pub(crate) fn many_records_output_field_arguments(ctx: &mut BuilderContext, fiel
         ModelField::Scalar(_) => vec![],
 
         // To-many relation.
-        ModelField::Relation(rf) if rf.is_list() => relation_selection_arguments(ctx, &rf.related_model(), true),
+        ModelField::Relation(rf) if rf.is_list() => {
+            relation_to_many_selection_arguments(ctx, &rf.related_model(), true)
+        }
 
-        // To-one relation.
+        // To-one optional relation.
+        ModelField::Relation(rf) if !rf.is_required() && ctx.has_feature(&PreviewFeature::ExtendedWhereUnique) => {
+            relation_to_one_selection_arguments(ctx, &rf.related_model())
+        }
+
+        // To-one required relation.
         ModelField::Relation(_) => vec![],
 
         // To-many composite.
@@ -90,7 +97,7 @@ pub(crate) fn many_records_output_field_arguments(ctx: &mut BuilderContext, fiel
 }
 
 /// Builds "many records where" arguments for to-many relation selection sets.
-pub(crate) fn relation_selection_arguments(
+pub(crate) fn relation_to_many_selection_arguments(
     ctx: &mut BuilderContext,
     model: &ModelRef,
     include_distinct: bool,
@@ -122,6 +129,11 @@ pub(crate) fn relation_selection_arguments(
     }
 
     args
+}
+
+/// Builds "many records where" arguments for to-many relation selection sets.
+pub(crate) fn relation_to_one_selection_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<InputField> {
+    vec![where_argument(ctx, model)]
 }
 
 /// Builds "many composite where" arguments for to-many composite selection sets.
