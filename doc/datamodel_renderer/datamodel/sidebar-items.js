@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["CompositeType","A type block in a PSL file."],["CompositeTypeField","A field in a composite type block."],["Datamodel","The PSL data model declaration."],["DefaultValue","A field default value."],["Enum","An enum block in a PSL file."],["EnumVariant","A variant declaration in an enum block."]]};

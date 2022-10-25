@@ -46,7 +46,7 @@ var sourcesIndex = JSON.parse('{\
 "crypto_common":["",[],["lib.rs"]],\
 "cuid":["",[],["counter.rs","error.rs","fingerprint.rs","lib.rs","random.rs","text.rs","time.rs"]],\
 "data_encoding":["",[],["lib.rs"]],\
-"datamodel_renderer":["",[["value",[],["array.rs","constant.rs","documentation.rs","env.rs","function.rs","text.rs"]]],["configuration.rs","datamodel.rs","datasource.rs","enumerator.rs","generator.rs","lib.rs","value.rs"]],\
+"datamodel_renderer":["",[["configuration",[],["datasource.rs","generator.rs"]],["datamodel",[["composite_type",[],["field.rs"]]],["attributes.rs","composite_type.rs","default.rs","enumerator.rs"]],["value",[],["array.rs","constant.rs","documentation.rs","env.rs","function.rs","text.rs"]]],["configuration.rs","datamodel.rs","lib.rs","value.rs"]],\
 "derivative":["",[],["ast.rs","attr.rs","bound.rs","clone.rs","cmp.rs","debug.rs","default.rs","hash.rs","lib.rs","matcher.rs","paths.rs","utils.rs"]],\
 "diagnostics":["",[],["collection.rs","error.rs","lib.rs","native_type_error_factory.rs","pretty_print.rs","span.rs","warning.rs"]],\
 "difference":["",[],["display.rs","lcs.rs","lib.rs","merge.rs"]],\

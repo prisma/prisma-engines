@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["Configuration","The configuration part of a data model. First the generators, then the datasources."],["Datasource","The datasource block in a PSL file."],["Generator","The generator block of the datasource."]]};
