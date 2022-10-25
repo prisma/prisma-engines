@@ -68,15 +68,23 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
 
     let test_api_args = TestApiArgs::new(test_function_name, &[], &[]);
     let mut test_api = TestApi::new(test_api_args);
+    let source_file = psl::SourceFile::new_allocated(text.clone());
 
     let migration: String = test_api.connector_diff(
         migration_core::migration_connector::DiffTarget::Empty,
-        migration_core::migration_connector::DiffTarget::Datamodel(psl::parser_database::SourceFile::new_allocated(
-            text.clone(),
-        )),
+        migration_core::migration_connector::DiffTarget::Datamodel(source_file.clone()),
     );
 
     test_api.raw_cmd(&migration); // check that it runs
+
+    let second_migration = test_api.connector_diff(
+        migration_core::migration_connector::DiffTarget::Database,
+        migration_core::migration_connector::DiffTarget::Datamodel(source_file),
+    );
+
+    if second_migration != "-- This is an empty migration." {
+        panic!("There is drift. Migration:\n\n{second_migration}");
+    }
 
     if migration == last_comment_contents {
         return; // success!
