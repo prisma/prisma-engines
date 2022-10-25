@@ -63,6 +63,13 @@ impl<'a> fmt::Display for FieldAttribute<'a> {
 #[derive(Debug)]
 pub(super) struct BlockAttribute<'a>(pub(super) Function<'a>);
 
+impl<'a> BlockAttribute<'a> {
+    /// Add a new parameter to the attribute function.
+    pub fn push_param(&mut self, param: impl Into<FunctionParam<'a>>) {
+        self.0.push_param(param.into());
+    }
+}
+
 impl<'a> fmt::Display for BlockAttribute<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str("@@")?;

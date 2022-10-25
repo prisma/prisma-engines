@@ -24,9 +24,13 @@ pub enum ConstantNameValidationError<'a> {
     SanitizedEmpty,
 }
 
-impl<T: fmt::Display> Constant<T> {
+impl<'a, T: fmt::Display + 'a> Constant<T> {
     pub(crate) fn new_no_validate(value: T) -> Self {
         Self(value)
+    }
+
+    pub(crate) fn boxed(self) -> Constant<Box<dyn fmt::Display + 'a>> {
+        Constant(Box::new(self.0) as Box<dyn fmt::Display + 'a>)
     }
 }
 

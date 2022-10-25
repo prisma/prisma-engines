@@ -48,6 +48,15 @@ impl<'a> fmt::Debug for Value<'a> {
     }
 }
 
+impl<'a, T> From<Constant<T>> for Value<'a>
+where
+    T: fmt::Display + 'a,
+{
+    fn from(c: Constant<T>) -> Self {
+        Self::Constant(c.boxed())
+    }
+}
+
 impl<'a> From<&'a [u8]> for Value<'a> {
     fn from(bytes: &'a [u8]) -> Self {
         let display = Base64Display::with_config(bytes, base64::STANDARD);

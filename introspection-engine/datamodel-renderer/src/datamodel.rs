@@ -6,10 +6,14 @@ mod attributes;
 mod composite_type;
 mod default;
 mod enumerator;
+mod field_type;
+mod model;
 
 pub use composite_type::{CompositeType, CompositeTypeField};
 pub use default::DefaultValue;
 pub use enumerator::{Enum, EnumVariant};
+pub use field_type::FieldType;
+pub use model::{IdDefinition, IndexDefinition, IndexFieldInput, IndexFieldOptions, Model, ModelField, Relation};
 use psl::dml;
 use std::fmt;
 

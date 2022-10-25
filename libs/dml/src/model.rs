@@ -312,6 +312,15 @@ pub enum SortOrder {
     Desc,
 }
 
+impl AsRef<str> for SortOrder {
+    fn as_ref(&self) -> &str {
+        match self {
+            SortOrder::Asc => "Asc",
+            SortOrder::Desc => "Desc",
+        }
+    }
+}
+
 /// A unique criteria is a set of fields through which a record can be uniquely identified.
 #[derive(Debug)]
 pub struct UniqueCriteria<'a> {
