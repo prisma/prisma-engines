@@ -576,7 +576,9 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for row in rows.into_iter() {
             procedures.push(Procedure {
-                namespace_id: sql_schema.get_namespace_id(&row.get_expect_string("namespace")),
+                namespace_id: sql_schema
+                    .get_namespace_id(&row.get_expect_string("namespace"))
+                    .unwrap(),
                 name: row.get_expect_string("name"),
                 definition: row.get_string("definition"),
             });
@@ -608,7 +610,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for (table_name, namespace) in names {
             let cloned_name = table_name.clone();
-            let id = sql_schema.push_table(table_name, sql_schema.get_namespace_id(&namespace));
+            let id = sql_schema.push_table(table_name, sql_schema.get_namespace_id(&namespace).unwrap());
             map.insert((namespace, cloned_name), id);
         }
 
@@ -651,7 +653,9 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for row in result_set.into_iter() {
             views.push(View {
-                namespace_id: sql_schema.get_namespace_id(&row.get_expect_string("namespace")),
+                namespace_id: sql_schema
+                    .get_namespace_id(&row.get_expect_string("namespace"))
+                    .unwrap(),
                 name: row.get_expect_string("view_name"),
                 definition: row.get_string("view_sql"),
             })
@@ -1143,7 +1147,9 @@ impl<'a> SqlSchemaDescriber<'a> {
             )
             .await?;
         let sequences = rows.into_iter().map(|seq| Sequence {
-            namespace_id: sql_schema.get_namespace_id(&seq.get_expect_string("namespace")),
+            namespace_id: sql_schema
+                .get_namespace_id(&seq.get_expect_string("namespace"))
+                .unwrap(),
             name: seq.get_expect_string("sequence_name"),
             start_value: seq.get_expect_i64("start_value"),
             min_value: seq.get_expect_i64("min_value"),
@@ -1191,7 +1197,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         let mut enums: Vec<Enum> = enum_values
             .into_iter()
             .map(|((name, namespace), values)| Enum {
-                namespace_id: sql_schema.get_namespace_id(&namespace),
+                namespace_id: sql_schema.get_namespace_id(&namespace).unwrap(),
                 name,
                 values,
             })
