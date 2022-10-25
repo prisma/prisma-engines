@@ -1,4 +1,3 @@
-use crate::query_builder::MongoReadQuery;
 use mongodb::{
     bson::{Bson, Document},
     options::FindOptions,
@@ -6,49 +5,13 @@ use mongodb::{
 use std::fmt::Write;
 use tracing::debug;
 
-// Bare-bones logging impl for debugging.
-pub(crate) fn log_read_query(coll_name: &str, query: &MongoReadQuery) {
-    let mut buffer = String::new();
-    fmt_query(&mut buffer, coll_name, query).unwrap();
-    let params: Vec<i32> = Vec::new();
-    debug!(target: "mongodb_query_connector::query", item_type = "query", is_query = true, query = %buffer, params = ?params);
-}
-
 macro_rules! write_indented {
     ($buffer:expr, $depth:expr, $fmt_str:literal, $($args:expr)*) => {
         write!($buffer, "{}{}", indent($depth), format!($fmt_str, $($args)*))?;
     };
 }
 
-fn fmt_query(buffer: &mut String, coll_name: &str, query: &MongoReadQuery) -> std::fmt::Result {
-    match query {
-        MongoReadQuery::Find(find) => {
-            write!(buffer, "db.{}.find(", coll_name)?;
-
-            if let Some(ref filter) = find.filter {
-                fmt_doc(buffer, filter, 1)?;
-                write!(buffer, ", ")?;
-            }
-
-            fmt_opts(buffer, &find.options, 1)?;
-            write!(buffer, ")")
-        }
-        MongoReadQuery::Pipeline(pipeline) => {
-            write!(buffer, "db.{}.aggregate(", coll_name)?;
-
-            let stages: Vec<_> = pipeline
-                .stages
-                .iter()
-                .map(|stage| Bson::Document(stage.clone()))
-                .collect();
-
-            fmt_list(buffer, &stages, 1)?;
-            write!(buffer, ")")
-        }
-    }
-}
-
-fn fmt_opts(buffer: &mut String, opts: &FindOptions, depth: usize) -> std::fmt::Result {
+pub(crate) fn fmt_opts(buffer: &mut String, opts: &FindOptions, depth: usize) -> std::fmt::Result {
     if cfg!(debug_assertions) {
         writeln!(buffer, "{{")?;
     } else {
@@ -96,7 +59,7 @@ fn indent(_: usize) -> String {
     String::from(" ")
 }
 
-fn fmt_doc(buffer: &mut String, doc: &Document, depth: usize) -> std::fmt::Result {
+pub(crate) fn fmt_doc(buffer: &mut String, doc: &Document, depth: usize) -> std::fmt::Result {
     if cfg!(debug_assertions) {
         writeln!(buffer, "{{")?;
     } else {
@@ -117,7 +80,7 @@ fn fmt_doc(buffer: &mut String, doc: &Document, depth: usize) -> std::fmt::Resul
     Ok(())
 }
 
-fn fmt_list(buffer: &mut String, list: &[Bson], depth: usize) -> std::fmt::Result {
+pub(crate) fn fmt_list(buffer: &mut String, list: &[Bson], depth: usize) -> std::fmt::Result {
     if cfg!(debug_assertions) {
         writeln!(buffer, "[")?;
     } else {
@@ -144,6 +107,36 @@ fn fmt_val(buffer: &mut String, val: &Bson, depth: usize) -> std::fmt::Result {
         Bson::Document(doc) => fmt_doc(buffer, doc, depth + 1),
         val => write!(buffer, "{}", val),
     }
+}
+
+pub(crate) fn log_find(filter: Option<Document>, options: FindOptions, coll_name: &str) {
+    let mut buffer = String::new();
+    write!(buffer, "db.{}.find(", coll_name).unwrap();
+
+    if let Some(ref filter) = filter {
+        fmt_doc(&mut buffer, filter, 1).unwrap();
+        write!(buffer, ", ").unwrap();
+    }
+
+    fmt_opts(&mut buffer, &options, 1).unwrap();
+    write!(buffer, ")").unwrap();
+
+    let params: Vec<i32> = Vec::new();
+    debug!(target: "mongodb_query_connector::query", item_type = "query", is_query = true, query = %buffer, params = ?params);
+}
+
+pub(crate) fn log_aggregate(stages: Vec<Document>, coll_name: &str) {
+    let mut buffer = String::new();
+
+    write!(buffer, "db.{}.aggregate(", coll_name).unwrap();
+
+    let stages: Vec<_> = stages.iter().map(|stage| Bson::Document(stage.clone())).collect();
+
+    fmt_list(&mut buffer, &stages, 1).unwrap();
+    write!(buffer, ")").unwrap();
+
+    let params: Vec<i32> = Vec::new();
+    debug!(target: "mongodb_query_connector::query", item_type = "query", is_query = true, query = %buffer, params = ?params);
 }
 
 // NOTE: All these log functions could be reduced to a single macro

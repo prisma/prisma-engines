@@ -5,12 +5,11 @@ use crate::{
     cursor::{CursorBuilder, CursorData},
     filter::{FilterPrefix, MongoFilterVisitor},
     join::JoinStage,
-    logger::log_read_query as log_query,
+    logger::{log_aggregate, log_find},
     orderby::OrderByBuilder,
     root_queries::metrics,
     vacuum_cursor, BsonTransform, IntoBson,
 };
-
 use connector_interface::{AggregationSelection, Filter, QueryArguments, RelAggregationSelection};
 use itertools::Itertools;
 use mongodb::{
@@ -35,7 +34,6 @@ impl MongoReadQuery {
         on_collection: Collection<Document>,
         with_session: &mut ClientSession,
     ) -> crate::Result<Vec<Document>> {
-        log_query(on_collection.name(), &self);
         match self {
             MongoReadQuery::Find(q) => q.execute(on_collection, with_session).await,
             MongoReadQuery::Pipeline(q) => q.execute(on_collection, with_session).await,
@@ -54,9 +52,11 @@ impl PipelineQuery {
         with_session: &mut ClientSession,
     ) -> crate::Result<Vec<Document>> {
         let opts = AggregateOptions::builder().allow_disk_use(true).build();
-        let cursor = metrics(|| on_collection.aggregate_with_session(self.stages, opts, with_session)).await?;
+        let cursor = metrics(|| on_collection.aggregate_with_session(self.stages.clone(), opts, with_session)).await?;
 
-        vacuum_cursor(cursor, with_session).await
+        let res = vacuum_cursor(cursor, with_session).await;
+        log_aggregate(self.stages, on_collection.name());
+        res
     }
 }
 
@@ -71,9 +71,13 @@ impl FindQuery {
         on_collection: Collection<Document>,
         with_session: &mut ClientSession,
     ) -> crate::Result<Vec<Document>> {
-        let cursor = metrics(|| on_collection.find_with_session(self.filter, self.options, with_session)).await?;
+        let cursor =
+            metrics(|| on_collection.find_with_session(self.filter.clone(), self.options.clone(), with_session))
+                .await?;
 
-        vacuum_cursor(cursor, with_session).await
+        let res = vacuum_cursor(cursor, with_session).await;
+        log_find(self.filter, self.options, on_collection.name());
+        res
     }
 }
 
