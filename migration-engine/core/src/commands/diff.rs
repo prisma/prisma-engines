@@ -37,7 +37,7 @@ pub async fn diff(params: DiffParams, host: Arc<dyn ConnectorHost>) -> CoreResul
         }
     };
 
-    let migration = connector.diff(from, to)?;
+    let migration = connector.diff(from, to);
 
     if params.script {
         let mut script_string = connector.render_script(&migration, &Default::default())?;

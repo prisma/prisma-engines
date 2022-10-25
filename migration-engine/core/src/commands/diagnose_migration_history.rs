@@ -135,15 +135,13 @@ pub async fn diagnose_migration_history(
             let to = connector
                 .database_schema_from_diff_target(DiffTarget::Database, None)
                 .await;
-            let drift = match from
-                .and_then(|from| to.and_then(|to| connector.diff(from, to)))
-                .map(|mig| {
-                    if connector.migration_is_empty(&mig) {
-                        None
-                    } else {
-                        Some(mig)
-                    }
-                }) {
+            let drift = match from.and_then(|from| to.map(|to| connector.diff(from, to))).map(|mig| {
+                if connector.migration_is_empty(&mig) {
+                    None
+                } else {
+                    Some(mig)
+                }
+            }) {
                 Ok(Some(drift)) => Some(DriftDiagnostic::DriftDetected {
                     summary: connector.migration_summary(&drift),
                 }),
