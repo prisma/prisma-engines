@@ -29,9 +29,8 @@ mod mongodb {
 
         let res = run_query_json!(&runner, insert_one_standing);
         let object_id = &res["data"]["createOneStanding"]["id"];
-
-        dbg!(object_id);
         let _ = runner.get_logs().await;
+
         run_query!(
             &runner,
             format!(
