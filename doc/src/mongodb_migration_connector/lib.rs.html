@@ -334,10 +334,10 @@
         <span class="ident">Box::pin</span>(<span class="ident">future::ready</span>(<span class="prelude-val">Ok</span>(<span class="string">&quot;4 or 5&quot;</span>.<span class="ident">to_owned</span>())))
     }
 
-    <span class="kw">fn</span> <span class="ident">diff</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">from</span>: <span class="ident">DatabaseSchema</span>, <span class="ident">to</span>: <span class="ident">DatabaseSchema</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">Migration</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">diff</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">from</span>: <span class="ident">DatabaseSchema</span>, <span class="ident">to</span>: <span class="ident">DatabaseSchema</span>) -&gt; <span class="ident">Migration</span> {
         <span class="kw">let</span> <span class="ident">from</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">MongoSchema</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">from</span>.<span class="ident">downcast</span>();
         <span class="kw">let</span> <span class="ident">to</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">MongoSchema</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">to</span>.<span class="ident">downcast</span>();
-        <span class="prelude-val">Ok</span>(<span class="ident">Migration::new</span>(<span class="ident">differ::diff</span>(<span class="ident">from</span>, <span class="ident">to</span>)))
+        <span class="ident">Migration::new</span>(<span class="ident">differ::diff</span>(<span class="ident">from</span>, <span class="ident">to</span>))
     }
 
     <span class="kw">fn</span> <span class="ident">drop_database</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {

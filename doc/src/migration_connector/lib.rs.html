@@ -202,7 +202,6 @@
 <span id="202">202</span>
 <span id="203">203</span>
 <span id="204">204</span>
-<span id="205">205</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>, <span class="ident">missing_docs</span>)]</span>
 
 <span class="doccomment">//! This crate defines the API exposed by the connectors to the migration engine core. The entry point for this API is the [MigrationConnector](trait.MigrationConnector.html) trait.</span>
@@ -320,9 +319,8 @@
     <span class="doccomment">/// Send a command to the database directly.</span>
     <span class="kw">fn</span> <span class="ident">db_execute</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">script</span>: <span class="ident">String</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>;
 
-    <span class="doccomment">/// Create a migration by comparing two database schemas. See</span>
-    <span class="doccomment">/// [DiffTarget](/enum.DiffTarget.html) for possible inputs.</span>
-    <span class="kw">fn</span> <span class="ident">diff</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">from</span>: <span class="ident">DatabaseSchema</span>, <span class="ident">to</span>: <span class="ident">DatabaseSchema</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">Migration</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Create a migration by comparing two database schemas.</span>
+    <span class="kw">fn</span> <span class="ident">diff</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">from</span>: <span class="ident">DatabaseSchema</span>, <span class="ident">to</span>: <span class="ident">DatabaseSchema</span>) -&gt; <span class="ident">Migration</span>;
 
     <span class="doccomment">/// Drop the database referenced by Prisma schema that was used to initialize the connector.</span>
     <span class="kw">fn</span> <span class="ident">drop_database</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>;
