@@ -18,6 +18,7 @@ use query_engine_metrics::{
     PRISMA_DATASOURCE_QUERIES_TOTAL,
 };
 use std::time::Instant;
+use tracing::debug;
 
 /// Transforms a document to a `Record`, fields ordered as defined in `fields`.
 fn document_to_record(mut doc: Document, fields: &[String], meta_mapping: &OutputMetaMapping) -> crate::Result<Record> {
@@ -43,6 +44,38 @@ fn pick_singular_id(model: &ModelRef) -> ScalarFieldRef {
         .into_iter()
         .next()
         .unwrap()
+}
+
+// perforns both metrics pushing and query logging. Query logging  might be disabled and thus
+// the query_string might not need to be built, that's why rather than a query_string
+// we receive a Future, as it's not trivial to buid and we want to skip that when possible.
+//
+// As a reminder, the query string is not fed into mongo db directly, we built it for debugging
+// purposes and it's only used when the query log is enabled. For querying mongo, we use the driver
+// wire protocol to build queries from a graphql query rather than executing raw mongodb statements.
+// As we don't have a mongodb query string, we need to create it from the driver object model, which
+// so better skip it if we don't need it, i.e. when the query log is disabled.
+pub(crate) async fn observing<'a, F, T, U>(
+    query_string: impl Future<Output = String>,
+    f: F,
+) -> mongodb::error::Result<T>
+where
+    F: FnOnce() -> U + 'a,
+    U: Future<Output = mongodb::error::Result<T>>,
+{
+    let start = Instant::now();
+    let res = f().await;
+
+    let elapsed = start.elapsed().as_millis() as f64;
+
+    histogram!(PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS, elapsed);
+    increment_counter!(PRISMA_DATASOURCE_QUERIES_TOTAL);
+
+    let params: Vec<i32> = Vec::new();
+    let query_string = query_string.await;
+    debug!(target: "mongodb_query_connector::query", item_type = "query", is_query = true, query = query_string, params = ?params, duration_ms=elapsed);
+
+    res
 }
 
 pub(crate) async fn metrics<'a, F, T, U>(f: F) -> mongodb::error::Result<T>

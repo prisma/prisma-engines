@@ -68,20 +68,6 @@ fn fmt_val(buffer: &mut String, val: &Bson, depth: usize) -> std::fmt::Result {
     }
 }
 
-pub(crate) fn log_aggregate(stages: Vec<Document>, coll_name: &str) {
-    let mut buffer = String::new();
-
-    write!(buffer, "db.{}.aggregate(", coll_name).unwrap();
-
-    let stages: Vec<_> = stages.iter().map(|stage| Bson::Document(stage.clone())).collect();
-
-    fmt_list(&mut buffer, &stages, 1).unwrap();
-    write!(buffer, ")").unwrap();
-
-    let params: Vec<i32> = Vec::new();
-    debug!(target: "mongodb_query_connector::query", item_type = "query", is_query = true, query = %buffer, params = ?params);
-}
-
 // NOTE: All these log functions could be reduced to a single macro
 pub(crate) fn log_insert_one(coll: &str, doc: &Document) {
     let mut buffer = String::new();

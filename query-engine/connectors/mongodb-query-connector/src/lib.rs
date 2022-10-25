@@ -11,6 +11,7 @@ mod orderby;
 mod output_meta;
 mod projection;
 mod query_builder;
+mod query_strings;
 mod root_queries;
 mod value;
 

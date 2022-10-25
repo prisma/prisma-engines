@@ -5,9 +5,9 @@ use crate::{
     cursor::{CursorBuilder, CursorData},
     filter::{FilterPrefix, MongoFilterVisitor},
     join::JoinStage,
-    logger::log_aggregate,
     orderby::OrderByBuilder,
-    root_queries::metrics,
+    query_strings,
+    root_queries::observing,
     vacuum_cursor, BsonTransform, IntoBson,
 };
 use connector_interface::{AggregationSelection, Filter, QueryArguments, RelAggregationSelection};
@@ -35,10 +35,13 @@ impl ReadQuery {
         with_session: &mut ClientSession,
     ) -> crate::Result<Vec<Document>> {
         let opts = AggregateOptions::builder().allow_disk_use(true).build();
-        let cursor = metrics(|| on_collection.aggregate_with_session(self.stages.clone(), opts, with_session)).await?;
+        let cursor = observing(
+            query_strings::build_aggregate(self.stages.clone(), on_collection.name()),
+            || on_collection.aggregate_with_session(self.stages, opts, with_session),
+        )
+        .await?;
 
         let res = vacuum_cursor(cursor, with_session).await;
-        log_aggregate(self.stages, on_collection.name());
         res
     }
 }
