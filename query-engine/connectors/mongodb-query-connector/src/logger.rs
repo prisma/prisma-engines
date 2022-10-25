@@ -1,7 +1,4 @@
-use mongodb::{
-    bson::{Bson, Document},
-    options::FindOptions,
-};
+use mongodb::bson::{Bson, Document};
 use std::fmt::Write;
 use tracing::debug;
 
@@ -9,44 +6,6 @@ macro_rules! write_indented {
     ($buffer:expr, $depth:expr, $fmt_str:literal, $($args:expr)*) => {
         write!($buffer, "{}{}", indent($depth), format!($fmt_str, $($args)*))?;
     };
-}
-
-pub(crate) fn fmt_opts(buffer: &mut String, opts: &FindOptions, depth: usize) -> std::fmt::Result {
-    if cfg!(debug_assertions) {
-        writeln!(buffer, "{{")?;
-    } else {
-        write!(buffer, "{{")?;
-    }
-
-    if let Some(skip) = opts.skip {
-        write_indented!(buffer, depth, "skip: {},\n", skip);
-    }
-
-    if let Some(limit) = opts.limit {
-        write_indented!(buffer, depth, "limit: {},\n", limit);
-    }
-
-    if let Some(ref sort) = opts.sort {
-        write_indented!(buffer, depth, "sort: ",);
-        fmt_doc(buffer, sort, depth + 1)?;
-
-        if cfg!(debug_assertions) {
-            writeln!(buffer, ",")?;
-        } else {
-            write!(buffer, ",")?;
-        }
-    }
-
-    if let Some(ref projection) = opts.projection {
-        write_indented!(buffer, depth, "projection: ",);
-        fmt_doc(buffer, projection, depth + 1)?;
-
-        if cfg!(debug_assertions) {
-            writeln!(buffer)?;
-        }
-    }
-
-    write!(buffer, "}}")
 }
 
 #[cfg(debug_assertions)]
@@ -107,22 +66,6 @@ fn fmt_val(buffer: &mut String, val: &Bson, depth: usize) -> std::fmt::Result {
         Bson::Document(doc) => fmt_doc(buffer, doc, depth + 1),
         val => write!(buffer, "{}", val),
     }
-}
-
-pub(crate) fn log_find(filter: Option<Document>, options: FindOptions, coll_name: &str) {
-    let mut buffer = String::new();
-    write!(buffer, "db.{}.find(", coll_name).unwrap();
-
-    if let Some(ref filter) = filter {
-        fmt_doc(&mut buffer, filter, 1).unwrap();
-        write!(buffer, ", ").unwrap();
-    }
-
-    fmt_opts(&mut buffer, &options, 1).unwrap();
-    write!(buffer, ")").unwrap();
-
-    let params: Vec<i32> = Vec::new();
-    debug!(target: "mongodb_query_connector::query", item_type = "query", is_query = true, query = %buffer, params = ?params);
 }
 
 pub(crate) fn log_aggregate(stages: Vec<Document>, coll_name: &str) {

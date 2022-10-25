@@ -5,7 +5,7 @@ use crate::{
     cursor::{CursorBuilder, CursorData},
     filter::{FilterPrefix, MongoFilterVisitor},
     join::JoinStage,
-    logger::{log_aggregate, log_find},
+    logger::log_aggregate,
     orderby::OrderByBuilder,
     root_queries::metrics,
     vacuum_cursor, BsonTransform, IntoBson,
@@ -14,38 +14,21 @@ use connector_interface::{AggregationSelection, Filter, QueryArguments, RelAggre
 use itertools::Itertools;
 use mongodb::{
     bson::{doc, Document},
-    options::{AggregateOptions, FindOptions},
+    options::AggregateOptions,
     ClientSession, Collection,
 };
 use prisma_models::{FieldSelection, ModelRef, ScalarFieldRef};
 use std::convert::TryFrom;
 
-/// Ergonomics wrapper for query execution and logging.
-/// Todo: Add all other queries gradually.
-#[allow(dead_code, clippy::large_enum_variant)]
-pub enum MongoReadQuery {
-    Find(FindQuery),
-    Pipeline(PipelineQuery),
-}
-
-impl MongoReadQuery {
-    pub async fn execute(
-        self,
-        on_collection: Collection<Document>,
-        with_session: &mut ClientSession,
-    ) -> crate::Result<Vec<Document>> {
-        match self {
-            MongoReadQuery::Find(q) => q.execute(on_collection, with_session).await,
-            MongoReadQuery::Pipeline(q) => q.execute(on_collection, with_session).await,
-        }
-    }
-}
-
-pub struct PipelineQuery {
+// Mongo Driver broke usage of the simple API, can't be used by us anymore.
+// As such the read query will always be based on aggregation pipeline
+// such pipeline will have different stages. See
+// https://www.mongodb.com/docs/manual/core/aggregation-pipeline/
+pub struct ReadQuery {
     pub(crate) stages: Vec<Document>,
 }
 
-impl PipelineQuery {
+impl ReadQuery {
     pub async fn execute(
         self,
         on_collection: Collection<Document>,
@@ -56,27 +39,6 @@ impl PipelineQuery {
 
         let res = vacuum_cursor(cursor, with_session).await;
         log_aggregate(self.stages, on_collection.name());
-        res
-    }
-}
-
-pub struct FindQuery {
-    pub(crate) filter: Option<Document>,
-    pub(crate) options: FindOptions,
-}
-
-impl FindQuery {
-    pub async fn execute(
-        self,
-        on_collection: Collection<Document>,
-        with_session: &mut ClientSession,
-    ) -> crate::Result<Vec<Document>> {
-        let cursor =
-            metrics(|| on_collection.find_with_session(self.filter.clone(), self.options.clone(), with_session))
-                .await?;
-
-        let res = vacuum_cursor(cursor, with_session).await;
-        log_find(self.filter, self.options, on_collection.name());
         res
     }
 }
@@ -208,57 +170,21 @@ impl MongoReadQueryBuilder {
     }
 
     /// Finalizes the builder and builds a `MongoQuery`.
-    pub(crate) fn build(mut self) -> crate::Result<MongoReadQuery> {
+    pub(crate) fn build(mut self) -> crate::Result<ReadQuery> {
         self.finalize()?;
-
-        // Depending on the builder contents, either an
-        // aggregation pipeline or a plain query is build.
-        // if self.joins.is_empty()
-        //     && self.order_joins.is_empty()
-        //     && self.aggregations.is_empty()
-        //     && self.cursor_data.is_none()
-        // {
-        //     Ok(self.build_find_query())
-        // } else {
-        // }
-
         Ok(self.build_pipeline_query())
-    }
-
-    /// Note: Mongo Driver broke usage of the simple API, can't be used by us anymore. Always doing aggr. pipeline for now.
-    /// Simplest form of find-documents query: `coll.find(filter, opts)`.
-    #[allow(dead_code)]
-    fn build_find_query(self) -> MongoReadQuery {
-        // let options = FindOptions::builder()
-        //     .projection(self.projection)
-        //     .limit(self.limit)
-        //     .skip(self.skip)
-        //     .sort(self.order)
-        //     .build();
-
-        // MongoReadQuery::Find(FindQuery {
-        //     filter: self.query,
-        //     options,
-        // })
-
-        unreachable!()
     }
 
     /// Aggregation-pipeline based query. A distinction must be made between cursored and uncursored queries,
     /// as they require different stage shapes (see individual fns for details).
-    fn build_pipeline_query(self) -> MongoReadQuery {
+    fn build_pipeline_query(self) -> ReadQuery {
         let stages = if self.cursor_data.is_none() {
-            self.flat_pipeline_stages()
+            self.into_pipeline_stages()
         } else {
             self.cursored_pipeline_stages()
         };
 
-        MongoReadQuery::Pipeline(PipelineQuery { stages })
-    }
-
-    /// Pipeline not requiring a cursor. Flat `coll.aggregate(stages, opts)` query.
-    fn flat_pipeline_stages(self) -> Vec<Document> {
-        self.into_pipeline_stages()
+        ReadQuery { stages }
     }
 
     fn into_pipeline_stages(self) -> Vec<Document> {
