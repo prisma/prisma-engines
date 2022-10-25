@@ -64,11 +64,37 @@ impl BatchDocument {
         Self::Multi(operations, transaction)
     }
 
+    /// Returns true if the operation contains any invalid filters to compact the batch.
+    /// They are invalid because they would prevent us from mapping the findMany result back to the original findUnique queries.
+    ///
+    /// Invalid filters are:
+    /// - non scalar filters (ie: relation filters, boolean operators...)
+    /// - any scalar filters that is not `EQUALS`
+    fn operation_contain_invalid_filter(op: &Operation, schema: &QuerySchemaRef) -> bool {
+        let where_obj = op.as_read().unwrap().arguments()[0].1.clone().into_object().unwrap();
+        let field = schema.find_query_field(op.name()).unwrap();
+        let model = field.model().unwrap();
+
+        where_obj.iter().any(|(key, val)| match val {
+            // If it's a compound, then it's still considered as scalar
+            QueryValue::Object(_) if resolve_compound_field(key, model).is_some() => false,
+            // Otherwise, we just look for a scalar field inside the model. If it's not one, then we break.
+            val => match model.fields().find_from_scalar(&key) {
+                Ok(_) => match val {
+                    // Consider scalar _only_ if the filter object contains "equals". eg: `{ scalar_field: { equals: 1 } }`
+                    QueryValue::Object(obj) => !obj.contains_key(filters::EQUALS),
+                    _ => false,
+                },
+                Err(_) => true,
+            },
+        })
+    }
+
     fn can_compact(&self, schema: &QuerySchemaRef) -> bool {
         match self {
             Self::Multi(operations, _) => match operations.split_first() {
                 Some((first, rest)) if first.is_find_unique() => {
-                    let all_operations_identical = rest.iter().all(|op| {
+                    let has_identical_selection_sets = rest.iter().all(|op| {
                         op.is_find_unique()
                             && first.name() == op.name()
                             && first.nested_selections().len() == op.nested_selections().len()
@@ -78,28 +104,13 @@ impl BatchDocument {
                                 .all(|fop| op.nested_selections().contains(fop))
                     });
 
-                    let where_obj = first.as_read().unwrap().arguments()[0].1.clone().into_object().unwrap();
-                    let field = schema.find_query_field(first.name()).unwrap();
-                    let model = field.model().unwrap();
+                    // If any of the operation has an "invalid" filter (see documentation of `operation_contain_invalid_filter`),
+                    // we do not compact the queries.
+                    let has_invalid_filters = operations
+                        .iter()
+                        .any(|op| Self::operation_contain_invalid_filter(op, schema));
 
-                    // Skip the compact optimization if the operation contains:
-                    // - non scalar filters (ie: relation filters, boolean operators...)
-                    // - any scalar filters that is not EQUAL
-                    let contains_non_scalar = where_obj.iter().any(|(key, val)| match val {
-                        // If it's a compound, then it's still considered as scalar
-                        QueryValue::Object(_) if resolve_compound_field(key, model).is_some() => false,
-                        // Otherwise, we just look for a scalar field inside the model. If it's not one, then we break.
-                        val => match model.fields().find_from_scalar(&key) {
-                            Ok(_) => match val {
-                                // Consider scalar _only_ if the filter object contains "equals". eg: `{ scalar_field: { equals: 1 } }`
-                                QueryValue::Object(obj) => !obj.contains_key(filters::EQUALS),
-                                _ => false,
-                            },
-                            Err(_) => true,
-                        },
-                    });
-
-                    all_operations_identical && !contains_non_scalar
+                    has_identical_selection_sets && !has_invalid_filters
                 }
                 _ => false,
             },

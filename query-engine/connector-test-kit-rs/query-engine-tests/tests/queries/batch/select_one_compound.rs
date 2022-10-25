@@ -291,6 +291,20 @@ mod compound_batch {
         ]).await?;
         assert!(doc.is_compact() == false);
 
+        // NO COMPACT: One of the query uses a non unique filter that's not EQUALS
+        let doc = compact_batch(&runner, vec![
+            r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"} }) {firstName lastName}}"#.to_string(),
+            r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"NO",lastName:"AVAIL"}, non_unique: { gt: 1 } }) {firstName lastName}}"#.to_string(),
+        ]).await?;
+        assert!(doc.is_compact() == false);
+
+        // NO COMPACT: One of the query is not a findUnique
+        let doc = compact_batch(&runner, vec![
+            r#"query {findManyArtist {firstName lastName}}"#.to_string(),
+            r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"NO",lastName:"AVAIL"}, non_unique: { gt: 1 } }) {firstName lastName}}"#.to_string(),
+        ]).await?;
+        assert!(doc.is_compact() == false);
+
         Ok(())
     }
 
