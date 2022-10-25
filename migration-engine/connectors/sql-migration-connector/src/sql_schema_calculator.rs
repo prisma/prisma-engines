@@ -16,6 +16,7 @@ use psl::{
 use sql_schema_describer as sql;
 use std::collections::HashMap;
 
+// TODO: This looks like it should also take the namespaces param, but not sure yet.
 pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn SqlFlavour) -> SqlDatabaseSchema {
     let mut schema = SqlDatabaseSchema::default();
 

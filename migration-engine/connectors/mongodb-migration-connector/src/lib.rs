@@ -71,6 +71,7 @@ impl MigrationConnector for MongoDbMigrationConnector {
         &'a mut self,
         diff_target: DiffTarget<'a>,
         _shadow_database_connection_string: Option<String>,
+        _namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
         Box::pin(async {
             let schema = self.mongodb_schema_from_diff_target(diff_target).await?;
@@ -161,6 +162,7 @@ impl MigrationConnector for MongoDbMigrationConnector {
     fn introspect<'a>(
         &'a mut self,
         ctx: &'a IntrospectionContext,
+        _namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<IntrospectionResult>> {
         Box::pin(async move {
             let url: String = ctx.datasource().load_url(|v| std::env::var(v).ok()).map_err(|err| {
@@ -201,9 +203,18 @@ impl MigrationConnector for MongoDbMigrationConnector {
     fn validate_migrations<'a>(
         &'a mut self,
         _migrations: &'a [MigrationDirectory],
+        _namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<()>> {
         Box::pin(future::ready(Ok(())))
     }
+
+    fn extract_namespaces(
+      &self,
+      _schema: &DatabaseSchema,
+    ) -> Option<Namespaces> {
+        None
+    }
+
 }
 
 fn unsupported_command_error() -> ConnectorError {

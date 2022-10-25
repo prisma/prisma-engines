@@ -21,16 +21,18 @@ pub async fn create_migration(
     // Infer the migration.
     let previous_migrations = list_migrations(Path::new(&input.migrations_directory_path))?;
 
-    let from = connector
-        .database_schema_from_diff_target(DiffTarget::Migrations(&previous_migrations), None)
-        .await?;
     let to = connector
         .database_schema_from_diff_target(
             DiffTarget::Datamodel(SourceFile::new_allocated(Arc::from(
                 input.prisma_schema.into_boxed_str(),
             ))),
             None,
+            None,
         )
+        .await?;
+    let namespaces = connector.extract_namespaces(&to);
+    let from = connector
+        .database_schema_from_diff_target(DiffTarget::Migrations(&previous_migrations), None, namespaces)
         .await?;
     let migration = connector.diff(from, to);
 

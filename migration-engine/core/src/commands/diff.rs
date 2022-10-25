@@ -3,13 +3,16 @@ use crate::{
     json_rpc::types::{DiffParams, DiffResult, DiffTarget, PathContainer, SchemaContainer, UrlContainer},
 };
 use enumflags2::BitFlags;
-use migration_connector::{ConnectorError, ConnectorHost, DatabaseSchema, DiffTarget as McDiff, MigrationConnector};
+use migration_connector::{
+    ConnectorError, ConnectorHost, DatabaseSchema, DiffTarget as McDiff, MigrationConnector, Namespaces,
+};
 use psl::parser_database::SourceFile;
 use std::{path::Path, sync::Arc};
 
 pub async fn diff(params: DiffParams, host: Arc<dyn ConnectorHost>) -> CoreResult<DiffResult> {
-    let mut from = json_rpc_diff_target_to_connector(&params.from, params.shadow_database_url.as_deref()).await?;
-    let mut to = json_rpc_diff_target_to_connector(&params.to, params.shadow_database_url.as_deref()).await?;
+    // TODO: add/read namespaces from DiffParams (the None in the two lines below)
+    let mut from = json_rpc_diff_target_to_connector(&params.from, params.shadow_database_url.as_deref(), None).await?;
+    let mut to = json_rpc_diff_target_to_connector(&params.to, params.shadow_database_url.as_deref(), None).await?;
 
     for (connector, _) in [from.as_mut(), to.as_mut()].into_iter().flatten() {
         connector.set_host(host.clone());
@@ -66,6 +69,7 @@ pub async fn diff(params: DiffParams, host: Arc<dyn ConnectorHost>) -> CoreResul
 async fn json_rpc_diff_target_to_connector(
     target: &DiffTarget,
     shadow_database_url: Option<&str>,
+    namespaces: Option<Namespaces>,
 ) -> CoreResult<Option<(Box<dyn MigrationConnector>, DatabaseSchema)>> {
     let read_prisma_schema_from_path = |schema_path: &str| -> CoreResult<String> {
         std::fs::read_to_string(schema_path).map_err(|err| {
@@ -84,7 +88,7 @@ async fn json_rpc_diff_target_to_connector(
             let mut connector = crate::schema_to_connector(&schema_contents, schema_dir)?;
             connector.ensure_connection_validity().await?;
             let schema = connector
-                .database_schema_from_diff_target(McDiff::Database, None)
+                .database_schema_from_diff_target(McDiff::Database, None, namespaces)
                 .await?;
             Ok(Some((connector, schema)))
         }
@@ -95,6 +99,7 @@ async fn json_rpc_diff_target_to_connector(
                 .database_schema_from_diff_target(
                     McDiff::Datamodel(SourceFile::new_allocated(Arc::from(schema_contents.into_boxed_str()))),
                     None,
+                    namespaces,
                 )
                 .await?;
             Ok(Some((connector, schema)))
@@ -103,7 +108,7 @@ async fn json_rpc_diff_target_to_connector(
             let mut connector = crate::connector_for_connection_string(url.clone(), None, BitFlags::empty())?;
             connector.ensure_connection_validity().await?;
             let schema = connector
-                .database_schema_from_diff_target(McDiff::Database, None)
+                .database_schema_from_diff_target(McDiff::Database, None, namespaces)
                 .await?;
             Ok(Some((connector, schema)))
         }
@@ -117,6 +122,7 @@ async fn json_rpc_diff_target_to_connector(
                         .database_schema_from_diff_target(
                             McDiff::Migrations(&directories),
                             Some(shadow_database_url.to_owned()),
+                            namespaces,
                         )
                         .await?;
                     Ok(Some((connector, schema)))
@@ -125,7 +131,7 @@ async fn json_rpc_diff_target_to_connector(
                     let mut connector = crate::connector_for_provider("sqlite")?;
                     let directories = migration_connector::migrations_directory::list_migrations(Path::new(path))?;
                     let schema = connector
-                        .database_schema_from_diff_target(McDiff::Migrations(&directories), None)
+                        .database_schema_from_diff_target(McDiff::Migrations(&directories), None, namespaces)
                         .await?;
                     Ok(Some((connector, schema)))
                 }

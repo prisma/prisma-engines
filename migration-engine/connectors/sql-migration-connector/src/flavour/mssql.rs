@@ -6,7 +6,7 @@ use crate::SqlFlavour;
 use connection_string::JdbcString;
 use indoc::formatdoc;
 use migration_connector::{
-    migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult,
+    migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult, Namespaces,
 };
 use quaint::{connector::MssqlUrl, prelude::Table};
 use sql_schema_describer::SqlSchema;
@@ -82,7 +82,7 @@ impl SqlFlavour for MssqlFlavour {
         psl::builtin_connectors::MSSQL
     }
 
-    fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
+    fn describe_schema(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
         with_connection(&mut self.state, |params, connection| async move {
             connection.describe_schema(params).await
         })
@@ -359,6 +359,7 @@ impl SqlFlavour for MssqlFlavour {
         &'a mut self,
         migrations: &'a [MigrationDirectory],
         shadow_database_connection_string: Option<String>,
+        _namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
         let shadow_database_connection_string = shadow_database_connection_string.or_else(|| {
             self.state

@@ -308,7 +308,8 @@ impl GenericApi for EngineState {
                 let composite_type_depth = From::from(params.composite_type_depth as isize);
                 let ctx = migration_connector::IntrospectionContext::new(schema, composite_type_depth);
                 Box::pin(async move {
-                    let result = connector.introspect(&ctx).await?;
+                    // TODO: Grab namespaces from introspect params, probably.
+                    let result = connector.introspect(&ctx, None).await?;
 
                     Ok(IntrospectResult {
                         datamodel: result.data_model,

@@ -17,13 +17,16 @@ pub async fn schema_push(
         return Err(ConnectorError::user_facing(err));
     };
 
-    let from = connector
-        .database_schema_from_diff_target(DiffTarget::Database, None)
-        .instrument(tracing::debug_span!("Calculate `from`"))
-        .await?;
     let to = connector
-        .database_schema_from_diff_target(DiffTarget::Datamodel(source), None)
+        .database_schema_from_diff_target(DiffTarget::Datamodel(source), None, None)
         .instrument(tracing::debug_span!("Calculate `to`"))
+        .await?;
+
+    let namespaces = connector.extract_namespaces(&to);
+
+    let from = connector
+        .database_schema_from_diff_target(DiffTarget::Database, None, namespaces)
+        .instrument(tracing::debug_span!("Calculate `from`"))
         .await?;
     let database_migration = connector.diff(from, to);
 

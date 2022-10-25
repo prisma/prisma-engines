@@ -6,7 +6,7 @@ use crate::{error::SystemDatabase, flavour::SqlFlavour};
 use enumflags2::BitFlags;
 use indoc::indoc;
 use migration_connector::{
-    migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult,
+    migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult, Namespaces,
 };
 use once_cell::sync::Lazy;
 use psl::{datamodel_connector, parser_database::ScalarType, ValidatedSchema};
@@ -91,7 +91,7 @@ impl SqlFlavour for MysqlFlavour {
         psl::builtin_connectors::MYSQL
     }
 
-    fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
+    fn describe_schema(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
         with_connection(&mut self.state, |params, _c, connection| async move {
             connection.describe_schema(params).await
         })
@@ -275,6 +275,7 @@ impl SqlFlavour for MysqlFlavour {
         &'a mut self,
         migrations: &'a [MigrationDirectory],
         shadow_database_connection_string: Option<String>,
+        _namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
         let shadow_database_connection_string = shadow_database_connection_string.or_else(|| {
             self.state

@@ -78,8 +78,8 @@ impl SqlMigrationConnector {
     }
 
     /// Made public for tests.
-    pub fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<sql::SqlSchema>> {
-        self.flavour.describe_schema()
+    pub fn describe_schema(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<sql::SqlSchema>> {
+        self.flavour.describe_schema(namespaces)
     }
 
     /// For tests
@@ -113,6 +113,7 @@ impl SqlMigrationConnector {
         &mut self,
         target: DiffTarget<'_>,
         shadow_database_connection_string: Option<String>,
+        namespaces: Option<Namespaces>,
     ) -> ConnectorResult<SqlDatabaseSchema> {
         match target {
             DiffTarget::Datamodel(schema) => {
@@ -124,10 +125,10 @@ impl SqlMigrationConnector {
             }
             DiffTarget::Migrations(migrations) => self
                 .flavour
-                .sql_schema_from_migration_history(migrations, shadow_database_connection_string)
+                .sql_schema_from_migration_history(migrations, shadow_database_connection_string, namespaces)
                 .await
                 .map(From::from),
-            DiffTarget::Database => self.flavour.describe_schema().await.map(From::from),
+            DiffTarget::Database => self.flavour.describe_schema(namespaces).await.map(From::from),
             DiffTarget::Empty => Ok(self.flavour.empty_database_schema().into()),
         }
     }
@@ -191,9 +192,10 @@ impl MigrationConnector for SqlMigrationConnector {
         &'a mut self,
         diff_target: DiffTarget<'a>,
         shadow_database_connection_string: Option<String>,
+        namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
         Box::pin(async move {
-            self.db_schema_from_diff_target(diff_target, shadow_database_connection_string)
+            self.db_schema_from_diff_target(diff_target, shadow_database_connection_string, namespaces)
                 .await
                 .map(From::from)
         })
@@ -224,9 +226,10 @@ impl MigrationConnector for SqlMigrationConnector {
     fn introspect<'a>(
         &'a mut self,
         ctx: &'a IntrospectionContext,
+        namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<IntrospectionResult>> {
         Box::pin(async move {
-            let sql_schema = self.flavour.describe_schema().await?;
+            let sql_schema = self.flavour.describe_schema(namespaces).await?;
             let datamodel = sql_introspection_connector::calculate_datamodel::calculate_datamodel(&sql_schema, ctx)
                 .map_err(|err| ConnectorError::from_source(err, "Introspection error"))?;
             Ok(datamodel)
@@ -284,12 +287,26 @@ impl MigrationConnector for SqlMigrationConnector {
     fn validate_migrations<'a>(
         &'a mut self,
         migrations: &'a [MigrationDirectory],
+        namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<()>> {
         Box::pin(async move {
-            self.flavour.sql_schema_from_migration_history(migrations, None).await?;
+            self.flavour.sql_schema_from_migration_history(migrations, None, namespaces).await?;
             Ok(())
         })
     }
+
+    fn extract_namespaces(
+      &self,
+      schema: &DatabaseSchema,
+    ) -> Option<Namespaces> {
+        let sql_schema : &SqlDatabaseSchema = schema.downcast_ref();
+        Namespaces::from_vec(
+          &mut sql_schema.describer_schema
+              .namespace_walkers().map(|nw| String::from(nw.name()))
+              .collect::<Vec<String>>()
+        )
+    }
+
 }
 
 fn new_shadow_database_name() -> String {
@@ -308,7 +325,8 @@ async fn best_effort_reset(flavour: &mut (dyn SqlFlavour + Send + Sync)) -> Conn
 async fn best_effort_reset_impl(flavour: &mut (dyn SqlFlavour + Send + Sync)) -> ConnectorResult<()> {
     tracing::info!("Attempting best_effort_reset");
 
-    let source_schema = flavour.describe_schema().await?;
+    // TODO: We probably need to figure this out too.
+    let source_schema = flavour.describe_schema(None).await?;
     let target_schema = flavour.empty_database_schema();
     let mut steps = Vec::new();
 

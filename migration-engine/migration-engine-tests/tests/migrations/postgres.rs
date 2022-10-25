@@ -411,6 +411,7 @@ fn foreign_key_renaming_to_default_works(api: TestApi) {
     let migration = api.connector_diff(
         DiffTarget::Database,
         DiffTarget::Datamodel(SourceFile::new_static(target_schema)),
+        None,
     );
     let expected = expect![[r#"
         -- RenameForeignKey
@@ -644,6 +645,7 @@ fn scalar_list_default_diffing(api: TestApi) {
     let migration = api.connector_diff(
         DiffTarget::Datamodel(SourceFile::new_static(schema_1)),
         DiffTarget::Datamodel(SourceFile::new_static(schema_2)),
+        None,
     );
 
     let expected_migration = expect![[r#"

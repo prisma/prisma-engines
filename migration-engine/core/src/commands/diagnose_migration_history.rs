@@ -129,11 +129,12 @@ pub async fn diagnose_migration_history(
 
     let (drift, error_in_unapplied_migration) = {
         if input.opt_in_to_shadow_database {
+            // TODO: this should probably fill the following namespaces from the CLI
             let from = connector
-                .database_schema_from_diff_target(DiffTarget::Migrations(&applied_migrations), None)
+                .database_schema_from_diff_target(DiffTarget::Migrations(&applied_migrations), None, None)
                 .await;
             let to = connector
-                .database_schema_from_diff_target(DiffTarget::Database, None)
+                .database_schema_from_diff_target(DiffTarget::Database, None, None)
                 .await;
             let drift = match from.and_then(|from| to.map(|to| connector.diff(from, to))).map(|mig| {
                 if connector.migration_is_empty(&mig) {
@@ -151,7 +152,8 @@ pub async fn diagnose_migration_history(
 
             let error_in_unapplied_migration = if !matches!(drift, Some(DriftDiagnostic::MigrationFailedToApply { .. }))
             {
-                connector.validate_migrations(&migrations_from_filesystem).await.err()
+                // TODO: This None probably needs re-evaluated.
+                connector.validate_migrations(&migrations_from_filesystem, None).await.err()
             } else {
                 None
             };

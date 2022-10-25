@@ -57,6 +57,11 @@ impl DatabaseSchema {
     pub fn downcast<T: 'static>(self) -> Box<T> {
         self.0.downcast().unwrap()
     }
+
+    /// Should never be used in the core, only in connectors that know what they put there.
+    pub fn downcast_ref<T: 'static>(&self) -> &T {
+        self.0.downcast_ref().unwrap()
+    }
 }
 
 /// An abstract host for a migration connector. It exposes IO that is not directly performed by the
@@ -188,17 +193,49 @@ pub trait MigrationConnector: Send + Sync + 'static {
         &'a mut self,
         target: DiffTarget<'a>,
         shadow_database_connection_string: Option<String>,
+        namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>>;
 
     /// In-tro-spec-shon.
     fn introspect<'a>(
         &'a mut self,
         ctx: &'a introspection_connector::IntrospectionContext,
+        namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<introspection_connector::IntrospectionResult>>;
 
     /// If possible, check that the passed in migrations apply cleanly.
     fn validate_migrations<'a>(
         &'a mut self,
         _migrations: &'a [MigrationDirectory],
+        namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<()>>;
+
+    /// TODO
+    fn extract_namespaces(
+      &self,
+      schema: &DatabaseSchema,
+    ) -> Option<Namespaces>;
+
+}
+
+/// TODO
+#[derive(Clone, Debug)]
+pub struct Namespaces (pub String, pub Vec<String>);
+
+impl Namespaces {
+    /// TODO
+    pub fn from_vec(v: &mut Vec<String>) -> Option<Self> {
+        v.pop().and_then(|i| Some(Namespaces(i, v.to_vec())))
+    }
+
+    /// TODO
+    pub fn to_vec(o: Option<Self>, def: String) -> Vec<String> {
+        match o {
+            Some(Namespaces(s, mut vec)) => {
+                vec.push(s);
+                vec
+            },
+            None => vec![def]
+        }
+    }
 }

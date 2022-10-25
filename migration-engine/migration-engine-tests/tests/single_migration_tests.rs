@@ -1,3 +1,4 @@
+use migration_core::migration_connector::Namespaces;
 use migration_engine_tests::test_api::*;
 use std::{fs, io::Write as _, path, sync::Arc};
 use test_setup::TestApiArgs;
@@ -73,6 +74,7 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
     let migration: String = test_api.connector_diff(
         migration_core::migration_connector::DiffTarget::Empty,
         migration_core::migration_connector::DiffTarget::Datamodel(source_file.clone()),
+        None,
     );
 
     test_api.raw_cmd(&migration); // check that it runs
@@ -80,6 +82,7 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
     let second_migration = test_api.connector_diff(
         migration_core::migration_connector::DiffTarget::Database,
         migration_core::migration_connector::DiffTarget::Datamodel(source_file),
+        Some(Namespaces("public".to_owned(), vec!["security".to_owned(), "users".to_owned()])),
     );
 
     if second_migration != "-- This is an empty migration." {
