@@ -204,17 +204,17 @@ impl MigrationConnector for SqlMigrationConnector {
     }
 
     #[tracing::instrument(skip(self, from, to))]
-    fn diff(&self, from: DatabaseSchema, to: DatabaseSchema) -> ConnectorResult<Migration> {
+    fn diff(&self, from: DatabaseSchema, to: DatabaseSchema) -> Migration {
         let previous = SqlDatabaseSchema::from_erased(from);
         let next = SqlDatabaseSchema::from_erased(to);
         let steps = sql_schema_differ::calculate_steps(Pair::new(&previous, &next), self.flavour.as_ref());
         tracing::debug!(?steps, "Inferred migration steps.");
 
-        Ok(Migration::new(SqlMigration {
+        Migration::new(SqlMigration {
             before: previous.describer_schema,
             after: next.describer_schema,
             steps,
-        }))
+        })
     }
 
     fn drop_database(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {

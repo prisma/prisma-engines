@@ -32,7 +32,7 @@ pub async fn create_migration(
             None,
         )
         .await?;
-    let migration = connector.diff(from, to)?;
+    let migration = connector.diff(from, to);
 
     if connector.migration_is_empty(&migration) && !input.draft {
         tracing::info!("Database is up-to-date, returning without creating new migration.");

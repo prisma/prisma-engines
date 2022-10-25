@@ -25,7 +25,7 @@ pub async fn schema_push(
         .database_schema_from_diff_target(DiffTarget::Datamodel(source), None)
         .instrument(tracing::debug_span!("Calculate `to`"))
         .await?;
-    let database_migration = connector.diff(from, to)?;
+    let database_migration = connector.diff(from, to);
 
     tracing::debug!(migration = connector.migration_summary(&database_migration).as_str());
 

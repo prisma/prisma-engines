@@ -23,7 +23,7 @@ pub async fn evaluate_data_loss(
     let to = connector
         .database_schema_from_diff_target(DiffTarget::Datamodel(source_file), None)
         .await?;
-    let migration = connector.diff(from, to)?;
+    let migration = connector.diff(from, to);
 
     let migration_steps = connector.migration_len(&migration) as u32;
     let diagnostics = connector.destructive_change_checker().check(&migration).await?;

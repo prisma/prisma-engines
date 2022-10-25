@@ -120,10 +120,10 @@ impl MigrationConnector for MongoDbMigrationConnector {
         Box::pin(future::ready(Ok("4 or 5".to_owned())))
     }
 
-    fn diff(&self, from: DatabaseSchema, to: DatabaseSchema) -> ConnectorResult<Migration> {
+    fn diff(&self, from: DatabaseSchema, to: DatabaseSchema) -> Migration {
         let from: Box<MongoSchema> = from.downcast();
         let to: Box<MongoSchema> = to.downcast();
-        Ok(Migration::new(differ::diff(from, to)))
+        Migration::new(differ::diff(from, to))
     }
 
     fn drop_database(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {

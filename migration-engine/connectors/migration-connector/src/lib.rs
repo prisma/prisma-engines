@@ -115,9 +115,8 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// Send a command to the database directly.
     fn db_execute(&mut self, script: String) -> BoxFuture<'_, ConnectorResult<()>>;
 
-    /// Create a migration by comparing two database schemas. See
-    /// [DiffTarget](/enum.DiffTarget.html) for possible inputs.
-    fn diff(&self, from: DatabaseSchema, to: DatabaseSchema) -> ConnectorResult<Migration>;
+    /// Create a migration by comparing two database schemas.
+    fn diff(&self, from: DatabaseSchema, to: DatabaseSchema) -> Migration;
 
     /// Drop the database referenced by Prisma schema that was used to initialize the connector.
     fn drop_database(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;

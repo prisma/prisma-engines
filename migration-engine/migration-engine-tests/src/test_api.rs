@@ -236,7 +236,7 @@ impl TestApi {
     pub fn connector_diff(&mut self, from: DiffTarget<'_>, to: DiffTarget<'_>) -> String {
         let from = tok(self.connector.database_schema_from_diff_target(from, None)).unwrap();
         let to = tok(self.connector.database_schema_from_diff_target(to, None)).unwrap();
-        let migration = self.connector.diff(from, to).unwrap();
+        let migration = self.connector.diff(from, to);
         self.connector.render_script(&migration, &Default::default()).unwrap()
     }
 
