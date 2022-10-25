@@ -195,60 +195,16 @@ pub(crate) fn introspect(ctx: &Context, warnings: &mut Vec<Warning>) -> Result<(
         "{}\n{}\n{}",
         config,
         psl::render_datamodel_to_string(&datamodel, Some(ctx.config)),
-        render_datamodel(&datamodel),
+        render::Datamodel::from_dml(&ctx.config.datasources[0], &datamodel),
     );
 
     Ok((version, psl::reformat(&rendered, 2).unwrap(), datamodel.is_empty()))
 }
 
-/// Render all of the data model. For now, just enums. More will be
-/// added in the upcoming days.
-fn render_datamodel(dml: &Datamodel) -> render::Datamodel<'_> {
-    let mut data_model = render::Datamodel::new();
-
-    for dml_enum in dml.enums() {
-        let mut r#enum = render::Enum::new(&dml_enum.name);
-
-        if let Some(ref docs) = dml_enum.documentation {
-            r#enum.documentation(docs);
-        }
-
-        if let Some(ref schema) = dml_enum.schema {
-            r#enum.schema(schema);
-        }
-
-        if let Some(ref map) = dml_enum.database_name {
-            r#enum.map(map);
-        }
-
-        for dml_variant in dml_enum.values.iter() {
-            let mut variant = render::EnumVariant::new(&dml_variant.name);
-
-            if dml_variant.commented_out {
-                variant = variant.into_commented_out();
-            }
-
-            if let Some(ref map) = dml_variant.database_name {
-                variant.map(map);
-            }
-
-            if let Some(ref docs) = dml_variant.documentation {
-                variant.documentation(docs);
-            }
-
-            r#enum.push_variant(variant);
-        }
-
-        data_model.push_enum(r#enum);
-    }
-
-    data_model
-}
-
 fn render_configuration<'a>(config: &'a Configuration, schema: &'a SqlSchema) -> render::Configuration<'a> {
     let mut output = render::Configuration::default();
     let prev_ds = config.datasources.first().unwrap();
-    let mut datasource = render::Datasource::from_psl(prev_ds);
+    let mut datasource = render::configuration::Datasource::from_psl(prev_ds);
 
     if prev_ds.active_connector.is_provider("postgres") {
         postgres::add_extensions(&mut datasource, schema, config);
@@ -257,7 +213,7 @@ fn render_configuration<'a>(config: &'a Configuration, schema: &'a SqlSchema) ->
     output.push_datasource(datasource);
 
     for prev in config.generators.iter() {
-        output.push_generator(render::Generator::from_psl(prev));
+        output.push_generator(render::configuration::Generator::from_psl(prev));
     }
 
     output

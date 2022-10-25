@@ -1,8 +1,5 @@
-use std::fmt;
-
-use crate::{Constant, Value};
-
-use super::{text::Text, ConstantNameValidationError};
+use super::{Constant, ConstantNameValidationError, Text, Value};
+use std::{borrow::Cow, fmt};
 
 /// Represents a function parameter in the PSL.
 #[derive(Debug)]
@@ -22,6 +19,15 @@ impl<'a> From<Value<'a>> for FunctionParam<'a> {
 impl<'a> From<&'a str> for FunctionParam<'a> {
     fn from(v: &'a str) -> Self {
         Self::OnlyValue(Value::Text(Text(v)))
+    }
+}
+
+impl<'a, T> From<Constant<T>> for FunctionParam<'a>
+where
+    T: fmt::Display + 'a,
+{
+    fn from(v: Constant<T>) -> Self {
+        Self::OnlyValue(Value::Constant(Constant::new_no_validate(Box::new(v))))
     }
 }
 
@@ -48,8 +54,9 @@ impl<'a> fmt::Display for FunctionParam<'a> {
 /// Represents a function value in the PSL.
 #[derive(Debug)]
 pub struct Function<'a> {
-    name: Constant<'a>,
+    name: Constant<Cow<'a, str>>,
     params: Vec<FunctionParam<'a>>,
+    render_empty_parentheses: bool,
 }
 
 impl<'a> Function<'a> {
@@ -59,24 +66,30 @@ impl<'a> Function<'a> {
             Ok(name) => {
                 let params = Vec::new();
 
-                Self { name, params }
+                Self {
+                    name,
+                    params,
+                    render_empty_parentheses: false,
+                }
             }
             // Will render `sanitized(map: "original")`
-            Err(ConstantNameValidationError::WasSanitized { sanitized, original }) => {
+            Err(ConstantNameValidationError::WasSanitized { sanitized }) => {
                 let mut fun = Self {
                     name: sanitized,
                     params: Vec::new(),
+                    render_empty_parentheses: false,
                 };
 
-                fun.push_param(("map", Text(original)));
+                fun.push_param(("map", Text(name)));
                 fun
             }
             // We just generate an invalid function in this case. It
             // will error in the validation.
             Err(ConstantNameValidationError::SanitizedEmpty) => {
                 let mut fun = Self {
-                    name: Constant::new_no_validate(name),
+                    name: Constant::new_no_validate(Cow::Borrowed(name)),
                     params: Vec::new(),
+                    render_empty_parentheses: false,
                 };
 
                 fun.push_param(("map", Text(name)));
@@ -86,8 +99,9 @@ impl<'a> Function<'a> {
             // hit this.
             Err(ConstantNameValidationError::OriginalEmpty) => {
                 let mut fun = Self {
-                    name: Constant::new_no_validate("emptyValue"),
+                    name: Constant::new_no_validate(Cow::Borrowed("emptyValue")),
                     params: Vec::new(),
+                    render_empty_parentheses: false,
                 };
 
                 fun.push_param(("map", Text(name)));
@@ -101,15 +115,21 @@ impl<'a> Function<'a> {
     pub fn push_param(&mut self, param: impl Into<FunctionParam<'a>>) {
         self.params.push(param.into());
     }
+
+    pub(crate) fn render_empty_parentheses(&mut self) {
+        self.render_empty_parentheses = true;
+    }
 }
 
 impl<'a> fmt::Display for Function<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.name.fmt(f)?;
 
-        if !self.params.is_empty() {
+        if !self.params.is_empty() || self.render_empty_parentheses {
             f.write_str("(")?;
+        }
 
+        if !self.params.is_empty() {
             for (i, param) in self.params.iter().enumerate() {
                 param.fmt(f)?;
 
@@ -117,7 +137,9 @@ impl<'a> fmt::Display for Function<'a> {
                     f.write_str(", ")?;
                 }
             }
+        }
 
+        if !self.params.is_empty() || self.render_empty_parentheses {
             f.write_str(")")?;
         }
 

@@ -1,6 +1,14 @@
-use std::fmt;
+//! Types related to the _configuration section_ in the PSL.
+//!
+//! Includes the `datasource` and `generator` definitions.
 
-use crate::{Datasource, Generator};
+mod datasource;
+mod generator;
+
+pub use datasource::Datasource;
+pub use generator::Generator;
+
+use std::fmt;
 
 /// The configuration part of a data model. First the generators, then
 /// the datasources.
@@ -53,7 +61,7 @@ impl<'a> fmt::Display for Configuration<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::*;
+    use crate::{configuration::*, value::*};
     use expect_test::expect;
 
     #[test]

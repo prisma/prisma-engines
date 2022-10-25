@@ -53,12 +53,18 @@ pub(super) async fn sample(
     let is_empty = data_model.is_empty();
 
     let data_model = if ctx.render_config {
-        let config = render::Configuration::from_psl(ctx.configuration());
-        let datamodel = psl::render_datamodel_to_string(&data_model, Some(ctx.configuration()));
-
-        format!("{}\n{}", config, datamodel)
+        format!(
+            "{}\n{}\n{}",
+            render::Configuration::from_psl(ctx.configuration()),
+            render::Datamodel::from_dml(ctx.datasource(), &data_model),
+            psl::render_datamodel_to_string(&data_model, Some(ctx.configuration())),
+        )
     } else {
-        psl::render_datamodel_to_string(&data_model, Some(ctx.configuration()))
+        format!(
+            "{}\n{}",
+            render::Datamodel::from_dml(ctx.datasource(), &data_model),
+            psl::render_datamodel_to_string(&data_model, Some(ctx.configuration())),
+        )
     };
 
     Ok(IntrospectionResult {

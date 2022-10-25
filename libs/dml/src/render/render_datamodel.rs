@@ -19,10 +19,6 @@ impl RenderParams<'_> {
 }
 
 pub(crate) fn render_datamodel(params: RenderParams<'_>, out: &mut String) {
-    for r#type in &params.datamodel.composite_types {
-        render_composite_type(r#type, params, out);
-    }
-
     for model in params.datamodel.models().filter(|m| !m.is_generated) {
         render_model(model, params, out);
     }
@@ -78,41 +74,6 @@ fn render_model_impl(model: &Model, params: RenderParams<'_>, out: &mut String) 
 
     out.push('\n');
     render_model_attributes(model, params, out);
-    out.push_str("}\n");
-}
-
-fn render_composite_type(tpe: &CompositeType, params: RenderParams<'_>, out: &mut String) {
-    out.push_str("type ");
-    out.push_str(&tpe.name);
-    out.push_str("{\n");
-
-    for field in &tpe.fields {
-        if let Some(docs) = &field.documentation {
-            super::render_documentation(docs, field.is_commented_out, out);
-        }
-
-        if field.is_commented_out {
-            out.push_str("// ");
-        }
-
-        out.push_str(&field.name);
-        out.push(' ');
-        render_composite_field_type(&field.r#type, out);
-        render_field_arity(&field.arity, out);
-
-        // @map
-        if let Some(mapped_name) = &field.database_name {
-            render_map_attribute(mapped_name, "@", out);
-        }
-
-        if let (Some((scalar_type, native_type)), Some(datasource)) = (field.r#type.as_native_type(), params.datasource)
-        {
-            render_native_type_attribute(scalar_type, native_type, datasource, out);
-        }
-
-        out.push('\n');
-    }
-
     out.push_str("}\n");
 }
 
@@ -367,18 +328,6 @@ fn render_index_field_array(fields: &[IndexField], index: &IndexDefinition) -> S
     out
 }
 
-fn render_composite_field_type(field_type: &CompositeTypeFieldType, out: &mut String) {
-    match field_type {
-        CompositeTypeFieldType::CompositeType(name) | CompositeTypeFieldType::Enum(name) => out.push_str(name),
-        CompositeTypeFieldType::Unsupported(name) => {
-            write!(out, "Unsupported({})", string_literal(name)).unwrap();
-        }
-        CompositeTypeFieldType::Scalar(tpe, _) => {
-            out.push_str(&tpe.to_string());
-        }
-    }
-}
-
 fn render_field_type(field_type: &FieldType, out: &mut String) {
     match field_type {
         FieldType::CompositeType(name) | FieldType::Enum(name) => out.push_str(name),
@@ -386,7 +335,7 @@ fn render_field_type(field_type: &FieldType, out: &mut String) {
             write!(out, "Unsupported({})", string_literal(name)).unwrap();
         }
         FieldType::Scalar(tpe, _) => {
-            out.push_str(&tpe.to_string());
+            out.push_str(tpe.as_ref());
         }
         FieldType::Relation(rel) => out.push_str(&rel.referenced_model),
     }
