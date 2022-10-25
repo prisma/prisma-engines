@@ -751,6 +751,8 @@
 <span id="751">751</span>
 <span id="752">752</span>
 <span id="753">753</span>
+<span id="754">754</span>
+<span id="755">755</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Database description. This crate is used heavily in the introspection and migration engines.</span>
 
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>)]</span>
@@ -877,10 +879,12 @@
         <span class="self">self</span>.<span class="ident">user_defined_types</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">name</span>)
     }
 
-    <span class="doccomment">/// Get a namespaceId by name</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_namespace_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">NamespaceId</span> {
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">namespaces</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">ns</span><span class="op">|</span> <span class="ident">ns</span> <span class="op">==</span> <span class="ident">name</span>).<span class="ident">unwrap</span>();
-        <span class="ident">NamespaceId</span>(<span class="ident">id</span> <span class="kw">as</span> <span class="ident">u32</span>)
+    <span class="doccomment">/// Find a namespace by name.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_namespace_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NamespaceId</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">namespaces</span>
+            .<span class="ident">binary_search_by</span>(<span class="op">|</span><span class="ident">ns_name</span><span class="op">|</span> <span class="ident">ns_name</span>.<span class="ident">as_str</span>().<span class="ident">cmp</span>(<span class="ident">name</span>))
+            .<span class="ident">ok</span>()
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">pos</span><span class="op">|</span> <span class="ident">NamespaceId</span>(<span class="ident">pos</span> <span class="kw">as</span> <span class="ident">u32</span>))
     }
 
     <span class="doccomment">/// The total number of indexes in the schema.</span>

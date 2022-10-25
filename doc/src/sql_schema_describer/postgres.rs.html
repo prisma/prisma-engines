@@ -1373,6 +1373,12 @@
 <span id="1373">1373</span>
 <span id="1374">1374</span>
 <span id="1375">1375</span>
+<span id="1376">1376</span>
+<span id="1377">1377</span>
+<span id="1378">1378</span>
+<span id="1379">1379</span>
+<span id="1380">1380</span>
+<span id="1381">1381</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Postgres schema description.</span>
 
 <span class="kw">mod</span> <span class="ident">default</span>;
@@ -1951,7 +1957,9 @@
 
         <span class="kw">for</span> <span class="ident">row</span> <span class="kw">in</span> <span class="ident">rows</span>.<span class="ident">into_iter</span>() {
             <span class="ident">procedures</span>.<span class="ident">push</span>(<span class="ident">Procedure</span> {
-                <span class="ident">namespace_id</span>: <span class="ident">sql_schema</span>.<span class="ident">get_namespace_id</span>(<span class="kw-2">&amp;</span><span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;namespace&quot;</span>)),
+                <span class="ident">namespace_id</span>: <span class="ident">sql_schema</span>
+                    .<span class="ident">get_namespace_id</span>(<span class="kw-2">&amp;</span><span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;namespace&quot;</span>))
+                    .<span class="ident">unwrap</span>(),
                 <span class="ident">name</span>: <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;name&quot;</span>),
                 <span class="ident">definition</span>: <span class="ident">row</span>.<span class="ident">get_string</span>(<span class="string">&quot;definition&quot;</span>),
             });
@@ -1983,7 +1991,7 @@
 
         <span class="kw">for</span> (<span class="ident">table_name</span>, <span class="ident">namespace</span>) <span class="kw">in</span> <span class="ident">names</span> {
             <span class="kw">let</span> <span class="ident">cloned_name</span> <span class="op">=</span> <span class="ident">table_name</span>.<span class="ident">clone</span>();
-            <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">sql_schema</span>.<span class="ident">push_table</span>(<span class="ident">table_name</span>, <span class="ident">sql_schema</span>.<span class="ident">get_namespace_id</span>(<span class="kw-2">&amp;</span><span class="ident">namespace</span>));
+            <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">sql_schema</span>.<span class="ident">push_table</span>(<span class="ident">table_name</span>, <span class="ident">sql_schema</span>.<span class="ident">get_namespace_id</span>(<span class="kw-2">&amp;</span><span class="ident">namespace</span>).<span class="ident">unwrap</span>());
             <span class="ident">map</span>.<span class="ident">insert</span>((<span class="ident">namespace</span>, <span class="ident">cloned_name</span>), <span class="ident">id</span>);
         }
 
@@ -2026,7 +2034,9 @@
 
         <span class="kw">for</span> <span class="ident">row</span> <span class="kw">in</span> <span class="ident">result_set</span>.<span class="ident">into_iter</span>() {
             <span class="ident">views</span>.<span class="ident">push</span>(<span class="ident">View</span> {
-                <span class="ident">namespace_id</span>: <span class="ident">sql_schema</span>.<span class="ident">get_namespace_id</span>(<span class="kw-2">&amp;</span><span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;namespace&quot;</span>)),
+                <span class="ident">namespace_id</span>: <span class="ident">sql_schema</span>
+                    .<span class="ident">get_namespace_id</span>(<span class="kw-2">&amp;</span><span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;namespace&quot;</span>))
+                    .<span class="ident">unwrap</span>(),
                 <span class="ident">name</span>: <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;view_name&quot;</span>),
                 <span class="ident">definition</span>: <span class="ident">row</span>.<span class="ident">get_string</span>(<span class="string">&quot;view_sql&quot;</span>),
             })
@@ -2518,7 +2528,9 @@
             )
             .<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">sequences</span> <span class="op">=</span> <span class="ident">rows</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">seq</span><span class="op">|</span> <span class="ident">Sequence</span> {
-            <span class="ident">namespace_id</span>: <span class="ident">sql_schema</span>.<span class="ident">get_namespace_id</span>(<span class="kw-2">&amp;</span><span class="ident">seq</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;namespace&quot;</span>)),
+            <span class="ident">namespace_id</span>: <span class="ident">sql_schema</span>
+                .<span class="ident">get_namespace_id</span>(<span class="kw-2">&amp;</span><span class="ident">seq</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;namespace&quot;</span>))
+                .<span class="ident">unwrap</span>(),
             <span class="ident">name</span>: <span class="ident">seq</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;sequence_name&quot;</span>),
             <span class="ident">start_value</span>: <span class="ident">seq</span>.<span class="ident">get_expect_i64</span>(<span class="string">&quot;start_value&quot;</span>),
             <span class="ident">min_value</span>: <span class="ident">seq</span>.<span class="ident">get_expect_i64</span>(<span class="string">&quot;min_value&quot;</span>),
@@ -2566,7 +2578,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">enums</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Enum</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">enum_values</span>
             .<span class="ident">into_iter</span>()
             .<span class="ident">map</span>(<span class="op">|</span>((<span class="ident">name</span>, <span class="ident">namespace</span>), <span class="ident">values</span>)<span class="op">|</span> <span class="ident">Enum</span> {
-                <span class="ident">namespace_id</span>: <span class="ident">sql_schema</span>.<span class="ident">get_namespace_id</span>(<span class="kw-2">&amp;</span><span class="ident">namespace</span>),
+                <span class="ident">namespace_id</span>: <span class="ident">sql_schema</span>.<span class="ident">get_namespace_id</span>(<span class="kw-2">&amp;</span><span class="ident">namespace</span>).<span class="ident">unwrap</span>(),
                 <span class="ident">name</span>,
                 <span class="ident">values</span>,
             })
