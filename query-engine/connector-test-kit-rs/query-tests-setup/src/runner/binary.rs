@@ -1,6 +1,6 @@
 use crate::{ConnectorTag, RunnerInterface, TestError, TestResult, TxResult};
 use hyper::{Body, Method, Request, Response};
-use query_core::TxId;
+use query_core::{schema::QuerySchemaRef, TxId};
 use query_engine::opt::PrismaOpt;
 use query_engine::server::{routes, setup, State};
 use query_engine_metrics::MetricRegistry;
@@ -183,6 +183,10 @@ impl RunnerInterface for BinaryRunner {
 
     fn get_metrics(&self) -> MetricRegistry {
         self.state.get_metrics()
+    }
+
+    fn query_schema(&self) -> &QuerySchemaRef {
+        self.state.query_schema()
     }
 }
 
