@@ -133,6 +133,19 @@ impl Item {
         match self {
             Self::Value(pv) => Some(pv),
             Self::Ref(r) => Arc::try_unwrap(r).ok().and_then(|r| r.into_value()),
+            Self::List(list) => {
+                let mut values = vec![];
+
+                for item in list {
+                    if let Some(pv) = item.into_value() {
+                        values.push(pv)
+                    } else {
+                        return None;
+                    }
+                }
+
+                Some(PrismaValue::List(values))
+            }
             _ => None,
         }
     }

@@ -296,16 +296,29 @@ mod compound_batch {
 
     #[connector_test(schema(common_list_types), capabilities(ScalarLists))]
     async fn should_only_batch_if_possible_list(runner: Runner) -> TestResult<()> {
-        // COMPACT: Queries use compound unique
-        let doc = compact_batch(
+        run_query!(
             &runner,
-            vec![
-                r#"query {findUniqueTestModel(where:{ id: 1, str_list: [1, 2, 3] }) {id}}"#.to_string(),
-                r#"query {findUniqueTestModel(where:{ id: 2, str_list: [1, 3, 4] }}) {id}}"#.to_string(),
-            ],
-        )
-        .await?;
+            r#"mutation { createOneTestModel(data: { id: 1, int: [1, 2, 3] }) { id } }"#
+        );
+        run_query!(
+            &runner,
+            r#"mutation { createOneTestModel(data: { id: 2, int: [1, 3, 4] }) { id } }"#
+        );
+
+        let queries = vec![
+            r#"query {findUniqueTestModel(where:{ id: 1, int: { equals: [1, 2, 3] } }) {id, int}}"#.to_string(),
+            r#"query {findUniqueTestModel(where:{ id: 2, int: { equals: [1, 3, 4] } }) {id, int}}"#.to_string(),
+        ];
+
+        // COMPACT: Queries use scalar list
+        let doc = compact_batch(&runner, queries.clone()).await?;
         assert!(doc.is_compact());
+
+        let batch_results = runner.batch(queries, false, None).await?;
+        insta::assert_snapshot!(
+            batch_results.to_string(),
+            @r###"{"batchResult":[{"data":{"findUniqueTestModel":{"id":1,"int":[1,2,3]}}},{"data":{"findUniqueTestModel":{"id":2,"int":[1,3,4]}}}]}"###
+        );
 
         Ok(())
     }
