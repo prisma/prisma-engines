@@ -228,6 +228,61 @@ mod native_upsert {
         Ok(())
     }
 
+    pub fn compound_id() -> String {
+        let schema = indoc! {
+            "model TestModel {
+              id1 Int
+              id2 Int
+              field String
+
+              @@id([id1, id2])
+          }"
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(compound_id))]
+    async fn should_upsert_on_compound_id(mut runner: Runner) -> TestResult<()> {
+        let upsert = r#"
+          mutation {
+            upsertOneTestModel(
+              where: {id1_id2: {
+                id1: 1,
+                id2: 2
+              }},
+              create: {
+                id1: 1,
+                id2: 2,
+                field: "hello",
+              },
+              update: {
+                field: "hello-updated",
+              }
+            ) {
+              id1,
+              id2,
+              field
+            }
+          }
+        "#;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, upsert),
+          @r###"{"data":{"upsertOneTestModel":{"id1":1,"id2":2,"field":"hello"}}}"###
+        );
+
+        assert_used_native_upsert(&mut runner).await;
+        insta::assert_snapshot!(
+          run_query!(&runner, upsert),
+          @r###"{"data":{"upsertOneTestModel":{"id1":1,"id2":2,"field":"hello-updated"}}}"###
+        );
+
+        assert_used_native_upsert(&mut runner).await;
+
+        Ok(())
+    }
+
     async fn assert_used_native_upsert(runner: &mut Runner) {
         let logs = runner.get_logs().await;
         let did_upsert = logs.iter().any(|l| l.contains("ON CONFLICT"));

@@ -52,13 +52,18 @@ impl NativeUpsert {
     pub fn unique_constraint(&self) -> Vec<ScalarFieldRef> {
         let compound_indexes = self.model.unique_indexes();
         let scalars = self.record_filter.filter.scalars();
-        let unique_index = compound_indexes.into_iter().find(|index| {
-            let index_fields = index.fields();
-            index_fields.into_iter().all(|f| scalars.contains(&f))
-        });
+        let unique_index = compound_indexes
+            .into_iter()
+            .find(|index| index.fields().iter().all(|f| scalars.contains(f)));
 
         if let Some(index) = unique_index {
             return index.fields();
+        }
+
+        if let Some(ids) = self.model.fields().compound_id() {
+            if ids.fields().iter().all(|f| scalars.contains(f)) {
+                return ids.fields();
+            }
         }
 
         self.record_filter.filter.unique_scalars()

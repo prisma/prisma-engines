@@ -215,13 +215,20 @@ fn can_use_connector_native_upsert(
 
     let has_one_unique = where_field
         .iter()
-        .filter(|(field_name, input)| {
-            is_unique_field(field_name, model) && where_and_create_equal(field_name, input, &create_argument)
-        })
+        .filter(|(field_name, _)| is_unique_field(field_name, model))
         .count()
         == 1;
 
-    connector_ctx.can_native_upsert() && has_one_unique && !has_nested_create && !has_nested_update
+    let where_values_same_as_create = where_field
+        .clone()
+        .into_iter()
+        .all(|(field_name, input)| where_and_create_equal(&field_name, &input, &create_argument));
+
+    connector_ctx.can_native_upsert()
+        && has_one_unique
+        && !has_nested_create
+        && !has_nested_update
+        && where_values_same_as_create
 }
 
 fn is_unique_field(field_name: &String, model: &ModelRef) -> bool {
@@ -233,31 +240,11 @@ fn is_unique_field(field_name: &String, model: &ModelRef) -> bool {
 
 /// Make sure the unique fields defined in the where clause have the same values
 /// as in the create of the upsert.
-fn where_and_create_equal(
-    field_name: &String,
-    where_input: &ParsedInputValue,
-    create_argument: &ParsedInputMap,
-) -> bool {
-    if let ParsedInputValue::Map(map) = where_input {
-        map.iter()
-            .all(|(field_name, map_input)| where_and_create_equal_internal(field_name, map_input, &create_argument))
-    } else {
-        where_and_create_equal_internal(field_name, where_input, &create_argument)
-    }
-}
-
-fn where_and_create_equal_internal(
-    field_name: &String,
-    where_input: &ParsedInputValue,
-    create_argument: &ParsedInputMap,
-) -> bool {
-    let arg = create_argument
-        .iter()
-        .find(|(create_name, _)| create_name == &field_name);
-
-    if let Some((_, create_input)) = arg {
-        create_input == where_input
-    } else {
-        false
+fn where_and_create_equal(field_name: &str, where_value: &ParsedInputValue, create_map: &ParsedInputMap) -> bool {
+    match where_value {
+        ParsedInputValue::Map(inner_map) => inner_map
+            .iter()
+            .all(|(inner_field, inner_value)| where_and_create_equal(inner_field, inner_value, create_map)),
+        _ => Some(where_value) == create_map.get(field_name),
     }
 }
