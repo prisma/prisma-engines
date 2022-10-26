@@ -57,7 +57,7 @@ impl<'a> LiftAstToDml<'a> {
         let mut field_ids_for_sorting: HashMap<(&str, &str), ast::FieldId> = HashMap::new();
 
         for model in self.db.walk_models() {
-            schema.add_model(self.lift_model(model, &mut field_ids_for_sorting));
+            schema.models.push(self.lift_model(model, &mut field_ids_for_sorting));
         }
 
         for composite_type in self.db.walk_composite_types() {
