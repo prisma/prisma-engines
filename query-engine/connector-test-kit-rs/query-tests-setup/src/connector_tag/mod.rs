@@ -4,16 +4,16 @@ mod mysql;
 mod postgres;
 mod sql_server;
 mod sqlite;
-mod vitess;
 mod tidb;
+mod vitess;
 
 pub use mongodb::*;
 pub use mysql::*;
 pub use postgres::*;
 pub use sql_server::*;
 pub use sqlite::*;
-pub use vitess::*;
 pub use tidb::*;
+pub use vitess::*;
 
 use crate::{datamodel_rendering::DatamodelRenderer, TestConfig, TestError};
 use cockroachdb::*;

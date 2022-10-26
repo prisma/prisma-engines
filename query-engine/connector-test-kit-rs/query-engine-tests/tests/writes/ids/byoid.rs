@@ -55,7 +55,9 @@ mod byoid {
         );
 
         let error_target = match runner.connector_version() {
-            query_engine_tests::ConnectorVersion::MySql(_) | query_engine_tests::ConnectorVersion::TiDB => "constraint: `PRIMARY`",
+            query_engine_tests::ConnectorVersion::MySql(_) | query_engine_tests::ConnectorVersion::TiDB => {
+                "constraint: `PRIMARY`"
+            }
             query_engine_tests::ConnectorVersion::Vitess(_) => "(not available)",
             _ => "fields: (`id`)",
         };

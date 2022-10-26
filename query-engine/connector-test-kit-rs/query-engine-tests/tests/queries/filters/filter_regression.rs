@@ -66,8 +66,11 @@ mod fr_one_to_m {
         );
 
         match runner.connector_version() {
-             ConnectorVersion::TiDB => is_one_of!(
-                run_query!(&runner, r#"query { findManyLocation(where: { company: { is: { id: { equals: 135 }}}}){ id }}"#),
+            ConnectorVersion::TiDB => is_one_of!(
+                run_query!(
+                    &runner,
+                    r#"query { findManyLocation(where: { company: { is: { id: { equals: 135 }}}}){ id }}"#
+                ),
                 vec![
                     r#"{"data":{"findManyLocation":[{"id":311},{"id":314}]}}"#,
                     r#"{"data":{"findManyLocation":[{"id":314},{"id":311}]}}"#

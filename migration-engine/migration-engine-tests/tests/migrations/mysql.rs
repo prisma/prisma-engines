@@ -260,7 +260,7 @@ fn native_type_columns_can_be_created(api: TestApi) {
                 "year(4) unsigned"
             } else {
                 "year(4)"
-            }
+            },
         ),
     ];
 

@@ -1,5 +1,5 @@
 use super::*;
-use crate::{SqlDatamodelRenderer};
+use crate::SqlDatamodelRenderer;
 
 const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::Enums,
@@ -47,13 +47,7 @@ impl ConnectorTagInterface for TiDBConnectorTag {
         Box::new(SqlDatamodelRenderer::new())
     }
 
-    fn connection_string(
-        &self,
-        database: &str,
-        _: bool,
-        _is_multi_schema: bool,
-        _: Option<&'static str>,
-    ) -> String {
+    fn connection_string(&self, database: &str, _: bool, _is_multi_schema: bool, _: Option<&'static str>) -> String {
         format!("mysql://root@localhost:4000/{}", database)
     }
 
@@ -72,7 +66,6 @@ impl ConnectorTagInterface for TiDBConnectorTag {
     fn relation_mode(&self) -> &'static str {
         "prisma"
     }
-
 }
 
 impl TiDBConnectorTag {
