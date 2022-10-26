@@ -11,9 +11,14 @@ pub(crate) struct CalculateDatamodelContext<'a> {
     pub previous_datamodel: &'a Datamodel,
     pub schema: &'a SqlSchema,
     pub sql_family: SqlFamily,
+    previous_schema: &'a psl::ValidatedSchema,
 }
 
-impl CalculateDatamodelContext<'_> {
+impl<'a> CalculateDatamodelContext<'a> {
+    pub(crate) fn previous_schema(&self) -> &'a psl::ValidatedSchema {
+        self.previous_schema
+    }
+
     pub(crate) fn is_cockroach(&self) -> bool {
         self.active_connector().provider_name() == COCKROACH.provider_name()
     }
@@ -46,6 +51,7 @@ pub fn calculate_datamodel(
         previous_datamodel,
         schema,
         sql_family: ctx.sql_family(),
+        previous_schema: ctx.previous_schema(),
     };
 
     let mut warnings = Vec::new();

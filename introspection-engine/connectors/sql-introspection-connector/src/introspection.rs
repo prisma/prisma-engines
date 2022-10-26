@@ -15,118 +15,16 @@ use psl::{
     dml::{self, Datamodel, Field, Model, PrimaryKeyDefinition, PrimaryKeyField, RelationField, SortOrder},
     Configuration,
 };
-use sql_schema_describer::{walkers::TableWalker, ForeignKeyId, SQLSortOrder, SqlSchema};
-use std::collections::HashSet;
+use sql_schema_describer::{self as sql, walkers::TableWalker, ForeignKeyId, SQLSortOrder, SqlSchema};
+use std::collections::{HashMap, HashSet};
 use tracing::debug;
 
 pub(crate) fn introspect(ctx: &Context, warnings: &mut Vec<Warning>) -> Result<(Version, String, bool), SqlError> {
     let mut datamodel = Datamodel::new();
     let schema = ctx.schema;
 
-    // collect m2m table names
-    let m2m_tables: Vec<String> = schema
-        .table_walkers()
-        .filter(|table| is_prisma_1_point_1_or_2_join_table(*table) || is_prisma_1_point_0_join_table(*table))
-        .map(|table| table.name()[1..].to_string())
-        .collect();
-
-    for table in schema
-        .table_walkers()
-        .filter(|table| !is_old_migration_table(*table))
-        .filter(|table| !is_new_migration_table(*table))
-        .filter(|table| !is_prisma_1_point_1_or_2_join_table(*table))
-        .filter(|table| !is_prisma_1_point_0_join_table(*table))
-        .filter(|table| !is_relay_table(*table))
-    {
-        debug!("Calculating model: {}", table.name());
-        let mut model = Model::new(table.name().to_owned(), None);
-
-        for column in table.columns() {
-            let field = calculate_scalar_field(column, ctx);
-            model.add_field(Field::ScalarField(field));
-        }
-
-        let duplicated_foreign_keys: HashSet<ForeignKeyId> = table
-            .foreign_keys()
-            .enumerate()
-            .filter(|(idx, left)| {
-                let mut already_visited = table.foreign_keys().take(*idx);
-                already_visited.any(|right| {
-                    let (left_constrained, right_constrained) =
-                        (left.constrained_columns(), right.constrained_columns());
-                    left_constrained.len() == right_constrained.len()
-                        && left_constrained
-                            .zip(right_constrained)
-                            .all(|(left, right)| left.id == right.id)
-                        && left
-                            .referenced_columns()
-                            .zip(right.referenced_columns())
-                            .all(|(left, right)| left.id == right.id)
-                })
-            })
-            .map(|(_, fk)| fk.id)
-            .collect();
-
-        for foreign_key in table
-            .foreign_keys()
-            .filter(|fk| !duplicated_foreign_keys.contains(&fk.id))
-        {
-            let mut relation_field = calculate_relation_field(foreign_key, &m2m_tables, &duplicated_foreign_keys);
-
-            relation_field.supports_restrict_action(!ctx.sql_family().is_mssql());
-
-            model.add_field(Field::RelationField(relation_field));
-        }
-
-        for index in table.indexes() {
-            if let Some(index) = calculate_index(index, ctx) {
-                model.add_index(index);
-            }
-        }
-
-        if let Some(pk) = table.primary_key() {
-            let clustered = primary_key_is_clustered(pk.id, ctx);
-
-            model.primary_key = Some(PrimaryKeyDefinition {
-                name: None,
-                db_name: Some(pk.name().to_owned()),
-                fields: pk
-                    .columns()
-                    .map(|c| {
-                        let sort_order = c.sort_order().map(|sort| match sort {
-                            SQLSortOrder::Asc => SortOrder::Asc,
-                            SQLSortOrder::Desc => SortOrder::Desc,
-                        });
-
-                        PrimaryKeyField {
-                            name: c.name().to_string(),
-                            sort_order,
-                            length: c.length(),
-                        }
-                    })
-                    .collect(),
-                defined_on_field: pk.columns().len() == 1,
-                clustered,
-            });
-        }
-
-        if matches!(ctx.config.datasources.first(), Some(ds) if !ds.namespaces.is_empty()) {
-            model.schema = table.namespace().map(|n| n.to_string());
-        }
-
-        datamodel.add_model(model);
-    }
-
-    for e in schema.enum_walkers() {
-        let values = e.values().iter().map(|v| dml::EnumValue::new(v)).collect();
-
-        let schema = if matches!(ctx.config.datasources.first(), Some(ds) if !ds.namespaces.is_empty()) {
-            e.namespace().map(|n| n.to_string())
-        } else {
-            None
-        };
-        datamodel.add_enum(dml::Enum::new(e.name(), values, schema));
-    }
+    introspect_enums(&mut datamodel, ctx);
+    introspect_models(&mut datamodel, ctx);
 
     let mut fields_to_be_added = Vec::new();
 
@@ -238,4 +136,153 @@ fn calculate_fields_for_prisma_join_table(
             fields_to_be_added.push((referenced_model.name.clone(), field));
         }
     }
+}
+
+fn introspect_enums(datamodel: &mut Datamodel, ctx: &Context) {
+    let existing_enums_by_database_name: HashMap<&str, _> = ctx
+        .previous_schema()
+        .db
+        .walk_enums()
+        .map(|enm| (enm.database_name(), enm.id))
+        .collect();
+
+    datamodel.enums = ctx
+        .schema
+        .enum_walkers()
+        .map(|enm| sql_enum_to_dml_enum(enm, ctx))
+        .collect();
+
+    datamodel.enums.sort_by(|a, b| {
+        let existing = |enm: &dml::Enum| -> Option<_> {
+            existing_enums_by_database_name.get(enm.database_name.as_deref().unwrap_or(enm.name.as_str()))
+        };
+        compare_options_none_last(existing(a), existing(b))
+    });
+}
+
+fn sql_enum_to_dml_enum(sql_enum: sql::EnumWalker<'_>, ctx: &Context) -> dml::Enum {
+    let values = sql_enum.values().iter().map(|v| dml::EnumValue::new(v)).collect();
+    let schema = if matches!(ctx.config.datasources.first(), Some(ds) if !ds.namespaces.is_empty()) {
+        sql_enum.namespace().map(String::from)
+    } else {
+        None
+    };
+    dml::Enum::new(sql_enum.name(), values, schema)
+}
+
+fn introspect_models(datamodel: &mut Datamodel, ctx: &Context) {
+    // collect m2m table names
+    let m2m_tables: Vec<String> = ctx
+        .schema
+        .table_walkers()
+        .filter(|table| is_prisma_1_point_1_or_2_join_table(*table) || is_prisma_1_point_0_join_table(*table))
+        .map(|table| table.name()[1..].to_string())
+        .collect();
+
+    for table in ctx
+        .schema
+        .table_walkers()
+        .filter(|table| !is_old_migration_table(*table))
+        .filter(|table| !is_new_migration_table(*table))
+        .filter(|table| !is_prisma_1_point_1_or_2_join_table(*table))
+        .filter(|table| !is_prisma_1_point_0_join_table(*table))
+        .filter(|table| !is_relay_table(*table))
+    {
+        debug!("Calculating model: {}", table.name());
+        let mut model = Model::new(table.name().to_owned(), None);
+
+        for column in table.columns() {
+            let field = calculate_scalar_field(column, ctx);
+            model.add_field(Field::ScalarField(field));
+        }
+
+        let duplicated_foreign_keys: HashSet<ForeignKeyId> = table
+            .foreign_keys()
+            .enumerate()
+            .filter(|(idx, left)| {
+                let mut already_visited = table.foreign_keys().take(*idx);
+                already_visited.any(|right| {
+                    let (left_constrained, right_constrained) =
+                        (left.constrained_columns(), right.constrained_columns());
+                    left_constrained.len() == right_constrained.len()
+                        && left_constrained
+                            .zip(right_constrained)
+                            .all(|(left, right)| left.id == right.id)
+                        && left
+                            .referenced_columns()
+                            .zip(right.referenced_columns())
+                            .all(|(left, right)| left.id == right.id)
+                })
+            })
+            .map(|(_, fk)| fk.id)
+            .collect();
+
+        for foreign_key in table
+            .foreign_keys()
+            .filter(|fk| !duplicated_foreign_keys.contains(&fk.id))
+        {
+            let mut relation_field = calculate_relation_field(foreign_key, &m2m_tables, &duplicated_foreign_keys);
+
+            relation_field.supports_restrict_action(!ctx.sql_family().is_mssql());
+
+            model.add_field(Field::RelationField(relation_field));
+        }
+
+        for index in table.indexes() {
+            if let Some(index) = calculate_index(index, ctx) {
+                model.add_index(index);
+            }
+        }
+
+        if let Some(pk) = table.primary_key() {
+            let clustered = primary_key_is_clustered(pk.id, ctx);
+
+            model.primary_key = Some(PrimaryKeyDefinition {
+                name: None,
+                db_name: Some(pk.name().to_owned()),
+                fields: pk
+                    .columns()
+                    .map(|c| {
+                        let sort_order = c.sort_order().map(|sort| match sort {
+                            SQLSortOrder::Asc => SortOrder::Asc,
+                            SQLSortOrder::Desc => SortOrder::Desc,
+                        });
+
+                        PrimaryKeyField {
+                            name: c.name().to_string(),
+                            sort_order,
+                            length: c.length(),
+                        }
+                    })
+                    .collect(),
+                defined_on_field: pk.columns().len() == 1,
+                clustered,
+            });
+        }
+
+        if matches!(ctx.config.datasources.first(), Some(ds) if !ds.namespaces.is_empty()) {
+            model.schema = table.namespace().map(|n| n.to_string());
+        }
+
+        datamodel.models.push(model);
+    }
+
+    sort_models(datamodel, ctx)
+}
+
+fn sort_models(datamodel: &mut Datamodel, ctx: &Context) {
+    let existing_models_by_database_name: HashMap<&str, _> = ctx
+        .previous_schema()
+        .db
+        .walk_models()
+        .map(|model| (model.database_name(), model.id))
+        .collect();
+
+    datamodel.models.sort_by(|a, b| {
+        let existing = |model: &dml::Model| -> Option<_> {
+            existing_models_by_database_name.get(model.database_name.as_deref().unwrap_or(&model.name))
+        };
+
+        compare_options_none_last(existing(a), existing(b))
+    });
 }

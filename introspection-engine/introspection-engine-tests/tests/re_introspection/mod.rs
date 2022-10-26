@@ -935,26 +935,16 @@ async fn custom_model_order(api: &TestApi) -> TestResult {
 
 #[test_connector(tags(Postgres))]
 async fn custom_enum_order(api: &TestApi) -> TestResult {
-    let sql = "CREATE Type a as ENUM ( \'id\')".to_string();
-    api.database().execute_raw(&sql, &[]).await?;
-
-    let sql = "CREATE Type b as ENUM ( \'id\')".to_string();
-    api.database().execute_raw(&sql, &[]).await?;
-
-    let sql = "CREATE Type j as ENUM ( \'id\')".to_string();
-    api.database().execute_raw(&sql, &[]).await?;
-
-    let sql = "CREATE Type f as ENUM ( \'id\')".to_string();
-    api.database().execute_raw(&sql, &[]).await?;
-
-    let sql = "CREATE Type z as ENUM ( \'id\')".to_string();
-    api.database().execute_raw(&sql, &[]).await?;
-
-    let sql = "CREATE Type m as ENUM ( \'id\')".to_string();
-    api.database().execute_raw(&sql, &[]).await?;
-
-    let sql = "CREATE Type l as ENUM ( \'id\')".to_string();
-    api.database().execute_raw(&sql, &[]).await?;
+    let sql = r#"
+        CREATE TYPE a AS ENUM ('id');
+        CREATE TYPE b AS ENUM ('id');
+        CREATE TYPE j AS ENUM ('id');
+        CREATE TYPE f AS ENUM ('id');
+        CREATE TYPE z AS ENUM ('id');
+        CREATE TYPE m AS ENUM ('id');
+        CREATE TYPE l AS ENUM ('id');
+    "#;
+    api.raw_cmd(sql).await;
 
     let input_dm = indoc! {r#"
         enum b {

@@ -1,6 +1,8 @@
 use crate::{
     calculate_datamodel::CalculateDatamodelContext,
-    introspection_helpers::{replace_index_field_names, replace_pk_field_names, replace_relation_info_field_names},
+    introspection_helpers::{
+        compare_options_none_last, replace_index_field_names, replace_pk_field_names, replace_relation_info_field_names,
+    },
     warnings::*,
     SqlFamilyTrait,
 };
@@ -39,22 +41,6 @@ pub(crate) fn enrich(
     merge_ignores(old_data_model, new_data_model, warnings);
     merge_comments(old_data_model, new_data_model);
     keep_index_ordering(old_data_model, new_data_model);
-
-    // restore old model order
-    new_data_model.models.sort_by(|model_a, model_b| {
-        let model_a_idx = old_data_model.models().position(|model| model.name == model_a.name);
-        let model_b_idx = old_data_model.models().position(|model| model.name == model_b.name);
-
-        re_order_putting_new_ones_last(model_a_idx, model_b_idx)
-    });
-
-    // restore old enum order
-    new_data_model.enums.sort_by(|enum_a, enum_b| {
-        let enum_a_idx = old_data_model.enums().position(|enm| enm.name == enum_a.name);
-        let enum_b_idx = old_data_model.enums().position(|enm| enm.name == enum_b.name);
-
-        re_order_putting_new_ones_last(enum_a_idx, enum_b_idx)
-    });
 }
 
 /// If we have to map the enum values, this makes sure we handle them
@@ -135,17 +121,8 @@ fn keep_index_ordering(old_data_model: &Datamodel, new_data_model: &mut Datamode
             let idx_a_idx = old_model.indices.iter().position(|idx| idx.db_name == idx_a.db_name);
             let idx_b_idx = old_model.indices.iter().position(|idx| idx.db_name == idx_b.db_name);
 
-            re_order_putting_new_ones_last(idx_a_idx, idx_b_idx)
+            compare_options_none_last(idx_a_idx, idx_b_idx)
         });
-    }
-}
-
-fn re_order_putting_new_ones_last(enum_a_idx: Option<usize>, enum_b_idx: Option<usize>) -> Ordering {
-    match (enum_a_idx, enum_b_idx) {
-        (None, None) => Equal,
-        (None, Some(_)) => Greater,
-        (Some(_), None) => Less,
-        (Some(a_idx), Some(b_idx)) => a_idx.cmp(&b_idx),
     }
 }
 

@@ -11,8 +11,19 @@ use sql_schema_describer::{
     self as sql, mssql::MssqlSchemaExt, postgres::PostgresSchemaExt, ColumnArity, ColumnTypeFamily, ForeignKeyAction,
     IndexType, SQLSortOrder, SqlSchema,
 };
-use std::collections::HashSet;
+use std::{cmp, collections::HashSet};
 use tracing::debug;
+
+/// This function implements the reverse behaviour of the `Ord` implementation for `Option`: it
+/// puts `None` values last, and otherwise orders `Some`s by their contents, like the `Ord` impl.
+pub(crate) fn compare_options_none_last<T: cmp::Ord>(a: Option<T>, b: Option<T>) -> cmp::Ordering {
+    match (a, b) {
+        (Some(a), Some(b)) => a.cmp(&b),
+        (Some(_), None) => cmp::Ordering::Less,
+        (None, Some(_)) => cmp::Ordering::Greater,
+        (None, None) => cmp::Ordering::Equal,
+    }
+}
 
 pub(crate) fn is_old_migration_table(table: TableWalker<'_>) -> bool {
     table.name() == "_Migration"
