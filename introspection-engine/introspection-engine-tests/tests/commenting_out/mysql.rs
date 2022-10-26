@@ -67,3 +67,38 @@ async fn a_table_without_uniques_should_ignore(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_connector(tags(Mysql))]
+async fn remapping_field_names_to_empty_mysql(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("1", types::text());
+                t.add_column("last", types::integer().increments(true));
+
+                t.add_constraint("User_pkey", types::primary_constraint(vec!["last"]));
+            });
+        })
+        .await?;
+
+    let dm = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "mysql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model User {
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 1 String @map("1") @db.Text
+          last Int @id @default(autoincrement())
+        }
+    "#]];
+
+    api.expect_datamodel(&dm).await;
+
+    Ok(())
+}

@@ -84,6 +84,10 @@ impl FieldType {
         matches!(self, Self::Enum(this) if this == name)
     }
 
+    pub fn is_unsupported(&self) -> bool {
+        matches!(self, Self::Unsupported(_))
+    }
+
     pub fn scalar_type(&self) -> Option<ScalarType> {
         match self {
             FieldType::Scalar(st, _) => Some(*st),

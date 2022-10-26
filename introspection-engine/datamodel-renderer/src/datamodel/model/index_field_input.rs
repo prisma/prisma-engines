@@ -1,13 +1,15 @@
 use std::borrow::Cow;
 
+use super::IndexOps;
 use crate::value::{Constant, ConstantNameValidationError, Function};
 
 /// Input parameters for a field in a model index definition.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct IndexFieldInput<'a> {
-    pub(super) name: &'a str,
+    pub(super) name: Cow<'a, str>,
     pub(super) sort_order: Option<&'a str>,
     pub(super) length: Option<u32>,
+    pub(super) ops: Option<IndexOps<'a>>,
 }
 
 impl<'a> IndexFieldInput<'a> {
@@ -19,9 +21,10 @@ impl<'a> IndexFieldInput<'a> {
     /// ```
     pub fn new(name: &'a str) -> Self {
         Self {
-            name,
+            name: Cow::Borrowed(name),
             sort_order: None,
             length: None,
+            ops: None,
         }
     }
 
@@ -52,6 +55,7 @@ pub struct IndexFieldOptions<'a> {
     pub(super) sort_order: Option<&'a str>,
     pub(super) length: Option<u32>,
     pub(super) clustered: Option<bool>,
+    pub(super) map: Option<&'a str>,
 }
 
 impl<'a> IndexFieldOptions<'a> {
@@ -84,17 +88,32 @@ impl<'a> IndexFieldOptions<'a> {
     pub fn clustered(&mut self, value: bool) {
         self.clustered = Some(value);
     }
+
+    /// Define the constraint name.
+    ///
+    /// ```ignore
+    /// @unique(map: "key_foo")
+    /// //            ^^^^^^^ here
+    /// ```
+    pub fn map(&mut self, value: &'a str) {
+        self.map = Some(value);
+    }
 }
 
 impl<'a> From<IndexFieldInput<'a>> for Function<'a> {
     fn from(definition: IndexFieldInput<'a>) -> Self {
-        let name = match Constant::new(definition.name) {
-            Ok(c) => c,
-            Err(ConstantNameValidationError::WasSanitized { sanitized }) => sanitized,
-            Err(_) => Constant::new_no_validate(Cow::Borrowed(definition.name)),
-        };
+        let name: Vec<_> = definition
+            .name
+            .split('.')
+            .map(|name| match Constant::new(name) {
+                Ok(c) => c,
+                Err(ConstantNameValidationError::WasSanitized { sanitized }) => sanitized,
+                Err(_) => Constant::new_no_validate(Cow::Borrowed(name)),
+            })
+            .map(|constant| constant.into_inner())
+            .collect();
 
-        let mut fun = Function::from(name);
+        let mut fun = Function::from(Constant::new_no_validate(Cow::Owned(name.join("."))));
 
         if let Some(length) = definition.length {
             fun.push_param(("length", Constant::new_no_validate(length)));
@@ -102,6 +121,10 @@ impl<'a> From<IndexFieldInput<'a>> for Function<'a> {
 
         if let Some(sort_order) = definition.sort_order {
             fun.push_param(("sort", Constant::new_no_validate(sort_order)));
+        }
+
+        if let Some(ops) = definition.ops {
+            fun.push_param(("ops", ops));
         }
 
         fun

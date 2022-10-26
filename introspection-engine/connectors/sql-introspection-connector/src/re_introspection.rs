@@ -185,8 +185,9 @@ fn merge_pre_3_0_index_names(old_data_model: &Datamodel, new_data_model: &mut Da
                                 .map(|f| &f.path.first().unwrap().0)
                                 .collect::<Vec<_>>()
                 }) {
-                    retained_legacy_index_name_args
-                        .push(ModelAndIndex::new(&model.name, old_index.name.as_ref().unwrap()))
+                    if let Some(ref old_name) = old_index.name {
+                        retained_legacy_index_name_args.push(ModelAndIndex::new(&model.name, old_name))
+                    }
                 }
             }
         }
@@ -395,12 +396,15 @@ fn merge_changed_relation_field_names(old_data_model: &Datamodel, new_data_model
 
                 let mf = ModelAndField::new(&new_model.name, &new_field.name);
 
-                if match_as_inline
-                    || (is_many_to_many
-                                //For many to many the relation infos always look the same, here we have to look at the relation name,
-                                //which translates to the join table name. But in case of self relations we cannot correctly infer the old name
-                                && (old_field.relation_info.name == new_field.relation_info.name && !is_self_relation))
-                {
+                //For many to many the relation infos always look the same, here we have to look at the relation name,
+                //which translates to the join table name. But in case of self relations we cannot correctly infer the old name
+                //
+                // ugh :(
+                let match_relation_names = old_field.relation_info.name == new_field.relation_info.name;
+
+                let match_as_many_to_many = is_many_to_many && (match_relation_names && !is_self_relation);
+
+                if match_as_inline || match_as_many_to_many {
                     changed_relation_field_names.push((mf.clone(), old_field.name.clone()));
                 }
             }

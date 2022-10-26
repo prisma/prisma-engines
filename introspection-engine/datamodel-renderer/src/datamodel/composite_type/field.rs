@@ -59,7 +59,7 @@ impl<'a> CompositeTypeField<'a> {
         Self::new(name, FieldType::array(type_name))
     }
 
-    /// Create a new unsupported composite field declaration.
+    /// Create a new required unsupported composite field declaration.
     ///
     /// ```ignore
     /// type Address {
@@ -68,8 +68,34 @@ impl<'a> CompositeTypeField<'a> {
     /// //^^^^^^ name
     /// }
     /// ```
-    pub fn new_unsupported(name: &'a str, type_name: &'a str) -> Self {
-        Self::new(name, FieldType::unsupported(type_name))
+    pub fn new_required_unsupported(name: &'a str, type_name: &'a str) -> Self {
+        Self::new(name, FieldType::required_unsupported(type_name))
+    }
+
+    /// Create a new optional unsupported composite field declaration.
+    ///
+    /// ```ignore
+    /// type Address {
+    ///   street Unsupported("foo")?
+    /// //                    ^^^ type_name
+    /// //^^^^^^ name
+    /// }
+    /// ```
+    pub fn new_optional_unsupported(name: &'a str, type_name: &'a str) -> Self {
+        Self::new(name, FieldType::optional_unsupported(type_name))
+    }
+
+    /// Create a new array unsupported composite field declaration.
+    ///
+    /// ```ignore
+    /// type Address {
+    ///   street Unsupported("foo")[]
+    /// //                    ^^^ type_name
+    /// //^^^^^^ name
+    /// }
+    /// ```
+    pub fn new_array_unsupported(name: &'a str, type_name: &'a str) -> Self {
+        Self::new(name, FieldType::array_unsupported(type_name))
     }
 
     /// Sets the field map attribute.
@@ -154,7 +180,15 @@ impl<'a> CompositeTypeField<'a> {
         };
 
         let mut field = match dml_field.arity {
-            _ if dml_field.r#type.is_unsupported() => CompositeTypeField::new_unsupported(&dml_field.name, r#type),
+            dml::FieldArity::Required if dml_field.r#type.is_unsupported() => {
+                CompositeTypeField::new_required_unsupported(&dml_field.name, r#type)
+            }
+            dml::FieldArity::Optional if dml_field.r#type.is_unsupported() => {
+                CompositeTypeField::new_optional_unsupported(&dml_field.name, r#type)
+            }
+            dml::FieldArity::List if dml_field.r#type.is_unsupported() => {
+                CompositeTypeField::new_array_unsupported(&dml_field.name, r#type)
+            }
             dml::FieldArity::Required => CompositeTypeField::new_required(&dml_field.name, r#type),
             dml::FieldArity::Optional => CompositeTypeField::new_optional(&dml_field.name, r#type),
             dml::FieldArity::List => CompositeTypeField::new_array(&dml_field.name, r#type),

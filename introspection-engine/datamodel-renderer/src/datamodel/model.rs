@@ -5,13 +5,14 @@ mod index_field_input;
 mod relation;
 
 pub use field::ModelField;
-pub use id::IdDefinition;
-pub use index::IndexDefinition;
+pub use id::{IdDefinition, IdFieldDefinition};
+pub use index::{IndexDefinition, IndexOps};
 pub use index_field_input::{IndexFieldInput, IndexFieldOptions};
+use psl::dml;
 pub use relation::Relation;
 
-use crate::value::{Constant, ConstantNameValidationError, Documentation, Function};
-use std::{borrow::Cow, fmt};
+use crate::value::{Constant, ConstantNameValidationError, Documentation, Function, Text};
+use std::{borrow::Cow, collections::HashMap, fmt};
 
 use super::attributes::BlockAttribute;
 
@@ -189,6 +190,187 @@ impl<'a> Model<'a> {
     pub fn push_index(&mut self, index: IndexDefinition<'a>) {
         self.indexes.push(index);
     }
+
+    /// Generate a model rendering from the deprecated DML structure.
+    ///
+    /// Remove when destroying the DML.
+    pub fn from_dml(datasource: &'a psl::Datasource, dml_model: &'a dml::Model) -> Self {
+        let mut model = Model::new(&dml_model.name);
+
+        if let Some(ref docs) = dml_model.documentation {
+            model.documentation(docs);
+        }
+
+        if let Some(ref map) = dml_model.database_name {
+            model.map(map);
+        }
+
+        if let Some(ref schema) = dml_model.schema {
+            model.schema(schema);
+        }
+
+        if dml_model.is_commented_out {
+            model.comment_out();
+        }
+
+        if dml_model.is_ignored {
+            model.ignore();
+        }
+
+        match dml_model.primary_key {
+            Some(ref pk) if !dml_model.has_single_id_field() => {
+                let fields = pk.fields.iter().map(|field| IndexFieldInput {
+                    name: Cow::Borrowed(&field.name),
+                    sort_order: field.sort_order.as_ref().map(|so| so.as_ref()),
+                    length: field.length,
+                    ops: None,
+                });
+
+                let mut definition = IdDefinition::new(fields);
+
+                if let Some(ref name) = pk.name {
+                    definition.name(name);
+                }
+
+                if let Some(ref map) = &pk.db_name {
+                    definition.map(map);
+                }
+
+                if let Some(clustered) = pk.clustered {
+                    definition.clustered(clustered);
+                }
+
+                model.id(definition);
+            }
+            _ => (),
+        }
+
+        // weep
+        let uniques: HashMap<&str, IndexFieldOptions> = dml_model
+            .indices
+            .iter()
+            .filter(|ix| ix.is_unique())
+            .filter(|ix| ix.defined_on_field)
+            .map(|ix| {
+                let definition = ix.fields.first().unwrap();
+                let mut opts = IndexFieldOptions::default();
+
+                if let Some(clustered) = ix.clustered {
+                    opts.clustered(clustered);
+                }
+
+                if let Some(ref sort_order) = definition.sort_order {
+                    opts.sort_order(sort_order.as_ref());
+                }
+
+                if let Some(length) = definition.length {
+                    opts.length(length);
+                }
+
+                if let Some(ref map) = ix.db_name {
+                    opts.map(map);
+                }
+
+                (definition.from_field(), opts)
+            })
+            .collect();
+
+        let primary_key = dml_model.primary_key.as_ref().filter(|pk| pk.defined_on_field);
+
+        for dml_field in dml_model.fields.iter() {
+            // sob :(
+            let id = primary_key.and_then(|pk| {
+                let field = pk.fields.first().unwrap();
+
+                if field.name == dml_field.name() {
+                    let mut opts = IdFieldDefinition::default();
+
+                    if let Some(clustered) = pk.clustered {
+                        opts.clustered(clustered);
+                    }
+
+                    if let Some(ref sort_order) = field.sort_order {
+                        opts.sort_order(sort_order.as_ref());
+                    }
+
+                    if let Some(length) = field.length {
+                        opts.length(length);
+                    }
+
+                    if let Some(ref map) = pk.db_name {
+                        opts.map(map);
+                    }
+
+                    Some(opts)
+                } else {
+                    None
+                }
+            });
+
+            model.push_field(ModelField::from_dml(datasource, dml_model, dml_field, &uniques, id));
+        }
+
+        for dml_index in dml_model.indices.iter() {
+            if dml_index.defined_on_field && dml_index.is_unique() {
+                continue;
+            }
+
+            // cry
+            let fields = dml_index.fields.iter().map(|f| {
+                let mut name = String::new();
+                let mut name_path = f.path.iter().peekable();
+
+                while let Some((ident, _)) = name_path.next() {
+                    name.push_str(ident);
+
+                    if name_path.peek().is_some() {
+                        name.push('.');
+                    }
+                }
+
+                let ops = f.operator_class.as_ref().map(|c| {
+                    if c.is_raw() {
+                        IndexOps::Raw(Text(c.as_ref()))
+                    } else {
+                        IndexOps::Managed(c.as_ref())
+                    }
+                });
+
+                IndexFieldInput {
+                    name: Cow::Owned(name),
+                    sort_order: f.sort_order.as_ref().map(AsRef::as_ref),
+                    length: f.length,
+                    ops,
+                }
+            });
+
+            let mut definition = match dml_index.tpe {
+                dml::IndexType::Unique => IndexDefinition::unique(fields),
+                dml::IndexType::Normal => IndexDefinition::index(fields),
+                dml::IndexType::Fulltext => IndexDefinition::fulltext(fields),
+            };
+
+            if let Some(ref name) = dml_index.name {
+                definition.name(name);
+            }
+
+            if let Some(ref map) = dml_index.db_name {
+                definition.map(map);
+            }
+
+            if let Some(clustered) = dml_index.clustered {
+                definition.clustered(clustered);
+            }
+
+            if let Some(ref algo) = dml_index.algorithm {
+                definition.index_type(algo.as_ref());
+            }
+
+            model.push_index(definition);
+        }
+
+        model
+    }
 }
 
 impl<'a> fmt::Display for Model<'a> {
@@ -235,7 +417,7 @@ impl<'a> fmt::Display for Model<'a> {
 
 #[cfg(test)]
 mod tests {
-    use std::ops::Deref;
+    use std::{borrow::Cow, ops::Deref};
 
     use crate::{datamodel::*, value::Function};
     use expect_test::expect;
@@ -247,7 +429,7 @@ mod tests {
 
         let mut field = ModelField::new_required("id", "String");
 
-        let mut opts = IndexFieldOptions::default();
+        let mut opts = IdFieldDefinition::default();
 
         opts.sort_order("Desc");
         opts.length(32);
@@ -268,16 +450,19 @@ mod tests {
         field.default(DefaultValue::array(vec![1, 2, 3, 4]));
         model.push_field(field);
 
-        let mut field = ModelField::new_unsupported("konig", "King");
+        let mut field = ModelField::new_required_unsupported("konig", "King");
         field.ignore();
         model.push_field(field);
 
         let mut field = ModelField::new_required("information", "Int");
-        field.unique(IndexFieldOptions {
-            sort_order: Some("Desc"),
-            length: Some(32),
-            clustered: Some(true),
-        });
+        let mut opts = IndexFieldOptions::default();
+
+        opts.sort_order("Desc");
+        opts.length(32);
+        opts.clustered(true);
+
+        field.unique(opts);
+
         model.push_field(field);
 
         let mut relation = Relation::new();
@@ -294,15 +479,17 @@ mod tests {
         let fields = ["foo", "bar"].iter().enumerate().map(|(i, name)| {
             if i == 1 {
                 IndexFieldInput {
-                    name,
+                    name: Cow::Borrowed(name),
                     sort_order: Some("Asc"),
                     length: Some(32),
+                    ops: None,
                 }
             } else {
                 IndexFieldInput {
-                    name,
+                    name: Cow::Borrowed(name),
                     sort_order: None,
                     length: None,
+                    ops: None,
                 }
             }
         });
@@ -332,7 +519,7 @@ mod tests {
             /// Do not fear death
             /// If you desire a speed king to become!
             model Country {
-              id          String              @id(sort: Desc, length: 32, clustered: false) @default(uuid) @db.VarChar(255)
+              id          String              @id(sort: Desc, length: 32, clustered: false) @default(uuid()) @db.VarChar(255)
               /// NOPEUSKUNINGAS
               value       Bytes?              @default("AQIDBA==")
               array       Int[]               @default([1, 2, 3, 4]) @map("1array")
@@ -359,7 +546,7 @@ mod tests {
         let mut model = Model::new("Country");
 
         let mut field = ModelField::new_required("id", "String");
-        field.id(IndexFieldOptions::default());
+        field.id(IdFieldDefinition::default());
         field.native_type("db", "VarChar", vec![String::from("255")]);
         field.default(DefaultValue::function(Function::new("uuid")));
         model.push_field(field);
@@ -369,7 +556,7 @@ mod tests {
 
         let expected = expect![[r#"
             // model Country {
-            // id String @id @default(uuid) @db.VarChar(255)
+            // id String @id @default(uuid()) @db.VarChar(255)
             // @@schema("public")
             // }
         "#]];

@@ -1,10 +1,11 @@
 use crate::{calculate_datamodel::CalculateDatamodelContext as Context, SqlError, SqlFamilyTrait};
 use psl::{
+    datamodel_connector::constraint_names::ConstraintNames,
     dml::{
         Datamodel, FieldArity, FieldType, IndexAlgorithm, IndexDefinition, IndexField, Model, OperatorClass,
         PrimaryKeyField, ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, SortOrder,
     },
-    PreviewFeature, RelationNames,
+    parser_database as db, PreviewFeature, RelationNames,
 };
 use sql::walkers::{ColumnWalker, ForeignKeyWalker, TableWalker};
 use sql_schema_describer::{
@@ -174,6 +175,23 @@ pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &Contex
         IndexType::PrimaryKey => return None,
     };
 
+    let default_constraint_name = match index.index_type() {
+        IndexType::Unique => {
+            let columns = index.column_names().collect::<Vec<_>>();
+            ConstraintNames::unique_index_name(index.table().name(), &columns, ctx.active_connector())
+        }
+        _ => {
+            let columns = index.column_names().collect::<Vec<_>>();
+            ConstraintNames::non_unique_index_name(index.table().name(), &columns, ctx.active_connector())
+        }
+    };
+
+    let db_name = if index.name() == default_constraint_name {
+        None
+    } else {
+        Some(index.name().to_owned())
+    };
+
     // We do not populate name in client by default. It increases datamodel noise, and we would
     // need to sanitize it. Users can give their own names if they want and re-introspection will
     // keep them. This is a change in introspection behaviour, but due to re-introspection previous
@@ -181,13 +199,13 @@ pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &Contex
 
     Some(IndexDefinition {
         name: None,
-        db_name: Some(index.name().to_owned()),
+        db_name,
         fields: index
             .columns()
             .map(|c| {
-                let sort_order = c.sort_order().map(|sort| match sort {
-                    SQLSortOrder::Asc => SortOrder::Asc,
-                    SQLSortOrder::Desc => SortOrder::Desc,
+                let sort_order = c.sort_order().and_then(|sort| match sort {
+                    SQLSortOrder::Asc => None,
+                    SQLSortOrder::Desc => Some(SortOrder::Desc),
                 });
 
                 let operator_class = get_opclass(c.id, index.schema, ctx);
@@ -215,12 +233,23 @@ pub(crate) fn calculate_scalar_field(column: ColumnWalker<'_>, ctx: &Context) ->
         ColumnArity::List => FieldArity::List,
     };
 
+    let mut default_value = crate::defaults::calculate_default(column, ctx);
+
+    let default_default_value =
+        ConstraintNames::default_name(column.table().name(), column.name(), ctx.active_connector());
+
+    if let Some(ref mut default_value) = default_value {
+        if default_value.db_name == Some(default_default_value) {
+            default_value.db_name = None;
+        }
+    }
+
     ScalarField {
         name: column.name().to_owned(),
         arity,
         field_type: calculate_scalar_field_type_with_native_types(column, ctx),
         database_name: None,
-        default_value: crate::defaults::calculate_default(column, ctx),
+        default_value,
         documentation: None,
         is_generated: false,
         is_updated_at: false,
@@ -230,6 +259,7 @@ pub(crate) fn calculate_scalar_field(column: ColumnWalker<'_>, ctx: &Context) ->
 }
 
 pub(crate) fn calculate_relation_field(
+    ctx: &Context,
     foreign_key: ForeignKeyWalker<'_>,
     m2m_table_names: &[String],
     duplicated_foreign_keys: &HashSet<sql::ForeignKeyId>,
@@ -244,14 +274,25 @@ pub(crate) fn calculate_relation_field(
         ForeignKeyAction::SetDefault => ReferentialAction::SetDefault,
     };
 
+    let cols: Vec<_> = foreign_key.constrained_columns().map(|c| c.name()).collect();
+    let default_constraint_name =
+        ConstraintNames::foreign_key_constraint_name(foreign_key.table().name(), &cols, ctx.active_connector());
+
+    // destroy this when removing dml
+    let fk_name = if foreign_key.constraint_name() == Some(default_constraint_name.as_str()) {
+        None
+    } else {
+        foreign_key.constraint_name().map(String::from)
+    };
+
     let relation_info = RelationInfo {
         name: calculate_relation_name(foreign_key, m2m_table_names, duplicated_foreign_keys),
-        fk_name: foreign_key.constraint_name().map(String::from),
+        fk_name,
         fields: foreign_key.constrained_columns().map(|c| c.name().to_owned()).collect(),
         referenced_model: foreign_key.referenced_table().name().to_owned(),
         references: foreign_key.referenced_columns().map(|c| c.name().to_owned()).collect(),
-        on_delete: Some(map_action(foreign_key.on_delete_action())),
-        on_update: Some(map_action(foreign_key.on_update_action())),
+        on_delete: None,
+        on_update: None,
     };
 
     let arity = match foreign_key.constrained_columns().any(|c| !c.arity().is_required()) {
@@ -264,12 +305,27 @@ pub(crate) fn calculate_relation_field(
         false => arity,
     };
 
-    RelationField::new(
+    let mut rf = RelationField::new(
         foreign_key.referenced_table().name(),
         arity,
         calculated_arity,
         relation_info,
-    )
+    );
+
+    rf.supports_restrict_action(!ctx.sql_family().is_mssql());
+
+    let on_delete = map_action(foreign_key.on_delete_action());
+    let on_update = map_action(foreign_key.on_update_action());
+
+    if rf.default_on_delete_action() != dbg!(on_delete) {
+        rf.relation_info.on_delete = Some(on_delete);
+    }
+
+    if rf.default_on_update_action() != on_update {
+        rf.relation_info.on_update = Some(on_update);
+    }
+
+    rf
 }
 
 pub(crate) fn calculate_backrelation_field(
@@ -387,15 +443,36 @@ pub(crate) fn calculate_scalar_field_type_with_native_types(column: sql::ColumnW
     match scalar_type {
         FieldType::Scalar(scal_type, _) => match &column.column_type().native_type {
             None => scalar_type,
-            Some(native_type) => FieldType::Scalar(
-                scal_type,
-                Some(psl::dml::NativeTypeInstance::new(
-                    native_type.clone(),
-                    ctx.active_connector(),
-                )),
-            ),
+            Some(native_type) => {
+                let is_default = ctx.active_connector().native_type_is_default_for_scalar_type(
+                    native_type,
+                    &dml_scalar_type_to_parser_database_scalar_type(scal_type),
+                );
+
+                if is_default {
+                    FieldType::Scalar(scal_type, None)
+                } else {
+                    let instance = psl::dml::NativeTypeInstance::new(native_type.clone(), ctx.active_connector());
+
+                    FieldType::Scalar(scal_type, Some(instance))
+                }
+            }
         },
         field_type => field_type,
+    }
+}
+
+fn dml_scalar_type_to_parser_database_scalar_type(st: ScalarType) -> db::ScalarType {
+    match st {
+        ScalarType::Int => db::ScalarType::Int,
+        ScalarType::BigInt => db::ScalarType::BigInt,
+        ScalarType::Float => db::ScalarType::Float,
+        ScalarType::Boolean => db::ScalarType::Boolean,
+        ScalarType::String => db::ScalarType::String,
+        ScalarType::DateTime => db::ScalarType::DateTime,
+        ScalarType::Json => db::ScalarType::Json,
+        ScalarType::Bytes => db::ScalarType::Bytes,
+        ScalarType::Decimal => db::ScalarType::Decimal,
     }
 }
 
@@ -455,14 +532,14 @@ fn index_algorithm(index: sql::walkers::IndexWalker<'_>, ctx: &Context) -> Optio
 
     let data: &PostgresSchemaExt = index.schema.downcast_connector_data();
 
-    Some(match data.index_algorithm(index.id) {
-        sql::postgres::SqlIndexAlgorithm::BTree => IndexAlgorithm::BTree,
-        sql::postgres::SqlIndexAlgorithm::Hash => IndexAlgorithm::Hash,
-        sql::postgres::SqlIndexAlgorithm::Gist => IndexAlgorithm::Gist,
-        sql::postgres::SqlIndexAlgorithm::Gin => IndexAlgorithm::Gin,
-        sql::postgres::SqlIndexAlgorithm::SpGist => IndexAlgorithm::SpGist,
-        sql::postgres::SqlIndexAlgorithm::Brin => IndexAlgorithm::Brin,
-    })
+    match data.index_algorithm(index.id) {
+        sql::postgres::SqlIndexAlgorithm::BTree => None,
+        sql::postgres::SqlIndexAlgorithm::Hash => Some(IndexAlgorithm::Hash),
+        sql::postgres::SqlIndexAlgorithm::Gist => Some(IndexAlgorithm::Gist),
+        sql::postgres::SqlIndexAlgorithm::Gin => Some(IndexAlgorithm::Gin),
+        sql::postgres::SqlIndexAlgorithm::SpGist => Some(IndexAlgorithm::SpGist),
+        sql::postgres::SqlIndexAlgorithm::Brin => Some(IndexAlgorithm::Brin),
+    }
 }
 
 fn index_is_clustered(index_id: sql::IndexId, schema: &SqlSchema, ctx: &Context) -> Option<bool> {
@@ -471,8 +548,13 @@ fn index_is_clustered(index_id: sql::IndexId, schema: &SqlSchema, ctx: &Context)
     }
 
     let ext: &MssqlSchemaExt = schema.downcast_connector_data();
+    let clustered = ext.index_is_clustered(index_id);
 
-    Some(ext.index_is_clustered(index_id))
+    if !clustered {
+        return None;
+    }
+
+    Some(clustered)
 }
 
 pub(crate) fn primary_key_is_clustered(pkid: sql::IndexId, ctx: &Context) -> Option<bool> {
@@ -482,7 +564,13 @@ pub(crate) fn primary_key_is_clustered(pkid: sql::IndexId, ctx: &Context) -> Opt
 
     let ext: &MssqlSchemaExt = ctx.schema.downcast_connector_data();
 
-    Some(ext.index_is_clustered(pkid))
+    let clustered = ext.index_is_clustered(pkid);
+
+    if clustered {
+        return None;
+    }
+
+    Some(clustered)
 }
 
 fn get_opclass(index_field_id: sql::IndexColumnId, schema: &SqlSchema, ctx: &Context) -> Option<OperatorClass> {

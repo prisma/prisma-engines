@@ -1,11 +1,13 @@
-use std::{borrow::Cow, fmt};
+use std::{borrow::Cow, collections::HashMap, fmt};
+
+use psl::{dml, RelationNames};
 
 use crate::{
     datamodel::{attributes::FieldAttribute, DefaultValue, FieldType},
-    value::{Constant, ConstantNameValidationError, Documentation, Function},
+    value::{Constant, ConstantNameValidationError, Documentation, Function, Text},
 };
 
-use super::{index_field_input::IndexFieldOptions, Relation};
+use super::{index_field_input::IndexFieldOptions, IdFieldDefinition, Relation};
 
 /// A field in a model block.
 #[derive(Debug)]
@@ -16,7 +18,7 @@ pub struct ModelField<'a> {
     documentation: Option<Documentation<'a>>,
     updated_at: Option<FieldAttribute<'a>>,
     unique: Option<FieldAttribute<'a>>,
-    id: Option<FieldAttribute<'a>>,
+    id: Option<IdFieldDefinition<'a>>,
     default: Option<DefaultValue<'a>>,
     map: Option<FieldAttribute<'a>>,
     relation: Option<Relation<'a>>,
@@ -64,7 +66,7 @@ impl<'a> ModelField<'a> {
         Self::new(name, FieldType::array(type_name))
     }
 
-    /// Create a new unsupported model field declaration.
+    /// Create a new required unsupported model field declaration.
     ///
     /// ```ignore
     /// model Address {
@@ -73,8 +75,34 @@ impl<'a> ModelField<'a> {
     /// //^^^^^^ name
     /// }
     /// ```
-    pub fn new_unsupported(name: &'a str, type_name: &'a str) -> Self {
-        Self::new(name, FieldType::unsupported(type_name))
+    pub fn new_required_unsupported(name: &'a str, type_name: &'a str) -> Self {
+        Self::new(name, FieldType::required_unsupported(type_name))
+    }
+
+    /// Create a new optional unsupported model field declaration.
+    ///
+    /// ```ignore
+    /// model Address {
+    ///   street Unsupported("foo")?
+    /// //                    ^^^ type_name
+    /// //^^^^^^ name
+    /// }
+    /// ```
+    pub fn new_optional_unsupported(name: &'a str, type_name: &'a str) -> Self {
+        Self::new(name, FieldType::optional_unsupported(type_name))
+    }
+
+    /// Create a new array unsupported model field declaration.
+    ///
+    /// ```ignore
+    /// model Address {
+    ///   street Unsupported("foo")[]
+    /// //                    ^^^ type_name
+    /// //^^^^^^ name
+    /// }
+    /// ```
+    pub fn new_array_unsupported(name: &'a str, type_name: &'a str) -> Self {
+        Self::new(name, FieldType::array_unsupported(type_name))
     }
 
     /// Sets the field map attribute.
@@ -163,6 +191,10 @@ impl<'a> ModelField<'a> {
     pub fn unique(&mut self, options: IndexFieldOptions<'a>) {
         let mut fun = Function::new("unique");
 
+        if let Some(map) = options.map {
+            fun.push_param(("map", Text(map)));
+        }
+
         if let Some(sort_order) = options.sort_order {
             fun.push_param(("sort", Constant::new_no_validate(sort_order)));
         }
@@ -186,22 +218,8 @@ impl<'a> ModelField<'a> {
     /// //              ^^^ this
     /// }
     /// ```
-    pub fn id(&mut self, options: IndexFieldOptions<'a>) {
-        let mut fun = Function::new("id");
-
-        if let Some(sort_order) = options.sort_order {
-            fun.push_param(("sort", Constant::new_no_validate(sort_order)));
-        }
-
-        if let Some(length) = options.length {
-            fun.push_param(("length", Constant::new_no_validate(length)));
-        }
-
-        if let Some(clustered) = options.clustered {
-            fun.push_param(("clustered", Constant::new_no_validate(clustered)));
-        }
-
-        self.unique = Some(FieldAttribute::new(fun));
+    pub fn id(&mut self, definition: IdFieldDefinition<'a>) {
+        self.id = Some(definition);
     }
 
     /// Set the field to be a relation.
@@ -270,6 +288,176 @@ impl<'a> ModelField<'a> {
             relation: None,
             native_type: None,
             ignore: None,
+        }
+    }
+
+    /// Generate a model field rendering from the deprecated DML structure.
+    ///
+    /// Remove when destroying the DML. This API cannot really be
+    /// public, because we need info from the model and it doesn't
+    /// make much sense to call this from outside of the module.
+    pub(super) fn from_dml(
+        datasource: &'a psl::Datasource,
+        dml_model: &dml::Model,
+        dml_field: &'a dml::Field,
+        uniques: &HashMap<&'a str, IndexFieldOptions<'a>>,
+        id: Option<IdFieldDefinition<'a>>,
+    ) -> Self {
+        match dml_field {
+            dml::Field::ScalarField(ref sf) => {
+                let (r#type, native_type) = match sf.field_type {
+                    dml::FieldType::Enum(ref ct) => (ct.as_str(), None),
+                    dml::FieldType::Relation(ref info) => (info.referenced_model.as_str(), None),
+                    dml::FieldType::Unsupported(ref s) => (s.as_str(), None),
+                    dml::FieldType::Scalar(ref st, ref nt) => {
+                        (st.as_ref(), nt.as_ref().map(|nt| (nt.name(), nt.args())))
+                    }
+                    dml::FieldType::CompositeType(ref ct) => (ct.as_str(), None),
+                };
+
+                let mut field = match sf.arity {
+                    dml::FieldArity::Required if sf.field_type.is_unsupported() => {
+                        Self::new_required_unsupported(&sf.name, r#type)
+                    }
+                    dml::FieldArity::Optional if sf.field_type.is_unsupported() => {
+                        Self::new_optional_unsupported(&sf.name, r#type)
+                    }
+                    dml::FieldArity::List if sf.field_type.is_unsupported() => {
+                        Self::new_array_unsupported(&sf.name, r#type)
+                    }
+                    dml::FieldArity::Required => Self::new_required(&sf.name, r#type),
+                    dml::FieldArity::Optional => Self::new_optional(&sf.name, r#type),
+                    dml::FieldArity::List => Self::new_array(&sf.name, r#type),
+                };
+
+                if let Some(ref docs) = sf.documentation {
+                    field.documentation(docs);
+                }
+
+                if let Some(dv) = sf.default_value() {
+                    field.default(DefaultValue::from_dml(dv));
+                }
+
+                if let Some((name, args)) = native_type {
+                    field.native_type(&datasource.name, name, args);
+                }
+
+                if sf.is_updated_at {
+                    field.updated_at();
+                }
+
+                if let Some(unique) = uniques.get(sf.name.as_str()) {
+                    field.unique(*unique);
+                }
+
+                if sf.is_ignored {
+                    field.ignore();
+                }
+
+                if sf.is_commented_out {
+                    field.commented_out();
+                }
+
+                if let Some(ref map) = sf.database_name {
+                    field.map(map);
+                }
+
+                if let Some(id) = id {
+                    field.id(id);
+                }
+
+                field
+            }
+            dml::Field::RelationField(rf) => {
+                let mut field = match rf.arity {
+                    dml::FieldArity::Required => Self::new_required(&rf.name, &rf.relation_info.referenced_model),
+                    dml::FieldArity::Optional => Self::new_optional(&rf.name, &rf.relation_info.referenced_model),
+                    dml::FieldArity::List => Self::new_array(&rf.name, &rf.relation_info.referenced_model),
+                };
+
+                if let Some(ref docs) = rf.documentation {
+                    field.documentation(docs);
+                }
+
+                if rf.is_commented_out {
+                    field.commented_out();
+                }
+
+                if rf.is_ignored {
+                    field.ignore();
+                }
+
+                let dml_info = &rf.relation_info;
+
+                let default_name =
+                    RelationNames::name_for_unambiguous_relation(&dml_info.referenced_model, &dml_model.name);
+
+                let is_self_relation = dml_model.name == dml_info.referenced_model;
+
+                // :( :(
+                let relation_name = if dml_info.name != default_name || is_self_relation {
+                    dml_info.name.as_str()
+                } else {
+                    ""
+                };
+
+                // :(
+                if !relation_name.is_empty() || (!dml_info.fields.is_empty() || !dml_info.references.is_empty()) {
+                    let mut relation = Relation::new();
+
+                    if !relation_name.is_empty() {
+                        relation.name(relation_name);
+                    }
+
+                    relation.fields(dml_info.fields.iter().map(AsRef::as_ref));
+                    relation.references(dml_info.references.iter().map(AsRef::as_ref));
+
+                    if let Some(ref action) = dml_info.on_delete {
+                        relation.on_delete(action.as_ref());
+                    }
+
+                    if let Some(ref action) = dml_info.on_update {
+                        relation.on_update(action.as_ref());
+                    }
+
+                    if let Some(ref map) = &dml_info.fk_name {
+                        relation.map(map);
+                    }
+
+                    field.relation(relation);
+                }
+
+                field
+            }
+            dml::Field::CompositeField(cf) => {
+                let mut field = match cf.arity {
+                    dml::FieldArity::Required => Self::new_required(&cf.name, &cf.composite_type),
+                    dml::FieldArity::Optional => Self::new_optional(&cf.name, &cf.composite_type),
+                    dml::FieldArity::List => Self::new_array(&cf.name, &cf.composite_type),
+                };
+
+                if let Some(ref docs) = cf.documentation {
+                    field.documentation(docs);
+                }
+
+                if let Some(ref map) = cf.database_name {
+                    field.map(map);
+                }
+
+                if cf.is_commented_out {
+                    field.commented_out();
+                }
+
+                if cf.is_ignored {
+                    field.ignore();
+                }
+
+                if let Some(ref dv) = cf.default_value {
+                    field.default(DefaultValue::from_dml(dv));
+                }
+
+                field
+            }
         }
     }
 }

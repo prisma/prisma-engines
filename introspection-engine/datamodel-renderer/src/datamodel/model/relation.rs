@@ -92,7 +92,9 @@ impl<'a> Relation<'a> {
             .map(Value::Constant)
             .collect();
 
-        self.0.push_param((param_name, Array::from(fields)));
+        if !fields.is_empty() {
+            self.0.push_param((param_name, Array::from(fields)));
+        }
     }
 }
 

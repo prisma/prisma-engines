@@ -19,7 +19,11 @@ impl<'a> DefaultValue<'a> {
     ///                         ^^^^ this
     /// }
     /// ```
-    pub fn function(function: Function<'a>) -> Self {
+    pub fn function(mut function: Function<'a>) -> Self {
+        // Our specialty in default values, empty function params lead to
+        // parentheses getting rendered unlike elsewhere.
+        function.render_empty_parentheses();
+
         let mut inner = Function::new("default");
         inner.push_param(Value::from(function));
 
@@ -116,7 +120,9 @@ impl<'a> DefaultValue<'a> {
             dml::DefaultKind::Single(dml::PrismaValue::Enum(val)) => Self::constant(val.as_str()),
             dml::DefaultKind::Single(dml::PrismaValue::Int(val)) => Self::constant(val),
             dml::DefaultKind::Single(dml::PrismaValue::Uuid(val)) => Self::constant(val.as_hyphenated()),
-            dml::DefaultKind::Single(dml::PrismaValue::List(ref vals)) => Self::array(vals.iter().collect()),
+            dml::DefaultKind::Single(dml::PrismaValue::List(ref vals)) => {
+                Self::array(vals.iter().map(Value::from).collect())
+            }
             dml::DefaultKind::Single(dml::PrismaValue::Json(ref val)) => Self::text(val),
             dml::DefaultKind::Single(dml::PrismaValue::Xml(ref val)) => Self::text(val),
             dml::DefaultKind::Single(dml::PrismaValue::Float(ref val)) => Self::constant(val),
@@ -136,7 +142,7 @@ impl<'a> DefaultValue<'a> {
                     }
                 }
 
-                Self::new(fun)
+                Self::function(fun)
             }
         };
 

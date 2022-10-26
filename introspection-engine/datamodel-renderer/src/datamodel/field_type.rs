@@ -8,7 +8,9 @@ enum FieldKind<'a> {
     Required(Constant<Cow<'a, str>>),
     Optional(Constant<Cow<'a, str>>),
     Array(Constant<Cow<'a, str>>),
-    Unsupported(Text<&'a str>),
+    RequiredUnsupported(Text<&'a str>),
+    OptionalUnsupported(Text<&'a str>),
+    ArrayUnsupported(Text<&'a str>),
 }
 
 /// A type of a field in the datamodel.
@@ -66,11 +68,27 @@ impl<'a> FieldType<'a> {
         }
     }
 
-    /// The field is not supported by Prisma, rendered as
-    /// `Unsupported(ts_vector)`.
-    pub fn unsupported(name: &'a str) -> Self {
+    /// The field is required, but not supported by Prisma, rendered
+    /// as `Unsupported(ts_vector)`.
+    pub fn required_unsupported(name: &'a str) -> Self {
         Self {
-            inner: FieldKind::Unsupported(Text(name)),
+            inner: FieldKind::RequiredUnsupported(Text(name)),
+        }
+    }
+
+    /// The field is optional, but not supported by Prisma, rendered
+    /// as `Unsupported(ts_vector)?`.
+    pub fn optional_unsupported(name: &'a str) -> Self {
+        Self {
+            inner: FieldKind::OptionalUnsupported(Text(name)),
+        }
+    }
+
+    /// The field is optional, but not supported by Prisma, rendered
+    /// as `Unsupported(ts_vector)?`.
+    pub fn array_unsupported(name: &'a str) -> Self {
+        Self {
+            inner: FieldKind::ArrayUnsupported(Text(name)),
         }
     }
 }
@@ -87,10 +105,20 @@ impl<'a> fmt::Display for FieldType<'a> {
                 t.fmt(f)?;
                 f.write_str("[]")
             }
-            FieldKind::Unsupported(ref t) => {
+            FieldKind::RequiredUnsupported(ref t) => {
                 f.write_str("Unsupported(")?;
                 t.fmt(f)?;
                 f.write_str(")")
+            }
+            FieldKind::OptionalUnsupported(ref t) => {
+                f.write_str("Unsupported(")?;
+                t.fmt(f)?;
+                f.write_str(")?")
+            }
+            FieldKind::ArrayUnsupported(ref t) => {
+                f.write_str("Unsupported(")?;
+                t.fmt(f)?;
+                f.write_str(")[]")
             }
         }
     }

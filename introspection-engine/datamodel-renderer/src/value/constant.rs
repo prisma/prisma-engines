@@ -8,6 +8,26 @@ use regex::Regex;
 #[derive(Debug)]
 pub struct Constant<T: fmt::Display>(T);
 
+impl<'a> Clone for Constant<&'a str> {
+    fn clone(&self) -> Self {
+        Constant(self.0)
+    }
+}
+
+impl<'a> Copy for Constant<&'a str> {}
+
+impl<'a> AsRef<str> for Constant<&'a str> {
+    fn as_ref(&self) -> &str {
+        self.0
+    }
+}
+
+impl<'a> AsRef<str> for Constant<Cow<'a, str>> {
+    fn as_ref(&self) -> &str {
+        self.0.as_ref()
+    }
+}
+
 /// Thrown if a constant cannot be cleanly created with the given
 /// input value.
 #[derive(Debug)]
@@ -31,6 +51,10 @@ impl<'a, T: fmt::Display + 'a> Constant<T> {
 
     pub(crate) fn boxed(self) -> Constant<Box<dyn fmt::Display + 'a>> {
         Constant(Box::new(self.0) as Box<dyn fmt::Display + 'a>)
+    }
+
+    pub(crate) fn into_inner(self) -> T {
+        self.0
     }
 }
 

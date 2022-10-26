@@ -13,13 +13,17 @@ pub use composite_type::{CompositeType, CompositeTypeField};
 pub use default::DefaultValue;
 pub use enumerator::{Enum, EnumVariant};
 pub use field_type::FieldType;
-pub use model::{IdDefinition, IndexDefinition, IndexFieldInput, IndexFieldOptions, Model, ModelField, Relation};
+pub use model::{
+    IdDefinition, IdFieldDefinition, IndexDefinition, IndexFieldInput, IndexFieldOptions, IndexOps, Model, ModelField,
+    Relation,
+};
 use psl::dml;
 use std::fmt;
 
 /// The PSL data model declaration.
 #[derive(Default, Debug)]
 pub struct Datamodel<'a> {
+    models: Vec<Model<'a>>,
     enums: Vec<Enum<'a>>,
     composite_types: Vec<CompositeType<'a>>,
 }
@@ -28,6 +32,17 @@ impl<'a> Datamodel<'a> {
     /// Create a new empty data model.
     pub fn new() -> Self {
         Self::default()
+    }
+
+    /// Add a model block to the data model.
+    ///
+    /// ```ignore
+    /// model Foo {  // <
+    ///   id Int @id // < this
+    /// }            // <
+    /// ```
+    pub fn push_model(&mut self, model: Model<'a>) {
+        self.models.push(model);
     }
 
     /// Add an enum block to the data model.
@@ -48,8 +63,8 @@ impl<'a> Datamodel<'a> {
     ///   street String // < this
     /// }               // <
     /// ```
-    pub fn push_composite_type(&mut self, r#enum: CompositeType<'a>) {
-        self.composite_types.push(r#enum);
+    pub fn push_composite_type(&mut self, composite_type: CompositeType<'a>) {
+        self.composite_types.push(composite_type);
     }
 
     /// A throwaway function to help generate a rendering from the DML structures.
@@ -58,8 +73,12 @@ impl<'a> Datamodel<'a> {
     pub fn from_dml(datasource: &'a psl::Datasource, dml_data_model: &'a dml::Datamodel) -> Datamodel<'a> {
         let mut data_model = Self::new();
 
+        for dml_model in dml_data_model.models() {
+            data_model.push_model(Model::from_dml(datasource, dml_model));
+        }
+
         for dml_ct in dml_data_model.composite_types() {
-            data_model.push_composite_type(CompositeType::from_dml(datasource, dml_ct))
+            data_model.push_composite_type(CompositeType::from_dml(datasource, dml_ct));
         }
 
         for dml_enum in dml_data_model.enums() {
@@ -76,6 +95,10 @@ impl<'a> fmt::Display for Datamodel<'a> {
             writeln!(f, "{ct}")?;
         }
 
+        for model in self.models.iter() {
+            writeln!(f, "{model}")?;
+        }
+
         for r#enum in self.enums.iter() {
             writeln!(f, "{enum}")?;
         }
@@ -86,11 +109,32 @@ impl<'a> fmt::Display for Datamodel<'a> {
 
 #[cfg(test)]
 mod tests {
+    use crate::value::Function;
+
     use super::*;
     use expect_test::expect;
 
     #[test]
     fn simple_data_model() {
+        let mut data_model = Datamodel::new();
+
+        let mut composite = CompositeType::new("Address");
+        let field = CompositeTypeField::new_required("street", "String");
+        composite.push_field(field);
+
+        data_model.push_composite_type(composite);
+
+        let mut model = Model::new("User");
+
+        let mut field = ModelField::new_required("id", "Int");
+        field.id(IdFieldDefinition::default());
+
+        let dv = DefaultValue::function(Function::new("autoincrement"));
+        field.default(dv);
+
+        model.push_field(field);
+        data_model.push_model(model);
+
         let mut traffic_light = Enum::new("TrafficLight");
 
         traffic_light.push_variant("Red");
@@ -101,11 +145,18 @@ mod tests {
         cat.push_variant("Asleep");
         cat.push_variant("Hungry");
 
-        let mut data_model = Datamodel::new();
         data_model.push_enum(traffic_light);
         data_model.push_enum(cat);
 
         let expected = expect![[r#"
+            type Address {
+              street String
+            }
+
+            model User {
+              id Int @id @default(autoincrement())
+            }
+
             enum TrafficLight {
               Red
               Yellow

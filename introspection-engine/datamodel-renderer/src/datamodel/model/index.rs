@@ -64,3 +64,33 @@ impl<'a> fmt::Display for IndexDefinition<'a> {
         self.0.fmt(f)
     }
 }
+
+/// Index type definition.
+#[derive(Debug, Clone, Copy)]
+pub enum IndexOps<'a> {
+    /// Managed and known by Prisma. Renders as-is as a constant.
+    ///
+    /// ```ignore
+    /// @@index([field(ops: Int2BloomOps)], type: Brin)
+    /// //                  ^^^^^^^^^^^^ like this
+    /// ```
+    Managed(&'a str),
+    /// A type we don't handle yet. Renders as raw.
+    ///
+    /// ```ignore
+    /// @@index([field(ops: raw("tsvector_ops"))], type: Gist)
+    /// //                  ^^^^^^^^^^^^^^^^^^^ like this
+    /// ```
+    Raw(Text<&'a str>),
+}
+
+impl<'a> fmt::Display for IndexOps<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Managed(s) => f.write_str(s),
+            Self::Raw(s) => {
+                write!(f, "raw({s})")
+            }
+        }
+    }
+}

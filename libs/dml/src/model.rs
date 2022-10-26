@@ -46,16 +46,22 @@ impl Default for IndexAlgorithm {
     }
 }
 
+impl AsRef<str> for IndexAlgorithm {
+    fn as_ref(&self) -> &str {
+        match self {
+            IndexAlgorithm::BTree => "BTree",
+            IndexAlgorithm::Hash => "Hash",
+            IndexAlgorithm::Gist => "Gist",
+            IndexAlgorithm::Gin => "Gin",
+            IndexAlgorithm::SpGist => "SpGist",
+            IndexAlgorithm::Brin => "Brin",
+        }
+    }
+}
+
 impl fmt::Display for IndexAlgorithm {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            IndexAlgorithm::BTree => f.write_str("BTree"),
-            IndexAlgorithm::Hash => f.write_str("Hash"),
-            IndexAlgorithm::Gist => f.write_str("Gist"),
-            IndexAlgorithm::Gin => f.write_str("Gin"),
-            IndexAlgorithm::SpGist => f.write_str("SpGist"),
-            IndexAlgorithm::Brin => f.write_str("Brin"),
-        }
+        f.write_str(self.as_ref())
     }
 }
 
@@ -150,67 +156,73 @@ pub enum OperatorClass {
     Raw(Cow<'static, str>),
 }
 
+impl AsRef<str> for OperatorClass {
+    fn as_ref(&self) -> &str {
+        match self {
+            Self::InetOps => "InetOps",
+            Self::JsonbOps => "JsonbOps",
+            Self::JsonbPathOps => "JsonbPathOps",
+            Self::ArrayOps => "ArrayOps",
+            Self::TextOps => "TextOps",
+            Self::BitMinMaxOps => "BitMinMaxOps",
+            Self::VarBitMinMaxOps => "VarBitMinMaxOps",
+            Self::BpcharBloomOps => "BpcharBloomOps",
+            Self::BpcharMinMaxOps => "BpcharMinMaxOps",
+            Self::ByteaBloomOps => "ByteaBloomOps",
+            Self::ByteaMinMaxOps => "ByteaMinMaxOps",
+            Self::DateBloomOps => "DateBloomOps",
+            Self::DateMinMaxOps => "DateMinMaxOps",
+            Self::DateMinMaxMultiOps => "DateMinMaxMultiOps",
+            Self::Float4BloomOps => "Float4BloomOps",
+            Self::Float4MinMaxOps => "Float4MinMaxOps",
+            Self::Float4MinMaxMultiOps => "Float4MinMaxMultiOps",
+            Self::Float8BloomOps => "Float8BloomOps",
+            Self::Float8MinMaxOps => "Float8MinMaxOps",
+            Self::Float8MinMaxMultiOps => "Float8MinMaxMultiOps",
+            Self::InetInclusionOps => "InetInclusionOps",
+            Self::InetBloomOps => "InetBloomOps",
+            Self::InetMinMaxOps => "InetMinMaxOps",
+            Self::InetMinMaxMultiOps => "InetMinMaxMultiOps",
+            Self::Int2BloomOps => "Int2BloomOps",
+            Self::Int2MinMaxOps => "Int2MinMaxOps",
+            Self::Int2MinMaxMultiOps => "Int2MinMaxMultiOps",
+            Self::Int4BloomOps => "Int4BloomOps",
+            Self::Int4MinMaxOps => "Int4MinMaxOps",
+            Self::Int4MinMaxMultiOps => "Int4MinMaxMultiOps",
+            Self::Int8BloomOps => "Int8BloomOps",
+            Self::Int8MinMaxOps => "Int8MinMaxOps",
+            Self::Int8MinMaxMultiOps => "Int8MinMaxMultiOps",
+            Self::NumericBloomOps => "NumericBloomOps",
+            Self::NumericMinMaxOps => "NumericMinMaxOps",
+            Self::NumericMinMaxMultiOps => "NumericMinMaxMultiOps",
+            Self::OidBloomOps => "OidBloomOps",
+            Self::OidMinMaxOps => "OidMinMaxOps",
+            Self::OidMinMaxMultiOps => "OidMinMaxMultiOps",
+            Self::TextBloomOps => "TextBloomOps",
+            Self::TextMinMaxOps => "TextMinMaxOps",
+            Self::TimestampBloomOps => "TimestampBloomOps",
+            Self::TimestampMinMaxOps => "TimestampMinMaxOps",
+            Self::TimestampMinMaxMultiOps => "TimestampMinMaxMultiOps",
+            Self::TimestampTzBloomOps => "TimestampTzBloomOps",
+            Self::TimestampTzMinMaxOps => "TimestampTzMinMaxOps",
+            Self::TimestampTzMinMaxMultiOps => "TimestampTzMinMaxMultiOps",
+            Self::TimeBloomOps => "TimeBloomOps",
+            Self::TimeMinMaxOps => "TimeMinMaxOps",
+            Self::TimeMinMaxMultiOps => "TimeMinMaxMultiOps",
+            Self::TimeTzBloomOps => "TimeTzBloomOps",
+            Self::TimeTzMinMaxOps => "TimeTzMinMaxOps",
+            Self::TimeTzMinMaxMultiOps => "TimeTzMinMaxMultiOps",
+            Self::UuidBloomOps => "UuidBloomOps",
+            Self::UuidMinMaxOps => "UuidMinMaxOps",
+            Self::UuidMinMaxMultiOps => "UuidMinMaxOps",
+            Self::Raw(s) => s.as_ref(),
+        }
+    }
+}
+
 impl fmt::Display for OperatorClass {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::InetOps => f.write_str("InetOps"),
-            Self::JsonbOps => f.write_str("JsonbOps"),
-            Self::JsonbPathOps => f.write_str("JsonbPathOps"),
-            Self::ArrayOps => f.write_str("ArrayOps"),
-            Self::TextOps => f.write_str("TextOps"),
-            Self::BitMinMaxOps => f.write_str("BitMinMaxOps"),
-            Self::VarBitMinMaxOps => f.write_str("VarBitMinMaxOps"),
-            Self::BpcharBloomOps => f.write_str("BpcharBloomOps"),
-            Self::BpcharMinMaxOps => f.write_str("BpcharMinMaxOps"),
-            Self::ByteaBloomOps => f.write_str("ByteaBloomOps"),
-            Self::ByteaMinMaxOps => f.write_str("ByteaMinMaxOps"),
-            Self::DateBloomOps => f.write_str("DateBloomOps"),
-            Self::DateMinMaxOps => f.write_str("DateMinMaxOps"),
-            Self::DateMinMaxMultiOps => f.write_str("DateMinMaxMultiOps"),
-            Self::Float4BloomOps => f.write_str("Float4BloomOps"),
-            Self::Float4MinMaxOps => f.write_str("Float4MinMaxOps"),
-            Self::Float4MinMaxMultiOps => f.write_str("Float4MinMaxMultiOps"),
-            Self::Float8BloomOps => f.write_str("Float8BloomOps"),
-            Self::Float8MinMaxOps => f.write_str("Float8MinMaxOps"),
-            Self::Float8MinMaxMultiOps => f.write_str("Float8MinMaxMultiOps"),
-            Self::InetInclusionOps => f.write_str("InetInclusionOps"),
-            Self::InetBloomOps => f.write_str("InetBloomOps"),
-            Self::InetMinMaxOps => f.write_str("InetMinMaxOps"),
-            Self::InetMinMaxMultiOps => f.write_str("InetMinMaxMultiOps"),
-            Self::Int2BloomOps => f.write_str("Int2BloomOps"),
-            Self::Int2MinMaxOps => f.write_str("Int2MinMaxOps"),
-            Self::Int2MinMaxMultiOps => f.write_str("Int2MinMaxMultiOps"),
-            Self::Int4BloomOps => f.write_str("Int4BloomOps"),
-            Self::Int4MinMaxOps => f.write_str("Int4MinMaxOps"),
-            Self::Int4MinMaxMultiOps => f.write_str("Int4MinMaxMultiOps"),
-            Self::Int8BloomOps => f.write_str("Int8BloomOps"),
-            Self::Int8MinMaxOps => f.write_str("Int8MinMaxOps"),
-            Self::Int8MinMaxMultiOps => f.write_str("Int8MinMaxMultiOps"),
-            Self::NumericBloomOps => f.write_str("NumericBloomOps"),
-            Self::NumericMinMaxOps => f.write_str("NumericMinMaxOps"),
-            Self::NumericMinMaxMultiOps => f.write_str("NumericMinMaxMultiOps"),
-            Self::OidBloomOps => f.write_str("OidBloomOps"),
-            Self::OidMinMaxOps => f.write_str("OidMinMaxOps"),
-            Self::OidMinMaxMultiOps => f.write_str("OidMinMaxMultiOps"),
-            Self::TextBloomOps => f.write_str("TextBloomOps"),
-            Self::TextMinMaxOps => f.write_str("TextMinMaxOps"),
-            Self::TimestampBloomOps => f.write_str("TimestampBloomOps"),
-            Self::TimestampMinMaxOps => f.write_str("TimestampMinMaxOps"),
-            Self::TimestampMinMaxMultiOps => f.write_str("TimestampMinMaxMultiOps"),
-            Self::TimestampTzBloomOps => f.write_str("TimestampTzBloomOps"),
-            Self::TimestampTzMinMaxOps => f.write_str("TimestampTzMinMaxOps"),
-            Self::TimestampTzMinMaxMultiOps => f.write_str("TimestampTzMinMaxMultiOps"),
-            Self::TimeBloomOps => f.write_str("TimeBloomOps"),
-            Self::TimeMinMaxOps => f.write_str("TimeMinMaxOps"),
-            Self::TimeMinMaxMultiOps => f.write_str("TimeMinMaxMultiOps"),
-            Self::TimeTzBloomOps => f.write_str("TimeTzBloomOps"),
-            Self::TimeTzMinMaxOps => f.write_str("TimeTzMinMaxOps"),
-            Self::TimeTzMinMaxMultiOps => f.write_str("TimeTzMinMaxMultiOps"),
-            Self::UuidBloomOps => f.write_str("UuidBloomOps"),
-            Self::UuidMinMaxOps => f.write_str("UuidMinMaxOps"),
-            Self::UuidMinMaxMultiOps => f.write_str("UuidMinMaxOps"),
-            Self::Raw(s) => f.write_str(s),
-        }
+        f.write_str(self.as_ref())
     }
 }
 
@@ -261,6 +273,10 @@ impl IndexField {
             length: None,
             operator_class: None,
         }
+    }
+
+    pub fn from_field(&self) -> &str {
+        &self.path.first().unwrap().0
     }
 }
 

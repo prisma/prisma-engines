@@ -17,6 +17,8 @@ pub use text::Text;
 use base64::display::Base64Display;
 use std::fmt;
 
+use crate::datamodel::IndexOps;
+
 /// A PSL value representation.
 pub enum Value<'a> {
     /// A string value, quoted and escaped accordingly.
@@ -31,6 +33,8 @@ pub enum Value<'a> {
     Function(Function<'a>),
     /// A value can be read from the environment.
     Env(Env<'a>),
+    /// An index ops definition.
+    IndexOps(IndexOps<'a>),
 }
 
 impl<'a> fmt::Debug for Value<'a> {
@@ -44,7 +48,14 @@ impl<'a> fmt::Debug for Value<'a> {
             Value::Function(fun) => f.debug_tuple("Function").field(fun).finish(),
             Value::Env(e) => f.debug_tuple("Env").field(e).finish(),
             Value::Bytes(Text(b)) => write!(f, "Bytes({b})"),
+            Value::IndexOps(ops) => write!(f, "IndexOps({ops})"),
         }
+    }
+}
+
+impl<'a> From<IndexOps<'a>> for Value<'a> {
+    fn from(ops: IndexOps<'a>) -> Self {
+        Self::IndexOps(ops)
     }
 }
 
@@ -109,6 +120,7 @@ impl<'a> fmt::Display for Value<'a> {
             Value::Bytes(val) => {
                 write!(f, "{val}")?;
             }
+            Value::IndexOps(ops) => ops.fmt(f)?,
         }
 
         Ok(())

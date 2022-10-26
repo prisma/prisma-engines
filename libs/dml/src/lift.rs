@@ -1,7 +1,7 @@
 use crate::{self as dml, *};
 use either::Either;
 use psl_core::{
-    datamodel_connector::{walker_ext_traits::*, Connector, RelationMode},
+    datamodel_connector::{constraint_names::ConstraintNames, walker_ext_traits::*, Connector, RelationMode},
     parser_database::{
         self as db,
         ast::{self, WithDocumentation, WithName, WithSpan},
@@ -137,8 +137,28 @@ impl<'a> LiftAstToDml<'a> {
                         let mut relation_field =
                             RelationField::new(forward_field_walker.name(), arity, referential_arity, relation_info);
 
-                        relation_field.relation_info.fk_name =
-                            Some(relation.constraint_name(active_connector).into_owned());
+                        let column_names: Vec<&str> = relation
+                            .referencing_fields()
+                            .unwrap()
+                            .map(|f| f.database_name())
+                            .collect();
+
+                        let fk_name = relation.constraint_name(active_connector);
+
+                        let default_name = ConstraintNames::foreign_key_constraint_name(
+                            relation.referencing_model().database_name(),
+                            &column_names,
+                            self.connector,
+                        );
+
+                        let fk_name = if fk_name.as_ref() == default_name.as_str() {
+                            None
+                        } else {
+                            Some(relation.constraint_name(active_connector).to_string())
+                        };
+
+                        relation_field.relation_info.fk_name = fk_name;
+
                         common_dml_fields(&mut relation_field, forward_field_walker);
                         field_ids_for_sorting.insert(
                             (forward_field_walker.model().name(), forward_field_walker.name()),
