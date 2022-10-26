@@ -1,4 +1,3 @@
-use barrel::types;
 use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 
