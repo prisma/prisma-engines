@@ -5,7 +5,7 @@ use crate::{
     ParsedField, ParsedInputMap, ParsedInputValue,
 };
 use connector::IntoFilter;
-use prisma_models::{Field, ModelRef};
+use prisma_models::ModelRef;
 use schema::ConnectorContext;
 use std::sync::Arc;
 
@@ -66,9 +66,9 @@ pub fn upsert_record(
 
     if can_use_connector_native_upsert(
         &model,
-        where_argument.clone(),
-        create_argument.clone(),
-        update_argument.clone(),
+        &where_argument,
+        &create_argument,
+        &update_argument,
         connector_ctx,
     ) {
         let mut create_write_args = WriteArgsParser::from(&model, create_argument.clone())?.args;
@@ -200,52 +200,39 @@ pub fn upsert_record(
 // 4. The unique field defined in where clause has the same value as defined in the create arguments
 fn can_use_connector_native_upsert(
     model: &ModelRef,
-    where_field: ParsedInputMap,
-    create_argument: ParsedInputMap,
-    update_argument: ParsedInputMap,
+    where_field: &ParsedInputMap,
+    create_argument: &ParsedInputMap,
+    update_argument: &ParsedInputMap,
     connector_ctx: &ConnectorContext,
 ) -> bool {
     let has_nested_create = create_argument
-        .clone()
-        .into_iter()
-        .any(|(k, _)| matches!(model.fields().find_from_all(&k), Ok(Field::Relation(_))));
+        .iter()
+        .any(|(field_name, _)| model.fields().find_from_relation_fields(&field_name).is_ok());
 
     let has_nested_update = update_argument
-        .into_iter()
-        .any(|(k, _)| matches!(model.fields().find_from_all(&k), Ok(Field::Relation(_))));
+        .iter()
+        .any(|(field_name, _)| model.fields().find_from_relation_fields(&field_name).is_ok());
 
-    let uniques = where_field
-        .clone()
-        .into_iter()
+    let has_one_unique = where_field
+        .iter()
         .filter(|(field_name, input)| {
             is_unique_field(field_name, model) && where_and_create_equal(field_name, input, &create_argument)
         })
-        .count();
+        .count()
+        == 1;
 
-    let where_values_same_as_create = where_field
-        .clone()
-        .into_iter()
-        .all(|(field_name, input)| where_and_create_equal(&field_name, &input, &create_argument));
-
-    connector_ctx.can_native_upsert()
-        && uniques == 1
-        && !has_nested_create
-        && !has_nested_update
-        && where_values_same_as_create
+    connector_ctx.can_native_upsert() && has_one_unique && !has_nested_create && !has_nested_update
 }
 
 fn is_unique_field(field_name: &String, model: &ModelRef) -> bool {
     match model.fields().find_from_scalar(&field_name) {
         Ok(field) => field.unique(),
-        Err(_) => model
-            .unique_indexes()
-            .iter()
-            .any(|index| index.name == Some(field_name.to_string())),
+        Err(_) => resolve_compound_field(field_name, model).is_some(),
     }
 }
 
-/// Make sure the the unique fields defined in the where clause have the same values
-/// as in the create of the upsert
+/// Make sure the unique fields defined in the where clause have the same values
+/// as in the create of the upsert.
 fn where_and_create_equal(
     field_name: &String,
     where_input: &ParsedInputValue,
@@ -253,13 +240,13 @@ fn where_and_create_equal(
 ) -> bool {
     if let ParsedInputValue::Map(map) = where_input {
         map.iter()
-            .all(|(field_name, map_input)| where_and_create_equal_int(field_name, map_input, &create_argument))
+            .all(|(field_name, map_input)| where_and_create_equal_internal(field_name, map_input, &create_argument))
     } else {
-        where_and_create_equal_int(field_name, where_input, &create_argument)
+        where_and_create_equal_internal(field_name, where_input, &create_argument)
     }
 }
 
-fn where_and_create_equal_int(
+fn where_and_create_equal_internal(
     field_name: &String,
     where_input: &ParsedInputValue,
     create_argument: &ParsedInputMap,
