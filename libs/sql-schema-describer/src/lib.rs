@@ -253,13 +253,6 @@ impl SqlSchema {
         Some(self.walk(NamespaceId(namespace_idx as u32)))
     }
 
-    pub fn namespace_walkers(&self) -> impl Iterator<Item = NamespaceWalker<'_>> {
-        (0..self.namespaces.len()).map(move |namespace_index| NamespaceWalker {
-            schema: self,
-            id: NamespaceId(namespace_index as u32),
-        })
-    }
-
     pub fn tables_count(&self) -> usize {
         self.tables.len()
     }
@@ -295,10 +288,7 @@ impl SqlSchema {
     }
 
     pub fn enum_walkers(&self) -> impl Iterator<Item = EnumWalker<'_>> {
-        (0..self.enums.len()).map(move |enum_index| EnumWalker {
-            schema: self,
-            id: EnumId(enum_index as u32),
-        })
+        (0..self.enums.len()).map(move |enum_index| self.walk(EnumId(enum_index as u32)))
     }
 
     pub fn walk_foreign_keys(&self) -> impl Iterator<Item = ForeignKeyWalker<'_>> {

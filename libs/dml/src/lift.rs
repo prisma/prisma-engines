@@ -65,7 +65,7 @@ impl<'a> LiftAstToDml<'a> {
         }
 
         for r#enum in self.db.walk_enums() {
-            schema.add_enum(self.lift_enum(r#enum))
+            schema.enums.push(self.lift_enum(r#enum))
         }
 
         self.lift_relations(&mut schema, &mut field_ids_for_sorting);

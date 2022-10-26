@@ -110,6 +110,10 @@ impl IntrospectionContext {
         }
     }
 
+    pub fn previous_schema(&self) -> &psl::ValidatedSchema {
+        &self.previous_schema
+    }
+
     pub fn datasource(&self) -> &Datasource {
         self.previous_schema.configuration.datasources.first().unwrap()
     }
