@@ -1,5 +1,6 @@
 mod mssql;
 mod mysql;
+mod relation_mode;
 mod sqlite;
 mod vitess;
 
