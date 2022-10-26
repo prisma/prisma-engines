@@ -11,6 +11,7 @@ pub struct Datasource<'a> {
     url: Env<'a>,
     shadow_database_url: Option<Env<'a>>,
     relation_mode: Option<RelationMode>,
+    referential_integrity: Option<RelationMode>,
     custom_properties: Vec<(&'a str, Value<'a>)>,
     documentation: Option<Documentation<'a>>,
     namespaces: Array<Text<&'a str>>,
@@ -35,6 +36,7 @@ impl<'a> Datasource<'a> {
             url: url.into(),
             shadow_database_url: None,
             relation_mode: None,
+            referential_integrity: None,
             custom_properties: Default::default(),
             documentation: None,
             namespaces: Array::new(),
@@ -114,6 +116,7 @@ impl<'a> Datasource<'a> {
             url: Env::from(&psl_ds.url),
             shadow_database_url,
             relation_mode: psl_ds.relation_mode,
+            referential_integrity: psl_ds.referential_integrity,
             documentation: psl_ds.documentation.as_deref().map(Documentation),
             custom_properties: Default::default(),
             namespaces: Array::from(namespaces),
@@ -137,6 +140,8 @@ impl<'a> fmt::Display for Datasource<'a> {
 
         if let Some(relation_mode) = self.relation_mode {
             writeln!(f, "relationMode = \"{}\"", relation_mode)?;
+        } else if let Some(referential_integrity) = self.referential_integrity {
+            writeln!(f, "referentialIntegrity = \"{}\"", referential_integrity)?;
         }
 
         for (key, value) in self.custom_properties.iter() {
