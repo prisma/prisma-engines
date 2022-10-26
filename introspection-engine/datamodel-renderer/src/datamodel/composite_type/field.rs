@@ -2,7 +2,7 @@ use crate::datamodel::attributes::FieldAttribute;
 use crate::datamodel::FieldType;
 use crate::{
     datamodel::DefaultValue,
-    value::{Constant, ConstantNameValidationError, Documentation, Function, Text},
+    value::{Constant, ConstantNameValidationError, Documentation, Function},
 };
 use psl::dml;
 use std::{borrow::Cow, fmt};
@@ -30,7 +30,7 @@ impl<'a> CompositeTypeField<'a> {
     /// }
     /// ```
     pub fn new_required(name: &'a str, type_name: &'a str) -> Self {
-        Self::new(name, FieldType::Required(Constant::new_no_validate(type_name)))
+        Self::new(name, FieldType::required(type_name))
     }
 
     /// Create a new optional composite field declaration.
@@ -43,7 +43,7 @@ impl<'a> CompositeTypeField<'a> {
     /// }
     /// ```
     pub fn new_optional(name: &'a str, type_name: &'a str) -> Self {
-        Self::new(name, FieldType::Optional(Constant::new_no_validate(type_name)))
+        Self::new(name, FieldType::optional(type_name))
     }
 
     /// Create a new array composite field declaration.
@@ -56,7 +56,7 @@ impl<'a> CompositeTypeField<'a> {
     /// }
     /// ```
     pub fn new_array(name: &'a str, type_name: &'a str) -> Self {
-        Self::new(name, FieldType::Array(Constant::new_no_validate(type_name)))
+        Self::new(name, FieldType::array(type_name))
     }
 
     /// Create a new unsupported composite field declaration.
@@ -69,7 +69,7 @@ impl<'a> CompositeTypeField<'a> {
     /// }
     /// ```
     pub fn new_unsupported(name: &'a str, type_name: &'a str) -> Self {
-        Self::new(name, FieldType::Unsupported(Text(type_name)))
+        Self::new(name, FieldType::unsupported(type_name))
     }
 
     /// Sets the field map attribute.

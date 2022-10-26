@@ -1,37 +1,93 @@
 use core::fmt;
+use std::borrow::Cow;
 
 use crate::value::{Constant, Text};
 
+#[derive(Debug)]
+enum FieldKind<'a> {
+    Required(Constant<Cow<'a, str>>),
+    Optional(Constant<Cow<'a, str>>),
+    Array(Constant<Cow<'a, str>>),
+    Unsupported(Text<&'a str>),
+}
+
 /// A type of a field in the datamodel.
 #[derive(Debug)]
-pub enum FieldType<'a> {
+pub struct FieldType<'a> {
+    inner: FieldKind<'a>,
+}
+
+impl<'a> FieldType<'a> {
     /// The field is required, rendered with only the name of the
     /// type. For example: `Int`.
-    Required(Constant<&'a str>),
+    ///
+    /// The name will be sanitized, removing unsupported characters.
+    pub fn required(name: &'a str) -> Self {
+        let name = match Constant::new(name) {
+            Ok(name) => name,
+            Err(crate::value::ConstantNameValidationError::WasSanitized { sanitized }) => sanitized,
+            Err(_) => Constant::new_no_validate(Cow::Borrowed(name)),
+        };
+
+        Self {
+            inner: FieldKind::Required(name),
+        }
+    }
+
     /// The field is optional, rendered with a question mark after the
     /// type name. For example: `Int?`.
-    Optional(Constant<&'a str>),
+    ///
+    /// The name will be sanitized, removing unsupported characters.
+    pub fn optional(name: &'a str) -> Self {
+        let name = match Constant::new(name) {
+            Ok(name) => name,
+            Err(crate::value::ConstantNameValidationError::WasSanitized { sanitized }) => sanitized,
+            Err(_) => Constant::new_no_validate(Cow::Borrowed(name)),
+        };
+
+        Self {
+            inner: FieldKind::Optional(name),
+        }
+    }
+
     /// The field is an array, rendered with square brackets after the
     /// type name. For example: `Int[]`.
-    Array(Constant<&'a str>),
+    ///
+    /// The name will be sanitized, removing unsupported characters.
+    pub fn array(name: &'a str) -> Self {
+        let name = match Constant::new(name) {
+            Ok(name) => name,
+            Err(crate::value::ConstantNameValidationError::WasSanitized { sanitized }) => sanitized,
+            Err(_) => Constant::new_no_validate(Cow::Borrowed(name)),
+        };
+
+        Self {
+            inner: FieldKind::Array(name),
+        }
+    }
+
     /// The field is not supported by Prisma, rendered as
     /// `Unsupported(ts_vector)`.
-    Unsupported(Text<&'a str>),
+    pub fn unsupported(name: &'a str) -> Self {
+        Self {
+            inner: FieldKind::Unsupported(Text(name)),
+        }
+    }
 }
 
 impl<'a> fmt::Display for FieldType<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Required(ref t) => t.fmt(f),
-            Self::Optional(ref t) => {
+        match self.inner {
+            FieldKind::Required(ref t) => t.fmt(f),
+            FieldKind::Optional(ref t) => {
                 t.fmt(f)?;
                 f.write_str("?")
             }
-            Self::Array(ref t) => {
+            FieldKind::Array(ref t) => {
                 t.fmt(f)?;
                 f.write_str("[]")
             }
-            Self::Unsupported(ref t) => {
+            FieldKind::Unsupported(ref t) => {
                 f.write_str("Unsupported(")?;
                 t.fmt(f)?;
                 f.write_str(")")

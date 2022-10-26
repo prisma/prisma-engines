@@ -235,6 +235,8 @@ impl<'a> fmt::Display for Model<'a> {
 
 #[cfg(test)]
 mod tests {
+    use std::ops::Deref;
+
     use crate::{datamodel::*, value::Function};
     use expect_test::expect;
 
@@ -276,6 +278,17 @@ mod tests {
             length: Some(32),
             clustered: Some(true),
         });
+        model.push_field(field);
+
+        let mut relation = Relation::new();
+        relation.fields(["information"].iter().map(Deref::deref));
+        relation.references(["id"].iter().map(Deref::deref));
+        relation.on_delete("Cascade");
+        relation.on_update("Restrict");
+
+        let mut field = ModelField::new_required("relfield", "1Planet");
+        field.relation(relation);
+
         model.push_field(field);
 
         let fields = ["foo", "bar"].iter().enumerate().map(|(i, name)| {
@@ -325,6 +338,7 @@ mod tests {
               array       Int[]               @default([1, 2, 3, 4]) @map("1array")
               konig       Unsupported("King") @ignore
               information Int                 @unique(sort: Desc, length: 32, clustered: true)
+              relfield    Planet              @relation(fields: [information], references: [id], onDelete: Cascade, onUpdate: Restrict)
 
               @@id([foo, bar(length: 32, sort: Asc)], name: "primary", map: "PKPK", clustered: false)
               @@unique([foo, bar])
