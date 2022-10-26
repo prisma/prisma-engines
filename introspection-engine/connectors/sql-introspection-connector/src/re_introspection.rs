@@ -10,10 +10,7 @@ use introspection_connector::Warning;
 use psl::dml::{
     self, Datamodel, DefaultValue, Field, FieldType, Ignorable, PrismaValue, ValueGenerator, WithDatabaseName, WithName,
 };
-use std::{
-    cmp::Ordering::{self, Equal, Greater, Less},
-    collections::{BTreeSet, HashMap},
-};
+use std::collections::{BTreeSet, HashMap};
 
 pub(crate) fn enrich(
     old_data_model: &Datamodel,
