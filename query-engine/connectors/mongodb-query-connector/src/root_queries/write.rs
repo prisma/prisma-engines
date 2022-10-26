@@ -66,7 +66,7 @@ pub async fn create_record<'conn>(
 
     let query_builder = InsertOne::new(&doc, coll.name());
     let insert_result = observing(Some(&query_builder), || {
-        coll.insert_one_with_session(doc.clone(), None, session)
+        coll.insert_one_with_session(&doc, None, session)
     })
     .instrument(span)
     .await?;
@@ -120,8 +120,9 @@ pub async fn create_records<'conn>(
     let options = Some(InsertManyOptions::builder().ordered(ordered).build());
 
     let query_string_builder = InsertMany::new(&docs, ordered, coll.name());
+    let docs_iter = docs.iter();
     let insert = observing(Some(&query_string_builder), || {
-        coll.insert_many_with_session(docs.clone(), options, session)
+        coll.insert_many_with_session(docs_iter, options, session)
     })
     .instrument(span);
 

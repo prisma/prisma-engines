@@ -41,8 +41,7 @@ impl ReadQuery {
         })
         .await?;
 
-        let res = vacuum_cursor(cursor, with_session).await;
-        res
+        vacuum_cursor(cursor, with_session).await
     }
 }
 

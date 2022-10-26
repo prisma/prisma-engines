@@ -103,10 +103,14 @@ impl QueryStringBuilder for UpdateMany<'_> {
     fn write_query(&self, buffer: &mut String) {
         fmt_doc(buffer, self.filter, 1).unwrap();
 
+        write!(buffer, ", ").unwrap();
+
+        if self.update_docs.len() > 1 {
+            write!(buffer, "[").unwrap();
+        }
+
         if cfg!(debug_assertions) {
-            writeln!(buffer, ", [").unwrap();
-        } else {
-            write!(buffer, ", [").unwrap();
+            writeln!(buffer).unwrap();
         }
 
         if let Some((last, docs)) = self.update_docs.split_last() {
@@ -115,6 +119,10 @@ impl QueryStringBuilder for UpdateMany<'_> {
                 writeln!(buffer, ",").unwrap();
             }
             fmt_doc(buffer, last, 1).unwrap();
+        }
+
+        if self.update_docs.len() > 1 {
+            write!(buffer, "]").unwrap();
         }
     }
 }
@@ -148,9 +156,9 @@ impl QueryStringBuilder for UpdateOne<'_> {
         fmt_doc(buffer, self.filter, 1).unwrap();
 
         if cfg!(debug_assertions) {
-            writeln!(buffer, ", [").unwrap();
+            writeln!(buffer, ", ").unwrap();
         } else {
-            write!(buffer, ", [").unwrap();
+            write!(buffer, ", ").unwrap();
         }
 
         fmt_doc(buffer, self.update_doc, 1).unwrap();
