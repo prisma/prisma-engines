@@ -64,15 +64,6 @@ async fn referential_integrity_prisma(api: &TestApi) -> TestResult {
           id  Int  @id @default(autoincrement())
           foo Foo?
         }
-
-        model bar_table {
-          id Int @id @default(autoincrement())
-        }
-
-        model foo_table {
-          id     Int @id @default(autoincrement())
-          bar_id Int @unique
-        }
     "#]];
 
     let result = api.re_introspect_config(input).await?;
@@ -136,13 +127,13 @@ async fn referential_integrity_foreign_keys(api: &TestApi) -> TestResult {
         }
 
         model Foo {
-          id     Int @id
+          id     Int @id @default(autoincrement())
           bar_id Int @unique
           bar    Bar @relation(fields: [bar_id], references: [id])
         }
 
         model Bar {
-          id  Int  @id
+          id  Int  @id @default(autoincrement())
           foo Foo?
         }
     "#]];
@@ -217,15 +208,6 @@ async fn relation_mode_prisma(api: &TestApi) -> TestResult {
           id  Int  @id @default(autoincrement())
           foo Foo?
         }
-
-        model bar_table {
-          id Int @id @default(autoincrement())
-        }
-
-        model foo_table {
-          id     Int @id @default(autoincrement())
-          bar_id Int @unique
-        }
     "#]];
 
     let result = api.re_introspect_config(input).await?;
@@ -290,13 +272,13 @@ async fn relation_mode_foreign_keys(api: &TestApi) -> TestResult {
         }
 
         model Foo {
-          id     Int @id
+          id     Int @id @default(autoincrement())
           bar_id Int @unique
           bar    Bar @relation(fields: [bar_id], references: [id])
         }
 
         model Bar {
-          id  Int  @id
+          id  Int  @id @default(autoincrement())
           foo Foo?
         }
     "#]];
@@ -351,13 +333,13 @@ async fn no_relation_mode(api: &TestApi) -> TestResult {
         }
 
         model Foo {
-          id     Int @id
+          id     Int @id @default(autoincrement())
           bar_id Int @unique
           bar    Bar @relation(fields: [bar_id], references: [id])
         }
 
         model Bar {
-          id  Int  @id
+          id  Int  @id @default(autoincrement())
           foo Foo?
         }
     "#]];
@@ -432,22 +414,15 @@ mod at_at_map {
 
             model Foo {
               id     Int @id @default(autoincrement())
-              bar    Bar @relation(fields: [bar_id], references: [id], map: "foo_table_bar_id_fkey")
               bar_id Int @unique
+
+              @@map("foo_table")
             }
 
             model Bar {
-              id  Int  @id @default(autoincrement())
-              foo Foo?
-            }
-
-            model bar_table {
               id Int @id @default(autoincrement())
-            }
 
-            model foo_table {
-              id     Int @id @default(autoincrement())
-              bar_id Int @unique
+              @@map("bar_table")
             }
         "#]];
 
@@ -506,28 +481,28 @@ mod at_at_map {
 
         let expected = expect![[r#"
             generator client {
-                provider        = "prisma-client-js"
-                previewFeatures = ["referentialIntegrity"]
+              provider        = "prisma-client-js"
+              previewFeatures = ["referentialIntegrity"]
             }
 
             datasource db {
-                provider = "sqlite"
-                url      = env("TEST_DATABASE_URL")
+              provider = "sqlite"
+              url      = env("TEST_DATABASE_URL")
             }
 
             model Foo {
-                id     Int @id
-                bar_id Int @unique
-                bar    Bar @relation(fields: [bar_id], references: [id])
+              id     Int @id @default(autoincrement())
+              bar_id Int @unique
+              bar    Bar @relation(fields: [bar_id], references: [id])
 
-                @@map("foo_table")
+              @@map("foo_table")
             }
 
             model Bar {
-                id  Int  @id
-                foo Foo?
+              id  Int  @id @default(autoincrement())
+              foo Foo?
 
-                @@map("bar_table")
+              @@map("bar_table")
             }
         "#]];
 
@@ -597,22 +572,15 @@ mod at_at_map {
 
             model Foo {
               id     Int @id @default(autoincrement())
-              bar    Bar @relation(fields: [bar_id], references: [id], map: "foo_table_bar_id_fkey")
               bar_id Int @unique
+
+              @@map("foo_table")
             }
 
             model Bar {
-              id  Int  @id @default(autoincrement())
-              foo Foo?
-            }
-
-            model bar_table {
               id Int @id @default(autoincrement())
-            }
 
-            model foo_table {
-              id     Int @id @default(autoincrement())
-              bar_id Int @unique
+              @@map("bar_table")
             }
         "#]];
 
@@ -671,29 +639,29 @@ mod at_at_map {
 
         let expected = expect![[r#"
             generator client {
-                provider        = "prisma-client-js"
-                previewFeatures = ["referentialIntegrity"]
+              provider        = "prisma-client-js"
+              previewFeatures = ["referentialIntegrity"]
             }
 
             datasource db {
-                provider     = "sqlite"
-                url          = env("TEST_DATABASE_URL")
-                relationMode = "foreignKeys"
+              provider     = "sqlite"
+              url          = env("TEST_DATABASE_URL")
+              relationMode = "foreignKeys"
             }
 
             model Foo {
-                id     Int @id
-                bar_id Int @unique
-                bar    Bar @relation(fields: [bar_id], references: [id])
+              id     Int @id @default(autoincrement())
+              bar_id Int @unique
+              bar    Bar @relation(fields: [bar_id], references: [id])
 
-                @@map("foo_table")
+              @@map("foo_table")
             }
 
             model Bar {
-                id  Int  @id
-                foo Foo?
+              id  Int  @id @default(autoincrement())
+              foo Foo?
 
-                @@map("bar_table")
+              @@map("bar_table")
             }
         "#]];
 
@@ -746,23 +714,23 @@ mod at_at_map {
 
         let expected = expect![[r#"
             datasource db {
-                provider = "sqlite"
-                url      = env("TEST_DATABASE_URL")
+              provider = "sqlite"
+              url      = env("TEST_DATABASE_URL")
             }
 
             model Foo {
-                id     Int @id
-                bar_id Int @unique
-                bar    Bar @relation(fields: [bar_id], references: [id])
+              id     Int @id @default(autoincrement())
+              bar_id Int @unique
+              bar    Bar @relation(fields: [bar_id], references: [id])
 
-                @@map("foo_table")
+              @@map("foo_table")
             }
 
             model Bar {
-                id  Int  @id
-                foo Foo?
+              id  Int  @id @default(autoincrement())
+              foo Foo?
 
-                @@map("bar_table")
+              @@map("bar_table")
             }
         "#]];
 
