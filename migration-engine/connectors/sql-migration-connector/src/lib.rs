@@ -16,6 +16,7 @@ mod sql_schema_calculator;
 mod sql_schema_differ;
 
 use database_schema::SqlDatabaseSchema;
+use enumflags2::BitFlags;
 use flavour::{MssqlFlavour, MysqlFlavour, PostgresFlavour, SqlFlavour, SqliteFlavour};
 use migration_connector::{migrations_directory::MigrationDirectory, *};
 use pair::Pair;
@@ -78,7 +79,10 @@ impl SqlMigrationConnector {
     }
 
     /// Made public for tests.
-    pub fn describe_schema(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<sql::SqlSchema>> {
+    pub fn describe_schema(
+        &mut self,
+        namespaces: Option<Namespaces>,
+    ) -> BoxFuture<'_, ConnectorResult<sql::SqlSchema>> {
         self.flavour.describe_schema(namespaces)
     }
 
@@ -141,6 +145,10 @@ impl MigrationConnector for SqlMigrationConnector {
 
     fn set_params(&mut self, params: ConnectorParams) -> ConnectorResult<()> {
         self.flavour.set_params(params)
+    }
+
+    fn set_preview_features(&mut self, preview_features: BitFlags<psl::PreviewFeature>) {
+        self.flavour.set_preview_features(preview_features)
     }
 
     fn connection_string(&self) -> Option<&str> {
@@ -290,23 +298,23 @@ impl MigrationConnector for SqlMigrationConnector {
         namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<()>> {
         Box::pin(async move {
-            self.flavour.sql_schema_from_migration_history(migrations, None, namespaces).await?;
+            self.flavour
+                .sql_schema_from_migration_history(migrations, None, namespaces)
+                .await?;
             Ok(())
         })
     }
 
-    fn extract_namespaces(
-      &self,
-      schema: &DatabaseSchema,
-    ) -> Option<Namespaces> {
-        let sql_schema : &SqlDatabaseSchema = schema.downcast_ref();
+    fn extract_namespaces(&self, schema: &DatabaseSchema) -> Option<Namespaces> {
+        let sql_schema: &SqlDatabaseSchema = schema.downcast_ref();
         Namespaces::from_vec(
-          &mut sql_schema.describer_schema
-              .namespace_walkers().map(|nw| String::from(nw.name()))
-              .collect::<Vec<String>>()
+            &mut sql_schema
+                .describer_schema
+                .namespace_walkers()
+                .map(|nw| String::from(nw.name()))
+                .collect::<Vec<String>>(),
         )
     }
-
 }
 
 fn new_shadow_database_name() -> String {

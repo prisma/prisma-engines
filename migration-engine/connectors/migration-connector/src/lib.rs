@@ -16,6 +16,7 @@ pub use destructive_change_checker::{
     DestructiveChangeChecker, DestructiveChangeDiagnostics, MigrationWarning, UnexecutableMigration,
 };
 pub use diff::DiffTarget;
+use enumflags2::BitFlags;
 pub use error::{ConnectorError, ConnectorResult};
 pub use introspection_connector::{IntrospectionConnector, IntrospectionContext, IntrospectionResult};
 pub use migration_persistence::{MigrationPersistence, MigrationRecord, PersistenceNotInitializedError, Timestamp};
@@ -94,6 +95,9 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// Accept and validate new ConnectorParams. This should fail if it is called twice on the same
     /// connector.
     fn set_params(&mut self, params: ConnectorParams) -> ConnectorResult<()>;
+
+    /// Accept a new set of enabled preview features.
+    fn set_preview_features(&mut self, preview_features: BitFlags<psl::PreviewFeature>);
 
     // Connector methods
 
@@ -211,16 +215,12 @@ pub trait MigrationConnector: Send + Sync + 'static {
     ) -> BoxFuture<'a, ConnectorResult<()>>;
 
     /// TODO
-    fn extract_namespaces(
-      &self,
-      schema: &DatabaseSchema,
-    ) -> Option<Namespaces>;
-
+    fn extract_namespaces(&self, schema: &DatabaseSchema) -> Option<Namespaces>;
 }
 
 /// TODO
 #[derive(Clone, Debug)]
-pub struct Namespaces (pub String, pub Vec<String>);
+pub struct Namespaces(pub String, pub Vec<String>);
 
 impl Namespaces {
     /// TODO
@@ -234,8 +234,8 @@ impl Namespaces {
             Some(Namespaces(s, mut vec)) => {
                 vec.push(s);
                 vec
-            },
-            None => vec![def]
+            }
+            None => vec![def],
         }
     }
 }

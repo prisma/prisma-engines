@@ -196,6 +196,10 @@ impl MigrationConnector for MongoDbMigrationConnector {
         Ok(())
     }
 
+    fn set_preview_features(&mut self, preview_features: BitFlags<psl::PreviewFeature>) {
+        self.preview_features = preview_features;
+    }
+
     fn set_host(&mut self, host: Arc<dyn migration_connector::ConnectorHost>) {
         self.host = host;
     }
@@ -208,13 +212,9 @@ impl MigrationConnector for MongoDbMigrationConnector {
         Box::pin(future::ready(Ok(())))
     }
 
-    fn extract_namespaces(
-      &self,
-      _schema: &DatabaseSchema,
-    ) -> Option<Namespaces> {
+    fn extract_namespaces(&self, _schema: &DatabaseSchema) -> Option<Namespaces> {
         None
     }
-
 }
 
 fn unsupported_command_error() -> ConnectorError {

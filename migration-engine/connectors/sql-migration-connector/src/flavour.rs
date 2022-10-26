@@ -19,7 +19,7 @@ use crate::{
 use enumflags2::BitFlags;
 use migration_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult,
-    MigrationRecord, PersistenceNotInitializedError, Namespaces,
+    MigrationRecord, Namespaces, PersistenceNotInitializedError,
 };
 use psl::{PreviewFeature, ValidatedSchema};
 use quaint::prelude::{ConnectionInfo, Table};
@@ -258,6 +258,8 @@ pub(crate) trait SqlFlavour:
 
     /// Receive and validate connector params.
     fn set_params(&mut self, connector_params: ConnectorParams) -> ConnectorResult<()>;
+
+    fn set_preview_features(&mut self, preview_features: BitFlags<psl::PreviewFeature>);
 
     /// Table to store applied migrations.
     fn migrations_table(&self) -> Table<'static> {

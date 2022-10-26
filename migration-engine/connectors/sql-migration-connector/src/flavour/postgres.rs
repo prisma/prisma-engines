@@ -291,6 +291,15 @@ impl SqlFlavour for PostgresFlavour {
         Ok(())
     }
 
+    fn set_preview_features(&mut self, preview_features: enumflags2::BitFlags<psl::PreviewFeature>) {
+        match &mut self.state {
+            super::State::Initial => (),
+            super::State::WithParams(params) | super::State::Connected(params, _) => {
+                params.connector_params.preview_features = preview_features
+            }
+        }
+    }
+
     #[tracing::instrument(skip(self, migrations))]
     fn sql_schema_from_migration_history<'a>(
         &'a mut self,
@@ -365,7 +374,8 @@ impl SqlFlavour for PostgresFlavour {
                     // We go through the whole process without early return, then clean up
                     // the shadow database, and only then return the result. This avoids
                     // leaving shadow databases behind in case of e.g. faulty migrations.
-                    let ret = shadow_db::sql_schema_from_migrations_history(migrations, shadow_database, namespaces).await;
+                    let ret =
+                        shadow_db::sql_schema_from_migrations_history(migrations, shadow_database, namespaces).await;
 
                     let drop_database = format!("DROP DATABASE IF EXISTS \"{}\"", shadow_database_name);
                     main_connection.raw_cmd(&drop_database, &params.url).await?;

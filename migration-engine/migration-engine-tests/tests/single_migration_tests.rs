@@ -1,7 +1,8 @@
-use migration_core::migration_connector::Namespaces;
+use migration_core::migration_connector::{ConnectorParams, MigrationConnector};
 use migration_engine_tests::test_api::*;
+use sql_migration_connector::SqlMigrationConnector;
 use std::{fs, io::Write as _, path, sync::Arc};
-use test_setup::TestApiArgs;
+use test_setup::{runtime::run_with_thread_local_runtime as tok, TestApiArgs};
 
 const TESTS_ROOT: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/single_migration_tests");
 
@@ -68,24 +69,78 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
     }
 
     let test_api_args = TestApiArgs::new(test_function_name, &[], &[]);
-    let mut test_api = TestApi::new(test_api_args);
-    let source_file = psl::SourceFile::new_allocated(text.clone());
+    let connection_string = if tags.contains(Tags::Postgres) {
+        let (_, _, connection_string) = tok(test_api_args.create_postgres_database());
+        connection_string
+    } else if tags.contains(Tags::Vitess) {
+        let params = ConnectorParams {
+            connection_string: test_api_args.database_url().to_owned(),
+            preview_features: Default::default(),
+            shadow_database_connection_string: None,
+        };
+        let mut conn = SqlMigrationConnector::new_mysql();
+        conn.set_params(params).unwrap();
+        tok(conn.reset(false)).unwrap();
+        test_api_args.database_url().to_owned()
+    } else if tags.contains(Tags::Mysql) {
+        let (_, connection_string) = tok(test_api_args.create_mysql_database());
+        connection_string
+    } else if tags.contains(Tags::Mssql) {
+        let (_, connection_string) = tok(test_api_args.create_mssql_database());
+        connection_string
+    } else if tags.contains(Tags::Sqlite) {
+        test_setup::sqlite_test_url(test_api_args.test_function_name())
+    } else {
+        unreachable!()
+    };
 
-    let migration: String = test_api.connector_diff(
-        migration_core::migration_connector::DiffTarget::Empty,
-        migration_core::migration_connector::DiffTarget::Datamodel(source_file.clone()),
-        None,
-    );
+    let host = Arc::new(migration_engine_tests::test_api::TestConnectorHost::default());
+    let migration_engine = migration_core::migration_api(None, Some(host.clone())).unwrap();
 
-    test_api.raw_cmd(&migration); // check that it runs
+    tok(migration_engine.diff(migration_core::json_rpc::types::DiffParams {
+        exit_code: None,
+        script: true,
+        shadow_database_url: None,
+        from: migration_core::json_rpc::types::DiffTarget::Empty,
+        to: migration_core::json_rpc::types::DiffTarget::SchemaDatamodel(
+            migration_core::json_rpc::types::SchemaContainer {
+                schema: file_path.to_str().unwrap().to_owned(),
+            },
+        ),
+    }))
+    .unwrap();
 
-    let second_migration = test_api.connector_diff(
-        migration_core::migration_connector::DiffTarget::Database,
-        migration_core::migration_connector::DiffTarget::Datamodel(source_file),
-        Some(Namespaces("public".to_owned(), vec!["security".to_owned(), "users".to_owned()])),
-    );
+    let migration: String = host.printed_messages.lock().unwrap()[0].clone();
 
-    if second_migration != "-- This is an empty migration." {
+    tok(
+        migration_engine.db_execute(migration_core::json_rpc::types::DbExecuteParams {
+            datasource_type: migration_core::json_rpc::types::DbExecuteDatasourceType::Url(
+                migration_core::json_rpc::types::UrlContainer {
+                    url: connection_string.clone(),
+                },
+            ),
+            script: migration.clone(),
+        }),
+    )
+    .unwrap(); // check that it runs
+
+    let second_migration_result = tok(migration_engine.diff(migration_core::json_rpc::types::DiffParams {
+        exit_code: Some(true),
+        script: true,
+        shadow_database_url: None,
+        from: migration_core::json_rpc::types::DiffTarget::Url(migration_core::json_rpc::types::UrlContainer {
+            url: connection_string,
+        }),
+        to: migration_core::json_rpc::types::DiffTarget::SchemaDatamodel(
+            migration_core::json_rpc::types::SchemaContainer {
+                schema: file_path.to_str().unwrap().to_owned(),
+            },
+        ),
+    }))
+    .unwrap();
+
+    if second_migration_result.exit_code != 0 {
+        let second_migration: String = host.printed_messages.lock().unwrap()[1].clone();
         panic!("There is drift. Migration:\n\n{second_migration}");
     }
 
