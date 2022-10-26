@@ -68,18 +68,6 @@ fn fmt_val(buffer: &mut String, val: &Bson, depth: usize) -> std::fmt::Result {
     }
 }
 
-// NOTE: All these log functions could be reduced to a single macro
-pub(crate) fn log_insert_one(coll: &str, doc: &Document) {
-    let mut buffer = String::new();
-
-    write!(&mut buffer, "db.{}.insertOne(", coll).unwrap();
-    fmt_doc(&mut buffer, doc, 1).unwrap();
-    write!(&mut buffer, ")").unwrap();
-
-    let params: Vec<i32> = Vec::new();
-    debug!(target: "mongodb_query_connector::query", query = %buffer, item_type = "query", is_query = true, params = ?params);
-}
-
 pub(crate) fn log_update_many_vec(coll: &str, filter: &Document, docs: &[Document]) {
     let mut buffer = String::new();
 

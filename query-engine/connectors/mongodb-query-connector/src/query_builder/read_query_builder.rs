@@ -6,7 +6,7 @@ use crate::{
     filter::{FilterPrefix, MongoFilterVisitor},
     join::JoinStage,
     orderby::OrderByBuilder,
-    query_strings,
+    query_string_builders,
     root_queries::observing,
     vacuum_cursor, BsonTransform, IntoBson,
 };
@@ -18,7 +18,7 @@ use mongodb::{
     ClientSession, Collection,
 };
 use prisma_models::{FieldSelection, ModelRef, ScalarFieldRef};
-use query_strings::AggregateQuery;
+use query_string_builders::Aggregate;
 use std::convert::TryFrom;
 
 // Mongo Driver broke usage of the simple API, can't be used by us anymore.
@@ -36,7 +36,7 @@ impl ReadQuery {
         with_session: &mut ClientSession,
     ) -> crate::Result<Vec<Document>> {
         let opts = AggregateOptions::builder().allow_disk_use(true).build();
-        let query_builder = AggregateQuery::new(&self.stages, on_collection.name());
+        let query_builder = Aggregate::new(&self.stages, on_collection.name());
         let cursor = observing(Some(&query_builder), || {
             on_collection.aggregate_with_session(self.stages.clone(), opts, with_session)
         })

@@ -4,6 +4,7 @@ use crate::{
     filter::{FilterPrefix, MongoFilter, MongoFilterVisitor},
     logger, output_meta,
     query_builder::MongoReadQueryBuilder,
+    query_string_builders,
     root_queries::raw::{MongoCommand, MongoOperation},
     IntoBson,
 };
@@ -63,11 +64,12 @@ pub async fn create_record<'conn>(
         doc.insert(field.db_name().to_owned(), bson);
     }
 
-    logger::log_insert_one(coll.name(), &doc);
-
-    let insert_result = observing(None, || coll.insert_one_with_session(doc, None, session))
-        .instrument(span)
-        .await?;
+    let query_builder = query_string_builders::InsertOne::new(&doc, coll.name());
+    let insert_result = observing(Some(&query_builder), || {
+        coll.insert_one_with_session(doc.clone(), None, session)
+    })
+    .instrument(span)
+    .await?;
     let id_value = value_from_bson(insert_result.inserted_id, &id_meta)?;
 
     Ok(SelectionResult::from((id_field, id_value)))

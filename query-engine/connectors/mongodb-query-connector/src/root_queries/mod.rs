@@ -6,7 +6,7 @@ pub mod write;
 mod raw;
 mod update;
 
-use crate::query_strings::*;
+use crate::query_string_builders::QueryStringBuilder;
 use crate::{
     error::DecorateErrorWithFieldInformationExtension, output_meta::OutputMetaMapping, value::value_from_bson,
 };

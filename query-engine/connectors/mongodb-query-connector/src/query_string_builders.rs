@@ -11,38 +11,74 @@ macro_rules! write_indented {
 }
 
 pub(crate) trait QueryStringBuilder: Sync + Send {
-    fn build(&self) -> String;
+    fn build(&self) -> String {
+        let mut buffer = String::new();
+
+        write!(&mut buffer, "db.{}.{}", self.collection(), self.query_type()).unwrap();
+        self.write_query(&mut buffer);
+        write!(&mut buffer, ")").unwrap();
+
+        buffer
+    }
+
+    fn collection(&self) -> &str;
+    fn query_type(&self) -> &str;
+    fn write_query(&self, buffer: &mut String);
 }
 
-/* Aggregate Query */
-
-pub(crate) struct AggregateQuery<'a> {
+pub(crate) struct Aggregate<'a> {
     stages: &'a [Document],
     coll_name: &'a str,
 }
 
-impl AggregateQuery<'_> {
-    pub(crate) fn new<'a>(stages: &'a [Document], coll_name: &'a str) -> AggregateQuery<'a> {
-        AggregateQuery { coll_name, stages }
+impl Aggregate<'_> {
+    pub(crate) fn new<'a>(stages: &'a [Document], coll_name: &'a str) -> Aggregate<'a> {
+        Aggregate { stages, coll_name }
     }
 }
 
-impl QueryStringBuilder for AggregateQuery<'_> {
-    fn build(&self) -> String {
-        let mut buffer = String::new();
+impl QueryStringBuilder for Aggregate<'_> {
+    fn collection(&self) -> &str {
+        self.coll_name
+    }
 
-        write!(buffer, "db.{}.aggregate(", self.coll_name).unwrap();
+    fn query_type(&self) -> &str {
+        "aggregate"
+    }
 
+    fn write_query(&self, buffer: &mut String) {
         let stages: Vec<_> = self
             .stages
             .into_iter()
             .map(|stage| Bson::Document(stage.clone()))
             .collect();
 
-        fmt_list(&mut buffer, &stages, 1).unwrap();
-        write!(buffer, ")").unwrap();
+        fmt_list(buffer, &stages, 1).unwrap();
+    }
+}
 
-        buffer
+pub(crate) struct InsertOne<'a> {
+    doc: &'a Document,
+    coll_name: &'a str,
+}
+
+impl InsertOne<'_> {
+    pub(crate) fn new<'a>(doc: &'a Document, coll_name: &'a str) -> InsertOne<'a> {
+        InsertOne { doc, coll_name }
+    }
+}
+
+impl QueryStringBuilder for InsertOne<'_> {
+    fn collection(&self) -> &str {
+        self.coll_name
+    }
+
+    fn query_type(&self) -> &str {
+        "insertOne"
+    }
+
+    fn write_query(&self, buffer: &mut String) {
+        fmt_doc(buffer, self.doc, 1).unwrap();
     }
 }
 
