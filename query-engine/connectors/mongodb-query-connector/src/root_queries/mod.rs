@@ -73,7 +73,7 @@ where
 
     let params: Vec<i32> = Vec::new();
 
-    // todo: put stats with the appropriate log level when query_log is enabled. And fix log suscription
+    // todo: emit tracing event with the appropriate log level only query_log is enabled. And fix log suscription
     if let Some(qs) = query_string_builder {
         let qs = qs.build();
         debug!(target: "mongodb_query_connector::query", item_type = "query", is_query = true, query = %qs, params = ?params, duration_ms=elapsed);
