@@ -68,32 +68,6 @@ fn fmt_val(buffer: &mut String, val: &Bson, depth: usize) -> std::fmt::Result {
     }
 }
 
-pub(crate) fn log_update_many_vec(coll: &str, filter: &Document, docs: &[Document]) {
-    let mut buffer = String::new();
-
-    write!(&mut buffer, "db.{}.updateMany(", coll).unwrap();
-    fmt_doc(&mut buffer, filter, 1).unwrap();
-
-    if cfg!(debug_assertions) {
-        writeln!(&mut buffer, ", [").unwrap();
-    } else {
-        write!(&mut buffer, ", [").unwrap();
-    }
-
-    if let Some((last, docs)) = docs.split_last() {
-        for doc in docs {
-            fmt_doc(&mut buffer, doc, 1).unwrap();
-            writeln!(&mut buffer, ",").unwrap();
-        }
-        fmt_doc(&mut buffer, last, 1).unwrap();
-    }
-
-    write!(&mut buffer, "])").unwrap();
-
-    let params: Vec<i32> = Vec::new();
-    debug!(target: "mongodb_query_connector::query", query = %buffer, item_type = "query", is_query = true, params = ?params);
-}
-
 pub(crate) fn log_update_many(coll: &str, filter: &Document, doc: &Document) {
     let mut buffer = String::new();
 

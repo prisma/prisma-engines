@@ -200,9 +200,9 @@ pub async fn update_records<'conn>(
     }
 
     if !update_docs.is_empty() {
-        logger::log_update_many_vec(coll.name(), &filter, &update_docs);
-        let res = observing(None, || {
-            coll.update_many_with_session(filter, update_docs, None, session)
+        let query_string_builder = query_string_builders::UpdateMany::new(&filter, &update_docs, coll.name());
+        let res = observing(Some(&query_string_builder), || {
+            coll.update_many_with_session(filter.clone(), update_docs.clone(), None, session)
         })
         .instrument(span)
         .await?;

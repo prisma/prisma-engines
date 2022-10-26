@@ -82,6 +82,50 @@ impl QueryStringBuilder for InsertOne<'_> {
     }
 }
 
+pub(crate) struct UpdateMany<'a> {
+    filter: &'a Document,
+    update_docs: &'a [Document],
+    coll_name: &'a str,
+}
+
+impl UpdateMany<'_> {
+    pub(crate) fn new<'a>(filter: &'a Document, update_docs: &'a [Document], coll_name: &'a str) -> UpdateMany<'a> {
+        UpdateMany {
+            filter,
+            update_docs,
+            coll_name,
+        }
+    }
+}
+
+impl QueryStringBuilder for UpdateMany<'_> {
+    fn collection(&self) -> &str {
+        self.coll_name
+    }
+
+    fn query_type(&self) -> &str {
+        "updateMany"
+    }
+
+    fn write_query(&self, buffer: &mut String) {
+        fmt_doc(buffer, self.filter, 1).unwrap();
+
+        if cfg!(debug_assertions) {
+            writeln!(buffer, ", [").unwrap();
+        } else {
+            write!(buffer, ", [").unwrap();
+        }
+
+        if let Some((last, docs)) = self.update_docs.split_last() {
+            for doc in docs {
+                fmt_doc(buffer, doc, 1).unwrap();
+                writeln!(buffer, ",").unwrap();
+            }
+            fmt_doc(buffer, last, 1).unwrap();
+        }
+    }
+}
+
 #[cfg(debug_assertions)]
 fn indent(depth: usize) -> String {
     " ".repeat(4 * depth)
