@@ -129,7 +129,7 @@ pub async fn diagnose_migration_history(
 
     let (drift, error_in_unapplied_migration) = {
         if input.opt_in_to_shadow_database {
-            // TODO: this should probably fill the following namespaces from the CLI since there is
+            // TODO(MultiSchema): this should probably fill the following namespaces from the CLI since there is
             // no schema to grab the namespaces off, in the case of MultiSchema.
             let from = connector
                 .database_schema_from_diff_target(DiffTarget::Migrations(&applied_migrations), None, None)
@@ -153,7 +153,7 @@ pub async fn diagnose_migration_history(
 
             let error_in_unapplied_migration = if !matches!(drift, Some(DriftDiagnostic::MigrationFailedToApply { .. }))
             {
-                // TODO: Not entirely sure passing no namespaces here is correct. Probably should
+                // TODO(MultiSchema): Not entirely sure passing no namespaces here is correct. Probably should
                 // also grab this as a CLI argument.
                 connector
                     .validate_migrations(&migrations_from_filesystem, None)

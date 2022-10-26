@@ -236,7 +236,7 @@ async fn main() -> anyhow::Result<()> {
             let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
             let api = migration_core::migration_api(Some(schema), None)?;
 
-            // TODO: Perhaps read namespaces from the schema somehow.
+            // TODO(MultiSchema): Perhaps read namespaces from the schema somehow.
             api.reset(None).await?;
         }
         Command::CreateDatabase(cmd) => {

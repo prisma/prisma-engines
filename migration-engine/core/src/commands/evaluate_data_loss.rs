@@ -23,7 +23,7 @@ pub async fn evaluate_data_loss(
 
     let namespaces = connector.extract_namespaces(&to);
 
-    // TODO: we may need to do something similar to
+    // TODO(MultiSchema): we may need to do something similar to
     // namespaces_and_preview_features_from_diff_targets here as well,
     // particulalry if it's not correctly setting the preview features flags.
     let from = connector
