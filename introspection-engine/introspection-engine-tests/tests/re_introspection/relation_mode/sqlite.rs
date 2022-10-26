@@ -73,7 +73,7 @@ async fn referential_integrity_prisma(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-// referentialIntegrity = "prisma" preserves the relation policy ("foreignKeys") as well as @relations, which are moved to the bottom.
+// referentialIntegrity = "foreignKeys" preserves the relation policy ("foreignKeys") as well as @relations, which are moved to the bottom.
 #[test_connector(tags(Sqlite))]
 async fn referential_integrity_foreign_keys(api: &TestApi) -> TestResult {
     let init = formatdoc! {r#"
