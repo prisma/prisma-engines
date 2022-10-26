@@ -18,6 +18,7 @@ use mongodb::{
     ClientSession, Collection,
 };
 use prisma_models::{FieldSelection, ModelRef, ScalarFieldRef};
+use query_strings::AggregateQuery;
 use std::convert::TryFrom;
 
 // Mongo Driver broke usage of the simple API, can't be used by us anymore.
@@ -35,10 +36,10 @@ impl ReadQuery {
         with_session: &mut ClientSession,
     ) -> crate::Result<Vec<Document>> {
         let opts = AggregateOptions::builder().allow_disk_use(true).build();
-        let cursor = observing(
-            query_strings::build_aggregate(self.stages.clone(), on_collection.name()),
-            || on_collection.aggregate_with_session(self.stages, opts, with_session),
-        )
+        let query_builder = AggregateQuery::new(&self.stages, on_collection.name());
+        let cursor = observing(Some(&query_builder), || {
+            on_collection.aggregate_with_session(self.stages.clone(), opts, with_session)
+        })
         .await?;
 
         let res = vacuum_cursor(cursor, with_session).await;

@@ -6,6 +6,7 @@ pub mod write;
 mod raw;
 mod update;
 
+use crate::query_strings::*;
 use crate::{
     error::DecorateErrorWithFieldInformationExtension, output_meta::OutputMetaMapping, value::value_from_bson,
 };
@@ -46,7 +47,7 @@ fn pick_singular_id(model: &ModelRef) -> ScalarFieldRef {
         .unwrap()
 }
 
-// perforns both metrics pushing and query logging. Query logging  might be disabled and thus
+// performs both metrics pushing and query logging. Query logging  might be disabled and thus
 // the query_string might not need to be built, that's why rather than a query_string
 // we receive a Future, as it's not trivial to buid and we want to skip that when possible.
 //
@@ -55,8 +56,8 @@ fn pick_singular_id(model: &ModelRef) -> ScalarFieldRef {
 // wire protocol to build queries from a graphql query rather than executing raw mongodb statements.
 // As we don't have a mongodb query string, we need to create it from the driver object model, which
 // so better skip it if we don't need it, i.e. when the query log is disabled.
-pub(crate) async fn observing<'a, F, T, U>(
-    query_string: impl Future<Output = String>,
+pub(crate) async fn observing<'a, 'b, F, T, U>(
+    query_string_builder: Option<&'b dyn QueryStringBuilder>,
     f: F,
 ) -> mongodb::error::Result<T>
 where
@@ -65,29 +66,18 @@ where
 {
     let start = Instant::now();
     let res = f().await;
-
     let elapsed = start.elapsed().as_millis() as f64;
 
     histogram!(PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS, elapsed);
     increment_counter!(PRISMA_DATASOURCE_QUERIES_TOTAL);
 
     let params: Vec<i32> = Vec::new();
-    let query_string = query_string.await;
-    debug!(target: "mongodb_query_connector::query", item_type = "query", is_query = true, query = query_string, params = ?params, duration_ms=elapsed);
 
-    res
-}
-
-pub(crate) async fn metrics<'a, F, T, U>(f: F) -> mongodb::error::Result<T>
-where
-    F: FnOnce() -> U + 'a,
-    U: Future<Output = mongodb::error::Result<T>>,
-{
-    let start = Instant::now();
-    let res = f().await;
-
-    histogram!(PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS, start.elapsed());
-    increment_counter!(PRISMA_DATASOURCE_QUERIES_TOTAL);
+    // todo: extract constant
+    if let Some(qs) = query_string_builder {
+        let qs = qs.build();
+        debug!(target: "mongodb_query_connector::query", item_type = "query", is_query = true, query = qs, params = ?params, duration_ms=elapsed);
+    }
 
     res
 }

@@ -10,17 +10,40 @@ macro_rules! write_indented {
     };
 }
 
-pub(crate) async fn build_aggregate(stages: Vec<Document>, coll_name: &str) -> String {
-    let mut buffer = String::new();
+pub(crate) trait QueryStringBuilder: Sync + Send {
+    fn build(&self) -> String;
+}
 
-    write!(buffer, "db.{}.aggregate(", coll_name).unwrap();
+/* Aggregate Query */
 
-    let stages: Vec<_> = stages.iter().map(|stage| Bson::Document(stage.clone())).collect();
+pub(crate) struct AggregateQuery<'a> {
+    stages: &'a [Document],
+    coll_name: &'a str,
+}
 
-    fmt_list(&mut buffer, &stages, 1).unwrap();
-    write!(buffer, ")").unwrap();
+impl AggregateQuery<'_> {
+    pub(crate) fn new<'a>(stages: &'a [Document], coll_name: &'a str) -> AggregateQuery<'a> {
+        AggregateQuery { coll_name, stages }
+    }
+}
 
-    return buffer.to_string();
+impl QueryStringBuilder for AggregateQuery<'_> {
+    fn build(&self) -> String {
+        let mut buffer = String::new();
+
+        write!(buffer, "db.{}.aggregate(", self.coll_name).unwrap();
+
+        let stages: Vec<_> = self
+            .stages
+            .into_iter()
+            .map(|stage| Bson::Document(stage.clone()))
+            .collect();
+
+        fmt_list(&mut buffer, &stages, 1).unwrap();
+        write!(buffer, ")").unwrap();
+
+        buffer
+    }
 }
 
 #[cfg(debug_assertions)]
