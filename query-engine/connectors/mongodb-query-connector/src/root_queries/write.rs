@@ -352,11 +352,10 @@ pub async fn m2m_connect<'conn>(
     let child_ids_scalar_field_name = field.related_field().relation_info.fields.get(0).unwrap().clone();
     let child_update = doc! { "$addToSet": { child_ids_scalar_field_name: parent_id } };
 
-    // this needs work
-    logger::log_update_many(child_coll.name(), &child_filter, &child_update);
-
-    observing(None, || {
-        child_coll.update_many_with_session(child_filter, child_update, None, session)
+    let child_updates = vec![child_update.clone()];
+    let query_string_builder = query_string_builders::UpdateMany::new(&child_filter, &child_updates, child_coll.name());
+    observing(Some(&query_string_builder), || {
+        child_coll.update_many_with_session(child_filter.clone(), child_update.clone(), None, session)
     })
     .await?;
 
@@ -410,10 +409,11 @@ pub async fn m2m_disconnect<'conn>(
     let child_ids_scalar_field_name = field.related_field().relation_info.fields.get(0).unwrap().clone();
 
     let child_update = doc! { "$pull": { child_ids_scalar_field_name: parent_id } };
-    logger::log_update_many(child_coll.name(), &child_filter, &child_update);
 
-    observing(None, || {
-        child_coll.update_many_with_session(child_filter, child_update, None, session)
+    let child_updates = vec![child_update.clone()];
+    let query_string_builder = query_string_builders::UpdateMany::new(&child_filter, &child_updates, child_coll.name());
+    observing(Some(&query_string_builder), || {
+        child_coll.update_many_with_session(child_filter.clone(), child_update, None, session)
     })
     .await?;
 
