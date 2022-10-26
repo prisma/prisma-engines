@@ -375,7 +375,7 @@ mod at_at_map {
 
     // referentialIntegrity = "prisma" with @@map loses track of the relation policy ("prisma") and of @relations.
     #[test_connector(tags(Mysql), exclude(Vitess))]
-    async fn referential_integrity_prisma(api: &TestApi) -> TestResult {
+    async fn referential_integrity_prisma_at_map_map(api: &TestApi) -> TestResult {
         let init = formatdoc! {r#"
             CREATE TABLE `foo_table` (
                 `id` INTEGER NOT NULL,
@@ -455,7 +455,7 @@ mod at_at_map {
 
     // referentialIntegrity = "foreignKeys" with @@map loses track of the relation policy ("foreignKeys"), but preserves @relations, which are moved to the bottom.
     #[test_connector(tags(Mysql), exclude(Vitess))]
-    async fn referential_integrity_foreign_keys(api: &TestApi) -> TestResult {
+    async fn referential_integrity_foreign_keys_at_map_map(api: &TestApi) -> TestResult {
         let init = formatdoc! {r#"
             CREATE TABLE `foo_table` (
                 `id` INTEGER NOT NULL,
@@ -539,7 +539,7 @@ mod at_at_map {
 
     // relationMode = "prisma" with @@map preserves the relation policy ("prisma"), but loses track of @relations.
     #[test_connector(tags(Mysql), exclude(Vitess))]
-    async fn relation_mode_prisma(api: &TestApi) -> TestResult {
+    async fn relation_mode_prisma_at_map_map(api: &TestApi) -> TestResult {
         let init = formatdoc! {r#"
             CREATE TABLE `foo_table` (
                 `id` INTEGER NOT NULL,
@@ -620,7 +620,7 @@ mod at_at_map {
 
     // relationMode = "foreignKeys" with @@map preserves the relation policy ("foreignKeys") and @relations, which are moved to the bottom.
     #[test_connector(tags(Mysql), exclude(Vitess))]
-    async fn relation_mode_foreign_keys(api: &TestApi) -> TestResult {
+    async fn relation_mode_foreign_keys_at_map_map(api: &TestApi) -> TestResult {
         let init = formatdoc! {r#"
             CREATE TABLE `foo_table` (
                 `id` INTEGER NOT NULL,
@@ -705,7 +705,7 @@ mod at_at_map {
 
     // @relations are moved to the bottom of the model even when no referentialIntegrity/relationMode is used and @@map is used.
     #[test_connector(tags(Mysql), exclude(Vitess))]
-    async fn no_relation(api: &TestApi) -> TestResult {
+    async fn no_relation_at_map_map(api: &TestApi) -> TestResult {
         let init = formatdoc! {r#"
           CREATE TABLE `foo_table` (
               `id` INTEGER NOT NULL,
