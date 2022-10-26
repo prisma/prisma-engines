@@ -374,23 +374,23 @@ mod at_at_map {
 
         let expected = expect![[r#"
             datasource db {
-              provider = "sqlserver"
-              url      = env("TEST_DATABASE_URL")
+                provider = "sqlserver"
+                url      = env("TEST_DATABASE_URL")
             }
 
             model Foo {
-              id     Int @id
-              bar_id Int @unique
-              bar    Bar @relation(fields: [bar_id], references: [id])
+                id     Int @id
+                bar_id Int @unique
+                bar    Bar @relation(fields: [bar_id], references: [id])
 
-              @@map("foo_table")
+                @@map("foo_table")
             }
 
             model Bar {
-              id  Int  @id
-              foo Foo?
+                id  Int  @id
+                foo Foo?
 
-              @@map("bar_table")
+                @@map("bar_table")
             }
         "#]];
 
