@@ -61,6 +61,12 @@
 <span id="61">61</span>
 <span id="62">62</span>
 <span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">introspection::introspect</span>, <span class="ident">SqlFamilyTrait</span>, <span class="ident">SqlIntrospectionResult</span>};
 <span class="kw">use</span> <span class="ident">introspection_connector</span>::{<span class="ident">IntrospectionContext</span>, <span class="ident">IntrospectionResult</span>};
 <span class="kw">use</span> <span class="ident">psl</span>::{<span class="ident">builtin_connectors</span>::<span class="kw-2">*</span>, <span class="ident">datamodel_connector::Connector</span>, <span class="ident">dml::Datamodel</span>, <span class="ident">Configuration</span>};
@@ -74,9 +80,14 @@
     <span class="kw">pub</span> <span class="ident">previous_datamodel</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Datamodel</span>,
     <span class="kw">pub</span> <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">SqlSchema</span>,
     <span class="kw">pub</span> <span class="ident">sql_family</span>: <span class="ident">SqlFamily</span>,
+    <span class="ident">previous_schema</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">psl::ValidatedSchema</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">CalculateDatamodelContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">CalculateDatamodelContext</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">previous_schema</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">psl::ValidatedSchema</span> {
+        <span class="self">self</span>.<span class="ident">previous_schema</span>
+    }
+
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_cockroach</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">active_connector</span>().<span class="ident">provider_name</span>() <span class="op">==</span> <span class="ident">COCKROACH</span>.<span class="ident">provider_name</span>()
     }
@@ -109,6 +120,7 @@
         <span class="ident">previous_datamodel</span>,
         <span class="ident">schema</span>,
         <span class="ident">sql_family</span>: <span class="ident">ctx</span>.<span class="ident">sql_family</span>(),
+        <span class="ident">previous_schema</span>: <span class="ident">ctx</span>.<span class="ident">previous_schema</span>(),
     };
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">warnings</span> <span class="op">=</span> <span class="ident">Vec::new</span>();

@@ -756,7 +756,7 @@
         }
 
         <span class="kw">for</span> <span class="ident">r#enum</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk_enums</span>() {
-            <span class="ident">schema</span>.<span class="ident">add_enum</span>(<span class="self">self</span>.<span class="ident">lift_enum</span>(<span class="ident">r#enum</span>))
+            <span class="ident">schema</span>.<span class="ident">enums</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">lift_enum</span>(<span class="ident">r#enum</span>))
         }
 
         <span class="self">self</span>.<span class="ident">lift_relations</span>(<span class="kw-2">&amp;mut</span> <span class="ident">schema</span>, <span class="kw-2">&amp;mut</span> <span class="ident">field_ids_for_sorting</span>);

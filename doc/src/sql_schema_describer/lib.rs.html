@@ -743,16 +743,6 @@
 <span id="743">743</span>
 <span id="744">744</span>
 <span id="745">745</span>
-<span id="746">746</span>
-<span id="747">747</span>
-<span id="748">748</span>
-<span id="749">749</span>
-<span id="750">750</span>
-<span id="751">751</span>
-<span id="752">752</span>
-<span id="753">753</span>
-<span id="754">754</span>
-<span id="755">755</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Database description. This crate is used heavily in the introspection and migration engines.</span>
 
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>)]</span>
@@ -1008,13 +998,6 @@
         <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">walk</span>(<span class="ident">NamespaceId</span>(<span class="ident">namespace_idx</span> <span class="kw">as</span> <span class="ident">u32</span>)))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">namespace_walkers</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">NamespaceWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        (<span class="number">0</span>..<span class="self">self</span>.<span class="ident">namespaces</span>.<span class="ident">len</span>()).<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">namespace_index</span><span class="op">|</span> <span class="ident">NamespaceWalker</span> {
-            <span class="ident">schema</span>: <span class="self">self</span>,
-            <span class="ident">id</span>: <span class="ident">NamespaceId</span>(<span class="ident">namespace_index</span> <span class="kw">as</span> <span class="ident">u32</span>),
-        })
-    }
-
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tables_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">len</span>()
     }
@@ -1050,10 +1033,7 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enum_walkers</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        (<span class="number">0</span>..<span class="self">self</span>.<span class="ident">enums</span>.<span class="ident">len</span>()).<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">enum_index</span><span class="op">|</span> <span class="ident">EnumWalker</span> {
-            <span class="ident">schema</span>: <span class="self">self</span>,
-            <span class="ident">id</span>: <span class="ident">EnumId</span>(<span class="ident">enum_index</span> <span class="kw">as</span> <span class="ident">u32</span>),
-        })
+        (<span class="number">0</span>..<span class="self">self</span>.<span class="ident">enums</span>.<span class="ident">len</span>()).<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">enum_index</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">walk</span>(<span class="ident">EnumId</span>(<span class="ident">enum_index</span> <span class="kw">as</span> <span class="ident">u32</span>)))
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">walk_foreign_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {

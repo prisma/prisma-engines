@@ -384,7 +384,7 @@
         };
 
         <span class="comment">// First insert all namespaces from the previous schema.</span>
-        <span class="kw">for</span> <span class="ident">namespace</span> <span class="kw">in</span> <span class="ident">schemas</span>.<span class="ident">previous</span>.<span class="ident">describer_schema</span>.<span class="ident">namespace_walkers</span>() {
+        <span class="kw">for</span> <span class="ident">namespace</span> <span class="kw">in</span> <span class="ident">schemas</span>.<span class="ident">previous</span>.<span class="ident">describer_schema</span>.<span class="ident">walk_namespaces</span>() {
             <span class="kw">let</span> <span class="ident">namespace_name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">flavour</span>.<span class="ident">lower_cases_table_names</span>() {
                 <span class="ident">namespace</span>.<span class="ident">name</span>().<span class="ident">to_ascii_lowercase</span>().<span class="ident">into</span>()
             } <span class="kw">else</span> {
@@ -395,7 +395,7 @@
         }
 
         <span class="comment">// Then insert all namespaces from the next schema.</span>
-        <span class="kw">for</span> <span class="ident">namespace</span> <span class="kw">in</span> <span class="ident">schemas</span>.<span class="ident">next</span>.<span class="ident">describer_schema</span>.<span class="ident">namespace_walkers</span>() {
+        <span class="kw">for</span> <span class="ident">namespace</span> <span class="kw">in</span> <span class="ident">schemas</span>.<span class="ident">next</span>.<span class="ident">describer_schema</span>.<span class="ident">walk_namespaces</span>() {
             <span class="kw">let</span> <span class="ident">namespace_name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">flavour</span>.<span class="ident">lower_cases_table_names</span>() {
                 <span class="ident">namespace</span>.<span class="ident">name</span>().<span class="ident">to_ascii_lowercase</span>().<span class="ident">into</span>()
             } <span class="kw">else</span> {
