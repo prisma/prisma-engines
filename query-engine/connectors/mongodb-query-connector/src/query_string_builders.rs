@@ -1,20 +1,17 @@
-//! query_strings provides functions for building query strings aynchronously from values
-//! of driver types such as Document. These query strings are not feed trough the wire to
-//! mongodb their main purpose is to add the query to log traces
+//! query_strings provides of types to build strings representing textual mongodb queries
+//! from driver types such as Document. These are used for logging / debugging purposes
+//! mainly and generated lazily. There is a type of each different type of query to generate
+//!
+//! All types implemen the QueryStringBuilder trait which is dynamically dispatched to
+//! a specific query string builder.
 use mongodb::bson::{Bson, Document};
 use std::fmt::Write;
-
-macro_rules! write_indented {
-    ($buffer:expr, $depth:expr, $fmt_str:literal, $($args:expr)*) => {
-        write!($buffer, "{}{}", indent($depth), format!($fmt_str, $($args)*))?;
-    };
-}
 
 pub(crate) trait QueryStringBuilder: Sync + Send {
     fn build(&self) -> String {
         let mut buffer = String::new();
 
-        write!(&mut buffer, "db.{}.{}", self.collection(), self.query_type()).unwrap();
+        write!(&mut buffer, "db.{}.{}(", self.collection(), self.query_type()).unwrap();
         self.write_query(&mut buffer);
         write!(&mut buffer, ")").unwrap();
 
@@ -124,6 +121,110 @@ impl QueryStringBuilder for UpdateMany<'_> {
             fmt_doc(buffer, last, 1).unwrap();
         }
     }
+}
+
+pub(crate) struct UpdateOne<'a> {
+    filter: &'a Document,
+    update_doc: &'a Document,
+    coll_name: &'a str,
+}
+
+impl UpdateOne<'_> {
+    pub(crate) fn new<'a>(filter: &'a Document, update_doc: &'a Document, coll_name: &'a str) -> UpdateOne<'a> {
+        UpdateOne {
+            filter,
+            update_doc,
+            coll_name,
+        }
+    }
+}
+
+impl QueryStringBuilder for UpdateOne<'_> {
+    fn collection(&self) -> &str {
+        self.coll_name
+    }
+
+    fn query_type(&self) -> &str {
+        "updateOne"
+    }
+
+    fn write_query(&self, buffer: &mut String) {
+        fmt_doc(buffer, self.filter, 1).unwrap();
+
+        if cfg!(debug_assertions) {
+            writeln!(buffer, ", [").unwrap();
+        } else {
+            write!(buffer, ", [").unwrap();
+        }
+
+        fmt_doc(buffer, self.update_doc, 1).unwrap();
+    }
+}
+
+pub(crate) struct DeleteMany<'a> {
+    filter: &'a Document,
+    coll_name: &'a str,
+}
+
+impl DeleteMany<'_> {
+    pub(crate) fn new<'a>(filter: &'a Document, coll_name: &'a str) -> DeleteMany<'a> {
+        DeleteMany { filter, coll_name }
+    }
+}
+
+impl QueryStringBuilder for DeleteMany<'_> {
+    fn collection(&self) -> &str {
+        self.coll_name
+    }
+
+    fn query_type(&self) -> &str {
+        "deleteMany"
+    }
+
+    fn write_query(&self, buffer: &mut String) {
+        fmt_doc(buffer, self.filter, 1).unwrap();
+    }
+}
+
+pub(crate) struct InsertMany<'a> {
+    insert_docs: &'a [Document],
+    coll_name: &'a str,
+    ordered: bool,
+}
+
+impl InsertMany<'_> {
+    pub(crate) fn new<'a>(insert_docs: &'a [Document], ordered: bool, coll_name: &'a str) -> InsertMany<'a> {
+        InsertMany {
+            insert_docs,
+            coll_name,
+            ordered,
+        }
+    }
+}
+
+impl QueryStringBuilder for InsertMany<'_> {
+    fn collection(&self) -> &str {
+        self.coll_name
+    }
+
+    fn query_type(&self) -> &str {
+        "insertMany"
+    }
+
+    fn write_query(&self, buffer: &mut String) {
+        for doc in self.insert_docs {
+            fmt_doc(buffer, doc, 1).unwrap();
+        }
+
+        write!(buffer, "], ").unwrap();
+        write!(buffer, r#"{{ "ordered": {} }}"#, self.ordered).unwrap();
+    }
+}
+
+macro_rules! write_indented {
+    ($buffer:expr, $depth:expr, $fmt_str:literal, $($args:expr)*) => {
+        write!($buffer, "{}{}", indent($depth), format!($fmt_str, $($args)*))?;
+    };
 }
 
 #[cfg(debug_assertions)]

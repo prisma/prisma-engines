@@ -2,7 +2,7 @@ use super::*;
 use crate::{
     error::{DecorateErrorWithFieldInformationExtension, MongoError},
     filter::{FilterPrefix, MongoFilter, MongoFilterVisitor},
-    logger, output_meta,
+    output_meta,
     query_builder::MongoReadQueryBuilder,
     query_string_builders,
     root_queries::raw::{MongoCommand, MongoOperation},
@@ -119,9 +119,11 @@ pub async fn create_records<'conn>(
     let ordered = !skip_duplicates;
     let options = Some(InsertManyOptions::builder().ordered(ordered).build());
 
-    logger::log_insert_many(coll.name(), &docs, ordered);
-
-    let insert = observing(None, || coll.insert_many_with_session(docs, options, session)).instrument(span);
+    let query_string_builder = query_string_builders::InsertMany::new(&docs, ordered, coll.name());
+    let insert = observing(Some(&query_string_builder), || {
+        coll.insert_many_with_session(docs.clone(), options, session)
+    })
+    .instrument(span);
 
     match insert.await {
         Ok(insert_result) => Ok(insert_result.inserted_ids.len()),
@@ -259,10 +261,12 @@ pub async fn delete_records<'conn>(
     );
 
     let filter = doc! { id_field.db_name(): { "$in": ids } };
-    logger::log_delete_many(coll.name(), &filter);
-    let delete_result = observing(None, || coll.delete_many_with_session(filter, None, session))
-        .instrument(span)
-        .await?;
+    let query_string_builder = query_string_builders::DeleteMany::new(&filter, coll.name());
+    let delete_result = observing(Some(&query_string_builder), || {
+        coll.delete_many_with_session(filter.clone(), None, session)
+    })
+    .instrument(span)
+    .await?;
 
     Ok(delete_result.deleted_count as usize)
 }
@@ -340,10 +344,11 @@ pub async fn m2m_connect<'conn>(
 
     let parent_update = doc! { "$addToSet": { parent_ids_scalar_field_name: { "$each": child_ids.clone() } } };
 
-    logger::log_update_one(parent_coll.name(), &parent_filter, &parent_update);
-    // First update the parent and add all child IDs to the m:n scalar field.
-    observing(None, || {
-        parent_coll.update_one_with_session(parent_filter, parent_update, None, session)
+    let query_string_builder =
+        query_string_builders::UpdateOne::new(&parent_filter, &parent_update, parent_coll.name());
+
+    observing(Some(&query_string_builder), || {
+        parent_coll.update_one_with_session(parent_filter.clone(), parent_update.clone(), None, session)
     })
     .await?;
 
@@ -398,9 +403,10 @@ pub async fn m2m_disconnect<'conn>(
     let parent_update = doc! { "$pullAll": { parent_ids_scalar_field_name: child_ids.clone() } };
 
     // First update the parent and remove all child IDs to the m:n scalar field.
-    logger::log_update_one(parent_coll.name(), &parent_filter, &parent_update);
-    observing(None, || {
-        parent_coll.update_one_with_session(parent_filter, parent_update, None, session)
+    let query_string_builder =
+        query_string_builders::UpdateOne::new(&parent_filter, &parent_update, parent_coll.name());
+    observing(Some(&query_string_builder), || {
+        parent_coll.update_one_with_session(parent_filter.clone(), parent_update.clone(), None, session)
     })
     .await?;
 
