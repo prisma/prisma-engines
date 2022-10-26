@@ -46,7 +46,7 @@ mod mongodb {
         );
         let logs = runner.get_logs().await;
         let last_log_line = logs.last().unwrap();
-        let expected = format!(
+        let expected_query = format!(
             r##"db.Standing.updateMany({{
     _id: {{
         $in: [
@@ -79,11 +79,21 @@ mod mongodb {
         );
 
         assert!(
-            last_log_line.contains(expected.as_str()),
+            last_log_line.contains(expected_query.as_str()),
             "{} should have contained {}",
             last_log_line,
-            expected
+            expected_query
         );
+
+        // Piggybacking assertion reproducing https://github.com/prisma/prisma/issues/14378
+        let expected_duration_field = "duration_ms";
+        assert!(
+            last_log_line.contains(expected_duration_field),
+            "{} should have contained {}",
+            last_log_line,
+            expected_duration_field
+        );
+
         Ok(())
     }
 }
