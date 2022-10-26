@@ -44,11 +44,7 @@ impl QueryStringBuilder for Aggregate<'_> {
     }
 
     fn write_query(&self, buffer: &mut String) {
-        let stages: Vec<_> = self
-            .stages
-            .into_iter()
-            .map(|stage| Bson::Document(stage.clone()))
-            .collect();
+        let stages: Vec<_> = self.stages.iter().map(|stage| Bson::Document(stage.clone())).collect();
 
         fmt_list(buffer, &stages, 1).unwrap();
     }

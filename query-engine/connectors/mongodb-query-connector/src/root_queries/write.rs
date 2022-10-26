@@ -4,7 +4,7 @@ use crate::{
     filter::{FilterPrefix, MongoFilter, MongoFilterVisitor},
     output_meta,
     query_builder::MongoReadQueryBuilder,
-    query_string_builders,
+    query_string_builders::{DeleteMany, InsertMany, InsertOne, UpdateMany, UpdateOne},
     root_queries::raw::{MongoCommand, MongoOperation},
     IntoBson,
 };
@@ -64,7 +64,7 @@ pub async fn create_record<'conn>(
         doc.insert(field.db_name().to_owned(), bson);
     }
 
-    let query_builder = query_string_builders::InsertOne::new(&doc, coll.name());
+    let query_builder = InsertOne::new(&doc, coll.name());
     let insert_result = observing(Some(&query_builder), || {
         coll.insert_one_with_session(doc.clone(), None, session)
     })
@@ -119,7 +119,7 @@ pub async fn create_records<'conn>(
     let ordered = !skip_duplicates;
     let options = Some(InsertManyOptions::builder().ordered(ordered).build());
 
-    let query_string_builder = query_string_builders::InsertMany::new(&docs, ordered, coll.name());
+    let query_string_builder = InsertMany::new(&docs, ordered, coll.name());
     let insert = observing(Some(&query_string_builder), || {
         coll.insert_many_with_session(docs.clone(), options, session)
     })
@@ -202,7 +202,7 @@ pub async fn update_records<'conn>(
     }
 
     if !update_docs.is_empty() {
-        let query_string_builder = query_string_builders::UpdateMany::new(&filter, &update_docs, coll.name());
+        let query_string_builder = UpdateMany::new(&filter, &update_docs, coll.name());
         let res = observing(Some(&query_string_builder), || {
             coll.update_many_with_session(filter.clone(), update_docs.clone(), None, session)
         })
@@ -261,7 +261,7 @@ pub async fn delete_records<'conn>(
     );
 
     let filter = doc! { id_field.db_name(): { "$in": ids } };
-    let query_string_builder = query_string_builders::DeleteMany::new(&filter, coll.name());
+    let query_string_builder = DeleteMany::new(&filter, coll.name());
     let delete_result = observing(Some(&query_string_builder), || {
         coll.delete_many_with_session(filter.clone(), None, session)
     })
@@ -344,8 +344,7 @@ pub async fn m2m_connect<'conn>(
 
     let parent_update = doc! { "$addToSet": { parent_ids_scalar_field_name: { "$each": child_ids.clone() } } };
 
-    let query_string_builder =
-        query_string_builders::UpdateOne::new(&parent_filter, &parent_update, parent_coll.name());
+    let query_string_builder = UpdateOne::new(&parent_filter, &parent_update, parent_coll.name());
 
     observing(Some(&query_string_builder), || {
         parent_coll.update_one_with_session(parent_filter.clone(), parent_update.clone(), None, session)
@@ -358,7 +357,7 @@ pub async fn m2m_connect<'conn>(
     let child_update = doc! { "$addToSet": { child_ids_scalar_field_name: parent_id } };
 
     let child_updates = vec![child_update.clone()];
-    let query_string_builder = query_string_builders::UpdateMany::new(&child_filter, &child_updates, child_coll.name());
+    let query_string_builder = UpdateMany::new(&child_filter, &child_updates, child_coll.name());
     observing(Some(&query_string_builder), || {
         child_coll.update_many_with_session(child_filter.clone(), child_update.clone(), None, session)
     })
@@ -403,8 +402,7 @@ pub async fn m2m_disconnect<'conn>(
     let parent_update = doc! { "$pullAll": { parent_ids_scalar_field_name: child_ids.clone() } };
 
     // First update the parent and remove all child IDs to the m:n scalar field.
-    let query_string_builder =
-        query_string_builders::UpdateOne::new(&parent_filter, &parent_update, parent_coll.name());
+    let query_string_builder = UpdateOne::new(&parent_filter, &parent_update, parent_coll.name());
     observing(Some(&query_string_builder), || {
         parent_coll.update_one_with_session(parent_filter.clone(), parent_update.clone(), None, session)
     })
@@ -417,7 +415,7 @@ pub async fn m2m_disconnect<'conn>(
     let child_update = doc! { "$pull": { child_ids_scalar_field_name: parent_id } };
 
     let child_updates = vec![child_update.clone()];
-    let query_string_builder = query_string_builders::UpdateMany::new(&child_filter, &child_updates, child_coll.name());
+    let query_string_builder = UpdateMany::new(&child_filter, &child_updates, child_coll.name());
     observing(Some(&query_string_builder), || {
         child_coll.update_many_with_session(child_filter.clone(), child_update, None, session)
     })
