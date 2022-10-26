@@ -370,6 +370,8 @@ async fn no_relation_mode(api: &TestApi) -> TestResult {
 
 // @@map
 mod at_at_map {
+    use indoc::indoc;
+    use introspection_engine_tests::test_api::*;
 
     // referentialIntegrity = "prisma" with @@map loses track of the relation policy ("prisma") and of @relations.
     #[test_connector(tags(Mysql), exclude(Vitess))]
@@ -422,26 +424,26 @@ mod at_at_map {
 
         let expected = expect![[r#"
             generator client {
-                provider        = "prisma-client-js"
-                previewFeatures = ["referentialIntegrity"]
+              provider        = "prisma-client-js"
+              previewFeatures = ["referentialIntegrity"]
             }
 
             datasource db {
-                provider = "mysql"
-                url      = env("TEST_DATABASE_URL")
+              provider = "mysql"
+              url      = env("TEST_DATABASE_URL")
             }
 
             model Foo {
-                id     Int @id
-                bar_id Int @unique
+              id     Int @id
+              bar_id Int @unique
 
-                @@map("foo_table")
+              @@map("foo_table")
             }
 
             model Bar {
-                id Int @id
+              id Int @id
 
-                @@map("bar_table")
+              @@map("bar_table")
             }
         "#]];
 
@@ -504,28 +506,28 @@ mod at_at_map {
 
         let expected = expect![[r#"
             generator client {
-                provider        = "prisma-client-js"
-                previewFeatures = ["referentialIntegrity"]
+              provider        = "prisma-client-js"
+              previewFeatures = ["referentialIntegrity"]
             }
 
             datasource db {
-                provider = "mysql"
-                url      = env("TEST_DATABASE_URL")
+              provider = "mysql"
+              url      = env("TEST_DATABASE_URL")
             }
 
             model Foo {
-                id     Int @id
-                bar_id Int @unique
-                bar    Bar @relation(fields: [bar_id], references: [id])
+              id     Int @id
+              bar_id Int @unique
+              bar    Bar @relation(fields: [bar_id], references: [id])
 
-                @@map("foo_table")
+              @@map("foo_table")
             }
 
             model Bar {
-                id  Int  @id
-                foo Foo?
+              id  Int  @id
+              foo Foo?
 
-                @@map("bar_table")
+              @@map("bar_table")
             }
         "#]];
 
@@ -586,27 +588,27 @@ mod at_at_map {
 
         let expected = expect![[r#"
             generator client {
-                provider        = "prisma-client-js"
-                previewFeatures = ["referentialIntegrity"]
+              provider        = "prisma-client-js"
+              previewFeatures = ["referentialIntegrity"]
             }
 
             datasource db {
-                provider     = "mysql"
-                url          = env("TEST_DATABASE_URL")
-                relationMode = "prisma"
+              provider     = "mysql"
+              url          = env("TEST_DATABASE_URL")
+              relationMode = "prisma"
             }
 
             model Foo {
-                id     Int @id
-                bar_id Int @unique
+              id     Int @id
+              bar_id Int @unique
 
-                @@map("foo_table")
+              @@map("foo_table")
             }
 
             model Bar {
-                id Int @id
+              id Int @id
 
-                @@map("bar_table")
+              @@map("bar_table")
             }
         "#]];
 
@@ -618,7 +620,7 @@ mod at_at_map {
 
     // relationMode = "foreignKeys" with @@map preserves the relation policy ("foreignKeys") and @relations, which are moved to the bottom.
     #[test_connector(tags(Mysql), exclude(Vitess))]
-    async fn referential_integrity_foreign_keys(api: &TestApi) -> TestResult {
+    async fn relation_mode_foreign_keys(api: &TestApi) -> TestResult {
         let init = formatdoc! {r#"
             CREATE TABLE `foo_table` (
                 `id` INTEGER NOT NULL,
@@ -669,29 +671,29 @@ mod at_at_map {
 
         let expected = expect![[r#"
             generator client {
-                provider        = "prisma-client-js"
-                previewFeatures = ["referentialIntegrity"]
+              provider        = "prisma-client-js"
+              previewFeatures = ["referentialIntegrity"]
             }
 
             datasource db {
-                provider     = "mysql"
-                url          = env("TEST_DATABASE_URL")
-                relationMode = "foreignKeys"
+              provider     = "mysql"
+              url          = env("TEST_DATABASE_URL")
+              relationMode = "foreignKeys"
             }
 
             model Foo {
-                id     Int @id
-                bar_id Int @unique
-                bar    Bar @relation(fields: [bar_id], references: [id])
+              id     Int @id
+              bar_id Int @unique
+              bar    Bar @relation(fields: [bar_id], references: [id])
 
-                @@map("foo_table")
+              @@map("foo_table")
             }
 
             model Bar {
-                id  Int  @id
-                foo Foo?
+              id  Int  @id
+              foo Foo?
 
-                @@map("bar_table")
+              @@map("bar_table")
             }
         "#]];
 

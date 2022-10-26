@@ -6,16 +6,12 @@ use introspection_engine_tests::test_api::*;
 async fn referential_integrity_prisma(api: &TestApi) -> TestResult {
     let init = formatdoc! {r#"
         CREATE TABLE "Foo" (
-            "id" INTEGER NOT NULL,
-            "bar_id" INTEGER NOT NULL,
-        
-            CONSTRAINT "Foo_pkey" PRIMARY KEY ("id")
+            "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+            "bar_id" INTEGER NOT NULL
         );
         
         CREATE TABLE "Bar" (
-            "id" INTEGER NOT NULL,
-        
-            CONSTRAINT "Bar_pkey" PRIMARY KEY ("id")
+            "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
         );
         
         CREATE UNIQUE INDEX "Foo_bar_id_key" ON "Foo"("bar_id");
@@ -30,7 +26,7 @@ async fn referential_integrity_prisma(api: &TestApi) -> TestResult {
         }
 
         datasource db {
-            provider             = "postgres"
+            provider             = "sqlite"
             url                  = env("TEST_DATABASE_URL")
             referentialIntegrity = "prisma"
         }
@@ -54,19 +50,28 @@ async fn referential_integrity_prisma(api: &TestApi) -> TestResult {
         }
 
         datasource db {
-          provider = "postgres"
+          provider = "sqlite"
           url      = env("TEST_DATABASE_URL")
         }
 
         model Foo {
-          id     Int @id
+          id     Int @id @default(autoincrement())
           bar    Bar @relation(fields: [bar_id], references: [id])
           bar_id Int @unique
         }
 
         model Bar {
-          id  Int  @id
+          id  Int  @id @default(autoincrement())
           foo Foo?
+        }
+
+        model bar_table {
+          id Int @id @default(autoincrement())
+        }
+
+        model foo_table {
+          id     Int @id @default(autoincrement())
+          bar_id Int @unique
         }
     "#]];
 
@@ -81,21 +86,16 @@ async fn referential_integrity_prisma(api: &TestApi) -> TestResult {
 async fn referential_integrity_foreign_keys(api: &TestApi) -> TestResult {
     let init = formatdoc! {r#"
         CREATE TABLE "Foo" (
-            "id" INTEGER NOT NULL,
+            "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
             "bar_id" INTEGER NOT NULL,
-        
-            CONSTRAINT "Foo_pkey" PRIMARY KEY ("id")
+            CONSTRAINT "Foo_bar_id_fkey" FOREIGN KEY ("bar_id") REFERENCES "Bar" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
         );
         
         CREATE TABLE "Bar" (
-            "id" INTEGER NOT NULL,
-        
-            CONSTRAINT "Bar_pkey" PRIMARY KEY ("id")
+            "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
         );
         
         CREATE UNIQUE INDEX "Foo_bar_id_key" ON "Foo"("bar_id");
-
-        ALTER TABLE "Foo" ADD CONSTRAINT "Foo_bar_id_fkey" FOREIGN KEY ("bar_id") REFERENCES "Bar"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
     "#};
 
     api.raw_cmd(&init).await;
@@ -107,7 +107,7 @@ async fn referential_integrity_foreign_keys(api: &TestApi) -> TestResult {
         }
 
         datasource db {
-            provider             = "postgres"
+            provider             = "sqlite"
             url                  = env("TEST_DATABASE_URL")
             referentialIntegrity = "foreignKeys"
         }
@@ -131,7 +131,7 @@ async fn referential_integrity_foreign_keys(api: &TestApi) -> TestResult {
         }
 
         datasource db {
-          provider = "postgres"
+          provider = "sqlite"
           url      = env("TEST_DATABASE_URL")
         }
 
@@ -158,16 +158,12 @@ async fn referential_integrity_foreign_keys(api: &TestApi) -> TestResult {
 async fn relation_mode_prisma(api: &TestApi) -> TestResult {
     let init = formatdoc! {r#"
         CREATE TABLE "Foo" (
-            "id" INTEGER NOT NULL,
-            "bar_id" INTEGER NOT NULL,
-        
-            CONSTRAINT "Foo_pkey" PRIMARY KEY ("id")
+            "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+            "bar_id" INTEGER NOT NULL
         );
         
         CREATE TABLE "Bar" (
-            "id" INTEGER NOT NULL,
-        
-            CONSTRAINT "Bar_pkey" PRIMARY KEY ("id")
+            "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
         );
         
         CREATE UNIQUE INDEX "Foo_bar_id_key" ON "Foo"("bar_id");
@@ -182,7 +178,7 @@ async fn relation_mode_prisma(api: &TestApi) -> TestResult {
         }
 
         datasource db {
-            provider     = "postgres"
+            provider     = "sqlite"
             url          = env("TEST_DATABASE_URL")
             relationMode = "prisma"
         }
@@ -206,20 +202,29 @@ async fn relation_mode_prisma(api: &TestApi) -> TestResult {
         }
 
         datasource db {
-          provider     = "postgres"
+          provider     = "sqlite"
           url          = env("TEST_DATABASE_URL")
           relationMode = "prisma"
         }
 
         model Foo {
-          id     Int @id
+          id     Int @id @default(autoincrement())
           bar    Bar @relation(fields: [bar_id], references: [id])
           bar_id Int @unique
         }
 
         model Bar {
-          id  Int  @id
+          id  Int  @id @default(autoincrement())
           foo Foo?
+        }
+
+        model bar_table {
+          id Int @id @default(autoincrement())
+        }
+
+        model foo_table {
+          id     Int @id @default(autoincrement())
+          bar_id Int @unique
         }
     "#]];
 
@@ -234,21 +239,16 @@ async fn relation_mode_prisma(api: &TestApi) -> TestResult {
 async fn relation_mode_foreign_keys(api: &TestApi) -> TestResult {
     let init = formatdoc! {r#"
         CREATE TABLE "Foo" (
-            "id" INTEGER NOT NULL,
+            "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
             "bar_id" INTEGER NOT NULL,
-        
-            CONSTRAINT "Foo_pkey" PRIMARY KEY ("id")
+            CONSTRAINT "Foo_bar_id_fkey" FOREIGN KEY ("bar_id") REFERENCES "Bar" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
         );
         
         CREATE TABLE "Bar" (
-            "id" INTEGER NOT NULL,
-        
-            CONSTRAINT "Bar_pkey" PRIMARY KEY ("id")
+            "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
         );
         
         CREATE UNIQUE INDEX "Foo_bar_id_key" ON "Foo"("bar_id");
-
-        ALTER TABLE "Foo" ADD CONSTRAINT "Foo_bar_id_fkey" FOREIGN KEY ("bar_id") REFERENCES "Bar"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
     "#};
 
     api.raw_cmd(&init).await;
@@ -260,7 +260,7 @@ async fn relation_mode_foreign_keys(api: &TestApi) -> TestResult {
         }
 
         datasource db {
-            provider     = "postgres"
+            provider     = "sqlite"
             url          = env("TEST_DATABASE_URL")
             relationMode = "foreignKeys"
         }
@@ -284,7 +284,7 @@ async fn relation_mode_foreign_keys(api: &TestApi) -> TestResult {
         }
 
         datasource db {
-          provider     = "postgres"
+          provider     = "sqlite"
           url          = env("TEST_DATABASE_URL")
           relationMode = "foreignKeys"
         }
@@ -312,28 +312,23 @@ async fn relation_mode_foreign_keys(api: &TestApi) -> TestResult {
 async fn no_relation_mode(api: &TestApi) -> TestResult {
     let init = formatdoc! {r#"
         CREATE TABLE "Foo" (
-            "id" INTEGER NOT NULL,
+            "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
             "bar_id" INTEGER NOT NULL,
-        
-            CONSTRAINT "Foo_pkey" PRIMARY KEY ("id")
+            CONSTRAINT "Foo_bar_id_fkey" FOREIGN KEY ("bar_id") REFERENCES "Bar" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
         );
         
         CREATE TABLE "Bar" (
-            "id" INTEGER NOT NULL,
-        
-            CONSTRAINT "Bar_pkey" PRIMARY KEY ("id")
+            "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
         );
         
         CREATE UNIQUE INDEX "Foo_bar_id_key" ON "Foo"("bar_id");
-
-        ALTER TABLE "Foo" ADD CONSTRAINT "Foo_bar_id_fkey" FOREIGN KEY ("bar_id") REFERENCES "Bar"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
     "#};
 
     api.raw_cmd(&init).await;
 
     let input = indoc! {r#"
         datasource db {
-            provider = "postgres"
+            provider = "sqlite"
             url      = env("TEST_DATABASE_URL")
         }
 
@@ -351,7 +346,7 @@ async fn no_relation_mode(api: &TestApi) -> TestResult {
 
     let expected = expect![[r#"
         datasource db {
-          provider = "postgres"
+          provider = "sqlite"
           url      = env("TEST_DATABASE_URL")
         }
 
@@ -375,22 +370,20 @@ async fn no_relation_mode(api: &TestApi) -> TestResult {
 
 // @@map
 mod at_at_map {
+    use indoc::indoc;
+    use introspection_engine_tests::test_api::*;
 
     // referentialIntegrity = "prisma" with @@map loses track of the relation policy ("prisma") and of @relations.
     #[test_connector(tags(Sqlite))]
     async fn referential_integrity_prisma(api: &TestApi) -> TestResult {
         let init = formatdoc! {r#"
             CREATE TABLE "foo_table" (
-                "id" INTEGER NOT NULL,
-                "bar_id" INTEGER NOT NULL,
-            
-                CONSTRAINT "foo_table_pkey" PRIMARY KEY ("id")
+                "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                "bar_id" INTEGER NOT NULL
             );
             
             CREATE TABLE "bar_table" (
-                "id" INTEGER NOT NULL,
-            
-                CONSTRAINT "bar_table_pkey" PRIMARY KEY ("id")
+                "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
             );
             
             CREATE UNIQUE INDEX "foo_table_bar_id_key" ON "foo_table"("bar_id");
@@ -405,7 +398,7 @@ mod at_at_map {
             }
 
             datasource db {
-                provider             = "postgres"
+                provider             = "sqlite"
                 url                  = env("TEST_DATABASE_URL")
                 referentialIntegrity = "prisma"
             }
@@ -428,26 +421,33 @@ mod at_at_map {
 
         let expected = expect![[r#"
             generator client {
-                provider        = "prisma-client-js"
-                previewFeatures = ["referentialIntegrity"]
+              provider        = "prisma-client-js"
+              previewFeatures = ["referentialIntegrity"]
             }
 
             datasource db {
-                provider = "postgres"
-                url      = env("TEST_DATABASE_URL")
+              provider = "sqlite"
+              url      = env("TEST_DATABASE_URL")
             }
 
             model Foo {
-                id     Int @id
-                bar_id Int @unique
-
-                @@map("foo_table")
+              id     Int @id @default(autoincrement())
+              bar    Bar @relation(fields: [bar_id], references: [id], map: "foo_table_bar_id_fkey")
+              bar_id Int @unique
             }
 
             model Bar {
-                id Int @id
+              id  Int  @id @default(autoincrement())
+              foo Foo?
+            }
 
-                @@map("bar_table")
+            model bar_table {
+              id Int @id @default(autoincrement())
+            }
+
+            model foo_table {
+              id     Int @id @default(autoincrement())
+              bar_id Int @unique
             }
         "#]];
 
@@ -462,21 +462,16 @@ mod at_at_map {
     async fn referential_integrity_foreign_keys(api: &TestApi) -> TestResult {
         let init = formatdoc! {r#"
             CREATE TABLE "foo_table" (
-                "id" INTEGER NOT NULL,
+                "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                 "bar_id" INTEGER NOT NULL,
-
-                CONSTRAINT "foo_table_pkey" PRIMARY KEY ("id")
+                CONSTRAINT "foo_table_bar_id_fkey" FOREIGN KEY ("bar_id") REFERENCES "bar_table" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
             );
-
+            
             CREATE TABLE "bar_table" (
-                "id" INTEGER NOT NULL,
-
-                CONSTRAINT "bar_table_pkey" PRIMARY KEY ("id")
+                "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
             );
-
+            
             CREATE UNIQUE INDEX "foo_table_bar_id_key" ON "foo_table"("bar_id");
-
-            ALTER TABLE "foo_table" ADD CONSTRAINT "foo_table_bar_id_fkey" FOREIGN KEY ("bar_id") REFERENCES "bar_table"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
         "#};
 
         api.raw_cmd(&init).await;
@@ -488,7 +483,7 @@ mod at_at_map {
             }
 
             datasource db {
-                provider             = "postgres"
+                provider             = "sqlite"
                 url                  = env("TEST_DATABASE_URL")
                 referentialIntegrity = "foreignKeys"
             }
@@ -516,7 +511,7 @@ mod at_at_map {
             }
 
             datasource db {
-                provider = "postgres"
+                provider = "sqlite"
                 url      = env("TEST_DATABASE_URL")
             }
 
@@ -547,18 +542,14 @@ mod at_at_map {
     async fn relation_mode_prisma(api: &TestApi) -> TestResult {
         let init = formatdoc! {r#"
             CREATE TABLE "foo_table" (
-                "id" INTEGER NOT NULL,
-                "bar_id" INTEGER NOT NULL,
-
-                CONSTRAINT "foo_table_pkey" PRIMARY KEY ("id")
+                "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                "bar_id" INTEGER NOT NULL
             );
-
+            
             CREATE TABLE "bar_table" (
-                "id" INTEGER NOT NULL,
-
-                CONSTRAINT "bar_table_pkey" PRIMARY KEY ("id")
+                "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
             );
-
+            
             CREATE UNIQUE INDEX "foo_table_bar_id_key" ON "foo_table"("bar_id");
         "#};
 
@@ -571,7 +562,7 @@ mod at_at_map {
             }
 
             datasource db {
-                provider     = "postgres"
+                provider     = "sqlite"
                 url          = env("TEST_DATABASE_URL")
                 relationMode = "prisma"
             }
@@ -594,27 +585,34 @@ mod at_at_map {
 
         let expected = expect![[r#"
             generator client {
-                provider        = "prisma-client-js"
-                previewFeatures = ["referentialIntegrity"]
+              provider        = "prisma-client-js"
+              previewFeatures = ["referentialIntegrity"]
             }
 
             datasource db {
-                provider     = "postgres"
-                url          = env("TEST_DATABASE_URL")
-                relationMode = "prisma"
+              provider     = "sqlite"
+              url          = env("TEST_DATABASE_URL")
+              relationMode = "prisma"
             }
 
             model Foo {
-                id     Int @id
-                bar_id Int @unique
-
-                @@map("foo_table")
+              id     Int @id @default(autoincrement())
+              bar    Bar @relation(fields: [bar_id], references: [id], map: "foo_table_bar_id_fkey")
+              bar_id Int @unique
             }
 
             model Bar {
-                id Int @id
+              id  Int  @id @default(autoincrement())
+              foo Foo?
+            }
 
-                @@map("bar_table")
+            model bar_table {
+              id Int @id @default(autoincrement())
+            }
+
+            model foo_table {
+              id     Int @id @default(autoincrement())
+              bar_id Int @unique
             }
         "#]];
 
@@ -626,24 +624,19 @@ mod at_at_map {
 
     // relationMode = "foreignKeys" with @@map preserves the relation policy ("foreignKeys") and @relations, which are moved to the bottom.
     #[test_connector(tags(Sqlite))]
-    async fn referential_integrity_foreign_keys(api: &TestApi) -> TestResult {
+    async fn relation_mode_foreign_keys(api: &TestApi) -> TestResult {
         let init = formatdoc! {r#"
             CREATE TABLE "foo_table" (
-                "id" INTEGER NOT NULL,
+                "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                 "bar_id" INTEGER NOT NULL,
-
-                CONSTRAINT "foo_table_pkey" PRIMARY KEY ("id")
+                CONSTRAINT "foo_table_bar_id_fkey" FOREIGN KEY ("bar_id") REFERENCES "bar_table" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
             );
-
+            
             CREATE TABLE "bar_table" (
-                "id" INTEGER NOT NULL,
-
-                CONSTRAINT "bar_table_pkey" PRIMARY KEY ("id")
+                "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
             );
-
+            
             CREATE UNIQUE INDEX "foo_table_bar_id_key" ON "foo_table"("bar_id");
-
-            ALTER TABLE "foo_table" ADD CONSTRAINT "foo_table_bar_id_fkey" FOREIGN KEY ("bar_id") REFERENCES "bar_table"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
         "#};
 
         api.raw_cmd(&init).await;
@@ -655,7 +648,7 @@ mod at_at_map {
             }
 
             datasource db {
-                provider     = "postgres"
+                provider     = "sqlite"
                 url          = env("TEST_DATABASE_URL")
                 relationMode = "foreignKeys"
             }
@@ -683,7 +676,7 @@ mod at_at_map {
             }
 
             datasource db {
-                provider     = "postgres"
+                provider     = "sqlite"
                 url          = env("TEST_DATABASE_URL")
                 relationMode = "foreignKeys"
             }
@@ -715,28 +708,23 @@ mod at_at_map {
     async fn no_relation(api: &TestApi) -> TestResult {
         let init = formatdoc! {r#"
             CREATE TABLE "foo_table" (
-                "id" INTEGER NOT NULL,
+                "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                 "bar_id" INTEGER NOT NULL,
-
-                CONSTRAINT "foo_table_pkey" PRIMARY KEY ("id")
+                CONSTRAINT "foo_table_bar_id_fkey" FOREIGN KEY ("bar_id") REFERENCES "bar_table" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
             );
-
+            
             CREATE TABLE "bar_table" (
-                "id" INTEGER NOT NULL,
-
-                CONSTRAINT "bar_table_pkey" PRIMARY KEY ("id")
+                "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
             );
-
+            
             CREATE UNIQUE INDEX "foo_table_bar_id_key" ON "foo_table"("bar_id");
-
-            ALTER TABLE "foo_table" ADD CONSTRAINT "foo_table_bar_id_fkey" FOREIGN KEY ("bar_id") REFERENCES "bar_table"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
         "#};
 
         api.raw_cmd(&init).await;
 
         let input = indoc! {r#"
             datasource db {
-                provider = "postgres"
+                provider = "sqlite"
                 url      = env("TEST_DATABASE_URL")
             }
 
@@ -758,7 +746,7 @@ mod at_at_map {
 
         let expected = expect![[r#"
             datasource db {
-                provider = "postgres"
+                provider = "sqlite"
                 url      = env("TEST_DATABASE_URL")
             }
 
