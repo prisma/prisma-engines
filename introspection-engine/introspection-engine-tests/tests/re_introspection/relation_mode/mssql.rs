@@ -1,7 +1,7 @@
 use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 
-// referentialIntegrity = "prisma" preserves the relation policy ("prisma") as well as @relations.
+// referentialIntegrity="prisma" is renamed as relationMode="prisma", and @relations are preserved.
 #[test_connector(tags(Mssql))]
 async fn referential_integrity_prisma(api: &TestApi) -> TestResult {
     let init = formatdoc! {r#"
@@ -51,9 +51,9 @@ async fn referential_integrity_prisma(api: &TestApi) -> TestResult {
         }
 
         datasource db {
-          provider             = "sqlserver"
-          url                  = env("TEST_DATABASE_URL")
-          referentialIntegrity = "prisma"
+          provider     = "sqlserver"
+          url          = env("TEST_DATABASE_URL")
+          relationMode = "prisma"
         }
 
         model Foo {
@@ -74,7 +74,7 @@ async fn referential_integrity_prisma(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-// referentialIntegrity = "prisma" preserves the relation policy ("foreignKeys") as well as @relations, which are moved to the bottom.
+// referentialIntegrity="foreignKeys" is renamed as relationMode="foreignKeys", and @relations are preserved but moved to the bottom.
 #[test_connector(tags(Mssql))]
 async fn referential_integrity_foreign_keys(api: &TestApi) -> TestResult {
     let init = formatdoc! {r#"
@@ -126,9 +126,9 @@ async fn referential_integrity_foreign_keys(api: &TestApi) -> TestResult {
         }
 
         datasource db {
-          provider             = "sqlserver"
-          url                  = env("TEST_DATABASE_URL")
-          referentialIntegrity = "foreignKeys"
+          provider     = "sqlserver"
+          url          = env("TEST_DATABASE_URL")
+          relationMode = "foreignKeys"
         }
 
         model Foo {
@@ -149,7 +149,7 @@ async fn referential_integrity_foreign_keys(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-// relationMode = "prisma" preserves the relation policy ("prisma") as well as @relations.
+// relationMode="prisma" preserves the relation policy ("prisma") as well as @relations.
 #[test_connector(tags(Mssql))]
 async fn relation_mode_prisma(api: &TestApi) -> TestResult {
     let init = formatdoc! {r#"
@@ -222,7 +222,7 @@ async fn relation_mode_prisma(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-// relationMode = "foreignKeys" preserves the relation policy ("foreignKeys") as well as @relations, which are moved to the bottom.
+// relationMode="foreignKeys" preserves the relation policy ("foreignKeys") as well as @relations, which are moved to the bottom.
 #[test_connector(tags(Mssql))]
 async fn relation_mode_foreign_keys(api: &TestApi) -> TestResult {
     let init = formatdoc! {r#"
