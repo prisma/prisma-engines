@@ -260,10 +260,10 @@ impl MigrationConnector for SqlMigrationConnector {
         apply_migration::render_script(migration, diagnostics, self.flavour())
     }
 
-    fn reset(&mut self, soft: bool) -> BoxFuture<'_, ConnectorResult<()>> {
+    fn reset(&mut self, soft: bool, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>> {
         Box::pin(async move {
             if soft || self.flavour.reset().await.is_err() {
-                best_effort_reset(self.flavour.as_mut()).await?;
+                best_effort_reset(self.flavour.as_mut(), namespaces).await?;
             }
 
             Ok(())
@@ -324,17 +324,22 @@ fn new_shadow_database_name() -> String {
 /// Try to reset the database to an empty state. This should only be used
 /// when we don't have the permissions to do a full reset.
 #[tracing::instrument(skip(flavour))]
-async fn best_effort_reset(flavour: &mut (dyn SqlFlavour + Send + Sync)) -> ConnectorResult<()> {
-    best_effort_reset_impl(flavour)
+async fn best_effort_reset(
+    flavour: &mut (dyn SqlFlavour + Send + Sync),
+    namespaces: Option<Namespaces>,
+) -> ConnectorResult<()> {
+    best_effort_reset_impl(flavour, namespaces)
         .await
         .map_err(|err| err.into_soft_reset_failed_error())
 }
 
-async fn best_effort_reset_impl(flavour: &mut (dyn SqlFlavour + Send + Sync)) -> ConnectorResult<()> {
+async fn best_effort_reset_impl(
+    flavour: &mut (dyn SqlFlavour + Send + Sync),
+    namespaces: Option<Namespaces>,
+) -> ConnectorResult<()> {
     tracing::info!("Attempting best_effort_reset");
 
-    // TODO: We probably need to figure this out too.
-    let source_schema = flavour.describe_schema(None).await?;
+    let source_schema = flavour.describe_schema(namespaces).await?;
     let target_schema = flavour.empty_database_schema();
     let mut steps = Vec::new();
 

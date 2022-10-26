@@ -233,8 +233,16 @@ impl TestApi {
     }
 
     /// Generate a migration script using `MigrationConnector::diff()`.
-    pub fn connector_diff(&mut self, from: DiffTarget<'_>, to: DiffTarget<'_>, namespaces: Option<Namespaces>) -> String {
-        let from = tok(self.connector.database_schema_from_diff_target(from, None, namespaces.clone())).unwrap();
+    pub fn connector_diff(
+        &mut self,
+        from: DiffTarget<'_>,
+        to: DiffTarget<'_>,
+        namespaces: Option<Namespaces>,
+    ) -> String {
+        let from = tok(self
+            .connector
+            .database_schema_from_diff_target(from, None, namespaces.clone()))
+        .unwrap();
         let to = tok(self.connector.database_schema_from_diff_target(to, None, namespaces)).unwrap();
         let migration = self.connector.diff(from, to);
         self.connector.render_script(&migration, &Default::default()).unwrap()
@@ -281,7 +289,11 @@ impl TestApi {
     }
 
     pub fn expect_sql_for_schema(&mut self, schema: &'static str, sql: &expect_test::Expect) {
-        let found = self.connector_diff(DiffTarget::Empty, DiffTarget::Datamodel(SourceFile::new_static(schema)), None);
+        let found = self.connector_diff(
+            DiffTarget::Empty,
+            DiffTarget::Datamodel(SourceFile::new_static(schema)),
+            None,
+        );
         sql.assert_eq(&found);
     }
 

@@ -368,7 +368,7 @@ impl SqlFlavour for MssqlFlavour {
         &'a mut self,
         migrations: &'a [MigrationDirectory],
         shadow_database_connection_string: Option<String>,
-        _namespaces: Option<Namespaces>,
+        namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
         let shadow_database_connection_string = shadow_database_connection_string.or_else(|| {
             self.state
@@ -399,7 +399,7 @@ impl SqlFlavour for MssqlFlavour {
                 shadow_database.ensure_connection_validity().await?;
 
                 if shadow_database.reset().await.is_err() {
-                    crate::best_effort_reset(&mut shadow_database).await?;
+                    crate::best_effort_reset(&mut shadow_database, namespaces).await?;
                 }
 
                 match self.state.params().map(|p| p.url.schema()) {

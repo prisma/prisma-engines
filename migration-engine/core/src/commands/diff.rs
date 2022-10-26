@@ -10,6 +10,9 @@ use psl::parser_database::SourceFile;
 use std::{path::Path, sync::Arc};
 
 pub async fn diff(params: DiffParams, host: Arc<dyn ConnectorHost>) -> CoreResult<DiffResult> {
+    // In order to properly handle MultiSchema, we need to make sure the preview feature is
+    // correctly set, and we need to grab the namespaces from the Schema, if any.
+    // Note that currently, we union all namespaces and preview features. This may not be correct.
     let (namespaces, preview_features) =
         namespaces_and_preview_features_from_diff_targets(&[&params.from, &params.to])?;
 
@@ -79,6 +82,9 @@ pub async fn diff(params: DiffParams, host: Arc<dyn ConnectorHost>) -> CoreResul
     Ok(DiffResult { exit_code })
 }
 
+// Grab the preview features and namespaces. Normally, we can only grab these from Schema files,
+// and we usually only expect one of these within a set of DiffTarget.
+// However, in case there's multiple, we union the results. This may be wrong.
 fn namespaces_and_preview_features_from_diff_targets(
     targets: &[&DiffTarget],
 ) -> CoreResult<(Option<Namespaces>, BitFlags<psl::PreviewFeature>)> {
@@ -90,8 +96,12 @@ fn namespaces_and_preview_features_from_diff_targets(
             DiffTarget::Migrations(_) | DiffTarget::Empty | DiffTarget::Url(_) => (),
             DiffTarget::SchemaDatasource(SchemaContainer { schema })
             | DiffTarget::SchemaDatamodel(SchemaContainer { schema }) => {
-                let schema_str: String = std::fs::read_to_string(&schema)
-                    .map_err(|err| ConnectorError::from_source(err, "When reading Prisma schema file"))?;
+                let schema_str: String = std::fs::read_to_string(&schema).map_err(|err| {
+                    ConnectorError::from_source_with_context(
+                        err,
+                        format!("Error trying to read Prisma schema file at `{}`.", schema).into_boxed_str(),
+                    )
+                })?;
 
                 let validated_schema = psl::validate(schema_str.into());
                 for (namespace, _span) in validated_schema

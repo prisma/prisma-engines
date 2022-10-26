@@ -40,15 +40,12 @@ impl Connection {
         if circumstances.contains(super::Circumstances::IsCockroachDb) {
             describer_circumstances |= describer::Circumstances::Cockroach;
         }
-        let v = Namespaces::to_vec(namespaces, String::from(params.url.schema()));
-        let mut ns_slice : Vec<&str> = v
-            .iter()
-            .map(AsRef::as_ref)
-            .collect();
-        ns_slice.sort();
+
+        let namespaces_vec = Namespaces::to_vec(namespaces, String::from(params.url.schema()));
+        let namespaces_str: Vec<&str> = namespaces_vec.iter().map(AsRef::as_ref).collect();
 
         let mut schema = sql_schema_describer::postgres::SqlSchemaDescriber::new(&self.0, describer_circumstances)
-            .describe(ns_slice.as_slice())
+            .describe(namespaces_str.as_slice())
             .await
             .map_err(|err| match err.into_kind() {
                 DescriberErrorKind::QuaintError(err) => quaint_err(&params.url)(err),

@@ -17,7 +17,8 @@ impl<'a> Reset<'a> {
     }
 
     pub async fn send(self) -> CoreResult<ResetAssertion> {
-        self.api.reset(self.soft).await?;
+        // TODO: should we somehow send Namespaces here?
+        self.api.reset(self.soft, None).await?;
 
         Ok(ResetAssertion {})
     }

@@ -5,7 +5,7 @@
 
 use crate::{api::GenericApi, commands, json_rpc::types::*, CoreResult};
 use enumflags2::BitFlags;
-use migration_connector::{ConnectorError, ConnectorHost, MigrationConnector};
+use migration_connector::{ConnectorError, ConnectorHost, MigrationConnector, Namespaces};
 use psl::parser_database::SourceFile;
 use std::{collections::HashMap, future::Future, path::Path, pin::Pin, sync::Arc};
 use tokio::sync::{mpsc, Mutex};
@@ -308,7 +308,7 @@ impl GenericApi for EngineState {
                 let composite_type_depth = From::from(params.composite_type_depth as isize);
                 let ctx = migration_connector::IntrospectionContext::new(schema, composite_type_depth);
                 Box::pin(async move {
-                    // TODO: Grab namespaces from introspect params, probably.
+                    // TODO: Grab namespaces from introspect params?
                     let result = connector.introspect(&ctx, None).await?;
 
                     Ok(IntrospectResult {
@@ -366,11 +366,11 @@ impl GenericApi for EngineState {
         .await
     }
 
-    async fn reset(&self) -> CoreResult<()> {
+    async fn reset(&self, namespaces: Option<Namespaces>) -> CoreResult<()> {
         tracing::debug!("Resetting the database.");
 
         self.with_default_connector(Box::new(move |connector| {
-            Box::pin(MigrationConnector::reset(connector, false).instrument(tracing::info_span!("Reset")))
+            Box::pin(MigrationConnector::reset(connector, false, namespaces).instrument(tracing::info_span!("Reset")))
         }))
         .await?;
         Ok(())

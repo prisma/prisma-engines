@@ -80,7 +80,7 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
         };
         let mut conn = SqlMigrationConnector::new_mysql();
         conn.set_params(params).unwrap();
-        tok(conn.reset(false)).unwrap();
+        tok(conn.reset(false, None)).unwrap();
         test_api_args.database_url().to_owned()
     } else if tags.contains(Tags::Mysql) {
         let (_, connection_string) = tok(test_api_args.create_mysql_database());

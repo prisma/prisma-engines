@@ -40,7 +40,7 @@ impl TestApi {
             .flat_map(|f| PreviewFeature::parse_opt(f))
             .collect();
 
-        let namespaces = args.namespaces().iter().map(|ns| ns.to_string()).collect();
+        let namespaces : Vec<String> = args.namespaces().iter().map(|ns| ns.to_string()).collect();
 
         let (database, connection_string): (Quaint, String) = if tags.intersects(Tags::Vitess) {
             let params = ConnectorParams {
@@ -51,7 +51,7 @@ impl TestApi {
             let mut me = SqlMigrationConnector::new_mysql();
             me.set_params(params).unwrap();
 
-            me.reset(true).await.unwrap();
+            me.reset(true, migration_connector::Namespaces::from_vec(&mut namespaces.clone())).await.unwrap();
 
             (
                 Quaint::new(connection_string).await.unwrap(),

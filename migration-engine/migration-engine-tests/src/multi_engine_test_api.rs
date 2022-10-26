@@ -51,7 +51,7 @@ impl TestApi {
             };
             let mut conn = SqlMigrationConnector::new_mysql();
             conn.set_params(params).unwrap();
-            tok(conn.reset(false)).unwrap();
+            tok(conn.reset(false, None)).unwrap();
 
             (
                 tok(Quaint::new(args.database_url())).unwrap(),

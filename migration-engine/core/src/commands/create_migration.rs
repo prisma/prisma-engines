@@ -21,6 +21,8 @@ pub async fn create_migration(
     // Infer the migration.
     let previous_migrations = list_migrations(Path::new(&input.migrations_directory_path))?;
 
+    // We need to start with the 'to', which is the Schema, in order to grab the
+    // namespaces, in case we've got MultiSchema enabled.
     let to = connector
         .database_schema_from_diff_target(
             DiffTarget::Datamodel(SourceFile::new_allocated(Arc::from(
@@ -30,7 +32,9 @@ pub async fn create_migration(
             None,
         )
         .await?;
+
     let namespaces = connector.extract_namespaces(&to);
+    // We pass the namespaces here, because we want to describe all of these namespaces.
     let from = connector
         .database_schema_from_diff_target(DiffTarget::Migrations(&previous_migrations), None, namespaces)
         .await?;

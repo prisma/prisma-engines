@@ -143,7 +143,7 @@ impl MigrationConnector for MongoDbMigrationConnector {
         migration.downcast_ref::<MongoDbMigration>().summary()
     }
 
-    fn reset(&mut self, _soft: bool) -> BoxFuture<'_, migration_connector::ConnectorResult<()>> {
+    fn reset(&mut self, _soft: bool, _namespaces: Option<Namespaces>) -> BoxFuture<'_, migration_connector::ConnectorResult<()>> {
         Box::pin(async { self.client().await?.drop_database().await })
     }
 

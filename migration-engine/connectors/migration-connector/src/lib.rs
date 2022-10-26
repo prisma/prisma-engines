@@ -8,9 +8,11 @@ mod destructive_change_checker;
 mod diff;
 mod error;
 mod migration_persistence;
+mod namespaces;
 
 pub mod migrations_directory;
 
+pub use crate::namespaces::Namespaces;
 pub use connector_params::ConnectorParams;
 pub use destructive_change_checker::{
     DestructiveChangeChecker, DestructiveChangeDiagnostics, MigrationWarning, UnexecutableMigration,
@@ -158,7 +160,7 @@ pub trait MigrationConnector: Send + Sync + 'static {
     ///
     /// Set the `soft` parameter to `true` to force a soft-reset, that is to say a reset that does
     /// not drop the database.
-    fn reset(&mut self, soft: bool) -> BoxFuture<'_, ConnectorResult<()>>;
+    fn reset(&mut self, soft: bool, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>>;
 
     /// Optionally check that the features implied by the provided datamodel are all compatible with
     /// the specific database version being used.
@@ -193,6 +195,8 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// Read a schema for diffing. The shadow database connection string is strictly optional, you
     /// don't need to pass it if a shadow database url was passed in params, or if it can be
     /// inferred from context, or if it isn't necessary for the task at hand.
+    /// When MultiSchema is enabled, the namespaces are required for diffing anything other than a
+    /// prisma schema, because that information is otherwise unavailable.
     fn database_schema_from_diff_target<'a>(
         &'a mut self,
         target: DiffTarget<'a>,
@@ -214,28 +218,6 @@ pub trait MigrationConnector: Send + Sync + 'static {
         namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<()>>;
 
-    /// TODO
+    /// Extract the namespaces from a Sql database schema (it will return None for mongodb).
     fn extract_namespaces(&self, schema: &DatabaseSchema) -> Option<Namespaces>;
-}
-
-/// TODO
-#[derive(Clone, Debug)]
-pub struct Namespaces(pub String, pub Vec<String>);
-
-impl Namespaces {
-    /// TODO
-    pub fn from_vec(v: &mut Vec<String>) -> Option<Self> {
-        v.pop().and_then(|i| Some(Namespaces(i, v.to_vec())))
-    }
-
-    /// TODO
-    pub fn to_vec(o: Option<Self>, def: String) -> Vec<String> {
-        match o {
-            Some(Namespaces(s, mut vec)) => {
-                vec.push(s);
-                vec
-            }
-            None => vec![def],
-        }
-    }
 }

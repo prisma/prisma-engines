@@ -339,7 +339,7 @@ impl SqlFlavour for PostgresFlavour {
                 tracing::info!("Connecting to user-provided shadow database.");
 
                 if shadow_database.reset().await.is_err() {
-                    crate::best_effort_reset(&mut shadow_database).await?;
+                    crate::best_effort_reset(&mut shadow_database, namespaces.clone()).await?;
                 }
 
                 shadow_db::sql_schema_from_migrations_history(migrations, shadow_database, namespaces).await
