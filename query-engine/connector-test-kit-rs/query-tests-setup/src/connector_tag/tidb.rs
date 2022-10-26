@@ -50,19 +50,12 @@ impl ConnectorTagInterface for TiDBConnectorTag {
     fn connection_string(
         &self,
         database: &str,
-        is_ci: bool,
+        _: bool,
         _is_multi_schema: bool,
         _: Option<&'static str>,
     ) -> String {
-        // Use the same database and schema name for CockroachDB - unfortunately CockroachDB
-        // can't handle 1 schema per test in a database well at this point in time.
-        if is_ci {
-            format!("mysql://root@localhost:4000/{}", database)
-        } else {
-            format!("mysql://root@localhost:4000/{}", database)
-        }
+        format!("mysql://root@localhost:4000/{}", database)
     }
-
 
     fn capabilities(&self) -> &[ConnectorCapability] {
         &self.capabilities
@@ -96,5 +89,5 @@ impl TiDBConnectorTag {
 }
 
 fn tidb_capabilities() -> Vec<ConnectorCapability> {
-    (&CAPABILITIES).to_vec().to_owned()
+    (CAPABILITIES).to_vec()
 }
