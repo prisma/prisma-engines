@@ -36,14 +36,6 @@ pub(crate) fn enrich(
     merge_ignores(old_data_model, new_data_model, warnings);
     merge_comments(old_data_model, new_data_model);
     keep_index_ordering(old_data_model, new_data_model);
-
-    // restore old model order
-    new_data_model.models.sort_by(|model_a, model_b| {
-        let model_a_idx = old_data_model.models().position(|model| model.name == model_a.name);
-        let model_b_idx = old_data_model.models().position(|model| model.name == model_b.name);
-
-        compare_options_none_last(model_a_idx, model_b_idx)
-    });
 }
 
 /// If we have to map the enum values, this makes sure we handle them
