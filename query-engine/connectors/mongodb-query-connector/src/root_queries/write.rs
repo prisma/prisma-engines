@@ -4,7 +4,7 @@ use crate::{
     filter::{FilterPrefix, MongoFilter, MongoFilterVisitor},
     output_meta,
     query_builder::MongoReadQueryBuilder,
-    query_string_builders::{DeleteMany, InsertMany, InsertOne, UpdateMany, UpdateOne},
+    query_strings::{DeleteMany, InsertMany, InsertOne, UpdateMany, UpdateOne},
     root_queries::raw::{MongoCommand, MongoOperation},
     IntoBson,
 };

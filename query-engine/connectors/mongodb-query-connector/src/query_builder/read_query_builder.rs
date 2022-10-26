@@ -6,7 +6,7 @@ use crate::{
     filter::{FilterPrefix, MongoFilterVisitor},
     join::JoinStage,
     orderby::OrderByBuilder,
-    query_string_builders::Aggregate,
+    query_strings::Aggregate,
     root_queries::observing,
     vacuum_cursor, BsonTransform, IntoBson,
 };

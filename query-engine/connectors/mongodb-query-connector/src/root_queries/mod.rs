@@ -6,7 +6,7 @@ pub mod write;
 mod raw;
 mod update;
 
-use crate::query_string_builders::QueryStringBuilder;
+use crate::query_strings::QueryString;
 use crate::{
     error::DecorateErrorWithFieldInformationExtension, output_meta::OutputMetaMapping, value::value_from_bson,
 };
@@ -57,7 +57,7 @@ fn pick_singular_id(model: &ModelRef) -> ScalarFieldRef {
 // As we don't have a mongodb query string, we need to create it from the driver object model, which
 // so better skip it if we don't need it, i.e. when the query log is disabled.
 pub(crate) async fn observing<'a, 'b, F, T, U>(
-    query_string_builder: Option<&'b dyn QueryStringBuilder>,
+    query_string_builder: Option<&'b dyn QueryString>,
     f: F,
 ) -> mongodb::error::Result<T>
 where

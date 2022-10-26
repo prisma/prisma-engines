@@ -1,13 +1,13 @@
-//! query_strings provides of types to build strings representing textual mongodb queries
-//! from driver types such as Document. These are used for logging / debugging purposes
-//! mainly and generated lazily. There is a type of each different type of query to generate
-//!
-//! All types implemen the QueryStringBuilder trait which is dynamically dispatched to
-//! a specific query string builder.
+//! query_strings provides types to build strings representing textual mongodb queries from driver
+//! types such as Document. These are used for logging / debugging purposes mainly, and are generated
+//! lazily.
+//! There is a struct fro each different type of query to generate each of them implement the
+//! QueryStringBuilder trait which is dynamically dispatched to a specific query string builder by
+//! `root_queries::observing`
 use mongodb::bson::{Bson, Document};
 use std::fmt::Write;
 
-pub(crate) trait QueryStringBuilder: Sync + Send {
+pub(crate) trait QueryString: Sync + Send {
     fn build(&self) -> String {
         let mut buffer = String::new();
 
@@ -34,7 +34,7 @@ impl Aggregate<'_> {
     }
 }
 
-impl QueryStringBuilder for Aggregate<'_> {
+impl QueryString for Aggregate<'_> {
     fn collection(&self) -> &str {
         self.coll_name
     }
@@ -61,7 +61,7 @@ impl InsertOne<'_> {
     }
 }
 
-impl QueryStringBuilder for InsertOne<'_> {
+impl QueryString for InsertOne<'_> {
     fn collection(&self) -> &str {
         self.coll_name
     }
@@ -91,7 +91,7 @@ impl UpdateMany<'_> {
     }
 }
 
-impl QueryStringBuilder for UpdateMany<'_> {
+impl QueryString for UpdateMany<'_> {
     fn collection(&self) -> &str {
         self.coll_name
     }
@@ -143,7 +143,7 @@ impl UpdateOne<'_> {
     }
 }
 
-impl QueryStringBuilder for UpdateOne<'_> {
+impl QueryString for UpdateOne<'_> {
     fn collection(&self) -> &str {
         self.coll_name
     }
@@ -176,7 +176,7 @@ impl DeleteMany<'_> {
     }
 }
 
-impl QueryStringBuilder for DeleteMany<'_> {
+impl QueryString for DeleteMany<'_> {
     fn collection(&self) -> &str {
         self.coll_name
     }
@@ -206,7 +206,7 @@ impl InsertMany<'_> {
     }
 }
 
-impl QueryStringBuilder for InsertMany<'_> {
+impl QueryString for InsertMany<'_> {
     fn collection(&self) -> &str {
         self.coll_name
     }
