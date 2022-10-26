@@ -689,7 +689,7 @@ fn enum_variants_can_be_dropped_without_data_loss(api: TestApi) {
         .send();
 
     if api.is_mysql() {
-        res.assert_warnings(&["The values [OUTRAGED] on the enum `Cat_mood` will be removed. If these variants are still used in the database, this will fail.".into(), "The values [OUTRAGED] on the enum `Human_mood` will be removed. If these variants are still used in the database, this will fail.".into()]);
+        res.assert_warnings(&["The values [OUTRAGED] on the enum `Human_mood` will be removed. If these variants are still used in the database, this will fail.".into(), "The values [OUTRAGED] on the enum `Human_mood` will be removed. If these variants are still used in the database, this will fail.".into()]);
     } else {
         res.assert_warnings(&["The values [OUTRAGED] on the enum `Mood` will be removed. If these variants are still used in the database, this will fail.".into()]);
     }

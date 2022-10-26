@@ -385,13 +385,13 @@ fn render_mysql_modify(
 }
 
 fn render_column_type(column: ColumnWalker<'_>) -> Cow<'static, str> {
-    if let ColumnTypeFamily::Enum(enum_name) = column.column_type_family() {
-        let r#enum = column
-            .schema
-            .get_enum(enum_name)
-            .unwrap_or_else(|| panic!("Could not render the variants of enum `{enum_name}`"));
-
-        let variants: String = r#enum.values.iter().map(Quoted::mysql_string).join(", ");
+    if let ColumnTypeFamily::Enum(enum_id) = column.column_type_family() {
+        let variants: String = column
+            .walk(*enum_id)
+            .values()
+            .iter()
+            .map(Quoted::mysql_string)
+            .join(", ");
 
         return format!("ENUM({})", variants).into();
     }

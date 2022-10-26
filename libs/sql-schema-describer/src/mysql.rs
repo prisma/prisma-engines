@@ -383,21 +383,17 @@ impl<'a> SqlSchemaDescriber<'a> {
 
             let default_value = col.get("column_default");
 
-            let (tpe, enum_option) = Self::get_column_type_and_enum(
-                &table_name,
-                &name,
+            let tpe = Self::get_column_type(
+                (&table_name, &name),
                 &data_type,
                 &full_data_type,
                 precision,
                 arity,
                 default_value,
+                sql_schema,
             );
             let extra = col.get_expect_string("extra").to_lowercase();
             let auto_increment = matches!(extra.as_str(), "auto_increment");
-
-            if let Some(enm) = enum_option {
-                sql_schema.enums.push(enm);
-            }
 
             let default = match default_value {
                 None => None,
@@ -518,15 +514,15 @@ impl<'a> SqlSchemaDescriber<'a> {
         }
     }
 
-    fn get_column_type_and_enum(
-        table: &str,
-        column_name: &str,
+    fn get_column_type(
+        (table, column_name): (&str, &str),
         data_type: &str,
         full_data_type: &str,
         precision: Precision,
         arity: ColumnArity,
         default: Option<&Value<'_>>,
-    ) -> (ColumnType, Option<Enum>) {
+        sql_schema: &mut SqlSchema,
+    ) -> ColumnType {
         static UNSIGNEDNESS_RE: Lazy<Regex> = Lazy::new(|| Regex::new("(?i)unsigned$").unwrap());
         let is_tinyint1 = || Self::extract_precision(full_data_type) == Some(1);
         let invalid_bool_default = || {
@@ -582,7 +578,13 @@ impl<'a> SqlSchemaDescriber<'a> {
             "tinytext" => (ColumnTypeFamily::String, Some(MySqlType::TinyText)),
             "mediumtext" => (ColumnTypeFamily::String, Some(MySqlType::MediumText)),
             "longtext" => (ColumnTypeFamily::String, Some(MySqlType::LongText)),
-            "enum" => (ColumnTypeFamily::Enum(format!("{}_{}", table, column_name)), None),
+            "enum" => {
+                let enum_name = format!("{}_{}", table, column_name);
+                let enum_id = sql_schema.push_enum(Default::default(), enum_name);
+                let mut enm = &mut sql_schema.enums[enum_id.0 as usize];
+                enm.values = Self::extract_enum_values(&full_data_type);
+                (ColumnTypeFamily::Enum(enum_id), None)
+            }
             "json" => (ColumnTypeFamily::Json, Some(MySqlType::Json)),
             "set" => (ColumnTypeFamily::String, None),
             //temporal
@@ -634,23 +636,12 @@ impl<'a> SqlSchemaDescriber<'a> {
             _ => (ColumnTypeFamily::Unsupported(full_data_type.into()), None),
         };
 
-        let enm = match &family {
-            ColumnTypeFamily::Enum(name) => Some(Enum {
-                namespace_id: Default::default(),
-                name: name.clone(),
-                values: Self::extract_enum_values(&full_data_type),
-            }),
-            _ => None,
-        };
-
-        let tpe = ColumnType {
+        ColumnType {
             full_data_type: full_data_type.to_owned(),
             family,
             arity,
             native_type: native_type.map(NativeTypeInstance::new::<MySqlType>),
-        };
-
-        (tpe, enm)
+        }
     }
 
     fn extract_precision(input: &str) -> Option<u32> {

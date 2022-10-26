@@ -333,8 +333,7 @@ async fn mapped_enum_name(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     if sql_family.is_postgres() {
-        let sql = "CREATE Type color as ENUM ( \'black\', \'white\')";
-        api.database().execute_raw(sql, &[]).await?;
+        api.raw_cmd("CREATE TYPE color AS ENUM ( \'black\', \'white\')").await;
     }
 
     api.barrel()
@@ -376,8 +375,7 @@ async fn mapped_enum_name(api: &TestApi) -> TestResult {
 
             @@map("{enum_name}")
         }}
-    "#,
-        enum_name = enum_name,
+    "#
     );
 
     let final_dm = format!(
@@ -397,8 +395,7 @@ async fn mapped_enum_name(api: &TestApi) -> TestResult {
 
             @@map("{enum_name}")
         }}
-    "#,
-        enum_name = enum_name,
+    "#
     );
 
     api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
@@ -406,9 +403,7 @@ async fn mapped_enum_name(api: &TestApi) -> TestResult {
     let expected = json!([{
         "code": 9,
         "message": "These enums were enriched with `@@map` information taken from the previous Prisma schema.",
-        "affected": [{
-            "enm": "BlackNWhite"
-        }]
+        "affected": [{ "enm": "BlackNWhite" }],
     }]);
 
     assert_eq_json!(expected, api.re_introspect_warnings(&input_dm).await?);
@@ -631,25 +626,13 @@ async fn manually_re_mapped_enum_name(api: &TestApi) -> TestResult {
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn manually_re_mapped_invalid_enum_values(api: &TestApi) -> TestResult {
-    let sql_family = api.sql_family();
-
-    if sql_family.is_postgres() {
-        let sql = r#"CREATE TYPE "invalid" as ENUM ('@', '-')"#;
-        api.database().execute_raw(sql, &[]).await?;
-    }
+    api.raw_cmd(r#"CREATE TYPE "invalid" as ENUM ('@', '-')"#).await;
 
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User", move |t| {
                 t.add_column("id", types::primary());
-
-                let typ = if sql_family.is_postgres() {
-                    "invalid"
-                } else {
-                    "ENUM ('@', '-')"
-                };
-
-                t.add_column("sign", types::custom(typ).nullable(false));
+                t.add_column("sign", types::custom("invalid").nullable(false));
             });
 
             migration.create_table("Unrelated", |t| {
@@ -658,47 +641,35 @@ async fn manually_re_mapped_invalid_enum_values(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let enum_name = if sql_family.is_postgres() {
-        "invalid"
-    } else {
-        "User_sign"
-    };
-
-    let input_dm = format!(
-        r#"
-        model User {{
+    let input_dm = r#"
+        model User {
             id               Int @id @default(autoincrement())
-            sign             {0}
-        }}
+            sign             invalid
+        }
 
-        enum {0} {{
+        enum invalid {
             at      @map("@")
             dash    @map("-")
-        }}
-    "#,
-        enum_name
-    );
+        }
+    "#;
 
-    let final_dm = format!(
-        r#"
-        model User {{
+    let final_dm = r#"
+        model User {
             id               Int @id @default(autoincrement())
-            sign             {0}
-        }}
+            sign             invalid
+        }
 
-        model Unrelated {{
+        model Unrelated {
             id               Int @id @default(autoincrement())
-        }}
+        }
 
-        enum {0} {{
+        enum invalid {
             at      @map("@")
             dash    @map("-")
-        }}
-    "#,
-        enum_name
-    );
+        }
+    "#;
 
-    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
 
     let expected = json!([{
         "code": 10,
@@ -709,7 +680,7 @@ async fn manually_re_mapped_invalid_enum_values(api: &TestApi) -> TestResult {
         ]
     }]);
 
-    assert_eq_json!(expected, api.re_introspect_warnings(&input_dm).await?);
+    assert_eq_json!(expected, api.re_introspect_warnings(input_dm).await?);
 
     Ok(())
 }
@@ -1370,19 +1341,17 @@ async fn multiple_many_to_many_on_same_model(api: &TestApi) -> TestResult {
 
 #[test_connector(tags(Mysql))]
 async fn re_introspecting_mysql_enum_names(api: &TestApi) -> TestResult {
-    let barrel = api.barrel();
-    let _setup_schema = barrel
-        .execute(|migration| {
-            migration.create_table("User", |t| {
-                t.add_column("id", types::primary());
-                t.inject_custom("color  ENUM('black', 'white') Not Null");
-            });
+    let sql = r#"
+        CREATE TABLE `User` (
+            id INTEGER AUTO_INCREMENT PRIMARY KEY,
+            color  ENUM('black', 'white') NOT NULL
+        );
 
-            migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::primary());
-            });
-        })
-        .await;
+        CREATE TABLE `Unrelated` (
+            id INTEGER AUTO_INCREMENT PRIMARY KEY
+        );
+    "#;
+    api.raw_cmd(sql).await;
 
     let input_dm = r#"
             model User {
@@ -1422,20 +1391,18 @@ async fn re_introspecting_mysql_enum_names(api: &TestApi) -> TestResult {
 
 #[test_connector(tags(Mysql))]
 async fn re_introspecting_mysql_enum_names_if_enum_is_reused(api: &TestApi) -> TestResult {
-    let barrel = api.barrel();
-    let _setup_schema = barrel
-        .execute(|migration| {
-            migration.create_table("User", |t| {
-                t.add_column("id", types::primary());
-                t.inject_custom("color  ENUM('black', 'white') Not Null");
-                t.inject_custom("color2  ENUM('black', 'white') Not Null");
-            });
+    let sql = r#"
+        CREATE TABLE `User` (
+            id INTEGER AUTO_INCREMENT PRIMARY KEY,
+            color  ENUM('black', 'white') NOT NULL,
+            color2 ENUM('black', 'white') NOT NULL
+        );
 
-            migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::primary());
-            });
-        })
-        .await;
+        CREATE TABLE `Unrelated` (
+            id INTEGER AUTO_INCREMENT PRIMARY KEY
+        );
+    "#;
+    api.raw_cmd(sql).await;
 
     let input_dm = r#"
             model User {
@@ -1450,33 +1417,23 @@ async fn re_introspecting_mysql_enum_names_if_enum_is_reused(api: &TestApi) -> T
             }
         "#;
 
-    let final_dm = r#"
-             model User {
-               id               Int @id @default(autoincrement())
-               color            BlackNWhite
-               color2           User_color2
-            }
+    let expected = expect![[r#"
+        model User {
+          id     Int         @id @default(autoincrement())
+          color  BlackNWhite
+          color2 BlackNWhite
+        }
 
-            model Unrelated {
-               id               Int @id @default(autoincrement())
-            }
+        model Unrelated {
+          id Int @id @default(autoincrement())
+        }
 
-            enum BlackNWhite{
-                black
-                white
-            }
-
-            enum User_color2{
-                black
-                white
-            }
-        "#;
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
-    assert_eq_json!(
-        serde_json::Value::Array(vec![]),
-        &api.re_introspect_warnings(input_dm).await?
-    );
-
+        enum BlackNWhite {
+          black
+          white
+        }
+    "#]];
+    api.expect_re_introspected_datamodel(input_dm, expected).await;
     Ok(())
 }
 

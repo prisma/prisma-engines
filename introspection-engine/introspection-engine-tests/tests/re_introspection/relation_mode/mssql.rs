@@ -18,7 +18,7 @@ async fn referential_integrity_prisma(api: &TestApi) -> TestResult {
         );
     "#};
 
-    api.raw_cmd(&init).await;
+    api.raw_cmd(init).await;
 
     let input = indoc! {r#"
         generator client {
@@ -93,7 +93,7 @@ async fn referential_integrity_foreign_keys(api: &TestApi) -> TestResult {
         ALTER TABLE [dbo].[Foo] ADD CONSTRAINT [Foo_bar_id_fkey] FOREIGN KEY ([bar_id]) REFERENCES [dbo].[Bar]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
     "#};
 
-    api.raw_cmd(&init).await;
+    api.raw_cmd(init).await;
 
     let input = indoc! {r#"
         generator client {
@@ -166,7 +166,7 @@ async fn relation_mode_prisma(api: &TestApi) -> TestResult {
         );
     "#};
 
-    api.raw_cmd(&init).await;
+    api.raw_cmd(init).await;
 
     let input = indoc! {r#"
         generator client {
@@ -241,7 +241,7 @@ async fn relation_mode_foreign_keys(api: &TestApi) -> TestResult {
         ALTER TABLE [dbo].[Foo] ADD CONSTRAINT [Foo_bar_id_fkey] FOREIGN KEY ([bar_id]) REFERENCES [dbo].[Bar]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
     "#};
 
-    api.raw_cmd(&init).await;
+    api.raw_cmd(init).await;
 
     let input = indoc! {r#"
         generator client {
@@ -319,7 +319,7 @@ mod at_at_map {
             );
         "#};
 
-        api.raw_cmd(&init).await;
+        api.raw_cmd(init).await;
 
         let input = indoc! {r#"
             generator client {
@@ -402,7 +402,7 @@ mod at_at_map {
             ALTER TABLE [dbo].[foo_table] ADD CONSTRAINT [foo_table_bar_id_fkey] FOREIGN KEY ([bar_id]) REFERENCES [dbo].[bar_table]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
         "#};
 
-        api.raw_cmd(&init).await;
+        api.raw_cmd(init).await;
 
         let input = indoc! {r#"
             generator client {
@@ -483,7 +483,7 @@ mod at_at_map {
             );
         "#};
 
-        api.raw_cmd(&init).await;
+        api.raw_cmd(init).await;
 
         let input = indoc! {r#"
             generator client {
@@ -566,7 +566,7 @@ mod at_at_map {
             ALTER TABLE [dbo].[foo_table] ADD CONSTRAINT [foo_table_bar_id_fkey] FOREIGN KEY ([bar_id]) REFERENCES [dbo].[bar_table]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
         "#};
 
-        api.raw_cmd(&init).await;
+        api.raw_cmd(init).await;
 
         let input = indoc! {r#"
             generator client {

@@ -7,19 +7,20 @@ use crate::{
     prisma_1_defaults::add_prisma_1_id_defaults,
     re_introspection::enrich,
     sanitize_datamodel_names::{sanitization_leads_to_duplicate_names, sanitize_datamodel_names},
-    version_checker, SqlError, SqlFamilyTrait,
+    version_checker, warnings, SqlError, SqlFamilyTrait,
 };
 use datamodel_renderer as render;
-use introspection_connector::{Version, Warning};
+use introspection_connector::Version;
 use psl::{
     dml::{self, Datamodel, Field, Model, PrimaryKeyDefinition, PrimaryKeyField, RelationField, SortOrder},
+    parser_database::{ast, walkers},
     Configuration,
 };
 use sql_schema_describer::{self as sql, walkers::TableWalker, ForeignKeyId, SQLSortOrder, SqlSchema};
 use std::collections::{HashMap, HashSet};
 use tracing::debug;
 
-pub(crate) fn introspect(ctx: &Context, warnings: &mut Vec<Warning>) -> Result<(Version, String, bool), SqlError> {
+pub(crate) fn introspect(ctx: &mut Context) -> Result<(Version, String, bool), SqlError> {
     let mut datamodel = Datamodel::new();
     let schema = ctx.schema;
 
@@ -70,18 +71,18 @@ pub(crate) fn introspect(ctx: &Context, warnings: &mut Vec<Warning>) -> Result<(
     deduplicate_relation_field_names(&mut datamodel);
 
     if !ctx.previous_datamodel.is_empty() {
-        enrich(ctx.previous_datamodel, &mut datamodel, ctx, warnings);
+        enrich(ctx.previous_datamodel, &mut datamodel, ctx);
         debug!("Enriching datamodel is done.");
     }
 
     // commenting out models, fields, enums, enum values
-    warnings.append(&mut commenting_out_guardrails(&mut datamodel, ctx));
+    ctx.warnings.append(&mut commenting_out_guardrails(&mut datamodel, ctx));
 
     // try to identify whether the schema was created by a previous Prisma version
-    let version = version_checker::check_prisma_version(ctx, warnings);
+    let version = version_checker::check_prisma_version(ctx);
 
     // if based on a previous Prisma version add id default opinionations
-    add_prisma_1_id_defaults(&version, &mut datamodel, schema, warnings, ctx);
+    add_prisma_1_id_defaults(&version, &mut datamodel, schema, ctx);
 
     let config = if ctx.render_config {
         render_configuration(ctx.config, schema).to_string()
@@ -138,36 +139,87 @@ fn calculate_fields_for_prisma_join_table(
     }
 }
 
-fn introspect_enums(datamodel: &mut Datamodel, ctx: &Context) {
-    let existing_enums_by_database_name: HashMap<&str, _> = ctx
-        .previous_schema()
-        .db
-        .walk_enums()
-        .map(|enm| (enm.database_name(), enm.id))
-        .collect();
-
-    datamodel.enums = ctx
+fn introspect_enums(datamodel: &mut Datamodel, ctx: &mut Context<'_>) {
+    let mut all_enums: Vec<(Option<ast::EnumId>, dml::Enum)> = ctx
         .schema
         .enum_walkers()
-        .map(|enm| sql_enum_to_dml_enum(enm, ctx))
+        .map(|enm| {
+            let existing_enum = ctx.existing_enum(enm.id);
+            let dml_enum = sql_enum_to_dml_enum(enm, existing_enum, ctx);
+            (existing_enum.map(|e| e.id), dml_enum)
+        })
         .collect();
 
-    datamodel.enums.sort_by(|a, b| {
-        let existing = |enm: &dml::Enum| -> Option<_> {
-            existing_enums_by_database_name.get(enm.database_name.as_deref().unwrap_or(enm.name.as_str()))
-        };
-        compare_options_none_last(existing(a), existing(b))
-    });
+    all_enums.sort_by(|(id_a, _), (id_b, _)| compare_options_none_last(id_a.as_ref(), id_b.as_ref()));
+
+    if ctx.sql_family().is_mysql() {
+        // MySQL can have multiple database enums matching one Prisma enum.
+        all_enums.dedup_by(|(id_a, _), (id_b, _)| match (id_a, id_b) {
+            (Some(id_a), Some(id_b)) => id_a == id_b,
+            _ => false,
+        });
+    }
+
+    datamodel.enums = all_enums.into_iter().map(|(_id, dml_enum)| dml_enum).collect();
 }
 
-fn sql_enum_to_dml_enum(sql_enum: sql::EnumWalker<'_>, ctx: &Context) -> dml::Enum {
-    let values = sql_enum.values().iter().map(|v| dml::EnumValue::new(v)).collect();
+fn sql_enum_to_dml_enum(
+    sql_enum: sql::EnumWalker<'_>,
+    existing_enum: Option<walkers::EnumWalker<'_>>,
+    ctx: &mut Context,
+) -> dml::Enum {
     let schema = if matches!(ctx.config.datasources.first(), Some(ds) if !ds.namespaces.is_empty()) {
         sql_enum.namespace().map(String::from)
     } else {
         None
     };
-    dml::Enum::new(sql_enum.name(), values, schema)
+    let enum_name = existing_enum.map(|enm| enm.name()).unwrap_or_else(|| sql_enum.name());
+    let mut dml_enum = dml::Enum::new(enum_name, Vec::new(), schema);
+
+    dml_enum.database_name = if ctx.sql_family.is_mysql() {
+        existing_enum.and_then(|enm| enm.mapped_name()).map(ToOwned::to_owned)
+    } else {
+        existing_enum
+            .filter(|existing_enum| existing_enum.name() != sql_enum.name())
+            .map(|_| sql_enum.name().to_owned())
+    };
+
+    if dml_enum.database_name.is_some() {
+        ctx.warnings
+            .push(warnings::warning_enriched_with_map_on_enum(&[warnings::Enum::new(
+                enum_name,
+            )]));
+    }
+
+    dml_enum.values.reserve(sql_enum.values().len());
+
+    let mut remapped_values = Vec::new(); // for warnings
+
+    for value in sql_enum.values() {
+        let mut dml_value = dml::EnumValue::new(value);
+
+        // Re-introspect mapped names.
+        if let Some(existing_value) = existing_enum.and_then(|enm| {
+            enm.values()
+                .find(|val| val.mapped_name().is_some() && val.database_name() == value)
+        }) {
+            let mapped_name = std::mem::replace(&mut dml_value.name, existing_value.name().to_owned());
+            dml_value.database_name = Some(mapped_name);
+            remapped_values.push(warnings::EnumAndValue {
+                value: dml_value.name.clone(),
+                enm: enum_name.to_owned(),
+            });
+        }
+
+        dml_enum.values.push(dml_value);
+    }
+
+    if !remapped_values.is_empty() {
+        ctx.warnings
+            .push(warnings::warning_enriched_with_map_on_enum_value(&remapped_values))
+    }
+
+    dml_enum
 }
 
 fn introspect_models(datamodel: &mut Datamodel, ctx: &Context) {
@@ -272,7 +324,7 @@ fn introspect_models(datamodel: &mut Datamodel, ctx: &Context) {
 
 fn sort_models(datamodel: &mut Datamodel, ctx: &Context) {
     let existing_models_by_database_name: HashMap<&str, _> = ctx
-        .previous_schema()
+        .previous_schema
         .db
         .walk_models()
         .map(|model| (model.database_name(), model.id))

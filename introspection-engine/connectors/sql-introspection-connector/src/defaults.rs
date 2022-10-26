@@ -65,6 +65,20 @@ pub(crate) fn calculate_default(column: sql::ColumnWalker<'_>, ctx: &Context) ->
             )),
             column,
         )),
+        (Some(sql::DefaultKind::Value(dml::PrismaValue::Enum(variant))), sql::ColumnTypeFamily::Enum(enum_id)) => {
+            let variant_name = ctx
+                .existing_enum(*enum_id)
+                .into_iter()
+                .flat_map(|enm| enm.values())
+                .find(|value| value.mapped_name() == Some(variant))
+                .map(|value| value.name())
+                .unwrap_or(variant);
+
+            Some(set_default(
+                dml::DefaultValue::new_single(dml::PrismaValue::Enum(variant_name.to_owned())),
+                column,
+            ))
+        }
         (Some(sql::DefaultKind::Value(val)), _) => {
             Some(set_default(dml::DefaultValue::new_single(val.clone()), column))
         }

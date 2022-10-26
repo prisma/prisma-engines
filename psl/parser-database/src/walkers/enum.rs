@@ -42,7 +42,7 @@ impl<'db> EnumWalker<'db> {
     }
 
     /// The values of the enum.
-    pub fn values(self) -> impl Iterator<Item = EnumValueWalker<'db>> {
+    pub fn values(self) -> impl ExactSizeIterator<Item = EnumValueWalker<'db>> {
         (0..self.ast_enum().values.len()).map(move |idx| self.db.walk((self.id, idx)))
     }
 

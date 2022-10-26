@@ -60,7 +60,7 @@ pub struct SqlSchema {
     /// The schema's tables.
     tables: Vec<Table>,
     /// The schema's enums.
-    pub enums: Vec<Enum>,
+    enums: Vec<Enum>,
     /// The schema's columns.
     columns: Vec<(TableId, Column)>,
     /// All foreign keys.
@@ -109,9 +109,9 @@ impl SqlSchema {
         self.views.iter().find(|v| v.name == name)
     }
 
-    /// Get an enum.
-    pub fn get_enum(&self, name: &str) -> Option<&Enum> {
-        self.enums.iter().find(|x| x.name == name)
+    /// Try to find an enum by name.
+    pub fn find_enum(&self, name: &str) -> Option<EnumId> {
+        self.enums.iter().position(|e| e.name == name).map(|i| EnumId(i as u32))
     }
 
     /// Get a procedure.
@@ -151,6 +151,22 @@ impl SqlSchema {
         let id = ColumnId(self.columns.len() as u32);
         self.columns.push((table_id, column));
         id
+    }
+
+    /// Add an enum to the schema.
+    pub fn push_enum(&mut self, namespace_id: NamespaceId, enum_name: String) -> EnumId {
+        let id = EnumId(self.enums.len() as u32);
+        self.enums.push(Enum {
+            namespace_id,
+            name: enum_name,
+            values: Vec::new(),
+        });
+        id
+    }
+
+    /// Add a variant to an enum.
+    pub fn push_enum_variant(&mut self, enum_id: EnumId, variant: String) {
+        self.enums[enum_id.0 as usize].values.push(variant)
     }
 
     /// Add a fulltext index to the schema.
@@ -473,15 +489,15 @@ pub enum ColumnTypeFamily {
     /// UUID types.
     Uuid,
     ///Enum
-    Enum(String),
+    Enum(EnumId),
     /// Unsupported
     Unsupported(String),
 }
 
 impl ColumnTypeFamily {
-    pub fn as_enum(&self) -> Option<&str> {
+    pub fn as_enum(&self) -> Option<EnumId> {
         match self {
-            ColumnTypeFamily::Enum(name) => Some(name),
+            ColumnTypeFamily::Enum(id) => Some(*id),
             _ => None,
         }
     }
@@ -590,14 +606,13 @@ struct ForeignKeyColumn {
 }
 
 /// A SQL enum.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
-pub struct Enum {
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
+struct Enum {
     /// The namespace the enum type belongs to, if applicable.
-    pub namespace_id: NamespaceId,
-    /// Enum name.
-    pub name: String,
+    namespace_id: NamespaceId,
+    name: String,
     /// Possible enum values.
-    pub values: Vec<String>,
+    values: Vec<String>,
 }
 
 /// An SQL view.

@@ -4,24 +4,18 @@ use crate::{
         compare_options_none_last, replace_index_field_names, replace_pk_field_names, replace_relation_info_field_names,
     },
     warnings::*,
-    SqlFamilyTrait,
 };
 use introspection_connector::Warning;
-use psl::dml::{
-    self, Datamodel, DefaultValue, Field, FieldType, Ignorable, PrismaValue, ValueGenerator, WithDatabaseName, WithName,
-};
+use psl::dml::{self, Datamodel, DefaultValue, Field, Ignorable, ValueGenerator, WithDatabaseName, WithName};
 use std::collections::{BTreeSet, HashMap};
 
-pub(crate) fn enrich(
-    old_data_model: &Datamodel,
-    new_data_model: &mut Datamodel,
-    ctx: &CalculateDatamodelContext,
-    warnings: &mut Vec<Warning>,
-) {
+pub(crate) fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, ctx: &mut CalculateDatamodelContext) {
     // Keep @relation attributes even if the database doesn't use foreign keys
     if !ctx.foreign_keys_enabled() {
-        merge_relation_fields(old_data_model, new_data_model, warnings);
+        merge_relation_fields(old_data_model, new_data_model, ctx.warnings);
     }
+
+    let warnings = &mut ctx.warnings;
 
     merge_map_attributes_on_models(old_data_model, new_data_model, warnings); //TODO
     merge_pre_3_0_index_names(old_data_model, new_data_model, warnings);
@@ -30,81 +24,10 @@ pub(crate) fn enrich(
     merge_changed_scalar_key_names(old_data_model, new_data_model, warnings);
     merge_changed_relation_field_names(old_data_model, new_data_model);
     merge_changed_relation_names(old_data_model, new_data_model);
-    merge_changed_enum_names(old_data_model, new_data_model, warnings); //TODO
-    merge_changed_enum_values(old_data_model, new_data_model, warnings);
-    merge_changed_enum_defaults(old_data_model, new_data_model, warnings);
-    merge_mysql_enum_names(old_data_model, new_data_model, ctx);
     merge_prisma_level_defaults(old_data_model, new_data_model, warnings);
     merge_ignores(old_data_model, new_data_model, warnings);
     merge_comments(old_data_model, new_data_model);
     keep_index_ordering(old_data_model, new_data_model);
-}
-
-/// If we have to map the enum values, this makes sure we handle them
-/// in the default attributes correctly.
-fn merge_changed_enum_defaults(
-    old_data_model: &Datamodel,
-    new_data_model: &mut Datamodel,
-    warnings: &mut Vec<Warning>,
-) {
-    let mut changes: Vec<ModelFieldAndValue> = Vec::new();
-
-    for old_model in old_data_model.models() {
-        let new_model = match new_data_model.models().find(|m| m.name == *old_model.name()) {
-            Some(m) => m,
-            None => continue,
-        };
-
-        // Mike
-        for old_field in old_model.scalar_fields() {
-            let new_field = match new_model.scalar_fields().find(|f| f.name == *old_field.name()) {
-                Some(f) => f,
-                None => continue,
-            };
-
-            let r#enum = match (&old_field.field_type, &new_field.field_type) {
-                (FieldType::Enum(left), FieldType::Enum(right)) if left == right => {
-                    new_data_model.enums().find(|e| e.name() == right).unwrap()
-                }
-                _ => continue,
-            };
-
-            match (
-                old_field.default_value.as_ref().and_then(|v| v.as_single()),
-                new_field.default_value.as_ref().and_then(|v| v.as_expression()),
-            ) {
-                // The right side is now considered as dbgenerated due
-                // to us not being able to generate a valid name to
-                // it.
-                //
-                // The user has renamed these already as the left side
-                // is a single value, so we'll map it to the now model
-                // accordingly.
-                (Some(_), Some(generator)) if generator.name() == "dbgenerated" => {
-                    let val = match generator.args().first().and_then(|(_, v)| v.as_string()) {
-                        Some(val) => val,
-                        None => continue,
-                    };
-
-                    if let Some(val) = r#enum.find_value_db_name(val) {
-                        changes.push(ModelFieldAndValue::new(new_model.name(), new_field.name(), &val.name));
-                    }
-                }
-                _ => continue,
-            }
-        }
-    }
-
-    for change in changes.iter() {
-        let model = new_data_model.find_model_mut(&change.model);
-        let field = model.find_scalar_field_mut(&change.field);
-
-        field.set_default_value(DefaultValue::new_single(PrismaValue::Enum(change.value.clone())));
-    }
-
-    if !changes.is_empty() {
-        warnings.push(warning_enum_defaults_added_from_the_previous_data_model(&changes));
-    }
 }
 
 fn keep_index_ordering(old_data_model: &Datamodel, new_data_model: &mut Datamodel) {
@@ -535,159 +458,6 @@ fn merge_changed_relation_names(old_data_model: &Datamodel, new_data_model: &mut
             .find_relation_field_mut(&changed_relation_name.0.model, &changed_relation_name.0.field)
             .relation_info
             .name = changed_relation_name.1;
-    }
-}
-
-// @@map on enums
-fn merge_changed_enum_names(old_data_model: &Datamodel, new_data_model: &mut Datamodel, warnings: &mut Vec<Warning>) {
-    let mut changed_enum_names = vec![];
-
-    for enm in new_data_model.enums() {
-        if let Some(old_enum) = old_data_model.find_enum_db_name(enm.database_name.as_ref().unwrap_or(&enm.name)) {
-            if new_data_model.find_enum(&old_enum.name).is_none() {
-                changed_enum_names.push((Enum { enm: enm.name.clone() }, old_enum.name.clone()))
-            }
-        }
-    }
-    for changed_enum_name in &changed_enum_names {
-        let enm = new_data_model.find_enum_mut(&changed_enum_name.0.enm);
-        enm.name = changed_enum_name.1.clone();
-
-        if enm.database_name.is_none() {
-            enm.database_name = Some(changed_enum_name.0.enm.clone());
-        }
-    }
-
-    for changed_enum_name in &changed_enum_names {
-        let fields_to_be_changed = new_data_model.find_enum_fields(&changed_enum_name.0.enm);
-
-        for change2 in fields_to_be_changed {
-            let field = new_data_model.find_scalar_field_mut(&change2.0, &change2.1);
-            field.field_type = FieldType::Enum(changed_enum_name.1.clone());
-        }
-    }
-
-    if !changed_enum_names.is_empty() {
-        let enums: Vec<_> = changed_enum_names.iter().map(|c| Enum::new(&c.1)).collect();
-        warnings.push(warning_enriched_with_map_on_enum(&enums));
-    }
-}
-
-// @map on enum values
-fn merge_changed_enum_values(old_data_model: &Datamodel, new_data_model: &mut Datamodel, warnings: &mut Vec<Warning>) {
-    let mut changed_enum_values = vec![];
-
-    for enm in new_data_model.enums() {
-        let old_enum = match old_data_model.find_enum(&enm.name) {
-            Some(old_enum) => old_enum,
-            None => continue,
-        };
-
-        for value in enm.values() {
-            let old_value =
-                match old_enum.find_value_db_name(value.database_name.as_ref().unwrap_or(&value.name.to_owned())) {
-                    Some(old_value) => old_value,
-                    None => continue,
-                };
-
-            if enm.find_value(&old_value.name).is_none() {
-                let ev = EnumAndValue::new(&enm.name, &value.name);
-                changed_enum_values.push((ev, old_value.name.clone()))
-            }
-        }
-    }
-
-    for changed_enum_value in &changed_enum_values {
-        let enm = new_data_model.find_enum_mut(&changed_enum_value.0.enm);
-
-        let value = enm.find_value_mut(&changed_enum_value.0.value);
-        value.name = changed_enum_value.1.clone();
-
-        if value.database_name.is_none() {
-            value.database_name = Some(changed_enum_value.0.value.clone());
-        }
-    }
-
-    for changed_enum_value in &changed_enum_values {
-        let fields_to_be_changed = new_data_model.find_enum_fields(&changed_enum_value.0.enm);
-
-        for field in fields_to_be_changed {
-            let field = new_data_model.find_scalar_field_mut(&field.0, &field.1);
-            if field.default_value
-                == Some(DefaultValue::new_single(PrismaValue::Enum(
-                    changed_enum_value.0.value.clone(),
-                )))
-            {
-                field.default_value = Some(DefaultValue::new_single(PrismaValue::Enum(
-                    changed_enum_value.1.clone(),
-                )));
-            }
-        }
-    }
-
-    if !changed_enum_values.is_empty() {
-        let enums_and_values: Vec<_> = changed_enum_values
-            .iter()
-            .map(|c| EnumAndValue::new(&c.0.enm, &c.1))
-            .collect();
-
-        warnings.push(warning_enriched_with_map_on_enum_value(&enums_and_values));
-    }
-}
-
-//mysql enum names
-fn merge_mysql_enum_names(old_data_model: &Datamodel, new_data_model: &mut Datamodel, ctx: &CalculateDatamodelContext) {
-    let mut changed_mysql_enum_names = vec![];
-
-    if ctx.sql_family().is_mysql() {
-        for enm in new_data_model.enums() {
-            let enum_fields = new_data_model.find_enum_fields(&enm.name);
-
-            let (model_name, field_name) = match enum_fields.first() {
-                Some((model_name, field_name)) => (model_name, field_name),
-                None => continue,
-            };
-
-            let old_model = match old_data_model.find_model(model_name) {
-                Some(old_model) => old_model,
-                None => continue,
-            };
-
-            let old_field = match old_model.find_field(field_name) {
-                Some(old_field) => old_field,
-                None => continue,
-            };
-
-            let old_enum_name = match old_field.field_type() {
-                FieldType::Enum(old_enum_name) => old_enum_name,
-                _ => continue,
-            };
-
-            let old_enum = old_data_model.find_enum(&old_enum_name).unwrap();
-
-            if enm.values == old_enum.values
-                && old_enum_name != enm.name
-                && !changed_mysql_enum_names
-                    .iter()
-                    .any(|x: &(String, String, ModelAndField)| x.1 == old_enum_name)
-            {
-                changed_mysql_enum_names.push((
-                    enm.name.clone(),
-                    old_enum.name.clone(),
-                    ModelAndField::new(model_name, field_name),
-                ))
-            }
-        }
-
-        for changed_enum_name in &changed_mysql_enum_names {
-            //adjust enum name
-            let enm = new_data_model.find_enum_mut(&changed_enum_name.0);
-            enm.name = changed_enum_name.1.clone();
-
-            //adjust Fieldtype on field that uses it
-            let field = new_data_model.find_scalar_field_mut(&changed_enum_name.2.model, &changed_enum_name.2.field);
-            field.field_type = FieldType::Enum(changed_enum_name.1.clone());
-        }
     }
 }
 

@@ -94,17 +94,7 @@ impl<'a> ColumnWalker<'a> {
 
     /// Extract an `Enum` column type family, or `None` if the family is something else.
     pub fn column_type_family_as_enum(self) -> Option<EnumWalker<'a>> {
-        self.column_type_family().as_enum().map(|enum_name| {
-            let idx = self
-                .schema
-                .enums
-                .iter()
-                .position(|enm| enm.name == enum_name)
-                .ok_or_else(|| panic!("Cannot find enum referenced in ColumnTypeFamily (`{}`)", enum_name))
-                .unwrap();
-
-            self.walk(EnumId(idx as u32))
-        })
+        self.column_type_family().as_enum().map(|enum_id| self.walk(enum_id))
     }
 
     /// The column name.
