@@ -168,11 +168,6 @@
 <span id="168">168</span>
 <span id="169">169</span>
 <span id="170">170</span>
-<span id="171">171</span>
-<span id="172">172</span>
-<span id="173">173</span>
-<span id="174">174</span>
-<span id="175">175</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::composite_type::CompositeType</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::field</span>::{<span class="ident">Field</span>, <span class="ident">RelationField</span>, <span class="ident">ScalarField</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::Model</span>;
@@ -200,11 +195,6 @@
     <span class="doccomment">/// Checks if a datamodel contains neither enums nor models.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">enums</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">models</span>.<span class="ident">is_empty</span>()
-    }
-
-    <span class="doccomment">/// Adds a model to this datamodel.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_model</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">model</span>: <span class="ident">Model</span>) {
-        <span class="self">self</span>.<span class="ident">models</span>.<span class="ident">push</span>(<span class="ident">model</span>);
     }
 
     <span class="doccomment">/// Gets an iterator over all models.</span>

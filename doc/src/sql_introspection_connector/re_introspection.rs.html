@@ -866,14 +866,6 @@
 <span id="866">866</span>
 <span id="867">867</span>
 <span id="868">868</span>
-<span id="869">869</span>
-<span id="870">870</span>
-<span id="871">871</span>
-<span id="872">872</span>
-<span id="873">873</span>
-<span id="874">874</span>
-<span id="875">875</span>
-<span id="876">876</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">calculate_datamodel::CalculateDatamodelContext</span>,
     <span class="ident">introspection_helpers</span>::{
@@ -912,14 +904,6 @@
     <span class="ident">merge_ignores</span>(<span class="ident">old_data_model</span>, <span class="ident">new_data_model</span>, <span class="ident">warnings</span>);
     <span class="ident">merge_comments</span>(<span class="ident">old_data_model</span>, <span class="ident">new_data_model</span>);
     <span class="ident">keep_index_ordering</span>(<span class="ident">old_data_model</span>, <span class="ident">new_data_model</span>);
-
-    <span class="comment">// restore old model order</span>
-    <span class="ident">new_data_model</span>.<span class="ident">models</span>.<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">model_a</span>, <span class="ident">model_b</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">model_a_idx</span> <span class="op">=</span> <span class="ident">old_data_model</span>.<span class="ident">models</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">model_a</span>.<span class="ident">name</span>);
-        <span class="kw">let</span> <span class="ident">model_b_idx</span> <span class="op">=</span> <span class="ident">old_data_model</span>.<span class="ident">models</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">model_b</span>.<span class="ident">name</span>);
-
-        <span class="ident">compare_options_none_last</span>(<span class="ident">model_a_idx</span>, <span class="ident">model_b_idx</span>)
-    });
 }
 
 <span class="doccomment">/// If we have to map the enum values, this makes sure we handle them</span>

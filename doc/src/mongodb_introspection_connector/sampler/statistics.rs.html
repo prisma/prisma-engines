@@ -673,7 +673,7 @@
         <span class="ident">add_missing_ids_to_models</span>(<span class="kw-2">&amp;mut</span> <span class="ident">models</span>);
 
         <span class="kw">for</span> (<span class="kw">_</span>, <span class="ident">model</span>) <span class="kw">in</span> <span class="ident">models</span>.<span class="ident">into_iter</span>() {
-            <span class="ident">data_model</span>.<span class="ident">add_model</span>(<span class="ident">model</span>);
+            <span class="ident">data_model</span>.<span class="ident">models</span>.<span class="ident">push</span>(<span class="ident">model</span>);
         }
 
         <span class="kw">for</span> (<span class="kw">_</span>, <span class="kw-2">mut</span> <span class="ident">composite_type</span>) <span class="kw">in</span> <span class="ident">types</span>.<span class="ident">into_iter</span>() {
