@@ -27,11 +27,6 @@ impl Datamodel {
         self.enums.is_empty() && self.models.is_empty()
     }
 
-    /// Adds an enum to this datamodel.
-    pub fn add_enum(&mut self, en: Enum) {
-        self.enums.push(en);
-    }
-
     /// Adds a model to this datamodel.
     pub fn add_model(&mut self, model: Model) {
         self.models.push(model);

@@ -15,13 +15,15 @@ use psl::{
     dml::{self, Datamodel, Field, Model, PrimaryKeyDefinition, PrimaryKeyField, RelationField, SortOrder},
     Configuration,
 };
-use sql_schema_describer::{walkers::TableWalker, ForeignKeyId, SQLSortOrder, SqlSchema};
-use std::collections::HashSet;
+use sql_schema_describer::{self as sql, walkers::TableWalker, ForeignKeyId, SQLSortOrder, SqlSchema};
+use std::collections::{HashMap, HashSet};
 use tracing::debug;
 
 pub(crate) fn introspect(ctx: &Context, warnings: &mut Vec<Warning>) -> Result<(Version, String, bool), SqlError> {
     let mut datamodel = Datamodel::new();
     let schema = ctx.schema;
+
+    introspect_enums(&mut datamodel, ctx);
 
     // collect m2m table names
     let m2m_tables: Vec<String> = schema
@@ -115,17 +117,6 @@ pub(crate) fn introspect(ctx: &Context, warnings: &mut Vec<Warning>) -> Result<(
         }
 
         datamodel.add_model(model);
-    }
-
-    for e in schema.enum_walkers() {
-        let values = e.values().iter().map(|v| dml::EnumValue::new(v)).collect();
-
-        let schema = if matches!(ctx.config.datasources.first(), Some(ds) if !ds.namespaces.is_empty()) {
-            e.namespace().map(|n| n.to_string())
-        } else {
-            None
-        };
-        datamodel.add_enum(dml::Enum::new(e.name(), values, schema));
     }
 
     let mut fields_to_be_added = Vec::new();
@@ -238,4 +229,36 @@ fn calculate_fields_for_prisma_join_table(
             fields_to_be_added.push((referenced_model.name.clone(), field));
         }
     }
+}
+
+fn introspect_enums(datamodel: &mut Datamodel, ctx: &Context) {
+    let existing_enums_by_database_name: HashMap<&str, _> = ctx
+        .previous_schema()
+        .db
+        .walk_enums()
+        .map(|enm| (enm.database_name(), enm.id))
+        .collect();
+
+    datamodel.enums = ctx
+        .schema
+        .enum_walkers()
+        .map(|enm| sql_enum_to_dml_enum(enm, ctx))
+        .collect();
+
+    datamodel.enums.sort_by(|a, b| {
+        let existing = |enm: &dml::Enum| -> Option<_> {
+            existing_enums_by_database_name.get(enm.database_name.as_deref().unwrap_or(enm.name.as_str()))
+        };
+        compare_options_none_last(existing(a), existing(b))
+    });
+}
+
+fn sql_enum_to_dml_enum(sql_enum: sql::EnumWalker<'_>, ctx: &Context) -> dml::Enum {
+    let values = sql_enum.values().iter().map(|v| dml::EnumValue::new(v)).collect();
+    let schema = if matches!(ctx.config.datasources.first(), Some(ds) if !ds.namespaces.is_empty()) {
+        sql_enum.namespace().map(String::from)
+    } else {
+        None
+    };
+    dml::Enum::new(sql_enum.name(), values, schema)
 }
