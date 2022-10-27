@@ -359,6 +359,11 @@ impl DatamodelError {
         Self::new(msg, span)
     }
 
+    pub fn new_referential_integrity_and_relation_mode_cooccur_error(span: Span) -> DatamodelError {
+        let msg = "The `referentialIntegrity` and `relationMode` attributes cannot be used together. Please use only `relationMode` instead.".to_string();
+        Self::new(msg, span)
+    }
+
     pub fn span(&self) -> Span {
         self.span
     }
