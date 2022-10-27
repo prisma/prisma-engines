@@ -142,9 +142,9 @@ fn merge_relation_fields(old_data_model: &Datamodel, new_data_model: &mut Datamo
     //
     // the map would be {"Foo" -> "foo_table"}.
     // ```
-    let old_model_name_to_final_database_name: HashMap<String, String> = old_data_model
+    let old_model_name_to_final_database_name: HashMap<&str, &str> = old_data_model
         .models()
-        .map(|m| (m.name.clone(), String::from(m.final_database_name())))
+        .map(|m| (m.name.as_str(), m.final_database_name()))
         .collect();
 
     for old_model in old_data_model.models() {
@@ -168,9 +168,9 @@ fn merge_relation_fields(old_data_model: &Datamodel, new_data_model: &mut Datamo
 
                 for field in old_model.relation_fields() {
                     if new_data_model.models().any(|m| {
-                        m.name
+                        m.name.as_str()
                             == *old_model_name_to_final_database_name
-                                .get(&field.relation_info.referenced_model)
+                                .get(field.relation_info.referenced_model.as_str())
                                 .unwrap() // as the old datamodel is guaranteed to be valid at this point, this unwrap is safe
                     }) {
                         fields.push(Field::RelationField(field.clone()));
