@@ -132,9 +132,7 @@ impl SqlMigrationConnector {
                 .sql_schema_from_migration_history(migrations, shadow_database_connection_string, namespaces)
                 .await
                 .map(From::from),
-            DiffTarget::Database => {
-                self.flavour.describe_schema(namespaces).await.map(From::from)
-            },
+            DiffTarget::Database => self.flavour.describe_schema(namespaces).await.map(From::from),
             DiffTarget::Empty => Ok(self.flavour.empty_database_schema().into()),
         }
     }
