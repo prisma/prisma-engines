@@ -102,8 +102,7 @@ impl QueryString for UpdateMany<'_> {
 
     fn write_query(&self, buffer: &mut String) {
         fmt_doc(buffer, self.filter, 1).unwrap();
-
-        write!(buffer, ", ").unwrap();
+        write!(buffer, ",").unwrap();
 
         if self.update_docs.len() > 1 {
             write!(buffer, "[").unwrap();
@@ -216,12 +215,17 @@ impl QueryString for InsertMany<'_> {
     }
 
     fn write_query(&self, buffer: &mut String) {
-        for doc in self.insert_docs {
-            fmt_doc(buffer, doc, 1).unwrap();
+        write!(buffer, "[").unwrap();
+
+        if let Some((last, docs)) = self.insert_docs.split_last() {
+            for doc in docs {
+                fmt_doc(buffer, doc, 1).unwrap();
+                writeln!(buffer, ",").unwrap();
+            }
+            fmt_doc(buffer, last, 1).unwrap();
         }
 
-        write!(buffer, "], ").unwrap();
-        write!(buffer, r#"{{ "ordered": {} }}"#, self.ordered).unwrap();
+        write!(buffer, r#"],{{ "ordered": {} }}"#, self.ordered).unwrap();
     }
 }
 
@@ -288,5 +292,181 @@ fn fmt_val(buffer: &mut String, val: &Bson, depth: usize) -> std::fmt::Result {
         Bson::Array(ary) => fmt_list(buffer, ary, depth + 1),
         Bson::Document(doc) => fmt_doc(buffer, doc, depth + 1),
         val => write!(buffer, "{}", val),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use bson::doc;
+
+    #[test]
+    fn test_aggregate() {
+        let pipeline = vec![
+            doc! { "$match": { "name": "Jane" } },
+            doc! { "$group": { "_id": "$name", "count": { "$sum": 1 } } },
+        ];
+        let agg = Aggregate::new(&pipeline, "collection");
+        let query = agg.build();
+        assert_eq!(
+            query.trim(),
+            r#"
+db.collection.aggregate([
+    {
+        $match: {
+            name: "Jane",
+        },
+    },
+    {
+        $group: {
+            _id: "$name",
+            count: {
+                $sum: 1,
+            },
+        },
+    },
+])"#
+            .trim()
+        );
+    }
+
+    #[test]
+    fn test_insert_one() {
+        let doc = doc! { "name": "Jane", "position": {"department": "engineering", "title": "principal"}  };
+        let insert = InsertOne::new(&doc, "collection");
+        let query = insert.build();
+        assert_eq!(
+            query.trim(),
+            r#"
+db.collection.insertOne({
+    name: "Jane",
+    position: {
+        department: "engineering",
+        title: "principal",
+    },
+})"#
+            .trim()
+        );
+    }
+
+    #[test]
+    fn test_update_many() {
+        let filter = doc! { "name": "Jane" };
+        // multiple documents
+        let pipeline = vec![
+            doc! { "$set": { "position": {"department": "engineering", "title": "principal"} } },
+            doc! { "$set": { "accomplishments": "many" } },
+        ];
+        let update = UpdateMany::new(&filter, &pipeline, "collection");
+        let query = update.build();
+        assert_eq!(
+            query.trim(),
+            r#"
+db.collection.updateMany({
+    name: "Jane",
+},[
+{
+    $set: {
+        position: {
+            department: "engineering",
+            title: "principal",
+        },
+    },
+},
+{
+    $set: {
+        accomplishments: "many",
+    },
+}])"#
+                .trim()
+        );
+
+        // only one doc
+        let pipeline = vec![doc! { "$set": { "position": {"department": "engineering", "title": "principal"} } }];
+        let update = UpdateMany::new(&filter, &pipeline, "collection");
+        let query = update.build();
+        assert_eq!(
+            query.trim(),
+            r#"
+db.collection.updateMany({
+    name: "Jane",
+},
+{
+    $set: {
+        position: {
+            department: "engineering",
+            title: "principal",
+        },
+    },
+})"#
+            .trim()
+        );
+    }
+
+    #[test]
+    fn test_update_one() {
+        let filter = doc! { "name": "Jane" };
+        let doc = doc! { "$set": { "position": {"department": "engineering", "title": "principal"} } };
+        let update = UpdateOne::new(&filter, &doc, "collection");
+        let query = update.build();
+        assert_eq!(
+            query.trim(),
+            r#"db.collection.updateOne({
+    name: "Jane",
+}, 
+{
+    $set: {
+        position: {
+            department: "engineering",
+            title: "principal",
+        },
+    },
+})"#
+            .trim()
+        );
+    }
+
+    #[test]
+    fn test_delete_many() {
+        let filter = doc! { "name": "Jane" };
+        let delete = DeleteMany::new(&filter, "collection");
+        let query = delete.build();
+        assert_eq!(
+            query.trim(),
+            r#"
+db.collection.deleteMany({
+    name: "Jane",
+})"#
+            .trim()
+        );
+    }
+
+    #[test]
+    fn test_insert_many() {
+        let docs = vec![
+            doc! { "name": "Jane", "position": {"department": "engineering", "title": "principal"}  },
+            doc! { "name": "John", "position": {"department": "product", "title": "senior manager"}  },
+        ];
+        let insert = InsertMany::new(&docs, true, "collection");
+        let query = insert.build();
+        assert_eq!(
+            query.trim(),
+            r#"
+db.collection.insertMany([{
+    name: "Jane",
+    position: {
+        department: "engineering",
+        title: "principal",
+    },
+},
+{
+    name: "John",
+    position: {
+        department: "product",
+        title: "senior manager",
+    },
+}],{ "ordered": true })"#
+                .trim()
+        );
     }
 }

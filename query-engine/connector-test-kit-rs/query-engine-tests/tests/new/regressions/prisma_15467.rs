@@ -46,14 +46,15 @@ mod mongodb {
         );
         let logs = runner.get_logs().await;
         let last_log_line = logs.last().unwrap();
-        let expected_query = format!(
-            r##"db.Standing.updateMany({{
+        let query = format!(
+            r#"
+db.Standing.updateMany({{
     _id: {{
         $in: [
             ObjectId({}),
         ],
     }},
-}}, [
+}},[
 {{
     $set: {{
         leagueId: {{
@@ -74,15 +75,16 @@ mod mongodb {
             $literal: 0,
         }},
     }},
-}}])"##,
+}}])"#,
             object_id
         );
 
+        let expected_query = query.trim();
         assert!(
-            last_log_line.contains(expected_query.as_str()),
+            last_log_line.contains(expected_query),
             "{} should have contained {}",
             last_log_line,
-            expected_query
+            expected_query,
         );
 
         // Piggybacking assertion reproducing https://github.com/prisma/prisma/issues/14378
