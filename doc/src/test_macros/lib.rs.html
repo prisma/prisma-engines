@@ -297,7 +297,7 @@
                     <span class="ident">BitFlags::empty</span>() #(<span class="op">|</span> <span class="ident">Capabilities</span>::#<span class="ident">capabilities</span>)<span class="kw-2">*</span>,
                 ) { <span class="kw">return</span> }
 
-                <span class="ident">test_setup::runtime::run_with_tokio</span>::<span class="op">&lt;</span>#<span class="ident">return_ty</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="kw">async</span> {
+                <span class="ident">test_setup::runtime::run_with_thread_local_runtime</span>::<span class="op">&lt;</span>#<span class="ident">return_ty</span><span class="op">&gt;</span>(<span class="kw">async</span> {
                     <span class="kw">let</span> #<span class="ident">arg_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span>#<span class="ident">arg_type::new</span>(<span class="ident">args</span>).<span class="kw">await</span>;
 
                     #<span class="ident">body</span>

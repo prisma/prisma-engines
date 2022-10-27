@@ -116,7 +116,7 @@
 <span id="116">116</span>
 <span id="117">117</span>
 <span id="118">118</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">runtime::run_with_tokio</span>, <span class="ident">AnyError</span>, <span class="ident">Tags</span>};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">runtime::run_with_thread_local_runtime</span> <span class="kw">as</span> <span class="ident">tok</span>, <span class="ident">AnyError</span>, <span class="ident">Tags</span>};
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">quaint</span>::{<span class="ident">prelude::Queryable</span>, <span class="ident">single::Quaint</span>};
 <span class="kw">use</span> <span class="ident">url::Url</span>;
@@ -190,7 +190,7 @@
         }
     };
 
-    <span class="ident">run_with_tokio</span>(<span class="ident">fut</span>)
+    <span class="ident">tok</span>(<span class="ident">fut</span>)
 }
 
 <span class="doccomment">/// Returns a connection to the new database, as well as the corresponding</span>

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["run_with_thread_local_runtime",""],["run_with_tokio",""],["test_tokio_runtime",""]]};
+window.SIDEBAR_ITEMS = {"fn":[["run_with_thread_local_runtime",""]]};

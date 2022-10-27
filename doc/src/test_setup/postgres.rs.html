@@ -83,7 +83,7 @@
 <span id="83">83</span>
 <span id="84">84</span>
 <span id="85">85</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">runtime::run_with_tokio</span>, <span class="ident">AnyError</span>, <span class="ident">Tags</span>};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">runtime::run_with_thread_local_runtime</span> <span class="kw">as</span> <span class="ident">tok</span>, <span class="ident">AnyError</span>, <span class="ident">Tags</span>};
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">quaint</span>::{<span class="ident">prelude::Queryable</span>, <span class="ident">single::Quaint</span>};
 <span class="kw">use</span> <span class="ident">url::Url</span>;
@@ -126,7 +126,7 @@
         }
     };
 
-    <span class="ident">run_with_tokio</span>(<span class="ident">fut</span>)
+    <span class="ident">tok</span>(<span class="ident">fut</span>)
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_postgres_database</span>(<span class="ident">database_url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">db_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Quaint</span>, <span class="ident">String</span>), <span class="ident">AnyError</span><span class="op">&gt;</span> {
