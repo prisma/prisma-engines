@@ -7,7 +7,9 @@ use crate::{
     SqlFamilyTrait,
 };
 use introspection_connector::Warning;
-use psl::dml::{self, Datamodel, DefaultValue, Field, FieldType, Ignorable, PrismaValue, ValueGenerator, WithName};
+use psl::dml::{
+    self, Datamodel, DefaultValue, Field, FieldType, Ignorable, PrismaValue, ValueGenerator, WithDatabaseName, WithName,
+};
 use std::collections::{BTreeSet, HashMap};
 
 pub(crate) fn enrich(
@@ -127,10 +129,28 @@ fn keep_index_ordering(old_data_model: &Datamodel, new_data_model: &mut Datamode
 fn merge_relation_fields(old_data_model: &Datamodel, new_data_model: &mut Datamodel, warnings: &mut Vec<Warning>) {
     let mut changed_models = BTreeSet::new();
 
+    // Maps a model name to the table name it was introspected to. This is helpful when @@map is used.
+    // E.g., for
+    //
+    // ```prisma
+    // model Foo {
+    //     id     Int @id
+    //     bar    Bar @relation(fields: [bar_id], references: [id])
+    //     bar_id Int @unique
+    //     @@map("foo_table")
+    // }
+    //
+    // the map would be {"Foo" -> "foo_table"}.
+    // ```
+    let old_model_name_to_final_database_name: HashMap<&str, &str> = old_data_model
+        .models()
+        .map(|m| (m.name.as_str(), m.final_database_name()))
+        .collect();
+
     for old_model in old_data_model.models() {
         let modifications = new_data_model
             .models()
-            .find(|m| m.name == *old_model.name())
+            .find(|m| *m.final_database_name() == *old_model.final_database_name())
             .map(|new_model| {
                 let mut ordering: HashMap<String, usize> = old_model
                     .fields()
@@ -147,10 +167,12 @@ fn merge_relation_fields(old_data_model: &Datamodel, new_data_model: &mut Datamo
                 let mut fields = Vec::new();
 
                 for field in old_model.relation_fields() {
-                    if new_data_model
-                        .models()
-                        .any(|m| m.name == field.relation_info.referenced_model)
-                    {
+                    if new_data_model.models().any(|m| {
+                        m.name.as_str()
+                            == *old_model_name_to_final_database_name
+                                .get(field.relation_info.referenced_model.as_str())
+                                .unwrap() // as the old datamodel is guaranteed to be valid at this point, this unwrap is safe
+                    }) {
                         fields.push(Field::RelationField(field.clone()));
                     }
                 }
