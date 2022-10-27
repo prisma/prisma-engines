@@ -83,7 +83,7 @@ pub fn test_connector(attr: TokenStream, input: TokenStream) -> TokenStream {
                     BitFlags::empty() #(| Capabilities::#capabilities)*,
                 ) { return }
 
-                test_setup::runtime::run_with_tokio::<#return_ty, _>(async {
+                test_setup::runtime::run_with_thread_local_runtime::<#return_ty>(async {
                     let #arg_name = &#arg_type::new(args).await;
 
                     #body
