@@ -26,12 +26,12 @@ impl<'db> InlineRelationWalker<'db> {
 
     /// The model which holds the relation arguments.
     pub fn referencing_model(self) -> ModelWalker<'db> {
-        self.0.db.walk_model(self.get().model_a)
+        self.0.db.walk(self.get().model_a)
     }
 
     /// The model referenced and which hold the back-relation field.
     pub fn referenced_model(self) -> ModelWalker<'db> {
-        self.0.db.walk_model(self.get().model_b)
+        self.0.db.walk(self.get().model_b)
     }
 
     /// If the relation is defined from both sides, convert to an explicit relation
@@ -109,6 +109,11 @@ impl<'db> InlineRelationWalker<'db> {
             RelationAttributes::ImplicitManyToMany { field_a: _, field_b: _ } => unreachable!(),
             RelationAttributes::TwoWayEmbeddedManyToMany { field_a: _, field_b: _ } => unreachable!(),
         }
+    }
+
+    /// The unique identifier of the relation.
+    pub fn relation_id(self) -> crate::RelationId {
+        self.0.id
     }
 
     /// The name of the relation. Either uses the `name` (or default) argument,

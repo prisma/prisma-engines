@@ -583,3 +583,13 @@ impl WithDatabaseName for CompositeField {
         self.database_name = database_name;
     }
 }
+
+impl From<psl_core::parser_database::ast::FieldArity> for FieldArity {
+    fn from(arity: psl_core::parser_database::ast::FieldArity) -> Self {
+        match arity {
+            schema_ast::ast::FieldArity::Required => FieldArity::Required,
+            schema_ast::ast::FieldArity::Optional => FieldArity::Optional,
+            schema_ast::ast::FieldArity::List => FieldArity::List,
+        }
+    }
+}

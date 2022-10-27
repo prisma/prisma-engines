@@ -60,8 +60,8 @@ async fn referential_integrity_prisma(api: &TestApi) -> TestResult {
 
         model Foo {
           id     Int @id
-          bar    Bar @relation(fields: [bar_id], references: [id])
           bar_id Int @unique
+          bar    Bar @relation(fields: [bar_id], references: [id])
         }
 
         model Bar {
@@ -212,8 +212,8 @@ async fn relation_mode_prisma(api: &TestApi) -> TestResult {
 
         model Foo {
           id     Int @id
-          bar    Bar @relation(fields: [bar_id], references: [id])
           bar_id Int @unique
+          bar    Bar @relation(fields: [bar_id], references: [id])
         }
 
         model Bar {
@@ -373,8 +373,8 @@ mod at_at_map {
 
             model Foo {
               id     Int @id
-              bar    Bar @relation(fields: [bar_id], references: [id])
               bar_id Int @unique
+              bar    Bar @relation(fields: [bar_id], references: [id])
 
               @@map("foo_table")
             }
@@ -541,8 +541,8 @@ mod at_at_map {
 
             model Foo {
               id     Int @id
-              bar    Bar @relation(fields: [bar_id], references: [id])
               bar_id Int @unique
+              bar    Bar @relation(fields: [bar_id], references: [id])
 
               @@map("foo_table")
             }

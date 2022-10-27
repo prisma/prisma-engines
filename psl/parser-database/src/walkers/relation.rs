@@ -17,7 +17,7 @@ impl<'db> RelationWalker<'db> {
     /// gathering 1:1 and 1:n relations.
     pub fn refine(self) -> RefinedRelationWalker<'db> {
         if self.get().is_implicit_many_to_many() {
-            RefinedRelationWalker::ImplicitManyToMany(ImplicitManyToManyRelationWalker(self))
+            RefinedRelationWalker::ImplicitManyToMany(self.db.walk(ManyToManyRelationId(self.id)))
         } else if self.get().is_two_way_embedded_many_to_many() {
             RefinedRelationWalker::TwoWayEmbeddedManyToMany(TwoWayEmbeddedManyToManyRelationWalker(self))
         } else {

@@ -57,6 +57,6 @@ impl<'db> UniqueCriteriaWalker<'db> {
     }
 
     fn model(self) -> ModelWalker<'db> {
-        self.db.walk_model(self.model_id)
+        self.db.walk(self.model_id)
     }
 }
