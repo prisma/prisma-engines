@@ -276,6 +276,14 @@ impl From<ScalarFieldRef> for FieldSelection {
     }
 }
 
+impl From<Vec<ScalarFieldRef>> for FieldSelection {
+    fn from(fields: Vec<ScalarFieldRef>) -> Self {
+        Self {
+            selections: fields.into_iter().map(SelectedField::from).collect_vec(),
+        }
+    }
+}
+
 impl From<&RelationField> for FieldSelection {
     fn from(rf: &RelationField) -> Self {
         Self {

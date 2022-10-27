@@ -1,6 +1,6 @@
 use crate::{
-    cursor_condition, filter_conversion::AliasedCondition, model_extensions::*, nested_aggregations, nested_read,
-    ordering, sql_trace::SqlTraceComment,
+    cursor_condition, filter_conversion::AliasedCondition, join_utils::JoinBuilder, model_extensions::*,
+    nested_aggregations, nested_read, ordering, sql_trace::SqlTraceComment,
 };
 use connector_interface::{filter::Filter, AggregationSelection, NestedRead, QueryArguments, RelAggregationSelection};
 use itertools::Itertools;
@@ -55,6 +55,17 @@ impl SelectDefinition for Select<'static> {
     }
 }
 
+#[derive(Debug, Default)]
+pub struct QueryBuilderContext {
+    join_builder: JoinBuilder,
+}
+
+impl QueryBuilderContext {
+    pub fn join_builder(&mut self) -> &mut JoinBuilder {
+        &mut self.join_builder
+    }
+}
+
 impl SelectDefinition for QueryArguments {
     fn into_select(
         self,
@@ -63,10 +74,11 @@ impl SelectDefinition for QueryArguments {
         aggr_selections: &[RelAggregationSelection],
         trace_id: Option<String>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
-        let order_by_definitions = OrderByBuilder::default().build(&self);
+        let mut ctx = QueryBuilderContext::default();
+        let nested_read_joins = nested_read::build_joins(&mut ctx, nested_reads, None);
+        let order_by_definitions = ordering::build(&mut ctx, &self, nested_reads);
         let (table_opt, cursor_condition) = cursor_condition::build(&self, &model, &order_by_definitions);
-        let aggregation_joins = nested_aggregations::build(aggr_selections);
-        let nested_read_joins = nested_read::build_joins(nested_reads);
+        let aggregation_joins = nested_aggregations::build(&mut ctx, aggr_selections);
 
         let limit = if self.ignore_take { None } else { self.take_abs() };
         let skip = if self.ignore_skip { 0 } else { self.skip.unwrap_or(0) };
@@ -82,19 +94,20 @@ impl SelectDefinition for QueryArguments {
             (filter, cursor) => ConditionTree::and(filter, cursor),
         };
 
+        // Add joins necessary to the nested reads
+        let joined_table = nested_read_joins
+            .joins
+            .into_iter()
+            .fold(model.as_table(), |acc, join| acc.left_join(join.data));
+
         // Add joins necessary to the ordering
         let joined_table = order_by_definitions
             .iter()
             .flat_map(|j| &j.joins)
-            .fold(model.as_table(), |acc, join| acc.left_join(join.clone().data));
+            .fold(joined_table, |acc, join| acc.left_join(join.clone().data));
 
         // Add joins necessary to the nested aggregations
         let joined_table = aggregation_joins
-            .joins
-            .into_iter()
-            .fold(joined_table, |acc, join| acc.left_join(join.data));
-
-        let joined_table = nested_read_joins
             .joins
             .into_iter()
             .fold(joined_table, |acc, join| acc.left_join(join.data));

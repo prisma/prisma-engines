@@ -6,7 +6,8 @@ use crate::{
 };
 use async_trait::async_trait;
 use connector_interface::{
-    Connection, ConnectionLike, NestedRead, ReadOperations, RelAggregationSelection, Transaction, UpdateType, WriteArgs, WriteOperations,
+    Connection, ConnectionLike, NestedRead, ReadOperations, RelAggregationSelection, Transaction, UpdateType,
+    WriteArgs, WriteOperations,
 };
 use mongodb::{ClientSession, Database};
 use prisma_models::{prelude::*, SelectionResult};

@@ -131,7 +131,7 @@ impl std::fmt::Debug for OrderByHop {
 }
 
 impl OrderByHop {
-    pub fn into_relation_hop(&self) -> Option<&RelationFieldRef> {
+    pub fn as_relation_hop(&self) -> Option<&RelationFieldRef> {
         match self {
             OrderByHop::Relation(rf) => Some(rf),
             OrderByHop::Composite(_) => None,

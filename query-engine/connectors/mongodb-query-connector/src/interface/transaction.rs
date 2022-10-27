@@ -4,7 +4,7 @@ use crate::{
     root_queries::{aggregate, read, write},
 };
 use connector_interface::{
-    ConnectionLike, NestedRead, ReadOperations, RelAggregationSelection, Transaction, UpdateType, WriteOperations
+    ConnectionLike, NestedRead, ReadOperations, RelAggregationSelection, Transaction, UpdateType, WriteOperations,
 };
 use mongodb::options::{Acknowledgment, ReadConcern, TransactionOptions, WriteConcern};
 use prisma_models::SelectionResult;

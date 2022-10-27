@@ -1,4 +1,7 @@
-use crate::join_utils::{compute_aggr_join, AggregationType, AliasedJoin};
+use crate::{
+    join_utils::{AggregationType, AliasedJoin},
+    query_builder::QueryBuilderContext,
+};
 use connector_interface::RelAggregationSelection;
 use quaint::prelude::*;
 
@@ -10,23 +13,16 @@ pub struct RelAggregationJoins {
     pub(crate) columns: Vec<Expression<'static>>,
 }
 
-pub fn build(aggr_selections: &[RelAggregationSelection]) -> RelAggregationJoins {
+pub fn build(ctx: &mut QueryBuilderContext, aggr_selections: &[RelAggregationSelection]) -> RelAggregationJoins {
     let mut joins = vec![];
     let mut columns: Vec<Expression<'static>> = vec![];
 
-    for (index, selection) in aggr_selections.iter().enumerate() {
+    for selection in aggr_selections.iter() {
         match selection {
             RelAggregationSelection::Count(rf, filter) => {
-                let join_alias = format!("aggr_selection_{}", index);
-                let aggregator_alias = selection.db_alias();
-                let join = compute_aggr_join(
-                    rf,
-                    AggregationType::Count,
-                    filter.clone(),
-                    aggregator_alias.as_str(),
-                    join_alias.as_str(),
-                    None,
-                );
+                let (aggregator_alias, join) =
+                    ctx.join_builder()
+                        .compute_aggr_join(rf, AggregationType::Count, filter.clone(), None);
 
                 columns.push(Column::from((join.alias.clone(), aggregator_alias)).into());
                 joins.push(join);

@@ -2,6 +2,7 @@ use crate::{filter_conversion::AliasedCondition, model_extensions::*};
 use connector_interface::Filter;
 use prisma_models::*;
 use quaint::prelude::*;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
 pub struct AliasedJoin {
@@ -11,40 +12,131 @@ pub struct AliasedJoin {
     pub(crate) alias: String,
 }
 
+#[derive(Debug, Default)]
+pub struct JoinBuilder {
+    count: usize,
+    cache: HashMap<RelationFieldRef, AliasedJoin>,
+    aggr_cache: HashMap<RelationFieldRef, (String, AliasedJoin)>,
+}
+
+impl JoinBuilder {
+    pub fn compute_aggr_join(
+        &mut self,
+        rf: &RelationFieldRef,
+        aggregation: AggregationType,
+        filter: Option<Filter>,
+        previous_join: Option<&AliasedJoin>,
+    ) -> (String, AliasedJoin) {
+        if let Some(entry) = self.aggr_cache.get(rf) {
+            return entry.clone();
+        }
+
+        let join_alias = self.join_alias();
+        let aggregator_alias = self.aggregator_alias();
+
+        let join = if rf.relation().is_many_to_many() {
+            compute_aggr_join_m2m(
+                rf,
+                aggregation,
+                filter,
+                aggregator_alias.as_str(),
+                join_alias.as_str(),
+                previous_join,
+            )
+        } else {
+            compute_aggr_join_one2m(
+                rf,
+                aggregation,
+                filter,
+                aggregator_alias.as_str(),
+                join_alias.as_str(),
+                previous_join,
+            )
+        };
+
+        self.aggr_cache
+            .insert(rf.clone(), (aggregator_alias.clone(), join.clone()));
+
+        (aggregator_alias, join)
+    }
+
+    pub fn compute_one2m_joins(&mut self, rfs: &[RelationFieldRef]) -> (Vec<AliasedJoin>, Option<AliasedJoin>) {
+        let mut joins = vec![];
+
+        for (i, hop) in rfs.iter().enumerate() {
+            let previous_join = if i > 0 { joins.get(i - 1) } else { None };
+            let join = self.compute_one2m_join(hop, previous_join);
+
+            joins.push(join);
+        }
+
+        let last = joins.last().cloned();
+
+        (joins, last)
+    }
+
+    pub fn compute_one2m_join(&mut self, rf: &RelationFieldRef, previous_join: Option<&AliasedJoin>) -> AliasedJoin {
+        if let Some(entry) = self.cache.get(rf) {
+            return entry.clone();
+        }
+
+        let join_alias = self.join_alias();
+        let (left_fields, right_fields) = if rf.is_inlined_on_enclosing_model() {
+            (rf.scalar_fields(), rf.referenced_fields())
+        } else {
+            (
+                rf.related_field().referenced_fields(),
+                rf.related_field().scalar_fields(),
+            )
+        };
+
+        let related_model = rf.related_model();
+        let pairs = left_fields.into_iter().zip(right_fields.into_iter());
+
+        let on_conditions: Vec<Expression> = pairs
+            .map(|(a, b)| {
+                let a_col = match previous_join {
+                    Some(prev_join) => Column::from((prev_join.alias.to_owned(), a.db_name().to_owned())),
+                    None => a.as_column(),
+                };
+
+                let b_col = Column::from((join_alias.clone(), b.db_name().to_owned()));
+
+                a_col.equals(b_col).into()
+            })
+            .collect::<Vec<_>>();
+
+        let join = AliasedJoin {
+            alias: join_alias.clone(),
+            data: related_model
+                .as_table()
+                .alias(join_alias)
+                .on(ConditionTree::And(on_conditions)),
+        };
+
+        self.cache.insert(rf.clone(), join.clone());
+
+        join
+    }
+
+    fn join_alias(&mut self) -> String {
+        let alias = format!("j{}", self.count);
+        self.count += 1;
+
+        alias
+    }
+
+    fn aggregator_alias(&mut self) -> String {
+        let alias = format!("aggr{}", self.count);
+        self.count += 1;
+
+        alias
+    }
+}
+
 #[derive(Debug, Clone)]
 pub enum AggregationType {
     Count,
-}
-
-pub fn compute_aggr_join(
-    rf: &RelationFieldRef,
-    aggregation: AggregationType,
-    filter: Option<Filter>,
-    aggregator_alias: &str,
-    join_alias: &str,
-    previous_join: Option<&AliasedJoin>,
-) -> AliasedJoin {
-    let join_alias = format!("{}_{}", join_alias, &rf.related_model().name);
-
-    if rf.relation().is_many_to_many() {
-        compute_aggr_join_m2m(
-            rf,
-            aggregation,
-            filter,
-            aggregator_alias,
-            join_alias.as_str(),
-            previous_join,
-        )
-    } else {
-        compute_aggr_join_one2m(
-            rf,
-            aggregation,
-            filter,
-            aggregator_alias,
-            join_alias.as_str(),
-            previous_join,
-        )
-    }
 }
 
 /// Computes a one-to-many join for an aggregation (in aggregation selections, order by...).
@@ -213,46 +305,5 @@ fn compute_aggr_join_m2m(
     AliasedJoin {
         alias: join_alias.to_owned(),
         data: join,
-    }
-}
-
-pub fn compute_one2m_join(
-    rf: &RelationFieldRef,
-    join_prefix: &str,
-    previous_join: Option<&AliasedJoin>,
-) -> AliasedJoin {
-    let (left_fields, right_fields) = if rf.is_inlined_on_enclosing_model() {
-        (rf.scalar_fields(), rf.referenced_fields())
-    } else {
-        (
-            rf.related_field().referenced_fields(),
-            rf.related_field().scalar_fields(),
-        )
-    };
-
-    let right_table_alias = format!("{}_{}", join_prefix, &rf.related_model().name);
-
-    let related_model = rf.related_model();
-    let pairs = left_fields.into_iter().zip(right_fields.into_iter());
-
-    let on_conditions: Vec<Expression> = pairs
-        .map(|(a, b)| {
-            let a_col = match previous_join {
-                Some(prev_join) => Column::from((prev_join.alias.to_owned(), a.db_name().to_owned())),
-                None => a.as_column(),
-            };
-
-            let b_col = Column::from((right_table_alias.clone(), b.db_name().to_owned()));
-
-            a_col.equals(b_col).into()
-        })
-        .collect::<Vec<_>>();
-
-    AliasedJoin {
-        alias: right_table_alias.to_owned(),
-        data: related_model
-            .as_table()
-            .alias(right_table_alias)
-            .on(ConditionTree::And(on_conditions)),
     }
 }

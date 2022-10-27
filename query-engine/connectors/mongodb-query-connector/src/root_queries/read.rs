@@ -61,7 +61,7 @@ pub async fn get_many_records<'conn>(
     model: &ModelRef,
     query_arguments: QueryArguments,
     selected_fields: &FieldSelection,
-    nested_reads: &[NestedRead],
+    _nested_reads: &[NestedRead],
     aggregation_selections: &[RelAggregationSelection],
 ) -> crate::Result<ManyRecords> {
     let coll = database.collection(model.db_name());

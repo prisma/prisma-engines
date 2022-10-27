@@ -4,7 +4,7 @@ use connector::{self, ConnectionLike, NestedRead, QueryArguments, RelAggregation
 use futures::future::{BoxFuture, FutureExt};
 use inmemory_record_processor::InMemoryRecordProcessor;
 use itertools::Itertools;
-use prisma_models::{ManyRecords, ModelRef, PrismaValue, Record, SelectedField, SelectionResult};
+use prisma_models::{FieldSelection, ManyRecords, ModelRef, PrismaValue, Record, SelectedField, SelectionResult};
 use std::collections::{HashMap, HashSet};
 
 pub fn execute<'conn>(
@@ -147,9 +147,14 @@ fn read_many(
             (scalars, aggregation_rows)
         };
 
+        // dbg!(&nested_reads);
+        // dbg!(&scalars);
+
         let nested = process_nested_read(&query.model, &nested_reads, &mut scalars)?;
 
         // let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
+
+        // dbg!(&nested);
 
         let record_selection = RecordSelection {
             name: query.name,
@@ -247,9 +252,10 @@ fn process_nested_read(
 ) -> crate::Result<Vec<QueryResult>> {
     let mut query_results = vec![];
 
-    let parent_ids = scalars.extract_selection_results(&model.primary_identifier())?;
-    let parent_id = parent_ids.first().unwrap();
+    dbg!(&scalars);
 
+    // TODO: Find out how to clean-up joins without result (aka null)
+    // TODO: Solution: We should find whether the unique criterias are set or not
     for read in nested {
         let field_names: HashSet<String> = read
             .selected_fields
@@ -257,6 +263,33 @@ fn process_nested_read(
             .enumerate()
             .map(|(i, _)| read.db_alias(i))
             .collect();
+
+        dbg!(&read);
+
+        let rf = &read.parent_field;
+
+        let (left_fields, right_fields) = if rf.is_inlined_on_enclosing_model() {
+            (rf.scalar_fields(), rf.referenced_fields())
+        } else {
+            (
+                rf.related_field().referenced_fields(),
+                rf.related_field().scalar_fields(),
+            )
+        };
+
+        let pairs = left_fields.into_iter().zip(right_fields.into_iter()).collect_vec();
+
+        let linking_fields_indexes = pairs
+            .into_iter()
+            .filter_map(|(parent_id, child_id)| {
+                read.selected_fields
+                    .selections()
+                    .position(|s| s.prisma_name() == &child_id.name)
+                    .map(|i| (SelectedField::from(parent_id), i))
+            })
+            .collect_vec();
+
+        dbg!(&linking_fields_indexes);
 
         let indexes_to_remove: Vec<_> = scalars
             .field_names
@@ -270,6 +303,8 @@ fn process_nested_read(
                 }
             })
             .collect();
+
+        // let parent_link_id = read.parent_field.linking_fields().merge(model.primary_identifier());
 
         let mut nested_scalars: Vec<Vec<PrismaValue>> = vec![];
         let mut n_record_removed = 0;
@@ -294,14 +329,42 @@ fn process_nested_read(
             n_record_removed += 1;
         }
 
+        // let parent_link_id = read.parent_field.related_field().linking_fields();
+        // let extractor = parent_model_id.clone().merge(parent_link_id.clone());
+        // let parent_ids = scalars.extract_selection_results(&extractor).unwrap();
+
+        // dbg!(&parent_ids);
+        // dbg!(&nested_scalars);
+
+        // TODO: Find out why parent ids aren't set correctly
         let nested_scalars = nested_scalars
             .into_iter()
-            .map(|values| {
-                let mut rec = Record::new(values);
-                rec.set_parent_id(parent_id.clone());
+            // .zip(parent_ids)
+            .filter_map(|values| {
+                let parent_ids = linking_fields_indexes
+                    .iter()
+                    .filter_map(|(parent_id, i)| {
+                        let linking_field_val = values.get(*i).expect("linking field value expected to be present");
 
-                rec
+                        if linking_field_val == &PrismaValue::Null {
+                            None
+                        } else {
+                            Some((parent_id.clone(), linking_field_val.clone()))
+                        }
+                    })
+                    .collect_vec();
+
+                // If any of the linking fields are Null, it means the relation couldn't be joined, so we skip the record entirely
+                if parent_ids.len() != linking_fields_indexes.len() {
+                    return None;
+                }
+
+                let mut rec = Record::new(values);
+                rec.set_parent_id(SelectionResult::new(parent_ids));
+
+                Some(rec)
             })
+            .unique()
             .collect_vec();
 
         let many_record = ManyRecords {
@@ -313,7 +376,7 @@ fn process_nested_read(
             name: read.name.clone(),
             model: read.parent_field.related_model(),
             aggregation_rows: None,
-            fields: read.selected_fields.prisma_names().collect_vec(),
+            fields: read.selection_order.clone(),
             nested: process_nested_read(&read.parent_field.related_model(), &read.nested, scalars)?,
             query_arguments: read.args.clone(),
             scalars: many_record,
@@ -321,6 +384,9 @@ fn process_nested_read(
 
         query_results.push(QueryResult::RecordSelection(Box::new(res)));
     }
+
+    // TODO: Should be unique by <the value of a unique field(s)>
+    scalars.records = scalars.records.clone().into_iter().unique().collect_vec();
 
     Ok(query_results)
 }

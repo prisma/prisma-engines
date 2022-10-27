@@ -235,9 +235,14 @@ impl NestedRead {
     pub fn db_alias(&self, i: usize) -> String {
         let selected_field = self.selected_fields.inner().get(i).unwrap();
 
+        // format!(
+        //     "__prisma_nested_read__{}_{}",
+        //     self.parent_field.relation_name,
+        //     selected_field.db_name()
+        // )
         format!(
-            "__prisma_nested_read__{}_{}",
-            self.parent_field.relation_name,
+            "{}.{}",
+            &self.parent_field.related_model().name,
             selected_field.db_name()
         )
     }
