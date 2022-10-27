@@ -310,7 +310,7 @@ impl MigrationConnector for SqlMigrationConnector {
         Namespaces::from_vec(
             &mut sql_schema
                 .describer_schema
-                .namespace_walkers()
+                .walk_namespaces()
                 .map(|nw| String::from(nw.name()))
                 .collect::<Vec<String>>(),
         )

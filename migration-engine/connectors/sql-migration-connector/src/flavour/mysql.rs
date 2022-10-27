@@ -350,7 +350,11 @@ impl SqlFlavour for MysqlFlavour {
 
     fn set_preview_features(&mut self, preview_features: enumflags2::BitFlags<psl::PreviewFeature>) {
         match &mut self.state {
-            super::State::Initial => (),
+            super::State::Initial => {
+                if !preview_features.is_empty() {
+                    tracing::warn!("set_preview_feature on Initial state has no effect ({preview_features}).");
+                }
+            }
             super::State::WithParams(params) | super::State::Connected(params, _) => {
                 params.connector_params.preview_features = preview_features
             }
