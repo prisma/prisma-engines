@@ -220,6 +220,16 @@ fn lift_datasource(
 
     let connector_data = active_connector.parse_datasource_properties(&mut args, diagnostics);
 
+    // referentialIntegrity and relationMode cannot co-occur
+    if referential_integrity.and(relation_mode).is_some() {
+        let span = args
+            .get("referentialIntegrity")
+            .map(|(_, v)| v.span())
+            .unwrap_or_else(Span::empty);
+
+        diagnostics.push_error(DatamodelError::new_referential_integrity_and_relation_mode_cooccur_error(span));
+    }
+
     // we handle these elsewhere
     args.remove("previewFeatures");
     args.remove("referentialIntegrity");

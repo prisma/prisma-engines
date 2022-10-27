@@ -721,11 +721,11 @@ fn relation_mode_default() {
 }
 
 #[test]
-fn relation_mode_prisma_has_precedence_over_referential_integrity() {
+fn relation_mode_and_referential_integrity_cannot_cooccur() {
     let schema = indoc! {r#"
         datasource ps {
-          provider = "sqlserver"
-          url = "mysql://root:prisma@localhost:3306/mydb"
+          provider = "sqlite"
+          url = "sqlite"
           relationMode = "prisma"
           referentialIntegrity = "foreignKeys"
         }
@@ -735,9 +735,18 @@ fn relation_mode_prisma_has_precedence_over_referential_integrity() {
         }
     "#};
 
-    let config = parse_configuration(schema);
+    let config = parse_config(schema);
+    let error = config.unwrap_err();
 
-    assert_eq!(config.relation_mode(), Some(RelationMode::Prisma));
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mThe `referentialIntegrity` and `relationMode` attributes cannot be used together. Please use only `relationMode` instead.[0m
+          [1;94m-->[0m  [4mschema.prisma:5[0m
+        [1;94m   | [0m
+        [1;94m 4 | [0m  relationMode = "prisma"
+        [1;94m 5 | [0m  referentialIntegrity = [1;91m"foreignKeys"[0m
+        [1;94m   | [0m
+    "#]];
+    expectation.assert_eq(&error);
 }
 
 fn load_env_var(key: &str) -> Option<String> {
