@@ -790,15 +790,6 @@
 <span id="790">790</span>
 <span id="791">791</span>
 <span id="792">792</span>
-<span id="793">793</span>
-<span id="794">794</span>
-<span id="795">795</span>
-<span id="796">796</span>
-<span id="797">797</span>
-<span id="798">798</span>
-<span id="799">799</span>
-<span id="800">800</span>
-<span id="801">801</span>
 </pre><pre class="rust"><code><span class="doccomment">//! MySQL schema description.</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">getters::Getter</span>, <span class="ident">parsers::Parser</span>, <span class="kw-2">*</span>};
@@ -1184,21 +1175,17 @@
 
             <span class="kw">let</span> <span class="ident">default_value</span> <span class="op">=</span> <span class="ident">col</span>.<span class="ident">get</span>(<span class="string">&quot;column_default&quot;</span>);
 
-            <span class="kw">let</span> (<span class="ident">tpe</span>, <span class="ident">enum_option</span>) <span class="op">=</span> <span class="ident"><span class="self">Self</span>::get_column_type_and_enum</span>(
-                <span class="kw-2">&amp;</span><span class="ident">table_name</span>,
-                <span class="kw-2">&amp;</span><span class="ident">name</span>,
+            <span class="kw">let</span> <span class="ident">tpe</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::get_column_type</span>(
+                (<span class="kw-2">&amp;</span><span class="ident">table_name</span>, <span class="kw-2">&amp;</span><span class="ident">name</span>),
                 <span class="kw-2">&amp;</span><span class="ident">data_type</span>,
                 <span class="kw-2">&amp;</span><span class="ident">full_data_type</span>,
                 <span class="ident">precision</span>,
                 <span class="ident">arity</span>,
                 <span class="ident">default_value</span>,
+                <span class="ident">sql_schema</span>,
             );
             <span class="kw">let</span> <span class="ident">extra</span> <span class="op">=</span> <span class="ident">col</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;extra&quot;</span>).<span class="ident">to_lowercase</span>();
             <span class="kw">let</span> <span class="ident">auto_increment</span> <span class="op">=</span> <span class="macro">matches!</span>(<span class="ident">extra</span>.<span class="ident">as_str</span>(), <span class="string">&quot;auto_increment&quot;</span>);
-
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">enm</span>) <span class="op">=</span> <span class="ident">enum_option</span> {
-                <span class="ident">sql_schema</span>.<span class="ident">enums</span>.<span class="ident">push</span>(<span class="ident">enm</span>);
-            }
 
             <span class="kw">let</span> <span class="ident">default</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">default_value</span> {
                 <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
@@ -1319,15 +1306,15 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">get_column_type_and_enum</span>(
-        <span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">column_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+    <span class="kw">fn</span> <span class="ident">get_column_type</span>(
+        (<span class="ident">table</span>, <span class="ident">column_name</span>): (<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>),
         <span class="ident">data_type</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">full_data_type</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">precision</span>: <span class="ident">Precision</span>,
         <span class="ident">arity</span>: <span class="ident">ColumnArity</span>,
         <span class="ident">default</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; (<span class="ident">ColumnType</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Enum</span><span class="op">&gt;</span>) {
+        <span class="ident">sql_schema</span>: <span class="kw-2">&amp;mut</span> <span class="ident">SqlSchema</span>,
+    ) -&gt; <span class="ident">ColumnType</span> {
         <span class="kw">static</span> <span class="ident">UNSIGNEDNESS_RE</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">Regex</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Regex::new</span>(<span class="string">&quot;(?i)unsigned$&quot;</span>).<span class="ident">unwrap</span>());
         <span class="kw">let</span> <span class="ident">is_tinyint1</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> <span class="ident"><span class="self">Self</span>::extract_precision</span>(<span class="ident">full_data_type</span>) <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="number">1</span>);
         <span class="kw">let</span> <span class="ident">invalid_bool_default</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
@@ -1383,7 +1370,13 @@
             <span class="string">&quot;tinytext&quot;</span> =&gt; (<span class="ident">ColumnTypeFamily::String</span>, <span class="prelude-val">Some</span>(<span class="ident">MySqlType::TinyText</span>)),
             <span class="string">&quot;mediumtext&quot;</span> =&gt; (<span class="ident">ColumnTypeFamily::String</span>, <span class="prelude-val">Some</span>(<span class="ident">MySqlType::MediumText</span>)),
             <span class="string">&quot;longtext&quot;</span> =&gt; (<span class="ident">ColumnTypeFamily::String</span>, <span class="prelude-val">Some</span>(<span class="ident">MySqlType::LongText</span>)),
-            <span class="string">&quot;enum&quot;</span> =&gt; (<span class="ident">ColumnTypeFamily::Enum</span>(<span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, <span class="ident">table</span>, <span class="ident">column_name</span>)), <span class="prelude-val">None</span>),
+            <span class="string">&quot;enum&quot;</span> =&gt; {
+                <span class="kw">let</span> <span class="ident">enum_name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, <span class="ident">table</span>, <span class="ident">column_name</span>);
+                <span class="kw">let</span> <span class="ident">enum_id</span> <span class="op">=</span> <span class="ident">sql_schema</span>.<span class="ident">push_enum</span>(<span class="ident">Default::default</span>(), <span class="ident">enum_name</span>);
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">enm</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">sql_schema</span>.<span class="ident">enums</span>[<span class="ident">enum_id</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>];
+                <span class="ident">enm</span>.<span class="ident">values</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::extract_enum_values</span>(<span class="kw-2">&amp;</span><span class="ident">full_data_type</span>);
+                (<span class="ident">ColumnTypeFamily::Enum</span>(<span class="ident">enum_id</span>), <span class="prelude-val">None</span>)
+            }
             <span class="string">&quot;json&quot;</span> =&gt; (<span class="ident">ColumnTypeFamily::Json</span>, <span class="prelude-val">Some</span>(<span class="ident">MySqlType::Json</span>)),
             <span class="string">&quot;set&quot;</span> =&gt; (<span class="ident">ColumnTypeFamily::String</span>, <span class="prelude-val">None</span>),
             <span class="comment">//temporal</span>
@@ -1435,23 +1428,12 @@
             <span class="kw">_</span> =&gt; (<span class="ident">ColumnTypeFamily::Unsupported</span>(<span class="ident">full_data_type</span>.<span class="ident">into</span>()), <span class="prelude-val">None</span>),
         };
 
-        <span class="kw">let</span> <span class="ident">enm</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">family</span> {
-            <span class="ident">ColumnTypeFamily::Enum</span>(<span class="ident">name</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">Enum</span> {
-                <span class="ident">namespace_id</span>: <span class="ident">Default::default</span>(),
-                <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">clone</span>(),
-                <span class="ident">values</span>: <span class="ident"><span class="self">Self</span>::extract_enum_values</span>(<span class="kw-2">&amp;</span><span class="ident">full_data_type</span>),
-            }),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
-        };
-
-        <span class="kw">let</span> <span class="ident">tpe</span> <span class="op">=</span> <span class="ident">ColumnType</span> {
+        <span class="ident">ColumnType</span> {
             <span class="ident">full_data_type</span>: <span class="ident">full_data_type</span>.<span class="ident">to_owned</span>(),
             <span class="ident">family</span>,
             <span class="ident">arity</span>,
             <span class="ident">native_type</span>: <span class="ident">native_type</span>.<span class="ident">map</span>(<span class="ident">NativeTypeInstance::new</span>::<span class="op">&lt;</span><span class="ident">MySqlType</span><span class="op">&gt;</span>),
-        };
-
-        (<span class="ident">tpe</span>, <span class="ident">enm</span>)
+        }
     }
 
     <span class="kw">fn</span> <span class="ident">extract_precision</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {

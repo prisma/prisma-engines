@@ -481,16 +481,6 @@
 <span id="481">481</span>
 <span id="482">482</span>
 <span id="483">483</span>
-<span id="484">484</span>
-<span id="485">485</span>
-<span id="486">486</span>
-<span id="487">487</span>
-<span id="488">488</span>
-<span id="489">489</span>
-<span id="490">490</span>
-<span id="491">491</span>
-<span id="492">492</span>
-<span id="493">493</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Functions and types for conveniently traversing and querying a SqlSchema.</span>
 
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
@@ -587,17 +577,7 @@
 
     <span class="doccomment">/// Extract an `Enum` column type family, or `None` if the family is something else.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_type_family_as_enum</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">column_type_family</span>().<span class="ident">as_enum</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">enum_name</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="self">self</span>
-                .<span class="ident">schema</span>
-                .<span class="ident">enums</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">position</span>(<span class="op">|</span><span class="ident">enm</span><span class="op">|</span> <span class="ident">enm</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">enum_name</span>)
-                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;Cannot find enum referenced in ColumnTypeFamily (`{}`)&quot;</span>, <span class="ident">enum_name</span>))
-                .<span class="ident">unwrap</span>();
-
-            <span class="self">self</span>.<span class="ident">walk</span>(<span class="ident">EnumId</span>(<span class="ident">idx</span> <span class="kw">as</span> <span class="ident">u32</span>))
-        })
+        <span class="self">self</span>.<span class="ident">column_type_family</span>().<span class="ident">as_enum</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">enum_id</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">walk</span>(<span class="ident">enum_id</span>))
     }
 
     <span class="doccomment">/// The column name.</span>

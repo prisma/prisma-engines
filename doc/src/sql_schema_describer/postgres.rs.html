@@ -2119,9 +2119,9 @@
                     .<span class="ident">circumstances</span>
                     .<span class="ident">contains</span>(<span class="ident">Circumstances::CockroachWithPostgresNativeTypes</span>)
             {
-                <span class="ident">get_column_type_cockroachdb</span>(<span class="kw-2">&amp;</span><span class="ident">col</span>, <span class="kw-2">&amp;</span><span class="ident">sql_schema</span>.<span class="ident">enums</span>)
+                <span class="ident">get_column_type_cockroachdb</span>(<span class="kw-2">&amp;</span><span class="ident">col</span>, <span class="ident">sql_schema</span>)
             } <span class="kw">else</span> {
-                <span class="ident">get_column_type_postgresql</span>(<span class="kw-2">&amp;</span><span class="ident">col</span>, <span class="kw-2">&amp;</span><span class="ident">sql_schema</span>.<span class="ident">enums</span>)
+                <span class="ident">get_column_type_postgresql</span>(<span class="kw-2">&amp;</span><span class="ident">col</span>, <span class="ident">sql_schema</span>)
             };
             <span class="kw">let</span> <span class="ident">default</span> <span class="op">=</span> <span class="ident">col</span>
                 .<span class="ident">get</span>(<span class="string">&quot;column_default&quot;</span>)
@@ -2591,7 +2591,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">get_column_type_postgresql</span>(<span class="ident">row</span>: <span class="kw-2">&amp;</span><span class="ident">ResultRow</span>, <span class="ident">enums</span>: <span class="kw-2">&amp;</span>[<span class="ident">Enum</span>]) -&gt; <span class="ident">ColumnType</span> {
+<span class="kw">fn</span> <span class="ident">get_column_type_postgresql</span>(<span class="ident">row</span>: <span class="kw-2">&amp;</span><span class="ident">ResultRow</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">SqlSchema</span>) -&gt; <span class="ident">ColumnType</span> {
     <span class="kw">use</span> <span class="ident">ColumnTypeFamily</span>::<span class="kw-2">*</span>;
     <span class="kw">let</span> <span class="ident">data_type</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;data_type&quot;</span>);
     <span class="kw">let</span> <span class="ident">full_data_type</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;full_data_type&quot;</span>);
@@ -2609,12 +2609,14 @@
 
     <span class="kw">let</span> <span class="ident">precision</span> <span class="op">=</span> <span class="ident">SqlSchemaDescriber::get_precision</span>(<span class="ident">row</span>);
     <span class="kw">let</span> <span class="ident">unsupported_type</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">Unsupported</span>(<span class="ident">full_data_type</span>.<span class="ident">clone</span>()), <span class="prelude-val">None</span>);
-    <span class="kw">let</span> <span class="ident">enum_exists</span> <span class="op">=</span> <span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="ident">enums</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">name</span>);
+    <span class="kw">let</span> <span class="ident">enum_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">data_type</span>.<span class="ident">as_str</span>() {
+        <span class="string">&quot;ARRAY&quot;</span> <span class="kw">if</span> <span class="ident">full_data_type</span>.<span class="ident">starts_with</span>(<span class="string">&#39;_&#39;</span>) =&gt; <span class="ident">schema</span>.<span class="ident">find_enum</span>(<span class="ident">full_data_type</span>.<span class="ident">trim_start_matches</span>(<span class="string">&#39;_&#39;</span>)),
+        <span class="kw">_</span> =&gt; <span class="ident">schema</span>.<span class="ident">find_enum</span>(<span class="kw-2">&amp;</span><span class="ident">full_data_type</span>),
+    };
 
     <span class="kw">let</span> (<span class="ident">family</span>, <span class="ident">native_type</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">full_data_type</span>.<span class="ident">as_str</span>() {
-        <span class="ident">name</span> <span class="kw">if</span> <span class="ident">data_type</span> <span class="op">==</span> <span class="string">&quot;USER-DEFINED&quot;</span> <span class="op">&amp;&amp;</span> <span class="ident">enum_exists</span>(<span class="ident">name</span>) =&gt; (<span class="ident">Enum</span>(<span class="ident">name</span>.<span class="ident">to_owned</span>()), <span class="prelude-val">None</span>),
-        <span class="ident">name</span> <span class="kw">if</span> <span class="ident">data_type</span> <span class="op">==</span> <span class="string">&quot;ARRAY&quot;</span> <span class="op">&amp;&amp;</span> <span class="ident">name</span>.<span class="ident">starts_with</span>(<span class="string">&#39;_&#39;</span>) <span class="op">&amp;&amp;</span> <span class="ident">enum_exists</span>(<span class="ident">name</span>.<span class="ident">trim_start_matches</span>(<span class="string">&#39;_&#39;</span>)) =&gt; {
-            (<span class="ident">Enum</span>(<span class="ident">name</span>.<span class="ident">trim_start_matches</span>(<span class="string">&#39;_&#39;</span>).<span class="ident">to_owned</span>()), <span class="prelude-val">None</span>)
+        <span class="kw">_</span> <span class="kw">if</span> (<span class="ident">data_type</span> <span class="op">==</span> <span class="string">&quot;USER-DEFINED&quot;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">data_type</span> <span class="op">==</span> <span class="string">&quot;ARRAY&quot;</span>) <span class="op">&amp;&amp;</span> <span class="ident">enum_id</span>.<span class="ident">is_some</span>() =&gt; {
+            (<span class="ident">Enum</span>(<span class="ident">enum_id</span>.<span class="ident">unwrap</span>()), <span class="prelude-val">None</span>)
         }
         <span class="string">&quot;int2&quot;</span> <span class="op">|</span> <span class="string">&quot;_int2&quot;</span> =&gt; (<span class="ident">Int</span>, <span class="prelude-val">Some</span>(<span class="ident">PostgresType::SmallInt</span>)),
         <span class="string">&quot;int4&quot;</span> <span class="op">|</span> <span class="string">&quot;_int4&quot;</span> =&gt; (<span class="ident">Int</span>, <span class="prelude-val">Some</span>(<span class="ident">PostgresType::Integer</span>)),
@@ -2665,8 +2667,7 @@
         <span class="string">&quot;lseg&quot;</span> <span class="op">|</span> <span class="string">&quot;_lseg&quot;</span> =&gt; <span class="ident">unsupported_type</span>(),
         <span class="string">&quot;path&quot;</span> <span class="op">|</span> <span class="string">&quot;_path&quot;</span> =&gt; <span class="ident">unsupported_type</span>(),
         <span class="string">&quot;polygon&quot;</span> <span class="op">|</span> <span class="string">&quot;_polygon&quot;</span> =&gt; <span class="ident">unsupported_type</span>(),
-        <span class="ident">name</span> <span class="kw">if</span> <span class="ident">enum_exists</span>(<span class="ident">name</span>) =&gt; (<span class="ident">Enum</span>(<span class="ident">name</span>.<span class="ident">to_owned</span>()), <span class="prelude-val">None</span>),
-        <span class="kw">_</span> =&gt; <span class="ident">unsupported_type</span>(),
+        <span class="kw">_</span> =&gt; <span class="ident">enum_id</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> (<span class="ident">Enum</span>(<span class="ident">id</span>), <span class="prelude-val">None</span>)).<span class="ident">unwrap_or_else</span>(<span class="ident">unsupported_type</span>),
     };
 
     <span class="ident">ColumnType</span> {
@@ -2678,7 +2679,7 @@
 }
 
 <span class="comment">// Separate from get_column_type_postgresql because of native types.</span>
-<span class="kw">fn</span> <span class="ident">get_column_type_cockroachdb</span>(<span class="ident">row</span>: <span class="kw-2">&amp;</span><span class="ident">ResultRow</span>, <span class="ident">enums</span>: <span class="kw-2">&amp;</span>[<span class="ident">Enum</span>]) -&gt; <span class="ident">ColumnType</span> {
+<span class="kw">fn</span> <span class="ident">get_column_type_cockroachdb</span>(<span class="ident">row</span>: <span class="kw-2">&amp;</span><span class="ident">ResultRow</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">SqlSchema</span>) -&gt; <span class="ident">ColumnType</span> {
     <span class="kw">use</span> <span class="ident">ColumnTypeFamily</span>::<span class="kw-2">*</span>;
     <span class="kw">let</span> <span class="ident">data_type</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;data_type&quot;</span>);
     <span class="kw">let</span> <span class="ident">full_data_type</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;full_data_type&quot;</span>);
@@ -2696,13 +2697,13 @@
 
     <span class="kw">let</span> <span class="ident">precision</span> <span class="op">=</span> <span class="ident">SqlSchemaDescriber::get_precision</span>(<span class="ident">row</span>);
     <span class="kw">let</span> <span class="ident">unsupported_type</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">Unsupported</span>(<span class="ident">full_data_type</span>.<span class="ident">clone</span>()), <span class="prelude-val">None</span>);
-    <span class="kw">let</span> <span class="ident">enum_exists</span> <span class="op">=</span> <span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="ident">enums</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">name</span>);
+    <span class="kw">let</span> <span class="ident">enum_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">data_type</span>.<span class="ident">as_str</span>() {
+        <span class="string">&quot;ARRAY&quot;</span> <span class="kw">if</span> <span class="ident">full_data_type</span>.<span class="ident">starts_with</span>(<span class="string">&#39;_&#39;</span>) =&gt; <span class="ident">schema</span>.<span class="ident">find_enum</span>(<span class="ident">full_data_type</span>.<span class="ident">trim_start_matches</span>(<span class="string">&#39;_&#39;</span>)),
+        <span class="kw">_</span> =&gt; <span class="ident">schema</span>.<span class="ident">find_enum</span>(<span class="kw-2">&amp;</span><span class="ident">full_data_type</span>),
+    };
 
     <span class="kw">let</span> (<span class="ident">family</span>, <span class="ident">native_type</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">full_data_type</span>.<span class="ident">as_str</span>() {
-        <span class="ident">name</span> <span class="kw">if</span> <span class="ident">data_type</span> <span class="op">==</span> <span class="string">&quot;USER-DEFINED&quot;</span> <span class="op">&amp;&amp;</span> <span class="ident">enum_exists</span>(<span class="ident">name</span>) =&gt; (<span class="ident">Enum</span>(<span class="ident">name</span>.<span class="ident">to_owned</span>()), <span class="prelude-val">None</span>),
-        <span class="ident">name</span> <span class="kw">if</span> <span class="ident">data_type</span> <span class="op">==</span> <span class="string">&quot;ARRAY&quot;</span> <span class="op">&amp;&amp;</span> <span class="ident">name</span>.<span class="ident">starts_with</span>(<span class="string">&#39;_&#39;</span>) <span class="op">&amp;&amp;</span> <span class="ident">enum_exists</span>(<span class="ident">name</span>.<span class="ident">trim_start_matches</span>(<span class="string">&#39;_&#39;</span>)) =&gt; {
-            (<span class="ident">Enum</span>(<span class="ident">name</span>.<span class="ident">trim_start_matches</span>(<span class="string">&#39;_&#39;</span>).<span class="ident">to_owned</span>()), <span class="prelude-val">None</span>)
-        }
+        <span class="kw">_</span> <span class="kw">if</span> <span class="ident">data_type</span> <span class="op">==</span> <span class="string">&quot;USER-DEFINED&quot;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">data_type</span> <span class="op">==</span> <span class="string">&quot;ARRAY&quot;</span> <span class="op">&amp;&amp;</span> <span class="ident">enum_id</span>.<span class="ident">is_some</span>() =&gt; (<span class="ident">Enum</span>(<span class="ident">enum_id</span>.<span class="ident">unwrap</span>()), <span class="prelude-val">None</span>),
         <span class="string">&quot;int2&quot;</span> <span class="op">|</span> <span class="string">&quot;_int2&quot;</span> =&gt; (<span class="ident">Int</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::Int2</span>)),
         <span class="string">&quot;int4&quot;</span> <span class="op">|</span> <span class="string">&quot;_int4&quot;</span> =&gt; (<span class="ident">Int</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::Int4</span>)),
         <span class="string">&quot;int8&quot;</span> <span class="op">|</span> <span class="string">&quot;_int8&quot;</span> =&gt; (<span class="ident">BigInt</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::Int8</span>)),
@@ -2749,8 +2750,7 @@
         <span class="string">&quot;lseg&quot;</span> <span class="op">|</span> <span class="string">&quot;_lseg&quot;</span> =&gt; <span class="ident">unsupported_type</span>(),
         <span class="string">&quot;path&quot;</span> <span class="op">|</span> <span class="string">&quot;_path&quot;</span> =&gt; <span class="ident">unsupported_type</span>(),
         <span class="string">&quot;polygon&quot;</span> <span class="op">|</span> <span class="string">&quot;_polygon&quot;</span> =&gt; <span class="ident">unsupported_type</span>(),
-        <span class="ident">name</span> <span class="kw">if</span> <span class="ident">enum_exists</span>(<span class="ident">name</span>) =&gt; (<span class="ident">Enum</span>(<span class="ident">name</span>.<span class="ident">to_owned</span>()), <span class="prelude-val">None</span>),
-        <span class="kw">_</span> =&gt; <span class="ident">unsupported_type</span>(),
+        <span class="kw">_</span> =&gt; <span class="ident">enum_id</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> (<span class="ident">Enum</span>(<span class="ident">id</span>), <span class="prelude-val">None</span>)).<span class="ident">unwrap_or_else</span>(<span class="ident">unsupported_type</span>),
     };
 
     <span class="ident">ColumnType</span> {

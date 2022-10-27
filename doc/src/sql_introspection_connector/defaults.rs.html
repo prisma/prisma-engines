@@ -88,6 +88,20 @@
 <span id="88">88</span>
 <span id="89">89</span>
 <span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::calculate_datamodel::CalculateDatamodelContext</span> <span class="kw">as</span> <span class="ident">Context</span>;
 <span class="kw">use</span> <span class="ident">psl::dml</span>;
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">sql</span>, <span class="ident">postgres::PostgresSchemaExt</span>};
@@ -155,6 +169,20 @@
             )),
             <span class="ident">column</span>,
         )),
+        (<span class="prelude-val">Some</span>(<span class="ident">sql::DefaultKind::Value</span>(<span class="ident">dml::PrismaValue::Enum</span>(<span class="ident">variant</span>))), <span class="ident">sql::ColumnTypeFamily::Enum</span>(<span class="ident">enum_id</span>)) =&gt; {
+            <span class="kw">let</span> <span class="ident">variant_name</span> <span class="op">=</span> <span class="ident">ctx</span>
+                .<span class="ident">existing_enum</span>(<span class="kw-2">*</span><span class="ident">enum_id</span>)
+                .<span class="ident">into_iter</span>()
+                .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">enm</span><span class="op">|</span> <span class="ident">enm</span>.<span class="ident">values</span>())
+                .<span class="ident">find</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">mapped_name</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">variant</span>))
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">name</span>())
+                .<span class="ident">unwrap_or</span>(<span class="ident">variant</span>);
+
+            <span class="prelude-val">Some</span>(<span class="ident">set_default</span>(
+                <span class="ident">dml::DefaultValue::new_single</span>(<span class="ident">dml::PrismaValue::Enum</span>(<span class="ident">variant_name</span>.<span class="ident">to_owned</span>())),
+                <span class="ident">column</span>,
+            ))
+        }
         (<span class="prelude-val">Some</span>(<span class="ident">sql::DefaultKind::Value</span>(<span class="ident">val</span>)), <span class="kw">_</span>) =&gt; {
             <span class="prelude-val">Some</span>(<span class="ident">set_default</span>(<span class="ident">dml::DefaultValue::new_single</span>(<span class="ident">val</span>.<span class="ident">clone</span>()), <span class="ident">column</span>))
         }

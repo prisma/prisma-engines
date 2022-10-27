@@ -244,36 +244,11 @@
 <span id="244">244</span>
 <span id="245">245</span>
 <span id="246">246</span>
-<span id="247">247</span>
-<span id="248">248</span>
-<span id="249">249</span>
-<span id="250">250</span>
-<span id="251">251</span>
-<span id="252">252</span>
-<span id="253">253</span>
-<span id="254">254</span>
-<span id="255">255</span>
-<span id="256">256</span>
-<span id="257">257</span>
-<span id="258">258</span>
-<span id="259">259</span>
-<span id="260">260</span>
-<span id="261">261</span>
-<span id="262">262</span>
-<span id="263">263</span>
-<span id="264">264</span>
-<span id="265">265</span>
-<span id="266">266</span>
-<span id="267">267</span>
-<span id="268">268</span>
-<span id="269">269</span>
-<span id="270">270</span>
-<span id="271">271</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">introspection_connector::Warning</span>;
 <span class="kw">use</span> <span class="ident">serde::Serialize</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Model</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Model</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">model</span>: <span class="ident">String</span>,
 }
 
@@ -286,12 +261,12 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Enum</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Enum</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">enm</span>: <span class="ident">String</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Enum</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Enum</span> { <span class="ident">enm</span>: <span class="ident">name</span>.<span class="ident">to_owned</span>() }
     }
 }
@@ -307,23 +282,6 @@
         <span class="ident">ModelAndField</span> {
             <span class="ident">model</span>: <span class="ident">model</span>.<span class="ident">to_owned</span>(),
             <span class="ident">field</span>: <span class="ident">field</span>.<span class="ident">to_owned</span>(),
-        }
-    }
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ModelFieldAndValue</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">model</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">field</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">value</span>: <span class="ident">String</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">ModelFieldAndValue</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">model</span>: <span class="ident">model</span>.<span class="ident">to_owned</span>(),
-            <span class="ident">field</span>: <span class="ident">field</span>.<span class="ident">to_owned</span>(),
-            <span class="ident">value</span>: <span class="ident">value</span>.<span class="ident">to_owned</span>(),
         }
     }
 }
@@ -365,7 +323,7 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">warning_models_without_identifier</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">Model</span>]) -&gt; <span class="ident">Warning</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">warning_models_without_identifier</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">Model</span>]) -&gt; <span class="ident">Warning</span> {
     <span class="ident">Warning</span> {
         <span class="ident">code</span>: <span class="number">1</span>,
         <span class="ident">message</span>: <span class="string">&quot;The following models were commented out as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client.&quot;</span>.<span class="ident">into</span>(),
@@ -419,7 +377,7 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">warning_enriched_with_map_on_model</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">Model</span>]) -&gt; <span class="ident">Warning</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">warning_enriched_with_map_on_model</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">Model</span>]) -&gt; <span class="ident">Warning</span> {
     <span class="ident">Warning</span> {
         <span class="ident">code</span>: <span class="number">7</span>,
         <span class="ident">message</span>: <span class="string">&quot;These models were enriched with `@@map` information taken from the previous Prisma schema.&quot;</span>.<span class="ident">into</span>(),
@@ -427,7 +385,7 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">warning_enriched_with_map_on_field</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">ModelAndField</span>]) -&gt; <span class="ident">Warning</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">warning_enriched_with_map_on_field</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">ModelAndField</span>]) -&gt; <span class="ident">Warning</span> {
     <span class="ident">Warning</span> {
         <span class="ident">code</span>: <span class="number">8</span>,
         <span class="ident">message</span>: <span class="string">&quot;These fields were enriched with `@map` information taken from the previous Prisma schema.&quot;</span>.<span class="ident">into</span>(),
@@ -435,7 +393,7 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">warning_enriched_with_map_on_enum</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">Enum</span>]) -&gt; <span class="ident">Warning</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">warning_enriched_with_map_on_enum</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">Enum</span>]) -&gt; <span class="ident">Warning</span> {
     <span class="ident">Warning</span> {
         <span class="ident">code</span>: <span class="number">9</span>,
         <span class="ident">message</span>: <span class="string">&quot;These enums were enriched with `@@map` information taken from the previous Prisma schema.&quot;</span>.<span class="ident">into</span>(),
@@ -472,7 +430,7 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">warning_enriched_with_updated_at</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">ModelAndField</span>]) -&gt; <span class="ident">Warning</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">warning_enriched_with_updated_at</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">ModelAndField</span>]) -&gt; <span class="ident">Warning</span> {
     <span class="ident">Warning</span> {
         <span class="ident">code</span>: <span class="number">13</span>,
         <span class="ident">message</span>:
@@ -484,7 +442,7 @@
 
 <span class="comment">//todo maybe we can get rid of this alltogether due to @@ignore</span>
 <span class="comment">//but maybe we should have warnings for ignored fields and models</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">warning_models_without_columns</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">Model</span>]) -&gt; <span class="ident">Warning</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">warning_models_without_columns</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">Model</span>]) -&gt; <span class="ident">Warning</span> {
     <span class="ident">Warning</span> {
         <span class="ident">code</span>: <span class="number">14</span>,
         <span class="ident">message</span>: <span class="string">&quot;The following models were commented out as we could not retrieve columns for them. Please check your privileges.&quot;</span>.<span class="ident">into</span>(),
@@ -492,7 +450,7 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">warning_enriched_models_with_ignore</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">Model</span>]) -&gt; <span class="ident">Warning</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">warning_enriched_models_with_ignore</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">Model</span>]) -&gt; <span class="ident">Warning</span> {
     <span class="ident">Warning</span> {
         <span class="ident">code</span>: <span class="number">15</span>,
         <span class="ident">message</span>: <span class="string">&quot;The following models were enriched with an @@ignore taken from your previous Prisma schema.&quot;</span>.<span class="ident">into</span>(),
@@ -500,7 +458,7 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">warning_enriched_fields_with_ignore</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">ModelAndField</span>]) -&gt; <span class="ident">Warning</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">warning_enriched_fields_with_ignore</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">ModelAndField</span>]) -&gt; <span class="ident">Warning</span> {
     <span class="ident">Warning</span> {
         <span class="ident">code</span>: <span class="number">16</span>,
         <span class="ident">message</span>: <span class="string">&quot;The following fields were enriched with an @ignore taken from your previous Prisma schema.&quot;</span>.<span class="ident">into</span>(),
@@ -508,7 +466,7 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">warning_enriched_with_custom_index_names</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">ModelAndIndex</span>]) -&gt; <span class="ident">Warning</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">warning_enriched_with_custom_index_names</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">ModelAndIndex</span>]) -&gt; <span class="ident">Warning</span> {
     <span class="ident">Warning</span> {
         <span class="ident">code</span>: <span class="number">17</span>,
         <span class="ident">message</span>: <span class="string">&quot;These Indices were enriched with custom index names taken from the previous Prisma schema.&quot;</span>.<span class="ident">into</span>(),
@@ -516,7 +474,7 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">warning_enriched_with_custom_primary_key_names</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">Model</span>]) -&gt; <span class="ident">Warning</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">warning_enriched_with_custom_primary_key_names</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">Model</span>]) -&gt; <span class="ident">Warning</span> {
     <span class="ident">Warning</span> {
         <span class="ident">code</span>: <span class="number">18</span>,
         <span class="ident">message</span>: <span class="string">&quot;These models were enriched with custom compound id names taken from the previous Prisma schema.&quot;</span>
@@ -525,18 +483,10 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">warning_relations_added_from_the_previous_data_model</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">Model</span>]) -&gt; <span class="ident">Warning</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">warning_relations_added_from_the_previous_data_model</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">Model</span>]) -&gt; <span class="ident">Warning</span> {
     <span class="ident">Warning</span> {
         <span class="ident">code</span>: <span class="number">19</span>,
         <span class="ident">message</span>: <span class="string">&quot;Relations were copied from the previous data model due to not using foreign keys in the database. If any of the relation columns changed in the database, the relations might not be correct anymore.&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">affected</span>: <span class="ident">serde_json::to_value</span>(<span class="ident">affected</span>).<span class="ident">unwrap</span>(),
-    }
-}
-
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">warning_enum_defaults_added_from_the_previous_data_model</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[<span class="ident">ModelFieldAndValue</span>]) -&gt; <span class="ident">Warning</span> {
-    <span class="ident">Warning</span> {
-        <span class="ident">code</span>: <span class="number">20</span>,
-        <span class="ident">message</span>: <span class="string">&quot;Default values were enriched with custom enum variants taken from the previous Prisma schema.&quot;</span>.<span class="ident">into</span>(),
         <span class="ident">affected</span>: <span class="ident">serde_json::to_value</span>(<span class="ident">affected</span>).<span class="ident">unwrap</span>(),
     }
 }
