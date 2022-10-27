@@ -1,4 +1,4 @@
-use crate::{runtime::run_with_tokio, AnyError, Tags};
+use crate::{runtime::run_with_thread_local_runtime as tok, AnyError, Tags};
 use enumflags2::BitFlags;
 use quaint::{prelude::Queryable, single::Quaint};
 use url::Url;
@@ -72,7 +72,7 @@ pub(crate) fn get_mysql_tags(database_url: &str) -> Result<BitFlags<Tags>, Strin
         }
     };
 
-    run_with_tokio(fut)
+    tok(fut)
 }
 
 /// Returns a connection to the new database, as well as the corresponding

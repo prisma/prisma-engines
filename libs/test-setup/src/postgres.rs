@@ -1,4 +1,4 @@
-use crate::{runtime::run_with_tokio, AnyError, Tags};
+use crate::{runtime::run_with_thread_local_runtime as tok, AnyError, Tags};
 use enumflags2::BitFlags;
 use quaint::{prelude::Queryable, single::Quaint};
 use url::Url;
@@ -41,7 +41,7 @@ pub(crate) fn get_postgres_tags(database_url: &str) -> Result<BitFlags<Tags>, St
         }
     };
 
-    run_with_tokio(fut)
+    tok(fut)
 }
 
 pub(crate) async fn create_postgres_database(database_url: &str, db_name: &str) -> Result<(Quaint, String), AnyError> {
