@@ -3,7 +3,7 @@ use crate::{
     warnings::{warning_default_cuid_warning, warning_default_uuid_warning, ModelAndField},
     SqlFamilyTrait,
 };
-use introspection_connector::{Version, Warning};
+use introspection_connector::Version;
 use psl::{
     builtin_connectors::{MySqlType, PostgresType},
     dml::{self, Datamodel, ValueGenerator},
@@ -14,8 +14,7 @@ pub(crate) fn add_prisma_1_id_defaults(
     version: &Version,
     data_model: &mut Datamodel,
     schema: &SqlSchema,
-    warnings: &mut Vec<Warning>,
-    ctx: &CalculateDatamodelContext,
+    ctx: &mut CalculateDatamodelContext,
 ) {
     let mut needs_to_be_changed = vec![];
 
@@ -67,10 +66,10 @@ pub(crate) fn add_prisma_1_id_defaults(
     }
 
     if !inferred_cuids.is_empty() {
-        warnings.push(warning_default_cuid_warning(&inferred_cuids))
+        ctx.warnings.push(warning_default_cuid_warning(&inferred_cuids))
     }
 
     if !inferred_uuids.is_empty() {
-        warnings.push(warning_default_uuid_warning(&inferred_uuids))
+        ctx.warnings.push(warning_default_uuid_warning(&inferred_uuids))
     }
 }

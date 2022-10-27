@@ -14,7 +14,7 @@ use sql::{
 use sql_schema_describer::{
     self as sql,
     postgres::{SQLOperatorClassKind, SqlIndexAlgorithm},
-    ColumnTypeFamily, DefaultKind, DefaultValue, Enum, ForeignKeyAction, IndexType, SQLSortOrder, SqlSchema,
+    ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, IndexType, SQLSortOrder, SqlSchema,
 };
 use test_setup::{BitFlags, Tags};
 
@@ -89,11 +89,11 @@ impl SchemaAssertion {
     }
 
     pub fn assert_has_no_enum(self, enum_name: &str) -> Self {
-        let has_matching_enum = self.schema.enums.iter().any(|enm| {
+        let has_matching_enum = self.schema.enum_walkers().any(|enm| {
             if self.tags.contains(Tags::LowerCasesTableNames) {
-                enm.name.eq_ignore_ascii_case(enum_name)
+                enm.name().eq_ignore_ascii_case(enum_name)
             } else {
-                enm.name == enum_name
+                enm.name() == enum_name
             }
         });
 
@@ -108,8 +108,8 @@ impl SchemaAssertion {
     where
         F: for<'a> FnOnce(EnumAssertion<'a>) -> EnumAssertion<'a>,
     {
-        let r#enum = match self.schema.get_enum(enum_name) {
-            Some(enm) => enm,
+        let r#enum = match self.schema.find_enum(enum_name) {
+            Some(enm) => self.schema.walk(enm),
             None => panic!("Assertion failed. Enum `{}` not found", enum_name),
         };
 
@@ -154,16 +154,16 @@ impl SchemaAssertion {
     }
 }
 
-pub struct EnumAssertion<'a>(&'a Enum);
+pub struct EnumAssertion<'a>(sql::EnumWalker<'a>);
 
 impl<'a> EnumAssertion<'a> {
     pub fn assert_values(self, expected_values: &[&'static str]) -> Self {
         assert!(
-            self.0.values == expected_values,
+            self.0.values() == expected_values,
             "Assertion failed. The `{}` enum does not contain the expected variants.\nExpected:\n{:#?}\n\nFound:\n{:#?}\n",
-            self.0.name,
+            self.0.name(),
             expected_values,
-            self.0.values,
+            self.0.values(),
         );
         self
     }
@@ -251,7 +251,7 @@ impl<'a> TableAssertion<'a> {
         let this = self.assert_has_column(column_name);
         let column = this.table.column(column_name).unwrap();
 
-        column_assertions(ColumnAssertion::new(column, self.tags));
+        column_assertions(ColumnAssertion { column });
         this
     }
 
@@ -334,14 +334,9 @@ impl<'a> TableAssertion<'a> {
 
 pub struct ColumnAssertion<'a> {
     column: ColumnWalker<'a>,
-    tags: BitFlags<Tags>,
 }
 
 impl<'a> ColumnAssertion<'a> {
-    pub fn new(column: ColumnWalker<'a>, tags: BitFlags<Tags>) -> Self {
-        Self { column, tags }
-    }
-
     pub fn assert_auto_increments(self) -> Self {
         assert!(
             self.column.is_autoincrement(),
@@ -477,13 +472,6 @@ impl<'a> ColumnAssertion<'a> {
 
     pub fn assert_type_family(self, expected: ColumnTypeFamily) -> Self {
         let found = self.column.column_type_family();
-
-        let expected = match expected {
-            ColumnTypeFamily::Enum(tbl_name) if self.tags.contains(Tags::LowerCasesTableNames) => {
-                ColumnTypeFamily::Enum(tbl_name.to_lowercase())
-            }
-            _ => expected,
-        };
 
         assert!(
             found == &expected,

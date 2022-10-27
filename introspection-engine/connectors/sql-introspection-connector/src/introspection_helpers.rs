@@ -208,26 +208,19 @@ pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &Contex
 }
 
 pub(crate) fn calculate_scalar_field(column: ColumnWalker<'_>, ctx: &Context) -> ScalarField {
-    debug!("Handling column {:?}", column);
-
-    let field_type = calculate_scalar_field_type_with_native_types(column, ctx);
-
-    let is_id = column.is_single_primary_key();
     let arity = match column.column_type().arity {
-        _ if is_id && column.is_autoincrement() => FieldArity::Required,
+        _ if column.is_single_primary_key() && column.is_autoincrement() => FieldArity::Required,
         ColumnArity::Required => FieldArity::Required,
         ColumnArity::Nullable => FieldArity::Optional,
         ColumnArity::List => FieldArity::List,
     };
 
-    let default_value = crate::defaults::calculate_default(column, ctx);
-
     ScalarField {
         name: column.name().to_owned(),
         arity,
-        field_type,
+        field_type: calculate_scalar_field_type_with_native_types(column, ctx),
         database_name: None,
-        default_value,
+        default_value: crate::defaults::calculate_default(column, ctx),
         documentation: None,
         is_generated: false,
         is_updated_at: false,
@@ -367,7 +360,7 @@ fn calculate_relation_name(
     }
 }
 
-pub(crate) fn calculate_scalar_field_type_for_native_type(column: ColumnWalker<'_>) -> FieldType {
+pub(crate) fn calculate_scalar_field_type_for_native_type(column: ColumnWalker<'_>, ctx: &Context) -> FieldType {
     debug!("Calculating field type for '{}'", column.name());
     let fdt = column.column_type().full_data_type.to_owned();
 
@@ -382,14 +375,14 @@ pub(crate) fn calculate_scalar_field_type_for_native_type(column: ColumnWalker<'
         ColumnTypeFamily::Json => FieldType::Scalar(ScalarType::Json, None),
         ColumnTypeFamily::Uuid => FieldType::Scalar(ScalarType::String, None),
         ColumnTypeFamily::Binary => FieldType::Scalar(ScalarType::Bytes, None),
-        ColumnTypeFamily::Enum(name) => FieldType::Enum(name.to_owned()),
+        ColumnTypeFamily::Enum(id) => FieldType::Enum(ctx.enum_prisma_name(*id).to_owned()),
         ColumnTypeFamily::Unsupported(_) => FieldType::Unsupported(fdt),
     }
 }
 
 pub(crate) fn calculate_scalar_field_type_with_native_types(column: sql::ColumnWalker<'_>, ctx: &Context) -> FieldType {
     debug!("Calculating native field type for '{}'", column.name());
-    let scalar_type = calculate_scalar_field_type_for_native_type(column);
+    let scalar_type = calculate_scalar_field_type_for_native_type(column, ctx);
 
     match scalar_type {
         FieldType::Scalar(scal_type, _) => match &column.column_type().native_type {

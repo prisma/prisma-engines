@@ -54,7 +54,7 @@ const MYSQL_TYPES: &[MySqlType] = &[
     MySqlType::Char(36),
 ];
 
-pub(crate) fn check_prisma_version(ctx: &CalculateDatamodelContext, warnings: &mut Vec<Warning>) -> Version {
+pub(crate) fn check_prisma_version(ctx: &CalculateDatamodelContext) -> Version {
     let mut version_checker = VersionChecker {
         sql_family: ctx.sql_family(),
         is_cockroachdb: ctx.is_cockroach(),
@@ -101,15 +101,15 @@ pub(crate) fn check_prisma_version(ctx: &CalculateDatamodelContext, warnings: &m
 
     match version_checker.sql_family {
         _ if ctx.schema.is_empty() => Version::NonPrisma,
-        SqlFamily::Sqlite if version_checker.is_prisma_2(warnings) => Version::Prisma2,
+        SqlFamily::Sqlite if version_checker.is_prisma_2(ctx.warnings) => Version::Prisma2,
         SqlFamily::Sqlite => Version::NonPrisma,
-        SqlFamily::Mysql if version_checker.is_prisma_2(warnings) => Version::Prisma2,
-        SqlFamily::Mysql if version_checker.is_prisma_1(warnings) => Version::Prisma1,
-        SqlFamily::Mysql if version_checker.is_prisma_1_1(warnings) => Version::Prisma11,
+        SqlFamily::Mysql if version_checker.is_prisma_2(ctx.warnings) => Version::Prisma2,
+        SqlFamily::Mysql if version_checker.is_prisma_1(ctx.warnings) => Version::Prisma1,
+        SqlFamily::Mysql if version_checker.is_prisma_1_1(ctx.warnings) => Version::Prisma11,
         SqlFamily::Mysql => Version::NonPrisma,
-        SqlFamily::Postgres if version_checker.is_prisma_2(warnings) => Version::Prisma2,
-        SqlFamily::Postgres if version_checker.is_prisma_1(warnings) => Version::Prisma1,
-        SqlFamily::Postgres if version_checker.is_prisma_1_1(warnings) => Version::Prisma11,
+        SqlFamily::Postgres if version_checker.is_prisma_2(ctx.warnings) => Version::Prisma2,
+        SqlFamily::Postgres if version_checker.is_prisma_1(ctx.warnings) => Version::Prisma1,
+        SqlFamily::Postgres if version_checker.is_prisma_1_1(ctx.warnings) => Version::Prisma11,
         SqlFamily::Postgres => Version::NonPrisma,
         SqlFamily::Mssql => Version::NonPrisma,
     }

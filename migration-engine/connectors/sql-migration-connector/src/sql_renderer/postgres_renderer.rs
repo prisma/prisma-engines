@@ -942,7 +942,9 @@ fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: Pair<&SqlSchema>)
 
     // Alter type of the current columns to new, with a cast
     {
-        let affected_columns = schemas.next.walk_columns().filter(|column| matches!(&column.column_type().family, ColumnTypeFamily::Enum(name) if name.as_str() == enums.next.name()));
+        let affected_columns = schemas.next.walk_columns().filter(
+            |column| matches!(&column.column_type().family, ColumnTypeFamily::Enum(id) if *id == enums.next.id),
+        );
 
         for column in affected_columns {
             let array = if column.arity().is_list() { "[]" } else { "" };

@@ -1093,11 +1093,11 @@ fn postgres_enums_must_work(api: TestApi) {
         api.schema_name()
     ));
     let schema = api.describe();
-    let got_enum = schema.get_enum("mood").expect("get enum");
+    let got_enum = schema.walk(schema.find_enum("mood").expect("get enum"));
     let values = &["sad", "ok", "happy"];
 
-    assert_eq!(got_enum.name, "mood");
-    assert_eq!(got_enum.values, values);
+    assert_eq!(got_enum.name(), "mood");
+    assert_eq!(got_enum.values(), values);
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]

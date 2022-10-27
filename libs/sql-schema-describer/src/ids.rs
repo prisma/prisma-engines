@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 pub struct TableId(pub(crate) u32);
 
 /// The identifier for an enum in a SqlSchema.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct EnumId(pub(crate) u32);
 
 /// The identifier for a column in a SqlSchema.

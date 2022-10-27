@@ -24,6 +24,7 @@ pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn Sq
         schema: &mut schema,
         flavour,
         model_id_to_table_id: HashMap::with_capacity(datamodel.db.models_count()),
+        enum_ids: HashMap::with_capacity(datamodel.db.enums_count()),
         schemas: Default::default(),
     };
 
@@ -37,7 +38,7 @@ pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn Sq
         }
     }
 
-    context.schema.describer_schema.enums = flavour.calculate_enums(&context);
+    flavour.calculate_enums(&mut context);
 
     // Two types of tables: model tables and implicit M2M relation tables (a.k.a. join tables.).
     push_model_tables(&mut context);
@@ -389,7 +390,10 @@ fn push_column_for_model_enum_scalar_field(
         table_id,
         sql::Column {
             name: field.database_name().to_owned(),
-            tpe: ctx.flavour.enum_column_type(field, r#enum.database_name()),
+            tpe: sql::ColumnType::pure(
+                sql::ColumnTypeFamily::Enum(ctx.enum_ids[&r#enum.id]),
+                column_arity(field.ast_field().arity),
+            ),
             default,
             auto_increment: false,
         },
@@ -564,6 +568,7 @@ pub(crate) struct Context<'a> {
     flavour: &'a dyn SqlFlavour,
     schemas: HashMap<&'a str, sql::NamespaceId>,
     model_id_to_table_id: HashMap<ast::ModelId, sql::TableId>,
+    enum_ids: HashMap<ast::EnumId, sql::EnumId>,
 }
 
 impl Context<'_> {

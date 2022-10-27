@@ -123,10 +123,6 @@ fn all_cockroach_column_types_must_work(api: TestApi) {
             c.assert_full_data_type("float8")
                 .assert_column_type_family(ColumnTypeFamily::Float)
         })
-        .assert_column("enum_col", |c| {
-            c.assert_full_data_type("mood")
-                .assert_column_type_family(ColumnTypeFamily::Enum("mood".into()))
-        })
         .assert_column("float_col", |c| {
             c.assert_full_data_type("float8")
                 .assert_column_type_family(ColumnTypeFamily::Float)

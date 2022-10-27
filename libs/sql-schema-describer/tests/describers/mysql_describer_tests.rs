@@ -521,7 +521,9 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "enum('a','b')",
                             family: Enum(
-                                "User_enum_col",
+                                EnumId(
+                                    0,
+                                ),
                             ),
                             arity: Nullable,
                             native_type: None,
@@ -1331,7 +1333,9 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "enum('a','b')",
                             family: Enum(
-                                "User_enum_col",
+                                EnumId(
+                                    0,
+                                ),
                             ),
                             arity: Required,
                             native_type: None,
@@ -2139,7 +2143,9 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "enum('a','b')",
                             family: Enum(
-                                "User_enum_col",
+                                EnumId(
+                                    0,
+                                ),
                             ),
                             arity: Required,
                             native_type: None,
@@ -3291,7 +3297,9 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "enum('x-small')",
                             family: Enum(
-                                "game_enum_col",
+                                EnumId(
+                                    0,
+                                ),
                             ),
                             arity: Nullable,
                             native_type: None,

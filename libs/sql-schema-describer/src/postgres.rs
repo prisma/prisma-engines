@@ -738,9 +738,9 @@ impl<'a> SqlSchemaDescriber<'a> {
                     .circumstances
                     .contains(Circumstances::CockroachWithPostgresNativeTypes)
             {
-                get_column_type_cockroachdb(&col, &sql_schema.enums)
+                get_column_type_cockroachdb(&col, sql_schema)
             } else {
-                get_column_type_postgresql(&col, &sql_schema.enums)
+                get_column_type_postgresql(&col, sql_schema)
             };
             let default = col
                 .get("column_default")
@@ -1210,7 +1210,7 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 }
 
-fn get_column_type_postgresql(row: &ResultRow, enums: &[Enum]) -> ColumnType {
+fn get_column_type_postgresql(row: &ResultRow, schema: &SqlSchema) -> ColumnType {
     use ColumnTypeFamily::*;
     let data_type = row.get_expect_string("data_type");
     let full_data_type = row.get_expect_string("full_data_type");
@@ -1228,12 +1228,14 @@ fn get_column_type_postgresql(row: &ResultRow, enums: &[Enum]) -> ColumnType {
 
     let precision = SqlSchemaDescriber::get_precision(row);
     let unsupported_type = || (Unsupported(full_data_type.clone()), None);
-    let enum_exists = |name| enums.iter().any(|e| e.name == name);
+    let enum_id: Option<_> = match data_type.as_str() {
+        "ARRAY" if full_data_type.starts_with('_') => schema.find_enum(full_data_type.trim_start_matches('_')),
+        _ => schema.find_enum(&full_data_type),
+    };
 
     let (family, native_type) = match full_data_type.as_str() {
-        name if data_type == "USER-DEFINED" && enum_exists(name) => (Enum(name.to_owned()), None),
-        name if data_type == "ARRAY" && name.starts_with('_') && enum_exists(name.trim_start_matches('_')) => {
-            (Enum(name.trim_start_matches('_').to_owned()), None)
+        _ if (data_type == "USER-DEFINED" || data_type == "ARRAY") && enum_id.is_some() => {
+            (Enum(enum_id.unwrap()), None)
         }
         "int2" | "_int2" => (Int, Some(PostgresType::SmallInt)),
         "int4" | "_int4" => (Int, Some(PostgresType::Integer)),
@@ -1284,8 +1286,7 @@ fn get_column_type_postgresql(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         "lseg" | "_lseg" => unsupported_type(),
         "path" | "_path" => unsupported_type(),
         "polygon" | "_polygon" => unsupported_type(),
-        name if enum_exists(name) => (Enum(name.to_owned()), None),
-        _ => unsupported_type(),
+        _ => enum_id.map(|id| (Enum(id), None)).unwrap_or_else(unsupported_type),
     };
 
     ColumnType {
@@ -1297,7 +1298,7 @@ fn get_column_type_postgresql(row: &ResultRow, enums: &[Enum]) -> ColumnType {
 }
 
 // Separate from get_column_type_postgresql because of native types.
-fn get_column_type_cockroachdb(row: &ResultRow, enums: &[Enum]) -> ColumnType {
+fn get_column_type_cockroachdb(row: &ResultRow, schema: &SqlSchema) -> ColumnType {
     use ColumnTypeFamily::*;
     let data_type = row.get_expect_string("data_type");
     let full_data_type = row.get_expect_string("full_data_type");
@@ -1315,13 +1316,13 @@ fn get_column_type_cockroachdb(row: &ResultRow, enums: &[Enum]) -> ColumnType {
 
     let precision = SqlSchemaDescriber::get_precision(row);
     let unsupported_type = || (Unsupported(full_data_type.clone()), None);
-    let enum_exists = |name| enums.iter().any(|e| e.name == name);
+    let enum_id: Option<_> = match data_type.as_str() {
+        "ARRAY" if full_data_type.starts_with('_') => schema.find_enum(full_data_type.trim_start_matches('_')),
+        _ => schema.find_enum(&full_data_type),
+    };
 
     let (family, native_type) = match full_data_type.as_str() {
-        name if data_type == "USER-DEFINED" && enum_exists(name) => (Enum(name.to_owned()), None),
-        name if data_type == "ARRAY" && name.starts_with('_') && enum_exists(name.trim_start_matches('_')) => {
-            (Enum(name.trim_start_matches('_').to_owned()), None)
-        }
+        _ if data_type == "USER-DEFINED" || data_type == "ARRAY" && enum_id.is_some() => (Enum(enum_id.unwrap()), None),
         "int2" | "_int2" => (Int, Some(CockroachType::Int2)),
         "int4" | "_int4" => (Int, Some(CockroachType::Int4)),
         "int8" | "_int8" => (BigInt, Some(CockroachType::Int8)),
@@ -1368,8 +1369,7 @@ fn get_column_type_cockroachdb(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         "lseg" | "_lseg" => unsupported_type(),
         "path" | "_path" => unsupported_type(),
         "polygon" | "_polygon" => unsupported_type(),
-        name if enum_exists(name) => (Enum(name.to_owned()), None),
-        _ => unsupported_type(),
+        _ => enum_id.map(|id| (Enum(id), None)).unwrap_or_else(unsupported_type),
     };
 
     ColumnType {
