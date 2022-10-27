@@ -34,7 +34,7 @@ services:
       - "6432:6432"
 
   postgres9:
-    image: postgres:9.5
+    image: postgres:9.6
     restart: always
     command: postgres -c 'max_connections=1000'
     environment:
