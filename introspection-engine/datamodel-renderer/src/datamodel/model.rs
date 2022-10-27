@@ -73,7 +73,12 @@ impl<'a> Model<'a> {
                 (Constant::new_no_validate(Cow::Borrowed(name)), Some(map), Commented::On)
             }
             Err(ConstantNameValidationError::OriginalEmpty) => {
-                todo!("If I left this for PR review, Tom... Remind me to consider something else than a panic.")
+                let mut map = Function::new("map");
+                map.push_param(name);
+
+                let map = BlockAttribute(map);
+
+                (Constant::new_no_validate(Cow::Borrowed(name)), Some(map), Commented::On)
             }
         };
 
