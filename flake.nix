@@ -60,7 +60,7 @@
 
               inherit src;
 
-              buildInputs = [ pkgs.openssl ];
+              buildInputs = [ pkgs.openssl pkgs.rust-analyzer ];
 
               nativeBuildInputs = with pkgs; [
                 git # for our build scripts that bake in the git hash
