@@ -37,6 +37,7 @@ impl Connection {
     ) -> ConnectorResult<SqlSchema> {
         use sql_schema_describer::{postgres as describer, DescriberErrorKind, SqlSchemaDescriberBackend};
         let mut describer_circumstances: BitFlags<describer::Circumstances> = Default::default();
+
         if circumstances.contains(super::Circumstances::IsCockroachDb) {
             describer_circumstances |= describer::Circumstances::Cockroach;
         }
