@@ -4,6 +4,7 @@
       url = "github:ipetkov/crane";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
+      inputs.rust-overlay.follows = "rust-overlay";
     };
     flake-utils.url = "github:numtide/flake-utils";
     rust-overlay = {
