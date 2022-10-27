@@ -1,0 +1,24 @@
+model Person {
+  firstName   String
+  lastName    String
+  codeName    String
+  yearOfBirth Int
+
+  @@id([firstName, lastName])
+  @@unique([codeName, yearOfBirth])
+  @@index([yearOfBirth])
+  @@fulltext([firstName, lastName, codeName])
+  @@map("blog")
+}
+
+model Blog {
+  id    Int    @default(1)
+  name  String
+  posts Post[]
+
+  @@id([id])
+  @@unique([name])
+  @@index([id, name])
+  @@fulltext([name])
+  @@map("blog")
+}

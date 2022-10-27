@@ -1,0 +1,16 @@
+model Post {
+  id        Int      @default(autoincrement()) @id
+  published Boolean  @map("_published") @default(false)
+  author    User?   @relation(fields: [authorId], references: [id])
+  authorId  Int?
+}
+
+model User {
+  megaField DateTime @map("mega_field") @id @default("_megaField") @unique @updatedAt
+}
+
+model Test {
+  id     Int   @id @map("_id") @default(1) @updatedAt
+  blogId Int?  @unique @default(1)
+}
+
