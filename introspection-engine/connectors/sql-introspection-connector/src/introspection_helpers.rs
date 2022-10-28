@@ -317,7 +317,7 @@ pub(crate) fn calculate_relation_field(
     let on_delete = map_action(foreign_key.on_delete_action());
     let on_update = map_action(foreign_key.on_update_action());
 
-    if rf.default_on_delete_action() != dbg!(on_delete) {
+    if rf.default_on_delete_action() != on_delete {
         rf.relation_info.on_delete = Some(on_delete);
     }
 
