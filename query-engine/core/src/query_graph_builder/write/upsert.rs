@@ -61,23 +61,24 @@ pub fn upsert_record(
     let create_argument = field.create_args().unwrap()?;
     let update_argument = field.update_args().unwrap()?;
 
-    let filter = extract_unique_filter(where_argument.clone(), &model)?;
-    let read_query = read::find_unique(field.clone(), model.clone())?;
-
-    if can_use_connector_native_upsert(
+    let can_use_native_upsert = can_use_connector_native_upsert(
         &model,
         &where_argument,
         &create_argument,
         &update_argument,
         connector_ctx,
-    ) {
-        let mut create_write_args = WriteArgsParser::from(&model, create_argument.clone())?.args;
-        let mut update_write_args = WriteArgsParser::from(&model, update_argument.clone())?.args;
+    );
 
-        create_write_args.add_datetimes(&model);
-        update_write_args.add_datetimes(&model);
+    let filter = extract_unique_filter(where_argument, &model)?;
+    let read_query = read::find_unique(field.clone(), model.clone())?;
 
+    if can_use_native_upsert {
         if let ReadQuery::RecordQuery(read) = read_query {
+            let mut create_write_args = WriteArgsParser::from(&model, create_argument)?.args;
+            let mut update_write_args = WriteArgsParser::from(&model, update_argument)?.args;
+
+            create_write_args.add_datetimes(&model);
+            update_write_args.add_datetimes(&model);
             graph.create_node(WriteQuery::native_upsert(
                 field.name,
                 model,
