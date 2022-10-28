@@ -147,6 +147,9 @@
 <span id="147">147</span>
 <span id="148">148</span>
 <span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">opentelemetry</span>::{
     <span class="ident">global</span>,
     <span class="ident">sdk</span>::{
@@ -291,7 +294,10 @@
     }
 
     <span class="kw">if</span> <span class="ident">log_queries</span> {
-        <span class="ident">filter</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">add_directive</span>(<span class="string">&quot;quaint[{is_query}]=trace&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>());
+        <span class="comment">// even when mongo queries are logged in debug mode, we want to log them if the log level is higher</span>
+        <span class="ident">filter</span> <span class="op">=</span> <span class="ident">filter</span>
+            .<span class="ident">add_directive</span>(<span class="string">&quot;quaint[{is_query}]=trace&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())
+            .<span class="ident">add_directive</span>(<span class="string">&quot;mongodb_query_connector=debug&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>());
     }
 
     <span class="ident">filter</span>
