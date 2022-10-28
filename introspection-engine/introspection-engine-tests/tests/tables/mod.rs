@@ -355,7 +355,7 @@ async fn a_table_with_non_id_autoincrement(api: &TestApi) -> TestResult {
         .execute(|migration| {
             migration.create_table("Test", |t| {
                 t.add_column("id", types::integer());
-                t.add_column("authorId", types::serial().unique(true));
+                t.add_column("authorId", types::serial());
 
                 t.add_constraint("Test_pkey", types::primary_constraint(vec!["id"]));
                 t.add_constraint("Test_authorId_key", types::unique_constraint(vec!["authorId"]));

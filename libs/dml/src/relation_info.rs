@@ -70,14 +70,20 @@ pub enum ReferentialAction {
     SetDefault,
 }
 
+impl AsRef<str> for ReferentialAction {
+    fn as_ref(&self) -> &str {
+        match self {
+            ReferentialAction::Cascade => "Cascade",
+            ReferentialAction::Restrict => "Restrict",
+            ReferentialAction::NoAction => "NoAction",
+            ReferentialAction::SetNull => "SetNull",
+            ReferentialAction::SetDefault => "SetDefault",
+        }
+    }
+}
+
 impl fmt::Display for ReferentialAction {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            ReferentialAction::Cascade => write!(f, "Cascade"),
-            ReferentialAction::Restrict => write!(f, "Restrict"),
-            ReferentialAction::NoAction => write!(f, "NoAction"),
-            ReferentialAction::SetNull => write!(f, "SetNull"),
-            ReferentialAction::SetDefault => write!(f, "SetDefault"),
-        }
+        f.write_str(self.as_ref())
     }
 }

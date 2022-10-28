@@ -59,6 +59,16 @@ pub struct Function<'a> {
     render_empty_parentheses: bool,
 }
 
+impl<'a> From<Constant<Cow<'a, str>>> for Function<'a> {
+    fn from(name: Constant<Cow<'a, str>>) -> Self {
+        Self {
+            name,
+            params: Vec::new(),
+            render_empty_parentheses: false,
+        }
+    }
+}
+
 impl<'a> Function<'a> {
     /// Creates a plain function with no parameters.
     pub fn new(name: &'a str) -> Self {

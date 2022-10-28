@@ -10,7 +10,6 @@ mod config;
 mod functions;
 mod parsing;
 mod reformat;
-mod renderer;
 mod types;
 
 #[allow(dead_code)]

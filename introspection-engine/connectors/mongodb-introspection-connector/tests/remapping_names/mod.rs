@@ -130,7 +130,7 @@ fn remapping_model_fields_with_numbers() {
     let expected = expect![[r#"
         model Outer {
           id String @id @default(auto()) @map("_id") @db.ObjectId
-          // This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
           // 1 Int @map("1")
         }
     "#]];
@@ -159,8 +159,8 @@ fn remapping_model_fields_with_numbers_dirty() {
     let expected = expect![[r#"
         model Outer {
           id String @id @default(auto()) @map("_id") @db.ObjectId
-          // Multiple data types found: String: 50%, Int: 50% out of 2 sampled entries
-          // This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          /// Multiple data types found: String: 50%, Int: 50% out of 2 sampled entries
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
           // 1 Json @map("1")
         }
     "#]];

@@ -1,48 +1,11 @@
 use crate::datamodel::attributes::FieldAttribute;
+use crate::datamodel::FieldType;
 use crate::{
     datamodel::DefaultValue,
-    value::{Constant, ConstantNameValidationError, Documentation, Function, Text},
+    value::{Constant, ConstantNameValidationError, Documentation, Function},
 };
 use psl::dml;
 use std::{borrow::Cow, fmt};
-
-/// A type of a field in the datamodel.
-#[derive(Debug)]
-pub enum FieldType<'a> {
-    /// The field is required, rendered with only the name of the
-    /// type. For example: `Int`.
-    Required(Constant<&'a str>),
-    /// The field is optional, rendered with a question mark after the
-    /// type name. For example: `Int?`.
-    Optional(Constant<&'a str>),
-    /// The field is an array, rendered with square brackets after the
-    /// type name. For example: `Int[]`.
-    Array(Constant<&'a str>),
-    /// The field is not supported by Prisma, rendered as
-    /// `Unsupported(ts_vector)`.
-    Unsupported(Text<&'a str>),
-}
-
-impl<'a> fmt::Display for FieldType<'a> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            FieldType::Required(ref t) => t.fmt(f),
-            FieldType::Optional(ref t) => {
-                t.fmt(f)?;
-                f.write_str("?")
-            }
-            FieldType::Array(ref t) => {
-                t.fmt(f)?;
-                f.write_str("[]")
-            }
-            FieldType::Unsupported(ref t) => {
-                f.write_str("Unsupported(")?;
-                t.fmt(f)?;
-                f.write_str(")")
-            }
-        }
-    }
-}
 
 /// A field in a composite type block.
 #[derive(Debug)]
@@ -67,7 +30,7 @@ impl<'a> CompositeTypeField<'a> {
     /// }
     /// ```
     pub fn new_required(name: &'a str, type_name: &'a str) -> Self {
-        Self::new(name, FieldType::Required(Constant::new_no_validate(type_name)))
+        Self::new(name, FieldType::required(type_name))
     }
 
     /// Create a new optional composite field declaration.
@@ -80,7 +43,7 @@ impl<'a> CompositeTypeField<'a> {
     /// }
     /// ```
     pub fn new_optional(name: &'a str, type_name: &'a str) -> Self {
-        Self::new(name, FieldType::Optional(Constant::new_no_validate(type_name)))
+        Self::new(name, FieldType::optional(type_name))
     }
 
     /// Create a new array composite field declaration.
@@ -93,10 +56,10 @@ impl<'a> CompositeTypeField<'a> {
     /// }
     /// ```
     pub fn new_array(name: &'a str, type_name: &'a str) -> Self {
-        Self::new(name, FieldType::Array(Constant::new_no_validate(type_name)))
+        Self::new(name, FieldType::array(type_name))
     }
 
-    /// Create a new unsupported composite field declaration.
+    /// Create a new required unsupported composite field declaration.
     ///
     /// ```ignore
     /// type Address {
@@ -105,8 +68,34 @@ impl<'a> CompositeTypeField<'a> {
     /// //^^^^^^ name
     /// }
     /// ```
-    pub fn new_unsupported(name: &'a str, type_name: &'a str) -> Self {
-        Self::new(name, FieldType::Unsupported(Text(type_name)))
+    pub fn new_required_unsupported(name: &'a str, type_name: &'a str) -> Self {
+        Self::new(name, FieldType::required_unsupported(type_name))
+    }
+
+    /// Create a new optional unsupported composite field declaration.
+    ///
+    /// ```ignore
+    /// type Address {
+    ///   street Unsupported("foo")?
+    /// //                    ^^^ type_name
+    /// //^^^^^^ name
+    /// }
+    /// ```
+    pub fn new_optional_unsupported(name: &'a str, type_name: &'a str) -> Self {
+        Self::new(name, FieldType::optional_unsupported(type_name))
+    }
+
+    /// Create a new array unsupported composite field declaration.
+    ///
+    /// ```ignore
+    /// type Address {
+    ///   street Unsupported("foo")[]
+    /// //                    ^^^ type_name
+    /// //^^^^^^ name
+    /// }
+    /// ```
+    pub fn new_array_unsupported(name: &'a str, type_name: &'a str) -> Self {
+        Self::new(name, FieldType::array_unsupported(type_name))
     }
 
     /// Sets the field map attribute.
@@ -191,7 +180,15 @@ impl<'a> CompositeTypeField<'a> {
         };
 
         let mut field = match dml_field.arity {
-            _ if dml_field.r#type.is_unsupported() => CompositeTypeField::new_unsupported(&dml_field.name, r#type),
+            dml::FieldArity::Required if dml_field.r#type.is_unsupported() => {
+                CompositeTypeField::new_required_unsupported(&dml_field.name, r#type)
+            }
+            dml::FieldArity::Optional if dml_field.r#type.is_unsupported() => {
+                CompositeTypeField::new_optional_unsupported(&dml_field.name, r#type)
+            }
+            dml::FieldArity::List if dml_field.r#type.is_unsupported() => {
+                CompositeTypeField::new_array_unsupported(&dml_field.name, r#type)
+            }
             dml::FieldArity::Required => CompositeTypeField::new_required(&dml_field.name, r#type),
             dml::FieldArity::Optional => CompositeTypeField::new_optional(&dml_field.name, r#type),
             dml::FieldArity::List => CompositeTypeField::new_array(&dml_field.name, r#type),

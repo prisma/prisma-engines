@@ -54,17 +54,12 @@ pub(super) async fn sample(
 
     let data_model = if ctx.render_config {
         format!(
-            "{}\n{}\n{}",
+            "{}\n{}",
             render::Configuration::from_psl(ctx.configuration()),
             render::Datamodel::from_dml(ctx.datasource(), &data_model),
-            psl::render_datamodel_to_string(&data_model, Some(ctx.configuration())),
         )
     } else {
-        format!(
-            "{}\n{}",
-            render::Datamodel::from_dml(ctx.datasource(), &data_model),
-            psl::render_datamodel_to_string(&data_model, Some(ctx.configuration())),
-        )
+        render::Datamodel::from_dml(ctx.datasource(), &data_model).to_string()
     };
 
     Ok(IntrospectionResult {

@@ -1,7 +1,7 @@
 mod field;
 
 use crate::value::{Constant, Documentation};
-pub use field::{CompositeTypeField, FieldType};
+pub use field::CompositeTypeField;
 use psl::dml;
 use std::fmt;
 

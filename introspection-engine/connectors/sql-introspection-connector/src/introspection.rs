@@ -12,6 +12,7 @@ use crate::{
 use datamodel_renderer as render;
 use introspection_connector::Version;
 use psl::{
+    datamodel_connector::constraint_names::ConstraintNames,
     dml::{self, Datamodel, Field, Model, PrimaryKeyDefinition, PrimaryKeyField, RelationField, SortOrder},
     parser_database::{ast, walkers},
     Configuration,
@@ -91,9 +92,8 @@ pub(crate) fn introspect(ctx: &mut Context) -> Result<(Version, String, bool), S
     };
 
     let rendered = format!(
-        "{}\n{}\n{}",
+        "{}\n{}",
         config,
-        psl::render_datamodel_to_string(&datamodel, Some(ctx.config)),
         render::Datamodel::from_dml(&ctx.config.datasources[0], &datamodel),
     );
 
@@ -273,10 +273,7 @@ fn introspect_models(datamodel: &mut Datamodel, ctx: &Context) {
             .foreign_keys()
             .filter(|fk| !duplicated_foreign_keys.contains(&fk.id))
         {
-            let mut relation_field = calculate_relation_field(foreign_key, &m2m_tables, &duplicated_foreign_keys);
-
-            relation_field.supports_restrict_action(!ctx.sql_family().is_mssql());
-
+            let relation_field = calculate_relation_field(ctx, foreign_key, &m2m_tables, &duplicated_foreign_keys);
             model.add_field(Field::RelationField(relation_field));
         }
 
@@ -289,15 +286,23 @@ fn introspect_models(datamodel: &mut Datamodel, ctx: &Context) {
         if let Some(pk) = table.primary_key() {
             let clustered = primary_key_is_clustered(pk.id, ctx);
 
+            let db_name = if pk.name() == ConstraintNames::primary_key_name(table.name(), ctx.active_connector())
+                || pk.name().is_empty()
+            {
+                None
+            } else {
+                Some(pk.name().to_owned())
+            };
+
             model.primary_key = Some(PrimaryKeyDefinition {
                 name: None,
-                db_name: Some(pk.name().to_owned()),
+                db_name,
                 fields: pk
                     .columns()
                     .map(|c| {
-                        let sort_order = c.sort_order().map(|sort| match sort {
-                            SQLSortOrder::Asc => SortOrder::Asc,
-                            SQLSortOrder::Desc => SortOrder::Desc,
+                        let sort_order = c.sort_order().and_then(|sort| match sort {
+                            SQLSortOrder::Asc => None,
+                            SQLSortOrder::Desc => Some(SortOrder::Desc),
                         });
 
                         PrimaryKeyField {
