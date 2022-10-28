@@ -111,12 +111,11 @@ impl ParsedField {
     }
 
     fn look_arg(&mut self, arg_name: &str) -> QueryParserResult<Option<ParsedInputMap>> {
-        Option::transpose(
-            self.arguments
-                .lookup(arg_name)
-                .as_ref()
-                .map(|arg| arg.value.clone().try_into()),
-        )
+        self.arguments
+            .lookup(arg_name)
+            .as_ref()
+            .map(|arg| arg.value.clone().try_into())
+            .transpose()
     }
 }
 
