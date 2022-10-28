@@ -370,7 +370,7 @@
             };
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">SqlMigrationConnector::new_mysql</span>();
             <span class="ident">conn</span>.<span class="ident">set_params</span>(<span class="ident">params</span>).<span class="ident">unwrap</span>();
-            <span class="ident">tok</span>(<span class="ident">conn</span>.<span class="ident">reset</span>(<span class="bool-val">false</span>)).<span class="ident">unwrap</span>();
+            <span class="ident">tok</span>(<span class="ident">conn</span>.<span class="ident">reset</span>(<span class="bool-val">false</span>, <span class="prelude-val">None</span>)).<span class="ident">unwrap</span>();
 
             (
                 <span class="ident">tok</span>(<span class="ident">Quaint::new</span>(<span class="ident">args</span>.<span class="ident">database_url</span>())).<span class="ident">unwrap</span>(),
@@ -612,7 +612,7 @@
 
     <span class="doccomment">/// Assert facts about the database schema</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_schema</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">SchemaAssertion</span> {
-        <span class="ident">SchemaAssertion::new</span>(<span class="ident">tok</span>(<span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">describe_schema</span>()).<span class="ident">unwrap</span>(), <span class="self">self</span>.<span class="ident">tags</span>)
+        <span class="ident">SchemaAssertion::new</span>(<span class="ident">tok</span>(<span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">describe_schema</span>(<span class="prelude-val">None</span>)).<span class="ident">unwrap</span>(), <span class="self">self</span>.<span class="ident">tags</span>)
     }
 
     <span class="doccomment">/// Plan a `reset` command</span>

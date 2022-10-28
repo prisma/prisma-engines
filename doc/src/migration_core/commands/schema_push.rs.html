@@ -64,6 +64,26 @@
 <span id="64">64</span>
 <span id="65">65</span>
 <span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">json_rpc::types</span>::<span class="kw-2">*</span>, <span class="ident">parse_schema</span>, <span class="ident">CoreResult</span>};
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{<span class="ident">ConnectorError</span>, <span class="ident">DiffTarget</span>, <span class="ident">MigrationConnector</span>};
 <span class="kw">use</span> <span class="ident">psl::parser_database::SourceFile</span>;
@@ -83,13 +103,33 @@
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::user_facing</span>(<span class="ident">err</span>));
     };
 
-    <span class="kw">let</span> <span class="ident">from</span> <span class="op">=</span> <span class="ident">connector</span>
-        .<span class="ident">database_schema_from_diff_target</span>(<span class="ident">DiffTarget::Database</span>, <span class="prelude-val">None</span>)
-        .<span class="ident">instrument</span>(<span class="macro">tracing::debug_span!</span>(<span class="string">&quot;Calculate `from`&quot;</span>))
-        .<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="comment">// FIXME: The reason we connect here is that some relevant bits of information about the</span>
+    <span class="comment">// database used in diffing come from connecting to the database and reading its version.</span>
+    <span class="comment">// Concretely: with a schema with `provider = &quot;postgresql&quot;` and a connection string for a</span>
+    <span class="comment">// CockroachDb database, `connector` here doesn&#39;t have context yet on the database and</span>
+    <span class="comment">// generates a SqlSchema with PostgreSQL native types, instead of CockroachDB native types.</span>
+    <span class="comment">//</span>
+    <span class="comment">// So depending on the order in which `from` and `to` schemas are constructed, the type of the</span>
+    <span class="comment">// native types could be inconsistent between `from` and `to`. As of this comment, the only</span>
+    <span class="comment">// case we are aware of is users using a postgres Prisma schema with a cockroachdb database.</span>
+    <span class="comment">//</span>
+    <span class="comment">// We should consider requiring using `provider = &quot;cockroachdb&quot;` with cockroach databases (and</span>
+    <span class="comment">// disallow `provider = &quot;postgresql&quot;`).</span>
+    <span class="ident">connector</span>.<span class="ident">ensure_connection_validity</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+
     <span class="kw">let</span> <span class="ident">to</span> <span class="op">=</span> <span class="ident">connector</span>
-        .<span class="ident">database_schema_from_diff_target</span>(<span class="ident">DiffTarget::Datamodel</span>(<span class="ident">source</span>), <span class="prelude-val">None</span>)
+        .<span class="ident">database_schema_from_diff_target</span>(<span class="ident">DiffTarget::Datamodel</span>(<span class="ident">source</span>), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
         .<span class="ident">instrument</span>(<span class="macro">tracing::debug_span!</span>(<span class="string">&quot;Calculate `to`&quot;</span>))
+        .<span class="kw">await</span><span class="question-mark">?</span>;
+
+    <span class="kw">let</span> <span class="ident">namespaces</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">extract_namespaces</span>(<span class="kw-2">&amp;</span><span class="ident">to</span>);
+
+    <span class="comment">// TODO(MultiSchema): we may need to do something similar to</span>
+    <span class="comment">// namespaces_and_preview_features_from_diff_targets here as well,</span>
+    <span class="comment">// particulalry if it&#39;s not correctly setting the preview features flags.</span>
+    <span class="kw">let</span> <span class="ident">from</span> <span class="op">=</span> <span class="ident">connector</span>
+        .<span class="ident">database_schema_from_diff_target</span>(<span class="ident">DiffTarget::Database</span>, <span class="prelude-val">None</span>, <span class="ident">namespaces</span>)
+        .<span class="ident">instrument</span>(<span class="macro">tracing::debug_span!</span>(<span class="string">&quot;Calculate `from`&quot;</span>))
         .<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">database_migration</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">diff</span>(<span class="ident">from</span>, <span class="ident">to</span>);
 

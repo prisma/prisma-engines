@@ -519,6 +519,20 @@
 <span id="519">519</span>
 <span id="520">520</span>
 <span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">connection</span>;
 <span class="kw">mod</span> <span class="ident">shadow_db</span>;
 
@@ -527,7 +541,7 @@
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">indoc::indoc</span>;
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{
-    <span class="ident">migrations_directory::MigrationDirectory</span>, <span class="ident">BoxFuture</span>, <span class="ident">ConnectorError</span>, <span class="ident">ConnectorParams</span>, <span class="ident">ConnectorResult</span>,
+    <span class="ident">migrations_directory::MigrationDirectory</span>, <span class="ident">BoxFuture</span>, <span class="ident">ConnectorError</span>, <span class="ident">ConnectorParams</span>, <span class="ident">ConnectorResult</span>, <span class="ident">Namespaces</span>,
 };
 <span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
 <span class="kw">use</span> <span class="ident">psl</span>::{<span class="ident">datamodel_connector</span>, <span class="ident">parser_database::ScalarType</span>, <span class="ident">ValidatedSchema</span>};
@@ -612,7 +626,7 @@
         <span class="ident">psl::builtin_connectors::MYSQL</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">describe_schema</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">describe_schema</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_namespaces</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Namespaces</span><span class="op">&gt;</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">with_connection</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">state</span>, <span class="op">|</span><span class="ident">params</span>, <span class="ident">_c</span>, <span class="ident">connection</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
             <span class="ident">connection</span>.<span class="ident">describe_schema</span>(<span class="ident">params</span>).<span class="kw">await</span>
         })
@@ -796,6 +810,7 @@
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">migrations</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">MigrationDirectory</span>],
         <span class="ident">shadow_database_connection_string</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+        <span class="ident">namespaces</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Namespaces</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">shadow_database_connection_string</span> <span class="op">=</span> <span class="ident">shadow_database_connection_string</span>.<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> {
             <span class="self">self</span>.<span class="ident">state</span>
@@ -828,7 +843,7 @@
 
                 <span class="macro">tracing::info!</span>(<span class="string">&quot;Connecting to user-provided shadow database.&quot;</span>);
                 <span class="kw">if</span> <span class="ident">shadow_database</span>.<span class="ident">reset</span>().<span class="kw">await</span>.<span class="ident">is_err</span>() {
-                    <span class="ident"><span class="kw">crate</span>::best_effort_reset</span>(<span class="kw-2">&amp;mut</span> <span class="ident">shadow_database</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                    <span class="ident"><span class="kw">crate</span>::best_effort_reset</span>(<span class="kw-2">&amp;mut</span> <span class="ident">shadow_database</span>, <span class="ident">namespaces</span>).<span class="kw">await</span><span class="question-mark">?</span>;
                 }
 
                 <span class="ident">shadow_db::sql_schema_from_migrations_history</span>(<span class="ident">migrations</span>, <span class="ident">shadow_database</span>).<span class="kw">await</span>
@@ -864,6 +879,19 @@
 
                     <span class="ident">ret</span>
                 })
+            }
+        }
+    }
+
+    <span class="kw">fn</span> <span class="ident">set_preview_features</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">preview_features</span>: <span class="ident">enumflags2::BitFlags</span><span class="op">&lt;</span><span class="ident">psl::PreviewFeature</span><span class="op">&gt;</span>) {
+        <span class="kw">match</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">state</span> {
+            <span class="ident"><span class="kw">super</span>::State::Initial</span> =&gt; {
+                <span class="kw">if</span> <span class="op">!</span><span class="ident">preview_features</span>.<span class="ident">is_empty</span>() {
+                    <span class="macro">tracing::warn!</span>(<span class="string">&quot;set_preview_feature on Initial state has no effect ({preview_features}).&quot;</span>);
+                }
+            }
+            <span class="ident"><span class="kw">super</span>::State::WithParams</span>(<span class="ident">params</span>) <span class="op">|</span> <span class="ident"><span class="kw">super</span>::State::Connected</span>(<span class="ident">params</span>, <span class="kw">_</span>) =&gt; {
+                <span class="ident">params</span>.<span class="ident">connector_params</span>.<span class="ident">preview_features</span> <span class="op">=</span> <span class="ident">preview_features</span>
             }
         }
     }

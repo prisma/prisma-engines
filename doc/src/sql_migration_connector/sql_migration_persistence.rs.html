@@ -139,6 +139,7 @@
 <span id="139">139</span>
 <span id="140">140</span>
 <span id="141">141</span>
+<span id="142">142</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::SqlMigrationConnector</span>;
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{
     <span class="ident">BoxFuture</span>, <span class="ident">ConnectorError</span>, <span class="ident">ConnectorResult</span>, <span class="ident">MigrationPersistence</span>, <span class="ident">MigrationRecord</span>, <span class="ident">PersistenceNotInitializedError</span>,
@@ -153,7 +154,8 @@
 
     <span class="kw">fn</span> <span class="ident">initialize</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-            <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">flavour</span>.<span class="ident">describe_schema</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="comment">// TODO(MultiSchema): We may need to change this too.</span>
+            <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">flavour</span>.<span class="ident">describe_schema</span>(<span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
             <span class="kw">if</span> <span class="ident">schema</span>
                 .<span class="ident">table_walkers</span>()

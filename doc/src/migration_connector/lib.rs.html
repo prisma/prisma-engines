@@ -202,6 +202,25 @@
 <span id="202">202</span>
 <span id="203">203</span>
 <span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>, <span class="ident">missing_docs</span>)]</span>
 
 <span class="doccomment">//! This crate defines the API exposed by the connectors to the migration engine core. The entry point for this API is the [MigrationConnector](trait.MigrationConnector.html) trait.</span>
@@ -212,14 +231,17 @@
 <span class="kw">mod</span> <span class="ident">diff</span>;
 <span class="kw">mod</span> <span class="ident">error</span>;
 <span class="kw">mod</span> <span class="ident">migration_persistence</span>;
+<span class="kw">mod</span> <span class="ident">namespaces</span>;
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">migrations_directory</span>;
 
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::namespaces::Namespaces</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">connector_params::ConnectorParams</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">destructive_change_checker</span>::{
     <span class="ident">DestructiveChangeChecker</span>, <span class="ident">DestructiveChangeDiagnostics</span>, <span class="ident">MigrationWarning</span>, <span class="ident">UnexecutableMigration</span>,
 };
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">diff::DiffTarget</span>;
+<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ConnectorResult</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">introspection_connector</span>::{<span class="ident">IntrospectionConnector</span>, <span class="ident">IntrospectionContext</span>, <span class="ident">IntrospectionResult</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">migration_persistence</span>::{<span class="ident">MigrationPersistence</span>, <span class="ident">MigrationRecord</span>, <span class="ident">PersistenceNotInitializedError</span>, <span class="ident">Timestamp</span>};
@@ -261,6 +283,11 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">downcast</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">downcast</span>().<span class="ident">unwrap</span>()
     }
+
+    <span class="doccomment">/// Should never be used in the core, only in connectors that know what they put there.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">downcast_ref</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">downcast_ref</span>().<span class="ident">unwrap</span>()
+    }
 }
 
 <span class="doccomment">/// An abstract host for a migration connector. It exposes IO that is not directly performed by the</span>
@@ -293,6 +320,9 @@
     <span class="doccomment">/// Accept and validate new ConnectorParams. This should fail if it is called twice on the same</span>
     <span class="doccomment">/// connector.</span>
     <span class="kw">fn</span> <span class="ident">set_params</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="ident">ConnectorParams</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+
+    <span class="doccomment">/// Accept a new set of enabled preview features.</span>
+    <span class="kw">fn</span> <span class="ident">set_preview_features</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">psl::PreviewFeature</span><span class="op">&gt;</span>);
 
     <span class="comment">// Connector methods</span>
 
@@ -353,7 +383,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Set the `soft` parameter to `true` to force a soft-reset, that is to say a reset that does</span>
     <span class="doccomment">/// not drop the database.</span>
-    <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">soft</span>: <span class="ident">bool</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">soft</span>: <span class="ident">bool</span>, <span class="ident">namespaces</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Namespaces</span><span class="op">&gt;</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Optionally check that the features implied by the provided datamodel are all compatible with</span>
     <span class="doccomment">/// the specific database version being used.</span>
@@ -388,23 +418,31 @@
     <span class="doccomment">/// Read a schema for diffing. The shadow database connection string is strictly optional, you</span>
     <span class="doccomment">/// don&#39;t need to pass it if a shadow database url was passed in params, or if it can be</span>
     <span class="doccomment">/// inferred from context, or if it isn&#39;t necessary for the task at hand.</span>
+    <span class="doccomment">/// When MultiSchema is enabled, the namespaces are required for diffing anything other than a</span>
+    <span class="doccomment">/// prisma schema, because that information is otherwise unavailable.</span>
     <span class="kw">fn</span> <span class="ident">database_schema_from_diff_target</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">target</span>: <span class="ident">DiffTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
         <span class="ident">shadow_database_connection_string</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+        <span class="ident">namespaces</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Namespaces</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">DatabaseSchema</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// In-tro-spec-shon.</span>
     <span class="kw">fn</span> <span class="ident">introspect</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">introspection_connector::IntrospectionContext</span>,
+        <span class="ident">namespaces</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Namespaces</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">introspection_connector::IntrospectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// If possible, check that the passed in migrations apply cleanly.</span>
     <span class="kw">fn</span> <span class="ident">validate_migrations</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">_migrations</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">MigrationDirectory</span>],
+        <span class="ident">namespaces</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Namespaces</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>;
+
+    <span class="doccomment">/// Extract the namespaces from a Sql database schema (it will return None for mongodb).</span>
+    <span class="kw">fn</span> <span class="ident">extract_namespaces</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">DatabaseSchema</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Namespaces</span><span class="op">&gt;</span>;
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>

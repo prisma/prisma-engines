@@ -52,6 +52,12 @@
 <span id="52">52</span>
 <span id="53">53</span>
 <span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">json_rpc::types</span>::<span class="kw-2">*</span>, <span class="ident">CoreResult</span>};
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{<span class="ident">migrations_directory</span>::<span class="kw-2">*</span>, <span class="ident">DiffTarget</span>, <span class="ident">MigrationConnector</span>};
 <span class="kw">use</span> <span class="ident">psl::parser_database::SourceFile</span>;
@@ -71,11 +77,17 @@
 
     <span class="kw">let</span> <span class="ident">migrations_from_directory</span> <span class="op">=</span> <span class="ident">list_migrations</span>(<span class="ident">input</span>.<span class="ident">migrations_directory_path</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">from</span> <span class="op">=</span> <span class="ident">connector</span>
-        .<span class="ident">database_schema_from_diff_target</span>(<span class="ident">DiffTarget::Migrations</span>(<span class="kw-2">&amp;</span><span class="ident">migrations_from_directory</span>), <span class="prelude-val">None</span>)
-        .<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">to</span> <span class="op">=</span> <span class="ident">connector</span>
-        .<span class="ident">database_schema_from_diff_target</span>(<span class="ident">DiffTarget::Datamodel</span>(<span class="ident">source_file</span>), <span class="prelude-val">None</span>)
+        .<span class="ident">database_schema_from_diff_target</span>(<span class="ident">DiffTarget::Datamodel</span>(<span class="ident">source_file</span>), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
+        .<span class="kw">await</span><span class="question-mark">?</span>;
+
+    <span class="kw">let</span> <span class="ident">namespaces</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">extract_namespaces</span>(<span class="kw-2">&amp;</span><span class="ident">to</span>);
+
+    <span class="comment">// TODO(MultiSchema): we may need to do something similar to</span>
+    <span class="comment">// namespaces_and_preview_features_from_diff_targets here as well,</span>
+    <span class="comment">// particulalry if it&#39;s not correctly setting the preview features flags.</span>
+    <span class="kw">let</span> <span class="ident">from</span> <span class="op">=</span> <span class="ident">connector</span>
+        .<span class="ident">database_schema_from_diff_target</span>(<span class="ident">DiffTarget::Migrations</span>(<span class="kw-2">&amp;</span><span class="ident">migrations_from_directory</span>), <span class="prelude-val">None</span>, <span class="ident">namespaces</span>)
         .<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">migration</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">diff</span>(<span class="ident">from</span>, <span class="ident">to</span>);
 

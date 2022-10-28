@@ -73,7 +73,11 @@
 <span id="73">73</span>
 <span id="74">74</span>
 <span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The external facing programmatic API to the migration engine.</span>
+
+<span class="kw">use</span> <span class="ident">migration_connector::Namespaces</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">commands</span>, <span class="ident">json_rpc::types</span>::<span class="kw-2">*</span>, <span class="ident">CoreResult</span>};
 
@@ -143,7 +147,7 @@
     ) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">MarkMigrationRolledBackOutput</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Reset a database to an empty state (no data, no schema).</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">namespaces</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Namespaces</span><span class="op">&gt;</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 
     <span class="doccomment">/// The command behind `prisma db push`.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">schema_push</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="ident">SchemaPushInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">SchemaPushOutput</span><span class="op">&gt;</span>;

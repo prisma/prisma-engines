@@ -299,6 +299,14 @@
 <span id="299">299</span>
 <span id="300">300</span>
 <span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
 </pre><pre class="rust"><code><span class="doccomment">//! SQL flavours implement behaviour specific to a given SQL implementation (PostgreSQL, SQLite...),</span>
 <span class="doccomment">//! in order to avoid cluttering the connector with conditionals. This is a private implementation</span>
 <span class="doccomment">//! detail of the SQL connector.</span>
@@ -320,7 +328,7 @@
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{
     <span class="ident">migrations_directory::MigrationDirectory</span>, <span class="ident">BoxFuture</span>, <span class="ident">ConnectorError</span>, <span class="ident">ConnectorParams</span>, <span class="ident">ConnectorResult</span>,
-    <span class="ident">MigrationRecord</span>, <span class="ident">PersistenceNotInitializedError</span>,
+    <span class="ident">MigrationRecord</span>, <span class="ident">Namespaces</span>, <span class="ident">PersistenceNotInitializedError</span>,
 };
 <span class="kw">use</span> <span class="ident">psl</span>::{<span class="ident">PreviewFeature</span>, <span class="ident">ValidatedSchema</span>};
 <span class="kw">use</span> <span class="ident">quaint::prelude</span>::{<span class="ident">ConnectionInfo</span>, <span class="ident">Table</span>};
@@ -440,7 +448,7 @@
     <span class="doccomment">/// The datamodel connector corresponding to the flavour</span>
     <span class="kw">fn</span> <span class="ident">datamodel_connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">psl::datamodel_connector::Connector</span>;
 
-    <span class="kw">fn</span> <span class="ident">describe_schema</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">describe_schema</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">namespaces</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Namespaces</span><span class="op">&gt;</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Drop the database.</span>
     <span class="kw">fn</span> <span class="ident">drop_database</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>;
@@ -554,10 +562,18 @@
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">migrations</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">MigrationDirectory</span>],
         <span class="ident">shadow_database_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+        <span class="ident">namespaces</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Namespaces</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Receive and validate connector params.</span>
     <span class="kw">fn</span> <span class="ident">set_params</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">connector_params</span>: <span class="ident">ConnectorParams</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+
+    <span class="doccomment">/// Sets the preview features. This is currently useful for MultiSchema, as we want to</span>
+    <span class="doccomment">/// grab the namespaces we&#39;re expected to diff/work on, which are generally set in</span>
+    <span class="doccomment">/// the schema.</span>
+    <span class="doccomment">/// WARNING: This may silently not do anything if the connector is in the initial state.</span>
+    <span class="doccomment">/// If this is ever a problem, considering returning an indicator of success.</span>
+    <span class="kw">fn</span> <span class="ident">set_preview_features</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">psl::PreviewFeature</span><span class="op">&gt;</span>);
 
     <span class="doccomment">/// Table to store applied migrations.</span>
     <span class="kw">fn</span> <span class="ident">migrations_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {

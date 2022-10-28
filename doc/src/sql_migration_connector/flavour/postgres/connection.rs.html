@@ -175,10 +175,15 @@
 <span id="175">175</span>
 <span id="176">176</span>
 <span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
 </pre><pre class="rust"><code><span class="doccomment">//! All the quaint-wrangling for the postgres connector should happen here.</span>
 
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
-<span class="kw">use</span> <span class="ident">migration_connector</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ConnectorResult</span>};
+<span class="kw">use</span> <span class="ident">migration_connector</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ConnectorResult</span>, <span class="ident">Namespaces</span>};
 <span class="kw">use</span> <span class="ident">psl::PreviewFeature</span>;
 <span class="kw">use</span> <span class="ident">quaint</span>::{
     <span class="ident">connector</span>::{<span class="self">self</span>, <span class="ident">tokio_postgres::error::ErrorPosition</span>, <span class="ident">PostgresUrl</span>},
@@ -210,15 +215,20 @@
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">circumstances</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::Circumstances</span><span class="op">&gt;</span>,
         <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="kw">super</span>::Params</span>,
+        <span class="ident">namespaces</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Namespaces</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="ident">postgres</span> <span class="kw">as</span> <span class="ident">describer</span>, <span class="ident">DescriberErrorKind</span>, <span class="ident">SqlSchemaDescriberBackend</span>};
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">describer_circumstances</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">describer::Circumstances</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Default::default</span>();
+
         <span class="kw">if</span> <span class="ident">circumstances</span>.<span class="ident">contains</span>(<span class="ident"><span class="kw">super</span>::Circumstances::IsCockroachDb</span>) {
             <span class="ident">describer_circumstances</span> <span class="op">|</span><span class="op">=</span> <span class="ident">describer::Circumstances::Cockroach</span>;
         }
 
+        <span class="kw">let</span> <span class="ident">namespaces_vec</span> <span class="op">=</span> <span class="ident">Namespaces::to_vec</span>(<span class="ident">namespaces</span>, <span class="ident">String::from</span>(<span class="ident">params</span>.<span class="ident">url</span>.<span class="ident">schema</span>()));
+        <span class="kw">let</span> <span class="ident">namespaces_str</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">namespaces_vec</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">AsRef::as_ref</span>).<span class="ident">collect</span>();
+
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">sql_schema_describer::postgres::SqlSchemaDescriber::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, <span class="ident">describer_circumstances</span>)
-            .<span class="ident">describe</span>(<span class="kw-2">&amp;</span>[<span class="ident">params</span>.<span class="ident">url</span>.<span class="ident">schema</span>()])
+            .<span class="ident">describe</span>(<span class="ident">namespaces_str</span>.<span class="ident">as_slice</span>())
             .<span class="kw">await</span>
             .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">err</span>.<span class="ident">into_kind</span>() {
                 <span class="ident">DescriberErrorKind::QuaintError</span>(<span class="ident">err</span>) =&gt; <span class="ident">quaint_err</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">url</span>)(<span class="ident">err</span>),

@@ -153,7 +153,7 @@ var sourcesIndex = JSON.parse('{\
 "metrics_exporter_prometheus":["",[],["builder.rs","common.rs","distribution.rs","formatting.rs","lib.rs","recorder.rs"]],\
 "metrics_macros":["",[],["lib.rs"]],\
 "metrics_util":["",[["layers",[],["fanout.rs","mod.rs","prefix.rs"]],["registry",[],["mod.rs","recency.rs","storage.rs"]]],["bucket.rs","common.rs","handles.rs","histogram.rs","key.rs","kind.rs","lib.rs","quantile.rs","summary.rs"]],\
-"migration_connector":["",[],["checksum.rs","connector_params.rs","destructive_change_checker.rs","diff.rs","error.rs","lib.rs","migration_persistence.rs","migrations_directory.rs"]],\
+"migration_connector":["",[],["checksum.rs","connector_params.rs","destructive_change_checker.rs","diff.rs","error.rs","lib.rs","migration_persistence.rs","migrations_directory.rs","namespaces.rs"]],\
 "migration_core":["",[["commands",[],["apply_migrations.rs","create_migration.rs","dev_diagnostic.rs","diagnose_migration_history.rs","diff.rs","evaluate_data_loss.rs","mark_migration_applied.rs","mark_migration_rolled_back.rs","schema_push.rs"]]],["api.rs","commands.rs","core_error.rs","lib.rs","rpc.rs","state.rs","timings.rs"]],\
 "migration_engine":["",[],["commands.rs","logger.rs","main.rs"]],\
 "migration_engine_tests":["",[["assertions",[],["migration_assertions.rs","quaint_result_set_ext.rs"]],["commands",[],["apply_migrations.rs","create_migration.rs","dev_diagnostic.rs","diagnose_migration_history.rs","evaluate_data_loss.rs","list_migration_directories.rs","mark_migration_applied.rs","mark_migration_rolled_back.rs","reset.rs","schema_push.rs"]]],["assertions.rs","commands.rs","lib.rs","multi_engine_test_api.rs","test_api.rs"]],\

@@ -63,6 +63,7 @@
 <span id="63">63</span>
 <span id="64">64</span>
 <span id="65">65</span>
+<span id="66">66</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">json_rpc::method_names</span>::<span class="kw-2">*</span>, <span class="ident">CoreError</span>, <span class="ident">CoreResult</span>, <span class="ident">GenericApi</span>};
 <span class="kw">use</span> <span class="ident">jsonrpc_core</span>::{<span class="ident">types::error::Error</span> <span class="kw">as</span> <span class="ident">JsonRpcError</span>, <span class="ident">IoHandler</span>, <span class="ident">Params</span>};
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
@@ -105,7 +106,8 @@
         <span class="ident">LIST_MIGRATION_DIRECTORIES</span> =&gt; <span class="ident">render</span>(<span class="ident">executor</span>.<span class="ident">list_migration_directories</span>(<span class="ident">params</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>).<span class="kw">await</span>),
         <span class="ident">MARK_MIGRATION_APPLIED</span> =&gt; <span class="ident">render</span>(<span class="ident">executor</span>.<span class="ident">mark_migration_applied</span>(<span class="ident">params</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>).<span class="kw">await</span>),
         <span class="ident">MARK_MIGRATION_ROLLED_BACK</span> =&gt; <span class="ident">render</span>(<span class="ident">executor</span>.<span class="ident">mark_migration_rolled_back</span>(<span class="ident">params</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>).<span class="kw">await</span>),
-        <span class="ident">RESET</span> =&gt; <span class="ident">render</span>(<span class="ident">executor</span>.<span class="ident">reset</span>().<span class="kw">await</span>),
+        <span class="comment">// TODO(MultiSchema): we probably need to grab the namespaces from the params</span>
+        <span class="ident">RESET</span> =&gt; <span class="ident">render</span>(<span class="ident">executor</span>.<span class="ident">reset</span>(<span class="prelude-val">None</span>).<span class="kw">await</span>),
         <span class="ident">SCHEMA_PUSH</span> =&gt; <span class="ident">render</span>(<span class="ident">executor</span>.<span class="ident">schema_push</span>(<span class="ident">params</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>).<span class="kw">await</span>),
         <span class="ident">other</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Unknown command {}&quot;</span>, <span class="ident">other</span>),
     }

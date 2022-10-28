@@ -404,6 +404,15 @@
 <span id="404">404</span>
 <span id="405">405</span>
 <span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::assertions</span>::{<span class="ident">MigrationsAssertions</span>, <span class="ident">ResultSetExt</span>, <span class="ident">SchemaAssertion</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">expect_test::expect</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">migration_core::json_rpc::types</span>::{
@@ -416,7 +425,7 @@
 <span class="kw">use</span> <span class="ident">migration_core</span>::{
     <span class="ident">commands::diff</span>,
     <span class="ident">migration_connector</span>::{
-        <span class="ident">BoxFuture</span>, <span class="ident">ConnectorHost</span>, <span class="ident">ConnectorResult</span>, <span class="ident">DiffTarget</span>, <span class="ident">MigrationConnector</span>, <span class="ident">MigrationPersistence</span>,
+        <span class="ident">BoxFuture</span>, <span class="ident">ConnectorHost</span>, <span class="ident">ConnectorResult</span>, <span class="ident">DiffTarget</span>, <span class="ident">MigrationConnector</span>, <span class="ident">MigrationPersistence</span>, <span class="ident">Namespaces</span>,
     },
 };
 <span class="kw">use</span> <span class="ident">psl</span>::{<span class="ident">parser_database::SourceFile</span>, <span class="ident">PreviewFeature</span>};
@@ -625,7 +634,7 @@
     <span class="doccomment">/// Assert facts about the database schema</span>
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_schema</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">SchemaAssertion</span> {
-        <span class="kw">let</span> <span class="ident">schema</span>: <span class="ident">SqlSchema</span> <span class="op">=</span> <span class="ident">tok</span>(<span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">describe_schema</span>()).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">schema</span>: <span class="ident">SqlSchema</span> <span class="op">=</span> <span class="ident">tok</span>(<span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">describe_schema</span>(<span class="prelude-val">None</span>)).<span class="ident">unwrap</span>();
         <span class="ident">SchemaAssertion::new</span>(<span class="ident">schema</span>, <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">args</span>.<span class="ident">tags</span>())
     }
 
@@ -639,9 +648,17 @@
     }
 
     <span class="doccomment">/// Generate a migration script using `MigrationConnector::diff()`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connector_diff</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">from</span>: <span class="ident">DiffTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">to</span>: <span class="ident">DiffTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">from</span> <span class="op">=</span> <span class="ident">tok</span>(<span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">database_schema_from_diff_target</span>(<span class="ident">from</span>, <span class="prelude-val">None</span>)).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">to</span> <span class="op">=</span> <span class="ident">tok</span>(<span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">database_schema_from_diff_target</span>(<span class="ident">to</span>, <span class="prelude-val">None</span>)).<span class="ident">unwrap</span>();
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connector_diff</span>(
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">from</span>: <span class="ident">DiffTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="ident">to</span>: <span class="ident">DiffTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="ident">namespaces</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Namespaces</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="ident">String</span> {
+        <span class="kw">let</span> <span class="ident">from</span> <span class="op">=</span> <span class="ident">tok</span>(<span class="self">self</span>
+            .<span class="ident">connector</span>
+            .<span class="ident">database_schema_from_diff_target</span>(<span class="ident">from</span>, <span class="prelude-val">None</span>, <span class="ident">namespaces</span>.<span class="ident">clone</span>()))
+        .<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">to</span> <span class="op">=</span> <span class="ident">tok</span>(<span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">database_schema_from_diff_target</span>(<span class="ident">to</span>, <span class="prelude-val">None</span>, <span class="ident">namespaces</span>)).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">migration</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">diff</span>(<span class="ident">from</span>, <span class="ident">to</span>);
         <span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">render_script</span>(<span class="kw-2">&amp;</span><span class="ident">migration</span>, <span class="kw-2">&amp;</span><span class="ident">Default::default</span>()).<span class="ident">unwrap</span>()
     }
@@ -687,10 +704,11 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expect_sql_for_schema</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">expect_test::Expect</span>) {
-        <span class="comment">// let dir = tempfile::tempdir().unwrap();</span>
-        <span class="comment">// let schema_path = dir.path().join(&quot;schema.prisma&quot;);</span>
-        <span class="comment">// std::fs::write(&amp;schema_path, schema).unwrap();</span>
-        <span class="kw">let</span> <span class="ident">found</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">connector_diff</span>(<span class="ident">DiffTarget::Empty</span>, <span class="ident">DiffTarget::Datamodel</span>(<span class="ident">SourceFile::new_static</span>(<span class="ident">schema</span>)));
+        <span class="kw">let</span> <span class="ident">found</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">connector_diff</span>(
+            <span class="ident">DiffTarget::Empty</span>,
+            <span class="ident">DiffTarget::Datamodel</span>(<span class="ident">SourceFile::new_static</span>(<span class="ident">schema</span>)),
+            <span class="prelude-val">None</span>,
+        );
         <span class="ident">sql</span>.<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">found</span>);
     }
 

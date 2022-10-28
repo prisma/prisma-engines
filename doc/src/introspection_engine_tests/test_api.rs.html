@@ -369,6 +369,8 @@
 <span id="369">369</span>
 <span id="370">370</span>
 <span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::TestResult</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">expect_test::expect</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">indoc</span>::{<span class="ident">formatdoc</span>, <span class="ident">indoc</span>};
@@ -411,7 +413,7 @@
             .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">PreviewFeature::parse_opt</span>(<span class="ident">f</span>))
             .<span class="ident">collect</span>();
 
-        <span class="kw">let</span> <span class="ident">namespaces</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">namespaces</span>().<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">ns</span><span class="op">|</span> <span class="ident">ns</span>.<span class="ident">to_string</span>()).<span class="ident">collect</span>();
+        <span class="kw">let</span> <span class="ident">namespaces</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">namespaces</span>().<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">ns</span><span class="op">|</span> <span class="ident">ns</span>.<span class="ident">to_string</span>()).<span class="ident">collect</span>();
 
         <span class="kw">let</span> (<span class="ident">database</span>, <span class="ident">connection_string</span>): (<span class="ident">Quaint</span>, <span class="ident">String</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">tags</span>.<span class="ident">intersects</span>(<span class="ident">Tags::Vitess</span>) {
             <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">ConnectorParams</span> {
@@ -422,7 +424,9 @@
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">me</span> <span class="op">=</span> <span class="ident">SqlMigrationConnector::new_mysql</span>();
             <span class="ident">me</span>.<span class="ident">set_params</span>(<span class="ident">params</span>).<span class="ident">unwrap</span>();
 
-            <span class="ident">me</span>.<span class="ident">reset</span>(<span class="bool-val">true</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+            <span class="ident">me</span>.<span class="ident">reset</span>(<span class="bool-val">true</span>, <span class="ident">migration_connector::Namespaces::from_vec</span>(<span class="kw-2">&amp;mut</span> <span class="ident">namespaces</span>.<span class="ident">clone</span>()))
+                .<span class="kw">await</span>
+                .<span class="ident">unwrap</span>();
 
             (
                 <span class="ident">Quaint::new</span>(<span class="ident">connection_string</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>(),
