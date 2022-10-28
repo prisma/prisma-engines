@@ -181,11 +181,11 @@ pub(crate) fn test_scenario(scenario_name: &str) {
         apply_state(&db, state).await;
 
         let from = connector
-            .database_schema_from_diff_target(DiffTarget::Database, None)
+            .database_schema_from_diff_target(DiffTarget::Database, None, None)
             .await
             .unwrap();
         let to = connector
-            .database_schema_from_diff_target(DiffTarget::Datamodel(schema.clone()), None)
+            .database_schema_from_diff_target(DiffTarget::Datamodel(schema.clone()), None, None)
             .await
             .unwrap();
         let migration = connector.diff(from, to);
@@ -223,11 +223,11 @@ Snapshot comparison failed. Run the test again with UPDATE_EXPECT=1 in the envir
 
         // Check that the migration is idempotent.
         let from = connector
-            .database_schema_from_diff_target(DiffTarget::Database, None)
+            .database_schema_from_diff_target(DiffTarget::Database, None, None)
             .await
             .unwrap();
         let to = connector
-            .database_schema_from_diff_target(DiffTarget::Datamodel(schema), None)
+            .database_schema_from_diff_target(DiffTarget::Datamodel(schema), None, None)
             .await
             .unwrap();
         let migration = connector.diff(from, to);

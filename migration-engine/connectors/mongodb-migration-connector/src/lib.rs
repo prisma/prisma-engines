@@ -71,6 +71,7 @@ impl MigrationConnector for MongoDbMigrationConnector {
         &'a mut self,
         diff_target: DiffTarget<'a>,
         _shadow_database_connection_string: Option<String>,
+        _namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
         Box::pin(async {
             let schema = self.mongodb_schema_from_diff_target(diff_target).await?;
@@ -142,7 +143,11 @@ impl MigrationConnector for MongoDbMigrationConnector {
         migration.downcast_ref::<MongoDbMigration>().summary()
     }
 
-    fn reset(&mut self, _soft: bool) -> BoxFuture<'_, migration_connector::ConnectorResult<()>> {
+    fn reset(
+        &mut self,
+        _soft: bool,
+        _namespaces: Option<Namespaces>,
+    ) -> BoxFuture<'_, migration_connector::ConnectorResult<()>> {
         Box::pin(async { self.client().await?.drop_database().await })
     }
 
@@ -161,6 +166,7 @@ impl MigrationConnector for MongoDbMigrationConnector {
     fn introspect<'a>(
         &'a mut self,
         ctx: &'a IntrospectionContext,
+        _namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<IntrospectionResult>> {
         Box::pin(async move {
             let url: String = ctx.datasource().load_url(|v| std::env::var(v).ok()).map_err(|err| {
@@ -194,6 +200,10 @@ impl MigrationConnector for MongoDbMigrationConnector {
         Ok(())
     }
 
+    fn set_preview_features(&mut self, preview_features: BitFlags<psl::PreviewFeature>) {
+        self.preview_features = preview_features;
+    }
+
     fn set_host(&mut self, host: Arc<dyn migration_connector::ConnectorHost>) {
         self.host = host;
     }
@@ -201,8 +211,13 @@ impl MigrationConnector for MongoDbMigrationConnector {
     fn validate_migrations<'a>(
         &'a mut self,
         _migrations: &'a [MigrationDirectory],
+        _namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<()>> {
         Box::pin(future::ready(Ok(())))
+    }
+
+    fn extract_namespaces(&self, _schema: &DatabaseSchema) -> Option<Namespaces> {
+        None
     }
 }
 

@@ -6,7 +6,7 @@ use crate::SqlFlavour;
 use enumflags2::BitFlags;
 use indoc::indoc;
 use migration_connector::{
-    migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult,
+    migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult, Namespaces,
 };
 use quaint::connector::PostgresUrl;
 use sql_schema_describer::SqlSchema;
@@ -126,9 +126,9 @@ impl SqlFlavour for PostgresFlavour {
         }
     }
 
-    fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
+    fn describe_schema(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
         with_connection(self, |params, circumstances, conn| async move {
-            conn.describe_schema(circumstances, params).await
+            conn.describe_schema(circumstances, params, namespaces).await
         })
     }
 
@@ -291,11 +291,25 @@ impl SqlFlavour for PostgresFlavour {
         Ok(())
     }
 
+    fn set_preview_features(&mut self, preview_features: enumflags2::BitFlags<psl::PreviewFeature>) {
+        match &mut self.state {
+            super::State::Initial => {
+                if !preview_features.is_empty() {
+                    tracing::warn!("set_preview_feature on Initial state has no effect ({preview_features}).");
+                }
+            }
+            super::State::WithParams(params) | super::State::Connected(params, _) => {
+                params.connector_params.preview_features = preview_features
+            }
+        }
+    }
+
     #[tracing::instrument(skip(self, migrations))]
     fn sql_schema_from_migration_history<'a>(
         &'a mut self,
         migrations: &'a [MigrationDirectory],
         shadow_database_connection_string: Option<String>,
+        namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
         let shadow_database_connection_string = shadow_database_connection_string.or_else(|| {
             self.state
@@ -329,10 +343,10 @@ impl SqlFlavour for PostgresFlavour {
                 tracing::info!("Connecting to user-provided shadow database.");
 
                 if shadow_database.reset().await.is_err() {
-                    crate::best_effort_reset(&mut shadow_database).await?;
+                    crate::best_effort_reset(&mut shadow_database, namespaces.clone()).await?;
                 }
 
-                shadow_db::sql_schema_from_migrations_history(migrations, shadow_database).await
+                shadow_db::sql_schema_from_migrations_history(migrations, shadow_database, namespaces).await
             }),
             None => {
                 with_connection(self, move |params, _circumstances, main_connection| async move {
@@ -364,7 +378,8 @@ impl SqlFlavour for PostgresFlavour {
                     // We go through the whole process without early return, then clean up
                     // the shadow database, and only then return the result. This avoids
                     // leaving shadow databases behind in case of e.g. faulty migrations.
-                    let ret = shadow_db::sql_schema_from_migrations_history(migrations, shadow_database).await;
+                    let ret =
+                        shadow_db::sql_schema_from_migrations_history(migrations, shadow_database, namespaces).await;
 
                     let drop_database = format!("DROP DATABASE IF EXISTS \"{}\"", shadow_database_name);
                     main_connection.raw_cmd(&drop_database, &params.url).await?;

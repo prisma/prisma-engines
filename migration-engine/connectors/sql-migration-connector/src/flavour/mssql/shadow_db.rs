@@ -23,5 +23,5 @@ pub(super) async fn sql_schema_from_migrations_history(
             })?;
     }
 
-    shadow_db.describe_schema().await
+    shadow_db.describe_schema(None).await
 }

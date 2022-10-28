@@ -19,7 +19,7 @@ use crate::{
 use enumflags2::BitFlags;
 use migration_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult,
-    MigrationRecord, PersistenceNotInitializedError,
+    MigrationRecord, Namespaces, PersistenceNotInitializedError,
 };
 use psl::{PreviewFeature, ValidatedSchema};
 use quaint::prelude::{ConnectionInfo, Table};
@@ -139,7 +139,7 @@ pub(crate) trait SqlFlavour:
     /// The datamodel connector corresponding to the flavour
     fn datamodel_connector(&self) -> &'static dyn psl::datamodel_connector::Connector;
 
-    fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<SqlSchema>>;
+    fn describe_schema(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<SqlSchema>>;
 
     /// Drop the database.
     fn drop_database(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
@@ -253,10 +253,18 @@ pub(crate) trait SqlFlavour:
         &'a mut self,
         migrations: &'a [MigrationDirectory],
         shadow_database_url: Option<String>,
+        namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>>;
 
     /// Receive and validate connector params.
     fn set_params(&mut self, connector_params: ConnectorParams) -> ConnectorResult<()>;
+
+    /// Sets the preview features. This is currently useful for MultiSchema, as we want to
+    /// grab the namespaces we're expected to diff/work on, which are generally set in
+    /// the schema.
+    /// WARNING: This may silently not do anything if the connector is in the initial state.
+    /// If this is ever a problem, considering returning an indicator of success.
+    fn set_preview_features(&mut self, preview_features: BitFlags<psl::PreviewFeature>);
 
     /// Table to store applied migrations.
     fn migrations_table(&self) -> Table<'static> {

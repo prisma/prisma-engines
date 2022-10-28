@@ -5,6 +5,7 @@ use sql_schema_describer::SqlSchema;
 pub(super) async fn sql_schema_from_migrations_history(
     migrations: &[MigrationDirectory],
     mut shadow_db: PostgresFlavour,
+    namespaces: Option<Namespaces>,
 ) -> ConnectorResult<SqlSchema> {
     for migration in migrations {
         let script = migration.read_migration_script()?;
@@ -23,5 +24,5 @@ pub(super) async fn sql_schema_from_migrations_history(
             })?;
     }
 
-    shadow_db.describe_schema().await
+    shadow_db.describe_schema(namespaces).await
 }

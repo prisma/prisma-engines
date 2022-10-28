@@ -1323,6 +1323,7 @@ fn schema_from_introspection_docs_works(api: TestApi) {
     let migration = api.connector_diff(
         DiffTarget::Database,
         DiffTarget::Datamodel(SourceFile::new_static(introspected_schema)),
+        None,
     );
 
     let expected = expect!["-- This is an empty migration."];
