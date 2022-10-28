@@ -407,7 +407,6 @@ fn alter_enum_name_remove_and_change_default(mut api: TestApi) {
         });
 }
 
-// this test was panicking before this PR
 #[test_connector(tags(Postgres, CockroachDb))]
 fn alter_enum_name_with_default_empty_list_shouldnt_set_new_default(mut api: TestApi) {
     let plain_dm = api.datamodel_with_provider(
