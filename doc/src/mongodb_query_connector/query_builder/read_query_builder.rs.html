@@ -464,74 +464,6 @@
 <span id="464">464</span>
 <span id="465">465</span>
 <span id="466">466</span>
-<span id="467">467</span>
-<span id="468">468</span>
-<span id="469">469</span>
-<span id="470">470</span>
-<span id="471">471</span>
-<span id="472">472</span>
-<span id="473">473</span>
-<span id="474">474</span>
-<span id="475">475</span>
-<span id="476">476</span>
-<span id="477">477</span>
-<span id="478">478</span>
-<span id="479">479</span>
-<span id="480">480</span>
-<span id="481">481</span>
-<span id="482">482</span>
-<span id="483">483</span>
-<span id="484">484</span>
-<span id="485">485</span>
-<span id="486">486</span>
-<span id="487">487</span>
-<span id="488">488</span>
-<span id="489">489</span>
-<span id="490">490</span>
-<span id="491">491</span>
-<span id="492">492</span>
-<span id="493">493</span>
-<span id="494">494</span>
-<span id="495">495</span>
-<span id="496">496</span>
-<span id="497">497</span>
-<span id="498">498</span>
-<span id="499">499</span>
-<span id="500">500</span>
-<span id="501">501</span>
-<span id="502">502</span>
-<span id="503">503</span>
-<span id="504">504</span>
-<span id="505">505</span>
-<span id="506">506</span>
-<span id="507">507</span>
-<span id="508">508</span>
-<span id="509">509</span>
-<span id="510">510</span>
-<span id="511">511</span>
-<span id="512">512</span>
-<span id="513">513</span>
-<span id="514">514</span>
-<span id="515">515</span>
-<span id="516">516</span>
-<span id="517">517</span>
-<span id="518">518</span>
-<span id="519">519</span>
-<span id="520">520</span>
-<span id="521">521</span>
-<span id="522">522</span>
-<span id="523">523</span>
-<span id="524">524</span>
-<span id="525">525</span>
-<span id="526">526</span>
-<span id="527">527</span>
-<span id="528">528</span>
-<span id="529">529</span>
-<span id="530">530</span>
-<span id="531">531</span>
-<span id="532">532</span>
-<span id="533">533</span>
-<span id="534">534</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::group_by_builder</span>::<span class="kw-2">*</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -539,73 +471,41 @@
     <span class="ident">cursor</span>::{<span class="ident">CursorBuilder</span>, <span class="ident">CursorData</span>},
     <span class="ident">filter</span>::{<span class="ident">FilterPrefix</span>, <span class="ident">MongoFilterVisitor</span>},
     <span class="ident">join::JoinStage</span>,
-    <span class="ident">logger::log_read_query</span> <span class="kw">as</span> <span class="ident">log_query</span>,
     <span class="ident">orderby::OrderByBuilder</span>,
-    <span class="ident">root_queries::metrics</span>,
+    <span class="ident">query_strings::Aggregate</span>,
+    <span class="ident">root_queries::observing</span>,
     <span class="ident">vacuum_cursor</span>, <span class="ident">BsonTransform</span>, <span class="ident">IntoBson</span>,
 };
-
 <span class="kw">use</span> <span class="ident">connector_interface</span>::{<span class="ident">AggregationSelection</span>, <span class="ident">Filter</span>, <span class="ident">QueryArguments</span>, <span class="ident">RelAggregationSelection</span>};
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 <span class="kw">use</span> <span class="ident">mongodb</span>::{
     <span class="ident">bson</span>::{<span class="ident">doc</span>, <span class="ident">Document</span>},
-    <span class="ident">options</span>::{<span class="ident">AggregateOptions</span>, <span class="ident">FindOptions</span>},
+    <span class="ident">options::AggregateOptions</span>,
     <span class="ident">ClientSession</span>, <span class="ident">Collection</span>,
 };
 <span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">FieldSelection</span>, <span class="ident">ModelRef</span>, <span class="ident">ScalarFieldRef</span>};
 <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
 
-<span class="doccomment">/// Ergonomics wrapper for query execution and logging.</span>
-<span class="doccomment">/// Todo: Add all other queries gradually.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>, <span class="ident">clippy::large_enum_variant</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MongoReadQuery</span> {
-    <span class="ident">Find</span>(<span class="ident">FindQuery</span>),
-    <span class="ident">Pipeline</span>(<span class="ident">PipelineQuery</span>),
-}
-
-<span class="kw">impl</span> <span class="ident">MongoReadQuery</span> {
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(
-        <span class="self">self</span>,
-        <span class="ident">on_collection</span>: <span class="ident">Collection</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>,
-        <span class="ident">with_session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">log_query</span>(<span class="ident">on_collection</span>.<span class="ident">name</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>);
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">MongoReadQuery::Find</span>(<span class="ident">q</span>) =&gt; <span class="ident">q</span>.<span class="ident">execute</span>(<span class="ident">on_collection</span>, <span class="ident">with_session</span>).<span class="kw">await</span>,
-            <span class="ident">MongoReadQuery::Pipeline</span>(<span class="ident">q</span>) =&gt; <span class="ident">q</span>.<span class="ident">execute</span>(<span class="ident">on_collection</span>, <span class="ident">with_session</span>).<span class="kw">await</span>,
-        }
-    }
-}
-
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PipelineQuery</span> {
+<span class="comment">// Mongo Driver broke usage of the simple API, can&#39;t be used by us anymore.</span>
+<span class="comment">// As such the read query will always be based on aggregation pipeline</span>
+<span class="comment">// such pipeline will have different stages. See</span>
+<span class="comment">// https://www.mongodb.com/docs/manual/core/aggregation-pipeline/</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ReadQuery</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">stages</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">PipelineQuery</span> {
+<span class="kw">impl</span> <span class="ident">ReadQuery</span> {
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(
         <span class="self">self</span>,
         <span class="ident">on_collection</span>: <span class="ident">Collection</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>,
         <span class="ident">with_session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
     ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">opts</span> <span class="op">=</span> <span class="ident">AggregateOptions::builder</span>().<span class="ident">allow_disk_use</span>(<span class="bool-val">true</span>).<span class="ident">build</span>();
-        <span class="kw">let</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">metrics</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">on_collection</span>.<span class="ident">aggregate_with_session</span>(<span class="self">self</span>.<span class="ident">stages</span>, <span class="ident">opts</span>, <span class="ident">with_session</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="ident">vacuum_cursor</span>(<span class="ident">cursor</span>, <span class="ident">with_session</span>).<span class="kw">await</span>
-    }
-}
-
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FindQuery</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">filter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">options</span>: <span class="ident">FindOptions</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">FindQuery</span> {
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(
-        <span class="self">self</span>,
-        <span class="ident">on_collection</span>: <span class="ident">Collection</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>,
-        <span class="ident">with_session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">metrics</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">on_collection</span>.<span class="ident">find_with_session</span>(<span class="self">self</span>.<span class="ident">filter</span>, <span class="self">self</span>.<span class="ident">options</span>, <span class="ident">with_session</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">query_string_builder</span> <span class="op">=</span> <span class="ident">Aggregate::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">stages</span>, <span class="ident">on_collection</span>.<span class="ident">name</span>());
+        <span class="kw">let</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">observing</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">query_string_builder</span>), <span class="op">|</span><span class="op">|</span> {
+            <span class="ident">on_collection</span>.<span class="ident">aggregate_with_session</span>(<span class="self">self</span>.<span class="ident">stages</span>.<span class="ident">clone</span>(), <span class="ident">opts</span>, <span class="ident">with_session</span>)
+        })
+        .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="ident">vacuum_cursor</span>(<span class="ident">cursor</span>, <span class="ident">with_session</span>).<span class="kw">await</span>
     }
@@ -738,57 +638,21 @@
     }
 
     <span class="doccomment">/// Finalizes the builder and builds a `MongoQuery`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">MongoReadQuery</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReadQuery</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">finalize</span>()<span class="question-mark">?</span>;
-
-        <span class="comment">// Depending on the builder contents, either an</span>
-        <span class="comment">// aggregation pipeline or a plain query is build.</span>
-        <span class="comment">// if self.joins.is_empty()</span>
-        <span class="comment">//     &amp;&amp; self.order_joins.is_empty()</span>
-        <span class="comment">//     &amp;&amp; self.aggregations.is_empty()</span>
-        <span class="comment">//     &amp;&amp; self.cursor_data.is_none()</span>
-        <span class="comment">// {</span>
-        <span class="comment">//     Ok(self.build_find_query())</span>
-        <span class="comment">// } else {</span>
-        <span class="comment">// }</span>
-
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">build_pipeline_query</span>())
-    }
-
-    <span class="doccomment">/// Note: Mongo Driver broke usage of the simple API, can&#39;t be used by us anymore. Always doing aggr. pipeline for now.</span>
-    <span class="doccomment">/// Simplest form of find-documents query: `coll.find(filter, opts)`.</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">build_find_query</span>(<span class="self">self</span>) -&gt; <span class="ident">MongoReadQuery</span> {
-        <span class="comment">// let options = FindOptions::builder()</span>
-        <span class="comment">//     .projection(self.projection)</span>
-        <span class="comment">//     .limit(self.limit)</span>
-        <span class="comment">//     .skip(self.skip)</span>
-        <span class="comment">//     .sort(self.order)</span>
-        <span class="comment">//     .build();</span>
-
-        <span class="comment">// MongoReadQuery::Find(FindQuery {</span>
-        <span class="comment">//     filter: self.query,</span>
-        <span class="comment">//     options,</span>
-        <span class="comment">// })</span>
-
-        <span class="macro">unreachable!</span>()
     }
 
     <span class="doccomment">/// Aggregation-pipeline based query. A distinction must be made between cursored and uncursored queries,</span>
     <span class="doccomment">/// as they require different stage shapes (see individual fns for details).</span>
-    <span class="kw">fn</span> <span class="ident">build_pipeline_query</span>(<span class="self">self</span>) -&gt; <span class="ident">MongoReadQuery</span> {
+    <span class="kw">fn</span> <span class="ident">build_pipeline_query</span>(<span class="self">self</span>) -&gt; <span class="ident">ReadQuery</span> {
         <span class="kw">let</span> <span class="ident">stages</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">cursor_data</span>.<span class="ident">is_none</span>() {
-            <span class="self">self</span>.<span class="ident">flat_pipeline_stages</span>()
+            <span class="self">self</span>.<span class="ident">into_pipeline_stages</span>()
         } <span class="kw">else</span> {
             <span class="self">self</span>.<span class="ident">cursored_pipeline_stages</span>()
         };
 
-        <span class="ident">MongoReadQuery::Pipeline</span>(<span class="ident">PipelineQuery</span> { <span class="ident">stages</span> })
-    }
-
-    <span class="doccomment">/// Pipeline not requiring a cursor. Flat `coll.aggregate(stages, opts)` query.</span>
-    <span class="kw">fn</span> <span class="ident">flat_pipeline_stages</span>(<span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">into_pipeline_stages</span>()
+        <span class="ident">ReadQuery</span> { <span class="ident">stages</span> }
     }
 
     <span class="kw">fn</span> <span class="ident">into_pipeline_stages</span>(<span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span> {

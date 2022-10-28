@@ -479,12 +479,34 @@
 <span id="479">479</span>
 <span id="480">480</span>
 <span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">error</span>::{<span class="ident">DecorateErrorWithFieldInformationExtension</span>, <span class="ident">MongoError</span>},
     <span class="ident">filter</span>::{<span class="ident">FilterPrefix</span>, <span class="ident">MongoFilter</span>, <span class="ident">MongoFilterVisitor</span>},
-    <span class="ident">logger</span>, <span class="ident">output_meta</span>,
+    <span class="ident">output_meta</span>,
     <span class="ident">query_builder::MongoReadQueryBuilder</span>,
+    <span class="ident">query_strings</span>::{<span class="ident">DeleteMany</span>, <span class="ident">InsertMany</span>, <span class="ident">InsertOne</span>, <span class="ident">UpdateMany</span>, <span class="ident">UpdateOne</span>},
     <span class="ident">root_queries::raw</span>::{<span class="ident">MongoCommand</span>, <span class="ident">MongoOperation</span>},
     <span class="ident">IntoBson</span>,
 };
@@ -544,11 +566,12 @@
         <span class="ident">doc</span>.<span class="ident">insert</span>(<span class="ident">field</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>(), <span class="ident">bson</span>);
     }
 
-    <span class="ident">logger::log_insert_one</span>(<span class="ident">coll</span>.<span class="ident">name</span>(), <span class="kw-2">&amp;</span><span class="ident">doc</span>);
-
-    <span class="kw">let</span> <span class="ident">insert_result</span> <span class="op">=</span> <span class="ident">metrics</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">coll</span>.<span class="ident">insert_one_with_session</span>(<span class="ident">doc</span>, <span class="prelude-val">None</span>, <span class="ident">session</span>))
-        .<span class="ident">instrument</span>(<span class="ident">span</span>)
-        .<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">query_builder</span> <span class="op">=</span> <span class="ident">InsertOne::new</span>(<span class="kw-2">&amp;</span><span class="ident">doc</span>, <span class="ident">coll</span>.<span class="ident">name</span>());
+    <span class="kw">let</span> <span class="ident">insert_result</span> <span class="op">=</span> <span class="ident">observing</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">query_builder</span>), <span class="op">|</span><span class="op">|</span> {
+        <span class="ident">coll</span>.<span class="ident">insert_one_with_session</span>(<span class="kw-2">&amp;</span><span class="ident">doc</span>, <span class="prelude-val">None</span>, <span class="ident">session</span>)
+    })
+    .<span class="ident">instrument</span>(<span class="ident">span</span>)
+    .<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">id_value</span> <span class="op">=</span> <span class="ident">value_from_bson</span>(<span class="ident">insert_result</span>.<span class="ident">inserted_id</span>, <span class="kw-2">&amp;</span><span class="ident">id_meta</span>)<span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(<span class="ident">SelectionResult::from</span>((<span class="ident">id_field</span>, <span class="ident">id_value</span>)))
@@ -598,9 +621,12 @@
     <span class="kw">let</span> <span class="ident">ordered</span> <span class="op">=</span> <span class="op">!</span><span class="ident">skip_duplicates</span>;
     <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">InsertManyOptions::builder</span>().<span class="ident">ordered</span>(<span class="ident">ordered</span>).<span class="ident">build</span>());
 
-    <span class="ident">logger::log_insert_many</span>(<span class="ident">coll</span>.<span class="ident">name</span>(), <span class="kw-2">&amp;</span><span class="ident">docs</span>, <span class="ident">ordered</span>);
-
-    <span class="kw">let</span> <span class="ident">insert</span> <span class="op">=</span> <span class="ident">metrics</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">coll</span>.<span class="ident">insert_many_with_session</span>(<span class="ident">docs</span>, <span class="ident">options</span>, <span class="ident">session</span>)).<span class="ident">instrument</span>(<span class="ident">span</span>);
+    <span class="kw">let</span> <span class="ident">query_string_builder</span> <span class="op">=</span> <span class="ident">InsertMany::new</span>(<span class="kw-2">&amp;</span><span class="ident">docs</span>, <span class="ident">ordered</span>, <span class="ident">coll</span>.<span class="ident">name</span>());
+    <span class="kw">let</span> <span class="ident">docs_iter</span> <span class="op">=</span> <span class="ident">docs</span>.<span class="ident">iter</span>();
+    <span class="kw">let</span> <span class="ident">insert</span> <span class="op">=</span> <span class="ident">observing</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">query_string_builder</span>), <span class="op">|</span><span class="op">|</span> {
+        <span class="ident">coll</span>.<span class="ident">insert_many_with_session</span>(<span class="ident">docs_iter</span>, <span class="ident">options</span>, <span class="ident">session</span>)
+    })
+    .<span class="ident">instrument</span>(<span class="ident">span</span>);
 
     <span class="kw">match</span> <span class="ident">insert</span>.<span class="kw">await</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">insert_result</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">insert_result</span>.<span class="ident">inserted_ids</span>.<span class="ident">len</span>()),
@@ -679,10 +705,12 @@
     }
 
     <span class="kw">if</span> <span class="op">!</span><span class="ident">update_docs</span>.<span class="ident">is_empty</span>() {
-        <span class="ident">logger::log_update_many_vec</span>(<span class="ident">coll</span>.<span class="ident">name</span>(), <span class="kw-2">&amp;</span><span class="ident">filter</span>, <span class="kw-2">&amp;</span><span class="ident">update_docs</span>);
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">metrics</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">coll</span>.<span class="ident">update_many_with_session</span>(<span class="ident">filter</span>, <span class="ident">update_docs</span>, <span class="prelude-val">None</span>, <span class="ident">session</span>))
-            .<span class="ident">instrument</span>(<span class="ident">span</span>)
-            .<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">query_string_builder</span> <span class="op">=</span> <span class="ident">UpdateMany::new</span>(<span class="kw-2">&amp;</span><span class="ident">filter</span>, <span class="kw-2">&amp;</span><span class="ident">update_docs</span>, <span class="ident">coll</span>.<span class="ident">name</span>());
+        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">observing</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">query_string_builder</span>), <span class="op">|</span><span class="op">|</span> {
+            <span class="ident">coll</span>.<span class="ident">update_many_with_session</span>(<span class="ident">filter</span>.<span class="ident">clone</span>(), <span class="ident">update_docs</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>, <span class="ident">session</span>)
+        })
+        .<span class="ident">instrument</span>(<span class="ident">span</span>)
+        .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="ident">update_type</span> <span class="op">==</span> <span class="ident">UpdateType::Many</span> <span class="op">&amp;&amp;</span> <span class="ident">res</span>.<span class="ident">modified_count</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Vec::new</span>());
@@ -736,10 +764,12 @@
     );
 
     <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="macro">doc!</span> { <span class="ident">id_field</span>.<span class="ident">db_name</span>(): { <span class="string">&quot;$in&quot;</span>: <span class="ident">ids</span> } };
-    <span class="ident">logger::log_delete_many</span>(<span class="ident">coll</span>.<span class="ident">name</span>(), <span class="kw-2">&amp;</span><span class="ident">filter</span>);
-    <span class="kw">let</span> <span class="ident">delete_result</span> <span class="op">=</span> <span class="ident">metrics</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">coll</span>.<span class="ident">delete_many_with_session</span>(<span class="ident">filter</span>, <span class="prelude-val">None</span>, <span class="ident">session</span>))
-        .<span class="ident">instrument</span>(<span class="ident">span</span>)
-        .<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">query_string_builder</span> <span class="op">=</span> <span class="ident">DeleteMany::new</span>(<span class="kw-2">&amp;</span><span class="ident">filter</span>, <span class="ident">coll</span>.<span class="ident">name</span>());
+    <span class="kw">let</span> <span class="ident">delete_result</span> <span class="op">=</span> <span class="ident">observing</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">query_string_builder</span>), <span class="op">|</span><span class="op">|</span> {
+        <span class="ident">coll</span>.<span class="ident">delete_many_with_session</span>(<span class="ident">filter</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>, <span class="ident">session</span>)
+    })
+    .<span class="ident">instrument</span>(<span class="ident">span</span>)
+    .<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(<span class="ident">delete_result</span>.<span class="ident">deleted_count</span> <span class="kw">as</span> <span class="ident">usize</span>)
 }
@@ -817,19 +847,24 @@
 
     <span class="kw">let</span> <span class="ident">parent_update</span> <span class="op">=</span> <span class="macro">doc!</span> { <span class="string">&quot;$addToSet&quot;</span>: { <span class="ident">parent_ids_scalar_field_name</span>: { <span class="string">&quot;$each&quot;</span>: <span class="ident">child_ids</span>.<span class="ident">clone</span>() } } };
 
-    <span class="ident">logger::log_update_one</span>(<span class="ident">parent_coll</span>.<span class="ident">name</span>(), <span class="kw-2">&amp;</span><span class="ident">parent_filter</span>, <span class="kw-2">&amp;</span><span class="ident">parent_update</span>);
-    <span class="comment">// First update the parent and add all child IDs to the m:n scalar field.</span>
-    <span class="ident">metrics</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">parent_coll</span>.<span class="ident">update_one_with_session</span>(<span class="ident">parent_filter</span>, <span class="ident">parent_update</span>, <span class="prelude-val">None</span>, <span class="ident">session</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">query_string_builder</span> <span class="op">=</span> <span class="ident">UpdateOne::new</span>(<span class="kw-2">&amp;</span><span class="ident">parent_filter</span>, <span class="kw-2">&amp;</span><span class="ident">parent_update</span>, <span class="ident">parent_coll</span>.<span class="ident">name</span>());
+
+    <span class="ident">observing</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">query_string_builder</span>), <span class="op">|</span><span class="op">|</span> {
+        <span class="ident">parent_coll</span>.<span class="ident">update_one_with_session</span>(<span class="ident">parent_filter</span>.<span class="ident">clone</span>(), <span class="ident">parent_update</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>, <span class="ident">session</span>)
+    })
+    .<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="comment">// Then update all children and add the parent</span>
     <span class="kw">let</span> <span class="ident">child_filter</span> <span class="op">=</span> <span class="macro">doc!</span> { <span class="string">&quot;_id&quot;</span>: { <span class="string">&quot;$in&quot;</span>: <span class="ident">child_ids</span> } };
     <span class="kw">let</span> <span class="ident">child_ids_scalar_field_name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">related_field</span>().<span class="ident">relation_info</span>.<span class="ident">fields</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">unwrap</span>().<span class="ident">clone</span>();
     <span class="kw">let</span> <span class="ident">child_update</span> <span class="op">=</span> <span class="macro">doc!</span> { <span class="string">&quot;$addToSet&quot;</span>: { <span class="ident">child_ids_scalar_field_name</span>: <span class="ident">parent_id</span> } };
 
-    <span class="comment">// this needs work</span>
-    <span class="ident">logger::log_update_many</span>(<span class="ident">child_coll</span>.<span class="ident">name</span>(), <span class="kw-2">&amp;</span><span class="ident">child_filter</span>, <span class="kw-2">&amp;</span><span class="ident">child_update</span>);
-
-    <span class="ident">metrics</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">child_coll</span>.<span class="ident">update_many_with_session</span>(<span class="ident">child_filter</span>, <span class="ident">child_update</span>, <span class="prelude-val">None</span>, <span class="ident">session</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">child_updates</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">child_update</span>.<span class="ident">clone</span>()];
+    <span class="kw">let</span> <span class="ident">query_string_builder</span> <span class="op">=</span> <span class="ident">UpdateMany::new</span>(<span class="kw-2">&amp;</span><span class="ident">child_filter</span>, <span class="kw-2">&amp;</span><span class="ident">child_updates</span>, <span class="ident">child_coll</span>.<span class="ident">name</span>());
+    <span class="ident">observing</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">query_string_builder</span>), <span class="op">|</span><span class="op">|</span> {
+        <span class="ident">child_coll</span>.<span class="ident">update_many_with_session</span>(<span class="ident">child_filter</span>.<span class="ident">clone</span>(), <span class="ident">child_update</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>, <span class="ident">session</span>)
+    })
+    .<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(())
 }
@@ -870,17 +905,24 @@
     <span class="kw">let</span> <span class="ident">parent_update</span> <span class="op">=</span> <span class="macro">doc!</span> { <span class="string">&quot;$pullAll&quot;</span>: { <span class="ident">parent_ids_scalar_field_name</span>: <span class="ident">child_ids</span>.<span class="ident">clone</span>() } };
 
     <span class="comment">// First update the parent and remove all child IDs to the m:n scalar field.</span>
-    <span class="ident">logger::log_update_one</span>(<span class="ident">parent_coll</span>.<span class="ident">name</span>(), <span class="kw-2">&amp;</span><span class="ident">parent_filter</span>, <span class="kw-2">&amp;</span><span class="ident">parent_update</span>);
-    <span class="ident">metrics</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">parent_coll</span>.<span class="ident">update_one_with_session</span>(<span class="ident">parent_filter</span>, <span class="ident">parent_update</span>, <span class="prelude-val">None</span>, <span class="ident">session</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">query_string_builder</span> <span class="op">=</span> <span class="ident">UpdateOne::new</span>(<span class="kw-2">&amp;</span><span class="ident">parent_filter</span>, <span class="kw-2">&amp;</span><span class="ident">parent_update</span>, <span class="ident">parent_coll</span>.<span class="ident">name</span>());
+    <span class="ident">observing</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">query_string_builder</span>), <span class="op">|</span><span class="op">|</span> {
+        <span class="ident">parent_coll</span>.<span class="ident">update_one_with_session</span>(<span class="ident">parent_filter</span>.<span class="ident">clone</span>(), <span class="ident">parent_update</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>, <span class="ident">session</span>)
+    })
+    .<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="comment">// Then update all children and add the parent</span>
     <span class="kw">let</span> <span class="ident">child_filter</span> <span class="op">=</span> <span class="macro">doc!</span> { <span class="string">&quot;_id&quot;</span>: { <span class="string">&quot;$in&quot;</span>: <span class="ident">child_ids</span> } };
     <span class="kw">let</span> <span class="ident">child_ids_scalar_field_name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">related_field</span>().<span class="ident">relation_info</span>.<span class="ident">fields</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">unwrap</span>().<span class="ident">clone</span>();
 
     <span class="kw">let</span> <span class="ident">child_update</span> <span class="op">=</span> <span class="macro">doc!</span> { <span class="string">&quot;$pull&quot;</span>: { <span class="ident">child_ids_scalar_field_name</span>: <span class="ident">parent_id</span> } };
-    <span class="ident">logger::log_update_many</span>(<span class="ident">child_coll</span>.<span class="ident">name</span>(), <span class="kw-2">&amp;</span><span class="ident">child_filter</span>, <span class="kw-2">&amp;</span><span class="ident">child_update</span>);
 
-    <span class="ident">metrics</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">child_coll</span>.<span class="ident">update_many_with_session</span>(<span class="ident">child_filter</span>, <span class="ident">child_update</span>, <span class="prelude-val">None</span>, <span class="ident">session</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">child_updates</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">child_update</span>.<span class="ident">clone</span>()];
+    <span class="kw">let</span> <span class="ident">query_string_builder</span> <span class="op">=</span> <span class="ident">UpdateMany::new</span>(<span class="kw-2">&amp;</span><span class="ident">child_filter</span>, <span class="kw-2">&amp;</span><span class="ident">child_updates</span>, <span class="ident">child_coll</span>.<span class="ident">name</span>());
+    <span class="ident">observing</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">query_string_builder</span>), <span class="op">|</span><span class="op">|</span> {
+        <span class="ident">child_coll</span>.<span class="ident">update_many_with_session</span>(<span class="ident">child_filter</span>.<span class="ident">clone</span>(), <span class="ident">child_update</span>, <span class="prelude-val">None</span>, <span class="ident">session</span>)
+    })
+    .<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(())
 }
@@ -914,7 +956,7 @@
     <span class="kw">async</span> {
         <span class="kw">let</span> <span class="ident">json_result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">mongo_command</span> {
             <span class="ident">MongoCommand::Raw</span> { <span class="ident">cmd</span> } =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">metrics</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">database</span>.<span class="ident">run_command_with_session</span>(<span class="ident">cmd</span>, <span class="prelude-val">None</span>, <span class="ident">session</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">observing</span>(<span class="prelude-val">None</span>, <span class="op">|</span><span class="op">|</span> <span class="ident">database</span>.<span class="ident">run_command_with_session</span>(<span class="ident">cmd</span>, <span class="prelude-val">None</span>, <span class="ident">session</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
 
                 <span class="comment">// Removes unnecessary properties from raw response</span>
                 <span class="comment">// See https://docs.mongodb.com/v5.0/reference/method/db.runCommand</span>
