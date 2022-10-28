@@ -1006,8 +1006,6 @@ fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: Pair<&SqlSchema>)
             let table_name = columns.previous.table().name();
             let column_name = columns.previous.name();
 
-            dbg!("table_name.column_name: {}.{}", &table_name, &column_name);
-
             // default_str_option may still be `None`, e.g. when `column_name` is a list of enum types
             // with the `@default([])` attribute.
             let default_str_option = columns
