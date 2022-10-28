@@ -27,7 +27,7 @@ pub async fn native_upsert(
 
     let insert = create_record(&upsert.model(), upsert.create().clone(), trace_id);
 
-    let constraints: Vec<_> = upsert.unique_constraint().as_columns().collect();
+    let constraints: Vec<_> = upsert.unique_constraints().as_columns().collect();
     let query: Query = insert
         .on_conflict(OnConflict::Update(update, constraints))
         .returning(selected_fields.as_columns())

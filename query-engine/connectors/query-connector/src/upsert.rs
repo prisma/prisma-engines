@@ -49,7 +49,7 @@ impl NativeUpsert {
         &self.create
     }
 
-    pub fn unique_constraint(&self) -> Vec<ScalarFieldRef> {
+    pub fn unique_constraints(&self) -> Vec<ScalarFieldRef> {
         let compound_indexes = self.model.unique_indexes();
         let scalars = self.record_filter.filter.scalars();
         let unique_index = compound_indexes

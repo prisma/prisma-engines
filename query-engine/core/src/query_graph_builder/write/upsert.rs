@@ -57,9 +57,9 @@ pub fn upsert_record(
     model: ModelRef,
     mut field: ParsedField,
 ) -> QueryGraphBuilderResult<()> {
-    let where_argument = field.where_args().unwrap()?;
-    let create_argument = field.create_args().unwrap()?;
-    let update_argument = field.update_args().unwrap()?;
+    let where_argument = field.where_arg()?.unwrap();
+    let create_argument = field.create_arg()?.unwrap();
+    let update_argument = field.update_arg()?.unwrap();
 
     let can_use_native_upsert = can_use_connector_native_upsert(
         &model,
@@ -221,8 +221,7 @@ fn can_use_connector_native_upsert(
         == 1;
 
     let where_values_same_as_create = where_field
-        .clone()
-        .into_iter()
+        .iter()
         .all(|(field_name, input)| where_and_create_equal(&field_name, &input, &create_argument));
 
     connector_ctx.can_native_upsert()

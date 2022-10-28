@@ -98,23 +98,25 @@ pub struct ParsedField {
 }
 
 impl ParsedField {
-    pub fn where_args(&mut self) -> Option<QueryParserResult<ParsedInputMap>> {
+    pub fn where_arg(&mut self) -> QueryParserResult<Option<ParsedInputMap>> {
         self.look_arg("where")
     }
 
-    pub fn create_args(&mut self) -> Option<QueryParserResult<ParsedInputMap>> {
+    pub fn create_arg(&mut self) -> QueryParserResult<Option<ParsedInputMap>> {
         self.look_arg("create")
     }
 
-    pub fn update_args(&mut self) -> Option<QueryParserResult<ParsedInputMap>> {
+    pub fn update_arg(&mut self) -> QueryParserResult<Option<ParsedInputMap>> {
         self.look_arg("update")
     }
 
-    fn look_arg(&mut self, arg_name: &str) -> Option<QueryParserResult<ParsedInputMap>> {
-        self.arguments
-            .lookup(arg_name)
-            .as_ref()
-            .map(|arg| arg.value.clone().try_into())
+    fn look_arg(&mut self, arg_name: &str) -> QueryParserResult<Option<ParsedInputMap>> {
+        Option::transpose(
+            self.arguments
+                .lookup(arg_name)
+                .as_ref()
+                .map(|arg| arg.value.clone().try_into()),
+        )
     }
 }
 
