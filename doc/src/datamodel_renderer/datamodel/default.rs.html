@@ -184,6 +184,12 @@
 <span id="184">184</span>
 <span id="185">185</span>
 <span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
 
 <span class="kw">use</span> <span class="ident">psl::dml</span>;
@@ -205,7 +211,11 @@
     <span class="doccomment">///                         ^^^^ this</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">function</span>(<span class="ident">function</span>: <span class="ident">Function</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">function</span>(<span class="kw-2">mut</span> <span class="ident">function</span>: <span class="ident">Function</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="comment">// Our specialty in default values, empty function params lead to</span>
+        <span class="comment">// parentheses getting rendered unlike elsewhere.</span>
+        <span class="ident">function</span>.<span class="ident">render_empty_parentheses</span>();
+
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">Function::new</span>(<span class="string">&quot;default&quot;</span>);
         <span class="ident">inner</span>.<span class="ident">push_param</span>(<span class="ident">Value::from</span>(<span class="ident">function</span>));
 
@@ -302,7 +312,9 @@
             <span class="ident">dml::DefaultKind::Single</span>(<span class="ident">dml::PrismaValue::Enum</span>(<span class="ident">val</span>)) =&gt; <span class="ident"><span class="self">Self</span>::constant</span>(<span class="ident">val</span>.<span class="ident">as_str</span>()),
             <span class="ident">dml::DefaultKind::Single</span>(<span class="ident">dml::PrismaValue::Int</span>(<span class="ident">val</span>)) =&gt; <span class="ident"><span class="self">Self</span>::constant</span>(<span class="ident">val</span>),
             <span class="ident">dml::DefaultKind::Single</span>(<span class="ident">dml::PrismaValue::Uuid</span>(<span class="ident">val</span>)) =&gt; <span class="ident"><span class="self">Self</span>::constant</span>(<span class="ident">val</span>.<span class="ident">as_hyphenated</span>()),
-            <span class="ident">dml::DefaultKind::Single</span>(<span class="ident">dml::PrismaValue::List</span>(<span class="kw-2">ref</span> <span class="ident">vals</span>)) =&gt; <span class="ident"><span class="self">Self</span>::array</span>(<span class="ident">vals</span>.<span class="ident">iter</span>().<span class="ident">collect</span>()),
+            <span class="ident">dml::DefaultKind::Single</span>(<span class="ident">dml::PrismaValue::List</span>(<span class="kw-2">ref</span> <span class="ident">vals</span>)) =&gt; {
+                <span class="ident"><span class="self">Self</span>::array</span>(<span class="ident">vals</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">Value::from</span>).<span class="ident">collect</span>())
+            }
             <span class="ident">dml::DefaultKind::Single</span>(<span class="ident">dml::PrismaValue::Json</span>(<span class="kw-2">ref</span> <span class="ident">val</span>)) =&gt; <span class="ident"><span class="self">Self</span>::text</span>(<span class="ident">val</span>),
             <span class="ident">dml::DefaultKind::Single</span>(<span class="ident">dml::PrismaValue::Xml</span>(<span class="kw-2">ref</span> <span class="ident">val</span>)) =&gt; <span class="ident"><span class="self">Self</span>::text</span>(<span class="ident">val</span>),
             <span class="ident">dml::DefaultKind::Single</span>(<span class="ident">dml::PrismaValue::Float</span>(<span class="kw-2">ref</span> <span class="ident">val</span>)) =&gt; <span class="ident"><span class="self">Self</span>::constant</span>(<span class="ident">val</span>),
@@ -322,7 +334,7 @@
                     }
                 }
 
-                <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">fun</span>)
+                <span class="ident"><span class="self">Self</span>::function</span>(<span class="ident">fun</span>)
             }
         };
 

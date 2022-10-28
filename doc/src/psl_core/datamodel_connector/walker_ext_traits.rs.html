@@ -159,6 +159,7 @@
 <span id="159">159</span>
 <span id="160">160</span>
 <span id="161">161</span>
+<span id="162">162</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::datamodel_connector</span>::{
     <span class="ident">constraint_names::ConstraintNames</span>, <span class="ident">Connector</span>, <span class="ident">NativeTypeInstance</span>, <span class="ident">ReferentialAction</span>, <span class="ident">RelationMode</span>,
 };
@@ -183,7 +184,8 @@
 
         <span class="kw">let</span> <span class="ident">field_db_names</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">scalar_field_attributes</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">as_mapped_path_to_indexed_field</span>())
+            .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">as_mapped_path_to_indexed_field</span>())
+            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">i</span>)
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_unique</span>() {

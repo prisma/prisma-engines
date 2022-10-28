@@ -46,13 +46,13 @@ var sourcesIndex = JSON.parse('{\
 "crypto_common":["",[],["lib.rs"]],\
 "cuid":["",[],["counter.rs","error.rs","fingerprint.rs","lib.rs","random.rs","text.rs","time.rs"]],\
 "data_encoding":["",[],["lib.rs"]],\
-"datamodel_renderer":["",[["configuration",[],["datasource.rs","generator.rs"]],["datamodel",[["composite_type",[],["field.rs"]]],["attributes.rs","composite_type.rs","default.rs","enumerator.rs"]],["value",[],["array.rs","constant.rs","documentation.rs","env.rs","function.rs","text.rs"]]],["configuration.rs","datamodel.rs","lib.rs","value.rs"]],\
+"datamodel_renderer":["",[["configuration",[],["datasource.rs","generator.rs"]],["datamodel",[["composite_type",[],["field.rs"]],["model",[],["field.rs","id.rs","index.rs","index_field_input.rs","relation.rs"]]],["attributes.rs","composite_type.rs","default.rs","enumerator.rs","field_type.rs","model.rs"]],["value",[],["array.rs","constant.rs","documentation.rs","env.rs","function.rs","text.rs"]]],["configuration.rs","datamodel.rs","lib.rs","value.rs"]],\
 "derivative":["",[],["ast.rs","attr.rs","bound.rs","clone.rs","cmp.rs","debug.rs","default.rs","hash.rs","lib.rs","matcher.rs","paths.rs","utils.rs"]],\
 "diagnostics":["",[],["collection.rs","error.rs","lib.rs","native_type_error_factory.rs","pretty_print.rs","span.rs","warning.rs"]],\
 "difference":["",[],["display.rs","lcs.rs","lib.rs","merge.rs"]],\
 "digest":["",[["core_api",[],["ct_variable.rs","rt_variable.rs","wrapper.rs","xof_reader.rs"]]],["core_api.rs","digest.rs","lib.rs","mac.rs"]],\
 "dissimilar":["",[],["find.rs","lib.rs","range.rs"]],\
-"dml":["",[["render",[],["render_datamodel.rs"]]],["composite_type.rs","datamodel.rs","default_value.rs","enum.rs","field.rs","lib.rs","lift.rs","model.rs","native_type_instance.rs","relation_info.rs","render.rs","scalars.rs","traits.rs"]],\
+"dml":["",[],["composite_type.rs","datamodel.rs","default_value.rs","enum.rs","field.rs","lib.rs","lift.rs","model.rs","native_type_instance.rs","relation_info.rs","scalars.rs","traits.rs"]],\
 "dmmf":["",[["ast_builders",[["schema_ast_builder",[],["enum_renderer.rs","field_renderer.rs","mod.rs","object_renderer.rs","schema_renderer.rs","type_renderer.rs"]]],["datamodel_ast_builder.rs","mod.rs"]],["serialization_ast",[],["datamodel_ast.rs","mappings_ast.rs","mod.rs","schema_ast.rs"]]],["lib.rs"]],\
 "either":["",[],["lib.rs"]],\
 "encoding":["",[["codec",[],["ascii.rs","error.rs","japanese.rs","korean.rs","simpchinese.rs","singlebyte.rs","tradchinese.rs","utf_16.rs","utf_8.rs","whatwg.rs"]]],["all.rs","label.rs","lib.rs","types.rs","util.rs"]],\

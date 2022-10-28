@@ -338,6 +338,11 @@
 <span id="338">338</span>
 <span id="339">339</span>
 <span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">postgres</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -352,6 +357,7 @@
 <span class="kw">use</span> <span class="ident">datamodel_renderer</span> <span class="kw">as</span> <span class="ident">render</span>;
 <span class="kw">use</span> <span class="ident">introspection_connector::Version</span>;
 <span class="kw">use</span> <span class="ident">psl</span>::{
+    <span class="ident">datamodel_connector::constraint_names::ConstraintNames</span>,
     <span class="ident">dml</span>::{<span class="self">self</span>, <span class="ident">Datamodel</span>, <span class="ident">Field</span>, <span class="ident">Model</span>, <span class="ident">PrimaryKeyDefinition</span>, <span class="ident">PrimaryKeyField</span>, <span class="ident">RelationField</span>, <span class="ident">SortOrder</span>},
     <span class="ident">parser_database</span>::{<span class="ident">ast</span>, <span class="ident">walkers</span>},
     <span class="ident">Configuration</span>,
@@ -431,9 +437,8 @@
     };
 
     <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="macro">format!</span>(
-        <span class="string">&quot;{}\n{}\n{}&quot;</span>,
+        <span class="string">&quot;{}\n{}&quot;</span>,
         <span class="ident">config</span>,
-        <span class="ident">psl::render_datamodel_to_string</span>(<span class="kw-2">&amp;</span><span class="ident">datamodel</span>, <span class="prelude-val">Some</span>(<span class="ident">ctx</span>.<span class="ident">config</span>)),
         <span class="ident">render::Datamodel::from_dml</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">config</span>.<span class="ident">datasources</span>[<span class="number">0</span>], <span class="kw-2">&amp;</span><span class="ident">datamodel</span>),
     );
 
@@ -613,10 +618,7 @@
             .<span class="ident">foreign_keys</span>()
             .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">fk</span><span class="op">|</span> <span class="op">!</span><span class="ident">duplicated_foreign_keys</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">fk</span>.<span class="ident">id</span>))
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">relation_field</span> <span class="op">=</span> <span class="ident">calculate_relation_field</span>(<span class="ident">foreign_key</span>, <span class="kw-2">&amp;</span><span class="ident">m2m_tables</span>, <span class="kw-2">&amp;</span><span class="ident">duplicated_foreign_keys</span>);
-
-            <span class="ident">relation_field</span>.<span class="ident">supports_restrict_action</span>(<span class="op">!</span><span class="ident">ctx</span>.<span class="ident">sql_family</span>().<span class="ident">is_mssql</span>());
-
+            <span class="kw">let</span> <span class="ident">relation_field</span> <span class="op">=</span> <span class="ident">calculate_relation_field</span>(<span class="ident">ctx</span>, <span class="ident">foreign_key</span>, <span class="kw-2">&amp;</span><span class="ident">m2m_tables</span>, <span class="kw-2">&amp;</span><span class="ident">duplicated_foreign_keys</span>);
             <span class="ident">model</span>.<span class="ident">add_field</span>(<span class="ident">Field::RelationField</span>(<span class="ident">relation_field</span>));
         }
 
@@ -629,15 +631,23 @@
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="op">=</span> <span class="ident">table</span>.<span class="ident">primary_key</span>() {
             <span class="kw">let</span> <span class="ident">clustered</span> <span class="op">=</span> <span class="ident">primary_key_is_clustered</span>(<span class="ident">pk</span>.<span class="ident">id</span>, <span class="ident">ctx</span>);
 
+            <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">pk</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">ConstraintNames::primary_key_name</span>(<span class="ident">table</span>.<span class="ident">name</span>(), <span class="ident">ctx</span>.<span class="ident">active_connector</span>())
+                <span class="op">|</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">name</span>().<span class="ident">is_empty</span>()
+            {
+                <span class="prelude-val">None</span>
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">pk</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>())
+            };
+
             <span class="ident">model</span>.<span class="ident">primary_key</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">PrimaryKeyDefinition</span> {
                 <span class="ident">name</span>: <span class="prelude-val">None</span>,
-                <span class="ident">db_name</span>: <span class="prelude-val">Some</span>(<span class="ident">pk</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>()),
+                <span class="ident">db_name</span>,
                 <span class="ident">fields</span>: <span class="ident">pk</span>
                     .<span class="ident">columns</span>()
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> {
-                        <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">sort_order</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">sort</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">sort</span> {
-                            <span class="ident">SQLSortOrder::Asc</span> =&gt; <span class="ident">SortOrder::Asc</span>,
-                            <span class="ident">SQLSortOrder::Desc</span> =&gt; <span class="ident">SortOrder::Desc</span>,
+                        <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">sort_order</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">sort</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">sort</span> {
+                            <span class="ident">SQLSortOrder::Asc</span> =&gt; <span class="prelude-val">None</span>,
+                            <span class="ident">SQLSortOrder::Desc</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">SortOrder::Desc</span>),
                         });
 
                         <span class="ident">PrimaryKeyField</span> {

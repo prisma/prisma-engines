@@ -118,6 +118,61 @@
 <span id="118">118</span>
 <span id="119">119</span>
 <span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Types related to the _datamodel section_ in the PSL.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Includes the `model`, `enum` and `type` definitions.</span>
@@ -126,16 +181,24 @@
 <span class="kw">mod</span> <span class="ident">composite_type</span>;
 <span class="kw">mod</span> <span class="ident">default</span>;
 <span class="kw">mod</span> <span class="ident">enumerator</span>;
+<span class="kw">mod</span> <span class="ident">field_type</span>;
+<span class="kw">mod</span> <span class="ident">model</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">composite_type</span>::{<span class="ident">CompositeType</span>, <span class="ident">CompositeTypeField</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">default::DefaultValue</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">enumerator</span>::{<span class="ident">Enum</span>, <span class="ident">EnumVariant</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">field_type::FieldType</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">model</span>::{
+    <span class="ident">IdDefinition</span>, <span class="ident">IdFieldDefinition</span>, <span class="ident">IndexDefinition</span>, <span class="ident">IndexFieldInput</span>, <span class="ident">IndexFieldOptions</span>, <span class="ident">IndexOps</span>, <span class="ident">Model</span>, <span class="ident">ModelField</span>,
+    <span class="ident">Relation</span>,
+};
 <span class="kw">use</span> <span class="ident">psl::dml</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 
 <span class="doccomment">/// The PSL data model declaration.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Datamodel</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="ident">models</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Model</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">enums</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Enum</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">composite_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CompositeType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
@@ -144,6 +207,17 @@
     <span class="doccomment">/// Create a new empty data model.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::default</span>()
+    }
+
+    <span class="doccomment">/// Add a model block to the data model.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```ignore</span>
+    <span class="doccomment">/// model Foo {  // &lt;</span>
+    <span class="doccomment">///   id Int @id // &lt; this</span>
+    <span class="doccomment">/// }            // &lt;</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_model</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">model</span>: <span class="ident">Model</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) {
+        <span class="self">self</span>.<span class="ident">models</span>.<span class="ident">push</span>(<span class="ident">model</span>);
     }
 
     <span class="doccomment">/// Add an enum block to the data model.</span>
@@ -164,8 +238,8 @@
     <span class="doccomment">///   street String // &lt; this</span>
     <span class="doccomment">/// }               // &lt;</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_composite_type</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">r#enum</span>: <span class="ident">CompositeType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">composite_types</span>.<span class="ident">push</span>(<span class="ident">r#enum</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_composite_type</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">composite_type</span>: <span class="ident">CompositeType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) {
+        <span class="self">self</span>.<span class="ident">composite_types</span>.<span class="ident">push</span>(<span class="ident">composite_type</span>);
     }
 
     <span class="doccomment">/// A throwaway function to help generate a rendering from the DML structures.</span>
@@ -174,8 +248,12 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_dml</span>(<span class="ident">datasource</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">psl::Datasource</span>, <span class="ident">dml_data_model</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">dml::Datamodel</span>) -&gt; <span class="ident">Datamodel</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data_model</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>();
 
+        <span class="kw">for</span> <span class="ident">dml_model</span> <span class="kw">in</span> <span class="ident">dml_data_model</span>.<span class="ident">models</span>() {
+            <span class="ident">data_model</span>.<span class="ident">push_model</span>(<span class="ident">Model::from_dml</span>(<span class="ident">datasource</span>, <span class="ident">dml_model</span>));
+        }
+
         <span class="kw">for</span> <span class="ident">dml_ct</span> <span class="kw">in</span> <span class="ident">dml_data_model</span>.<span class="ident">composite_types</span>() {
-            <span class="ident">data_model</span>.<span class="ident">push_composite_type</span>(<span class="ident">CompositeType::from_dml</span>(<span class="ident">datasource</span>, <span class="ident">dml_ct</span>))
+            <span class="ident">data_model</span>.<span class="ident">push_composite_type</span>(<span class="ident">CompositeType::from_dml</span>(<span class="ident">datasource</span>, <span class="ident">dml_ct</span>));
         }
 
         <span class="kw">for</span> <span class="ident">dml_enum</span> <span class="kw">in</span> <span class="ident">dml_data_model</span>.<span class="ident">enums</span>() {
@@ -192,6 +270,10 @@
             <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;{ct}&quot;</span>)<span class="question-mark">?</span>;
         }
 
+        <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">models</span>.<span class="ident">iter</span>() {
+            <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;{model}&quot;</span>)<span class="question-mark">?</span>;
+        }
+
         <span class="kw">for</span> <span class="ident">r#enum</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">enums</span>.<span class="ident">iter</span>() {
             <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;{enum}&quot;</span>)<span class="question-mark">?</span>;
         }
@@ -202,11 +284,32 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::value::Function</span>;
+
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
     <span class="kw">use</span> <span class="ident">expect_test::expect</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">simple_data_model</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data_model</span> <span class="op">=</span> <span class="ident">Datamodel::new</span>();
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">composite</span> <span class="op">=</span> <span class="ident">CompositeType::new</span>(<span class="string">&quot;Address&quot;</span>);
+        <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">CompositeTypeField::new_required</span>(<span class="string">&quot;street&quot;</span>, <span class="string">&quot;String&quot;</span>);
+        <span class="ident">composite</span>.<span class="ident">push_field</span>(<span class="ident">field</span>);
+
+        <span class="ident">data_model</span>.<span class="ident">push_composite_type</span>(<span class="ident">composite</span>);
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">Model::new</span>(<span class="string">&quot;User&quot;</span>);
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">ModelField::new_required</span>(<span class="string">&quot;id&quot;</span>, <span class="string">&quot;Int&quot;</span>);
+        <span class="ident">field</span>.<span class="ident">id</span>(<span class="ident">IdFieldDefinition::default</span>());
+
+        <span class="kw">let</span> <span class="ident">dv</span> <span class="op">=</span> <span class="ident">DefaultValue::function</span>(<span class="ident">Function::new</span>(<span class="string">&quot;autoincrement&quot;</span>));
+        <span class="ident">field</span>.<span class="ident">default</span>(<span class="ident">dv</span>);
+
+        <span class="ident">model</span>.<span class="ident">push_field</span>(<span class="ident">field</span>);
+        <span class="ident">data_model</span>.<span class="ident">push_model</span>(<span class="ident">model</span>);
+
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">traffic_light</span> <span class="op">=</span> <span class="ident">Enum::new</span>(<span class="string">&quot;TrafficLight&quot;</span>);
 
         <span class="ident">traffic_light</span>.<span class="ident">push_variant</span>(<span class="string">&quot;Red&quot;</span>);
@@ -217,11 +320,18 @@
         <span class="ident">cat</span>.<span class="ident">push_variant</span>(<span class="string">&quot;Asleep&quot;</span>);
         <span class="ident">cat</span>.<span class="ident">push_variant</span>(<span class="string">&quot;Hungry&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data_model</span> <span class="op">=</span> <span class="ident">Datamodel::new</span>();
         <span class="ident">data_model</span>.<span class="ident">push_enum</span>(<span class="ident">traffic_light</span>);
         <span class="ident">data_model</span>.<span class="ident">push_enum</span>(<span class="ident">cat</span>);
 
         <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">expect!</span>[[<span class="string">r#&quot;
+            type Address {
+              street String
+            }
+
+            model User {
+              id Int @id @default(autoincrement())
+            }
+
             enum TrafficLight {
               Red
               Yellow

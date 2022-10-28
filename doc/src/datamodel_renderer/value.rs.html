@@ -105,6 +105,27 @@
 <span id="105">105</span>
 <span id="106">106</span>
 <span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Common types needed in the configuration and datamodel.</span>
 
 <span class="kw">mod</span> <span class="ident">array</span>;
@@ -124,6 +145,8 @@
 <span class="kw">use</span> <span class="ident">base64::display::Base64Display</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::datamodel::IndexOps</span>;
+
 <span class="doccomment">/// A PSL value representation.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// A string value, quoted and escaped accordingly.</span>
@@ -138,6 +161,8 @@
     <span class="ident">Function</span>(<span class="ident">Function</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
     <span class="doccomment">/// A value can be read from the environment.</span>
     <span class="ident">Env</span>(<span class="ident">Env</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
+    <span class="doccomment">/// An index ops definition.</span>
+    <span class="ident">IndexOps</span>(<span class="ident">IndexOps</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
@@ -151,7 +176,23 @@
             <span class="ident">Value::Function</span>(<span class="ident">fun</span>) =&gt; <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;Function&quot;</span>).<span class="ident">field</span>(<span class="ident">fun</span>).<span class="ident">finish</span>(),
             <span class="ident">Value::Env</span>(<span class="ident">e</span>) =&gt; <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;Env&quot;</span>).<span class="ident">field</span>(<span class="ident">e</span>).<span class="ident">finish</span>(),
             <span class="ident">Value::Bytes</span>(<span class="ident">Text</span>(<span class="ident">b</span>)) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Bytes({b})&quot;</span>),
+            <span class="ident">Value::IndexOps</span>(<span class="ident">ops</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;IndexOps({ops})&quot;</span>),
         }
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">IndexOps</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">ops</span>: <span class="ident">IndexOps</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::IndexOps</span>(<span class="ident">ops</span>)
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Constant</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">T</span>: <span class="ident">fmt::Display</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
+{
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">c</span>: <span class="ident">Constant</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::Constant</span>(<span class="ident">c</span>.<span class="ident">boxed</span>())
     }
 }
 
@@ -207,6 +248,7 @@
             <span class="ident">Value::Bytes</span>(<span class="ident">val</span>) =&gt; {
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{val}&quot;</span>)<span class="question-mark">?</span>;
             }
+            <span class="ident">Value::IndexOps</span>(<span class="ident">ops</span>) =&gt; <span class="ident">ops</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)<span class="question-mark">?</span>,
         }
 
         <span class="prelude-val">Ok</span>(())

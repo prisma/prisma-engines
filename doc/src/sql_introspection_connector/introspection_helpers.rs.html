@@ -560,13 +560,102 @@
 <span id="560">560</span>
 <span id="561">561</span>
 <span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
+<span id="631">631</span>
+<span id="632">632</span>
+<span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
+<span id="650">650</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">calculate_datamodel::CalculateDatamodelContext</span> <span class="kw">as</span> <span class="ident">Context</span>, <span class="ident">SqlError</span>, <span class="ident">SqlFamilyTrait</span>};
 <span class="kw">use</span> <span class="ident">psl</span>::{
+    <span class="ident">datamodel_connector::constraint_names::ConstraintNames</span>,
     <span class="ident">dml</span>::{
         <span class="ident">Datamodel</span>, <span class="ident">FieldArity</span>, <span class="ident">FieldType</span>, <span class="ident">IndexAlgorithm</span>, <span class="ident">IndexDefinition</span>, <span class="ident">IndexField</span>, <span class="ident">Model</span>, <span class="ident">OperatorClass</span>,
         <span class="ident">PrimaryKeyField</span>, <span class="ident">ReferentialAction</span>, <span class="ident">RelationField</span>, <span class="ident">RelationInfo</span>, <span class="ident">ScalarField</span>, <span class="ident">ScalarType</span>, <span class="ident">SortOrder</span>,
     },
-    <span class="ident">PreviewFeature</span>, <span class="ident">RelationNames</span>,
+    <span class="ident">parser_database</span> <span class="kw">as</span> <span class="ident">db</span>, <span class="ident">PreviewFeature</span>, <span class="ident">RelationNames</span>,
 };
 <span class="kw">use</span> <span class="ident">sql::walkers</span>::{<span class="ident">ColumnWalker</span>, <span class="ident">ForeignKeyWalker</span>, <span class="ident">TableWalker</span>};
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
@@ -736,6 +825,23 @@
         <span class="ident">IndexType::PrimaryKey</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
     };
 
+    <span class="kw">let</span> <span class="ident">default_constraint_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">index</span>.<span class="ident">index_type</span>() {
+        <span class="ident">IndexType::Unique</span> =&gt; {
+            <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">column_names</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+            <span class="ident">ConstraintNames::unique_index_name</span>(<span class="ident">index</span>.<span class="ident">table</span>().<span class="ident">name</span>(), <span class="kw-2">&amp;</span><span class="ident">columns</span>, <span class="ident">ctx</span>.<span class="ident">active_connector</span>())
+        }
+        <span class="kw">_</span> =&gt; {
+            <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">column_names</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+            <span class="ident">ConstraintNames::non_unique_index_name</span>(<span class="ident">index</span>.<span class="ident">table</span>().<span class="ident">name</span>(), <span class="kw-2">&amp;</span><span class="ident">columns</span>, <span class="ident">ctx</span>.<span class="ident">active_connector</span>())
+        }
+    };
+
+    <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">index</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">default_constraint_name</span> {
+        <span class="prelude-val">None</span>
+    } <span class="kw">else</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">index</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>())
+    };
+
     <span class="comment">// We do not populate name in client by default. It increases datamodel noise, and we would</span>
     <span class="comment">// need to sanitize it. Users can give their own names if they want and re-introspection will</span>
     <span class="comment">// keep them. This is a change in introspection behaviour, but due to re-introspection previous</span>
@@ -743,13 +849,13 @@
 
     <span class="prelude-val">Some</span>(<span class="ident">IndexDefinition</span> {
         <span class="ident">name</span>: <span class="prelude-val">None</span>,
-        <span class="ident">db_name</span>: <span class="prelude-val">Some</span>(<span class="ident">index</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>()),
+        <span class="ident">db_name</span>,
         <span class="ident">fields</span>: <span class="ident">index</span>
             .<span class="ident">columns</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">sort_order</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">sort</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">sort</span> {
-                    <span class="ident">SQLSortOrder::Asc</span> =&gt; <span class="ident">SortOrder::Asc</span>,
-                    <span class="ident">SQLSortOrder::Desc</span> =&gt; <span class="ident">SortOrder::Desc</span>,
+                <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">sort_order</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">sort</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">sort</span> {
+                    <span class="ident">SQLSortOrder::Asc</span> =&gt; <span class="prelude-val">None</span>,
+                    <span class="ident">SQLSortOrder::Desc</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">SortOrder::Desc</span>),
                 });
 
                 <span class="kw">let</span> <span class="ident">operator_class</span> <span class="op">=</span> <span class="ident">get_opclass</span>(<span class="ident">c</span>.<span class="ident">id</span>, <span class="ident">index</span>.<span class="ident">schema</span>, <span class="ident">ctx</span>);
@@ -777,12 +883,23 @@
         <span class="ident">ColumnArity::List</span> =&gt; <span class="ident">FieldArity::List</span>,
     };
 
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">default_value</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::defaults::calculate_default</span>(<span class="ident">column</span>, <span class="ident">ctx</span>);
+
+    <span class="kw">let</span> <span class="ident">default_default_value</span> <span class="op">=</span>
+        <span class="ident">ConstraintNames::default_name</span>(<span class="ident">column</span>.<span class="ident">table</span>().<span class="ident">name</span>(), <span class="ident">column</span>.<span class="ident">name</span>(), <span class="ident">ctx</span>.<span class="ident">active_connector</span>());
+
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">default_value</span>) <span class="op">=</span> <span class="ident">default_value</span> {
+        <span class="kw">if</span> <span class="ident">default_value</span>.<span class="ident">db_name</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">default_default_value</span>) {
+            <span class="ident">default_value</span>.<span class="ident">db_name</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+        }
+    }
+
     <span class="ident">ScalarField</span> {
         <span class="ident">name</span>: <span class="ident">column</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
         <span class="ident">arity</span>,
         <span class="ident">field_type</span>: <span class="ident">calculate_scalar_field_type_with_native_types</span>(<span class="ident">column</span>, <span class="ident">ctx</span>),
         <span class="ident">database_name</span>: <span class="prelude-val">None</span>,
-        <span class="ident">default_value</span>: <span class="ident"><span class="kw">crate</span>::defaults::calculate_default</span>(<span class="ident">column</span>, <span class="ident">ctx</span>),
+        <span class="ident">default_value</span>,
         <span class="ident">documentation</span>: <span class="prelude-val">None</span>,
         <span class="ident">is_generated</span>: <span class="bool-val">false</span>,
         <span class="ident">is_updated_at</span>: <span class="bool-val">false</span>,
@@ -792,6 +909,7 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_relation_field</span>(
+    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>,
     <span class="ident">foreign_key</span>: <span class="ident">ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     <span class="ident">m2m_table_names</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>],
     <span class="ident">duplicated_foreign_keys</span>: <span class="kw-2">&amp;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">sql::ForeignKeyId</span><span class="op">&gt;</span>,
@@ -806,14 +924,25 @@
         <span class="ident">ForeignKeyAction::SetDefault</span> =&gt; <span class="ident">ReferentialAction::SetDefault</span>,
     };
 
+    <span class="kw">let</span> <span class="ident">cols</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">foreign_key</span>.<span class="ident">constrained_columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>()).<span class="ident">collect</span>();
+    <span class="kw">let</span> <span class="ident">default_constraint_name</span> <span class="op">=</span>
+        <span class="ident">ConstraintNames::foreign_key_constraint_name</span>(<span class="ident">foreign_key</span>.<span class="ident">table</span>().<span class="ident">name</span>(), <span class="kw-2">&amp;</span><span class="ident">cols</span>, <span class="ident">ctx</span>.<span class="ident">active_connector</span>());
+
+    <span class="comment">// destroy this when removing dml</span>
+    <span class="kw">let</span> <span class="ident">fk_name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">foreign_key</span>.<span class="ident">constraint_name</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">default_constraint_name</span>.<span class="ident">as_str</span>()) {
+        <span class="prelude-val">None</span>
+    } <span class="kw">else</span> {
+        <span class="ident">foreign_key</span>.<span class="ident">constraint_name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>)
+    };
+
     <span class="kw">let</span> <span class="ident">relation_info</span> <span class="op">=</span> <span class="ident">RelationInfo</span> {
         <span class="ident">name</span>: <span class="ident">calculate_relation_name</span>(<span class="ident">foreign_key</span>, <span class="ident">m2m_table_names</span>, <span class="ident">duplicated_foreign_keys</span>),
-        <span class="ident">fk_name</span>: <span class="ident">foreign_key</span>.<span class="ident">constraint_name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>),
+        <span class="ident">fk_name</span>,
         <span class="ident">fields</span>: <span class="ident">foreign_key</span>.<span class="ident">constrained_columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>()).<span class="ident">collect</span>(),
         <span class="ident">referenced_model</span>: <span class="ident">foreign_key</span>.<span class="ident">referenced_table</span>().<span class="ident">name</span>().<span class="ident">to_owned</span>(),
         <span class="ident">references</span>: <span class="ident">foreign_key</span>.<span class="ident">referenced_columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>()).<span class="ident">collect</span>(),
-        <span class="ident">on_delete</span>: <span class="prelude-val">Some</span>(<span class="ident">map_action</span>(<span class="ident">foreign_key</span>.<span class="ident">on_delete_action</span>())),
-        <span class="ident">on_update</span>: <span class="prelude-val">Some</span>(<span class="ident">map_action</span>(<span class="ident">foreign_key</span>.<span class="ident">on_update_action</span>())),
+        <span class="ident">on_delete</span>: <span class="prelude-val">None</span>,
+        <span class="ident">on_update</span>: <span class="prelude-val">None</span>,
     };
 
     <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">foreign_key</span>.<span class="ident">constrained_columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="op">!</span><span class="ident">c</span>.<span class="ident">arity</span>().<span class="ident">is_required</span>()) {
@@ -826,12 +955,27 @@
         <span class="bool-val">false</span> =&gt; <span class="ident">arity</span>,
     };
 
-    <span class="ident">RelationField::new</span>(
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rf</span> <span class="op">=</span> <span class="ident">RelationField::new</span>(
         <span class="ident">foreign_key</span>.<span class="ident">referenced_table</span>().<span class="ident">name</span>(),
         <span class="ident">arity</span>,
         <span class="ident">calculated_arity</span>,
         <span class="ident">relation_info</span>,
-    )
+    );
+
+    <span class="ident">rf</span>.<span class="ident">supports_restrict_action</span>(<span class="op">!</span><span class="ident">ctx</span>.<span class="ident">sql_family</span>().<span class="ident">is_mssql</span>());
+
+    <span class="kw">let</span> <span class="ident">on_delete</span> <span class="op">=</span> <span class="ident">map_action</span>(<span class="ident">foreign_key</span>.<span class="ident">on_delete_action</span>());
+    <span class="kw">let</span> <span class="ident">on_update</span> <span class="op">=</span> <span class="ident">map_action</span>(<span class="ident">foreign_key</span>.<span class="ident">on_update_action</span>());
+
+    <span class="kw">if</span> <span class="ident">rf</span>.<span class="ident">default_on_delete_action</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">on_delete</span> {
+        <span class="ident">rf</span>.<span class="ident">relation_info</span>.<span class="ident">on_delete</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">on_delete</span>);
+    }
+
+    <span class="kw">if</span> <span class="ident">rf</span>.<span class="ident">default_on_update_action</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">on_update</span> {
+        <span class="ident">rf</span>.<span class="ident">relation_info</span>.<span class="ident">on_update</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">on_update</span>);
+    }
+
+    <span class="ident">rf</span>
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_backrelation_field</span>(
@@ -949,15 +1093,36 @@
     <span class="kw">match</span> <span class="ident">scalar_type</span> {
         <span class="ident">FieldType::Scalar</span>(<span class="ident">scal_type</span>, <span class="kw">_</span>) =&gt; <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">column</span>.<span class="ident">column_type</span>().<span class="ident">native_type</span> {
             <span class="prelude-val">None</span> =&gt; <span class="ident">scalar_type</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">native_type</span>) =&gt; <span class="ident">FieldType::Scalar</span>(
-                <span class="ident">scal_type</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">psl::dml::NativeTypeInstance::new</span>(
-                    <span class="ident">native_type</span>.<span class="ident">clone</span>(),
-                    <span class="ident">ctx</span>.<span class="ident">active_connector</span>(),
-                )),
-            ),
+            <span class="prelude-val">Some</span>(<span class="ident">native_type</span>) =&gt; {
+                <span class="kw">let</span> <span class="ident">is_default</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">active_connector</span>().<span class="ident">native_type_is_default_for_scalar_type</span>(
+                    <span class="ident">native_type</span>,
+                    <span class="kw-2">&amp;</span><span class="ident">dml_scalar_type_to_parser_database_scalar_type</span>(<span class="ident">scal_type</span>),
+                );
+
+                <span class="kw">if</span> <span class="ident">is_default</span> {
+                    <span class="ident">FieldType::Scalar</span>(<span class="ident">scal_type</span>, <span class="prelude-val">None</span>)
+                } <span class="kw">else</span> {
+                    <span class="kw">let</span> <span class="ident">instance</span> <span class="op">=</span> <span class="ident">psl::dml::NativeTypeInstance::new</span>(<span class="ident">native_type</span>.<span class="ident">clone</span>(), <span class="ident">ctx</span>.<span class="ident">active_connector</span>());
+
+                    <span class="ident">FieldType::Scalar</span>(<span class="ident">scal_type</span>, <span class="prelude-val">Some</span>(<span class="ident">instance</span>))
+                }
+            }
         },
         <span class="ident">field_type</span> =&gt; <span class="ident">field_type</span>,
+    }
+}
+
+<span class="kw">fn</span> <span class="ident">dml_scalar_type_to_parser_database_scalar_type</span>(<span class="ident">st</span>: <span class="ident">ScalarType</span>) -&gt; <span class="ident">db::ScalarType</span> {
+    <span class="kw">match</span> <span class="ident">st</span> {
+        <span class="ident">ScalarType::Int</span> =&gt; <span class="ident">db::ScalarType::Int</span>,
+        <span class="ident">ScalarType::BigInt</span> =&gt; <span class="ident">db::ScalarType::BigInt</span>,
+        <span class="ident">ScalarType::Float</span> =&gt; <span class="ident">db::ScalarType::Float</span>,
+        <span class="ident">ScalarType::Boolean</span> =&gt; <span class="ident">db::ScalarType::Boolean</span>,
+        <span class="ident">ScalarType::String</span> =&gt; <span class="ident">db::ScalarType::String</span>,
+        <span class="ident">ScalarType::DateTime</span> =&gt; <span class="ident">db::ScalarType::DateTime</span>,
+        <span class="ident">ScalarType::Json</span> =&gt; <span class="ident">db::ScalarType::Json</span>,
+        <span class="ident">ScalarType::Bytes</span> =&gt; <span class="ident">db::ScalarType::Bytes</span>,
+        <span class="ident">ScalarType::Decimal</span> =&gt; <span class="ident">db::ScalarType::Decimal</span>,
     }
 }
 
@@ -1017,14 +1182,14 @@
 
     <span class="kw">let</span> <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
 
-    <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">data</span>.<span class="ident">index_algorithm</span>(<span class="ident">index</span>.<span class="ident">id</span>) {
-        <span class="ident">sql::postgres::SqlIndexAlgorithm::BTree</span> =&gt; <span class="ident">IndexAlgorithm::BTree</span>,
-        <span class="ident">sql::postgres::SqlIndexAlgorithm::Hash</span> =&gt; <span class="ident">IndexAlgorithm::Hash</span>,
-        <span class="ident">sql::postgres::SqlIndexAlgorithm::Gist</span> =&gt; <span class="ident">IndexAlgorithm::Gist</span>,
-        <span class="ident">sql::postgres::SqlIndexAlgorithm::Gin</span> =&gt; <span class="ident">IndexAlgorithm::Gin</span>,
-        <span class="ident">sql::postgres::SqlIndexAlgorithm::SpGist</span> =&gt; <span class="ident">IndexAlgorithm::SpGist</span>,
-        <span class="ident">sql::postgres::SqlIndexAlgorithm::Brin</span> =&gt; <span class="ident">IndexAlgorithm::Brin</span>,
-    })
+    <span class="kw">match</span> <span class="ident">data</span>.<span class="ident">index_algorithm</span>(<span class="ident">index</span>.<span class="ident">id</span>) {
+        <span class="ident">sql::postgres::SqlIndexAlgorithm::BTree</span> =&gt; <span class="prelude-val">None</span>,
+        <span class="ident">sql::postgres::SqlIndexAlgorithm::Hash</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::Hash</span>),
+        <span class="ident">sql::postgres::SqlIndexAlgorithm::Gist</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::Gist</span>),
+        <span class="ident">sql::postgres::SqlIndexAlgorithm::Gin</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::Gin</span>),
+        <span class="ident">sql::postgres::SqlIndexAlgorithm::SpGist</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::SpGist</span>),
+        <span class="ident">sql::postgres::SqlIndexAlgorithm::Brin</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::Brin</span>),
+    }
 }
 
 <span class="kw">fn</span> <span class="ident">index_is_clustered</span>(<span class="ident">index_id</span>: <span class="ident">sql::IndexId</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">SqlSchema</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
@@ -1033,8 +1198,13 @@
     }
 
     <span class="kw">let</span> <span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="ident">MssqlSchemaExt</span> <span class="op">=</span> <span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
+    <span class="kw">let</span> <span class="ident">clustered</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">index_is_clustered</span>(<span class="ident">index_id</span>);
 
-    <span class="prelude-val">Some</span>(<span class="ident">ext</span>.<span class="ident">index_is_clustered</span>(<span class="ident">index_id</span>))
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">clustered</span> {
+        <span class="kw">return</span> <span class="prelude-val">None</span>;
+    }
+
+    <span class="prelude-val">Some</span>(<span class="ident">clustered</span>)
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">primary_key_is_clustered</span>(<span class="ident">pkid</span>: <span class="ident">sql::IndexId</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
@@ -1044,7 +1214,13 @@
 
     <span class="kw">let</span> <span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="ident">MssqlSchemaExt</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
 
-    <span class="prelude-val">Some</span>(<span class="ident">ext</span>.<span class="ident">index_is_clustered</span>(<span class="ident">pkid</span>))
+    <span class="kw">let</span> <span class="ident">clustered</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">index_is_clustered</span>(<span class="ident">pkid</span>);
+
+    <span class="kw">if</span> <span class="ident">clustered</span> {
+        <span class="kw">return</span> <span class="prelude-val">None</span>;
+    }
+
+    <span class="prelude-val">Some</span>(<span class="ident">clustered</span>)
 }
 
 <span class="kw">fn</span> <span class="ident">get_opclass</span>(<span class="ident">index_field_id</span>: <span class="ident">sql::IndexColumnId</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">SqlSchema</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OperatorClass</span><span class="op">&gt;</span> {
