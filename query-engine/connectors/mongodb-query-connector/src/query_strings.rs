@@ -1,8 +1,9 @@
 //! query_strings provides types to build strings representing textual mongodb queries from driver
-//! types such as Document. These are used for logging / debugging purposes mainly, and are generated
-//! lazily.
-//! There is a struct fro each different type of query to generate each of them implement the
-//! QueryStringBuilder trait which is dynamically dispatched to a specific query string builder by
+//! types such as Document. These are used for logging / debugging purposes mainly, and are
+//! generated lazily.
+//!
+//! There is a struct for each different type of query to generate. Each of them implement the
+//! QueryStringBuilder trait, which is dynamically dispatched to a specific query string builder by
 //! `root_queries::observing`
 use mongodb::bson::{Bson, Document};
 use std::fmt::Write;

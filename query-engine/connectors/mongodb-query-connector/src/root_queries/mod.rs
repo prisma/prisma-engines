@@ -47,15 +47,16 @@ fn pick_singular_id(model: &ModelRef) -> ScalarFieldRef {
         .unwrap()
 }
 
-// performs both metrics pushing and query logging. Query logging  might be disabled and thus
+// Performs both metrics pushing and query logging. Query logging  might be disabled and thus
 // the query_string might not need to be built, that's why rather than a query_string
-// we receive a Future, as it's not trivial to buid and we want to skip that when possible.
+// we receive a Builder, as it's not trivial to buid a query and we want to skip that when possible.
 //
 // As a reminder, the query string is not fed into mongo db directly, we built it for debugging
 // purposes and it's only used when the query log is enabled. For querying mongo, we use the driver
 // wire protocol to build queries from a graphql query rather than executing raw mongodb statements.
+//
 // As we don't have a mongodb query string, we need to create it from the driver object model, which
-// so better skip it if we don't need it, i.e. when the query log is disabled.
+// we better skip it if we don't need it (i.e. when the query log is disabled.)
 pub(crate) async fn observing<'a, 'b, F, T, U>(
     query_string_builder: Option<&'b dyn QueryString>,
     f: F,
