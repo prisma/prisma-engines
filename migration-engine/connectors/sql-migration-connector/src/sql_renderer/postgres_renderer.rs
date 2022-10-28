@@ -1005,21 +1005,33 @@ fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: Pair<&SqlSchema>)
             let columns = schemas.walk(Pair::new(*prev_colidx, next_colidx));
             let table_name = columns.previous.table().name();
             let column_name = columns.previous.name();
-            let default_str = columns
-                    .next
-                    .default()
-                    .and_then(|default| default.as_value())
-                    .and_then(|value| value.as_enum_value())
-                    .expect("We should only be setting a changed default if there was one on the previous schema and in the next with the same enum.");
 
-            let set_default = format!(
-                "ALTER TABLE {table_name} ALTER COLUMN {column_name} SET DEFAULT '{default}'",
+            dbg!("table_name.column_name: {}.{}", &table_name, &column_name);
+
+            // default_str_option may still be `None`, e.g. when `column_name` is a list of enum types
+            // with the `@default([])` attribute.
+            let default_str_option = columns
+                .next
+                .default()
+                .and_then(|default| default.as_value())
+                .and_then(|value| value.as_enum_value());
+
+            let mut alter_sql = format!(
+                "ALTER TABLE {table_name} ALTER COLUMN {column_name}",
                 table_name = Quoted::postgres_ident(&table_name),
                 column_name = Quoted::postgres_ident(&column_name),
-                default = escape_string_literal(default_str),
             );
 
-            stmts.push(set_default);
+            // we only set a default if there is one
+            if let Some(default_str) = default_str_option {
+                alter_sql = format!(
+                    "{} SET DEFAULT '{default}'",
+                    alter_sql,
+                    default = escape_string_literal(default_str),
+                );
+            }
+
+            stmts.push(alter_sql);
         }
     }
 
