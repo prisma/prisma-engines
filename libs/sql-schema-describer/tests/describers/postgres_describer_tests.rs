@@ -6,20 +6,66 @@ use psl::dml::PrismaValue;
 use sql_schema_describer::{postgres::PostgresSchemaExt, *};
 
 #[test_connector(tags(Postgres))]
-fn postgres_detects_namespaces(api: TestApi) {
+fn postgres_skips_nonexisting_namespaces(api: TestApi) {
+    let full_sql = r#"
+        CREATE SCHEMA "one";
+    "#;
+
+    api.raw_cmd(full_sql);
+    let schema = api.describe_with_schemas(&["one", "two"]);
+
+    schema
+        .assert_namespace("one")
+        .assert_not_namespace("two");
+}
+
+#[test_connector(tags(Postgres))]
+fn postgres_skips_ignored_namespaces(api: TestApi) {
     let full_sql = r#"
         CREATE SCHEMA "one";
         CREATE SCHEMA "two";
     "#;
 
     api.raw_cmd(full_sql);
-    let schema = api.describe_with_schemas(&["one", "three"]);
+    let schema = api.describe_with_schemas(&["one"]);
 
     schema
         .assert_namespace("one")
-        .assert_not_namespace("two")
-        .assert_not_namespace("three");
+        .assert_not_namespace("two");
 }
+
+#[test_connector(tags(Postgres))]
+fn postgres_skips_public_when_ignored_namespaces(api: TestApi) {
+    let full_sql = r#"
+        CREATE SCHEMA "one";
+        CREATE SCHEMA IF NOT EXISTS "public";
+    "#;
+
+    api.raw_cmd(full_sql);
+    let schema = api.describe_with_schemas(&["one"]);
+
+    schema
+        .assert_namespace("one")
+        .assert_not_namespace("public");
+}
+
+#[test_connector(tags(Postgres))]
+fn postgres_many_namespaces(api: TestApi) {
+    let full_sql = r#"
+        CREATE SCHEMA "one";
+        CREATE SCHEMA "two";
+        CREATE SCHEMA "three";
+    "#;
+
+    api.raw_cmd(full_sql);
+    let schema = api.describe_with_schemas(&["one", "two", "three"]);
+
+    schema
+        .assert_namespace("one")
+        .assert_namespace("two")
+        .assert_namespace("three");
+}
+
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn views_can_be_described(api: TestApi) {
