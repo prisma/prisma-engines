@@ -1,5 +1,5 @@
 use crate::{filter_conversion::AliasedCondition, model_extensions::*};
-use connector_interface::Filter;
+use connector_interface::{Filter, RelationCondition, RelationFilter};
 use prisma_models::*;
 use quaint::prelude::*;
 use std::collections::HashMap;
@@ -16,6 +16,7 @@ pub struct AliasedJoin {
 pub struct JoinBuilder {
     count: usize,
     cache: HashMap<RelationFieldRef, AliasedJoin>,
+    m2m_cache: HashMap<RelationFieldRef, Vec<AliasedJoin>>,
     aggr_cache: HashMap<RelationFieldRef, (String, AliasedJoin)>,
 }
 
@@ -60,25 +61,44 @@ impl JoinBuilder {
         (aggregator_alias, join)
     }
 
-    pub fn compute_one2m_joins(&mut self, rfs: &[RelationFieldRef]) -> (Vec<AliasedJoin>, Option<AliasedJoin>) {
-        let mut joins = vec![];
-
-        for (i, hop) in rfs.iter().enumerate() {
-            let previous_join = if i > 0 { joins.get(i - 1) } else { None };
-            let join = self.compute_one2m_join(hop, previous_join);
-
-            joins.push(join);
+    pub fn compute_join(
+        &mut self,
+        rf: &RelationFieldRef,
+        filter: Option<&Filter>,
+        previous_join: Option<&AliasedJoin>,
+    ) -> Vec<AliasedJoin> {
+        if rf.relation().is_many_to_many() {
+            self.compute_m2m_join(rf, filter, previous_join)
+        } else {
+            vec![self.compute_one2m_join(rf, filter, previous_join)]
         }
-
-        let last = joins.last().cloned();
-
-        (joins, last)
     }
 
-    pub fn compute_one2m_join(&mut self, rf: &RelationFieldRef, previous_join: Option<&AliasedJoin>) -> AliasedJoin {
+    fn compute_one2m_join(
+        &mut self,
+        rf: &RelationFieldRef,
+        filter: Option<&Filter>,
+        previous_join: Option<&AliasedJoin>,
+    ) -> AliasedJoin {
         if let Some(entry) = self.cache.get(rf) {
             return entry.clone();
         }
+
+        dbg!(&filter);
+        let conditions: ConditionTree = filter
+            .map(|f| {
+                Filter::Relation(RelationFilter {
+                    field: rf.clone(),
+                    condition: RelationCondition::EveryRelatedRecord,
+                    nested_filter: Box::new(f.clone()),
+                })
+            })
+            .map(|f| {
+                dbg!(&f);
+
+                f.aliased_condition_from(None, false)
+            })
+            .unwrap_or(ConditionTree::NoCondition);
 
         let join_alias = self.join_alias();
         let (left_fields, right_fields) = if rf.is_inlined_on_enclosing_model() {
@@ -117,6 +137,73 @@ impl JoinBuilder {
         self.cache.insert(rf.clone(), join.clone());
 
         join
+    }
+
+    fn compute_m2m_join(
+        &mut self,
+        rf: &RelationFieldRef,
+        filter: Option<&Filter>,
+        previous_join: Option<&AliasedJoin>,
+    ) -> Vec<AliasedJoin> {
+        if let Some(entry) = self.m2m_cache.get(rf) {
+            return entry.clone();
+        }
+
+        // First join - parent to m2m join
+        let join_alias = self.join_alias();
+        let parent_ids: ModelProjection = rf.model().primary_identifier().into();
+        let left_join_conditions: Vec<Expression> = parent_ids
+            .as_columns()
+            .into_iter()
+            .map(|col_a| {
+                let col_b: Vec<_> = rf
+                    .related_field()
+                    .m2m_columns()
+                    .into_iter()
+                    .map(|c| c.table(join_alias.clone()))
+                    .collect();
+
+                col_a.equals(col_b).into()
+            })
+            .collect();
+        let parent_to_m2m_join = AliasedJoin {
+            alias: join_alias.clone(),
+            data: rf
+                .as_table()
+                .alias(join_alias)
+                .on(ConditionTree::And(left_join_conditions)),
+        };
+
+        // Second join - m2m to child join
+        let join_alias_2 = self.join_alias();
+        let child_ids: ModelProjection = rf.related_model().primary_identifier().into();
+        let left_join_conditions: Vec<Expression> = child_ids
+            .into_iter()
+            .map(|c| {
+                let col_a = Column::from((join_alias_2.clone(), c.db_name().to_owned()));
+                let col_b: Vec<_> = rf
+                    .m2m_columns()
+                    .into_iter()
+                    .map(|c| c.table(parent_to_m2m_join.alias.clone()))
+                    .collect();
+
+                col_a.equals(col_b).into()
+            })
+            .collect();
+        let m2m_to_child_join = AliasedJoin {
+            alias: join_alias_2.clone(),
+            data: rf
+                .related_model()
+                .as_table()
+                .alias(join_alias_2.clone())
+                .on(ConditionTree::And(left_join_conditions)),
+        };
+
+        let joins = vec![parent_to_m2m_join, m2m_to_child_join];
+
+        self.m2m_cache.insert(rf.clone(), joins.clone());
+
+        joins
     }
 
     fn join_alias(&mut self) -> String {

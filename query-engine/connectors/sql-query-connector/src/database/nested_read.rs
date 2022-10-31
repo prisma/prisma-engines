@@ -13,20 +13,18 @@ pub struct NestedReadJoins {
 
 pub fn build_joins(
     ctx: &mut QueryBuilderContext,
-    nested: &[NestedRead],
+    nested_reads: &[NestedRead],
     previous_join: Option<&AliasedJoin>,
 ) -> NestedReadJoins {
-    let mut joins: Vec<AliasedJoin> = vec![];
+    let mut output: Vec<AliasedJoin> = vec![];
     let mut columns: Vec<Expression<'static>> = vec![];
 
-    for (a, read) in nested.iter().enumerate() {
-        let join = if read.parent_field.relation().is_one_to_many() {
-            ctx.join_builder().compute_one2m_join(&read.parent_field, previous_join)
-        } else if read.parent_field.relation().is_one_to_one() {
-            ctx.join_builder().compute_one2m_join(&read.parent_field, previous_join)
-        } else {
-            todo!("m2m not supported yet")
-        };
+    for read in nested_reads.iter() {
+        let joins = ctx
+            .join_builder()
+            .compute_join(&read.parent_field, read.args.filter.as_ref(), previous_join);
+
+        let join = joins.last().unwrap();
 
         for (i, selection) in read.selected_fields.selections().enumerate() {
             let col: Expression =
@@ -37,11 +35,11 @@ pub fn build_joins(
 
         let nested = build_joins(ctx, &read.nested, Some(&join));
 
-        joins.push(join);
-        joins.extend(nested.joins);
+        output.extend(joins);
+        output.extend(nested.joins);
 
         columns.extend(nested.columns);
     }
 
-    NestedReadJoins { joins, columns }
+    NestedReadJoins { joins: output, columns }
 }

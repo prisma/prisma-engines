@@ -128,18 +128,18 @@ fn compute_joins_aggregation(
         .split_last()
         .expect("An order by relation aggregation has to have at least one hop");
 
-    let parent_join = parent.map(|p| ctx.join_builder().compute_one2m_join(p, None));
+    let parent_join = parent.map(|p| ctx.join_builder().compute_join(p, None, None).last().cloned().unwrap());
 
     // Unwraps are safe because the SQL connector doesn't yet support any other type of orderBy hop but the relation hop.
     let mut joins = vec![];
     for (i, hop) in rest_hops.iter().enumerate() {
         let previous_join = if i > 0 { joins.get(i - 1) } else { None };
 
-        let join = ctx
+        let inner_joins = ctx
             .join_builder()
-            .compute_one2m_join(hop.as_relation_hop().unwrap(), previous_join);
+            .compute_join(hop.as_relation_hop().unwrap(), None, previous_join);
 
-        joins.push(join);
+        joins.extend(inner_joins);
     }
 
     let aggregation_type = match order_by.sort_aggregation {
@@ -175,11 +175,11 @@ pub fn compute_joins_scalar(
 
     for (i, hop) in order_by.path.iter().enumerate() {
         let previous_join = if i > 0 { joins.get(i - 1) } else { None };
-        let join = ctx
+        let inner_joins = ctx
             .join_builder()
-            .compute_one2m_join(hop.as_relation_hop().unwrap(), previous_join);
+            .compute_join(hop.as_relation_hop().unwrap(), None, previous_join);
 
-        joins.push(join);
+        joins.extend(inner_joins);
     }
 
     // This is the final column identifier to be used for the scalar field to order by.
@@ -190,7 +190,12 @@ pub fn compute_joins_scalar(
     let order_by_column = if let Some(last_join) = joins.last() {
         Column::from((last_join.alias.to_owned(), order_by.field.db_name().to_owned()))
     } else if let Some(parent) = parent {
-        let join = ctx.join_builder().compute_one2m_join(parent, None);
+        let join = ctx
+            .join_builder()
+            .compute_join(parent, None, None)
+            .last()
+            .cloned()
+            .unwrap();
 
         Column::from((join.alias.to_owned(), order_by.field.db_name().to_owned()))
     } else {

@@ -1,7 +1,8 @@
 //! Prisma read query AST
 use super::FilteredQuery;
 use connector::{filter::Filter, AggregationSelection, QueryArguments, RelAggregationSelection};
-use prisma_models::prelude::*;
+use itertools::Itertools;
+use prisma_models::{dml::FieldArity, prelude::*};
 use std::fmt::Display;
 
 #[derive(Debug, Clone)]
@@ -38,6 +39,14 @@ impl ReadQuery {
             ReadQuery::ManyRecordsQuery(x) => x.model.clone(),
             ReadQuery::RelatedRecordsQuery(x) => x.parent_field.related_field().model(),
             ReadQuery::AggregateRecordsQuery(x) => x.model.clone(),
+        }
+    }
+
+    pub fn as_related_records_query(&self) -> Option<&RelatedRecordsQuery> {
+        if let Self::RelatedRecordsQuery(v) = self {
+            Some(v)
+        } else {
+            None
         }
     }
 }
@@ -124,6 +133,65 @@ pub struct RelatedRecordsQuery {
     /// Fields and values of the parent to satisfy the relation query without
     /// relying on the parent result passed by the interpreter.
     pub parent_results: Option<Vec<SelectionResult>>,
+}
+
+impl RelatedRecordsQuery {
+    pub fn db_alias(&self, i: usize) -> String {
+        let selected_field = self.selected_fields.inner().get(i).unwrap();
+
+        // format!(
+        //     "__prisma_nested_read__{}_{}",
+        //     self.parent_field.relation_name,
+        //     selected_field.db_name()
+        // )
+        format!(
+            "{}.{}",
+            &self.parent_field.related_model().name,
+            selected_field.db_name()
+        )
+    }
+
+    pub fn db_aliases(&self) -> Vec<String> {
+        let mut aliases = self
+            .selected_fields
+            .selections()
+            .enumerate()
+            .map(|(i, _)| self.db_alias(i))
+            .collect_vec();
+
+        for read in &self.nested {
+            match read {
+                ReadQuery::RelatedRecordsQuery(rrq) => {
+                    aliases.extend(rrq.db_aliases());
+                }
+                _ => unreachable!(),
+            }
+        }
+
+        aliases
+    }
+
+    pub fn type_identifier_with_arities(&self) -> Vec<(TypeIdentifier, FieldArity)> {
+        let mut result = self
+            .selected_fields
+            .selections()
+            .map(|field| match field {
+                SelectedField::Scalar(sf) => sf.type_identifier_with_arity(),
+                SelectedField::Composite(_) => unreachable!(),
+            })
+            .collect_vec();
+
+        for read in &self.nested {
+            match read {
+                ReadQuery::RelatedRecordsQuery(rrq) => {
+                    result.extend(rrq.type_identifier_with_arities());
+                }
+                _ => unreachable!(),
+            };
+        }
+
+        result
+    }
 }
 
 #[derive(Debug, Clone)]
