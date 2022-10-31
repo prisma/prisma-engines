@@ -1379,6 +1379,25 @@
 <span id="1379">1379</span>
 <span id="1380">1380</span>
 <span id="1381">1381</span>
+<span id="1382">1382</span>
+<span id="1383">1383</span>
+<span id="1384">1384</span>
+<span id="1385">1385</span>
+<span id="1386">1386</span>
+<span id="1387">1387</span>
+<span id="1388">1388</span>
+<span id="1389">1389</span>
+<span id="1390">1390</span>
+<span id="1391">1391</span>
+<span id="1392">1392</span>
+<span id="1393">1393</span>
+<span id="1394">1394</span>
+<span id="1395">1395</span>
+<span id="1396">1396</span>
+<span id="1397">1397</span>
+<span id="1398">1398</span>
+<span id="1399">1399</span>
+<span id="1400">1400</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Postgres schema description.</span>
 
 <span class="kw">mod</span> <span class="ident">default</span>;
@@ -1821,9 +1840,13 @@
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">get_databases</span>().<span class="kw">await</span><span class="question-mark">?</span>)
     }
 
+    <span class="comment">// TODO(MultiSchema): this going to provide wrong results with respect to MultiSchema,</span>
+    <span class="comment">// but this function does not seem to be called all that much. Should probably look into</span>
+    <span class="comment">// either updating or removing it.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_metadata</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">SqlMetadata</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sql_schema</span> <span class="op">=</span> <span class="ident">SqlSchema::default</span>();
-        <span class="ident">sql_schema</span>.<span class="ident">push_namespace</span>((<span class="kw-2">*</span><span class="ident">schema</span>).<span class="ident">into</span>());
+
+        <span class="self">self</span>.<span class="ident">get_namespaces</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sql_schema</span>, <span class="kw-2">&amp;</span>[<span class="ident">schema</span>]).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">table_count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_table_names</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sql_schema</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">len</span>();
         <span class="kw">let</span> <span class="ident">size_in_bytes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_size</span>(<span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -1838,9 +1861,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sql_schema</span> <span class="op">=</span> <span class="ident">SqlSchema::default</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pg_ext</span> <span class="op">=</span> <span class="ident">PostgresSchemaExt::default</span>();
 
-        <span class="kw">for</span> <span class="ident">schema</span> <span class="kw">in</span> <span class="ident">schemas</span> {
-            <span class="ident">sql_schema</span>.<span class="ident">push_namespace</span>((<span class="kw-2">*</span><span class="ident">schema</span>).<span class="ident">into</span>());
-        }
+        <span class="self">self</span>.<span class="ident">get_namespaces</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sql_schema</span>, <span class="ident">schemas</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="comment">//TODO(matthias) can we get rid of the table names map and instead just use tablewalker_ns everywhere like in get_columns?</span>
         <span class="kw">let</span> <span class="ident">table_names</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_table_names</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sql_schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -1966,6 +1987,23 @@
         }
 
         <span class="ident">sql_schema</span>.<span class="ident">procedures</span> <span class="op">=</span> <span class="ident">procedures</span>;
+
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_namespaces</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql_schema</span>: <span class="kw-2">&amp;mut</span> <span class="ident">SqlSchema</span>, <span class="ident">namespaces</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>]) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;postgres/namespaces_query.sql&quot;</span>);
+
+        <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">conn</span>
+            .<span class="ident">query_raw</span>(<span class="ident">sql</span>, <span class="kw-2">&amp;</span>[<span class="ident">Array</span>(<span class="prelude-val">Some</span>(<span class="ident">namespaces</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> (<span class="kw-2">*</span><span class="ident">s</span>).<span class="ident">into</span>()).<span class="ident">collect</span>()))])
+            .<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="kw">let</span> <span class="ident">names</span> <span class="op">=</span> <span class="ident">rows</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">row</span><span class="op">|</span> (<span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;namespace_name&quot;</span>)));
+
+        <span class="kw">for</span> <span class="ident">namespace</span> <span class="kw">in</span> <span class="ident">names</span> {
+            <span class="ident">sql_schema</span>.<span class="ident">push_namespace</span>(<span class="ident">namespace</span>);
+        }
 
         <span class="prelude-val">Ok</span>(())
     }
