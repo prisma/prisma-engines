@@ -600,9 +600,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             )
             .await?;
 
-        let names = rows
-            .into_iter()
-            .map(|row| (row.get_expect_string("namespace_name")));
+        let names = rows.into_iter().map(|row| (row.get_expect_string("namespace_name")));
 
         for namespace in names {
             sql_schema.push_namespace(namespace);
