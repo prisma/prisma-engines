@@ -16,7 +16,7 @@ enum Status {
     OK
     ERROR
 }
-
+// Expected Migration:
 // -- CreateEnum
 // CREATE TYPE "Status" AS ENUM ('OK', 'ERROR');
 // 
