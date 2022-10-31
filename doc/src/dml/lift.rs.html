@@ -695,20 +695,6 @@
 <span id="695">695</span>
 <span id="696">696</span>
 <span id="697">697</span>
-<span id="698">698</span>
-<span id="699">699</span>
-<span id="700">700</span>
-<span id="701">701</span>
-<span id="702">702</span>
-<span id="703">703</span>
-<span id="704">704</span>
-<span id="705">705</span>
-<span id="706">706</span>
-<span id="707">707</span>
-<span id="708">708</span>
-<span id="709">709</span>
-<span id="710">710</span>
-<span id="711">711</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">dml</span>, <span class="kw-2">*</span>};
 <span class="kw">use</span> <span class="ident">either::Either</span>;
 <span class="kw">use</span> <span class="ident">psl_core</span>::{
@@ -800,12 +786,8 @@
         <span class="kw">let</span> <span class="ident">relation_mode</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">relation_mode</span>;
         <span class="kw">let</span> <span class="ident">common_dml_fields</span> <span class="op">=</span> <span class="op">|</span><span class="ident">field</span>: <span class="kw-2">&amp;mut</span> <span class="ident">RelationField</span>, <span class="ident">relation_field</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">ast_field</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">ast_field</span>();
-            <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">on_delete</span> <span class="op">=</span> <span class="ident">relation_field</span>
-                .<span class="ident">explicit_on_delete</span>()
-                .<span class="ident">map</span>(<span class="ident">parser_database_referential_action_to_dml_referential_action</span>);
-            <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">on_update</span> <span class="op">=</span> <span class="ident">relation_field</span>
-                .<span class="ident">explicit_on_update</span>()
-                .<span class="ident">map</span>(<span class="ident">parser_database_referential_action_to_dml_referential_action</span>);
+            <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">on_delete</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">explicit_on_delete</span>().<span class="ident">map</span>(<span class="ident">From::from</span>);
+            <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">on_update</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">explicit_on_update</span>().<span class="ident">map</span>(<span class="ident">From::from</span>);
             <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">relation_name</span>().<span class="ident">to_string</span>();
             <span class="ident">field</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">ast_field</span>.<span class="ident">documentation</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
             <span class="ident">field</span>.<span class="ident">is_ignored</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">is_ignored</span>();
@@ -1272,16 +1254,6 @@
     <span class="kw">match</span> <span class="ident">sort_order</span> {
         <span class="ident">db::SortOrder::Asc</span> =&gt; <span class="ident">SortOrder::Asc</span>,
         <span class="ident">db::SortOrder::Desc</span> =&gt; <span class="ident">SortOrder::Desc</span>,
-    }
-}
-
-<span class="kw">fn</span> <span class="ident">parser_database_referential_action_to_dml_referential_action</span>(<span class="ident">ra</span>: <span class="ident">db::ReferentialAction</span>) -&gt; <span class="ident">ReferentialAction</span> {
-    <span class="kw">match</span> <span class="ident">ra</span> {
-        <span class="ident">db::ReferentialAction::Cascade</span> =&gt; <span class="ident">ReferentialAction::Cascade</span>,
-        <span class="ident">db::ReferentialAction::SetNull</span> =&gt; <span class="ident">ReferentialAction::SetNull</span>,
-        <span class="ident">db::ReferentialAction::SetDefault</span> =&gt; <span class="ident">ReferentialAction::SetDefault</span>,
-        <span class="ident">db::ReferentialAction::Restrict</span> =&gt; <span class="ident">ReferentialAction::Restrict</span>,
-        <span class="ident">db::ReferentialAction::NoAction</span> =&gt; <span class="ident">ReferentialAction::NoAction</span>,
     }
 }
 
