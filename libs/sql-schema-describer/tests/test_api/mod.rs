@@ -138,6 +138,10 @@ pub trait SqlSchemaAssertionsExt {
         table_name: &str,
         assertions: impl for<'a> FnOnce(&'a TableAssertion<'a>) -> &'a TableAssertion<'a>,
     ) -> &Self;
+
+    fn assert_namespace(&self, namespace_name: &str) -> &Self;
+
+    fn assert_not_namespace(&self, namespace_name: &str) -> &Self;
 }
 
 impl SqlSchemaAssertionsExt for SqlSchema {
@@ -152,6 +156,16 @@ impl SqlSchemaAssertionsExt for SqlSchema {
 
         assertions(&mut table);
 
+        self
+    }
+
+    fn assert_namespace(&self, namespace_name: &str) -> &Self {
+        self.namespace_walker(namespace_name).or_else(|| panic!("Could not find namespace '{namespace_name}'"));
+        self
+    }
+
+    fn assert_not_namespace(&self, namespace_name: &str) -> &Self {
+        self.walk_namespaces().find(|ns| ns.name() == namespace_name).and_then::<(), _>(|_x| panic!("Found unexpected namespace '{namespace_name}'"));
         self
     }
 }

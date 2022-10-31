@@ -5,6 +5,22 @@ use pretty_assertions::assert_eq;
 use psl::dml::PrismaValue;
 use sql_schema_describer::{postgres::PostgresSchemaExt, *};
 
+#[test_connector(tags(Postgres))]
+fn postgres_detects_namespaces(api: TestApi) {
+    let full_sql = r#"
+        CREATE SCHEMA "one";
+        CREATE SCHEMA "two";
+    "#;
+
+    api.raw_cmd(full_sql);
+    let schema = api.describe_with_schemas(&["one", "three"]);
+
+    schema
+        .assert_namespace("one")
+        .assert_not_namespace("two")
+        .assert_not_namespace("three");
+}
+
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn views_can_be_described(api: TestApi) {
     let full_sql = r#"
