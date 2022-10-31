@@ -440,10 +440,12 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
         Ok(self.get_databases().await?)
     }
 
+    // TODO(MultiSchema): this going to provide wrong results with respect to MultiSchema,
+    // but this function does not seem to be called all that much. Should probably look into
+    // either updating or removing it.
     async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata> {
         let mut sql_schema = SqlSchema::default();
 
-        // TODO(MultiSchema): is this correct?
         self.get_namespaces(&mut sql_schema, &[schema]).await?;
 
         let table_count = self.get_table_names(&mut sql_schema).await?.len();
@@ -594,10 +596,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         let rows = self
             .conn
-            .query_raw(
-                sql,
-                &[Array(Some(namespaces.iter().map(|s| (*s).into()).collect()))],
-            )
+            .query_raw(sql, &[Array(Some(namespaces.iter().map(|s| (*s).into()).collect()))])
             .await?;
 
         let names = rows.into_iter().map(|row| (row.get_expect_string("namespace_name")));
