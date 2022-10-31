@@ -442,7 +442,9 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
 
     async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata> {
         let mut sql_schema = SqlSchema::default();
-        sql_schema.push_namespace((*schema).into());
+
+        // TODO(MultiSchema): is this correct?
+        self.get_namespaces(&mut sql_schema, &[schema]).await?;
 
         let table_count = self.get_table_names(&mut sql_schema).await?.len();
         let size_in_bytes = self.get_size(schema).await?;
@@ -457,9 +459,7 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
         let mut sql_schema = SqlSchema::default();
         let mut pg_ext = PostgresSchemaExt::default();
 
-        for schema in schemas {
-            sql_schema.push_namespace((*schema).into());
-        }
+        self.get_namespaces(&mut sql_schema, schemas).await?;
 
         //TODO(matthias) can we get rid of the table names map and instead just use tablewalker_ns everywhere like in get_columns?
         let table_names = self.get_table_names(&mut sql_schema).await?;
@@ -585,6 +585,28 @@ impl<'a> SqlSchemaDescriber<'a> {
         }
 
         sql_schema.procedures = procedures;
+
+        Ok(())
+    }
+
+    async fn get_namespaces(&self, sql_schema: &mut SqlSchema, namespaces: &[&str]) -> DescriberResult<()> {
+        let sql = include_str!("postgres/namespaces_query.sql");
+
+        let rows = self
+            .conn
+            .query_raw(
+                sql,
+                &[Array(Some(namespaces.iter().map(|s| s.clone().into()).collect()))],
+            )
+            .await?;
+
+        let names = rows
+            .into_iter()
+            .map(|row| (row.get_expect_string("namespace_name")));
+
+        for namespace in names {
+            sql_schema.push_namespace(namespace);
+        }
 
         Ok(())
     }
