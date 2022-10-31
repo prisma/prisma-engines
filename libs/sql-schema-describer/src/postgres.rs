@@ -596,7 +596,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             .conn
             .query_raw(
                 sql,
-                &[Array(Some(namespaces.iter().map(|s| s.clone().into()).collect()))],
+                &[Array(Some(namespaces.iter().map(|s| (*s).into()).collect()))],
             )
             .await?;
 
