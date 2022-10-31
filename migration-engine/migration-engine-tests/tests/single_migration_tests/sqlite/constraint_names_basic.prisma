@@ -25,6 +25,7 @@ model B {
   @@id([a, b])
 }
 
+// Expected Migration:
 // -- CreateTable
 // CREATE TABLE "A" (
 //     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,

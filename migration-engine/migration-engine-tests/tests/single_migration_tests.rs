@@ -10,30 +10,33 @@ const TESTS_ROOT: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/single_migr
 fn run_single_migration_test(test_file_path: &str, test_function_name: &'static str) {
     let file_path = path::Path::new(TESTS_ROOT).join(test_file_path);
     let text: Arc<str> = Arc::from(std::fs::read_to_string(&file_path).unwrap().into_boxed_str());
+    const EXPECTATION_TEXT: &str = "// Expected Migration:";
 
+    // Find the beginning of expectation comment.
     let last_comment_idx = {
-        let mut idx = None;
-        let newlines = text.char_indices().filter(|(_, c)| *c == '\n');
-
-        for (newline_idx, _) in newlines {
-            match (text.get(newline_idx + 1..newline_idx + 3), idx) {
-                (Some("//"), None) => {
-                    idx = Some(newline_idx + 1); // new comment
-                }
-                (Some("//"), Some(_)) => (), // comment continues
-                (None, _) => (),             // eof
-                (Some(_), _) => {
-                    idx = None;
-                }
-            }
-        }
-
-        idx
+        text.char_indices()
+            // only look at newlines
+            .filter(|(_, c)| *c == '\n')
+            // look for the first EXPECTATION_TEXT
+            .find_map(|(idx, _)| {
+                // ... if there's enough left of the file to look ahead
+                text.get(idx + 1..idx + EXPECTATION_TEXT.len() + 1).and_then(|t| {
+                    // ... and that text matches the delimiter
+                    if t == EXPECTATION_TEXT {
+                        Some(idx + 1)
+                    } else {
+                        None
+                    }
+                })
+            })
     };
+
+    // Contents of the expectation, to compare with the atual migration.
     let last_comment_contents: String = last_comment_idx
         .map(|idx| {
             let mut out = String::with_capacity(text.len() - idx);
-            for line in text[idx..].lines() {
+            // Skipping the EXPECTATION_TEXT line.
+            for line in text[idx..].lines().skip(1) {
                 out.push_str(line.trim_start_matches("// "));
                 out.push('\n');
             }
@@ -153,6 +156,8 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
 
         let schema = last_comment_idx.map(|idx| &text[..idx]).unwrap_or(&text);
         file.write_all(schema.as_bytes()).unwrap();
+
+        writeln!(file, "{EXPECTATION_TEXT}").unwrap();
 
         for line in migration.lines() {
             writeln!(file, "// {line}").unwrap();

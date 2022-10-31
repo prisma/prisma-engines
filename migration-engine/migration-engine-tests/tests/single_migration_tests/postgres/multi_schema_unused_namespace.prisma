@@ -4,7 +4,7 @@
 datasource testds {
     provider = "postgresql"
     url = env("TEST_DATABASE_URL")
-    schemas = ["public", "security", "users"]
+    schemas = ["public", "security", "users", "unused"]
 }
 
 generator js {
@@ -49,12 +49,16 @@ model Test5 {
   test4 Test4[]
   @@schema("security")
 }
+
 // Expected Migration:
 // -- CreateSchema
 // CREATE SCHEMA IF NOT EXISTS "public";
 // 
 // -- CreateSchema
 // CREATE SCHEMA IF NOT EXISTS "security";
+// 
+// -- CreateSchema
+// CREATE SCHEMA IF NOT EXISTS "unused";
 // 
 // -- CreateSchema
 // CREATE SCHEMA IF NOT EXISTS "users";

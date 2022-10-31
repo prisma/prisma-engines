@@ -16,6 +16,7 @@ enum MyEnum {
     B
 }
 
+// Expected Migration:
 // -- CreateEnum
 // CREATE TYPE "MyEnum" AS ENUM ('A', 'B');
 // 
