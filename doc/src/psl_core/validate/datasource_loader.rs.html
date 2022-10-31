@@ -261,104 +261,6 @@
 <span id="261">261</span>
 <span id="262">262</span>
 <span id="263">263</span>
-<span id="264">264</span>
-<span id="265">265</span>
-<span id="266">266</span>
-<span id="267">267</span>
-<span id="268">268</span>
-<span id="269">269</span>
-<span id="270">270</span>
-<span id="271">271</span>
-<span id="272">272</span>
-<span id="273">273</span>
-<span id="274">274</span>
-<span id="275">275</span>
-<span id="276">276</span>
-<span id="277">277</span>
-<span id="278">278</span>
-<span id="279">279</span>
-<span id="280">280</span>
-<span id="281">281</span>
-<span id="282">282</span>
-<span id="283">283</span>
-<span id="284">284</span>
-<span id="285">285</span>
-<span id="286">286</span>
-<span id="287">287</span>
-<span id="288">288</span>
-<span id="289">289</span>
-<span id="290">290</span>
-<span id="291">291</span>
-<span id="292">292</span>
-<span id="293">293</span>
-<span id="294">294</span>
-<span id="295">295</span>
-<span id="296">296</span>
-<span id="297">297</span>
-<span id="298">298</span>
-<span id="299">299</span>
-<span id="300">300</span>
-<span id="301">301</span>
-<span id="302">302</span>
-<span id="303">303</span>
-<span id="304">304</span>
-<span id="305">305</span>
-<span id="306">306</span>
-<span id="307">307</span>
-<span id="308">308</span>
-<span id="309">309</span>
-<span id="310">310</span>
-<span id="311">311</span>
-<span id="312">312</span>
-<span id="313">313</span>
-<span id="314">314</span>
-<span id="315">315</span>
-<span id="316">316</span>
-<span id="317">317</span>
-<span id="318">318</span>
-<span id="319">319</span>
-<span id="320">320</span>
-<span id="321">321</span>
-<span id="322">322</span>
-<span id="323">323</span>
-<span id="324">324</span>
-<span id="325">325</span>
-<span id="326">326</span>
-<span id="327">327</span>
-<span id="328">328</span>
-<span id="329">329</span>
-<span id="330">330</span>
-<span id="331">331</span>
-<span id="332">332</span>
-<span id="333">333</span>
-<span id="334">334</span>
-<span id="335">335</span>
-<span id="336">336</span>
-<span id="337">337</span>
-<span id="338">338</span>
-<span id="339">339</span>
-<span id="340">340</span>
-<span id="341">341</span>
-<span id="342">342</span>
-<span id="343">343</span>
-<span id="344">344</span>
-<span id="345">345</span>
-<span id="346">346</span>
-<span id="347">347</span>
-<span id="348">348</span>
-<span id="349">349</span>
-<span id="350">350</span>
-<span id="351">351</span>
-<span id="352">352</span>
-<span id="353">353</span>
-<span id="354">354</span>
-<span id="355">355</span>
-<span id="356">356</span>
-<span id="357">357</span>
-<span id="358">358</span>
-<span id="359">359</span>
-<span id="360">360</span>
-<span id="361">361</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">SourceConfig</span>, <span class="ident">Span</span>},
     <span class="ident">configuration::StringFromEnvVar</span>,
@@ -483,11 +385,9 @@
             <span class="prelude-val">None</span>
         };
 
-    <span class="ident">preview_features_guardrail</span>(<span class="kw-2">&amp;</span><span class="ident">args</span>, <span class="ident">diagnostics</span>);
+    <span class="ident">preview_features_guardrail</span>(<span class="kw-2">&amp;mut</span> <span class="ident">args</span>, <span class="ident">diagnostics</span>);
 
     <span class="kw">let</span> <span class="ident">documentation</span> <span class="op">=</span> <span class="ident">ast_source</span>.<span class="ident">documentation</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
-    <span class="kw">let</span> <span class="ident">referential_integrity</span> <span class="op">=</span> <span class="ident">get_referential_integrity</span>(<span class="kw-2">&amp;</span><span class="ident">args</span>, <span class="ident">preview_features</span>, <span class="ident">ast_source</span>, <span class="ident">diagnostics</span>);
-    <span class="kw">let</span> <span class="ident">relation_mode</span> <span class="op">=</span> <span class="ident">get_relation_mode</span>(<span class="kw-2">&amp;</span><span class="ident">args</span>, <span class="ident">preview_features</span>, <span class="ident">ast_source</span>, <span class="ident">diagnostics</span>);
 
     <span class="kw">let</span> <span class="ident">active_connector</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident"><span class="kw">crate</span>::datamodel_connector::Connector</span> <span class="op">=</span>
         <span class="kw">match</span> <span class="ident">connectors</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_provider</span>(<span class="ident">provider</span>)) {
@@ -502,57 +402,7 @@
             }
         };
 
-    <span class="comment">// TODO: deprecated, keeping here since the &quot;referentialIntegrity&quot; datasource property</span>
-    <span class="comment">// is still silently supported.</span>
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">integrity</span>) <span class="op">=</span> <span class="ident">referential_integrity</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">active_connector</span>.<span class="ident">allowed_relation_mode_settings</span>().<span class="ident">contains</span>(<span class="ident">integrity</span>) {
-            <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">args</span>
-                .<span class="ident">get</span>(<span class="string">&quot;referentialIntegrity&quot;</span>)
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">v</span>)<span class="op">|</span> <span class="ident">v</span>.<span class="ident">span</span>())
-                .<span class="ident">unwrap_or_else</span>(<span class="ident">Span::empty</span>);
-
-            <span class="kw">let</span> <span class="ident">supported_values</span> <span class="op">=</span> <span class="ident">active_connector</span>
-                .<span class="ident">allowed_relation_mode_settings</span>()
-                .<span class="ident">iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">r#&quot;&quot;{}&quot;&quot;#</span>, <span class="ident">v</span>))
-                .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-                .<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>);
-
-            <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
-                <span class="string">&quot;Invalid referential integrity setting: \&quot;{}\&quot;. Supported values: {}&quot;</span>,
-                <span class="ident">integrity</span>, <span class="ident">supported_values</span>,
-            );
-
-            <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">DatamodelError::new_source_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>, <span class="string">&quot;referentialIntegrity&quot;</span>, <span class="ident">span</span>);
-
-            <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">error</span>);
-        }
-    }
-
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">integrity</span>) <span class="op">=</span> <span class="ident">relation_mode</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">active_connector</span>.<span class="ident">allowed_relation_mode_settings</span>().<span class="ident">contains</span>(<span class="ident">integrity</span>) {
-            <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">args</span>
-                .<span class="ident">get</span>(<span class="string">&quot;relationMode&quot;</span>)
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">v</span>)<span class="op">|</span> <span class="ident">v</span>.<span class="ident">span</span>())
-                .<span class="ident">unwrap_or_else</span>(<span class="ident">Span::empty</span>);
-
-            <span class="kw">let</span> <span class="ident">supported_values</span> <span class="op">=</span> <span class="ident">active_connector</span>
-                .<span class="ident">allowed_relation_mode_settings</span>()
-                .<span class="ident">iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">r#&quot;&quot;{}&quot;&quot;#</span>, <span class="ident">v</span>))
-                .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-                .<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>);
-
-            <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
-                <span class="string">&quot;Invalid relation mode setting: \&quot;{}\&quot;. Supported values: {}&quot;</span>,
-                <span class="ident">integrity</span>, <span class="ident">supported_values</span>,
-            );
-
-            <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">DatamodelError::new_source_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>, <span class="string">&quot;relationMode&quot;</span>, <span class="ident">span</span>);
-
-            <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">error</span>);
-        }
-    }
+    <span class="kw">let</span> <span class="ident">relation_mode</span> <span class="op">=</span> <span class="ident">get_relation_mode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">args</span>, <span class="ident">preview_features</span>, <span class="ident">ast_source</span>, <span class="ident">diagnostics</span>, <span class="ident">active_connector</span>);
 
     <span class="kw">let</span> (<span class="ident">schemas</span>, <span class="ident">schemas_span</span>) <span class="op">=</span> <span class="ident">args</span>
         .<span class="ident">remove</span>(<span class="ident">SCHEMAS_KEY</span>)
@@ -581,21 +431,6 @@
 
     <span class="kw">let</span> <span class="ident">connector_data</span> <span class="op">=</span> <span class="ident">active_connector</span>.<span class="ident">parse_datasource_properties</span>(<span class="kw-2">&amp;mut</span> <span class="ident">args</span>, <span class="ident">diagnostics</span>);
 
-    <span class="comment">// referentialIntegrity and relationMode cannot co-occur</span>
-    <span class="kw">if</span> <span class="ident">referential_integrity</span>.<span class="ident">and</span>(<span class="ident">relation_mode</span>).<span class="ident">is_some</span>() {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">args</span>
-            .<span class="ident">get</span>(<span class="string">&quot;referentialIntegrity&quot;</span>)
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">v</span>)<span class="op">|</span> <span class="ident">v</span>.<span class="ident">span</span>())
-            .<span class="ident">unwrap_or_else</span>(<span class="ident">Span::empty</span>);
-
-        <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_referential_integrity_and_relation_mode_cooccur_error</span>(<span class="ident">span</span>));
-    }
-
-    <span class="comment">// we handle these elsewhere</span>
-    <span class="ident">args</span>.<span class="ident">remove</span>(<span class="string">&quot;previewFeatures&quot;</span>);
-    <span class="ident">args</span>.<span class="ident">remove</span>(<span class="string">&quot;referentialIntegrity&quot;</span>);
-    <span class="ident">args</span>.<span class="ident">remove</span>(<span class="string">&quot;relationMode&quot;</span>);
-
     <span class="kw">for</span> (<span class="ident">name</span>, (<span class="ident">span</span>, <span class="kw">_</span>)) <span class="kw">in</span> <span class="ident">args</span>.<span class="ident">into_iter</span>() {
         <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_property_not_known_error</span>(<span class="ident">name</span>, <span class="ident">span</span>));
     }
@@ -611,62 +446,13 @@
         <span class="ident">documentation</span>,
         <span class="ident">active_connector</span>,
         <span class="ident">shadow_database_url</span>,
-        <span class="ident">referential_integrity</span>,
         <span class="ident">relation_mode</span>,
         <span class="ident">connector_data</span>,
     })
 }
 
-<span class="kw">const</span> <span class="ident">REFERENTIAL_INTEGRITY_PREVIEW_FEATURE_ERR</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot;
-The `referentialIntegrity` option can only be set if the preview feature is enabled in a generator block.
-
-Example:
-
-generator client {
-    provider = &quot;prisma-client-js&quot;
-    previewFeatures = [&quot;referentialIntegrity&quot;]
-}
-&quot;#</span>;
-
-<span class="kw">fn</span> <span class="ident">get_referential_integrity</span>(
-    <span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Span</span>, <span class="kw-2">&amp;</span><span class="ident">ast::Expression</span>)<span class="op">&gt;</span>,
-    <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
-    <span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">SourceConfig</span>,
-    <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
-) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RelationMode</span><span class="op">&gt;</span> {
-    <span class="ident">args</span>.<span class="ident">get</span>(<span class="string">&quot;referentialIntegrity&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span>(<span class="ident">span</span>, <span class="ident">value</span>)<span class="op">|</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::ReferentialIntegrity</span>) {
-            <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_source_validation_error</span>(
-                <span class="ident">REFERENTIAL_INTEGRITY_PREVIEW_FEATURE_ERR</span>,
-                <span class="kw-2">&amp;</span><span class="ident">source</span>.<span class="ident">name</span>.<span class="ident">name</span>,
-                <span class="kw-2">*</span><span class="ident">span</span>,
-            ));
-
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="kw">match</span> <span class="ident">coerce::string</span>(<span class="ident">value</span>, <span class="ident">diagnostics</span>)<span class="question-mark">?</span> {
-                <span class="string">&quot;prisma&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">RelationMode::Prisma</span>),
-                <span class="string">&quot;foreignKeys&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">RelationMode::ForeignKeys</span>),
-                <span class="ident">s</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
-                        <span class="string">&quot;Invalid referential integrity setting: \&quot;{}\&quot;. Supported values: \&quot;prisma\&quot;, \&quot;foreignKeys\&quot;&quot;</span>,
-                        <span class="ident">s</span>
-                    );
-
-                    <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span>
-                        <span class="ident">DatamodelError::new_source_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>, <span class="string">&quot;referentialIntegrity&quot;</span>, <span class="ident">value</span>.<span class="ident">span</span>());
-
-                    <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">error</span>);
-
-                    <span class="prelude-val">None</span>
-                }
-            }
-        }
-    })
-}
-
 <span class="kw">const</span> <span class="ident">RELATION_MODE_PREVIEW_FEATURE_ERR</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot;
-The `relationMode` option can only be set if the preview feature is enabled in a generator block.
+This option can only be set if the preview feature is enabled in a generator block.
 
 Example:
 
@@ -677,47 +463,65 @@ generator client {
 &quot;#</span>;
 
 <span class="kw">fn</span> <span class="ident">get_relation_mode</span>(
-    <span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Span</span>, <span class="kw-2">&amp;</span><span class="ident">ast::Expression</span>)<span class="op">&gt;</span>,
+    <span class="ident">args</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Span</span>, <span class="kw-2">&amp;</span><span class="ident">ast::Expression</span>)<span class="op">&gt;</span>,
     <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
     <span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">SourceConfig</span>,
     <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
+    <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident"><span class="kw">crate</span>::datamodel_connector::Connector</span>,
 ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RelationMode</span><span class="op">&gt;</span> {
-    <span class="ident">args</span>.<span class="ident">get</span>(<span class="string">&quot;relationMode&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span>(<span class="ident">span</span>, <span class="ident">value</span>)<span class="op">|</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::ReferentialIntegrity</span>) {
-            <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_source_validation_error</span>(
-                <span class="ident">RELATION_MODE_PREVIEW_FEATURE_ERR</span>,
-                <span class="kw-2">&amp;</span><span class="ident">source</span>.<span class="ident">name</span>.<span class="ident">name</span>,
-                <span class="kw-2">*</span><span class="ident">span</span>,
-            ));
-
+    <span class="kw">match</span> (<span class="ident">args</span>.<span class="ident">remove</span>(<span class="string">&quot;relationMode&quot;</span>), <span class="ident">args</span>.<span class="ident">remove</span>(<span class="string">&quot;referentialIntegrity&quot;</span>)) {
+        (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">None</span>,
+        (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">Some</span>((<span class="ident">span</span>, <span class="kw">_</span>))) =&gt; {
+            <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_referential_integrity_and_relation_mode_cooccur_error</span>(<span class="ident">span</span>));
             <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="kw">match</span> <span class="ident">coerce::string</span>(<span class="ident">value</span>, <span class="ident">diagnostics</span>)<span class="question-mark">?</span> {
-                <span class="string">&quot;prisma&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">RelationMode::Prisma</span>),
-                <span class="string">&quot;foreignKeys&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">RelationMode::ForeignKeys</span>),
-                <span class="ident">s</span> =&gt; {
+        }
+        (<span class="prelude-val">Some</span>((<span class="ident">span</span>, <span class="ident">rm</span>)), <span class="prelude-val">None</span>) <span class="op">|</span> (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>((<span class="ident">span</span>, <span class="ident">rm</span>))) =&gt; {
+            <span class="kw">if</span> <span class="op">!</span><span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::ReferentialIntegrity</span>) {
+                <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_source_validation_error</span>(
+                    <span class="ident">RELATION_MODE_PREVIEW_FEATURE_ERR</span>,
+                    <span class="kw-2">&amp;</span><span class="ident">source</span>.<span class="ident">name</span>.<span class="ident">name</span>,
+                    <span class="ident">span</span>,
+                ));
+                <span class="prelude-val">None</span>
+            } <span class="kw">else</span> {
+                <span class="kw">let</span> <span class="ident">integrity</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">coerce::string</span>(<span class="ident">rm</span>, <span class="ident">diagnostics</span>)<span class="question-mark">?</span> {
+                    <span class="string">&quot;prisma&quot;</span> =&gt; <span class="ident">RelationMode::Prisma</span>,
+                    <span class="string">&quot;foreignKeys&quot;</span> =&gt; <span class="ident">RelationMode::ForeignKeys</span>,
+                    <span class="ident">other</span> =&gt; {
+                        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
+                            <span class="string">&quot;Invalid relation mode setting: \&quot;{other}\&quot;. Supported values: \&quot;prisma\&quot;, \&quot;foreignKeys\&quot;&quot;</span>,
+                        );
+                        <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">DatamodelError::new_source_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>, <span class="string">&quot;relationMode&quot;</span>, <span class="ident">source</span>.<span class="ident">span</span>);
+                        <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">error</span>);
+                        <span class="kw">return</span> <span class="prelude-val">None</span>;
+                    }
+                };
+
+                <span class="kw">if</span> <span class="op">!</span><span class="ident">connector</span>.<span class="ident">allowed_relation_mode_settings</span>().<span class="ident">contains</span>(<span class="ident">integrity</span>) {
+                    <span class="kw">let</span> <span class="ident">supported_values</span> <span class="op">=</span> <span class="ident">connector</span>
+                        .<span class="ident">allowed_relation_mode_settings</span>()
+                        .<span class="ident">iter</span>()
+                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">r#&quot;&quot;{}&quot;&quot;#</span>, <span class="ident">v</span>))
+                        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+                        .<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>);
+
                     <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
-                        <span class="string">&quot;Invalid relation mode setting: \&quot;{}\&quot;. Supported values: \&quot;prisma\&quot;, \&quot;foreignKeys\&quot;&quot;</span>,
-                        <span class="ident">s</span>
+                        <span class="string">&quot;Invalid relation mode setting: \&quot;{integrity}\&quot;. Supported values: {supported_values}&quot;</span>,
                     );
-
-                    <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">DatamodelError::new_source_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>, <span class="string">&quot;relationMode&quot;</span>, <span class="ident">value</span>.<span class="ident">span</span>());
-
+                    <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">DatamodelError::new_source_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>, <span class="string">&quot;relationMode&quot;</span>, <span class="ident">rm</span>.<span class="ident">span</span>());
                     <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">error</span>);
-
-                    <span class="prelude-val">None</span>
                 }
+
+                <span class="prelude-val">Some</span>(<span class="ident">integrity</span>)
             }
         }
-    })
+    }
 }
 
-<span class="kw">fn</span> <span class="ident">preview_features_guardrail</span>(<span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Span</span>, <span class="kw-2">&amp;</span><span class="ident">ast::Expression</span>)<span class="op">&gt;</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) {
-    <span class="kw">let</span> <span class="ident">arg</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">get</span>(<span class="ident">PREVIEW_FEATURES_KEY</span>);
-
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">span</span>, <span class="kw">_</span>)) <span class="op">=</span> <span class="ident">arg</span> {
+<span class="kw">fn</span> <span class="ident">preview_features_guardrail</span>(<span class="ident">args</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Span</span>, <span class="kw-2">&amp;</span><span class="ident">ast::Expression</span>)<span class="op">&gt;</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) {
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">span</span>, <span class="kw">_</span>)) <span class="op">=</span> <span class="ident">args</span>.<span class="ident">remove</span>(<span class="ident">PREVIEW_FEATURES_KEY</span>) {
         <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;Preview features are only supported in the generator block. Please move this field to the generator block.&quot;</span>;
-        <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_static</span>(<span class="ident">msg</span>, <span class="kw-2">*</span><span class="ident">span</span>));
+        <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_static</span>(<span class="ident">msg</span>, <span class="ident">span</span>));
     }
 }
 </code></pre></div>

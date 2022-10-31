@@ -194,11 +194,6 @@
 <span id="194">194</span>
 <span id="195">195</span>
 <span id="196">196</span>
-<span id="197">197</span>
-<span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
-<span id="201">201</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">configuration::StringFromEnvVar</span>,
     <span class="ident">datamodel_connector</span>::{<span class="ident">Connector</span>, <span class="ident">ConnectorCapabilities</span>, <span class="ident">RelationMode</span>},
@@ -220,9 +215,6 @@
     <span class="kw">pub</span> <span class="ident">active_connector</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">Connector</span>,
     <span class="doccomment">/// An optional user-defined shadow database URL.</span>
     <span class="kw">pub</span> <span class="ident">shadow_database_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">StringFromEnvVar</span>, <span class="ident">Span</span>)<span class="op">&gt;</span>,
-    <span class="doccomment">/// In which layer referential actions are handled.</span>
-    <span class="comment">// #[deprecated(since = &quot;4.5.0&quot;, note = &quot;Use `relation_mode` instead&quot;)]</span>
-    <span class="kw">pub</span> <span class="ident">referential_integrity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RelationMode</span><span class="op">&gt;</span>,
     <span class="doccomment">/// In which layer referential actions are handled.</span>
     <span class="kw">pub</span> <span class="ident">relation_mode</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RelationMode</span><span class="op">&gt;</span>,
     <span class="doccomment">/// _Sorted_ vec of schemas defined in the schemas property.</span>
@@ -257,7 +249,6 @@
             .<span class="ident">field</span>(<span class="string">&quot;documentation&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">documentation</span>)
             .<span class="ident">field</span>(<span class="string">&quot;active_connector&quot;</span>, <span class="op">&amp;&amp;</span><span class="string">&quot;...&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;shadow_database_url&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;&lt;shadow_database_url&gt;&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;referential_integrity [deprecated]&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">referential_integrity</span>)
             .<span class="ident">field</span>(<span class="string">&quot;relation_mode&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relation_mode</span>)
             .<span class="ident">field</span>(<span class="string">&quot;namespaces&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">namespaces</span>)
             .<span class="ident">finish</span>()
@@ -285,7 +276,6 @@
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::or_fun_call</span>)]</span> <span class="comment">// not applicable in this case</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_mode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RelationMode</span> {
         <span class="self">self</span>.<span class="ident">relation_mode</span>
-            .<span class="ident">or</span>(<span class="self">self</span>.<span class="ident">referential_integrity</span>)
             .<span class="ident">unwrap_or</span>(<span class="self">self</span>.<span class="ident">active_connector</span>.<span class="ident">default_relation_mode</span>())
     }
 
