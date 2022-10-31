@@ -89,12 +89,8 @@ impl<'a> LiftAstToDml<'a> {
         let relation_mode = self.relation_mode;
         let common_dml_fields = |field: &mut RelationField, relation_field: RelationFieldWalker<'_>| {
             let ast_field = relation_field.ast_field();
-            field.relation_info.on_delete = relation_field
-                .explicit_on_delete()
-                .map(parser_database_referential_action_to_dml_referential_action);
-            field.relation_info.on_update = relation_field
-                .explicit_on_update()
-                .map(parser_database_referential_action_to_dml_referential_action);
+            field.relation_info.on_delete = relation_field.explicit_on_delete().map(From::from);
+            field.relation_info.on_update = relation_field.explicit_on_update().map(From::from);
             field.relation_info.name = relation_field.relation_name().to_string();
             field.documentation = ast_field.documentation().map(String::from);
             field.is_ignored = relation_field.is_ignored();
@@ -561,16 +557,6 @@ fn parser_database_sort_order_to_dml_sort_order(sort_order: db::SortOrder) -> So
     match sort_order {
         db::SortOrder::Asc => SortOrder::Asc,
         db::SortOrder::Desc => SortOrder::Desc,
-    }
-}
-
-fn parser_database_referential_action_to_dml_referential_action(ra: db::ReferentialAction) -> ReferentialAction {
-    match ra {
-        db::ReferentialAction::Cascade => ReferentialAction::Cascade,
-        db::ReferentialAction::SetNull => ReferentialAction::SetNull,
-        db::ReferentialAction::SetDefault => ReferentialAction::SetDefault,
-        db::ReferentialAction::Restrict => ReferentialAction::Restrict,
-        db::ReferentialAction::NoAction => ReferentialAction::NoAction,
     }
 }
 
