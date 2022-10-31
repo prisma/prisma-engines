@@ -818,6 +818,7 @@ impl QueryGraph {
                 nested: vec![],
                 selection_order: vec![],
                 aggregation_selections: vec![],
+                options: vec![],
             });
 
             let query = Query::Read(read_query);

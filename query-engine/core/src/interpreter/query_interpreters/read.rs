@@ -1,5 +1,5 @@
 use super::*;
-use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
+use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*, QueryGraphBuilderError};
 use connector::{self, ConnectionLike, QueryArguments, RelAggregationRow, RelAggregationSelection};
 use futures::future::{BoxFuture, FutureExt};
 use inmemory_record_processor::InMemoryRecordProcessor;
@@ -62,6 +62,14 @@ fn read_one(
                 .into())
             }
 
+            None if query
+                .options
+                .iter()
+                .any(|option| matches!(option, QueryOption::ThrowOnEmpty)) =>
+            {
+                Err(QueryGraphBuilderError::RecordNotFound("Record not found".to_owned()).into())
+            }
+
             None => Ok(QueryResult::RecordSelection(Box::new(RecordSelection {
                 name: query.name,
                 fields: query.selection_order,
@@ -120,18 +128,26 @@ fn read_many(
             (scalars, aggregation_rows)
         };
 
-        let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
-
-        Ok(RecordSelection {
-            name: query.name,
-            fields: query.selection_order,
-            scalars,
-            nested,
-            query_arguments: query.args,
-            model: query.model,
-            aggregation_rows,
+        if scalars.records.is_empty()
+            && query
+                .options
+                .iter()
+                .any(|option| matches!(option, QueryOption::ThrowOnEmpty))
+        {
+            Err(QueryGraphBuilderError::RecordNotFound("Record not found".to_owned()).into())
+        } else {
+            let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
+            Ok(RecordSelection {
+                name: query.name,
+                fields: query.selection_order,
+                scalars,
+                nested,
+                query_arguments: query.args,
+                model: query.model,
+                aggregation_rows,
+            }
+            .into())
         }
-        .into())
     };
 
     fut.boxed()
@@ -165,7 +181,6 @@ fn read_related<'conn>(
             )
             .await?
         };
-
         let model = query.parent_field.related_model();
         let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
 

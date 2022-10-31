@@ -9,12 +9,14 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
         .flat_map(|model| {
             let mut vec = vec![
                 find_first_field(ctx, &model),
+                find_first_or_throw_field(ctx, &model),
                 all_items_field(ctx, &model),
                 plain_aggregation_field(ctx, &model),
             ];
 
             vec.push(group_by_aggregation_field(ctx, &model));
             append_opt(&mut vec, find_unique_field(ctx, &model));
+            append_opt(&mut vec, find_unique_or_throw_field(ctx, &model));
 
             if ctx.enable_raw_queries && ctx.has_capability(ConnectorCapability::MongoDbQueryRaw) {
                 vec.push(mongo_find_raw_field(&model));
@@ -50,6 +52,25 @@ fn find_unique_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
     })
 }
 
+/// Builds a "single" query arity item field (e.g. "user", "post" ...) for given model
+/// that will throw a NotFoundError if the item is not found
+fn find_unique_or_throw_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputField> {
+    arguments::where_unique_argument(ctx, model).map(|arg| {
+        let field_name = format!("findUniqueOrThrow{}", model.name);
+
+        field(
+            field_name,
+            vec![arg],
+            OutputType::object(objects::model::map_type(ctx, model)),
+            Some(QueryInfo {
+                model: Some(Arc::clone(model)),
+                tag: QueryTag::FindUniqueOrThrow,
+            }),
+        )
+        .nullable()
+    })
+}
+
 /// Builds a find first item field for given model.
 fn find_first_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     let args = arguments::relation_selection_arguments(ctx, model, true);
@@ -62,6 +83,24 @@ fn find_first_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
         Some(QueryInfo {
             model: Some(Arc::clone(model)),
             tag: QueryTag::FindFirst,
+        }),
+    )
+    .nullable()
+}
+
+/// Builds a find first item field for given model that throws a NotFoundError in case the item does
+/// not exist
+fn find_first_or_throw_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
+    let args = arguments::relation_selection_arguments(ctx, model, true);
+    let field_name = format!("findFirstOrThrow{}", model.name);
+
+    field(
+        field_name,
+        args,
+        OutputType::object(objects::model::map_type(ctx, model)),
+        Some(QueryInfo {
+            model: Some(Arc::clone(model)),
+            tag: QueryTag::FindFirstOrThrow,
         }),
     )
     .nullable()
