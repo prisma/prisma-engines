@@ -86,6 +86,12 @@ impl Display for ReadQuery {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum QueryOption {
+    ThrowOnEmpty,
+}
+pub const THROW_ON_EMPTY: [QueryOption; 1] = [QueryOption::ThrowOnEmpty];
+
 #[derive(Debug, Clone)]
 pub struct RecordQuery {
     pub name: String,
@@ -96,6 +102,7 @@ pub struct RecordQuery {
     pub nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
     pub aggregation_selections: Vec<RelAggregationSelection>,
+    pub options: Vec<QueryOption>,
 }
 
 #[derive(Debug, Clone)]
@@ -108,6 +115,7 @@ pub struct ManyRecordsQuery {
     pub nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
     pub aggregation_selections: Vec<RelAggregationSelection>,
+    pub options: Vec<QueryOption>,
 }
 
 #[derive(Debug, Clone)]
