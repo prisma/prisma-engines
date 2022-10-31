@@ -108,14 +108,12 @@ impl<'a> Datasource<'a> {
         let shadow_database_url = psl_ds.shadow_database_url.as_ref().map(|(url, _)| Env::from(url));
         let namespaces: Vec<Text<_>> = psl_ds.namespaces.iter().map(|(ns, _)| Text(ns.as_str())).collect();
 
-        let relation_mode = psl_ds.relation_mode.or(psl_ds.referential_integrity);
-
         Self {
             name: &psl_ds.name,
             provider: Text(&psl_ds.provider),
             url: Env::from(&psl_ds.url),
             shadow_database_url,
-            relation_mode,
+            relation_mode: psl_ds.relation_mode,
             documentation: psl_ds.documentation.as_deref().map(Documentation),
             custom_properties: Default::default(),
             namespaces: Array::from(namespaces),

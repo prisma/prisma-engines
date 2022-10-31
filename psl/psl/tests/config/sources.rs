@@ -603,7 +603,7 @@ fn referential_integrity_without_preview_feature_errors() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating datasource `ps`: 
-        The `referentialIntegrity` option can only be set if the preview feature is enabled in a generator block.
+        This option can only be set if the preview feature is enabled in a generator block.
 
         Example:
 
@@ -641,7 +641,7 @@ fn relation_mode_without_preview_feature_errors() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating datasource `ps`: 
-        The `relationMode` option can only be set if the preview feature is enabled in a generator block.
+        This option can only be set if the preview feature is enabled in a generator block.
 
         Example:
 
@@ -743,7 +743,8 @@ fn relation_mode_and_referential_integrity_cannot_cooccur() {
           [1;94m-->[0m  [4mschema.prisma:5[0m
         [1;94m   | [0m
         [1;94m 4 | [0m  relationMode = "prisma"
-        [1;94m 5 | [0m  referentialIntegrity = [1;91m"foreignKeys"[0m
+        [1;94m 5 | [0m  [1;91mreferentialIntegrity = "foreignKeys"[0m
+        [1;94m 6 | [0m}
         [1;94m   | [0m
     "#]];
     expectation.assert_eq(&error);

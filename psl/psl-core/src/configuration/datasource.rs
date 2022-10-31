@@ -20,9 +20,6 @@ pub struct Datasource {
     /// An optional user-defined shadow database URL.
     pub shadow_database_url: Option<(StringFromEnvVar, Span)>,
     /// In which layer referential actions are handled.
-    // #[deprecated(since = "4.5.0", note = "Use `relation_mode` instead")]
-    pub referential_integrity: Option<RelationMode>,
-    /// In which layer referential actions are handled.
     pub relation_mode: Option<RelationMode>,
     /// _Sorted_ vec of schemas defined in the schemas property.
     pub namespaces: Vec<(String, Span)>,
@@ -56,7 +53,6 @@ impl std::fmt::Debug for Datasource {
             .field("documentation", &self.documentation)
             .field("active_connector", &&"...")
             .field("shadow_database_url", &"<shadow_database_url>")
-            .field("referential_integrity [deprecated]", &self.referential_integrity)
             .field("relation_mode", &self.relation_mode)
             .field("namespaces", &self.namespaces)
             .finish()
@@ -84,7 +80,6 @@ impl Datasource {
     #[allow(clippy::or_fun_call)] // not applicable in this case
     pub fn relation_mode(&self) -> RelationMode {
         self.relation_mode
-            .or(self.referential_integrity)
             .unwrap_or(self.active_connector.default_relation_mode())
     }
 

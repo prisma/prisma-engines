@@ -122,11 +122,9 @@ fn lift_datasource(
             None
         };
 
-    preview_features_guardrail(&args, diagnostics);
+    preview_features_guardrail(&mut args, diagnostics);
 
     let documentation = ast_source.documentation().map(String::from);
-    let referential_integrity = get_referential_integrity(&args, preview_features, ast_source, diagnostics);
-    let relation_mode = get_relation_mode(&args, preview_features, ast_source, diagnostics);
 
     let active_connector: &'static dyn crate::datamodel_connector::Connector =
         match connectors.iter().find(|c| c.is_provider(provider)) {
@@ -141,57 +139,7 @@ fn lift_datasource(
             }
         };
 
-    // TODO: deprecated, keeping here since the "referentialIntegrity" datasource property
-    // is still silently supported.
-    if let Some(integrity) = referential_integrity {
-        if !active_connector.allowed_relation_mode_settings().contains(integrity) {
-            let span = args
-                .get("referentialIntegrity")
-                .map(|(_, v)| v.span())
-                .unwrap_or_else(Span::empty);
-
-            let supported_values = active_connector
-                .allowed_relation_mode_settings()
-                .iter()
-                .map(|v| format!(r#""{}""#, v))
-                .collect::<Vec<_>>()
-                .join(", ");
-
-            let message = format!(
-                "Invalid referential integrity setting: \"{}\". Supported values: {}",
-                integrity, supported_values,
-            );
-
-            let error = DatamodelError::new_source_validation_error(&message, "referentialIntegrity", span);
-
-            diagnostics.push_error(error);
-        }
-    }
-
-    if let Some(integrity) = relation_mode {
-        if !active_connector.allowed_relation_mode_settings().contains(integrity) {
-            let span = args
-                .get("relationMode")
-                .map(|(_, v)| v.span())
-                .unwrap_or_else(Span::empty);
-
-            let supported_values = active_connector
-                .allowed_relation_mode_settings()
-                .iter()
-                .map(|v| format!(r#""{}""#, v))
-                .collect::<Vec<_>>()
-                .join(", ");
-
-            let message = format!(
-                "Invalid relation mode setting: \"{}\". Supported values: {}",
-                integrity, supported_values,
-            );
-
-            let error = DatamodelError::new_source_validation_error(&message, "relationMode", span);
-
-            diagnostics.push_error(error);
-        }
-    }
+    let relation_mode = get_relation_mode(&mut args, preview_features, ast_source, diagnostics, active_connector);
 
     let (schemas, schemas_span) = args
         .remove(SCHEMAS_KEY)
@@ -220,21 +168,6 @@ fn lift_datasource(
 
     let connector_data = active_connector.parse_datasource_properties(&mut args, diagnostics);
 
-    // referentialIntegrity and relationMode cannot co-occur
-    if referential_integrity.and(relation_mode).is_some() {
-        let span = args
-            .get("referentialIntegrity")
-            .map(|(_, v)| v.span())
-            .unwrap_or_else(Span::empty);
-
-        diagnostics.push_error(DatamodelError::new_referential_integrity_and_relation_mode_cooccur_error(span));
-    }
-
-    // we handle these elsewhere
-    args.remove("previewFeatures");
-    args.remove("referentialIntegrity");
-    args.remove("relationMode");
-
     for (name, (span, _)) in args.into_iter() {
         diagnostics.push_error(DatamodelError::new_property_not_known_error(name, span));
     }
@@ -250,62 +183,13 @@ fn lift_datasource(
         documentation,
         active_connector,
         shadow_database_url,
-        referential_integrity,
         relation_mode,
         connector_data,
     })
 }
 
-const REFERENTIAL_INTEGRITY_PREVIEW_FEATURE_ERR: &str = r#"
-The `referentialIntegrity` option can only be set if the preview feature is enabled in a generator block.
-
-Example:
-
-generator client {
-    provider = "prisma-client-js"
-    previewFeatures = ["referentialIntegrity"]
-}
-"#;
-
-fn get_referential_integrity(
-    args: &HashMap<&str, (Span, &ast::Expression)>,
-    preview_features: BitFlags<PreviewFeature>,
-    source: &SourceConfig,
-    diagnostics: &mut Diagnostics,
-) -> Option<RelationMode> {
-    args.get("referentialIntegrity").and_then(|(span, value)| {
-        if !preview_features.contains(PreviewFeature::ReferentialIntegrity) {
-            diagnostics.push_error(DatamodelError::new_source_validation_error(
-                REFERENTIAL_INTEGRITY_PREVIEW_FEATURE_ERR,
-                &source.name.name,
-                *span,
-            ));
-
-            None
-        } else {
-            match coerce::string(value, diagnostics)? {
-                "prisma" => Some(RelationMode::Prisma),
-                "foreignKeys" => Some(RelationMode::ForeignKeys),
-                s => {
-                    let message = format!(
-                        "Invalid referential integrity setting: \"{}\". Supported values: \"prisma\", \"foreignKeys\"",
-                        s
-                    );
-
-                    let error =
-                        DatamodelError::new_source_validation_error(&message, "referentialIntegrity", value.span());
-
-                    diagnostics.push_error(error);
-
-                    None
-                }
-            }
-        }
-    })
-}
-
 const RELATION_MODE_PREVIEW_FEATURE_ERR: &str = r#"
-The `relationMode` option can only be set if the preview feature is enabled in a generator block.
+This option can only be set if the preview feature is enabled in a generator block.
 
 Example:
 
@@ -316,46 +200,64 @@ generator client {
 "#;
 
 fn get_relation_mode(
-    args: &HashMap<&str, (Span, &ast::Expression)>,
+    args: &mut HashMap<&str, (Span, &ast::Expression)>,
     preview_features: BitFlags<PreviewFeature>,
     source: &SourceConfig,
     diagnostics: &mut Diagnostics,
+    connector: &'static dyn crate::datamodel_connector::Connector,
 ) -> Option<RelationMode> {
-    args.get("relationMode").and_then(|(span, value)| {
-        if !preview_features.contains(PreviewFeature::ReferentialIntegrity) {
-            diagnostics.push_error(DatamodelError::new_source_validation_error(
-                RELATION_MODE_PREVIEW_FEATURE_ERR,
-                &source.name.name,
-                *span,
-            ));
-
+    match (args.remove("relationMode"), args.remove("referentialIntegrity")) {
+        (None, None) => None,
+        (Some(_), Some((span, _))) => {
+            diagnostics.push_error(DatamodelError::new_referential_integrity_and_relation_mode_cooccur_error(span));
             None
-        } else {
-            match coerce::string(value, diagnostics)? {
-                "prisma" => Some(RelationMode::Prisma),
-                "foreignKeys" => Some(RelationMode::ForeignKeys),
-                s => {
+        }
+        (Some((span, rm)), None) | (None, Some((span, rm))) => {
+            if !preview_features.contains(PreviewFeature::ReferentialIntegrity) {
+                diagnostics.push_error(DatamodelError::new_source_validation_error(
+                    RELATION_MODE_PREVIEW_FEATURE_ERR,
+                    &source.name.name,
+                    span,
+                ));
+                None
+            } else {
+                let integrity = match coerce::string(rm, diagnostics)? {
+                    "prisma" => RelationMode::Prisma,
+                    "foreignKeys" => RelationMode::ForeignKeys,
+                    other => {
+                        let message = format!(
+                            "Invalid relation mode setting: \"{other}\". Supported values: \"prisma\", \"foreignKeys\"",
+                        );
+                        let error = DatamodelError::new_source_validation_error(&message, "relationMode", source.span);
+                        diagnostics.push_error(error);
+                        return None;
+                    }
+                };
+
+                if !connector.allowed_relation_mode_settings().contains(integrity) {
+                    let supported_values = connector
+                        .allowed_relation_mode_settings()
+                        .iter()
+                        .map(|v| format!(r#""{}""#, v))
+                        .collect::<Vec<_>>()
+                        .join(", ");
+
                     let message = format!(
-                        "Invalid relation mode setting: \"{}\". Supported values: \"prisma\", \"foreignKeys\"",
-                        s
+                        "Invalid relation mode setting: \"{integrity}\". Supported values: {supported_values}",
                     );
-
-                    let error = DatamodelError::new_source_validation_error(&message, "relationMode", value.span());
-
+                    let error = DatamodelError::new_source_validation_error(&message, "relationMode", rm.span());
                     diagnostics.push_error(error);
-
-                    None
                 }
+
+                Some(integrity)
             }
         }
-    })
+    }
 }
 
-fn preview_features_guardrail(args: &HashMap<&str, (Span, &ast::Expression)>, diagnostics: &mut Diagnostics) {
-    let arg = args.get(PREVIEW_FEATURES_KEY);
-
-    if let Some((span, _)) = arg {
+fn preview_features_guardrail(args: &mut HashMap<&str, (Span, &ast::Expression)>, diagnostics: &mut Diagnostics) {
+    if let Some((span, _)) = args.remove(PREVIEW_FEATURES_KEY) {
         let msg = "Preview features are only supported in the generator block. Please move this field to the generator block.";
-        diagnostics.push_error(DatamodelError::new_static(msg, *span));
+        diagnostics.push_error(DatamodelError::new_static(msg, span));
     }
 }
