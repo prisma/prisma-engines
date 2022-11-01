@@ -254,6 +254,7 @@ impl<'a> Model<'a> {
         let uniques: HashMap<&str, IndexFieldOptions> = dml_model
             .indices
             .iter()
+            .rev() // replicate existing behaviour on duplicate unique constraints
             .filter(|ix| ix.is_unique())
             .filter(|ix| ix.defined_on_field)
             .map(|ix| {
