@@ -36,19 +36,19 @@ async fn should_not_remap_if_renaming_would_lead_to_duplicate_names(api: &TestAp
 
         /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
         model nodes {
-          node_a                     Int
-          node_b                     Int
-          nodes__nodes_node_aTonodes nodes @relation("_nodes_node_aTonodes", fields: [node_a], references: [id], onDelete: Cascade)
-          nodes__nodes_node_bTonodes nodes @relation("_nodes_node_bTonodes", fields: [node_b], references: [id], onDelete: Cascade)
+          node_a Int
+          node_b Int
 
           @@map("_nodes")
           @@ignore
         }
 
         model nodes {
-          id                         Int     @id @default(autoincrement())
-          nodes__nodes_node_aTonodes nodes[] @map("_nodes__nodes_node_aTonodes") @relation("_nodes_node_aTonodes") @ignore
-          nodes__nodes_node_bTonodes nodes[] @map("_nodes__nodes_node_bTonodes") @relation("_nodes_node_bTonodes") @ignore
+          id                        Int     @id @default(autoincrement())
+          nodes_nodes_node_aTonodes nodes   @relation("nodes_node_aTonodes", fields: [node_a], references: [id], onDelete: Cascade) @ignore
+          nodes_nodes_node_bTonodes nodes   @relation("nodes_node_bTonodes", fields: [node_b], references: [id], onDelete: Cascade) @ignore
+          nodes_nodes_node_aTonodes nodes[] @relation("nodes_node_aTonodes") @ignore
+          nodes_nodes_node_bTonodes nodes[] @relation("nodes_node_bTonodes") @ignore
         }
     "#]];
     api.expect_datamodel(&expected).await;

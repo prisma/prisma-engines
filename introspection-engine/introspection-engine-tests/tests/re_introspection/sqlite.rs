@@ -104,8 +104,8 @@ async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestAp
     let expectation = expect![[r#"
         model User {
           id     Int    @id @default(autoincrement())
-          User_B User[] @relation("FollowRelation")
           User_A User[] @relation("FollowRelation")
+          User_B User[] @relation("FollowRelation")
         }
     "#]];
 
