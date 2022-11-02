@@ -128,4 +128,3 @@ fn multi_schema_add_table(api: TestApi) {
         .assert_has_table("Second")
         .assert_has_table("Third");
 }
-
