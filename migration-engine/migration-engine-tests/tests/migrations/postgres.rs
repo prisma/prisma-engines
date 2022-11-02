@@ -1,4 +1,5 @@
 mod extensions;
+mod multi_schema;
 
 use migration_core::migration_connector::DiffTarget;
 use migration_engine_tests::test_api::*;

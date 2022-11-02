@@ -223,6 +223,12 @@ impl TestApi {
         SchemaAssertion::new(schema, self.root.args.tags())
     }
 
+    #[track_caller]
+    pub fn assert_schema_with_namespaces(&mut self, namespaces: Option<Namespaces>) -> SchemaAssertion {
+        let schema: SqlSchema = tok(self.connector.describe_schema(namespaces)).unwrap();
+        SchemaAssertion::new(schema, self.root.args.tags())
+    }
+
     /// Render a valid datasource block, including database URL.
     pub fn datasource_block(&self) -> DatasourceBlock<'_> {
         self.root.datasource_block()
