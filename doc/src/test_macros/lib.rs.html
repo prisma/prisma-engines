@@ -357,7 +357,7 @@
 
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
             }
-            <span class="ident">p</span> <span class="kw">if</span> <span class="ident">p</span>.<span class="ident">is_ident</span>(<span class="string">&quot;db_schemas&quot;</span>) =&gt; {
+            <span class="ident">p</span> <span class="kw">if</span> <span class="ident">p</span>.<span class="ident">is_ident</span>(<span class="string">&quot;namespaces&quot;</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">namespaces</span>.<span class="ident">reserve</span>(<span class="ident">list</span>.<span class="ident">nested</span>.<span class="ident">len</span>());
 
                 <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">list</span>.<span class="ident">nested</span> {
