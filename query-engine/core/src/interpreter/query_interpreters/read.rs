@@ -1,10 +1,13 @@
 use super::*;
-use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*, QueryGraphBuilderError};
-use connector::{self, ConnectionLike, QueryArguments, RelAggregationRow, RelAggregationSelection};
+use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
+use connector::{
+    self, error::ConnectorError, ConnectionLike, QueryArguments, RelAggregationRow, RelAggregationSelection,
+};
 use futures::future::{BoxFuture, FutureExt};
 use inmemory_record_processor::InMemoryRecordProcessor;
 use prisma_models::ManyRecords;
 use std::collections::HashMap;
+use user_facing_errors::KnownError;
 
 pub fn execute<'conn>(
     tx: &'conn mut dyn ConnectionLike,
@@ -62,9 +65,7 @@ fn read_one(
                 .into())
             }
 
-            None if query.options.throw_on_empty() => {
-                Err(QueryGraphBuilderError::RecordNotFound("Record not found".to_owned()).into())
-            }
+            None if query.options.throw_on_empty() => record_not_found(),
 
             None => Ok(QueryResult::RecordSelection(Box::new(RecordSelection {
                 name: query.name,
@@ -118,7 +119,7 @@ fn read_many(
         let (scalars, aggregation_rows) = extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
 
         if scalars.records.is_empty() && query.options.throw_on_empty() {
-            Err(QueryGraphBuilderError::RecordNotFound("Record not found".to_owned()).into())
+            record_not_found()
         } else {
             let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
             Ok(RecordSelection {
@@ -286,4 +287,18 @@ pub fn extract_aggregation_rows_from_scalars(
     }
 
     (scalars, Some(aggregation_rows))
+}
+
+// Custom error built for findXOrThrow queries, when a record is not found and it needs to throw an error
+#[inline]
+fn record_not_found() -> InterpretationResult<QueryResult> {
+    Err(ConnectorError {
+        user_facing_error: Some(KnownError::new(
+            user_facing_errors::query_engine::RecordRequiredButNotFound {
+                cause: "Expected a record, found none.".to_owned(),
+            },
+        )),
+        kind: connector::error::ErrorKind::RecordDoesNotExist,
+    }
+    .into())
 }
