@@ -253,18 +253,18 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
 
     let expected = expect![[r#"
         model Event {
-          id                       Int    @id @default(autoincrement())
-          host_id                  Int
-          User_Event_host_idToUser User   @relation("Event_host_idToUser", fields: [host_id], references: [id], map: "host_id")
-          User_EventToUser         User[]
+          id                      Int    @id @default(autoincrement())
+          host_id                 Int
+          UserEvent_host_idToUser User   @relation("Event_host_idToUser", fields: [host_id], references: [id], map: "host_id")
+          User                    User[]
 
           @@index([host_id], map: "host_id")
         }
 
         model User {
-          id                        Int     @id @default(autoincrement())
-          Event_Event_host_idToUser Event[] @relation("Event_host_idToUser")
-          Event_EventToUser         Event[]
+          id                       Int     @id @default(autoincrement())
+          EventEvent_host_idToUser Event[] @relation("Event_host_idToUser")
+          Event                    Event[]
         }
     "#]];
 

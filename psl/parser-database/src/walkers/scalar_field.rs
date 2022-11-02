@@ -334,7 +334,7 @@ impl<'db> ScalarFieldAttributeWalker<'db> {
         match path.type_holding_the_indexed_field() {
             None => {
                 let field_id = path.field_in_index();
-                let walker = self.db.walk_model(self.model_id).scalar_field(field_id);
+                let walker = self.db.walk(self.model_id).scalar_field(field_id);
 
                 IndexFieldWalker::new(walker)
             }

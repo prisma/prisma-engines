@@ -38,7 +38,7 @@ mod types;
 
 pub use coerce_expression::{coerce, coerce_array, coerce_opt};
 pub use names::is_reserved_type_name;
-pub use relations::ReferentialAction;
+pub use relations::{ManyToManyRelationId, ReferentialAction, RelationId};
 pub use schema_ast::{ast, SourceFile};
 pub use types::{
     IndexAlgorithm, IndexFieldPath, IndexType, OperatorClass, ScalarFieldType, ScalarType, SchemaFlags, SortOrder,
