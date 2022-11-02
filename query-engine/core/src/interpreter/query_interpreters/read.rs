@@ -62,11 +62,7 @@ fn read_one(
                 .into())
             }
 
-            None if query
-                .options
-                .iter()
-                .any(|option| matches!(option, QueryOption::ThrowOnEmpty)) =>
-            {
+            None if query.options.throw_on_empty() => {
                 Err(QueryGraphBuilderError::RecordNotFound("Record not found".to_owned()).into())
             }
 
@@ -96,44 +92,32 @@ fn read_many(
     mut query: ManyRecordsQuery,
     trace_id: Option<String>,
 ) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
-    let fut = async move {
-        let (scalars, aggregation_rows) = if query.args.requires_inmemory_processing() {
-            let processor = InMemoryRecordProcessor::new_from_query_args(&mut query.args);
-            let scalars = tx
-                .get_many_records(
-                    &query.model,
-                    query.args.clone(),
-                    &query.selected_fields,
-                    &query.aggregation_selections,
-                    trace_id,
-                )
-                .await?;
-            let scalars = processor.apply(scalars);
-            let (scalars, aggregation_rows) =
-                extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
+    let processor = if query.args.requires_inmemory_processing() {
+        Some(InMemoryRecordProcessor::new_from_query_args(&mut query.args))
+    } else {
+        None
+    };
 
-            (scalars, aggregation_rows)
+    let fut = async move {
+        let scalars = tx
+            .get_many_records(
+                &query.model,
+                query.args.clone(),
+                &query.selected_fields,
+                &query.aggregation_selections,
+                trace_id,
+            )
+            .await?;
+
+        let scalars = if let Some(p) = processor {
+            p.apply(scalars)
         } else {
-            let scalars = tx
-                .get_many_records(
-                    &query.model,
-                    query.args.clone(),
-                    &query.selected_fields,
-                    &query.aggregation_selections,
-                    trace_id,
-                )
-                .await?;
-            let (scalars, aggregation_rows) =
-                extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
-            (scalars, aggregation_rows)
+            scalars
         };
 
-        if scalars.records.is_empty()
-            && query
-                .options
-                .iter()
-                .any(|option| matches!(option, QueryOption::ThrowOnEmpty))
-        {
+        let (scalars, aggregation_rows) = extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
+
+        if scalars.records.is_empty() && query.options.throw_on_empty() {
             Err(QueryGraphBuilderError::RecordNotFound("Record not found".to_owned()).into())
         } else {
             let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;

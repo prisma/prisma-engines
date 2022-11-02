@@ -8,7 +8,8 @@ pub use formatters::*;
 pub use transformers::*;
 
 use crate::{
-    interpreter::ExpressionResult, FilteredQuery, ManyRecordsQuery, Query, QueryGraphBuilderResult, ReadQuery,
+    interpreter::ExpressionResult, FilteredQuery, ManyRecordsQuery, Query, QueryGraphBuilderResult, QueryOptions,
+    ReadQuery,
 };
 use connector::{IntoFilter, QueryArguments};
 use guard::*;
@@ -818,7 +819,7 @@ impl QueryGraph {
                 nested: vec![],
                 selection_order: vec![],
                 aggregation_selections: vec![],
-                options: vec![],
+                options: QueryOptions::none(),
             });
 
             let query = Query::Read(read_query);
