@@ -64,12 +64,12 @@
 
     <span class="doccomment">/// The model which comes first in the alphabetical order.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model_a</span>(<span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">db</span>.<span class="ident">walk_model</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">model_a</span>)
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">db</span>.<span class="ident">walk</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">model_a</span>)
     }
 
     <span class="doccomment">/// The model which comes after model a in the alphabetical order.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model_b</span>(<span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">db</span>.<span class="ident">walk_model</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">model_b</span>)
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">db</span>.<span class="ident">walk</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">model_b</span>)
     }
 
     <span class="doccomment">/// The field that defines the relation in model a.</span>

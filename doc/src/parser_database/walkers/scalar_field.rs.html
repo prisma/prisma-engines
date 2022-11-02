@@ -768,7 +768,7 @@
         <span class="kw">match</span> <span class="ident">path</span>.<span class="ident">type_holding_the_indexed_field</span>() {
             <span class="prelude-val">None</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">field_id</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">field_in_index</span>();
-                <span class="kw">let</span> <span class="ident">walker</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk_model</span>(<span class="self">self</span>.<span class="ident">model_id</span>).<span class="ident">scalar_field</span>(<span class="ident">field_id</span>);
+                <span class="kw">let</span> <span class="ident">walker</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk</span>(<span class="self">self</span>.<span class="ident">model_id</span>).<span class="ident">scalar_field</span>(<span class="ident">field_id</span>);
 
                 <span class="ident">IndexFieldWalker::new</span>(<span class="ident">walker</span>)
             }

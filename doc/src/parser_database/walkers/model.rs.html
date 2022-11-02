@@ -435,7 +435,7 @@
 
     <span class="doccomment">/// Walk a scalar field by id.</span>
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">scalar_field</span>(<span class="self">self</span>, <span class="ident">field_id</span>: <span class="ident">ast::FieldId</span>) -&gt; <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_field</span>(<span class="self">self</span>, <span class="ident">field_id</span>: <span class="ident">ast::FieldId</span>) -&gt; <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="ident">ScalarFieldWalker</span> {
             <span class="ident">model_id</span>: <span class="self">self</span>.<span class="ident">id</span>,
             <span class="ident">field_id</span>,

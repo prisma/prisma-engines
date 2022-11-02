@@ -121,6 +121,11 @@
 <span id="121">121</span>
 <span id="122">122</span>
 <span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">complete</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">complete::CompleteInlineRelationWalker</span>;
@@ -149,12 +154,12 @@
 
     <span class="doccomment">/// The model which holds the relation arguments.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referencing_model</span>(<span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">db</span>.<span class="ident">walk_model</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">model_a</span>)
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">db</span>.<span class="ident">walk</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">model_a</span>)
     }
 
     <span class="doccomment">/// The model referenced and which hold the back-relation field.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referenced_model</span>(<span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">db</span>.<span class="ident">walk_model</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">model_b</span>)
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">db</span>.<span class="ident">walk</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">model_b</span>)
     }
 
     <span class="doccomment">/// If the relation is defined from both sides, convert to an explicit relation</span>
@@ -232,6 +237,11 @@
             <span class="ident">RelationAttributes::ImplicitManyToMany</span> { <span class="ident">field_a</span>: <span class="kw">_</span>, <span class="ident">field_b</span>: <span class="kw">_</span> } =&gt; <span class="macro">unreachable!</span>(),
             <span class="ident">RelationAttributes::TwoWayEmbeddedManyToMany</span> { <span class="ident">field_a</span>: <span class="kw">_</span>, <span class="ident">field_b</span>: <span class="kw">_</span> } =&gt; <span class="macro">unreachable!</span>(),
         }
+    }
+
+    <span class="doccomment">/// The unique identifier of the relation.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_id</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::RelationId</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">id</span>
     }
 
     <span class="doccomment">/// The name of the relation. Either uses the `name` (or default) argument,</span>

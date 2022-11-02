@@ -113,16 +113,6 @@
 <span id="113">113</span>
 <span id="114">114</span>
 <span id="115">115</span>
-<span id="116">116</span>
-<span id="117">117</span>
-<span id="118">118</span>
-<span id="119">119</span>
-<span id="120">120</span>
-<span id="121">121</span>
-<span id="122">122</span>
-<span id="123">123</span>
-<span id="124">124</span>
-<span id="125">125</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Convenient access to a datamodel as understood by ParserDatabase.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The walkers:</span>
@@ -174,22 +164,12 @@
             .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">enum_id</span><span class="op">|</span> <span class="ident">Walker</span> { <span class="ident">db</span>: <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">enum_id</span> })
     }
 
-    <span class="doccomment">/// Find a model by ID.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">walk_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">walk</span>(<span class="ident">model_id</span>)
-    }
-
-    <span class="doccomment">/// Find an enum by ID.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">walk_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">enum_id</span>: <span class="ident">ast::EnumId</span>) -&gt; <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">Walker</span> { <span class="ident">db</span>: <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">enum_id</span> }
-    }
-
     <span class="doccomment">/// Walk all the models in the schema.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">walk_models</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
         <span class="self">self</span>.<span class="ident">ast</span>()
             .<span class="ident">iter_tops</span>()
             .<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">top_id</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">top_id</span>.<span class="ident">as_model_id</span>())
-            .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">model_id</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">walk_model</span>(<span class="ident">model_id</span>))
+            .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">model_id</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">walk</span>(<span class="ident">model_id</span>))
     }
 
     <span class="doccomment">/// Walk a specific composite type by ID.</span>

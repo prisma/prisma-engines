@@ -81,7 +81,7 @@
     <span class="doccomment">/// gathering 1:1 and 1:n relations.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">refine</span>(<span class="self">self</span>) -&gt; <span class="ident">RefinedRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">is_implicit_many_to_many</span>() {
-            <span class="ident">RefinedRelationWalker::ImplicitManyToMany</span>(<span class="ident">ImplicitManyToManyRelationWalker</span>(<span class="self">self</span>))
+            <span class="ident">RefinedRelationWalker::ImplicitManyToMany</span>(<span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk</span>(<span class="ident">ManyToManyRelationId</span>(<span class="self">self</span>.<span class="ident">id</span>)))
         } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">is_two_way_embedded_many_to_many</span>() {
             <span class="ident">RefinedRelationWalker::TwoWayEmbeddedManyToMany</span>(<span class="ident">TwoWayEmbeddedManyToManyRelationWalker</span>(<span class="self">self</span>))
         } <span class="kw">else</span> {

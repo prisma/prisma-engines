@@ -338,12 +338,11 @@
 <span id="338">338</span>
 <span id="339">339</span>
 <span id="340">340</span>
-<span id="341">341</span>
-<span id="342">342</span>
-<span id="343">343</span>
-<span id="344">344</span>
-<span id="345">345</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">postgres</span>;
+</pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">inline_relations</span>;
+
+<span class="kw">mod</span> <span class="ident">m2m_relations</span>;
+<span class="kw">mod</span> <span class="ident">postgres</span>;
+<span class="kw">mod</span> <span class="ident">prisma_relation_mode</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">calculate_datamodel::CalculateDatamodelContext</span> <span class="kw">as</span> <span class="ident">Context</span>,
@@ -358,55 +357,26 @@
 <span class="kw">use</span> <span class="ident">introspection_connector::Version</span>;
 <span class="kw">use</span> <span class="ident">psl</span>::{
     <span class="ident">datamodel_connector::constraint_names::ConstraintNames</span>,
-    <span class="ident">dml</span>::{<span class="self">self</span>, <span class="ident">Datamodel</span>, <span class="ident">Field</span>, <span class="ident">Model</span>, <span class="ident">PrimaryKeyDefinition</span>, <span class="ident">PrimaryKeyField</span>, <span class="ident">RelationField</span>, <span class="ident">SortOrder</span>},
+    <span class="ident">dml</span>::{<span class="self">self</span>, <span class="ident">Datamodel</span>, <span class="ident">Field</span>, <span class="ident">Model</span>, <span class="ident">PrimaryKeyDefinition</span>, <span class="ident">PrimaryKeyField</span>, <span class="ident">SortOrder</span>},
     <span class="ident">parser_database</span>::{<span class="ident">ast</span>, <span class="ident">walkers</span>},
+    <span class="ident">schema_ast::ast::WithDocumentation</span>,
     <span class="ident">Configuration</span>,
 };
-<span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">sql</span>, <span class="ident">walkers::TableWalker</span>, <span class="ident">ForeignKeyId</span>, <span class="ident">SQLSortOrder</span>, <span class="ident">SqlSchema</span>};
-<span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">HashMap</span>, <span class="ident">HashSet</span>};
-<span class="kw">use</span> <span class="ident">tracing::debug</span>;
+<span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">sql</span>, <span class="ident">SQLSortOrder</span>, <span class="ident">SqlSchema</span>};
+<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">introspect</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Version</span>, <span class="ident">String</span>, <span class="ident">bool</span>), <span class="ident">SqlError</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">Datamodel::new</span>();
-    <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">schema</span>;
 
     <span class="ident">introspect_enums</span>(<span class="kw-2">&amp;mut</span> <span class="ident">datamodel</span>, <span class="ident">ctx</span>);
     <span class="ident">introspect_models</span>(<span class="kw-2">&amp;mut</span> <span class="ident">datamodel</span>, <span class="ident">ctx</span>);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields_to_be_added</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-
-    <span class="comment">// add backrelation fields</span>
-    <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="ident">datamodel</span>.<span class="ident">models</span>() {
-        <span class="kw">for</span> <span class="ident">relation_field</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">relation_fields</span>() {
-            <span class="kw">let</span> <span class="ident">relation_info</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">relation_field</span>.<span class="ident">relation_info</span>;
-            <span class="kw">if</span> <span class="ident">datamodel</span>
-                .<span class="ident">find_related_field_for_info</span>(<span class="ident">relation_info</span>, <span class="kw-2">&amp;</span><span class="ident">relation_field</span>.<span class="ident">name</span>)
-                .<span class="ident">is_none</span>()
-            {
-                <span class="kw">let</span> <span class="ident">other_model</span> <span class="op">=</span> <span class="ident">datamodel</span>.<span class="ident">find_model</span>(<span class="kw-2">&amp;</span><span class="ident">relation_info</span>.<span class="ident">referenced_model</span>).<span class="ident">unwrap</span>();
-                <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">calculate_backrelation_field</span>(<span class="ident">schema</span>, <span class="ident">model</span>, <span class="ident">other_model</span>, <span class="ident">relation_field</span>, <span class="ident">relation_info</span>)<span class="question-mark">?</span>;
-
-                <span class="ident">fields_to_be_added</span>.<span class="ident">push</span>((<span class="ident">other_model</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">field</span>));
-            }
-        }
+    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">foreign_keys_enabled</span>() {
+        <span class="ident">inline_relations::introspect_inline_relations</span>(<span class="kw-2">&amp;mut</span> <span class="ident">datamodel</span>, <span class="ident">ctx</span>);
+    } <span class="kw">else</span> {
+        <span class="ident">prisma_relation_mode::reintrospect_relations</span>(<span class="kw-2">&amp;mut</span> <span class="ident">datamodel</span>, <span class="ident">ctx</span>);
     }
 
-    <span class="comment">// add prisma many to many relation fields</span>
-    <span class="kw">for</span> <span class="ident">table</span> <span class="kw">in</span> <span class="ident">schema</span>
-        .<span class="ident">table_walkers</span>()
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">table</span><span class="op">|</span> <span class="ident">is_prisma_1_point_1_or_2_join_table</span>(<span class="kw-2">*</span><span class="ident">table</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">is_prisma_1_point_0_join_table</span>(<span class="kw-2">*</span><span class="ident">table</span>))
-    {
-        <span class="ident">calculate_fields_for_prisma_join_table</span>(<span class="ident">table</span>, <span class="kw-2">&amp;mut</span> <span class="ident">fields_to_be_added</span>, <span class="kw-2">&amp;</span><span class="ident">datamodel</span>)
-    }
-
-    <span class="kw">for</span> (<span class="ident">model</span>, <span class="ident">field</span>) <span class="kw">in</span> <span class="ident">fields_to_be_added</span> {
-        <span class="ident">datamodel</span>.<span class="ident">find_model_mut</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>).<span class="ident">add_field</span>(<span class="ident">Field::RelationField</span>(<span class="ident">field</span>));
-    }
-
-    <span class="comment">//TODO(matthias) the sanitation and deduplication of names that come from the schema should move to an initial phase based upon the sqlschema</span>
-    <span class="comment">//it could yield a map from tableId / enumId to the changed name,</span>
-    <span class="comment">// during the construction of the dml we&#39;d then draw from that map</span>
-    <span class="comment">// this way, all usages are already populated with the correct final name and won&#39;t need to be tracked down separately</span>
     <span class="kw">if</span> <span class="op">!</span><span class="ident">sanitization_leads_to_duplicate_names</span>(<span class="kw-2">&amp;</span><span class="ident">datamodel</span>) {
         <span class="comment">// our opinionation about valid names</span>
         <span class="ident">sanitize_datamodel_names</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;mut</span> <span class="ident">datamodel</span>);
@@ -418,7 +388,6 @@
 
     <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">previous_datamodel</span>.<span class="ident">is_empty</span>() {
         <span class="ident">enrich</span>(<span class="ident">ctx</span>.<span class="ident">previous_datamodel</span>, <span class="kw-2">&amp;mut</span> <span class="ident">datamodel</span>, <span class="ident">ctx</span>);
-        <span class="macro">debug!</span>(<span class="string">&quot;Enriching datamodel is done.&quot;</span>);
     }
 
     <span class="comment">// commenting out models, fields, enums, enum values</span>
@@ -428,13 +397,33 @@
     <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">version_checker::check_prisma_version</span>(<span class="ident">ctx</span>);
 
     <span class="comment">// if based on a previous Prisma version add id default opinionations</span>
-    <span class="ident">add_prisma_1_id_defaults</span>(<span class="kw-2">&amp;</span><span class="ident">version</span>, <span class="kw-2">&amp;mut</span> <span class="ident">datamodel</span>, <span class="ident">schema</span>, <span class="ident">ctx</span>);
+    <span class="ident">add_prisma_1_id_defaults</span>(<span class="kw-2">&amp;</span><span class="ident">version</span>, <span class="kw-2">&amp;mut</span> <span class="ident">datamodel</span>, <span class="ident">ctx</span>.<span class="ident">schema</span>, <span class="ident">ctx</span>);
 
     <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">render_config</span> {
-        <span class="ident">render_configuration</span>(<span class="ident">ctx</span>.<span class="ident">config</span>, <span class="ident">schema</span>).<span class="ident">to_string</span>()
+        <span class="ident">render_configuration</span>(<span class="ident">ctx</span>.<span class="ident">config</span>, <span class="ident">ctx</span>.<span class="ident">schema</span>).<span class="ident">to_string</span>()
     } <span class="kw">else</span> {
         <span class="ident">String::new</span>()
     };
+
+    <span class="ident">m2m_relations::introspect_m2m_relations</span>(<span class="kw-2">&amp;mut</span> <span class="ident">datamodel</span>, <span class="ident">ctx</span>);
+
+    <span class="comment">// Ordering of model fields.</span>
+    <span class="comment">//</span>
+    <span class="comment">// This sorts backrelation field after relation fields, in order to preserve an ordering</span>
+    <span class="comment">// similar to that of the previous implementation.</span>
+    <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="ident">datamodel</span>.<span class="ident">models</span> {
+        <span class="ident">model</span>
+            .<span class="ident">fields</span>
+            .<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="kw">match</span> (<span class="ident">a</span>.<span class="ident">as_relation_field</span>(), <span class="ident">b</span>.<span class="ident">as_relation_field</span>()) {
+                (<span class="prelude-val">Some</span>(<span class="ident">a</span>), <span class="prelude-val">Some</span>(<span class="ident">b</span>)) <span class="kw">if</span> <span class="ident">a</span>.<span class="ident">relation_info</span>.<span class="ident">fields</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">b</span>.<span class="ident">relation_info</span>.<span class="ident">fields</span>.<span class="ident">is_empty</span>() =&gt; {
+                    <span class="ident">std::cmp::Ordering::Greater</span> <span class="comment">// back relation fields last</span>
+                }
+                (<span class="prelude-val">Some</span>(<span class="ident">a</span>), <span class="prelude-val">Some</span>(<span class="ident">b</span>)) <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">relation_info</span>.<span class="ident">fields</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">a</span>.<span class="ident">relation_info</span>.<span class="ident">fields</span>.<span class="ident">is_empty</span>() =&gt; {
+                    <span class="ident">std::cmp::Ordering::Less</span>
+                }
+                <span class="kw">_</span> =&gt; <span class="ident">std::cmp::Ordering::Equal</span>,
+            });
+    }
 
     <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="macro">format!</span>(
         <span class="string">&quot;{}\n{}&quot;</span>,
@@ -461,27 +450,6 @@
     }
 
     <span class="ident">output</span>
-}
-
-<span class="kw">fn</span> <span class="ident">calculate_fields_for_prisma_join_table</span>(
-    <span class="ident">join_table</span>: <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">fields_to_be_added</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">RelationField</span>)<span class="op">&gt;</span>,
-    <span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">Datamodel</span>,
-) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">foreign_keys</span> <span class="op">=</span> <span class="ident">join_table</span>.<span class="ident">foreign_keys</span>();
-    <span class="kw">if</span> <span class="kw">let</span> (<span class="prelude-val">Some</span>(<span class="ident">fk_a</span>), <span class="prelude-val">Some</span>(<span class="ident">fk_b</span>)) <span class="op">=</span> (<span class="ident">foreign_keys</span>.<span class="ident">next</span>(), <span class="ident">foreign_keys</span>.<span class="ident">next</span>()) {
-        <span class="kw">let</span> <span class="ident">is_self_relation</span> <span class="op">=</span> <span class="ident">fk_a</span>.<span class="ident">referenced_table</span>().<span class="ident">id</span> <span class="op">==</span> <span class="ident">fk_b</span>.<span class="ident">referenced_table</span>().<span class="ident">id</span>;
-
-        <span class="kw">for</span> (<span class="ident">fk</span>, <span class="ident">opposite_fk</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span>[(<span class="ident">fk_a</span>, <span class="ident">fk_b</span>), (<span class="ident">fk_b</span>, <span class="ident">fk_a</span>)] {
-            <span class="kw">let</span> <span class="ident">referenced_model</span> <span class="op">=</span> <span class="ident">dml::find_model_by_db_name</span>(<span class="ident">datamodel</span>, <span class="ident">fk</span>.<span class="ident">referenced_table</span>().<span class="ident">name</span>())
-                .<span class="ident">expect</span>(<span class="string">&quot;Could not find model referenced in relation table.&quot;</span>);
-
-            <span class="kw">let</span> <span class="ident">relation_name</span> <span class="op">=</span> <span class="ident">join_table</span>.<span class="ident">name</span>()[<span class="number">1</span>..].<span class="ident">to_owned</span>();
-            <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">calculate_many_to_many_field</span>(<span class="kw-2">*</span><span class="ident">opposite_fk</span>, <span class="ident">relation_name</span>, <span class="ident">is_self_relation</span>);
-
-            <span class="ident">fields_to_be_added</span>.<span class="ident">push</span>((<span class="ident">referenced_model</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">field</span>));
-        }
-    }
 }
 
 <span class="kw">fn</span> <span class="ident">introspect_enums</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Datamodel</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
@@ -521,6 +489,10 @@
     <span class="kw">let</span> <span class="ident">enum_name</span> <span class="op">=</span> <span class="ident">existing_enum</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">enm</span><span class="op">|</span> <span class="ident">enm</span>.<span class="ident">name</span>()).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">sql_enum</span>.<span class="ident">name</span>());
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dml_enum</span> <span class="op">=</span> <span class="ident">dml::Enum::new</span>(<span class="ident">enum_name</span>, <span class="ident">Vec::new</span>(), <span class="ident">schema</span>);
 
+    <span class="ident">dml_enum</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">existing_enum</span>
+        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">enm</span><span class="op">|</span> <span class="ident">enm</span>.<span class="ident">ast_enum</span>().<span class="ident">documentation</span>())
+        .<span class="ident">map</span>(<span class="ident">ToOwned::to_owned</span>);
+
     <span class="ident">dml_enum</span>.<span class="ident">database_name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">sql_family</span>.<span class="ident">is_mysql</span>() {
         <span class="ident">existing_enum</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">enm</span><span class="op">|</span> <span class="ident">enm</span>.<span class="ident">mapped_name</span>()).<span class="ident">map</span>(<span class="ident">ToOwned::to_owned</span>)
     } <span class="kw">else</span> {
@@ -542,12 +514,11 @@
 
     <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">sql_enum</span>.<span class="ident">values</span>() {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dml_value</span> <span class="op">=</span> <span class="ident">dml::EnumValue::new</span>(<span class="ident">value</span>);
+        <span class="kw">let</span> <span class="ident">existing_value</span> <span class="op">=</span> <span class="ident">existing_enum</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">enm</span><span class="op">|</span> <span class="ident">enm</span>.<span class="ident">values</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="ident">val</span>.<span class="ident">database_name</span>() <span class="op">==</span> <span class="ident">value</span>));
+        <span class="ident">dml_value</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">existing_value</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">documentation</span>()).<span class="ident">map</span>(<span class="ident">ToOwned::to_owned</span>);
 
         <span class="comment">// Re-introspect mapped names.</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">existing_value</span>) <span class="op">=</span> <span class="ident">existing_enum</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">enm</span><span class="op">|</span> {
-            <span class="ident">enm</span>.<span class="ident">values</span>()
-                .<span class="ident">find</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="ident">val</span>.<span class="ident">mapped_name</span>().<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="ident">val</span>.<span class="ident">database_name</span>() <span class="op">==</span> <span class="ident">value</span>)
-        }) {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">existing_value</span>) <span class="op">=</span> <span class="ident">existing_value</span>.<span class="ident">filter</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="ident">val</span>.<span class="ident">mapped_name</span>().<span class="ident">is_some</span>()) {
             <span class="kw">let</span> <span class="ident">mapped_name</span> <span class="op">=</span> <span class="ident">std::mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dml_value</span>.<span class="ident">name</span>, <span class="ident">existing_value</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>());
             <span class="ident">dml_value</span>.<span class="ident">database_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">mapped_name</span>);
             <span class="ident">remapped_values</span>.<span class="ident">push</span>(<span class="ident">warnings::EnumAndValue</span> {
@@ -567,59 +538,36 @@
     <span class="ident">dml_enum</span>
 }
 
-<span class="kw">fn</span> <span class="ident">introspect_models</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Datamodel</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) {
-    <span class="comment">// collect m2m table names</span>
-    <span class="kw">let</span> <span class="ident">m2m_tables</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ctx</span>
-        .<span class="ident">schema</span>
-        .<span class="ident">table_walkers</span>()
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">table</span><span class="op">|</span> <span class="ident">is_prisma_1_point_1_or_2_join_table</span>(<span class="kw-2">*</span><span class="ident">table</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">is_prisma_1_point_0_join_table</span>(<span class="kw-2">*</span><span class="ident">table</span>))
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">table</span><span class="op">|</span> <span class="ident">table</span>.<span class="ident">name</span>()[<span class="number">1</span>..].<span class="ident">to_string</span>())
-        .<span class="ident">collect</span>();
+<span class="kw">fn</span> <span class="ident">introspect_models</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Datamodel</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">re_introspected_model_ignores</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">remapped_models</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">remapped_fields</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reintrospected_id_names</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
     <span class="kw">for</span> <span class="ident">table</span> <span class="kw">in</span> <span class="ident">ctx</span>
         .<span class="ident">schema</span>
         .<span class="ident">table_walkers</span>()
         .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">table</span><span class="op">|</span> <span class="op">!</span><span class="ident">is_old_migration_table</span>(<span class="kw-2">*</span><span class="ident">table</span>))
         .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">table</span><span class="op">|</span> <span class="op">!</span><span class="ident">is_new_migration_table</span>(<span class="kw-2">*</span><span class="ident">table</span>))
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">table</span><span class="op">|</span> <span class="op">!</span><span class="ident">is_prisma_1_point_1_or_2_join_table</span>(<span class="kw-2">*</span><span class="ident">table</span>))
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">table</span><span class="op">|</span> <span class="op">!</span><span class="ident">is_prisma_1_point_0_join_table</span>(<span class="kw-2">*</span><span class="ident">table</span>))
+        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">table</span><span class="op">|</span> <span class="op">!</span><span class="ident">is_prisma_join_table</span>(<span class="kw-2">*</span><span class="ident">table</span>))
         .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">table</span><span class="op">|</span> <span class="op">!</span><span class="ident">is_relay_table</span>(<span class="kw-2">*</span><span class="ident">table</span>))
     {
-        <span class="macro">debug!</span>(<span class="string">&quot;Calculating model: {}&quot;</span>, <span class="ident">table</span>.<span class="ident">name</span>());
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">Model::new</span>(<span class="ident">table</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(), <span class="prelude-val">None</span>);
+        <span class="kw">let</span> <span class="ident">existing_model</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">existing_model</span>(<span class="ident">table</span>.<span class="ident">id</span>);
+        <span class="kw">let</span> <span class="ident">model_name</span> <span class="op">=</span> <span class="ident">existing_model</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">name</span>()).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">table</span>.<span class="ident">name</span>());
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">Model::new</span>(<span class="ident">model_name</span>.<span class="ident">to_owned</span>(), <span class="prelude-val">None</span>);
 
-        <span class="kw">for</span> <span class="ident">column</span> <span class="kw">in</span> <span class="ident">table</span>.<span class="ident">columns</span>() {
-            <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">calculate_scalar_field</span>(<span class="ident">column</span>, <span class="ident">ctx</span>);
-            <span class="ident">model</span>.<span class="ident">add_field</span>(<span class="ident">Field::ScalarField</span>(<span class="ident">field</span>));
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">m</span>) <span class="op">=</span> <span class="ident">existing_model</span>.<span class="ident">filter</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">mapped_name</span>().<span class="ident">is_some</span>()) {
+            <span class="ident">remapped_models</span>.<span class="ident">push</span>(<span class="ident">warnings::Model</span> {
+                <span class="ident">model</span>: <span class="ident">m</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
+            });
         }
 
-        <span class="kw">let</span> <span class="ident">duplicated_foreign_keys</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">ForeignKeyId</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">table</span>
-            .<span class="ident">foreign_keys</span>()
-            .<span class="ident">enumerate</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span>(<span class="ident">idx</span>, <span class="ident">left</span>)<span class="op">|</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">already_visited</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">foreign_keys</span>().<span class="ident">take</span>(<span class="kw-2">*</span><span class="ident">idx</span>);
-                <span class="ident">already_visited</span>.<span class="ident">any</span>(<span class="op">|</span><span class="ident">right</span><span class="op">|</span> {
-                    <span class="kw">let</span> (<span class="ident">left_constrained</span>, <span class="ident">right_constrained</span>) <span class="op">=</span>
-                        (<span class="ident">left</span>.<span class="ident">constrained_columns</span>(), <span class="ident">right</span>.<span class="ident">constrained_columns</span>());
-                    <span class="ident">left_constrained</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">right_constrained</span>.<span class="ident">len</span>()
-                        <span class="op">&amp;&amp;</span> <span class="ident">left_constrained</span>
-                            .<span class="ident">zip</span>(<span class="ident">right_constrained</span>)
-                            .<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">left</span>, <span class="ident">right</span>)<span class="op">|</span> <span class="ident">left</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">right</span>.<span class="ident">id</span>)
-                        <span class="op">&amp;&amp;</span> <span class="ident">left</span>
-                            .<span class="ident">referenced_columns</span>()
-                            .<span class="ident">zip</span>(<span class="ident">right</span>.<span class="ident">referenced_columns</span>())
-                            .<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">left</span>, <span class="ident">right</span>)<span class="op">|</span> <span class="ident">left</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">right</span>.<span class="ident">id</span>)
-                })
-            })
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">fk</span>)<span class="op">|</span> <span class="ident">fk</span>.<span class="ident">id</span>)
-            .<span class="ident">collect</span>();
-
-        <span class="kw">for</span> <span class="ident">foreign_key</span> <span class="kw">in</span> <span class="ident">table</span>
-            .<span class="ident">foreign_keys</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">fk</span><span class="op">|</span> <span class="op">!</span><span class="ident">duplicated_foreign_keys</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">fk</span>.<span class="ident">id</span>))
-        {
-            <span class="kw">let</span> <span class="ident">relation_field</span> <span class="op">=</span> <span class="ident">calculate_relation_field</span>(<span class="ident">ctx</span>, <span class="ident">foreign_key</span>, <span class="kw-2">&amp;</span><span class="ident">m2m_tables</span>, <span class="kw-2">&amp;</span><span class="ident">duplicated_foreign_keys</span>);
-            <span class="ident">model</span>.<span class="ident">add_field</span>(<span class="ident">Field::RelationField</span>(<span class="ident">relation_field</span>));
+        <span class="kw">for</span> <span class="ident">column</span> <span class="kw">in</span> <span class="ident">table</span>.<span class="ident">columns</span>() {
+            <span class="ident">model</span>.<span class="ident">add_field</span>(<span class="ident">Field::ScalarField</span>(<span class="ident">calculate_scalar_field</span>(
+                <span class="ident">column</span>,
+                <span class="kw-2">&amp;mut</span> <span class="ident">remapped_fields</span>,
+                <span class="ident">ctx</span>,
+            )));
         }
 
         <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">table</span>.<span class="ident">indexes</span>() {
@@ -630,6 +578,16 @@
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="op">=</span> <span class="ident">table</span>.<span class="ident">primary_key</span>() {
             <span class="kw">let</span> <span class="ident">clustered</span> <span class="op">=</span> <span class="ident">primary_key_is_clustered</span>(<span class="ident">pk</span>.<span class="ident">id</span>, <span class="ident">ctx</span>);
+            <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">existing_model</span>
+                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">primary_key</span>())
+                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">name</span>())
+                .<span class="ident">map</span>(<span class="ident">ToOwned::to_owned</span>);
+
+            <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">is_some</span>() {
+                <span class="ident">reintrospected_id_names</span>.<span class="ident">push</span>(<span class="ident">warnings::Model</span> {
+                    <span class="ident">model</span>: <span class="ident">existing_model</span>.<span class="ident">unwrap</span>().<span class="ident">name</span>().<span class="ident">to_owned</span>(),
+                });
+            }
 
             <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">pk</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">ConstraintNames::primary_key_name</span>(<span class="ident">table</span>.<span class="ident">name</span>(), <span class="ident">ctx</span>.<span class="ident">active_connector</span>())
                 <span class="op">|</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">name</span>().<span class="ident">is_empty</span>()
@@ -640,7 +598,7 @@
             };
 
             <span class="ident">model</span>.<span class="ident">primary_key</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">PrimaryKeyDefinition</span> {
-                <span class="ident">name</span>: <span class="prelude-val">None</span>,
+                <span class="ident">name</span>,
                 <span class="ident">db_name</span>,
                 <span class="ident">fields</span>: <span class="ident">pk</span>
                     .<span class="ident">columns</span>()
@@ -651,7 +609,7 @@
                         });
 
                         <span class="ident">PrimaryKeyField</span> {
-                            <span class="ident">name</span>: <span class="ident">c</span>.<span class="ident">name</span>().<span class="ident">to_string</span>(),
+                            <span class="ident">name</span>: <span class="ident">ctx</span>.<span class="ident">column_prisma_name</span>(<span class="ident">c</span>.<span class="ident">as_column</span>().<span class="ident">id</span>).<span class="ident">to_owned</span>(),
                             <span class="ident">sort_order</span>,
                             <span class="ident">length</span>: <span class="ident">c</span>.<span class="ident">length</span>(),
                         }
@@ -666,7 +624,39 @@
             <span class="ident">model</span>.<span class="ident">schema</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">namespace</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">to_string</span>());
         }
 
+        <span class="ident">model</span>.<span class="ident">database_name</span> <span class="op">=</span> <span class="ident">existing_model</span>
+            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">name</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">table</span>.<span class="ident">name</span>())
+            .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">table</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>());
+
+        <span class="ident">model</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">existing_model</span>
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">documentation</span>())
+            .<span class="ident">map</span>(<span class="ident">ToOwned::to_owned</span>);
+
+        <span class="kw">if</span> <span class="ident">existing_model</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">is_ignored</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
+            <span class="ident">model</span>.<span class="ident">is_ignored</span> <span class="op">=</span> <span class="bool-val">true</span>;
+            <span class="ident">re_introspected_model_ignores</span>.<span class="ident">push</span>(<span class="ident">warnings::Model</span> {
+                <span class="ident">model</span>: <span class="ident">model_name</span>.<span class="ident">to_owned</span>(),
+            });
+        }
+
         <span class="ident">datamodel</span>.<span class="ident">models</span>.<span class="ident">push</span>(<span class="ident">model</span>);
+    }
+
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">remapped_models</span>.<span class="ident">is_empty</span>() {
+        <span class="ident">ctx</span>.<span class="ident">warnings</span>
+            .<span class="ident">push</span>(<span class="ident">warnings::warning_enriched_with_map_on_model</span>(<span class="kw-2">&amp;</span><span class="ident">remapped_models</span>));
+    }
+
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">remapped_fields</span>.<span class="ident">is_empty</span>() {
+        <span class="ident">ctx</span>.<span class="ident">warnings</span>
+            .<span class="ident">push</span>(<span class="ident">warnings::warning_enriched_with_map_on_field</span>(<span class="kw-2">&amp;</span><span class="ident">remapped_fields</span>));
+    }
+
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">reintrospected_id_names</span>.<span class="ident">is_empty</span>() {
+        <span class="ident">ctx</span>.<span class="ident">warnings</span>
+            .<span class="ident">push</span>(<span class="ident">warnings::warning_enriched_with_custom_primary_key_names</span>(
+                <span class="kw-2">&amp;</span><span class="ident">reintrospected_id_names</span>,
+            ))
     }
 
     <span class="ident">sort_models</span>(<span class="ident">datamodel</span>, <span class="ident">ctx</span>)
