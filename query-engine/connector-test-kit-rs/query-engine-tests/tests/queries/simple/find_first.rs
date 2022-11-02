@@ -5,7 +5,7 @@ mod find_first_query {
     use query_engine_tests::assert_query;
 
     #[connector_test]
-    async fn fetch_first_matching(runner: Runner) -> TestResult<()> {
+    async fn find_first_matching(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
 
         assert_query!(
@@ -30,6 +30,19 @@ mod find_first_query {
             runner,
             "query { findFirstTestModel(where: { field: { not: null }}, cursor: { id: 1 }, take: 1, skip: 1, orderBy: { id: asc }) { id }}",
             r#"{"data":{"findFirstTestModel":{"id":2}}}"#
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn find_first_not_matching(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
+
+        assert_query!(
+            runner,
+            "query { findFirstTestModel(where: { id: 6 }) { id }}",
+            r#"{"data":{"findFirstTestModel":null}}"#
         );
 
         Ok(())
