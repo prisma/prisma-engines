@@ -143,7 +143,7 @@ impl TestConnectorAttrs {
 
                 return Ok(());
             }
-            p if p.is_ident("db_schemas") => {
+            p if p.is_ident("namespaces") => {
                 self.namespaces.reserve(list.nested.len());
 
                 for item in list.nested {
