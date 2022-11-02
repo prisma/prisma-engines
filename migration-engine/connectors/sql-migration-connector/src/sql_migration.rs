@@ -7,7 +7,7 @@ use enumflags2::BitFlags;
 use sql_schema_describer::{
     postgres::{self, PostgresSchemaExt},
     walkers::{ColumnWalker, TableWalker},
-    ColumnId, EnumId, ForeignKeyId, IndexId, SqlSchema, TableId, UdtId, ViewId,
+    ColumnId, EnumId, ForeignKeyId, IndexId, SqlSchema, TableId, UdtId, ViewId, NamespaceId,
 };
 use std::{collections::BTreeSet, fmt::Write as _};
 
@@ -61,68 +61,69 @@ impl SqlMigration {
         let mut drift_items: BTreeSet<(DriftType, &str, u32)> = BTreeSet::new();
 
         for (idx, step) in self.steps.iter().enumerate() {
+            // TODO PR: None?
             let idx = idx as u32;
-            match step {
-                SqlMigrationStep::AlterSequence(_, _) => (),
-                SqlMigrationStep::CreateSchema(_) => (), // todo
-                SqlMigrationStep::DropView(drop_view) => {
+            match &step.kind {
+                SqlMigrationStepKind::AlterSequence(_, _) => (),
+                SqlMigrationStepKind::CreateSchema(_) => (), // todo
+                SqlMigrationStepKind::DropView(drop_view) => {
                     drift_items.insert((
                         DriftType::RemovedView,
                         self.schemas().previous.walk(drop_view.view_id).name(),
                         idx,
                     ));
                 }
-                SqlMigrationStep::DropUserDefinedType(drop_udt) => {
+                SqlMigrationStepKind::DropUserDefinedType(drop_udt) => {
                     drift_items.insert((
                         DriftType::RemovedUdt,
                         self.schemas().previous.walk(drop_udt.udt_id).name(),
                         idx,
                     ));
                 }
-                SqlMigrationStep::CreateEnum(_) => {
+                SqlMigrationStepKind::CreateEnum(_) => {
                     drift_items.insert((DriftType::AddedEnum, "", idx));
                 }
-                SqlMigrationStep::AlterEnum(alter_enum) => {
+                SqlMigrationStepKind::AlterEnum(alter_enum) => {
                     drift_items.insert((
                         DriftType::ChangedEnum,
                         self.schemas().walk(alter_enum.id).previous.name(),
                         idx,
                     ));
                 }
-                SqlMigrationStep::DropForeignKey { foreign_key_id } => {
+                SqlMigrationStepKind::DropForeignKey { foreign_key_id } => {
                     drift_items.insert((
                         DriftType::ChangedTable,
                         self.schemas().previous.walk(*foreign_key_id).table().name(),
                         idx,
                     ));
                 }
-                SqlMigrationStep::AlterPrimaryKey(table_id) => {
+                SqlMigrationStepKind::AlterPrimaryKey(table_id) => {
                     drift_items.insert((DriftType::ChangedTable, self.before.walk(table_id.previous).name(), idx));
                 }
-                SqlMigrationStep::DropIndex { index_id } => {
+                SqlMigrationStepKind::DropIndex { index_id } => {
                     drift_items.insert((
                         DriftType::ChangedTable,
                         self.schemas().previous.walk(*index_id).table().name(),
                         idx,
                     ));
                 }
-                SqlMigrationStep::AlterTable(alter_table) => {
+                SqlMigrationStepKind::AlterTable(alter_table) => {
                     drift_items.insert((
                         DriftType::ChangedTable,
                         self.schemas().walk(alter_table.table_ids).previous.name(),
                         idx,
                     ));
                 }
-                SqlMigrationStep::DropTable { .. } => {
+                SqlMigrationStepKind::DropTable { .. } => {
                     drift_items.insert((DriftType::RemovedTable, "", idx));
                 }
-                SqlMigrationStep::DropEnum(_) => {
+                SqlMigrationStepKind::DropEnum(_) => {
                     drift_items.insert((DriftType::RemovedEnum, "", idx));
                 }
-                SqlMigrationStep::CreateTable { .. } => {
+                SqlMigrationStepKind::CreateTable { .. } => {
                     drift_items.insert((DriftType::AddedTable, "", idx));
                 }
-                SqlMigrationStep::RedefineTables(redefines) => {
+                SqlMigrationStepKind::RedefineTables(redefines) => {
                     for redefine in redefines {
                         drift_items.insert((
                             DriftType::RedefinedTable,
@@ -131,46 +132,46 @@ impl SqlMigration {
                         ));
                     }
                 }
-                SqlMigrationStep::RenameForeignKey { foreign_key_id } => {
+                SqlMigrationStepKind::RenameForeignKey { foreign_key_id } => {
                     drift_items.insert((
                         DriftType::ChangedTable,
                         self.schemas().walk(*foreign_key_id).next.table().name(),
                         idx,
                     ));
                 }
-                SqlMigrationStep::CreateIndex {
+                SqlMigrationStepKind::CreateIndex {
                     table_id: (_, table_id),
                     ..
                 } => {
                     drift_items.insert((DriftType::ChangedTable, self.schemas().next.walk(*table_id).name(), idx));
                 }
-                SqlMigrationStep::AddForeignKey { foreign_key_id: id } => {
+                SqlMigrationStepKind::AddForeignKey { foreign_key_id: id } => {
                     drift_items.insert((
                         DriftType::ChangedTable,
                         self.schemas().next.walk(*id).table().name(),
                         idx,
                     ));
                 }
-                SqlMigrationStep::RenameIndex { index } | SqlMigrationStep::RedefineIndex { index } => {
+                SqlMigrationStepKind::RenameIndex { index } | SqlMigrationStepKind::RedefineIndex { index } => {
                     drift_items.insert((
                         DriftType::ChangedTable,
                         self.schemas().walk(*index).previous.table().name(),
                         idx,
                     ));
                 }
-                SqlMigrationStep::CreateExtension(create_extension) => {
+                SqlMigrationStepKind::CreateExtension(create_extension) => {
                     let ext: &PostgresSchemaExt = self.schemas().next.downcast_connector_data();
                     let extension = ext.get_extension(create_extension.id);
 
                     drift_items.insert((DriftType::CreatedExtension, &extension.name, idx));
                 }
-                SqlMigrationStep::AlterExtension(alter_extension) => {
+                SqlMigrationStepKind::AlterExtension(alter_extension) => {
                     let ext: &PostgresSchemaExt = self.schemas().previous.downcast_connector_data();
                     let extension = ext.get_extension(alter_extension.ids.previous);
 
                     drift_items.insert((DriftType::AlteredExtension, &extension.name, idx));
                 }
-                SqlMigrationStep::DropExtension(drop_extension) => {
+                SqlMigrationStepKind::DropExtension(drop_extension) => {
                     let ext: &PostgresSchemaExt = self.schemas().previous.downcast_connector_data();
                     let extension = ext.get_extension(drop_extension.id);
 
@@ -226,17 +227,18 @@ impl SqlMigration {
 
             render_state = (*new_state, *item_name);
 
-            match &self.steps[*step_idx as usize] {
-                SqlMigrationStep::AlterSequence(_, _) => {}
-                SqlMigrationStep::DropView(_) => {}
-                SqlMigrationStep::DropUserDefinedType(_) => {}
-                SqlMigrationStep::CreateEnum(enum_id) => {
+            // TODO PR: None?
+            match &self.steps[*step_idx as usize].kind {
+                SqlMigrationStepKind::AlterSequence(_, _) => {}
+                SqlMigrationStepKind::DropView(_) => {}
+                SqlMigrationStepKind::DropUserDefinedType(_) => {}
+                SqlMigrationStepKind::CreateEnum(enum_id) => {
                     out.push_str("  - ");
                     out.push_str(self.schemas().next.walk(*enum_id).name());
                     out.push('\n');
                 }
-                SqlMigrationStep::CreateSchema(_) => {} // todo
-                SqlMigrationStep::AlterEnum(alter_enum) => {
+                SqlMigrationStepKind::CreateSchema(_) => {} // todo
+                SqlMigrationStepKind::AlterEnum(alter_enum) => {
                     for added in &alter_enum.created_variants {
                         out.push_str("  [+] Added variant `");
                         out.push_str(added);
@@ -249,20 +251,20 @@ impl SqlMigration {
                         out.push_str("`\n");
                     }
                 }
-                SqlMigrationStep::AlterPrimaryKey(table_id) => {
+                SqlMigrationStepKind::AlterPrimaryKey(table_id) => {
                     let table_name = self.schemas().previous.walk(table_id.previous).name();
                     out.push_str("   [*] Changed the primary key for `");
                     out.push_str(table_name);
                     out.push_str("`\n");
                 }
-                SqlMigrationStep::DropForeignKey { foreign_key_id } => {
+                SqlMigrationStepKind::DropForeignKey { foreign_key_id } => {
                     let fk = self.schemas().previous.walk(*foreign_key_id);
 
                     out.push_str("  [-] Removed foreign key on columns (");
                     out.push_str(&fk.constrained_columns().map(|c| c.name()).join(", "));
                     out.push_str(")\n")
                 }
-                SqlMigrationStep::DropIndex { index_id } => {
+                SqlMigrationStepKind::DropIndex { index_id } => {
                     let index = self.schemas().previous.walk(*index_id);
 
                     out.push_str("  [-] Removed ");
@@ -275,7 +277,7 @@ impl SqlMigration {
                     out.push_str(&index.column_names().join(", "));
                     out.push_str(")\n");
                 }
-                SqlMigrationStep::AlterTable(alter_table) => {
+                SqlMigrationStepKind::AlterTable(alter_table) => {
                     let tables = self.schemas().walk(alter_table.table_ids);
 
                     for change in &alter_table.changes {
@@ -334,23 +336,23 @@ impl SqlMigration {
                         }
                     }
                 }
-                SqlMigrationStep::DropTable { table_id } => {
+                SqlMigrationStepKind::DropTable { table_id } => {
                     out.push_str("  - ");
                     out.push_str(self.schemas().previous.walk(*table_id).name());
                     out.push('\n');
                 }
-                SqlMigrationStep::DropEnum(enum_id) => {
+                SqlMigrationStepKind::DropEnum(enum_id) => {
                     out.push_str("  - ");
                     out.push_str(self.schemas().previous.walk(*enum_id).name());
                     out.push('\n');
                 }
-                SqlMigrationStep::CreateTable { table_id } => {
+                SqlMigrationStepKind::CreateTable { table_id } => {
                     out.push_str("  - ");
                     out.push_str(self.schemas().next.walk(*table_id).name());
                     out.push('\n');
                 }
-                SqlMigrationStep::RedefineTables(_) => {}
-                SqlMigrationStep::RenameForeignKey { foreign_key_id } => {
+                SqlMigrationStepKind::RedefineTables(_) => {}
+                SqlMigrationStepKind::RenameForeignKey { foreign_key_id } => {
                     let fks = self.schemas().walk(*foreign_key_id);
                     out.push_str("  [*] Renamed the foreign key \"");
                     out.push_str(fks.previous.constraint_name().unwrap());
@@ -358,7 +360,7 @@ impl SqlMigration {
                     out.push_str(fks.next.constraint_name().unwrap());
                     out.push_str("\"\n");
                 }
-                SqlMigrationStep::CreateIndex {
+                SqlMigrationStepKind::CreateIndex {
                     table_id: _,
                     index_id,
                     from_drop_and_recreate: _,
@@ -375,13 +377,13 @@ impl SqlMigration {
                     out.push_str(&index.column_names().join(", "));
                     out.push_str(")\n");
                 }
-                SqlMigrationStep::AddForeignKey { foreign_key_id } => {
+                SqlMigrationStepKind::AddForeignKey { foreign_key_id } => {
                     let foreign_key = self.schemas().next.walk(*foreign_key_id);
                     out.push_str("  [+] Added foreign key on columns (");
                     out.push_str(&foreign_key.constrained_columns().map(|c| c.name()).join(", "));
                     out.push_str(")\n")
                 }
-                SqlMigrationStep::RenameIndex { index } => {
+                SqlMigrationStepKind::RenameIndex { index } => {
                     let index = self.schemas().walk(*index);
 
                     out.push_str("  [*] Renamed index `");
@@ -390,21 +392,21 @@ impl SqlMigration {
                     out.push_str(index.next.name());
                     out.push_str("`\n");
                 }
-                SqlMigrationStep::RedefineIndex { index } => {
+                SqlMigrationStepKind::RedefineIndex { index } => {
                     let index = self.schemas().walk(*index);
 
                     out.push_str("  [*] Redefined index `");
                     out.push_str(index.previous.name());
                     out.push_str("`\n");
                 }
-                SqlMigrationStep::CreateExtension(create_extension) => {
+                SqlMigrationStepKind::CreateExtension(create_extension) => {
                     let ext: &PostgresSchemaExt = self.schemas().next.downcast_connector_data();
                     out.push_str("  - ");
                     out.push_str(&ext.get_extension(create_extension.id).name);
                     out.push('\n');
                 }
-                SqlMigrationStep::AlterExtension(_) => {}
-                SqlMigrationStep::DropExtension(_) => {}
+                SqlMigrationStepKind::AlterExtension(_) => {}
+                SqlMigrationStepKind::DropExtension(_) => {}
             }
         }
 
@@ -447,7 +449,27 @@ fn render_column_changes(columns: Pair<ColumnWalker<'_>>, changes: &ColumnChange
 // SqlSchema struct, the natural ordering of the indexes matches well with what
 // you would intuitively expect.
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub(crate) enum SqlMigrationStep {
+pub(crate) struct SqlMigrationStep {
+    pub(crate) kind: SqlMigrationStepKind,
+    pub(crate) namespace: Option<NamespaceId>,
+}
+
+impl SqlMigrationStep {
+    pub(crate) fn new(namespace: Option<NamespaceId>, kind: SqlMigrationStepKind) -> Self {
+        SqlMigrationStep { namespace, kind }
+    }
+
+    pub(crate) fn description(&self) -> &'static str {
+        self.kind.description()
+    }
+}
+
+// The order of the variants matters for sorting. The steps are sorted _first_
+// by variant, then by the contents. Since the contents are mostly indexes in a
+// SqlSchema struct, the natural ordering of the indexes matches well with what
+// you would intuitively expect.
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub(crate) enum SqlMigrationStepKind {
     CreateSchema(sql_schema_describer::NamespaceId),
     DropExtension(DropExtension),
     CreateExtension(CreateExtension),
@@ -505,31 +527,31 @@ pub(crate) enum SqlMigrationStep {
     },
 }
 
-impl SqlMigrationStep {
+impl SqlMigrationStepKind {
     pub(crate) fn description(&self) -> &'static str {
         match self {
-            SqlMigrationStep::AddForeignKey { .. } => "AddForeignKey",
-            SqlMigrationStep::AlterEnum(_) => "AlterEnum",
-            SqlMigrationStep::AlterPrimaryKey(_) => "AlterPrimaryKey",
-            SqlMigrationStep::AlterSequence(_, _) => "AlterSequence",
-            SqlMigrationStep::AlterTable(_) => "AlterTable",
-            SqlMigrationStep::CreateEnum(_) => "CreateEnum",
-            SqlMigrationStep::CreateIndex { .. } => "CreateIndex",
-            SqlMigrationStep::CreateSchema { .. } => "CreateSchema",
-            SqlMigrationStep::CreateTable { .. } => "CreateTable",
-            SqlMigrationStep::DropEnum(_) => "DropEnum",
-            SqlMigrationStep::DropForeignKey { .. } => "DropForeignKey",
-            SqlMigrationStep::DropIndex { .. } => "DropIndex",
-            SqlMigrationStep::DropTable { .. } => "DropTable",
-            SqlMigrationStep::DropUserDefinedType(_) => "DropUserDefinedType",
-            SqlMigrationStep::DropView(_) => "DropView",
-            SqlMigrationStep::RedefineIndex { .. } => "RedefineIndex",
-            SqlMigrationStep::RedefineTables { .. } => "RedefineTables",
-            SqlMigrationStep::RenameForeignKey { .. } => "RenameForeignKey",
-            SqlMigrationStep::RenameIndex { .. } => "RenameIndex",
-            SqlMigrationStep::CreateExtension(_) => "CreateExtension",
-            SqlMigrationStep::AlterExtension(_) => "AlterExtension",
-            SqlMigrationStep::DropExtension(_) => "DropExtension",
+            SqlMigrationStepKind::AddForeignKey { .. } => "AddForeignKey",
+            SqlMigrationStepKind::AlterEnum(_) => "AlterEnum",
+            SqlMigrationStepKind::AlterPrimaryKey(_) => "AlterPrimaryKey",
+            SqlMigrationStepKind::AlterSequence(_, _) => "AlterSequence",
+            SqlMigrationStepKind::AlterTable(_) => "AlterTable",
+            SqlMigrationStepKind::CreateEnum(_) => "CreateEnum",
+            SqlMigrationStepKind::CreateIndex { .. } => "CreateIndex",
+            SqlMigrationStepKind::CreateSchema { .. } => "CreateSchema",
+            SqlMigrationStepKind::CreateTable { .. } => "CreateTable",
+            SqlMigrationStepKind::DropEnum(_) => "DropEnum",
+            SqlMigrationStepKind::DropForeignKey { .. } => "DropForeignKey",
+            SqlMigrationStepKind::DropIndex { .. } => "DropIndex",
+            SqlMigrationStepKind::DropTable { .. } => "DropTable",
+            SqlMigrationStepKind::DropUserDefinedType(_) => "DropUserDefinedType",
+            SqlMigrationStepKind::DropView(_) => "DropView",
+            SqlMigrationStepKind::RedefineIndex { .. } => "RedefineIndex",
+            SqlMigrationStepKind::RedefineTables { .. } => "RedefineTables",
+            SqlMigrationStepKind::RenameForeignKey { .. } => "RenameForeignKey",
+            SqlMigrationStepKind::RenameIndex { .. } => "RenameIndex",
+            SqlMigrationStepKind::CreateExtension(_) => "CreateExtension",
+            SqlMigrationStepKind::AlterExtension(_) => "AlterExtension",
+            SqlMigrationStepKind::DropExtension(_) => "DropExtension",
         }
     }
 }

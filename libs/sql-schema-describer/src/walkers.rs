@@ -168,6 +168,11 @@ impl<'a> ViewWalker<'a> {
         &self.view().name
     }
 
+    /// Traverse the views' namespace
+    pub fn namespace(self) -> NamespaceWalker<'a> {
+        self.walk(self.view().namespace_id)
+    }
+
     /// The SQL definition of the view
     pub fn definition(self) -> Option<&'a str> {
         self.view().definition.as_deref()

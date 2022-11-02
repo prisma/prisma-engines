@@ -2,7 +2,7 @@ use super::SqlSchemaDifferFlavour;
 use crate::{
     flavour::MssqlFlavour,
     pair::Pair,
-    sql_migration::SqlMigrationStep,
+    sql_migration::{SqlMigrationStep, SqlMigrationStepKind},
     sql_schema_differ::{column::ColumnTypeChange, differ_database::DifferDatabase, table::TableDiffer, ColumnChanges},
 };
 use psl::builtin_connectors::{MsSqlType, MsSqlTypeParameter};
@@ -89,20 +89,22 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
                 .columns()
                 .any(|col| col.as_column().id == column_id.previous)
         }) {
-            steps.push(SqlMigrationStep::DropIndex {
+            // TODO PR: None?
+            steps.push(SqlMigrationStep::new(None, SqlMigrationStepKind::DropIndex {
                 index_id: dropped_index.previous.id,
-            })
+            }))
         }
 
         for created_index in table
             .index_pairs()
             .filter(|pair| pair.next.columns().any(|col| col.as_column().id == column_id.next))
         {
-            steps.push(SqlMigrationStep::CreateIndex {
+            // TODO PR: None?
+            steps.push(SqlMigrationStep::new(None, SqlMigrationStepKind::CreateIndex {
                 table_id: (None, table.next().id),
                 index_id: created_index.next.id,
                 from_drop_and_recreate: false,
-            })
+            }))
         }
     }
 }

@@ -12,7 +12,7 @@ use self::differ_database::DifferDatabase;
 use crate::{
     database_schema::SqlDatabaseSchema,
     pair::Pair,
-    sql_migration::{self, AlterColumn, AlterTable, RedefineTable, SqlMigrationStep, TableChange},
+    sql_migration::{self, AlterColumn, AlterTable, RedefineTable, SqlMigrationStep, TableChange, SqlMigrationStepKind},
     SqlFlavour,
 };
 use column::ColumnTypeChange;
@@ -44,17 +44,20 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlDatabaseSchema>, flavour: &dyn S
 
 fn push_created_schema_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDatabase<'_>) {
     for schema in db.created_namespaces() {
-        steps.push(SqlMigrationStep::CreateSchema(schema.id))
+        // TODO PR: None?
+        steps.push(SqlMigrationStep::new(None, SqlMigrationStepKind::CreateSchema(schema.id)))
     }
 }
 
 fn push_created_table_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDatabase<'_>) {
     for table in db.created_tables() {
-        steps.push(SqlMigrationStep::CreateTable { table_id: table.id });
+        // TODO PR: None?
+        steps.push(SqlMigrationStep::new(None, SqlMigrationStepKind::CreateTable { table_id: table.id }));
 
         if db.flavour.should_push_foreign_keys_from_created_tables() {
             for fk in table.foreign_keys() {
-                steps.push(SqlMigrationStep::AddForeignKey { foreign_key_id: fk.id });
+                // TODO PR: None?
+                steps.push(SqlMigrationStep::new(None, SqlMigrationStepKind::AddForeignKey { foreign_key_id: fk.id }));
             }
         }
 
@@ -62,11 +65,12 @@ fn push_created_table_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDataba
             let create_indexes_from_created_tables = table
                 .indexes()
                 .filter(|index| !index.is_primary_key() && !db.flavour.should_skip_index_for_new_table(*index))
-                .map(|index| SqlMigrationStep::CreateIndex {
+                // TODO PR: None?
+                .map(|index| SqlMigrationStep::new(None, SqlMigrationStepKind::CreateIndex {
                     table_id: (None, index.table().id),
                     index_id: index.id,
                     from_drop_and_recreate: false,
-                });
+                }));
 
             steps.extend(create_indexes_from_created_tables);
         }
@@ -77,16 +81,18 @@ fn push_created_table_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDataba
 // please later.
 fn push_dropped_table_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDatabase<'_>) {
     for dropped_table in db.dropped_tables() {
-        steps.push(SqlMigrationStep::DropTable {
+        // TODO PR: None?
+        steps.push(SqlMigrationStep::new(None, SqlMigrationStepKind::DropTable {
             table_id: dropped_table.id,
-        });
+        }));
 
         if !db.flavour.should_drop_foreign_keys_from_dropped_tables() {
             continue;
         }
 
         for fk in dropped_table.foreign_keys() {
-            steps.push(SqlMigrationStep::DropForeignKey { foreign_key_id: fk.id });
+            // TODO PR: None?
+            steps.push(SqlMigrationStep::new(None, SqlMigrationStepKind::DropForeignKey { foreign_key_id: fk.id }));
         }
     }
 }
@@ -94,15 +100,17 @@ fn push_dropped_table_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDataba
 fn push_altered_table_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDatabase<'_>) {
     for table in db.non_redefined_table_pairs() {
         for created_fk in table.created_foreign_keys() {
-            steps.push(SqlMigrationStep::AddForeignKey {
+            // TODO PR: None?
+            steps.push(SqlMigrationStep::new(None, SqlMigrationStepKind::AddForeignKey {
                 foreign_key_id: created_fk.id,
-            })
+            }))
         }
 
         for dropped_fk in table.dropped_foreign_keys() {
-            steps.push(SqlMigrationStep::DropForeignKey {
+            // TODO PR: None?
+            steps.push(SqlMigrationStep::new(None, SqlMigrationStepKind::DropForeignKey {
                 foreign_key_id: dropped_fk.id,
-            })
+            }))
         }
 
         for fk in table.foreign_key_pairs() {
@@ -119,9 +127,11 @@ fn push_altered_table_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDataba
             let index: Pair<IndexId> = i.map(|i| i.id);
 
             let step = if db.flavour.can_rename_index() {
-                SqlMigrationStep::RenameIndex { index }
+                // TODO PR: None?
+                SqlMigrationStep::new(None, SqlMigrationStepKind::RenameIndex { index })
             } else {
-                SqlMigrationStep::RedefineIndex { index }
+                // TODO PR: None?
+                SqlMigrationStep::new(None, SqlMigrationStepKind::RedefineIndex { index })
             };
 
             steps.push(step);
@@ -158,10 +168,11 @@ fn push_altered_table_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDataba
                 .push_index_changes_for_column_changes(&table, ids, db.column_changes(ids), steps);
         }
 
-        steps.push(SqlMigrationStep::AlterTable(AlterTable {
+        // TODO PR: None?
+        steps.push(SqlMigrationStep::new(None, SqlMigrationStepKind::AlterTable(AlterTable {
             table_ids: table.tables.map(|t| t.id),
             changes,
-        }));
+        })));
     }
 }
 
@@ -318,17 +329,19 @@ fn push_alter_primary_key(differ: &TableDiffer<'_, '_>, steps: &mut Vec<SqlMigra
         return;
     }
 
-    steps.push(SqlMigrationStep::AlterPrimaryKey(differ.table_ids()))
+    // TODO PR: None?
+    steps.push(SqlMigrationStep::new(None, SqlMigrationStepKind::AlterPrimaryKey(differ.table_ids())))
 }
 
 fn push_created_index_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDatabase<'_>) {
     for tables in db.non_redefined_table_pairs() {
         for index in tables.created_indexes() {
-            steps.push(SqlMigrationStep::CreateIndex {
+            // TODO PR: None?
+            steps.push(SqlMigrationStep::new(None, SqlMigrationStepKind::CreateIndex {
                 table_id: (Some(tables.previous().id), tables.next().id),
                 index_id: index.id,
                 from_drop_and_recreate: false,
-            })
+            }))
         }
 
         if db.flavour.indexes_should_be_recreated_after_column_drop() {
@@ -349,11 +362,12 @@ fn push_created_index_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDataba
                     .columns()
                     .any(|col| dropped_and_recreated_column_ids_next.contains(&col.as_column().id))
             }) {
-                steps.push(SqlMigrationStep::CreateIndex {
+                // TODO PR: None?
+                steps.push(SqlMigrationStep::new(None, SqlMigrationStepKind::CreateIndex {
                     table_id: (Some(tables.previous().id), tables.next().id),
                     index_id: index.next.id,
                     from_drop_and_recreate: true,
-                })
+                }))
             }
         }
     }
@@ -385,7 +399,8 @@ fn push_dropped_index_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDataba
     }
 
     for index_id in drop_indexes.into_iter() {
-        steps.push(SqlMigrationStep::DropIndex { index_id })
+        // TODO PR: None?
+        steps.push(SqlMigrationStep::new(None, SqlMigrationStepKind::DropIndex { index_id }))
     }
 }
 
@@ -429,7 +444,8 @@ fn push_redefined_table_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferData
         })
         .collect();
 
-    steps.push(SqlMigrationStep::RedefineTables(tables_to_redefine))
+    // TODO PR: None?
+    steps.push(SqlMigrationStep::new(None, SqlMigrationStepKind::RedefineTables(tables_to_redefine)))
 }
 
 /// Compare two foreign keys and return whether they should be considered
@@ -477,12 +493,14 @@ fn push_foreign_key_pair_changes(
     if db.table_is_redefined(fk.previous.referenced_table().name())
         && !db.flavour.can_redefine_tables_with_inbound_foreign_keys()
     {
-        steps.push(SqlMigrationStep::DropForeignKey {
+        // TODO PR: None?
+        steps.push(SqlMigrationStep::new(None, SqlMigrationStepKind::DropForeignKey {
             foreign_key_id: fk.previous.id,
-        });
-        steps.push(SqlMigrationStep::AddForeignKey {
+        }));
+        // TODO PR: None?
+        steps.push(SqlMigrationStep::new(None, SqlMigrationStepKind::AddForeignKey {
             foreign_key_id: fk.next.id,
-        });
+        }));
         return;
     }
 
@@ -507,16 +525,19 @@ fn push_foreign_key_pair_changes(
         }
 
         if db.flavour.can_rename_foreign_key() {
-            steps.push(SqlMigrationStep::RenameForeignKey {
+            // TODO PR: None?
+            steps.push(SqlMigrationStep::new(None, SqlMigrationStepKind::RenameForeignKey {
                 foreign_key_id: fk.map(|fk| fk.id),
-            })
+            }))
         } else {
-            steps.push(SqlMigrationStep::AddForeignKey {
+            // TODO PR: None?
+            steps.push(SqlMigrationStep::new(None, SqlMigrationStepKind::AddForeignKey {
                 foreign_key_id: fk.next.id,
-            });
-            steps.push(SqlMigrationStep::DropForeignKey {
+            }));
+            // TODO PR: None?
+            steps.push(SqlMigrationStep::new(None, SqlMigrationStepKind::DropForeignKey {
                 foreign_key_id: fk.previous.id,
-            })
+            }))
         }
     }
 }

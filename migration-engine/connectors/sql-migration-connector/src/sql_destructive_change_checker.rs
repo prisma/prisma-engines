@@ -24,7 +24,7 @@ mod warning_check;
 pub(crate) use destructive_change_checker_flavour::DestructiveChangeCheckerFlavour;
 
 use crate::{
-    sql_migration::{AlterEnum, AlterTable, ColumnTypeChange, SqlMigrationStep, TableChange},
+    sql_migration::{AlterEnum, AlterTable, ColumnTypeChange, TableChange, SqlMigrationStepKind},
     SqlMigration, SqlMigrationConnector,
 };
 use destructive_check_plan::DestructiveCheckPlan;
@@ -96,8 +96,9 @@ impl SqlMigrationConnector {
         let mut plan = DestructiveCheckPlan::new();
 
         for (step_index, step) in steps.iter().enumerate() {
-            match step {
-                SqlMigrationStep::AlterTable(AlterTable {
+            // TODO PR: None?
+            match &step.kind {
+                SqlMigrationStepKind::AlterTable(AlterTable {
                     table_ids: table_id,
                     changes,
                 }) => {
@@ -143,7 +144,7 @@ impl SqlMigrationConnector {
                         }
                     }
                 }
-                SqlMigrationStep::RedefineTables(redefine_tables) => {
+                SqlMigrationStepKind::RedefineTables(redefine_tables) => {
                     for redefine_table in redefine_tables {
                         let tables = schemas.walk(redefine_table.table_ids);
 
@@ -228,10 +229,10 @@ impl SqlMigrationConnector {
                         }
                     }
                 }
-                SqlMigrationStep::DropTable { table_id } => {
+                SqlMigrationStepKind::DropTable { table_id } => {
                     self.check_table_drop(schemas.previous.walk(*table_id).name(), &mut plan, step_index);
                 }
-                SqlMigrationStep::CreateIndex {
+                SqlMigrationStepKind::CreateIndex {
                     table_id: (Some(_), _),
                     index_id,
                     from_drop_and_recreate: false,
@@ -247,7 +248,7 @@ impl SqlMigrationConnector {
                         )
                     }
                 }
-                SqlMigrationStep::AlterEnum(AlterEnum {
+                SqlMigrationStepKind::AlterEnum(AlterEnum {
                     id,
                     created_variants: _,
                     dropped_variants,

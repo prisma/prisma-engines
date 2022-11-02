@@ -5,7 +5,7 @@ use crate::{
     pair::Pair,
     sql_migration::{
         AlterEnum, AlterExtension, CreateExtension, DropExtension, ExtensionChange, SequenceChange, SequenceChanges,
-        SqlMigrationStep,
+        SqlMigrationStep, SqlMigrationStepKind,
     },
     sql_schema_differ::{column::ColumnTypeChange, differ_database::DifferDatabase},
 };
@@ -82,15 +82,18 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
             }
 
             push_alter_enum_previous_usages_as_default(db, &mut alter_enum);
-            steps.push(SqlMigrationStep::AlterEnum(alter_enum));
+            // TODO PR: None?
+            steps.push(SqlMigrationStep::new(None, SqlMigrationStepKind::AlterEnum(alter_enum)));
         }
 
         for enm in db.created_enums() {
-            steps.push(SqlMigrationStep::CreateEnum(enm.id))
+            // TODO PR: None?
+            steps.push(SqlMigrationStep::new(None, SqlMigrationStepKind::CreateEnum(enm.id)))
         }
 
         for enm in db.dropped_enums() {
-            steps.push(SqlMigrationStep::DropEnum(enm.id))
+            // TODO PR: None?
+            steps.push(SqlMigrationStep::new(None, SqlMigrationStepKind::DropEnum(enm.id)))
         }
     }
 
@@ -145,10 +148,11 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
             }
 
             if !changes.is_empty() {
-                steps.push(SqlMigrationStep::AlterSequence(
+                // TODO PR: None?
+                steps.push(SqlMigrationStep::new(None, SqlMigrationStepKind::AlterSequence(
                     pair.map(|p| p.0 as u32),
                     SequenceChanges(changes),
-                ));
+                )));
             }
         }
     }
@@ -237,8 +241,9 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
 
     fn push_extension_steps(&self, steps: &mut Vec<SqlMigrationStep>, db: &DifferDatabase<'_>) {
         for ext in db.non_relocatable_extension_pairs() {
-            steps.push(SqlMigrationStep::DropExtension(DropExtension { id: ext.previous.id }));
-            steps.push(SqlMigrationStep::CreateExtension(CreateExtension { id: ext.next.id }));
+            // TODO PR: None?
+            steps.push(SqlMigrationStep::new(None, SqlMigrationStepKind::DropExtension(DropExtension { id: ext.previous.id })));
+            steps.push(SqlMigrationStep::new(None, SqlMigrationStepKind::CreateExtension(CreateExtension { id: ext.next.id })));
         }
 
         for ext in db.relocatable_extension_pairs() {
@@ -258,14 +263,16 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
                 _ => {}
             }
 
-            steps.push(SqlMigrationStep::AlterExtension(AlterExtension {
+            // TODO PR: None?
+            steps.push(SqlMigrationStep::new(None, SqlMigrationStepKind::AlterExtension(AlterExtension {
                 ids: Pair::new(ext.previous.id, ext.next.id),
                 changes,
-            }));
+            })));
         }
 
         for id in db.created_extensions() {
-            steps.push(SqlMigrationStep::CreateExtension(CreateExtension { id }));
+            // TODO PR: None?
+            steps.push(SqlMigrationStep::new(None, SqlMigrationStepKind::CreateExtension(CreateExtension { id })));
         }
     }
 

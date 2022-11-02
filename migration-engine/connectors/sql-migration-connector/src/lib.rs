@@ -25,6 +25,8 @@ use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationSte
 use sql_schema_describer as sql;
 use std::sync::Arc;
 
+use crate::sql_migration::SqlMigrationStepKind;
+
 const MIGRATIONS_TABLE_NAME: &str = "_prisma_migrations";
 
 /// The top-level SQL migration connector.
@@ -348,8 +350,12 @@ async fn best_effort_reset_impl(
     let drop_views = source_schema
         .view_walkers()
         .filter(|view| !flavour.view_should_be_ignored(view.name()))
-        .map(|vw| DropView::new(vw.id))
-        .map(SqlMigrationStep::DropView);
+        .map(|vw| {
+            SqlMigrationStep::new(
+                Some(vw.namespace().id),
+                SqlMigrationStepKind::DropView(DropView::new(vw.id)),
+            )
+        });
 
     steps.extend(drop_views);
 
@@ -357,11 +363,13 @@ async fn best_effort_reset_impl(
     steps.extend(sql_schema_differ::calculate_steps(diffables.as_ref(), flavour));
     let (source_schema, target_schema) = diffables.map(|s| s.describer_schema).into_tuple();
 
+    // TODO(MultiSchema): Handle this gracefully for MSSQL. We're going to let this as-is for now
+    // since we're focusing on Postgres and this is always empty.
     let drop_udts = source_schema
         .udt_walkers()
         .map(|udtw| udtw.id)
-        .map(DropUserDefinedType::new)
-        .map(SqlMigrationStep::DropUserDefinedType);
+        // TODO PR: None?
+        .map(|udtw_id| SqlMigrationStep::new(None, SqlMigrationStepKind::DropUserDefinedType(DropUserDefinedType::new(udtw_id))));
 
     steps.extend(drop_udts);
 
