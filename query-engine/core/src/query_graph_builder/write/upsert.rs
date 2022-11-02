@@ -214,6 +214,8 @@ fn can_use_connector_native_upsert(
         .iter()
         .any(|(field_name, _)| model.fields().find_from_relation_fields(&field_name).is_ok());
 
+    let empty_update = update_argument.iter().len() == 0;
+
     let has_one_unique = where_field
         .iter()
         .filter(|(field_name, _)| is_unique_field(field_name, model))
@@ -228,6 +230,7 @@ fn can_use_connector_native_upsert(
         && has_one_unique
         && !has_nested_create
         && !has_nested_update
+        && !empty_update
         && where_values_same_as_create
 }
 

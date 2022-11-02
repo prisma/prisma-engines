@@ -228,6 +228,32 @@ mod native_upsert {
         Ok(())
     }
 
+    #[connector_test(schema(user))]
+    async fn should_not_if_missing_update(mut runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            upsertOneUser(
+              where: {email: "email1"}
+              create: {
+                id: 1,
+                email: "email1",
+                first_name: "first",
+                last_name: "last",
+              }
+              update: {
+              }
+            ){
+              id,
+              email
+            }
+          }"#),
+          @r###"{"data":{"upsertOneUser":{"id":1,"email":"email1"}}}"###
+        );
+
+        assert_not_used_native_upsert(&mut runner).await;
+        Ok(())
+    }
+
     pub fn compound_id() -> String {
         let schema = indoc! {
             "model TestModel {
