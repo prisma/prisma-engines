@@ -49,6 +49,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::DecimalType,
     ConnectorCapability::OrderByNullsFirstLast,
     ConnectorCapability::SupportsTxIsolationSerializable,
+    ConnectorCapability::NativeUpsert,
 ];
 
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, CockroachType)] = &[

@@ -159,6 +159,14 @@ impl WriteOperations for MongoDbConnection {
     ) -> connector_interface::Result<serde_json::Value> {
         catch(async move { write::query_raw(&self.database, &mut self.session, model, inputs, query_type).await }).await
     }
+
+    async fn native_upsert_record(
+        &mut self,
+        _upsert: connector_interface::NativeUpsert,
+        _trace_id: Option<String>,
+    ) -> connector_interface::Result<SingleRecord> {
+        unimplemented!("Native upsert is not currently supported.")
+    }
 }
 
 #[async_trait]

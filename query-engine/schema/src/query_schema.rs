@@ -66,6 +66,10 @@ impl ConnectorContext {
             relation_mode,
         }
     }
+
+    pub fn can_native_upsert(&self) -> bool {
+        self.capabilities.contains(&ConnectorCapability::NativeUpsert)
+    }
 }
 
 impl QuerySchema {
