@@ -37,14 +37,19 @@ impl SchemaAssertion {
     }
 
     #[track_caller]
-    fn find_table<'a>(&'a self, table_name: &str) -> TableWalker<'a> {
-        match self.schema.table_walkers().find(|t| {
+    fn find_table_option<'a>(&'a self, table_name: &str) -> Option<TableWalker<'a>> {
+        self.schema.table_walkers().find(|t| {
             if self.tags.contains(Tags::LowerCasesTableNames) {
                 t.name().eq_ignore_ascii_case(table_name)
             } else {
                 t.name() == table_name
             }
-        }) {
+        })
+    }
+
+    #[track_caller]
+    fn find_table<'a>(&'a self, table_name: &str) -> TableWalker<'a> {
+        match self.find_table_option(table_name) {
             Some(table) => table,
             None => panic!(
                 "assert_has_table failed. Table {} not found. Tables in database: {:?}",
@@ -75,6 +80,13 @@ impl SchemaAssertion {
     #[track_caller]
     pub fn assert_has_table(self, table_name: &str) -> Self {
         self.find_table(table_name);
+        self
+    }
+
+    #[track_caller]
+    pub fn assert_has_no_table(self, table_name: &str) -> Self {
+        self.find_table_option(table_name)
+            .and_then::<(), _>(|_| panic!("assert_has_no_table failed. Table {} was found.", table_name));
         self
     }
 

@@ -1,6 +1,11 @@
 // tags=postgres
 // exclude=cockroachdb
 
+datasource pg {
+    provider = "postgresql"
+    url = env("TEST_DATABASE_URL")
+}
+
 model Test {
     id String @id @default(cuid())
     enum MyEnum
@@ -11,6 +16,7 @@ enum MyEnum {
     B
 }
 
+// Expected Migration:
 // -- CreateEnum
 // CREATE TYPE "MyEnum" AS ENUM ('A', 'B');
 // 

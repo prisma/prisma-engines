@@ -354,7 +354,7 @@ fn push_column_for_model_enum_scalar_field(
     table_id: sql::TableId,
     ctx: &mut Context<'_>,
 ) {
-    let r#enum = ctx.datamodel.db.walk_enum(enum_id);
+    let r#enum = ctx.datamodel.db.walk(enum_id);
     let value_for_name = |name: &str| -> PrismaValue {
         match r#enum.values().find(|v| v.name() == name).map(|v| v.database_name()) {
             Some(v) => PrismaValue::Enum(v.to_owned()),

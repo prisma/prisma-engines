@@ -8,6 +8,7 @@ mod defaults;
 mod error;
 mod introspection;
 mod introspection_helpers;
+mod introspection_map;
 mod prisma_1_defaults;
 mod re_introspection;
 mod sanitize_datamodel_names;

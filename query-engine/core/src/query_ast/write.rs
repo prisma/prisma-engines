@@ -1,6 +1,7 @@
 //! Write query AST
 use super::{FilteredNestedMutation, FilteredQuery};
-use connector::{filter::Filter, DatasourceFieldName, RecordFilter, WriteArgs};
+use crate::RecordQuery;
+use connector::{filter::Filter, DatasourceFieldName, NativeUpsert, RecordFilter, WriteArgs};
 use prisma_models::prelude::*;
 use std::{collections::HashMap, sync::Arc};
 
@@ -16,6 +17,7 @@ pub enum WriteQuery {
     DisconnectRecords(DisconnectRecords),
     ExecuteRaw(RawQuery),
     QueryRaw(RawQuery),
+    Upsert(NativeUpsert),
 }
 
 impl WriteQuery {
@@ -65,6 +67,7 @@ impl WriteQuery {
             Self::DisconnectRecords(_) => false,
             Self::ExecuteRaw(_) => false,
             Self::QueryRaw(_) => false,
+            Self::Upsert(_) => returns_id,
         }
     }
 
@@ -73,6 +76,7 @@ impl WriteQuery {
             Self::CreateRecord(q) => Arc::clone(&q.model),
             Self::CreateManyRecords(q) => Arc::clone(&q.model),
             Self::UpdateRecord(q) => Arc::clone(&q.model),
+            Self::Upsert(q) => q.model().clone(),
             Self::DeleteRecord(q) => Arc::clone(&q.model),
             Self::UpdateManyRecords(q) => Arc::clone(&q.model),
             Self::DeleteManyRecords(q) => Arc::clone(&q.model),
@@ -81,6 +85,25 @@ impl WriteQuery {
             Self::ExecuteRaw(_) => unimplemented!(),
             Self::QueryRaw(_) => unimplemented!(),
         }
+    }
+
+    pub fn native_upsert(
+        name: String,
+        model: ModelRef,
+        record_filter: RecordFilter,
+        create: WriteArgs,
+        update: WriteArgs,
+        read: RecordQuery,
+    ) -> crate::Query {
+        crate::Query::Write(WriteQuery::Upsert(NativeUpsert::new(
+            name,
+            model,
+            record_filter,
+            create,
+            update,
+            read.selected_fields,
+            read.selection_order,
+        )))
     }
 }
 
@@ -123,6 +146,7 @@ impl std::fmt::Display for WriteQuery {
             Self::DisconnectRecords(_) => write!(f, "DisconnectRecords"),
             Self::ExecuteRaw(r) => write!(f, "ExecuteRaw: {:?}", r.inputs),
             Self::QueryRaw(r) => write!(f, "QueryRaw: {:?}", r.inputs),
+            Self::Upsert(q) => q.fmt(f),
         }
     }
 }

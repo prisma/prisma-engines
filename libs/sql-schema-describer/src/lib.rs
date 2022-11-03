@@ -114,6 +114,14 @@ impl SqlSchema {
         self.enums.iter().position(|e| e.name == name).map(|i| EnumId(i as u32))
     }
 
+    /// Try to find a table by name.
+    pub fn find_table(&self, name: &str) -> Option<TableId> {
+        self.tables
+            .iter()
+            .position(|t| t.name == name)
+            .map(|i| TableId(i as u32))
+    }
+
     /// Get a procedure.
     pub fn get_procedure(&self, name: &str) -> Option<&Procedure> {
         self.procedures.iter().find(|x| x.name == name)
@@ -288,14 +296,11 @@ impl SqlSchema {
         Some(self.walk(TableId(table_idx as u32)))
     }
 
-    pub fn table_walkers(&self) -> impl Iterator<Item = TableWalker<'_>> {
-        (0..self.tables.len()).map(move |table_index| TableWalker {
-            schema: self,
-            id: TableId(table_index as u32),
-        })
+    pub fn table_walkers(&self) -> impl ExactSizeIterator<Item = TableWalker<'_>> {
+        (0..self.tables.len()).map(move |table_index| self.walk(TableId(table_index as u32)))
     }
 
-    pub fn view_walkers(&self) -> impl Iterator<Item = ViewWalker<'_>> {
+    pub fn view_walkers(&self) -> impl ExactSizeIterator<Item = ViewWalker<'_>> {
         (0..self.views.len()).map(move |view_index| self.walk(ViewId(view_index as u32)))
     }
 

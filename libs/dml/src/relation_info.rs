@@ -1,4 +1,5 @@
 use enumflags2::bitflags;
+use psl_core::parser_database as db;
 use std::fmt;
 
 /// Holds information about a relation field.
@@ -68,6 +69,18 @@ pub enum ReferentialAction {
     /// of relation. Will always result in a runtime error if no defaults are
     /// provided for any relation scalar fields.
     SetDefault,
+}
+
+impl From<db::ReferentialAction> for ReferentialAction {
+    fn from(ra: db::ReferentialAction) -> Self {
+        match ra {
+            db::ReferentialAction::Cascade => ReferentialAction::Cascade,
+            db::ReferentialAction::SetNull => ReferentialAction::SetNull,
+            db::ReferentialAction::SetDefault => ReferentialAction::SetDefault,
+            db::ReferentialAction::Restrict => ReferentialAction::Restrict,
+            db::ReferentialAction::NoAction => ReferentialAction::NoAction,
+        }
+    }
 }
 
 impl AsRef<str> for ReferentialAction {

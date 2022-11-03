@@ -17,12 +17,12 @@ impl<'db> TwoWayEmbeddedManyToManyRelationWalker<'db> {
 
     /// The model which comes first in the alphabetical order.
     pub fn model_a(self) -> ModelWalker<'db> {
-        self.0.db.walk_model(self.get().model_a)
+        self.0.db.walk(self.get().model_a)
     }
 
     /// The model which comes after model a in the alphabetical order.
     pub fn model_b(self) -> ModelWalker<'db> {
-        self.0.db.walk_model(self.get().model_b)
+        self.0.db.walk(self.get().model_b)
     }
 
     /// The field that defines the relation in model a.

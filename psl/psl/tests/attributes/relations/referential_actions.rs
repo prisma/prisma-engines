@@ -363,7 +363,7 @@ fn on_update_no_action_should_work_on_prisma_relation_mode() {
 
 #[test]
 fn foreign_keys_not_allowed_on_mongo() {
-    let dml = indoc! {r#"
+    let schema = indoc! {r#"
         datasource db {
           provider = "mongodb"
           relationMode = "foreignKeys"
@@ -396,7 +396,7 @@ fn foreign_keys_not_allowed_on_mongo() {
         [1;94m   | [0m
     "#]];
 
-    expected.assert_eq(&parse_config(dml).map(drop).unwrap_err())
+    expect_error(schema, &expected)
 }
 
 #[test]

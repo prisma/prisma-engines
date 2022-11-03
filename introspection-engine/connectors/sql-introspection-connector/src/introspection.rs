@@ -1,4 +1,8 @@
+pub(crate) mod inline_relations;
+
+mod m2m_relations;
 mod postgres;
+mod prisma_relation_mode;
 
 use crate::{
     calculate_datamodel::CalculateDatamodelContext as Context,
@@ -13,55 +17,26 @@ use datamodel_renderer as render;
 use introspection_connector::Version;
 use psl::{
     datamodel_connector::constraint_names::ConstraintNames,
-    dml::{self, Datamodel, Field, Model, PrimaryKeyDefinition, PrimaryKeyField, RelationField, SortOrder},
+    dml::{self, Datamodel, Field, Model, PrimaryKeyDefinition, PrimaryKeyField, SortOrder},
     parser_database::{ast, walkers},
+    schema_ast::ast::WithDocumentation,
     Configuration,
 };
-use sql_schema_describer::{self as sql, walkers::TableWalker, ForeignKeyId, SQLSortOrder, SqlSchema};
-use std::collections::{HashMap, HashSet};
-use tracing::debug;
+use sql_schema_describer::{self as sql, SQLSortOrder, SqlSchema};
+use std::collections::HashMap;
 
 pub(crate) fn introspect(ctx: &mut Context) -> Result<(Version, String, bool), SqlError> {
     let mut datamodel = Datamodel::new();
-    let schema = ctx.schema;
 
     introspect_enums(&mut datamodel, ctx);
     introspect_models(&mut datamodel, ctx);
 
-    let mut fields_to_be_added = Vec::new();
-
-    // add backrelation fields
-    for model in datamodel.models() {
-        for relation_field in model.relation_fields() {
-            let relation_info = &relation_field.relation_info;
-            if datamodel
-                .find_related_field_for_info(relation_info, &relation_field.name)
-                .is_none()
-            {
-                let other_model = datamodel.find_model(&relation_info.referenced_model).unwrap();
-                let field = calculate_backrelation_field(schema, model, other_model, relation_field, relation_info)?;
-
-                fields_to_be_added.push((other_model.name.clone(), field));
-            }
-        }
+    if ctx.foreign_keys_enabled() {
+        inline_relations::introspect_inline_relations(&mut datamodel, ctx);
+    } else {
+        prisma_relation_mode::reintrospect_relations(&mut datamodel, ctx);
     }
 
-    // add prisma many to many relation fields
-    for table in schema
-        .table_walkers()
-        .filter(|table| is_prisma_1_point_1_or_2_join_table(*table) || is_prisma_1_point_0_join_table(*table))
-    {
-        calculate_fields_for_prisma_join_table(table, &mut fields_to_be_added, &datamodel)
-    }
-
-    for (model, field) in fields_to_be_added {
-        datamodel.find_model_mut(&model).add_field(Field::RelationField(field));
-    }
-
-    //TODO(matthias) the sanitation and deduplication of names that come from the schema should move to an initial phase based upon the sqlschema
-    //it could yield a map from tableId / enumId to the changed name,
-    // during the construction of the dml we'd then draw from that map
-    // this way, all usages are already populated with the correct final name and won't need to be tracked down separately
     if !sanitization_leads_to_duplicate_names(&datamodel) {
         // our opinionation about valid names
         sanitize_datamodel_names(ctx, &mut datamodel);
@@ -73,7 +48,6 @@ pub(crate) fn introspect(ctx: &mut Context) -> Result<(Version, String, bool), S
 
     if !ctx.previous_datamodel.is_empty() {
         enrich(ctx.previous_datamodel, &mut datamodel, ctx);
-        debug!("Enriching datamodel is done.");
     }
 
     // commenting out models, fields, enums, enum values
@@ -83,13 +57,33 @@ pub(crate) fn introspect(ctx: &mut Context) -> Result<(Version, String, bool), S
     let version = version_checker::check_prisma_version(ctx);
 
     // if based on a previous Prisma version add id default opinionations
-    add_prisma_1_id_defaults(&version, &mut datamodel, schema, ctx);
+    add_prisma_1_id_defaults(&version, &mut datamodel, ctx.schema, ctx);
 
     let config = if ctx.render_config {
-        render_configuration(ctx.config, schema).to_string()
+        render_configuration(ctx.config, ctx.schema).to_string()
     } else {
         String::new()
     };
+
+    m2m_relations::introspect_m2m_relations(&mut datamodel, ctx);
+
+    // Ordering of model fields.
+    //
+    // This sorts backrelation field after relation fields, in order to preserve an ordering
+    // similar to that of the previous implementation.
+    for model in &mut datamodel.models {
+        model
+            .fields
+            .sort_by(|a, b| match (a.as_relation_field(), b.as_relation_field()) {
+                (Some(a), Some(b)) if a.relation_info.fields.is_empty() && !b.relation_info.fields.is_empty() => {
+                    std::cmp::Ordering::Greater // back relation fields last
+                }
+                (Some(a), Some(b)) if b.relation_info.fields.is_empty() && !a.relation_info.fields.is_empty() => {
+                    std::cmp::Ordering::Less
+                }
+                _ => std::cmp::Ordering::Equal,
+            });
+    }
 
     let rendered = format!(
         "{}\n{}",
@@ -116,27 +110,6 @@ fn render_configuration<'a>(config: &'a Configuration, schema: &'a SqlSchema) ->
     }
 
     output
-}
-
-fn calculate_fields_for_prisma_join_table(
-    join_table: TableWalker<'_>,
-    fields_to_be_added: &mut Vec<(String, RelationField)>,
-    datamodel: &Datamodel,
-) {
-    let mut foreign_keys = join_table.foreign_keys();
-    if let (Some(fk_a), Some(fk_b)) = (foreign_keys.next(), foreign_keys.next()) {
-        let is_self_relation = fk_a.referenced_table().id == fk_b.referenced_table().id;
-
-        for (fk, opposite_fk) in &[(fk_a, fk_b), (fk_b, fk_a)] {
-            let referenced_model = dml::find_model_by_db_name(datamodel, fk.referenced_table().name())
-                .expect("Could not find model referenced in relation table.");
-
-            let relation_name = join_table.name()[1..].to_owned();
-            let field = calculate_many_to_many_field(*opposite_fk, relation_name, is_self_relation);
-
-            fields_to_be_added.push((referenced_model.name.clone(), field));
-        }
-    }
 }
 
 fn introspect_enums(datamodel: &mut Datamodel, ctx: &mut Context<'_>) {
@@ -176,6 +149,10 @@ fn sql_enum_to_dml_enum(
     let enum_name = existing_enum.map(|enm| enm.name()).unwrap_or_else(|| sql_enum.name());
     let mut dml_enum = dml::Enum::new(enum_name, Vec::new(), schema);
 
+    dml_enum.documentation = existing_enum
+        .and_then(|enm| enm.ast_enum().documentation())
+        .map(ToOwned::to_owned);
+
     dml_enum.database_name = if ctx.sql_family.is_mysql() {
         existing_enum.and_then(|enm| enm.mapped_name()).map(ToOwned::to_owned)
     } else {
@@ -197,12 +174,11 @@ fn sql_enum_to_dml_enum(
 
     for value in sql_enum.values() {
         let mut dml_value = dml::EnumValue::new(value);
+        let existing_value = existing_enum.and_then(|enm| enm.values().find(|val| val.database_name() == value));
+        dml_value.documentation = existing_value.and_then(|v| v.documentation()).map(ToOwned::to_owned);
 
         // Re-introspect mapped names.
-        if let Some(existing_value) = existing_enum.and_then(|enm| {
-            enm.values()
-                .find(|val| val.mapped_name().is_some() && val.database_name() == value)
-        }) {
+        if let Some(existing_value) = existing_value.filter(|val| val.mapped_name().is_some()) {
             let mapped_name = std::mem::replace(&mut dml_value.name, existing_value.name().to_owned());
             dml_value.database_name = Some(mapped_name);
             remapped_values.push(warnings::EnumAndValue {
@@ -222,59 +198,36 @@ fn sql_enum_to_dml_enum(
     dml_enum
 }
 
-fn introspect_models(datamodel: &mut Datamodel, ctx: &Context) {
-    // collect m2m table names
-    let m2m_tables: Vec<String> = ctx
-        .schema
-        .table_walkers()
-        .filter(|table| is_prisma_1_point_1_or_2_join_table(*table) || is_prisma_1_point_0_join_table(*table))
-        .map(|table| table.name()[1..].to_string())
-        .collect();
+fn introspect_models(datamodel: &mut Datamodel, ctx: &mut Context<'_>) {
+    let mut re_introspected_model_ignores = Vec::new();
+    let mut remapped_models = Vec::new();
+    let mut remapped_fields = Vec::new();
+    let mut reintrospected_id_names = Vec::new();
 
     for table in ctx
         .schema
         .table_walkers()
         .filter(|table| !is_old_migration_table(*table))
         .filter(|table| !is_new_migration_table(*table))
-        .filter(|table| !is_prisma_1_point_1_or_2_join_table(*table))
-        .filter(|table| !is_prisma_1_point_0_join_table(*table))
+        .filter(|table| !is_prisma_join_table(*table))
         .filter(|table| !is_relay_table(*table))
     {
-        debug!("Calculating model: {}", table.name());
-        let mut model = Model::new(table.name().to_owned(), None);
+        let existing_model = ctx.existing_model(table.id);
+        let model_name = existing_model.map(|m| m.name()).unwrap_or_else(|| table.name());
+        let mut model = Model::new(model_name.to_owned(), None);
 
-        for column in table.columns() {
-            let field = calculate_scalar_field(column, ctx);
-            model.add_field(Field::ScalarField(field));
+        if let Some(m) = existing_model.filter(|m| m.mapped_name().is_some()) {
+            remapped_models.push(warnings::Model {
+                model: m.name().to_owned(),
+            });
         }
 
-        let duplicated_foreign_keys: HashSet<ForeignKeyId> = table
-            .foreign_keys()
-            .enumerate()
-            .filter(|(idx, left)| {
-                let mut already_visited = table.foreign_keys().take(*idx);
-                already_visited.any(|right| {
-                    let (left_constrained, right_constrained) =
-                        (left.constrained_columns(), right.constrained_columns());
-                    left_constrained.len() == right_constrained.len()
-                        && left_constrained
-                            .zip(right_constrained)
-                            .all(|(left, right)| left.id == right.id)
-                        && left
-                            .referenced_columns()
-                            .zip(right.referenced_columns())
-                            .all(|(left, right)| left.id == right.id)
-                })
-            })
-            .map(|(_, fk)| fk.id)
-            .collect();
-
-        for foreign_key in table
-            .foreign_keys()
-            .filter(|fk| !duplicated_foreign_keys.contains(&fk.id))
-        {
-            let relation_field = calculate_relation_field(ctx, foreign_key, &m2m_tables, &duplicated_foreign_keys);
-            model.add_field(Field::RelationField(relation_field));
+        for column in table.columns() {
+            model.add_field(Field::ScalarField(calculate_scalar_field(
+                column,
+                &mut remapped_fields,
+                ctx,
+            )));
         }
 
         for index in table.indexes() {
@@ -285,6 +238,16 @@ fn introspect_models(datamodel: &mut Datamodel, ctx: &Context) {
 
         if let Some(pk) = table.primary_key() {
             let clustered = primary_key_is_clustered(pk.id, ctx);
+            let name = existing_model
+                .and_then(|model| model.primary_key())
+                .and_then(|pk| pk.name())
+                .map(ToOwned::to_owned);
+
+            if name.is_some() {
+                reintrospected_id_names.push(warnings::Model {
+                    model: existing_model.unwrap().name().to_owned(),
+                });
+            }
 
             let db_name = if pk.name() == ConstraintNames::primary_key_name(table.name(), ctx.active_connector())
                 || pk.name().is_empty()
@@ -295,7 +258,7 @@ fn introspect_models(datamodel: &mut Datamodel, ctx: &Context) {
             };
 
             model.primary_key = Some(PrimaryKeyDefinition {
-                name: None,
+                name,
                 db_name,
                 fields: pk
                     .columns()
@@ -306,7 +269,7 @@ fn introspect_models(datamodel: &mut Datamodel, ctx: &Context) {
                         });
 
                         PrimaryKeyField {
-                            name: c.name().to_string(),
+                            name: ctx.column_prisma_name(c.as_column().id).to_owned(),
                             sort_order,
                             length: c.length(),
                         }
@@ -321,7 +284,39 @@ fn introspect_models(datamodel: &mut Datamodel, ctx: &Context) {
             model.schema = table.namespace().map(|n| n.to_string());
         }
 
+        model.database_name = existing_model
+            .filter(|model| model.name() != table.name())
+            .map(|_| table.name().to_owned());
+
+        model.documentation = existing_model
+            .and_then(|model| model.ast_model().documentation())
+            .map(ToOwned::to_owned);
+
+        if existing_model.map(|model| model.is_ignored()).unwrap_or(false) {
+            model.is_ignored = true;
+            re_introspected_model_ignores.push(warnings::Model {
+                model: model_name.to_owned(),
+            });
+        }
+
         datamodel.models.push(model);
+    }
+
+    if !remapped_models.is_empty() {
+        ctx.warnings
+            .push(warnings::warning_enriched_with_map_on_model(&remapped_models));
+    }
+
+    if !remapped_fields.is_empty() {
+        ctx.warnings
+            .push(warnings::warning_enriched_with_map_on_field(&remapped_fields));
+    }
+
+    if !reintrospected_id_names.is_empty() {
+        ctx.warnings
+            .push(warnings::warning_enriched_with_custom_primary_key_names(
+                &reintrospected_id_names,
+            ))
     }
 
     sort_models(datamodel, ctx)

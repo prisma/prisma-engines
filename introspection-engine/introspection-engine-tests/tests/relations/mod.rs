@@ -607,74 +607,20 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
 
     let expected = expect![[r#"
         model Event {
-          id                       Int    @id @default(autoincrement())
-          host_id                  Int
-          User_Event_host_idToUser User   @relation("Event_host_idToUser", fields: [host_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-          User_EventToUser         User[]
+          id                      Int    @id @default(autoincrement())
+          host_id                 Int
+          UserEvent_host_idToUser User   @relation("Event_host_idToUser", fields: [host_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+          User                    User[]
         }
 
         model User {
-          id                        Int     @id @default(autoincrement())
-          Event_Event_host_idToUser Event[] @relation("Event_host_idToUser")
-          Event_EventToUser         Event[]
+          id                       Int     @id @default(autoincrement())
+          EventEvent_host_idToUser Event[] @relation("Event_host_idToUser")
+          Event                    Event[]
         }
     "#]];
 
     expected.assert_eq(&api.introspect_dml().await?);
-
-    Ok(())
-}
-
-#[test_connector(exclude(Vitess, CockroachDb, Sqlite))]
-async fn many_to_many_relation_field_names_do_not_conflict_with_themselves(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("User", |table| {
-                table.add_column("id", types::integer().increments(true));
-                table.add_constraint("User_pkey", types::primary_constraint(&["id"]));
-            });
-
-            migration.create_table("_Friendship", |table| {
-                table.add_column("A", types::integer().nullable(false));
-                table.add_column("B", types::integer().nullable(false));
-
-                table.add_foreign_key(&["A"], "User", &["id"]);
-                table.add_foreign_key(&["B"], "User", &["id"]);
-
-                table.add_index(
-                    "_FriendShip_AB_unique",
-                    barrel::types::index(vec!["A", "B"]).unique(true),
-                );
-                table.add_index("_FriendShip_B_index", barrel::types::index(vec!["B"]));
-            });
-
-            migration.create_table("_Frenemyship", |table| {
-                table.add_column("A", types::integer().nullable(false));
-                table.add_column("B", types::integer().nullable(false));
-
-                table.add_foreign_key(&["A"], "User", &["id"]);
-                table.add_foreign_key(&["B"], "User", &["id"]);
-
-                table.add_index(
-                    "_Frenemyship_AB_unique",
-                    barrel::types::index(vec!["A", "B"]).unique(true),
-                );
-                table.add_index("_Frenemyship_B_index", barrel::types::index(vec!["B"]));
-            });
-        })
-        .await?;
-
-    let expected_dm = indoc! {r#"
-        model User {
-            id                 Int    @id @default(autoincrement())
-            User_B_Frenemyship User[] @relation("Frenemyship")
-            User_A_Frenemyship User[] @relation("Frenemyship")
-            User_B_Friendship  User[] @relation("Friendship")
-            User_A_Friendship  User[] @relation("Friendship")
-        }
-    "#};
-
-    api.assert_eq_datamodels(expected_dm, &api.introspect().await?);
 
     Ok(())
 }

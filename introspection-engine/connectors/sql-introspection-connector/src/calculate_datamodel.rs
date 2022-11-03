@@ -1,16 +1,10 @@
 use crate::{introspection::introspect, SqlFamilyTrait, SqlIntrospectionResult};
 use introspection_connector::{IntrospectionContext, IntrospectionResult, Warning};
 use psl::{
-    builtin_connectors::*,
-    datamodel_connector::Connector,
-    dml::Datamodel,
-    parser_database::{ast, walkers},
-    Configuration,
+    builtin_connectors::*, datamodel_connector::Connector, dml::Datamodel, parser_database::walkers, Configuration,
 };
 use quaint::prelude::SqlFamily;
 use sql_schema_describer as sql;
-use std::collections::HashMap;
-use tracing::debug;
 
 pub(crate) struct CalculateDatamodelContext<'a> {
     pub(crate) config: &'a Configuration,
@@ -20,7 +14,7 @@ pub(crate) struct CalculateDatamodelContext<'a> {
     pub(crate) sql_family: SqlFamily,
     pub(crate) warnings: &'a mut Vec<Warning>,
     pub(crate) previous_schema: &'a psl::ValidatedSchema,
-    existing_enums: &'a HashMap<sql::EnumId, ast::EnumId>,
+    introspection_map: crate::introspection_map::IntrospectionMap,
 }
 
 impl<'a> CalculateDatamodelContext<'a> {
@@ -44,7 +38,10 @@ impl<'a> CalculateDatamodelContext<'a> {
     /// Given a SQL enum from the database, this method returns the enum that matches it (by name)
     /// in the Prisma schema.
     pub(crate) fn existing_enum(&self, id: sql::EnumId) -> Option<walkers::EnumWalker<'a>> {
-        self.existing_enums.get(&id).map(|id| self.previous_schema.db.walk(*id))
+        self.introspection_map
+            .existing_enums
+            .get(&id)
+            .map(|id| self.previous_schema.db.walk(*id))
     }
 
     /// Given a SQL enum from the database, this method returns the name it will be given in the
@@ -55,6 +52,51 @@ impl<'a> CalculateDatamodelContext<'a> {
             .map(|enm| enm.name())
             .unwrap_or_else(|| self.schema.walk(id).name())
     }
+
+    /// Given a foreign key from the database, this methods returns the existing relation in the
+    /// Prisma schema that matches it.
+    pub(crate) fn existing_inline_relation(&self, id: sql::ForeignKeyId) -> Option<walkers::InlineRelationWalker<'a>> {
+        self.introspection_map
+            .existing_inline_relations
+            .get(&id)
+            .map(|relation_id| self.previous_schema.db.walk(*relation_id).refine().as_inline().unwrap())
+    }
+
+    pub(crate) fn existing_m2m_relation(
+        &self,
+        id: sql::TableId,
+    ) -> Option<walkers::ImplicitManyToManyRelationWalker<'a>> {
+        self.introspection_map
+            .existing_m2m_relations
+            .get(&id)
+            .map(|relation_id| self.previous_schema.db.walk(*relation_id))
+    }
+
+    pub(crate) fn existing_model(&self, id: sql::TableId) -> Option<walkers::ModelWalker<'a>> {
+        self.introspection_map
+            .existing_models
+            .get(&id)
+            .map(|id| self.previous_schema.db.walk(*id))
+    }
+
+    pub(crate) fn existing_scalar_field(&self, id: sql::ColumnId) -> Option<walkers::ScalarFieldWalker<'a>> {
+        self.introspection_map
+            .existing_scalar_fields
+            .get(&id)
+            .map(|(model_id, field_id)| self.previous_schema.db.walk(*model_id).scalar_field(*field_id))
+    }
+
+    pub(crate) fn column_prisma_name(&self, id: sql::ColumnId) -> &'a str {
+        self.existing_scalar_field(id)
+            .map(|sf| sf.name())
+            .unwrap_or_else(|| self.schema.walk(id).name())
+    }
+
+    pub(crate) fn model_prisma_name(&self, id: sql::TableId) -> &'a str {
+        self.existing_model(id)
+            .map(|model| model.name())
+            .unwrap_or_else(|| self.schema.walk(id).name())
+    }
 }
 
 /// Calculate a data model from a database schema.
@@ -62,40 +104,6 @@ pub fn calculate_datamodel(
     schema: &sql::SqlSchema,
     ctx: &IntrospectionContext,
 ) -> SqlIntrospectionResult<IntrospectionResult> {
-    let existing_enums = if ctx.sql_family().is_mysql() {
-        schema
-            .walk_columns()
-            .filter_map(|col| col.column_type_family_as_enum().map(|enm| (col, enm)))
-            .filter_map(|(col, sql_enum)| {
-                ctx.previous_schema()
-                    .db
-                    .walk_models()
-                    .find(|model| model.database_name() == col.table().name())
-                    .and_then(|model| model.scalar_fields().find(|sf| sf.database_name() == col.name()))
-                    .and_then(|scalar_field| scalar_field.field_type_as_enum())
-                    .map(|ast_enum| (sql_enum.id, ast_enum.id))
-            })
-            // Make sure the values are the same, otherwise we're not _really_ dealing with the same
-            // enum.
-            .filter(|(sql_enum_id, ast_enum_id)| {
-                let sql_values = schema.walk(*sql_enum_id).values();
-                let prisma_values = ctx.previous_schema().db.walk(*ast_enum_id).values();
-                prisma_values.len() == sql_values.len()
-                    && prisma_values.zip(sql_values).all(|(a, b)| a.database_name() == b)
-            })
-            .collect()
-    } else {
-        ctx.previous_schema()
-            .db
-            .walk_enums()
-            .filter_map(|prisma_enum| {
-                schema
-                    .find_enum(prisma_enum.database_name())
-                    .map(|sql_id| (sql_id, prisma_enum.id))
-            })
-            .collect()
-    };
-
     let mut warnings = Vec::new();
 
     let mut context = CalculateDatamodelContext {
@@ -106,12 +114,10 @@ pub fn calculate_datamodel(
         sql_family: ctx.sql_family(),
         previous_schema: ctx.previous_schema(),
         warnings: &mut warnings,
-        existing_enums: &existing_enums,
+        introspection_map: crate::introspection_map::IntrospectionMap::new(schema, ctx.previous_schema()),
     };
 
     let (version, data_model, is_empty) = introspect(&mut context)?;
-
-    debug!("Done calculating datamodel.");
 
     Ok(IntrospectionResult {
         data_model,

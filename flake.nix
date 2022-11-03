@@ -22,8 +22,8 @@
           overlays = [
             rust-overlay.overlays.default
             (self: super:
-              let toolchain = pkgs.rust-bin.stable.latest.default; in
-              { cargo = toolchain; rustc = toolchain; })
+              let toolchain = pkgs.rust-bin.stable.latest; in
+              { cargo = toolchain.minimal; rustc = toolchain.minimal; rustToolchain = toolchain; })
           ];
           pkgs = import nixpkgs { inherit system overlays; };
           craneLib = crane.mkLib pkgs;
@@ -61,7 +61,7 @@
 
               inherit src;
 
-              buildInputs = [ pkgs.openssl pkgs.rust-analyzer ];
+              buildInputs = [ pkgs.openssl ];
 
               nativeBuildInputs = with pkgs; [
                 git # for our build scripts that bake in the git hash
@@ -88,7 +88,10 @@
 
           checks = prisma-fmt-wasm.checks;
 
-          devShells.default = pkgs.mkShell { inputsFrom = [ prisma-engines-deps ]; };
+          devShells.default = pkgs.mkShell {
+            packages = [ (pkgs.rustToolchain.default.override { extensions = [ "rust-analyzer" "rust-src" ]; }) ];
+            inputsFrom = [ prisma-engines-deps ];
+          };
         }
       );
 }

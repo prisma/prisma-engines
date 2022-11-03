@@ -89,12 +89,8 @@ impl<'a> LiftAstToDml<'a> {
         let relation_mode = self.relation_mode;
         let common_dml_fields = |field: &mut RelationField, relation_field: RelationFieldWalker<'_>| {
             let ast_field = relation_field.ast_field();
-            field.relation_info.on_delete = relation_field
-                .explicit_on_delete()
-                .map(parser_database_referential_action_to_dml_referential_action);
-            field.relation_info.on_update = relation_field
-                .explicit_on_update()
-                .map(parser_database_referential_action_to_dml_referential_action);
+            field.relation_info.on_delete = relation_field.explicit_on_delete().map(From::from);
+            field.relation_info.on_update = relation_field.explicit_on_update().map(From::from);
             field.relation_info.name = relation_field.relation_name().to_string();
             field.documentation = ast_field.documentation().map(String::from);
             field.is_ignored = relation_field.is_ignored();
@@ -132,8 +128,8 @@ impl<'a> LiftAstToDml<'a> {
 
                         let forward_field_walker = relation.forward_relation_field().unwrap();
                         // Construct a relation field in the DML for an existing relation field in the source.
-                        let arity = self.lift_arity(&forward_field_walker.ast_field().arity);
-                        let referential_arity = self.lift_arity(&forward_field_walker.referential_arity());
+                        let arity = forward_field_walker.ast_field().arity.into();
+                        let referential_arity = forward_field_walker.referential_arity().into();
                         let mut relation_field =
                             RelationField::new(forward_field_walker.name(), arity, referential_arity, relation_info);
 
@@ -189,8 +185,8 @@ impl<'a> LiftAstToDml<'a> {
 
                         let mut field = if let Some(relation_field) = relation.back_relation_field() {
                             let ast_field = relation_field.ast_field();
-                            let arity = self.lift_arity(&ast_field.arity);
-                            let referential_arity = self.lift_arity(&relation_field.referential_arity());
+                            let arity = ast_field.arity.into();
+                            let referential_arity = relation_field.referential_arity().into();
                             let mut field =
                                 RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
 
@@ -223,9 +219,9 @@ impl<'a> LiftAstToDml<'a> {
                 RefinedRelationWalker::ImplicitManyToMany(relation) => {
                     for relation_field in [relation.field_a(), relation.field_b()] {
                         let ast_field = relation_field.ast_field();
-                        let arity = self.lift_arity(&ast_field.arity);
+                        let arity = ast_field.arity.into();
                         let relation_info = RelationInfo::new(relation_field.related_model().name());
-                        let referential_arity = self.lift_arity(&relation_field.referential_arity());
+                        let referential_arity = relation_field.referential_arity().into();
                         let mut field =
                             RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
 
@@ -253,9 +249,9 @@ impl<'a> LiftAstToDml<'a> {
                 RefinedRelationWalker::TwoWayEmbeddedManyToMany(relation) => {
                     for relation_field in [relation.field_a(), relation.field_b()] {
                         let ast_field = relation_field.ast_field();
-                        let arity = self.lift_arity(&ast_field.arity);
+                        let arity = ast_field.arity.into();
                         let relation_info = RelationInfo::new(relation_field.related_model().name());
-                        let referential_arity = self.lift_arity(&relation_field.referential_arity());
+                        let referential_arity = relation_field.referential_arity().into();
 
                         let mut field =
                             RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
@@ -295,7 +291,7 @@ impl<'a> LiftAstToDml<'a> {
             let field = CompositeTypeField {
                 name: field.name().to_owned(),
                 r#type: self.lift_composite_type_field_type(field, field.r#type()),
-                arity: self.lift_arity(&field.arity()),
+                arity: field.arity().into(),
                 database_name: field.mapped_name().map(String::from),
                 documentation: field.documentation().map(ToString::to_string),
                 default_value: field.default_value().map(|value| DefaultValue {
@@ -405,7 +401,6 @@ impl<'a> LiftAstToDml<'a> {
         for scalar_field in walker.scalar_fields() {
             let field_id = scalar_field.field_id();
             let ast_field = &ast_model[field_id];
-            let arity = self.lift_arity(&ast_field.arity);
 
             field_ids_for_sorting.insert((ast_model.name(), ast_field.name()), field_id);
 
@@ -417,7 +412,7 @@ impl<'a> LiftAstToDml<'a> {
                     field.documentation = ast_field.documentation().map(String::from);
                     field.is_ignored = scalar_field.is_ignored();
                     field.database_name = scalar_field.mapped_name().map(String::from);
-                    field.arity = arity;
+                    field.arity = ast_field.arity.into();
 
                     model.add_field(Field::CompositeField(field));
                     continue;
@@ -425,7 +420,7 @@ impl<'a> LiftAstToDml<'a> {
                 _ => self.lift_scalar_field_type(ast_field, &scalar_field.scalar_field_type(), scalar_field),
             };
 
-            let mut field = ScalarField::new(ast_field.name(), arity, field_type);
+            let mut field = ScalarField::new(ast_field.name(), ast_field.arity.into(), field_type);
 
             field.documentation = ast_field.documentation().map(String::from);
             field.is_ignored = scalar_field.is_ignored();
@@ -463,15 +458,6 @@ impl<'a> LiftAstToDml<'a> {
         enum_value.documentation = value.documentation().map(String::from);
         enum_value.database_name = value.mapped_name().map(String::from);
         enum_value
-    }
-
-    /// Internal: Lift a field's arity.
-    fn lift_arity(&self, field_arity: &ast::FieldArity) -> FieldArity {
-        match field_arity {
-            ast::FieldArity::Required => FieldArity::Required,
-            ast::FieldArity::Optional => FieldArity::Optional,
-            ast::FieldArity::List => FieldArity::List,
-        }
     }
 
     fn lift_scalar_field_type(
@@ -561,16 +547,6 @@ fn parser_database_sort_order_to_dml_sort_order(sort_order: db::SortOrder) -> So
     match sort_order {
         db::SortOrder::Asc => SortOrder::Asc,
         db::SortOrder::Desc => SortOrder::Desc,
-    }
-}
-
-fn parser_database_referential_action_to_dml_referential_action(ra: db::ReferentialAction) -> ReferentialAction {
-    match ra {
-        db::ReferentialAction::Cascade => ReferentialAction::Cascade,
-        db::ReferentialAction::SetNull => ReferentialAction::SetNull,
-        db::ReferentialAction::SetDefault => ReferentialAction::SetDefault,
-        db::ReferentialAction::Restrict => ReferentialAction::Restrict,
-        db::ReferentialAction::NoAction => ReferentialAction::NoAction,
     }
 }
 
