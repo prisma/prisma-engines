@@ -232,6 +232,7 @@
 <span id="232">232</span>
 <span id="233">233</span>
 <span id="234">234</span>
+<span id="235">235</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model_extensions</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sql_trace::SqlTraceComment</span>;
 <span class="kw">use</span> <span class="ident">connector_interface</span>::{<span class="ident">DatasourceFieldName</span>, <span class="ident">ScalarWriteOperation</span>, <span class="ident">WriteArgs</span>};
@@ -334,10 +335,11 @@
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_update_and_set_query</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="ident">args</span>: <span class="ident">WriteArgs</span>, <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident">Update</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">scalar_fields</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">scalar</span>();
+    <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">as_table</span>();
     <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">args</span>
         .<span class="ident">args</span>
         .<span class="ident">into_iter</span>()
-        .<span class="ident">fold</span>(<span class="ident">Update::table</span>(<span class="ident">model</span>.<span class="ident">as_table</span>()), <span class="op">|</span><span class="ident">acc</span>, (<span class="ident">field_name</span>, <span class="ident">val</span>)<span class="op">|</span> {
+        .<span class="ident">fold</span>(<span class="ident">Update::table</span>(<span class="ident">table</span>.<span class="ident">clone</span>()), <span class="op">|</span><span class="ident">acc</span>, (<span class="ident">field_name</span>, <span class="ident">val</span>)<span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">DatasourceFieldName</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">field_name</span>;
             <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">scalar_fields</span>
                 .<span class="ident">iter</span>()
@@ -358,22 +360,22 @@
                     <span class="ident">e</span>.<span class="ident">compare_raw</span>(<span class="string">&quot;||&quot;</span>, <span class="ident">Value::array</span>(<span class="ident">vals</span>)).<span class="ident">into</span>()
                 }
                 <span class="ident">ScalarWriteOperation::Add</span>(<span class="ident">rhs</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">e</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Column::from</span>(<span class="ident">name</span>.<span class="ident">clone</span>()).<span class="ident">into</span>();
+                    <span class="kw">let</span> <span class="ident">e</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Column::from</span>((<span class="ident">table</span>.<span class="ident">clone</span>(), <span class="ident">name</span>.<span class="ident">clone</span>())).<span class="ident">into</span>();
                     <span class="ident">e</span> <span class="op">+</span> <span class="ident">field</span>.<span class="ident">value</span>(<span class="ident">rhs</span>).<span class="ident">into</span>()
                 }
 
                 <span class="ident">ScalarWriteOperation::Substract</span>(<span class="ident">rhs</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">e</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Column::from</span>(<span class="ident">name</span>.<span class="ident">clone</span>()).<span class="ident">into</span>();
+                    <span class="kw">let</span> <span class="ident">e</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Column::from</span>((<span class="ident">table</span>.<span class="ident">clone</span>(), <span class="ident">name</span>.<span class="ident">clone</span>())).<span class="ident">into</span>();
                     <span class="ident">e</span> <span class="op">-</span> <span class="ident">field</span>.<span class="ident">value</span>(<span class="ident">rhs</span>).<span class="ident">into</span>()
                 }
 
                 <span class="ident">ScalarWriteOperation::Multiply</span>(<span class="ident">rhs</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">e</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Column::from</span>(<span class="ident">name</span>.<span class="ident">clone</span>()).<span class="ident">into</span>();
+                    <span class="kw">let</span> <span class="ident">e</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Column::from</span>((<span class="ident">table</span>.<span class="ident">clone</span>(), <span class="ident">name</span>.<span class="ident">clone</span>())).<span class="ident">into</span>();
                     <span class="ident">e</span> <span class="op">*</span> <span class="ident">field</span>.<span class="ident">value</span>(<span class="ident">rhs</span>).<span class="ident">into</span>()
                 }
 
                 <span class="ident">ScalarWriteOperation::Divide</span>(<span class="ident">rhs</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">e</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Column::from</span>(<span class="ident">name</span>.<span class="ident">clone</span>()).<span class="ident">into</span>();
+                    <span class="kw">let</span> <span class="ident">e</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Column::from</span>((<span class="ident">table</span>.<span class="ident">clone</span>(), <span class="ident">name</span>.<span class="ident">clone</span>())).<span class="ident">into</span>();
                     <span class="ident">e</span> <span class="op">/</span> <span class="ident">field</span>.<span class="ident">value</span>(<span class="ident">rhs</span>).<span class="ident">into</span>()
                 }
 

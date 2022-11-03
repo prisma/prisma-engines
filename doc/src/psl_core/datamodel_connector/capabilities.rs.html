@@ -166,6 +166,7 @@
 <span id="166">166</span>
 <span id="167">167</span>
 <span id="168">168</span>
+<span id="169">169</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">str::FromStr</span>};
 
 <span class="doccomment">/// Not all Databases are created equal. Hence connectors for our datasources support different capabilities.</span>
@@ -265,6 +266,7 @@
     <span class="ident">SupportsTxIsolationRepeatableRead</span>,
     <span class="ident">SupportsTxIsolationSerializable</span>,
     <span class="ident">SupportsTxIsolationSnapshot</span>,
+    <span class="ident">NativeUpsert</span>
 );
 
 <span class="doccomment">/// Contains all capabilities that the connector is able to serve.</span>

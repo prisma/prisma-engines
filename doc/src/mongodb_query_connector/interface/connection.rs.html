@@ -243,6 +243,14 @@
 <span id="243">243</span>
 <span id="244">244</span>
 <span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::catch</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">error::MongoError</span>,
@@ -403,6 +411,14 @@
         <span class="ident">query_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span> {
         <span class="ident">catch</span>(<span class="kw">async</span> <span class="kw">move</span> { <span class="ident">write::query_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">session</span>, <span class="ident">model</span>, <span class="ident">inputs</span>, <span class="ident">query_type</span>).<span class="kw">await</span> }).<span class="kw">await</span>
+    }
+
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">native_upsert_record</span>(
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">_upsert</span>: <span class="ident">connector_interface::NativeUpsert</span>,
+        <span class="ident">_trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">SingleRecord</span><span class="op">&gt;</span> {
+        <span class="macro">unimplemented!</span>(<span class="string">&quot;Native upsert is not currently supported.&quot;</span>)
     }
 }
 

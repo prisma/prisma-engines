@@ -121,6 +121,7 @@
 <span id="121">121</span>
 <span id="122">122</span>
 <span id="123">123</span>
+<span id="124">124</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">psl_core</span>::{
     <span class="ident">datamodel_connector</span>::{<span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ConstraintScope</span>, <span class="ident">NativeTypeConstructor</span>, <span class="ident">NativeTypeInstance</span>},
@@ -143,6 +144,7 @@
     <span class="ident">ConnectorCapability::BackwardCompatibleQueryRaw</span>,
     <span class="ident">ConnectorCapability::OrderByNullsFirstLast</span>,
     <span class="ident">ConnectorCapability::SupportsTxIsolationSerializable</span>,
+    <span class="ident">ConnectorCapability::NativeUpsert</span>,
 ];
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SqliteDatamodelConnector</span>;

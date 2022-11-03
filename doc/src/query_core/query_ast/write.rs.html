@@ -267,9 +267,34 @@
 <span id="267">267</span>
 <span id="268">268</span>
 <span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Write query AST</span>
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">FilteredNestedMutation</span>, <span class="ident">FilteredQuery</span>};
-<span class="kw">use</span> <span class="ident">connector</span>::{<span class="ident">filter::Filter</span>, <span class="ident">DatasourceFieldName</span>, <span class="ident">RecordFilter</span>, <span class="ident">WriteArgs</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::RecordQuery</span>;
+<span class="kw">use</span> <span class="ident">connector</span>::{<span class="ident">filter::Filter</span>, <span class="ident">DatasourceFieldName</span>, <span class="ident">NativeUpsert</span>, <span class="ident">RecordFilter</span>, <span class="ident">WriteArgs</span>};
 <span class="kw">use</span> <span class="ident">prisma_models::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">sync::Arc</span>};
 
@@ -285,6 +310,7 @@
     <span class="ident">DisconnectRecords</span>(<span class="ident">DisconnectRecords</span>),
     <span class="ident">ExecuteRaw</span>(<span class="ident">RawQuery</span>),
     <span class="ident">QueryRaw</span>(<span class="ident">RawQuery</span>),
+    <span class="ident">Upsert</span>(<span class="ident">NativeUpsert</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">WriteQuery</span> {
@@ -334,6 +360,7 @@
             <span class="ident"><span class="self">Self</span>::DisconnectRecords</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
             <span class="ident"><span class="self">Self</span>::ExecuteRaw</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
             <span class="ident"><span class="self">Self</span>::QueryRaw</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+            <span class="ident"><span class="self">Self</span>::Upsert</span>(<span class="kw">_</span>) =&gt; <span class="ident">returns_id</span>,
         }
     }
 
@@ -342,6 +369,7 @@
             <span class="ident"><span class="self">Self</span>::CreateRecord</span>(<span class="ident">q</span>) =&gt; <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">q</span>.<span class="ident">model</span>),
             <span class="ident"><span class="self">Self</span>::CreateManyRecords</span>(<span class="ident">q</span>) =&gt; <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">q</span>.<span class="ident">model</span>),
             <span class="ident"><span class="self">Self</span>::UpdateRecord</span>(<span class="ident">q</span>) =&gt; <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">q</span>.<span class="ident">model</span>),
+            <span class="ident"><span class="self">Self</span>::Upsert</span>(<span class="ident">q</span>) =&gt; <span class="ident">q</span>.<span class="ident">model</span>().<span class="ident">clone</span>(),
             <span class="ident"><span class="self">Self</span>::DeleteRecord</span>(<span class="ident">q</span>) =&gt; <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">q</span>.<span class="ident">model</span>),
             <span class="ident"><span class="self">Self</span>::UpdateManyRecords</span>(<span class="ident">q</span>) =&gt; <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">q</span>.<span class="ident">model</span>),
             <span class="ident"><span class="self">Self</span>::DeleteManyRecords</span>(<span class="ident">q</span>) =&gt; <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">q</span>.<span class="ident">model</span>),
@@ -350,6 +378,25 @@
             <span class="ident"><span class="self">Self</span>::ExecuteRaw</span>(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
             <span class="ident"><span class="self">Self</span>::QueryRaw</span>(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
         }
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">native_upsert</span>(
+        <span class="ident">name</span>: <span class="ident">String</span>,
+        <span class="ident">model</span>: <span class="ident">ModelRef</span>,
+        <span class="ident">record_filter</span>: <span class="ident">RecordFilter</span>,
+        <span class="ident">create</span>: <span class="ident">WriteArgs</span>,
+        <span class="ident">update</span>: <span class="ident">WriteArgs</span>,
+        <span class="ident">read</span>: <span class="ident">RecordQuery</span>,
+    ) -&gt; <span class="ident"><span class="kw">crate</span>::Query</span> {
+        <span class="ident"><span class="kw">crate</span>::Query::Write</span>(<span class="ident">WriteQuery::Upsert</span>(<span class="ident">NativeUpsert::new</span>(
+            <span class="ident">name</span>,
+            <span class="ident">model</span>,
+            <span class="ident">record_filter</span>,
+            <span class="ident">create</span>,
+            <span class="ident">update</span>,
+            <span class="ident">read</span>.<span class="ident">selected_fields</span>,
+            <span class="ident">read</span>.<span class="ident">selection_order</span>,
+        )))
     }
 }
 
@@ -392,6 +439,7 @@
             <span class="ident"><span class="self">Self</span>::DisconnectRecords</span>(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;DisconnectRecords&quot;</span>),
             <span class="ident"><span class="self">Self</span>::ExecuteRaw</span>(<span class="ident">r</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ExecuteRaw: {:?}&quot;</span>, <span class="ident">r</span>.<span class="ident">inputs</span>),
             <span class="ident"><span class="self">Self</span>::QueryRaw</span>(<span class="ident">r</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;QueryRaw: {:?}&quot;</span>, <span class="ident">r</span>.<span class="ident">inputs</span>),
+            <span class="ident"><span class="self">Self</span>::Upsert</span>(<span class="ident">q</span>) =&gt; <span class="ident">q</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
         }
     }
 }

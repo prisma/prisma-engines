@@ -177,17 +177,90 @@
 <span id="177">177</span>
 <span id="178">178</span>
 <span id="179">179</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">write_args_parser::WriteArgsParser</span>, <span class="kw-2">*</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">query_ast</span>::<span class="kw-2">*</span>,
     <span class="ident">query_graph</span>::{<span class="ident">Flow</span>, <span class="ident">Node</span>, <span class="ident">QueryGraph</span>, <span class="ident">QueryGraphDependency</span>},
-    <span class="ident">ArgumentListLookup</span>, <span class="ident">ParsedField</span>, <span class="ident">ParsedInputMap</span>,
+    <span class="ident">ParsedField</span>, <span class="ident">ParsedInputMap</span>, <span class="ident">ParsedInputValue</span>,
 };
 <span class="kw">use</span> <span class="ident">connector::IntoFilter</span>;
 <span class="kw">use</span> <span class="ident">prisma_models::ModelRef</span>;
 <span class="kw">use</span> <span class="ident">schema::ConnectorContext</span>;
-<span class="kw">use</span> <span class="ident">schema_builder::constants::args</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryInto</span>, <span class="ident">sync::Arc</span>};
+<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
 <span class="doccomment">/// Handles a top-level upsert</span>
 <span class="doccomment">///</span>
@@ -237,35 +310,51 @@
     <span class="ident">model</span>: <span class="ident">ModelRef</span>,
     <span class="kw-2">mut</span> <span class="ident">field</span>: <span class="ident">ParsedField</span>,
 ) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">where_argument</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">where_arg</span>()<span class="question-mark">?</span>.<span class="ident">unwrap</span>();
+    <span class="kw">let</span> <span class="ident">create_argument</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">create_arg</span>()<span class="question-mark">?</span>.<span class="ident">unwrap</span>();
+    <span class="kw">let</span> <span class="ident">update_argument</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">update_arg</span>()<span class="question-mark">?</span>.<span class="ident">unwrap</span>();
+
+    <span class="kw">let</span> <span class="ident">can_use_native_upsert</span> <span class="op">=</span> <span class="ident">can_use_connector_native_upsert</span>(
+        <span class="kw-2">&amp;</span><span class="ident">model</span>,
+        <span class="kw-2">&amp;</span><span class="ident">where_argument</span>,
+        <span class="kw-2">&amp;</span><span class="ident">create_argument</span>,
+        <span class="kw-2">&amp;</span><span class="ident">update_argument</span>,
+        <span class="ident">connector_ctx</span>,
+    );
+
+    <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">extract_unique_filter</span>(<span class="ident">where_argument</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>)<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">read_query</span> <span class="op">=</span> <span class="ident">read::find_unique</span>(<span class="ident">field</span>.<span class="ident">clone</span>(), <span class="ident">model</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>;
+
+    <span class="kw">if</span> <span class="ident">can_use_native_upsert</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ReadQuery::RecordQuery</span>(<span class="ident">read</span>) <span class="op">=</span> <span class="ident">read_query</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">create_write_args</span> <span class="op">=</span> <span class="ident">WriteArgsParser::from</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>, <span class="ident">create_argument</span>)<span class="question-mark">?</span>.<span class="ident">args</span>;
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">update_write_args</span> <span class="op">=</span> <span class="ident">WriteArgsParser::from</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>, <span class="ident">update_argument</span>)<span class="question-mark">?</span>.<span class="ident">args</span>;
+
+            <span class="ident">create_write_args</span>.<span class="ident">add_datetimes</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>);
+            <span class="ident">update_write_args</span>.<span class="ident">add_datetimes</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>);
+            <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">WriteQuery::native_upsert</span>(
+                <span class="ident">field</span>.<span class="ident">name</span>,
+                <span class="ident">model</span>,
+                <span class="ident">filter</span>.<span class="ident">into</span>(),
+                <span class="ident">create_write_args</span>,
+                <span class="ident">update_write_args</span>,
+                <span class="ident">read</span>,
+            ));
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+        }
+    }
+
     <span class="ident">graph</span>.<span class="ident">flag_transactional</span>();
 
-    <span class="kw">let</span> <span class="ident">where_arg</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">arguments</span>.<span class="ident">lookup</span>(<span class="ident">args::WHERE</span>).<span class="ident">unwrap</span>().<span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
-
-    <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">extract_unique_filter</span>(<span class="ident">where_arg</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">model_id</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_identifier</span>();
-
-    <span class="kw">let</span> <span class="ident">create_argument</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">arguments</span>.<span class="ident">lookup</span>(<span class="ident">args::CREATE</span>).<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">update_argument</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">arguments</span>.<span class="ident">lookup</span>(<span class="ident">args::UPDATE</span>).<span class="ident">unwrap</span>();
 
     <span class="kw">let</span> <span class="ident">read_parent_records</span> <span class="op">=</span> <span class="ident">utils::read_ids_infallible</span>(<span class="ident">model</span>.<span class="ident">clone</span>(), <span class="ident">model_id</span>.<span class="ident">clone</span>(), <span class="ident">filter</span>.<span class="ident">clone</span>());
     <span class="kw">let</span> <span class="ident">read_parent_records_node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">read_parent_records</span>);
 
-    <span class="kw">let</span> <span class="ident">create_node</span> <span class="op">=</span> <span class="ident">create::create_record_node</span>(
-        <span class="ident">graph</span>,
-        <span class="ident">connector_ctx</span>,
-        <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>),
-        <span class="ident">create_argument</span>.<span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
-    )<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">create_node</span> <span class="op">=</span> <span class="ident">create::create_record_node</span>(<span class="ident">graph</span>, <span class="ident">connector_ctx</span>, <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>), <span class="ident">create_argument</span>)<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">update_node</span> <span class="op">=</span> <span class="ident">update::update_record_node</span>(
-        <span class="ident">graph</span>,
-        <span class="ident">connector_ctx</span>,
-        <span class="ident">filter</span>,
-        <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>),
-        <span class="ident">update_argument</span>.<span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
-    )<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">update_node</span> <span class="op">=</span> <span class="ident">update::update_record_node</span>(<span class="ident">graph</span>, <span class="ident">connector_ctx</span>, <span class="ident">filter</span>, <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>), <span class="ident">update_argument</span>)<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">read_query</span> <span class="op">=</span> <span class="ident">read::find_unique</span>(<span class="ident">field</span>, <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>))<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">read_node_create</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">Query::Read</span>(<span class="ident">read_query</span>.<span class="ident">clone</span>()));
     <span class="kw">let</span> <span class="ident">read_node_update</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">Query::Read</span>(<span class="ident">read_query</span>));
 
@@ -355,6 +444,65 @@
     )<span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(())
+}
+
+<span class="comment">// This optimisation on our upserts allows us to use the `INSERT ... ON CONFLICT SET ..`</span>
+<span class="comment">// when the query matches the following conditions:</span>
+<span class="comment">// 1. The data connector supports it</span>
+<span class="comment">// 2. The create and update arguments do not have any nested queries</span>
+<span class="comment">// 3. There is only 1 unique field in the where clause</span>
+<span class="comment">// 4. The unique field defined in where clause has the same value as defined in the create arguments</span>
+<span class="kw">fn</span> <span class="ident">can_use_connector_native_upsert</span>(
+    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
+    <span class="ident">where_field</span>: <span class="kw-2">&amp;</span><span class="ident">ParsedInputMap</span>,
+    <span class="ident">create_argument</span>: <span class="kw-2">&amp;</span><span class="ident">ParsedInputMap</span>,
+    <span class="ident">update_argument</span>: <span class="kw-2">&amp;</span><span class="ident">ParsedInputMap</span>,
+    <span class="ident">connector_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span>,
+) -&gt; <span class="ident">bool</span> {
+    <span class="kw">let</span> <span class="ident">has_nested_create</span> <span class="op">=</span> <span class="ident">create_argument</span>
+        .<span class="ident">iter</span>()
+        .<span class="ident">any</span>(<span class="op">|</span>(<span class="ident">field_name</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">find_from_relation_fields</span>(<span class="kw-2">&amp;</span><span class="ident">field_name</span>).<span class="ident">is_ok</span>());
+
+    <span class="kw">let</span> <span class="ident">has_nested_update</span> <span class="op">=</span> <span class="ident">update_argument</span>
+        .<span class="ident">iter</span>()
+        .<span class="ident">any</span>(<span class="op">|</span>(<span class="ident">field_name</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">find_from_relation_fields</span>(<span class="kw-2">&amp;</span><span class="ident">field_name</span>).<span class="ident">is_ok</span>());
+
+    <span class="kw">let</span> <span class="ident">empty_update</span> <span class="op">=</span> <span class="ident">update_argument</span>.<span class="ident">iter</span>().<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>;
+
+    <span class="kw">let</span> <span class="ident">has_one_unique</span> <span class="op">=</span> <span class="ident">where_field</span>
+        .<span class="ident">iter</span>()
+        .<span class="ident">filter</span>(<span class="op">|</span>(<span class="ident">field_name</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">is_unique_field</span>(<span class="ident">field_name</span>, <span class="ident">model</span>))
+        .<span class="ident">count</span>()
+        <span class="op">==</span> <span class="number">1</span>;
+
+    <span class="kw">let</span> <span class="ident">where_values_same_as_create</span> <span class="op">=</span> <span class="ident">where_field</span>
+        .<span class="ident">iter</span>()
+        .<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">field_name</span>, <span class="ident">input</span>)<span class="op">|</span> <span class="ident">where_and_create_equal</span>(<span class="kw-2">&amp;</span><span class="ident">field_name</span>, <span class="kw-2">&amp;</span><span class="ident">input</span>, <span class="kw-2">&amp;</span><span class="ident">create_argument</span>));
+
+    <span class="ident">connector_ctx</span>.<span class="ident">can_native_upsert</span>()
+        <span class="op">&amp;&amp;</span> <span class="ident">has_one_unique</span>
+        <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">has_nested_create</span>
+        <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">has_nested_update</span>
+        <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">empty_update</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">where_values_same_as_create</span>
+}
+
+<span class="kw">fn</span> <span class="ident">is_unique_field</span>(<span class="ident">field_name</span>: <span class="kw-2">&amp;</span><span class="ident">String</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">match</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">find_from_scalar</span>(<span class="kw-2">&amp;</span><span class="ident">field_name</span>) {
+        <span class="prelude-val">Ok</span>(<span class="ident">field</span>) =&gt; <span class="ident">field</span>.<span class="ident">unique</span>(),
+        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="ident">resolve_compound_field</span>(<span class="ident">field_name</span>, <span class="ident">model</span>).<span class="ident">is_some</span>(),
+    }
+}
+
+<span class="doccomment">/// Make sure the unique fields defined in the where clause have the same values</span>
+<span class="doccomment">/// as in the create of the upsert.</span>
+<span class="kw">fn</span> <span class="ident">where_and_create_equal</span>(<span class="ident">field_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">where_value</span>: <span class="kw-2">&amp;</span><span class="ident">ParsedInputValue</span>, <span class="ident">create_map</span>: <span class="kw-2">&amp;</span><span class="ident">ParsedInputMap</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">match</span> <span class="ident">where_value</span> {
+        <span class="ident">ParsedInputValue::Map</span>(<span class="ident">inner_map</span>) =&gt; <span class="ident">inner_map</span>
+            .<span class="ident">iter</span>()
+            .<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">inner_field</span>, <span class="ident">inner_value</span>)<span class="op">|</span> <span class="ident">where_and_create_equal</span>(<span class="ident">inner_field</span>, <span class="ident">inner_value</span>, <span class="ident">create_map</span>)),
+        <span class="kw">_</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">where_value</span>) <span class="op">==</span> <span class="ident">create_map</span>.<span class="ident">get</span>(<span class="ident">field_name</span>),
+    }
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>

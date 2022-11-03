@@ -642,6 +642,7 @@
 <span id="642">642</span>
 <span id="643">643</span>
 <span id="644">644</span>
+<span id="645">645</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">datasource</span>;
 <span class="kw">mod</span> <span class="ident">native_types</span>;
 <span class="kw">mod</span> <span class="ident">validations</span>;
@@ -702,6 +703,7 @@
     <span class="ident">ConnectorCapability::SupportsTxIsolationReadCommitted</span>,
     <span class="ident">ConnectorCapability::SupportsTxIsolationRepeatableRead</span>,
     <span class="ident">ConnectorCapability::SupportsTxIsolationSerializable</span>,
+    <span class="ident">ConnectorCapability::NativeUpsert</span>,
 ];
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PostgresDatamodelConnector</span>;
