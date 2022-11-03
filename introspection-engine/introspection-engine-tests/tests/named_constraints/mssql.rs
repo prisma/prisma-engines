@@ -10,14 +10,14 @@ async fn introspecting_custom_fk_names_works(api: &TestApi) -> TestResult {
         .execute(move |migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("User_pkey", types::primary_constraint(["id"]));
             });
 
             migration.create_table("Post", move |t| {
                 t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("Post_pkey", types::primary_constraint(["id"]));
                 t.add_column("user_id", types::integer().nullable(false));
-                t.add_index("Post_user_id_idx", types::index(&["user_id"]));
+                t.add_index("Post_user_id_idx", types::index(["user_id"]));
                 t.add_constraint(
                     "CustomFKName",
                     types::foreign_constraint(&["user_id"], "User", &["id"], None, None),
@@ -52,14 +52,14 @@ async fn introspecting_default_fk_names_works(api: &TestApi) -> TestResult {
         .execute(move |migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("User_pkey", types::primary_constraint(["id"]));
             });
 
             migration.create_table("Post", move |t| {
                 t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("Post_pkey", types::primary_constraint(["id"]));
                 t.add_column("user_id", types::integer().nullable(false));
-                t.add_index("Post_user_id_idx", types::index(&["user_id"]));
+                t.add_index("Post_user_id_idx", types::index(["user_id"]));
                 t.add_constraint(
                     "Post_user_id_fkey",
                     types::foreign_constraint(&["user_id"], "User", &["id"], None, None),

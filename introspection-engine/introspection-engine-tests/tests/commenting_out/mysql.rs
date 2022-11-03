@@ -37,7 +37,7 @@ async fn a_table_without_uniques_should_ignore(api: &TestApi) -> TestResult {
             migration.create_table("Post", |t| {
                 t.add_column("id", types::integer());
                 t.add_column("user_id", types::integer().nullable(false));
-                t.add_index("Post_user_id_idx", types::index(&["user_id"]));
+                t.add_index("Post_user_id_idx", types::index(["user_id"]));
 
                 t.inject_custom(
                     "CONSTRAINT user_id FOREIGN KEY (user_id) REFERENCES `User`(id) ON DELETE RESTRICT ON UPDATE CASCADE",

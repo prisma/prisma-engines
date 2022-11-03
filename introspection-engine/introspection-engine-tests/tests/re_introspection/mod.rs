@@ -69,12 +69,12 @@ async fn manually_overwritten_mapped_field_name(api: &TestApi) -> TestResult {
                 t.add_column("id", types::integer().increments(true));
                 t.add_column("_test", types::integer());
 
-                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("User_pkey", types::primary_constraint(["id"]));
             });
 
             migration.create_table("Unrelated", |t| {
                 t.add_column("id", types::integer().increments(true));
-                t.add_constraint("Unrelated_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(["id"]));
             });
         })
         .await?;
@@ -261,7 +261,7 @@ async fn mapped_field_name(api: &TestApi) -> TestResult {
 
                 t.add_index("test2", types::index(vec!["index"]));
 
-                t.add_constraint("User_pkey", types::primary_constraint(&["id_1", "id_2"]));
+                t.add_constraint("User_pkey", types::primary_constraint(["id_1", "id_2"]));
             });
 
             migration.create_table("Unrelated", |t| {
@@ -1570,7 +1570,7 @@ async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestAp
         .execute(|migration| {
             migration.create_table("User", move |t| {
                 t.add_column("id", types::integer().increments(true));
-                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("User_pkey", types::primary_constraint(["id"]));
             });
 
             migration.create_table("_FollowRelation", |t| {
@@ -1613,18 +1613,18 @@ async fn re_introspecting_custom_compound_unique_names(api: &TestApi) -> TestRes
         .execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("User_pkey", types::primary_constraint(["id"]));
                 t.add_column("first", types::integer());
                 t.add_column("last", types::integer());
                 t.add_index(
                     "User.something@invalid-and/weird",
-                    types::index(&["first", "last"]).unique(true),
+                    types::index(["first", "last"]).unique(true),
                 );
             });
 
             migration.create_table("Unrelated", |t| {
                 t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("Unrelated_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(["id"]));
             });
         })
         .await?;
@@ -1674,15 +1674,15 @@ async fn re_introspecting_custom_compound_unique_upgrade(api: &TestApi) -> TestR
         .execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("User_pkey", types::primary_constraint(["id"]));
                 t.add_column("first", types::integer());
                 t.add_column("last", types::integer());
-                t.add_index("compound", types::index(&["first", "last"]).unique(true));
+                t.add_index("compound", types::index(["first", "last"]).unique(true));
             });
 
             migration.create_table("Unrelated", |t| {
                 t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("Unrelated_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(["id"]));
             });
         })
         .await?;
@@ -1735,19 +1735,19 @@ async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult 
                 t.add_column("last", types::integer());
                 t.add_constraint(
                     "User.something@invalid-and/weird",
-                    types::primary_constraint(&["first", "last"]),
+                    types::primary_constraint(["first", "last"]),
                 );
             });
 
             migration.create_table("User2", |t| {
                 t.add_column("first", types::integer());
                 t.add_column("last", types::integer());
-                t.add_constraint("User2_pkey", types::primary_constraint(&["first", "last"]));
+                t.add_constraint("User2_pkey", types::primary_constraint(["first", "last"]));
             });
 
             migration.create_table("Unrelated", |t| {
                 t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("Unrelated_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(["id"]));
             });
         })
         .await?;

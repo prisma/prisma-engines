@@ -598,7 +598,7 @@ fn render_column_type_postgres(col: ColumnWalker<'_>) -> Cow<'static, str> {
     };
 
     if t.arity.is_list() {
-        format!("{}[]", tpe.to_owned()).into()
+        format!("{tpe}[]").into()
     } else {
         tpe
     }
@@ -639,7 +639,7 @@ fn render_column_type_cockroachdb(col: ColumnWalker<'_>) -> Cow<'static, str> {
     };
 
     if t.arity.is_list() {
-        format!("{}[]", tpe.to_owned()).into()
+        format!("{tpe}[]").into()
     } else {
         tpe
     }

@@ -98,7 +98,7 @@ fn namespaces_and_preview_features_from_diff_targets(
             DiffTarget::Migrations(_) | DiffTarget::Empty | DiffTarget::Url(_) => (),
             DiffTarget::SchemaDatasource(SchemaContainer { schema })
             | DiffTarget::SchemaDatamodel(SchemaContainer { schema }) => {
-                let schema_str: String = std::fs::read_to_string(&schema).map_err(|err| {
+                let schema_str: String = std::fs::read_to_string(schema).map_err(|err| {
                     ConnectorError::from_source_with_context(
                         err,
                         format!("Error trying to read Prisma schema file at `{}`.", schema).into_boxed_str(),

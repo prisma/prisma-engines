@@ -432,12 +432,12 @@ async fn not_automatically_remapping_invalid_compound_unique_key_names(api: &Tes
         .execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("User_pkey", types::primary_constraint(["id"]));
                 t.add_column("first", types::integer());
                 t.add_column("last", types::integer());
                 t.add_index(
                     "User.something@invalid-and/weird",
-                    types::index(&["first", "last"]).unique(true),
+                    types::index(["first", "last"]).unique(true),
                 );
             });
         })
@@ -467,7 +467,7 @@ async fn not_automatically_remapping_invalid_compound_primary_key_names(api: &Te
                 t.add_column("last", types::integer());
                 t.add_constraint(
                     "User.something@invalid-and/weird",
-                    types::primary_constraint(&["first", "last"]).unique(true),
+                    types::primary_constraint(["first", "last"]).unique(true),
                 );
             });
         })

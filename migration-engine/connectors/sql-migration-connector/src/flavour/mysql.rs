@@ -443,7 +443,7 @@ where
     C: (FnOnce(&'a mut Params, BitFlags<Circumstances>, &'a mut Connection) -> F) + Send + 'a,
 {
     static MYSQL_SYSTEM_DATABASES: Lazy<regex::RegexSet> = Lazy::new(|| {
-        RegexSet::new(&[
+        RegexSet::new([
             "(?i)^mysql$",
             "(?i)^information_schema$",
             "(?i)^performance_schema$",

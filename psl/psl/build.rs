@@ -78,5 +78,5 @@ fn test_name(schema_file_path: &str) -> String {
     schema_file_path
         .trim_start_matches('/')
         .trim_end_matches(".prisma")
-        .replace(&['/', '\\'], "_")
+        .replace(['/', '\\'], "_")
 }

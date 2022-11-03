@@ -241,8 +241,8 @@ mod raw_mongo {
             (q, o) => {
                 format!(
                     r#"query {{ findTestModelRaw({} {}) }}"#,
-                    q.unwrap_or_else(|| "".to_string()),
-                    o.unwrap_or_else(|| "".to_string())
+                    q.unwrap_or_default(),
+                    o.unwrap_or_default()
                 )
             }
         }
@@ -262,8 +262,8 @@ mod raw_mongo {
             (p, o) => {
                 format!(
                     r#"query {{ aggregateTestModelRaw({} {}) }}"#,
-                    p.unwrap_or_else(|| "".to_string()),
-                    o.unwrap_or_else(|| "".to_string())
+                    p.unwrap_or_default(),
+                    o.unwrap_or_default()
                 )
             }
         }
