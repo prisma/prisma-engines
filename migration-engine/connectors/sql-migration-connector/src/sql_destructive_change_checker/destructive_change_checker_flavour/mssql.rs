@@ -3,7 +3,9 @@ use crate::{
     flavour::{MssqlFlavour, SqlFlavour},
     pair::Pair,
     sql_destructive_change_checker::{
-        destructive_check_plan::DestructiveCheckPlan, unexecutable_step_check::UnexecutableStepCheck,
+        check::{Column, Table},
+        destructive_check_plan::DestructiveCheckPlan,
+        unexecutable_step_check::UnexecutableStepCheck,
         warning_check::SqlMigrationWarningCheck,
     },
     sql_migration::{AlterColumn, ColumnTypeChange},
@@ -51,6 +53,7 @@ impl DestructiveChangeCheckerFlavour for MssqlFlavour {
                 plan.push_warning(
                     SqlMigrationWarningCheck::RiskyCast {
                         table: columns.previous.table().name().to_owned(),
+                        namespace: None,
                         column: columns.previous.name().to_owned(),
                         previous_type,
                         next_type,
@@ -62,6 +65,7 @@ impl DestructiveChangeCheckerFlavour for MssqlFlavour {
                 plan.push_warning(
                     SqlMigrationWarningCheck::NotCastable {
                         table: columns.previous.table().name().to_owned(),
+                        namespace: None,
                         column: columns.previous.name().to_owned(),
                         previous_type: format!("{:?}", columns.previous.column_type_family()),
                         next_type: format!("{:?}", columns.next.column_type_family()),
@@ -105,33 +109,33 @@ impl DestructiveChangeCheckerFlavour for MssqlFlavour {
                 SqlMigrationWarningCheck::DropAndRecreateColumn {
                     column: columns.previous.name().to_owned(),
                     table: columns.previous.table().name().to_owned(),
+                    namespace: None,
                 },
                 step_index,
             )
         }
     }
 
-    fn count_rows_in_table<'a>(&'a mut self, table_name: &'a str) -> BoxFuture<'a, ConnectorResult<i64>> {
+    fn count_rows_in_table<'a>(&'a mut self, table: &'a Table) -> BoxFuture<'a, ConnectorResult<i64>> {
         Box::pin(async move {
             let query = {
+                // TODO(MultiSchema): replace this when implementing MSSQL.
                 let schema_name = self.schema_name();
-                format!("SELECT COUNT(*) FROM [{}].[{}]", schema_name, table_name)
+                format!("SELECT COUNT(*) FROM [{}].[{}]", schema_name, table.table)
             };
             let result_set = self.query_raw(&query, &[]).await?;
-            super::extract_table_rows_count(table_name, result_set)
+            super::extract_table_rows_count(table, result_set)
         })
     }
 
-    fn count_values_in_column<'a>(
-        &'a mut self,
-        (table, column): (&'a str, &'a str),
-    ) -> BoxFuture<'a, ConnectorResult<i64>> {
+    fn count_values_in_column<'a>(&'a mut self, column: &'a Column) -> BoxFuture<'a, ConnectorResult<i64>> {
         Box::pin(async move {
             let query = {
+                // TODO(MultiSchema): replace this when implementing MSSQL.
                 let schema_name = self.schema_name();
                 format!(
                     "SELECT COUNT(*) FROM [{}].[{}] WHERE [{}] IS NOT NULL",
-                    schema_name, table, column
+                    schema_name, column.table, column.column
                 )
             };
             let result_set = self.query_raw(&query, &[]).await?;

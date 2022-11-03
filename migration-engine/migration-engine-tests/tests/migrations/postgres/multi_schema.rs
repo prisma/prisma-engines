@@ -133,7 +133,7 @@ fn multi_schema_add_table(api: TestApi) {
     tags(Postgres),
     exclude(CockroachDb),
     preview_features("multiSchema"),
-    namespaces("one", "two"),
+    namespaces("one", "two")
 )]
 fn multi_schema_remove_table(api: TestApi) {
     let base = indoc! {r#"

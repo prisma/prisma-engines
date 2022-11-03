@@ -1,4 +1,7 @@
-use super::{check::Check, database_inspection_results::DatabaseInspectionResults};
+use super::{
+    check::{Check, Column, Table},
+    database_inspection_results::DatabaseInspectionResults,
+};
 
 #[derive(Debug)]
 pub(crate) enum UnexecutableStepCheck {
@@ -10,20 +13,25 @@ pub(crate) enum UnexecutableStepCheck {
 }
 
 impl Check for UnexecutableStepCheck {
-    fn needed_table_row_count(&self) -> Option<&str> {
+    fn needed_table_row_count(&self) -> Option<Table> {
         match self {
             UnexecutableStepCheck::AddedRequiredFieldToTableWithPrismaLevelDefault { table, column: _ }
             | UnexecutableStepCheck::MadeOptionalFieldRequired { table, column: _ }
             | UnexecutableStepCheck::MadeScalarFieldIntoArrayField { table, column: _ }
             | UnexecutableStepCheck::AddedRequiredFieldToTable { table, column: _ }
-            | UnexecutableStepCheck::DropAndRecreateRequiredColumn { table, column: _ } => Some(table),
+            | UnexecutableStepCheck::DropAndRecreateRequiredColumn { table, column: _ } => {
+                Some(Table::new(table.clone(), None))
+            } // TODO(MultiSchema): test this is fine
         }
     }
 
-    fn needed_column_value_count(&self) -> Option<(&str, &str)> {
+    fn needed_column_value_count(&self) -> Option<Column> {
         match self {
             UnexecutableStepCheck::MadeOptionalFieldRequired { table, column }
-            | UnexecutableStepCheck::MadeScalarFieldIntoArrayField { table, column } => Some((table, column)),
+            | UnexecutableStepCheck::MadeScalarFieldIntoArrayField { table, column } => {
+                Some(Column::new(table.clone(), None, column.clone()))
+            }
+            // TODO(MultiSchema): test this is fine
             UnexecutableStepCheck::AddedRequiredFieldToTable { .. }
             | UnexecutableStepCheck::AddedRequiredFieldToTableWithPrismaLevelDefault { .. }
             | UnexecutableStepCheck::DropAndRecreateRequiredColumn { .. } => None,
@@ -42,7 +50,8 @@ impl Check for UnexecutableStepCheck {
                     )
                 };
 
-                let message = match database_checks.get_row_count(table) {
+                // TODO(MultiSchema): test this is fine
+                let message = match database_checks.get_row_count(&Table::new(table.clone(), None)) {
                     Some(0) => return None, // Adding a required column is possible if there is no data
                     Some(row_count) => message(format_args!(
                         "There are {row_count} rows in this table, it is not possible to execute this step.",
@@ -63,7 +72,8 @@ impl Check for UnexecutableStepCheck {
                     )
                 };
 
-                let message = match database_checks.get_row_count(table) {
+                // TODO(MultiSchema): test this is fine
+                let message = match database_checks.get_row_count(&Table::new(table.clone(), None)) {
                     Some(0) => return None, // Adding a required column is possible if there is no data
                     Some(row_count) => message(format_args!(
                         "There are {row_count} rows in this table, it is not possible to execute this step.",
@@ -75,7 +85,8 @@ impl Check for UnexecutableStepCheck {
                 Some(message)
             }
             UnexecutableStepCheck::MadeOptionalFieldRequired { table, column } => {
-                match database_checks.get_row_and_non_null_value_count(table, column) {
+                // TODO(MultiSchema): test this is fine
+                match database_checks.get_row_and_non_null_value_count(&Column::new(table.clone(), None, column.clone())) {
                     (Some(0), _) => None,
                     (Some(row_count), Some(value_count)) => {
                         let null_value_count = row_count - value_count;
@@ -103,7 +114,12 @@ impl Check for UnexecutableStepCheck {
                     format!("Changed the column `{column}` on the `{table}` table from a scalar field to a list field. {details}", column = column, table = table, details = details)
                 };
 
-                match database_checks.get_row_and_non_null_value_count(table, column) {
+                // TODO(MultiSchema): test this is fine
+                match database_checks.get_row_and_non_null_value_count(&Column::new(
+                    table.clone(),
+                    None,
+                    column.clone(),
+                )) {
                     (Some(0), _) => None,
                     (_, Some(0)) => None,
                     (_, Some(value_count)) => Some(message(format_args!(
@@ -116,7 +132,8 @@ impl Check for UnexecutableStepCheck {
                 }
             }
             UnexecutableStepCheck::DropAndRecreateRequiredColumn { table, column } => {
-                match database_checks.get_row_count(table) {
+                // TODO(MultiSchema): test this is fine
+                match database_checks.get_row_count(&Table::new(table.clone(), None)) {
                     None => Some(format!("Changed the type of `{column}` on the `{table}` table. No cast exists, the column would be dropped and recreated, which cannot be done if there is data, since the column is required.", column = column, table = table)),
                     Some(0) => None,
                     Some(_) => Some(format!("Changed the type of `{column}` on the `{table}` table. No cast exists, the column would be dropped and recreated, which cannot be done since the column is required and there is data in the table.", column = column, table = table)),
