@@ -23,8 +23,6 @@ async fn introspect_set_default_should_fail(api: &TestApi) -> TestResult {
 
     api.raw_cmd(setup).await;
 
-    // TODO: this is currently succeeding, but should fail instead.
-    // That is, unless
     let expected_schema = expect![[r#"
         generator client {
           provider = "prisma-client-js"
@@ -53,16 +51,16 @@ async fn introspect_set_default_should_fail(api: &TestApi) -> TestResult {
     let validation = psl::parse_schema(expected_schema.data());
 
     let expected_validation = expect![[r#"
-        [1;91merror[0m: [1mError validating: Invalid referential action: `SetDefault`. Allowed values: (`Cascade`, `Restrict`, `NoAction`, `SetNull`). `SetDefault` is invalid for MySQL when using `relationMode = \"foreignKeys\"`, as MySQL does not support the
-        `SET DEFAULT` referential action. Learn more at https://github.com/prisma/prisma/issues/11498
+        [1;91merror[0m: [1mError validating: Invalid referential action: `SetDefault`. Allowed values: (`Cascade`, `Restrict`, `NoAction`, `SetNull`). `SetDefault` is invalid for MySQL when using `relationMode = \"foreignKeys\"`, as MySQL does not support the `SET DEFAULT` referential action.
+        Learn more at https://github.com/prisma/prisma/issues/11498
         [0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m          userId   Int?      @default(3)
         [1;94m14 | [0m          SomeUser SomeUser? @relation(fields: [userId], references: [id], [1;91monDelete: SetDefault[0m, onUpdate: SetDefault)
         [1;94m   | [0m
-        [1;91merror[0m: [1mError validating: Invalid referential action: `SetDefault`. Allowed values: (`Cascade`, `Restrict`, `NoAction`, `SetNull`). `SetDefault` is invalid for MySQL when using `relationMode = \"foreignKeys\"`, as MySQL does not support the
-        `SET DEFAULT` referential action. Learn more at https://github.com/prisma/prisma/issues/11498
+        [1;91merror[0m: [1mError validating: Invalid referential action: `SetDefault`. Allowed values: (`Cascade`, `Restrict`, `NoAction`, `SetNull`). `SetDefault` is invalid for MySQL when using `relationMode = \"foreignKeys\"`, as MySQL does not support the `SET DEFAULT` referential action.
+        Learn more at https://github.com/prisma/prisma/issues/11498
         [0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m

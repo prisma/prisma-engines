@@ -155,8 +155,8 @@ pub(super) fn referential_actions(field: RelationFieldWalker<'_>, ctx: &mut Cont
         let additional_info = match (action, connector.provider_name()) {
             (ReferentialAction::SetDefault, "mysql") => Some(formatdoc! {
                 r#"
-                    . `{set_default}` is invalid for {provider} when using `relationMode = \"foreignKeys\"`, as {provider} does not support the
-                    `SET DEFAULT` referential action. Learn more at https://github.com/prisma/prisma/issues/11498
+                    . `{set_default}` is invalid for {provider} when using `relationMode = \"foreignKeys\"`, as {provider} does not support the `SET DEFAULT` referential action.
+                    Learn more at https://github.com/prisma/prisma/issues/11498
                     "#,
                 set_default = ReferentialAction::SetDefault.as_str(),
                 provider = connector.name(),

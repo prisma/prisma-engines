@@ -554,16 +554,16 @@ fn set_default_should_not_work_on_mysql() {
     "#};
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError validating: Invalid referential action: `SetDefault`. Allowed values: (`Cascade`, `Restrict`, `NoAction`, `SetNull`). `SetDefault` is invalid for MySQL when using `relationMode = \"foreignKeys\"`, as MySQL does not support the
-        `SET DEFAULT` referential action. Learn more at https://github.com/prisma/prisma/issues/11498
+        [1;91merror[0m: [1mError validating: Invalid referential action: `SetDefault`. Allowed values: (`Cascade`, `Restrict`, `NoAction`, `SetNull`). `SetDefault` is invalid for MySQL when using `relationMode = \"foreignKeys\"`, as MySQL does not support the `SET DEFAULT` referential action.
+        Learn more at https://github.com/prisma/prisma/issues/11498
         [0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m    aId Int? @default(3)
         [1;94m14 | [0m    a   A?   @relation(fields: [aId], references: [id], onUpdate: SetDefault, [1;91monDelete: SetDefault[0m)
         [1;94m   | [0m
-        [1;91merror[0m: [1mError validating: Invalid referential action: `SetDefault`. Allowed values: (`Cascade`, `Restrict`, `NoAction`, `SetNull`). `SetDefault` is invalid for MySQL when using `relationMode = \"foreignKeys\"`, as MySQL does not support the
-        `SET DEFAULT` referential action. Learn more at https://github.com/prisma/prisma/issues/11498
+        [1;91merror[0m: [1mError validating: Invalid referential action: `SetDefault`. Allowed values: (`Cascade`, `Restrict`, `NoAction`, `SetNull`). `SetDefault` is invalid for MySQL when using `relationMode = \"foreignKeys\"`, as MySQL does not support the `SET DEFAULT` referential action.
+        Learn more at https://github.com/prisma/prisma/issues/11498
         [0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
