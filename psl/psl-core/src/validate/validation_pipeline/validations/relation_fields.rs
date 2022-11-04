@@ -6,6 +6,7 @@ use crate::{
     validate::validation_pipeline::context::Context,
 };
 use enumflags2::BitFlags;
+use indoc::formatdoc;
 use itertools::Itertools;
 use parser_database::{
     walkers::{ModelWalker, RelationFieldWalker, RelationName},
@@ -151,8 +152,21 @@ pub(super) fn referential_actions(field: RelationFieldWalker<'_>, ctx: &mut Cont
     let msg_foreign_keys = |action: ReferentialAction| {
         let allowed_actions = connector.referential_actions();
 
+        let additional_info = match (action, connector.provider_name()) {
+            (ReferentialAction::SetDefault, "mysql") => Some(formatdoc! {
+                r#"
+                    . `{set_default}` is invalid for {provider} when using `relationMode = \"foreignKeys\"`, as {provider} does not support the
+                    `SET DEFAULT` referential action. Learn more at https://github.com/prisma/prisma/issues/11498
+                    "#,
+                set_default = ReferentialAction::SetDefault.as_str(),
+                provider = connector.name(),
+            }),
+            _ => None,
+        };
+        let additional_info = additional_info.unwrap_or_default();
+
         format!(
-            "Invalid referential action: `{}`. Allowed values: ({})",
+            "Invalid referential action: `{}`. Allowed values: ({}){additional_info}",
             action.as_str(),
             fmt_allowed_actions(allowed_actions),
         )

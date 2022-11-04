@@ -90,7 +90,7 @@ impl Connector for MySqlDatamodelConnector {
     fn referential_actions(&self) -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
-        Restrict | Cascade | SetNull | NoAction | SetDefault
+        Restrict | Cascade | SetNull | NoAction
     }
 
     fn scalar_type_for_native_type(&self, native_type: &NativeTypeInstance) -> ScalarType {

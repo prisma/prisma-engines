@@ -534,6 +534,48 @@ fn invalid_on_update_action() {
 }
 
 #[test]
+fn set_default_should_not_work_on_mysql() {
+    let dml = indoc! { r#"
+        datasource db {
+            provider = "mysql"
+            url = "mysql://"
+        }
+
+        model A {
+            id Int @id
+            bs B[]
+        }
+
+        model B {
+            id Int   @id
+            aId Int? @default(3)
+            a   A?   @relation(fields: [aId], references: [id], onUpdate: SetDefault, onDelete: SetDefault)
+        }
+    "#};
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating: Invalid referential action: `SetDefault`. Allowed values: (`Cascade`, `Restrict`, `NoAction`, `SetNull`). `SetDefault` is invalid for MySQL when using `relationMode = \"foreignKeys\"`, as MySQL does not support the
+        `SET DEFAULT` referential action. Learn more at https://github.com/prisma/prisma/issues/11498
+        [0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m    aId Int? @default(3)
+        [1;94m14 | [0m    a   A?   @relation(fields: [aId], references: [id], onUpdate: SetDefault, [1;91monDelete: SetDefault[0m)
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError validating: Invalid referential action: `SetDefault`. Allowed values: (`Cascade`, `Restrict`, `NoAction`, `SetNull`). `SetDefault` is invalid for MySQL when using `relationMode = \"foreignKeys\"`, as MySQL does not support the
+        `SET DEFAULT` referential action. Learn more at https://github.com/prisma/prisma/issues/11498
+        [0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m    aId Int? @default(3)
+        [1;94m14 | [0m    a   A?   @relation(fields: [aId], references: [id], [1;91monUpdate: SetDefault[0m, onDelete: SetDefault)
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&parse_unwrap_err(dml));
+}
+
+#[test]
 fn restrict_should_not_work_on_sql_server() {
     let dml = indoc! { r#"
         datasource db {
